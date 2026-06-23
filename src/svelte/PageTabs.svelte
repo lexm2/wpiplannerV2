@@ -26,3 +26,10 @@
   aria-label="Schedule view"
   onclick={() => onSwitch('schedule')}
 >Schedule</button>
+<button
+  id="degree-tab"
+  class="nav-tab"
+  class:active={page === 'degree'}
+  aria-label="Degree view"
+  onclick={() => onSwitch('degree')}
+>Degree</button>

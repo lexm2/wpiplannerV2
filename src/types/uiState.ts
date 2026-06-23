@@ -1,4 +1,4 @@
-export type PageId = 'planner' | 'schedule';
+export type PageId = 'planner' | 'schedule' | 'degree';
 export type ViewMode = 'list' | 'grid';
 export type WizardStep = 'lecture' | 'discussion' | 'lab';
 

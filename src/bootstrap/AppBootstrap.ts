@@ -15,6 +15,8 @@ import { TermBoundsService } from '../utils/termBounds'
 import { createDefaultFilters, SearchTextFilter } from '../core/filtering/filters'
 import { CourseColorService } from '../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator'
+import { DegreeImportService } from '../services/degree/degreeImportService'
+import { TransactionalStorageManager } from '../core/storage/TransactionalStorageManager'
 import { calendarEventProvider } from '../services/scheduling/calendarEventProvider'
 import { componentWizardService } from '../services/scheduling/componentWizardService'
 import { localEventService } from '../services/scheduling/localEventService'
@@ -48,6 +50,11 @@ export class AppBootstrap {
         const colorService = new CourseColorService(courseSelectionService);
         const autoScheduleOrchestrator = new AutoScheduleOrchestrator(courseSelectionService, filterService);
 
+        // Degree page: imports/persists the Workday Academic Progress export.
+        // Uses its own storage-manager handle (degree data lives in localStorage,
+        // independent of the schedule/IndexedDB collection).
+        const degreeImportService = new DegreeImportService(new TransactionalStorageManager());
+
         return {
             profileStateManager,
             storageService,
@@ -62,6 +69,7 @@ export class AppBootstrap {
             timestampManager,
             colorService,
             autoScheduleOrchestrator,
+            degreeImportService,
         };
     }
 
@@ -107,6 +115,9 @@ export class AppBootstrap {
 
         await courseDataService.loadCourseData();
         await timestampManager.loadServerTimestamp();
+
+        // Rehydrate a previously-imported degree record (no-op if none/invalid).
+        await services.degreeImportService.load();
     }
 
     static setupWindowUnloadHandler(): void {

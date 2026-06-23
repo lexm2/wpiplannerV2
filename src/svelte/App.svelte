@@ -33,6 +33,7 @@
   import WizardHost from './WizardHost.svelte';
   import AutoScheduleControls from './AutoScheduleControls.svelte';
   import ScheduleGrids from './schedule/ScheduleGrids.svelte';
+  import DegreePage from './degree/DegreePage.svelte';
 
   // The whole app shell is now declarative. main.ts mounts this once into #app
   // (and ModalLayer separately into #modal-root) instead of MainController's ~16
@@ -81,6 +82,10 @@
       // Close the wizard when switching back to the classes/planner page.
       componentWizardService.closeComponentWizard();
       services.uiStateManager.setPage('planner');
+    } else if (page === 'degree') {
+      // The wizard belongs to the planner/schedule flow; close it here too.
+      componentWizardService.closeComponentWizard();
+      services.uiStateManager.setPage('degree');
     } else {
       services.uiStateManager.setPage('schedule');
     }
@@ -231,4 +236,8 @@
       />
     </main>
   </div>
+</div>
+
+<div class="app-body degree-page" id="degree-page" style:display={currentPage === 'degree' ? 'block' : 'none'}>
+  <DegreePage degreeImportService={services.degreeImportService} />
 </div>

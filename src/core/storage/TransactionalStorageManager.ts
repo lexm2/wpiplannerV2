@@ -6,6 +6,7 @@ import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { setReplacer, setReviver } from '../../utils/jsonSerializer'
 import { ScheduleState } from '../../types/ScheduleState'
 import { ApplicationState } from '../../types/ApplicationState'
+import type { StudentRecord } from '../../types/degree'
 
 export interface StorageTransaction {
     id: string;
@@ -35,6 +36,7 @@ export class TransactionalStorageManager {
         SCHEDULES: 'wpi-planner-schedules',
         THEME: 'wpi-planner-theme',
         ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
+        DEGREE_RECORD: 'wpi-planner-degree-record',
         TRANSACTION_LOG: 'wpi-planner-transaction-log'
     };
 
@@ -233,6 +235,29 @@ export class TransactionalStorageManager {
                 error: `Failed to load active schedule ID: ${error}`
             };
         }
+    }
+
+    /** Persist the imported degree record (a small single blob) to localStorage. */
+    saveDegreeRecord(record: StudentRecord | null): TransactionResult {
+        return this.executeSyncTransaction(() => {
+            if (record) {
+                localStorage.setItem(
+                    TransactionalStorageManager.STORAGE_KEYS.DEGREE_RECORD,
+                    JSON.stringify(record, this.replacer)
+                );
+            } else {
+                localStorage.removeItem(TransactionalStorageManager.STORAGE_KEYS.DEGREE_RECORD);
+            }
+        });
+    }
+
+    /** Load the raw persisted degree record. Caller validates the schema. */
+    loadDegreeRecord(): { data: StudentRecord | null; valid: boolean; error?: string } {
+        return this.safeLoad<StudentRecord | null>(
+            TransactionalStorageManager.STORAGE_KEYS.DEGREE_RECORD,
+            null,
+            'degree record'
+        );
     }
 
     clearAllData(): TransactionResult {

@@ -15,6 +15,7 @@
 @import url('./styles/components/course-list.css');
 @import url('./styles/components/right-panel.css');
 @import url('./styles/components/schedule-page.css');
+@import url('./styles/components/degree-page.css');
 @import url('./styles/components/schedule-picker-modal.css');
 @import url('./styles/components/modal.css'); /* BaseModal framework - LocalEventModal migrated to local-event-modal.module.css */
 /* dual-range-slider.module.css - imported directly in svelte/filters/DualRangeSlider.svelte */

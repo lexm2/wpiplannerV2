@@ -11,6 +11,7 @@ import { UIStateManager } from '../services/ui/UIStateManager'
 import { TimestampManager } from '../ui/controllers/TimestampManager'
 import { CourseColorService } from '../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator'
+import { DegreeImportService } from '../services/degree/degreeImportService'
 import type { TutorialSetup } from '../services/tutorial/setupTutorial'
 
 export interface ServiceContainer {
@@ -28,4 +29,5 @@ export interface ServiceContainer {
     timestampManager: TimestampManager;
     colorService: CourseColorService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
+    degreeImportService: DegreeImportService;
 }

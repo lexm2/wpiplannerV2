@@ -1,0 +1,403 @@
+/* Degree page — imports the student's Workday Academic Progress export and
+   displays requirement completion. Single-column flow layout (the planner's
+   3-pane shell doesn't fit this view). */
+
+#degree-page.degree-page {
+  overflow-y: auto;
+}
+
+.degree-content {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+  width: 100%;
+  font-family: var(--font-family);
+  color: var(--color-text);
+}
+
+/* ---- Import / empty state ---- */
+.degree-import {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.degree-dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--effect-border-radius-large, 12px);
+  background: var(--color-surface);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--effect-transition);
+}
+
+.degree-dropzone:hover,
+.degree-dropzone:focus-visible,
+.degree-dropzone.drag-over {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+  outline: none;
+}
+
+.degree-dropzone-title {
+  margin: 0 0 0.5rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.degree-dropzone-hint {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+}
+
+.degree-dropzone-status {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-secondary);
+}
+
+.degree-dropzone-error {
+  margin: 1rem 0 0;
+  color: var(--color-danger);
+}
+
+.degree-file-input {
+  display: none;
+}
+
+.degree-import-help {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  padding: 1rem 1.25rem;
+}
+
+.degree-import-help h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.degree-import-help ol {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.degree-privacy-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* ---- Summary ---- */
+.degree-summary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius-large, 12px);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.degree-summary-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.degree-summary-title {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.degree-summary-sub {
+  margin: 0.15rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.degree-summary-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.degree-credit-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.degree-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.6rem 0.4rem;
+  background: var(--color-background-alt);
+  border-radius: var(--effect-border-radius);
+}
+
+.degree-stat-value {
+  font-size: 1.35rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.degree-stat-label {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Progress bars ---- */
+.degree-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.degree-progress-sm {
+  margin-top: 0.5rem;
+}
+
+.degree-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-background-alt);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.degree-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width var(--effect-transition);
+}
+
+.degree-progress-label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ---- Requirement list ---- */
+.degree-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.degree-filter-chip {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--effect-transition);
+}
+
+.degree-filter-chip:hover {
+  border-color: var(--color-primary);
+}
+
+.degree-filter-chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.degree-filter-count {
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.degree-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.degree-empty-list {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* ---- Requirement card ---- */
+.requirement-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  padding: 1rem 1.15rem;
+}
+
+.requirement-card.is-satisfied {
+  border-left: 3px solid var(--color-success);
+}
+
+.requirement-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.requirement-card-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.requirement-card-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.requirement-card-scope {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.requirement-card-remaining {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* status pills */
+.req-status {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.req-status-satisfied {
+  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  color: var(--color-success);
+}
+
+.req-status-in_progress {
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
+  color: var(--color-warning);
+}
+
+.req-status-not_satisfied {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  color: var(--color-danger);
+}
+
+/* applied courses — outlined grid tiles */
+.requirement-courses {
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.5rem;
+}
+
+.requirement-course {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 3.75rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-background-alt);
+  font-size: 0.85rem;
+}
+
+/* planned (in-progress) and transfer tiles get an accent left edge */
+.requirement-course.is-progress {
+  border-left: 3px solid var(--color-warning);
+}
+
+.requirement-course.is-transfer {
+  border-left: 3px solid var(--color-text-muted);
+}
+
+.requirement-course-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.requirement-course-code {
+  font-family: var(--font-family-mono);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.requirement-course-title {
+  color: var(--color-text-secondary);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.requirement-course-term {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+/* empty placeholder tile — a slot still needing a course */
+.requirement-course-empty {
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  background: transparent;
+}
+
+.requirement-course-empty-label {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.course-badge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--effect-border-radius);
+  white-space: nowrap;
+}
+
+.course-badge-transfer {
+  background: var(--color-background-alt);
+  color: var(--color-text-muted);
+}
+
+.course-badge-progress {
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-warning);
+}
+
+.course-badge-grade {
+  background: var(--color-background-alt);
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-mono);
+}
+
+@media (max-width: 560px) {
+  .degree-credit-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .requirement-courses {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
