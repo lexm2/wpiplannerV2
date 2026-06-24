@@ -12,7 +12,7 @@ import { TimestampManager } from '../ui/controllers/TimestampManager'
 import { rateMyProfessorService } from '../services/external/RateMyProfessorService'
 import { StorageWorkerManager } from '../workers/StorageWorkerManager'
 import { TermBoundsService } from '../utils/termBounds'
-import { createDefaultFilters, SearchTextFilter } from '../core/filtering/filters'
+import { createDefaultFilters, SearchTextFilter, DegreeBucketFilter } from '../core/filtering/filters'
 import { CourseColorService } from '../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator'
 import { DegreeImportService } from '../services/degree/degreeImportService'
@@ -100,6 +100,12 @@ export class AppBootstrap {
 
         const searchTextFilter = new SearchTextFilter();
         filterService.registerFilter(searchTextFilter);
+
+        // Backend-only: registered for the pipeline but intentionally has no
+        // FilterPanel component, so it never appears in the UI (same pattern as
+        // SearchTextFilter). Applied programmatically from the Degree page.
+        filterService.registerFilter(new DegreeBucketFilter());
+
         filterService.setConflictDetector();
     }
 

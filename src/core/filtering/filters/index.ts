@@ -12,6 +12,7 @@ export { SectionCodeFilter } from './SectionCodeFilter';
 export { PeriodTypeFilter } from './PeriodTypeFilter';
 export { AcademicYearFilter } from './AcademicYearFilter';
 export { GraduateLevelFilter } from './GraduateLevelFilter';
+export { DegreeBucketFilter } from './DegreeBucketFilter';
 
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { DepartmentFilter } from './DepartmentFilter';

@@ -6,6 +6,7 @@ import type { FilterService } from '../filtering/FilterService';
 import type { Requirement, StudentRecord } from '../../types/degree';
 import { matchPlannedCourses, type PlanMatchResult } from './planMatcher';
 import { inferRequirementDepartments, matchScheduleToRequirements } from './requirementMatching';
+import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
 import { courseListState } from '../../svelte/courseListState.svelte';
@@ -103,11 +104,26 @@ class DegreePlanService {
     browseForRequirement(req: Requirement): void {
         if (!this.filterService) return;
 
-        const depts = inferRequirementDepartments(req, appState.loadedDepartments);
-        if (depts.length) {
-            this.filterService.addFilter('department', { departments: depts });
-        } else {
+        // Prefer authoritative tracking-sheet rules (valid departments + excluded
+        // course codes) via the backend-only degreeBucket filter; fall back to the
+        // applied-course heuristic when the sheets carry no rule for this bucket.
+        const record = degreeState.record;
+        const classYear = record?.startYear != null ? record.startYear + 4 : null;
+        const bucketCriteria = record
+            ? getDegreeBucketCriteria(record.major, classYear, req.category, req.name)
+            : null;
+
+        if (bucketCriteria) {
+            this.filterService.addFilter('degreeBucket', bucketCriteria);
             this.filterService.removeFilter('department');
+        } else {
+            this.filterService.removeFilter('degreeBucket');
+            const depts = inferRequirementDepartments(req, appState.loadedDepartments);
+            if (depts.length) {
+                this.filterService.addFilter('department', { departments: depts });
+            } else {
+                this.filterService.removeFilter('department');
+            }
         }
 
         const year = appState.activeSchedule?.year ?? this.profileStateManager?.getDefaultAcademicYear();
