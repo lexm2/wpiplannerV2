@@ -33,6 +33,44 @@ test('imports an Academic Progress file and persists it across reload', async ({
     await expect(page.locator('.degree-dropzone')).toHaveCount(0);
 });
 
+test('hides umbrella (degree-wide) requirements until toggled', async ({ page }) => {
+    await page.goto('/');
+    await page.click('#degree-tab');
+    await page.setInputFiles('.degree-file-input', fixture);
+    await page.locator('.degree-summary-title').waitFor();
+
+    // "Total Credits" / "Residency" are hidden by default.
+    await expect(page.locator('.requirement-card-name', { hasText: 'Total Credits' })).toHaveCount(0);
+
+    // The toggle reveals them.
+    await page.locator('.degree-umbrella-toggle').click();
+    await expect(page.locator('.requirement-card-name', { hasText: 'Total Credits' })).toBeVisible();
+});
+
+test('status filters are multi-select and collapse to All when all chosen', async ({ page }) => {
+    await page.goto('/');
+    await page.click('#degree-tab');
+    await page.setInputFiles('.degree-file-input', fixture);
+    await page.locator('.degree-summary-title').waitFor();
+
+    const cards = page.locator('.requirement-card');
+    // Anchor the match: plain-string hasText is case-insensitive, so "Satisfied"
+    // would otherwise also match "Not satisfied".
+    const chip = (name: string) => page.locator('.degree-filter-chip', { hasText: new RegExp('^' + name) });
+
+    await expect(cards).toHaveCount(3); // All selected by default
+
+    await chip('Not satisfied').click();
+    await expect(cards).toHaveCount(1);
+
+    await chip('In progress').click(); // multi-select: both statuses shown
+    await expect(cards).toHaveCount(2);
+
+    await chip('Satisfied').click(); // all three → collapse to All
+    await expect(chip('All')).toHaveAttribute('aria-pressed', 'true');
+    await expect(cards).toHaveCount(3);
+});
+
 test('builds a schedule from the planned courses and swaps to it', async ({ page }) => {
     await page.goto('/');
     await page.click('#degree-tab');
@@ -64,6 +102,8 @@ test('overlays the current schedule onto requirements and browses from an empty 
 
     // Toggle the non-destructive overlay → schedule tiles appear on the cards.
     await page.locator('.degree-check-btn').click();
+    // The fixture's only schedule course sits under the Total Credits umbrella; reveal it.
+    await page.locator('.degree-umbrella-toggle').click();
     await expect(page.locator('.requirement-course.is-schedule').first()).toBeVisible();
 
     // Clicking an empty slot filters the courses page and navigates there.
@@ -84,6 +124,7 @@ test('clicking a course name opens its catalog entry on the classes page', async
     await expect(page.locator('#schedule-page')).toBeVisible();
     await page.click('#degree-tab');
     await page.locator('.degree-check-btn').click();
+    await page.locator('.degree-umbrella-toggle').click(); // schedule tile is under Total Credits
 
     // Clicking the code navigates to the classes page and highlights that course's entry.
     await page.locator('.requirement-course.is-schedule .requirement-course-link').first().click();

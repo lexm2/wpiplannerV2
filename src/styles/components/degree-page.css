@@ -231,6 +231,10 @@
   margin-bottom: 1rem;
 }
 
+.degree-umbrella-toggle {
+  margin-left: auto;
+}
+
 .degree-filter-chip {
   border: 1px solid var(--color-border);
   background: var(--color-surface);

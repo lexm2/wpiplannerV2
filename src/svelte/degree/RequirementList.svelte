@@ -1,18 +1,40 @@
 <script lang="ts">
-  import type { StudentRecord, RequirementStatus } from '../../types/degree';
+  import type { StudentRecord, RequirementStatus, RequirementCategory } from '../../types/degree';
   import RequirementCard from './RequirementCard.svelte';
 
   let { record }: { record: StudentRecord } = $props();
 
-  type Filter = 'all' | RequirementStatus;
-  let filter = $state<Filter>('all');
+  // Status filter is multi-select: pick any combination of statuses. An empty
+  // selection means "All"; selecting every status collapses back to All.
+  const STATUSES: { key: RequirementStatus; label: string }[] = [
+    { key: 'not_satisfied', label: 'Not satisfied' },
+    { key: 'in_progress', label: 'In progress' },
+    { key: 'satisfied', label: 'Satisfied' },
+  ];
+  let selected = $state<RequirementStatus[]>([]);
+  const allActive = $derived(selected.length === 0);
+
+  function toggleStatus(s: RequirementStatus): void {
+    let next = selected.includes(s) ? selected.filter(x => x !== s) : [...selected, s];
+    if (next.length === STATUSES.length) next = []; // all selected → collapse to All
+    selected = next;
+  }
+
+  // "Umbrella" requirements are degree-wide aggregates (total credits, residency)
+  // that accumulate every course rather than naming a specific bucket to fill, so
+  // they're hidden by default behind a toggle.
+  const UMBRELLA = new Set<RequirementCategory>(['total_credits', 'residency']);
+  let showUmbrella = $state(false);
+  const umbrellaCount = $derived(record.requirements.filter(r => UMBRELLA.has(r.category)).length);
 
   // Hide the synthetic "Unused Courses" bucket — it's always Not Satisfied and
-  // isn't a real requirement.
-  const visible = $derived(record.requirements.filter(r => r.category !== 'unused'));
+  // isn't a real requirement — plus umbrella requirements unless toggled on.
+  const visible = $derived(
+    record.requirements.filter(r => r.category !== 'unused' && (showUmbrella || !UMBRELLA.has(r.category)))
+  );
 
   const filtered = $derived(
-    filter === 'all' ? visible : visible.filter(r => r.status === filter)
+    allActive ? visible : visible.filter(r => selected.includes(r.status))
   );
 
   const counts = $derived({
@@ -21,27 +43,35 @@
     in_progress: visible.filter(r => r.status === 'in_progress').length,
     satisfied: visible.filter(r => r.status === 'satisfied').length,
   });
-
-  const filters: { key: Filter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'not_satisfied', label: 'Not satisfied' },
-    { key: 'in_progress', label: 'In progress' },
-    { key: 'satisfied', label: 'Satisfied' },
-  ];
 </script>
 
 <div class="degree-requirements">
-  <div class="degree-filter-row" role="tablist" aria-label="Filter requirements by status">
-    {#each filters as f}
+  <div class="degree-filter-row" role="group" aria-label="Filter requirements by status">
+    <button
+      type="button"
+      class="degree-filter-chip"
+      class:active={allActive}
+      aria-pressed={allActive}
+      onclick={() => (selected = [])}
+    >All <span class="degree-filter-count">{counts.all}</span></button>
+    {#each STATUSES as s}
       <button
         type="button"
         class="degree-filter-chip"
-        class:active={filter === f.key}
-        role="tab"
-        aria-selected={filter === f.key}
-        onclick={() => (filter = f.key)}
-      >{f.label} <span class="degree-filter-count">{counts[f.key]}</span></button>
+        class:active={selected.includes(s.key)}
+        aria-pressed={selected.includes(s.key)}
+        onclick={() => toggleStatus(s.key)}
+      >{s.label} <span class="degree-filter-count">{counts[s.key]}</span></button>
     {/each}
+    {#if umbrellaCount > 0}
+      <button
+        type="button"
+        class="degree-filter-chip degree-umbrella-toggle"
+        class:active={showUmbrella}
+        aria-pressed={showUmbrella}
+        onclick={() => (showUmbrella = !showUmbrella)}
+      >{showUmbrella ? 'Hide' : 'Show'} degree-wide <span class="degree-filter-count">{umbrellaCount}</span></button>
+    {/if}
   </div>
 
   {#if filtered.length === 0}
