@@ -34,6 +34,11 @@
   import AutoScheduleControls from './AutoScheduleControls.svelte';
   import ScheduleGrids from './schedule/ScheduleGrids.svelte';
   import DegreePage from './degree/DegreePage.svelte';
+  import ResizeHandle from './ResizeHandle.svelte';
+  import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
+
+  // Restore any saved sidebar widths before first paint to avoid a layout flash.
+  applyStoredPanelWidths();
 
   // The whole app shell is now declarative. main.ts mounts this once into #app
   // (and ModalLayer separately into #modal-root) instead of MainController's ~16
@@ -162,6 +167,7 @@
     <div class="department-categories" id="department-list">
       <DepartmentSidebar filterService={services.filterService} />
     </div>
+    <ResizeHandle config={PANEL_WIDTHS.sidebar} edge="right" label="Resize department sidebar" />
   </aside>
 
   <main class="main-content">
@@ -188,6 +194,7 @@
   </main>
 
   <aside class="right-panel" aria-label="Course details and selection">
+    <ResizeHandle config={PANEL_WIDTHS.rightPanel} edge="left" label="Resize course details panel" />
     <section class="selected-courses-section">
       <SelectedCoursesPanel courseSelectionService={services.courseSelectionService} />
     </section>
@@ -225,6 +232,7 @@
           onOpenAutoSchedule={() => autoScheduleService.openAutoSchedule()}
         />
       </div>
+      <ResizeHandle config={PANEL_WIDTHS.scheduleSidebar} edge="right" label="Resize schedule sidebar" />
     </aside>
 
     <main class="schedule-main">
