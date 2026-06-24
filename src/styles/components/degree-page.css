@@ -488,6 +488,7 @@
 .requirement-course-empty {
   align-items: center;
   justify-content: center;
+  gap: 0;
   border-style: dashed;
   background: transparent;
   cursor: pointer;
@@ -505,20 +506,31 @@
 }
 
 .requirement-course-empty-label {
-  font-size: 0.78rem;
+  font-size: 1.05rem;
   color: var(--color-text-muted);
+  transition: var(--effect-transition);
+}
+
+.requirement-course-empty:hover .requirement-course-empty-label,
+.requirement-course-empty:focus-visible .requirement-course-empty-label {
+  font-size: 0.78rem;
 }
 
 .requirement-course-empty-hint {
   font-size: 0.72rem;
   color: var(--color-primary);
   opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
   transition: var(--effect-transition);
 }
 
 .requirement-course-empty:hover .requirement-course-empty-hint,
 .requirement-course-empty:focus-visible .requirement-course-empty-hint {
   opacity: 1;
+  max-height: 1.1rem;
+  margin-top: 0.1rem;
 }
 
 .course-badge {
