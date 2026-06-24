@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { matchPlannedCourses, academicYearForPeriod, candidateCodes } from '../../src/services/degree/planMatcher';
+import { matchPlannedCourses } from '../../src/services/degree/planMatcher';
+import { academicYearForPeriod } from '../../src/services/degree/catalogLookup';
 import { AcademicTerm } from '../../src/types/schedule';
 import type { Course, Department, Section, LectureGroup } from '../../src/types/types';
 import type { AppliedCourse, StudentRecord } from '../../src/types/degree';
@@ -86,13 +87,6 @@ describe('academicYearForPeriod', () => {
     });
     it('null period -> null', () => {
         expect(academicYearForPeriod(null)).toBeNull();
-    });
-});
-
-describe('candidateCodes', () => {
-    it('splits cross-listed codes', () => {
-        const codes = candidateCodes(planned('CS 2022/ MA 2201', 2026, 'Fall', 'A'));
-        expect(codes).toEqual([{ dept: 'CS', number: '2022' }, { dept: 'MA', number: '2201' }]);
     });
 });
 

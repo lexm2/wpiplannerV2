@@ -2,6 +2,8 @@
   import type { StudentRecord } from '../../types/degree';
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
+  import { degreeState } from './degreeState.svelte';
+  import { appState } from '../../core/state/appState.svelte';
 
   let { record, degreeImportService }: {
     record: StudentRecord;
@@ -11,6 +13,17 @@
   let fileInput = $state<HTMLInputElement | null>(null);
 
   const plannedCount = $derived(record.courses.filter(c => c.isInProgress).length);
+
+  // "Check current schedule" preview — overlay of what the active schedule fills.
+  const scheduleCourseCount = $derived(appState.selectedCourses.length);
+  const overlayOn = $derived(degreeState.scheduleMatch !== null);
+  const overlayMatched = $derived.by(() => {
+    const m = degreeState.scheduleMatch;
+    if (!m) return 0;
+    const ids = new Set<string>();
+    for (const entries of m.values()) for (const e of entries) ids.add(e.courseId);
+    return ids.size;
+  });
 
   let building = $state(false);
   let buildResult = $state<string | null>(null);
@@ -23,7 +36,7 @@
     buildUnmatched = [];
     try {
       const stats = await degreePlanService.buildFromPlan(record);
-      buildResult = `Created “Planned Courses” — ${stats.matched} added` +
+      buildResult = `Created “Enrolled” — ${stats.matched} added` +
         ` (${stats.autoSectioned} with sections, ${stats.pinnedOnly} pinned to term).`;
       buildUnmatched = stats.unmatched;
     } catch (err) {
@@ -82,16 +95,30 @@
     <div class="degree-stat"><span class="degree-stat-value">{required ?? '—'}</span><span class="degree-stat-label">Required</span></div>
   </div>
 
-  {#if plannedCount > 0}
+  {#if plannedCount > 0 || scheduleCourseCount > 0}
     <div class="degree-build">
-      <button type="button" class="btn btn-primary degree-build-btn" disabled={building} onclick={buildSchedule}>
-        {building ? 'Building…' : `Build schedule from plan (${plannedCount} planned)`}
+      {#if plannedCount > 0}
+        <button type="button" class="btn btn-primary degree-build-btn" disabled={building} onclick={buildSchedule}>
+          {building ? 'Building…' : `Build schedule from plan (${plannedCount} planned)`}
+        </button>
+      {/if}
+      <button
+        type="button"
+        class="btn degree-check-btn"
+        class:active={overlayOn}
+        disabled={scheduleCourseCount === 0}
+        onclick={() => degreePlanService.checkActiveSchedule()}
+      >
+        {overlayOn ? `Hide schedule overlay (${overlayMatched} matched)` : 'Check current schedule'}
       </button>
       {#if buildResult}
         <p class="degree-build-result">{buildResult}</p>
       {/if}
       {#if buildUnmatched.length}
         <p class="degree-build-unmatched">Not found in catalog: {buildUnmatched.join(', ')}</p>
+      {/if}
+      {#if overlayOn}
+        <p class="degree-build-unmatched">Drag a schedule tile to another requirement to re-bucket it.</p>
       {/if}
     </div>
   {/if}

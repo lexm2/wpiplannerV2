@@ -156,11 +156,26 @@
   margin-top: 1.25rem;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.degree-build-btn:disabled {
+.degree-build-btn:disabled,
+.degree-check-btn:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+.degree-check-btn.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* result lines span the full row under the buttons */
+.degree-build-result,
+.degree-build-unmatched {
+  flex-basis: 100%;
 }
 
 .degree-build-result {
@@ -353,6 +368,35 @@
   border-left: 3px solid var(--color-text-muted);
 }
 
+/* draggable tiles (planned + schedule overlay) — grab cursor + drag affordance */
+.requirement-course-draggable {
+  cursor: grab;
+}
+
+.requirement-course-draggable:active {
+  cursor: grabbing;
+}
+
+/* schedule-overlay tiles get a primary accent; tentative (heuristic) is dashed */
+.requirement-course.is-schedule {
+  border-left: 3px solid var(--color-primary);
+}
+
+.requirement-course.is-schedule.is-tentative {
+  border-left-style: dashed;
+}
+
+.course-badge-schedule {
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  color: var(--color-primary);
+}
+
+/* drop-target highlight while dragging a schedule tile over a card */
+.requirement-card.drag-over {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
 .requirement-course-top {
   display: flex;
   align-items: center;
@@ -364,6 +408,24 @@
   font-family: var(--font-family-mono);
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
+}
+
+/* clickable course code — opens the catalog entry on the classes page */
+.requirement-course-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: inherit;
+}
+
+.requirement-course-link:hover,
+.requirement-course-link:focus-visible {
+  color: var(--color-primary);
+  text-decoration: underline;
+  outline: none;
 }
 
 .requirement-course-title {
@@ -380,17 +442,41 @@
   color: var(--color-text-muted);
 }
 
-/* empty placeholder tile — a slot still needing a course */
+/* empty placeholder tile — a clickable slot still needing a course */
 .requirement-course-empty {
   align-items: center;
   justify-content: center;
   border-style: dashed;
   background: transparent;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  color: inherit;
+  transition: var(--effect-transition);
+}
+
+.requirement-course-empty:hover,
+.requirement-course-empty:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+  outline: none;
 }
 
 .requirement-course-empty-label {
   font-size: 0.78rem;
   color: var(--color-text-muted);
+}
+
+.requirement-course-empty-hint {
+  font-size: 0.72rem;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: var(--effect-transition);
+}
+
+.requirement-course-empty:hover .requirement-course-empty-hint,
+.requirement-course-empty:focus-visible .requirement-course-empty-hint {
+  opacity: 1;
 }
 
 .course-badge {

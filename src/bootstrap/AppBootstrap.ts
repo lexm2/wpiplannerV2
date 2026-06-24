@@ -87,7 +87,7 @@ export class AppBootstrap {
         localEventService.init(profileStateManager, uiStateManager);
         sectionInfoService.init(courseSelectionService, colorService, uiStateManager);
         autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator, uiStateManager);
-        degreePlanService.init(scheduleManagementService, profileStateManager, uiStateManager);
+        degreePlanService.init(scheduleManagementService, profileStateManager, uiStateManager, filterService);
     }
 
     static initializeFilters(services: ServiceContainer): void {

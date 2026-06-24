@@ -9,10 +9,10 @@
  * section for the user / auto-scheduler. Pure (no service/state deps) so it's
  * unit-testable.
  */
-import type { AppliedCourse, StudentRecord } from '../../types/degree';
+import type { StudentRecord } from '../../types/degree';
 import type { Course, Department, Section } from '../../types/types';
 import type { SelectedCourse } from '../../types/schedule';
-import { findCourseById } from '../../types/ScheduleState';
+import { academicYearForPeriod, findCatalogCourse } from './catalogLookup';
 
 export interface PlanMatchResult {
     selections: SelectedCourse[];
@@ -24,30 +24,6 @@ export interface PlanMatchResult {
         pinnedOnly: number;
         unmatched: string[];
     };
-}
-
-/**
- * Catalog `academicYear` is the fall year of the academic year. A planned course
- * gives a calendar year + season: Fall terms share that year, Spring terms
- * (C/D) belong to the previous fall year.
- */
-export function academicYearForPeriod(period: AppliedCourse['period']): number | null {
-    if (!period || !Number.isFinite(period.year)) return null;
-    return period.season === 'Spring' ? period.year - 1 : period.year;
-}
-
-/** Candidate {dept, number} pairs, handling cross-listed codes like "CS 2022/ MA 2201". */
-export function candidateCodes(course: AppliedCourse): { dept: string; number: string }[] {
-    const out: { dept: string; number: string }[] = [];
-    for (const part of course.code.split('/')) {
-        const m = /^\s*([A-Za-z]+)\s+([A-Za-z0-9]+)\s*$/.exec(part);
-        if (m) out.push({ dept: m[1].toUpperCase(), number: m[2] });
-    }
-    // Always include the already-parsed primary as a fallback.
-    if (!out.length && course.department && course.number) {
-        out.push({ dept: course.department, number: course.number });
-    }
-    return out;
 }
 
 /** A graduate F section covers A/B; S covers C/D. */
@@ -69,13 +45,9 @@ export function matchPlannedCourses(record: StudentRecord, departments: Departme
     for (const pc of planned) {
         const ay = academicYearForPeriod(pc.period);
 
-        let course: Course | null = null;
-        if (ay !== null) {
-            for (const { dept, number } of candidateCodes(pc)) {
-                course = findCourseById(`${dept}-${number}-${ay}`, departments);
-                if (course) break;
-            }
-        }
+        // Plan-building needs the exact academic year for term pinning, so no
+        // newest-year fallback here.
+        const course: Course | null = findCatalogCourse(pc.code, ay, departments, { fallbackToNewest: false });
         if (!course) {
             unmatched.push(pc.code);
             continue;

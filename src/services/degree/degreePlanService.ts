@@ -2,8 +2,13 @@ import { appState } from '../../core/state/appState.svelte';
 import type { ScheduleManagementService } from '../selection/ScheduleManagementService';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { UIStateManager } from '../ui/UIStateManager';
-import type { StudentRecord } from '../../types/degree';
+import type { FilterService } from '../filtering/FilterService';
+import type { Requirement, StudentRecord } from '../../types/degree';
 import { matchPlannedCourses, type PlanMatchResult } from './planMatcher';
+import { inferRequirementDepartments, matchScheduleToRequirements } from './requirementMatching';
+import { findCatalogCourse } from './catalogLookup';
+import { degreeState } from '../../svelte/degree/degreeState.svelte';
+import { courseListState } from '../../svelte/courseListState.svelte';
 
 /**
  * Builds a planner schedule from the planned (in-progress) courses of an
@@ -18,20 +23,23 @@ class DegreePlanService {
     private scheduleManagementService: ScheduleManagementService | null = null;
     private profileStateManager: ProfileStateManager | null = null;
     private uiStateManager: UIStateManager | null = null;
+    private filterService: FilterService | null = null;
 
     init(
         scheduleManagementService: ScheduleManagementService,
         profileStateManager: ProfileStateManager,
         uiStateManager: UIStateManager,
+        filterService: FilterService,
     ): void {
         this.scheduleManagementService = scheduleManagementService;
         this.profileStateManager = profileStateManager;
         this.uiStateManager = uiStateManager;
+        this.filterService = filterService;
     }
 
     /**
      * Match the record's planned courses against the catalog, create a new
-     * "Planned Courses" schedule containing them, activate it, and switch to the
+     * "Enrolled" schedule containing them, activate it, and switch to the
      * schedule page. Returns match stats for the UI to surface.
      */
     async buildFromPlan(record: StudentRecord): Promise<PlanMatchResult['stats']> {
@@ -41,7 +49,7 @@ class DegreePlanService {
 
         const { selections, year, stats } = matchPlannedCourses(record, appState.loadedDepartments);
 
-        const created = await this.scheduleManagementService.createNewSchedule('Planned Courses', {
+        const created = await this.scheduleManagementService.createNewSchedule('Enrolled', {
             autoActivate: false,
             autoSave: false,
         });
@@ -67,6 +75,92 @@ class DegreePlanService {
 
         return stats;
     }
+
+    /**
+     * Toggle the non-destructive "what does my current schedule fill?" preview.
+     * Computes which requirements the active schedule's courses match and stores
+     * the result on degreeState (overlay tiles read it); a second call clears it.
+     */
+    checkActiveSchedule(): void {
+        if (degreeState.scheduleMatch) {
+            degreeState.clearOverlay();
+            return;
+        }
+        const record = degreeState.record;
+        if (!record) return;
+        degreeState.scheduleMatch = matchScheduleToRequirements(
+            record,
+            appState.selectedCourses,
+            appState.loadedDepartments,
+        );
+    }
+
+    /**
+     * From an empty requirement slot: filter the courses page to the departments
+     * that give credit for the requirement (+ the active academic year) and
+     * navigate there so the user can pick a course.
+     */
+    browseForRequirement(req: Requirement): void {
+        if (!this.filterService) return;
+
+        const depts = inferRequirementDepartments(req, appState.loadedDepartments);
+        if (depts.length) {
+            this.filterService.addFilter('department', { departments: depts });
+        } else {
+            this.filterService.removeFilter('department');
+        }
+
+        const year = appState.activeSchedule?.year ?? this.profileStateManager?.getDefaultAcademicYear();
+        if (year !== undefined) {
+            this.filterService.addFilter('academicYear', { year });
+        }
+
+        this.uiStateManager?.setPage('planner');
+    }
+
+    /**
+     * Open a degree course's catalog entry on the classes (planner) page: resolve
+     * the linked Course, surface it (search + year filter), select it so the
+     * detail panel shows it, and scroll its list entry into view. If the catalog
+     * has no such course, alert and do nothing else.
+     */
+    openCourse(code: string, year: number | null): void {
+        const preferredYear =
+            year ?? appState.activeSchedule?.year ?? this.profileStateManager?.getDefaultAcademicYear() ?? null;
+        const course = findCatalogCourse(code, preferredYear, appState.loadedDepartments);
+
+        if (!course) {
+            if (typeof alert === 'function') alert(`${code} could not be found in the course catalog.`);
+            return;
+        }
+
+        if (this.filterService) {
+            this.filterService.addFilter('searchText', { query: `${course.departmentAbbr}${course.number}` });
+            if (course.academicYear !== undefined) {
+                this.filterService.addFilter('academicYear', { year: course.academicYear });
+            }
+        }
+
+        courseListState.selectedCourse = course;
+        this.uiStateManager?.setPage('planner');
+        scrollCourseIntoView(course.id);
+    }
+}
+
+/** Best-effort scroll of a course's list entry into view once the planner renders it. */
+function scrollCourseIntoView(courseId: string): void {
+    if (typeof document === 'undefined' || typeof requestAnimationFrame !== 'function') return;
+    const selector = `#course-container [data-course-id="${typeof CSS !== 'undefined' ? CSS.escape(courseId) : courseId}"]`;
+    let tries = 0;
+    const tick = () => {
+        const el = document.querySelector(selector);
+        if (el) {
+            el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            return;
+        }
+        if (tries++ < 12) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
 }
 
 export const degreePlanService = new DegreePlanService();
