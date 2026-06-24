@@ -204,11 +204,49 @@
 
 .degree-progress-bar {
   flex: 1;
+  display: flex;
   height: 8px;
   background: var(--color-background-alt);
   border-radius: 999px;
   overflow: hidden;
 }
+
+/* segmented fill — earned / planned / schedule contributions */
+.degree-progress-seg {
+  height: 100%;
+  transition: width var(--effect-transition);
+}
+
+.degree-progress-seg.seg-earned { background: var(--color-success); }
+.degree-progress-seg.seg-planned { background: var(--color-warning); }
+.degree-progress-seg.seg-schedule { background: var(--color-primary); }
+
+/* legend mapping the segment colors to their source */
+.degree-progress-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.degree-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.degree-legend-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.degree-legend-swatch.seg-earned { background: var(--color-success); }
+.degree-legend-swatch.seg-planned { background: var(--color-warning); }
+.degree-legend-swatch.seg-schedule { background: var(--color-primary); }
 
 .degree-progress-fill {
   height: 100%;

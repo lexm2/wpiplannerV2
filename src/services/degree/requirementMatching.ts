@@ -20,6 +20,7 @@ export interface ScheduleMatchEntry {
     courseId: string;
     code: string;             // "CS 3013"
     title: string;
+    credits: number;
     confidence: 'exact' | 'heuristic';
 }
 
@@ -37,6 +38,7 @@ export interface DegreeTile {
     kind: 'planned' | 'schedule';
     code: string;
     title: string;
+    credits: number;
     term: string | null;
     /** Best-guess catalog academic year, for resolving the linked course. */
     year: number | null;
@@ -71,7 +73,7 @@ export function computePlacements(
                 if (!c.isInProgress) continue; // only "planned" tiles are draggable; completed/transfer stay fixed
                 items.push({
                     key: `planned:${c.code}:${c.period?.raw ?? ''}:${req.rawName}`,
-                    kind: 'planned', code: c.code, title: c.title, term: c.period?.raw ?? null,
+                    kind: 'planned', code: c.code, title: c.title, credits: c.credits, term: c.period?.raw ?? null,
                     year: academicYearForPeriod(c.period), confidence: null, moved: false, originRawName: req.rawName,
                 });
             }
@@ -83,7 +85,7 @@ export function computePlacements(
             for (const e of entries) {
                 items.push({
                     key: `sched:${e.courseId}:${rawName}`,
-                    kind: 'schedule', code: e.code, title: e.title, term: null,
+                    kind: 'schedule', code: e.code, title: e.title, credits: e.credits, term: null,
                     year: yearFromCourseId(e.courseId), confidence: e.confidence, moved: false, originRawName: rawName,
                 });
             }
@@ -174,12 +176,13 @@ export function matchScheduleToRequirements(
     for (const sc of selectedCourses) {
         const course = sc.course;
         const code = codeOf(course);
+        const credits = course.minCredits;
 
         // Exact: the code is already listed under one or more requirements.
         const exact = reqs.filter(r => reqListsCode(r, code));
         if (exact.length) {
             for (const r of exact) {
-                push(r.rawName, { courseId: course.id, code, title: course.name, confidence: 'exact' });
+                push(r.rawName, { courseId: course.id, code, title: course.name, credits, confidence: 'exact' });
             }
             continue;
         }
@@ -189,7 +192,7 @@ export function matchScheduleToRequirements(
             .filter(r => r.status !== 'satisfied' && inferRequirementDepartments(r, departments).includes(course.departmentAbbr))
             .sort((a, b) => categoryRank(a) - categoryRank(b));
         if (candidates.length) {
-            push(candidates[0].rawName, { courseId: course.id, code, title: course.name, confidence: 'heuristic' });
+            push(candidates[0].rawName, { courseId: course.id, code, title: course.name, credits, confidence: 'heuristic' });
         }
     }
 

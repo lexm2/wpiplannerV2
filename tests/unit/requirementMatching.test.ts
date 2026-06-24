@@ -94,7 +94,7 @@ describe('matchScheduleToRequirements', () => {
         const rec = record([req('CS Core', 'major_specific', { applied: ['CS 3013'] })]);
         const m = matchScheduleToRequirements(rec, selected(course('CS', '3013')), departments);
         expect(m.get('CS Core')).toEqual([
-            { courseId: 'CS-3013-2026', code: 'CS 3013', title: 'CS 3013', confidence: 'exact' },
+            { courseId: 'CS-3013-2026', code: 'CS 3013', title: 'CS 3013', credits: 3, confidence: 'exact' },
         ]);
     });
 
@@ -130,7 +130,7 @@ function planned(code: string): AppliedCourse {
 
 describe('computePlacements', () => {
     const base: ScheduleMatch = new Map([
-        ['CS Core', [{ courseId: 'CS-4341-2026', code: 'CS 4341', title: 'AI', confidence: 'heuristic' }]],
+        ['CS Core', [{ courseId: 'CS-4341-2026', code: 'CS 4341', title: 'AI', credits: 3, confidence: 'heuristic' }]],
     ]);
 
     it('makes in-progress (planned) courses draggable tiles, ignoring completed ones', () => {

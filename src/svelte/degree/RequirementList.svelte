@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { StudentRecord, RequirementStatus, RequirementCategory } from '../../types/degree';
   import RequirementCard from './RequirementCard.svelte';
+  import { effectiveProgress } from '../../services/degree/requirementProgress';
+  import { degreeState } from './degreeState.svelte';
 
   let { record }: { record: StudentRecord } = $props();
 
@@ -33,15 +35,21 @@
     record.requirements.filter(r => r.category !== 'unused' && (showUmbrella || !UMBRELLA.has(r.category)))
   );
 
+  // Filter/count by the *live* status (reflects schedule overlay + drag moves),
+  // so a requirement that becomes satisfied moves between filters in real time.
+  const withStatus = $derived(
+    visible.map(r => ({ r, status: effectiveProgress(r, degreeState.placements.get(r.rawName) ?? []).status }))
+  );
+
   const filtered = $derived(
-    allActive ? visible : visible.filter(r => selected.includes(r.status))
+    allActive ? withStatus.map(x => x.r) : withStatus.filter(x => selected.includes(x.status)).map(x => x.r)
   );
 
   const counts = $derived({
     all: visible.length,
-    not_satisfied: visible.filter(r => r.status === 'not_satisfied').length,
-    in_progress: visible.filter(r => r.status === 'in_progress').length,
-    satisfied: visible.filter(r => r.status === 'satisfied').length,
+    not_satisfied: withStatus.filter(x => x.status === 'not_satisfied').length,
+    in_progress: withStatus.filter(x => x.status === 'in_progress').length,
+    satisfied: withStatus.filter(x => x.status === 'satisfied').length,
   });
 </script>
 
@@ -72,6 +80,12 @@
         onclick={() => (showUmbrella = !showUmbrella)}
       >{showUmbrella ? 'Hide' : 'Show'} degree-wide <span class="degree-filter-count">{umbrellaCount}</span></button>
     {/if}
+  </div>
+
+  <div class="degree-progress-legend" aria-hidden="true">
+    <span class="degree-legend-item"><span class="degree-legend-swatch seg-earned"></span> Completed</span>
+    <span class="degree-legend-item"><span class="degree-legend-swatch seg-planned"></span> Planned</span>
+    <span class="degree-legend-item"><span class="degree-legend-swatch seg-schedule"></span> Schedule</span>
   </div>
 
   {#if filtered.length === 0}

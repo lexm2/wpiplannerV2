@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Requirement } from '../../types/degree';
-  import { completionFraction } from '../../services/degree/requirementProgress';
+  import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
   import { degreePlanService } from '../../services/degree/degreePlanService';
   import { academicYearForPeriod } from '../../services/degree/catalogLookup';
@@ -8,41 +8,28 @@
 
   let { req }: { req: Requirement } = $props();
 
-  const pct = $derived.by(() => {
-    const f = completionFraction(req);
-    return f === null ? null : Math.round(f * 100);
-  });
-
-  const statusLabel = $derived(
-    req.status === 'satisfied' ? 'Satisfied' : req.status === 'in_progress' ? 'In progress' : 'Not satisfied'
-  );
-
-  const remainingLabel = $derived.by(() => {
-    if (req.status === 'satisfied') return null;
-    if (req.creditsRemaining !== null) return `${req.creditsRemaining} credits left`;
-    if (req.coursesRemaining !== null) return `${req.coursesRemaining} course${req.coursesRemaining === 1 ? '' : 's'} left`;
-    return 'See requirement';
-  });
-
   // Completed/transfer courses stay fixed; planned (in-progress) + schedule
   // overlay courses are the draggable tiles, sourced from degreeState.placements.
   const fixedCourses = $derived(req.appliedCourses.filter(c => !c.isInProgress));
   const tiles = $derived(degreeState.placements.get(req.rawName) ?? []);
-  const scheduleHere = $derived(tiles.filter(t => t.kind === 'schedule').length);
 
-  // Empty placeholder tiles for slots that still need a course. Course-count
-  // requirements give an exact number; credit requirements are estimated at the
-  // typical 3-credit course. Schedule-overlay tiles fill some slots. Capped so
-  // large buckets don't render a huge grid.
-  const EMPTY_CAP = 12;
-  const baseEmpty = $derived.by(() => {
-    if (req.status === 'satisfied') return 0;
-    if (req.coursesRemaining !== null) return Math.min(EMPTY_CAP, req.coursesRemaining);
-    if (req.creditsRemaining !== null) return Math.min(EMPTY_CAP, Math.max(1, Math.ceil(req.creditsRemaining / 3)));
-    return req.appliedCourses.length ? 0 : 1; // unknown (combination): show one cue
+  // Live status/percent/remaining recomputed from the courses currently placed
+  // in this requirement — updates as tiles are dragged in/out or the overlay toggles.
+  const progress = $derived(effectiveProgress(req, tiles));
+  const pct = $derived(progress.fraction === null ? null : Math.round(progress.fraction * 100));
+
+  const statusLabel = $derived(
+    progress.status === 'satisfied' ? 'Satisfied' : progress.status === 'in_progress' ? 'In progress' : 'Not satisfied'
+  );
+
+  const remainingLabel = $derived.by(() => {
+    if (progress.status === 'satisfied') return null;
+    if (progress.creditsRemaining !== null) return `${progress.creditsRemaining} credits left`;
+    if (progress.coursesRemaining !== null) return `${progress.coursesRemaining} course${progress.coursesRemaining === 1 ? '' : 's'} left`;
+    return 'See requirement';
   });
-  const emptySlots = $derived(Math.max(0, baseEmpty - scheduleHere));
-  const emptyTiles = $derived(Array.from({ length: emptySlots }));
+
+  const emptyTiles = $derived(Array.from({ length: progress.emptySlots }));
 
   let dragOver = $state(false);
 
@@ -69,7 +56,7 @@
 
 <article
   class="requirement-card"
-  class:is-satisfied={req.status === 'satisfied'}
+  class:is-satisfied={progress.status === 'satisfied'}
   class:drag-over={dragOver}
   ondragover={(e) => { e.preventDefault(); dragOver = true; }}
   ondragleave={() => (dragOver = false)}
@@ -81,12 +68,16 @@
       <h3 class="requirement-card-name">{req.name}</h3>
       {#if req.scope}<span class="requirement-card-scope">{req.scope}</span>{/if}
     </div>
-    <span class="req-status req-status-{req.status}">{statusLabel}</span>
+    <span class="req-status req-status-{progress.status}">{statusLabel}</span>
   </header>
 
   {#if pct !== null}
     <div class="degree-progress degree-progress-sm">
-      <div class="degree-progress-bar"><div class="degree-progress-fill" style:width="{pct}%"></div></div>
+      <div class="degree-progress-bar">
+        <div class="degree-progress-seg seg-earned" style:width="{progress.segments.earned * 100}%"></div>
+        <div class="degree-progress-seg seg-planned" style:width="{progress.segments.planned * 100}%"></div>
+        <div class="degree-progress-seg seg-schedule" style:width="{progress.segments.schedule * 100}%"></div>
+      </div>
       {#if remainingLabel}<span class="degree-progress-label">{remainingLabel}</span>{/if}
     </div>
   {:else if remainingLabel}
