@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 25, 2026, 3:59 PM",
+  "generated": "Jun 25, 2026, 6:18 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -7037,7 +7037,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Zhangxian Yuan",
+                    "professor": "Nikolaos Gatsonis; Zhangxian Yuan",
                     "startTime": "12:00",
                     "endTime": "12:00",
                     "location": "Unknown",
@@ -41411,7 +41411,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "18:00",
                     "endTime": "20:50",
                     "location": "Kaven Hall 116",
@@ -41460,7 +41460,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "10:00",
                     "endTime": "11:50",
                     "location": "Washburn 323",
@@ -125956,7 +125956,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Higgins Labs 116",
@@ -125992,7 +125992,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Alireza Mahdavi Nejad",
+                      "professor": "Alireza Nejad",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Washburn 229",
@@ -126165,7 +126165,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Higgins Labs 218 Discovery Classroom",
@@ -126458,7 +126458,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Kaven Hall 116",
@@ -127505,7 +127505,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Higgins Labs 218 Discovery Classroom",
@@ -127541,7 +127541,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Alireza Mahdavi Nejad",
+                      "professor": "Alireza Nejad",
                       "startTime": "14:00",
                       "endTime": "14:50",
                       "location": "Higgins Labs 218 Discovery Classroom",
@@ -127834,7 +127834,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Higgins Labs 116",
@@ -127914,7 +127914,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "14:00",
                     "endTime": "14:50",
                     "location": "Washburn 229",
@@ -128102,7 +128102,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Unity Hall 500",
@@ -135853,7 +135853,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "13:00",
                     "endTime": "13:50",
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
@@ -323198,7 +323198,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "08:00",
                     "endTime": "08:50",
                     "location": "Fuller Labs 320",
@@ -323572,7 +323572,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Alireza Mahdavi Nejad; Fiona Zoutendyk",
+                      "professor": "Alireza Nejad; Fiona Zoutendyk",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Innovation Studio 203 Active Learning Classroom South",
@@ -323844,7 +323844,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Alireza Mahdavi Nejad; Fiona Zoutendyk",
+                      "professor": "Alireza Nejad; Fiona Zoutendyk",
                       "startTime": "13:00",
                       "endTime": "13:50",
                       "location": "Innovation Studio 203 Active Learning Classroom South",
@@ -325411,7 +325411,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "15:00",
                     "endTime": "16:50",
                     "location": "Higgins Labs 230 Geom Modeling Computer Lab",
@@ -325461,7 +325461,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "16:00",
                     "endTime": "17:50",
                     "location": "Higgins Labs 230 Geom Modeling Computer Lab",
@@ -327239,7 +327239,7 @@
                 "crn": 348874,
                 "number": "A01",
                 "seats": 35,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -327256,7 +327256,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 35,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "A01",
@@ -327448,7 +327448,7 @@
                 "crn": 349797,
                 "number": "B02",
                 "seats": 45,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -327465,7 +327465,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 45,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B02",
@@ -328199,7 +328199,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "18:00",
                     "endTime": "20:50",
                     "location": "Kaven Hall 116",
@@ -328248,7 +328248,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Alireza Mahdavi Nejad",
+                    "professor": "Alireza Nejad",
                     "startTime": "10:00",
                     "endTime": "11:50",
                     "location": "Washburn 323",
@@ -330124,7 +330124,7 @@
                 "crn": 350461,
                 "number": "F01",
                 "seats": 20,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -330141,7 +330141,7 @@
                     "building": "",
                     "room": "Other",
                     "seats": 20,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F01",
@@ -339729,7 +339729,7 @@
                 "crn": 348874,
                 "number": "A01",
                 "seats": 35,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -339746,7 +339746,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 35,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "A01",
@@ -339938,7 +339938,7 @@
                 "crn": 349797,
                 "number": "B02",
                 "seats": 45,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -339955,7 +339955,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 45,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B02",
@@ -354258,7 +354258,7 @@
                 "crn": 350499,
                 "number": "F01",
                 "seats": 50,
-                "seatsAvailable": 33,
+                "seatsAvailable": 32,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -354275,7 +354275,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 33,
+                    "seatsAvailable": 32,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F01",
@@ -354571,7 +354571,7 @@
                 "crn": 350229,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 56,
+                "seatsAvailable": 55,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -354588,7 +354588,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 56,
+                    "seatsAvailable": 55,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -427948,7 +427948,7 @@
                 "crn": 354551,
                 "number": "C01",
                 "seats": 35,
-                "seatsAvailable": 20,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -427965,7 +427965,7 @@
                     "building": "",
                     "room": "Stratton Hall 207 (new)",
                     "seats": 35,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
@@ -428210,7 +428210,7 @@
                 "number": "C01",
                 "seats": 35,
                 "seatsAvailable": 15,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "C",
@@ -428227,7 +428227,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 35,
                     "seatsAvailable": 15,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "C01",
                     "days": [
@@ -428359,7 +428359,7 @@
                 "crn": 352236,
                 "number": "D01",
                 "seats": 35,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -428376,7 +428376,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 35,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
