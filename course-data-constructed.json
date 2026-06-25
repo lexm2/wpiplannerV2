@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 24, 2026, 10:53 PM",
+  "generated": "Jun 25, 2026, 12:05 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -67130,7 +67130,7 @@
                 "number": "F02 - AT: Plant Medicinal Chemistry",
                 "seats": 30,
                 "seatsAvailable": 24,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "F",
@@ -67147,7 +67147,7 @@
                     "room": "Unknown",
                     "seats": 30,
                     "seatsAvailable": 24,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 20,
                     "specificSection": "F02 - AT: Plant Medicinal Chemistry",
                     "days": [],
