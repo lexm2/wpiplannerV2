@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 25, 2026, 11:07 AM",
+  "generated": "Jun 25, 2026, 1:25 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -93716,7 +93716,7 @@
                 "crn": 350425,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 45,
+                "seatsAvailable": 44,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -93733,7 +93733,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 60,
-                    "seatsAvailable": 45,
+                    "seatsAvailable": 44,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -112796,7 +112796,7 @@
                 "crn": 358310,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
@@ -112813,7 +112813,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -135690,9 +135690,9 @@
                     "professor": "Brandon Beneche",
                     "startTime": "12:00",
                     "endTime": "12:50",
-                    "location": "Unity Hall",
+                    "location": "Higgins Labs 202",
                     "building": "",
-                    "room": "Unity Hall",
+                    "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
@@ -135726,9 +135726,9 @@
                     "professor": "Not Assigned",
                     "startTime": "11:00",
                     "endTime": "11:50",
-                    "location": "Unity Hall",
+                    "location": "Higgins Labs 202",
                     "building": "",
-                    "room": "Unity Hall",
+                    "room": "Higgins Labs 202",
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
@@ -135762,9 +135762,9 @@
                     "professor": "Not Assigned",
                     "startTime": "12:00",
                     "endTime": "12:50",
-                    "location": "Unity Hall",
+                    "location": "Higgins Labs 154",
                     "building": "",
-                    "room": "Unity Hall",
+                    "room": "Higgins Labs 154",
                     "seats": 30,
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
@@ -371250,7 +371250,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Qi Wen",
+                    "professor": "Hektor Kashuri",
                     "startTime": "10:00",
                     "endTime": "10:50",
                     "location": "Olin Hall 107",
@@ -371285,7 +371285,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Qi Wen",
+                      "professor": "Hektor Kashuri",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Olin Hall 107",
@@ -371318,7 +371318,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Qi Wen",
+                      "professor": "Not Assigned",
                       "startTime": "09:00",
                       "endTime": "09:50",
                       "location": "Olin Hall 218",
@@ -371351,7 +371351,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Qi Wen",
+                      "professor": "Not Assigned",
                       "startTime": "11:00",
                       "endTime": "11:50",
                       "location": "Olin Hall 218",
@@ -371384,7 +371384,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Qi Wen",
+                      "professor": "Not Assigned",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Olin Hall 126",
@@ -374215,7 +374215,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Hektor Kashuri",
+                    "professor": "Kateryna Friedman",
                     "startTime": "10:00",
                     "endTime": "11:50",
                     "location": "Kaven Hall 116",
@@ -374249,7 +374249,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Hektor Kashuri",
+                      "professor": "Kateryna Friedman",
                       "startTime": "10:00",
                       "endTime": "10:50",
                       "location": "Kaven Hall 116",
@@ -375630,7 +375630,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Kateryna Friedman",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Higgins Labs 116",
@@ -375666,7 +375666,7 @@
                   "periods": [
                     {
                       "type": "Discussion",
-                      "professor": "Not Assigned",
+                      "professor": "Kateryna Friedman",
                       "startTime": "12:00",
                       "endTime": "12:50",
                       "location": "Higgins Labs 116",
@@ -384778,7 +384778,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Izabela Stroe",
+                    "professor": "Thomas Noviello",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Olin Hall 107",
@@ -385715,7 +385715,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Thomas Noviello",
+                    "professor": "Izabela Stroe",
                     "startTime": "16:00",
                     "endTime": "16:50",
                     "location": "Atwater Kent 116 Newell Hall",
@@ -421098,7 +421098,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Doug Petkie",
+                    "professor": "Kateryna Friedman",
                     "startTime": "15:00",
                     "endTime": "15:50",
                     "location": "Olin Hall 109",
@@ -421675,7 +421675,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Not Assigned",
+                  "professor": "Kateryna Friedman",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Olin Hall 205 Photonics Lab",
@@ -421708,7 +421708,7 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Not Assigned",
+                  "professor": "Kateryna Friedman",
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Olin Hall 205 Photonics Lab",
@@ -422223,7 +422223,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "David Medich",
+                    "professor": "Sathwik Bharadwaj",
                     "startTime": "09:00",
                     "endTime": "09:50",
                     "location": "Unity Hall 420",
@@ -422327,7 +422327,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Lyubov Titova",
+                    "professor": "Alex Zozulya",
                     "startTime": "09:00",
                     "endTime": "09:50",
                     "location": "Olin Hall 223",
@@ -433993,7 +433993,7 @@
                 "crn": 350017,
                 "number": "B01",
                 "seats": 20,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -434010,7 +434010,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 20,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -437275,7 +437275,7 @@
                 "crn": 349982,
                 "number": "B01 - ST: Deep learning For Perception",
                 "seats": 20,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -437292,7 +437292,7 @@
                     "building": "",
                     "room": "Higgins Labs 154",
                     "seats": 20,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01 - ST: Deep learning For Perception",
