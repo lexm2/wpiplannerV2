@@ -1,5 +1,5 @@
 {
-  "generated": "Jun 29, 2026, 8:32 AM",
+  "generated": "Jun 29, 2026, 12:47 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -21279,7 +21279,7 @@
               "crn": 350008,
               "number": "BX01",
               "seats": 16,
-              "seatsAvailable": 2,
+              "seatsAvailable": 1,
               "actualWaitlist": 0,
               "maxWaitlist": 5,
               "note": null,
@@ -21296,7 +21296,7 @@
                   "building": "",
                   "room": "Goddard Hall 205 BB Lab",
                   "seats": 16,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 5,
                   "specificSection": "BX01",
@@ -73427,7 +73427,7 @@
                 "number": "DL01",
                 "seats": 85,
                 "seatsAvailable": 30,
-                "actualWaitlist": 19,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5401",
                 "computedTerm": "D",
@@ -73444,7 +73444,7 @@
                     "room": "Atwater Kent 219",
                     "seats": 85,
                     "seatsAvailable": 30,
-                    "actualWaitlist": 19,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "DL01",
                     "days": [
@@ -86301,7 +86301,7 @@
                 "crn": 349312,
                 "number": "B02",
                 "seats": 60,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -86318,7 +86318,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B02",
@@ -118031,6 +118031,53 @@
           ]
         },
         {
+          "id": "EDU-580-2026",
+          "number": "580",
+          "name": "Special Topics in STEM Education",
+          "description": "EDU 580: Special Topics in STEM Eduon (3 credits) This online synchronous course explores key topics in the forefront of STEM eduon research and practice. Course offerings will change regularly and may include topics such as integrated STEM through robotics, Storyline model of teaching and learning, and more. Students may earn credit for multiple offerings of this course provided each offering bears distinct course descriptions and course content. Recommended Background: Is determined based on the specific topic of the course. This course is intended for practicing PK-12 educators. Students who are aspiring educators or with prior teaching experience should consult with the program director prior to registration. Students enrolled in the MS for Integrated STEM program should take EDU 500 before or concurrent to this course.",
+          "category": 1,
+          "minCredits": 3,
+          "maxCredits": 3,
+          "isGraduate": true,
+          "academicYear": 2026,
+          "lectures": [
+            {
+              "section": {
+                "crn": 360581,
+                "number": "B01 - ST: The Storyline Model of Teaching & Learning Science",
+                "seats": 20,
+                "seatsAvailable": 20,
+                "actualWaitlist": 0,
+                "maxWaitlist": 5,
+                "note": null,
+                "computedTerm": "B",
+                "isGps": true,
+                "isInterestList": false,
+                "periods": [
+                  {
+                    "type": "Lecture",
+                    "professor": "Mia Dubosarsky",
+                    "startTime": "12:00",
+                    "endTime": "12:00",
+                    "location": "Unknown",
+                    "building": "",
+                    "room": "Unknown",
+                    "seats": 20,
+                    "seatsAvailable": 20,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 5,
+                    "specificSection": "B01 - ST: The Storyline Model of Teaching & Learning Science",
+                    "days": [],
+                    "isAsync": true
+                  }
+                ]
+              },
+              "compatibleDiscussions": [],
+              "compatibleLabs": []
+            }
+          ]
+        },
+        {
           "id": "EDU-597-2026",
           "number": "597",
           "name": "Integrated STEM Capstone Project",
@@ -128173,7 +128220,7 @@
                 "number": "D01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 19,
+                "actualWaitlist": 18,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
@@ -128190,7 +128237,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 19,
+                    "actualWaitlist": 18,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -164678,38 +164725,6 @@
                       "isAsync": false
                     }
                   ]
-                },
-                {
-                  "crn": 350431,
-                  "number": "FD02",
-                  "seats": 35,
-                  "seatsAvailable": 34,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5279",
-                  "computedTerm": "F",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Tatiana Doytchinova",
-                      "startTime": "09:00",
-                      "endTime": "09:50",
-                      "location": "Stratton Hall 207 (new)",
-                      "building": "",
-                      "room": "Stratton Hall 207 (new)",
-                      "seats": 35,
-                      "seatsAvailable": 34,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "FD02",
-                      "days": [
-                        "F"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
                 }
               ],
               "compatibleLabs": []
@@ -170564,8 +170579,8 @@
               "section": {
                 "crn": 348704,
                 "number": "AL02",
-                "seats": 120,
-                "seatsAvailable": 106,
+                "seats": 90,
+                "seatsAvailable": 76,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5042",
@@ -170581,8 +170596,8 @@
                     "location": "Olin Hall 107",
                     "building": "",
                     "room": "Olin Hall 107",
-                    "seats": 120,
-                    "seatsAvailable": 106,
+                    "seats": 90,
+                    "seatsAvailable": 76,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL02",
@@ -170686,38 +170701,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD11",
-                      "days": [
-                        "M"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348403,
-                  "number": "AD17",
-                  "seats": 30,
-                  "seatsAvailable": 30,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5042",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "12:50",
-                      "location": "Higgins Labs 154",
-                      "building": "",
-                      "room": "Higgins Labs 154",
-                      "seats": 30,
-                      "seatsAvailable": 30,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AD17",
                       "days": [
                         "M"
                       ],
@@ -222157,8 +222140,8 @@
               "section": {
                 "crn": 348730,
                 "number": "AL06",
-                "seats": 70,
-                "seatsAvailable": 68,
+                "seats": 35,
+                "seatsAvailable": 33,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5050",
@@ -222171,11 +222154,11 @@
                     "professor": "Not Assigned",
                     "startTime": "11:00",
                     "endTime": "11:50",
-                    "location": "Fuller Labs PHL Perreault Hall - Lower Section",
+                    "location": "Salisbury Labs 104",
                     "building": "",
-                    "room": "Fuller Labs PHL Perreault Hall - Lower Section",
-                    "seats": 70,
-                    "seatsAvailable": 68,
+                    "room": "Salisbury Labs 104",
+                    "seats": 35,
+                    "seatsAvailable": 33,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL06",
@@ -222215,38 +222198,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD14",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 348724,
-                  "number": "AD15",
-                  "seats": 35,
-                  "seatsAvailable": 35,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5050",
-                  "computedTerm": "A",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Discussion",
-                      "professor": "Not Assigned",
-                      "startTime": "10:00",
-                      "endTime": "10:50",
-                      "location": "Olin Hall 223",
-                      "building": "",
-                      "room": "Olin Hall 223",
-                      "seats": 35,
-                      "seatsAvailable": 35,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "AD15",
                       "days": [
                         "W"
                       ],
@@ -223236,9 +223187,9 @@
                     "professor": "Zhongqiang Zhang",
                     "startTime": "11:00",
                     "endTime": "11:50",
-                    "location": "Salisbury Labs 104",
+                    "location": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "building": "",
-                    "room": "Salisbury Labs 104",
+                    "room": "Fuller Labs PHL Perreault Hall - Lower Section",
                     "seats": 70,
                     "seatsAvailable": 70,
                     "actualWaitlist": 0,
@@ -328900,7 +328851,7 @@
                 "number": "D01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
@@ -328917,7 +328868,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -330847,7 +330798,7 @@
                 "number": "D01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
@@ -330864,7 +330815,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -442706,7 +442657,7 @@
                 "crn": 349312,
                 "number": "B02",
                 "seats": 60,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -442723,7 +442674,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B02",
@@ -450810,7 +450761,7 @@
                 "number": "D03",
                 "seats": 33,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "D",
@@ -450827,7 +450778,7 @@
                     "room": "Recreation Center Track",
                     "seats": 33,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 15,
                     "specificSection": "D03",
                     "days": [
