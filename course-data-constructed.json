@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 1, 2026, 11:56 AM",
+  "generated": "Jul 1, 2026, 2:35 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -63038,7 +63038,7 @@
                 "crn": 349980,
                 "number": "BL01",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5195",
@@ -63055,7 +63055,7 @@
                     "building": "",
                     "room": "Goddard Hall 227 Classroom",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "BL01",
@@ -63072,7 +63072,7 @@
                   "crn": 349978,
                   "number": "BX01",
                   "seats": 20,
-                  "seatsAvailable": 4,
+                  "seatsAvailable": 3,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5195",
@@ -63089,7 +63089,7 @@
                       "building": "",
                       "room": "Goddard Hall 307 CH Lab",
                       "seats": 20,
-                      "seatsAvailable": 4,
+                      "seatsAvailable": 3,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX01",
