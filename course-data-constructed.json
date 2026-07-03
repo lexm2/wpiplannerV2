@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 3, 2026, 5:10 AM",
+  "generated": "Jul 3, 2026, 8:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -291612,7 +291612,7 @@
                   "crn": 349045,
                   "number": "AD11",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5123",
@@ -291629,7 +291629,7 @@
                       "building": "",
                       "room": "Stratton Hall 301",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD11",
@@ -291644,7 +291644,7 @@
                   "crn": 358338,
                   "number": "AD12",
                   "seats": 35,
-                  "seatsAvailable": 20,
+                  "seatsAvailable": 19,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5123",
@@ -291661,7 +291661,7 @@
                       "building": "",
                       "room": "Stratton Hall 207 (new)",
                       "seats": 35,
-                      "seatsAvailable": 20,
+                      "seatsAvailable": 19,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD12",
