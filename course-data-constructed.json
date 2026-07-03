@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 3, 2026, 10:11 PM",
+  "generated": "Jul 3, 2026, 11:17 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -93716,7 +93716,7 @@
                 "crn": 350425,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 44,
+                "seatsAvailable": 43,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -93733,7 +93733,7 @@
                     "building": "",
                     "room": "Higgins Labs 116",
                     "seats": 60,
-                    "seatsAvailable": 44,
+                    "seatsAvailable": 43,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
