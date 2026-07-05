@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 5, 2026, 12:46 PM",
+  "generated": "Jul 5, 2026, 2:28 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -92819,7 +92819,7 @@
                 "crn": 350273,
                 "number": "F02",
                 "seats": 27,
-                "seatsAvailable": 5,
+                "seatsAvailable": 6,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -92836,7 +92836,7 @@
                     "building": "",
                     "room": "Unity Hall 520",
                     "seats": 27,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F02",
@@ -157648,7 +157648,7 @@
                 "number": "DL01",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 24,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5448",
                 "computedTerm": "D",
@@ -157665,7 +157665,7 @@
                     "room": "Unity Hall 235 IMGD Computer Lab",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 24,
                     "specificSection": "DL01",
                     "days": [
