@@ -3,6 +3,7 @@ import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { componentWizardService } from '../../services/scheduling/componentWizardService';
 import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 import { modalState } from '../../svelte/modals/modalState.svelte';
+import { getUiSnapshot, restoreUiSnapshot, closeAllModals, openModal } from '../ui/uiState.svelte';
 import { setReplacer, setReviver } from '../../utils';
 
 export class TutorialStateMachine {
@@ -19,7 +20,7 @@ export class TutorialStateMachine {
             activeScheduleId: state.activeScheduleId,
             schedules: this.deepClone(state.schedules),
             preferences: this.deepClone(state.preferences),
-            uiState: this.services.uiStateManager.getSnapshot(),
+            uiState: getUiSnapshot(),
             activeFilters: this.deepClone(this.services.filterService.getActiveFilters()),
         };
         this.snapshots.set(stepIndex, snapshot);
@@ -29,7 +30,7 @@ export class TutorialStateMachine {
         const snapshot = this.snapshots.get(stepIndex);
         if (!snapshot) return;
 
-        this.services.uiStateManager.closeAllModals();
+        closeAllModals();
         componentWizardService.closeComponentWizard();
 
         this.services.profileStateManager.restoreTutorialState({
@@ -43,7 +44,7 @@ export class TutorialStateMachine {
             this.services.filterService.addFilter(filter.id, filter.criteria);
         }
 
-        this.services.uiStateManager.restoreState(snapshot.uiState);
+        restoreUiSnapshot(snapshot.uiState);
 
         if (snapshot.uiState.wizard.isOpen && snapshot.uiState.wizard.courseId) {
             const { courseId, step } = snapshot.uiState.wizard;
@@ -71,10 +72,10 @@ export class TutorialStateMachine {
         switch (typeId) {
             case 'filter-modal':
                 modalState.filter = { mode: 'filter' };
-                this.services.uiStateManager.modalOpened('filter-modal');
+                openModal('filter-modal');
                 break;
             case 'schedule-picker':
-                this.services.uiStateManager.modalOpened('schedule-picker');
+                openModal('schedule-picker');
                 break;
             case 'auto-schedule':
                 autoScheduleService.openAutoSchedule();

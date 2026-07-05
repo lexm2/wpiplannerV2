@@ -6,6 +6,7 @@ import { appState } from '../../core/state/appState.svelte';
 import { componentWizardService } from '../../services/scheduling/componentWizardService';
 import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 import { modalState } from '../../svelte/modals/modalState.svelte';
+import { uiState, setPage, openModal, closeAllModals } from '../ui/uiState.svelte';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 
 export interface TutorialEntry {
@@ -102,7 +103,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         id: 'welcome',
         onStart: () => {
             componentWizardService.closeComponentWizard();
-            services.uiStateManager.setPage('planner');
+            setPage('planner');
         },
         steps: [
             {
@@ -185,7 +186,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
             id: 'filtering',
             onStart: async () => {
                 componentWizardService.closeComponentWizard();
-                services.uiStateManager.setPage('schedule');
+                setPage('schedule');
                 const selections: Array<[string, string, string | null, string | null]> = [
                     ['TUT-2001', 'TAL01', null, 'TAX01'],
                     ['TUT-2002', 'TDL01', null, 'TDX02'],
@@ -355,7 +356,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 }
             });
             services.filterService.clearFilters();
-            services.uiStateManager.setPage('schedule');
+            setPage('schedule');
         },
         steps: [
             {
@@ -446,7 +447,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         lastStepLabel: 'Finish',
         onStart: () => {
             componentWizardService.closeComponentWizard();
-            services.uiStateManager.setPage('planner');
+            setPage('planner');
         },
         steps: [
             {
@@ -527,49 +528,43 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         }
     });
 
-    tutorialService.onUIStateTransition((uiState) => {
-        if (uiState.currentPage) {
-            services.uiStateManager.setPage(uiState.currentPage);
+    tutorialService.onUIStateTransition((desired) => {
+        if (desired.currentPage) {
+            setPage(desired.currentPage);
         }
-        if (uiState.wizard?.isOpen && uiState.wizard.courseId) {
-            const { courseId, step } = uiState.wizard;
+        if (desired.wizard?.isOpen && desired.wizard.courseId) {
+            const { courseId, step } = desired.wizard;
             const selected = services.courseSelectionService.getSelectedCourses()
                 .find(sc => sc.course.id === courseId);
             if (selected) {
                 componentWizardService.openComponentWizard(selected.course, selected, step ?? undefined);
             }
-        } else if (uiState.wizard && !uiState.wizard.isOpen) {
+        } else if (desired.wizard && !desired.wizard.isOpen) {
             componentWizardService.closeComponentWizard();
         }
-        const currentTypes = services.uiStateManager.getState().openModals;
-        if (uiState.openModals !== undefined) {
-            const desiredTypes = uiState.openModals;
+        const currentTypes = uiState.openModals;
+        if (desired.openModals !== undefined) {
+            const desiredTypes = desired.openModals;
             const same = currentTypes.length === desiredTypes.length
                 && desiredTypes.every(t => currentTypes.includes(t));
             if (!same) {
-                services.uiStateManager.closeAllModals();
-                for (const typeId of [...currentTypes]) {
-                    services.uiStateManager.modalClosed(typeId);
-                }
+                closeAllModals();
                 for (const modalId of desiredTypes) {
                     if (modalId === 'filter-modal') {
                         modalState.filter = { mode: 'filter' };
-                        services.uiStateManager.modalOpened('filter-modal');
+                        openModal('filter-modal');
                     }
-                    if (modalId === 'schedule-picker') services.uiStateManager.modalOpened('schedule-picker');
+                    if (modalId === 'schedule-picker') openModal('schedule-picker');
                     if (modalId === 'auto-schedule') autoScheduleService.openAutoSchedule();
                     if (modalId === 'auto-schedule-intro') autoScheduleService.openAutoScheduleIntro();
                     if (modalId === 'auto-schedule-filter') autoScheduleService.openAutoScheduleFilter();
                 }
             }
         } else {
-            services.uiStateManager.closeAllModals();
-            for (const typeId of [...currentTypes]) {
-                services.uiStateManager.modalClosed(typeId);
-            }
+            closeAllModals();
         }
-        if (uiState.schedulePickerTab) {
-            modalState.schedulePickerTab = uiState.schedulePickerTab;
+        if (desired.schedulePickerTab) {
+            modalState.schedulePickerTab = desired.schedulePickerTab;
         }
     });
 

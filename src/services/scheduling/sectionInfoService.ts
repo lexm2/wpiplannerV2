@@ -1,8 +1,8 @@
 import { modalState } from '../../svelte/modals/modalState.svelte'
 import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState.svelte'
+import { openModal } from '../ui/uiState.svelte'
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { CourseColorService } from './CourseColorService'
-import type { UIStateManager } from '../ui/UIStateManager'
 import type { Course, Section } from '../../types/types'
 
 /**
@@ -10,25 +10,22 @@ import type { Course, Section } from '../../types/types'
  *
  * Resolves the clicked section/course from either the wizard preview rune
  * (schedulePreviewState) or the saved selection (CourseSelectionService), then
- * shows the declarative section-info modal via modalState + UIStateManager.
+ * shows the declarative section-info modal via modalState + openModal.
  * Color get/set route straight through CourseColorService.
  *
- * Needs CourseSelectionService, CourseColorService (both non-singletons) +
- * UIStateManager, injected once via init().
+ * Needs CourseSelectionService, CourseColorService (both non-singletons),
+ * injected once via init().
  */
 class SectionInfoService {
     private courseSelectionService: CourseSelectionService | null = null
     private colorService: CourseColorService | null = null
-    private uiStateManager: UIStateManager | null = null
 
     init(
         courseSelectionService: CourseSelectionService,
         colorService: CourseColorService,
-        uiStateManager: UIStateManager,
     ): void {
         this.courseSelectionService = courseSelectionService
         this.colorService = colorService
-        this.uiStateManager = uiStateManager
     }
 
     show(courseId: string, sectionNumber: string): void {
@@ -86,7 +83,7 @@ class SectionInfoService {
             currentColor: this.colorService.getCourseColor(courseId),
             onColorChange: (color: string) => this.colorService?.setCourseColor(courseId, color),
         }
-        this.uiStateManager?.modalOpened('section-info')
+        openModal('section-info')
     }
 }
 

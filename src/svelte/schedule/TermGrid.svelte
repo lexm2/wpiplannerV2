@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getInlineSVG } from '../../utils/iconPaths';
-  import { TimeUtils } from '../../ui/utils/timeUtils';
+  import { TimeUtils } from '../../utils/timeUtils';
   import { scheduleSidebarState } from '../scheduleSidebarState.svelte';
   import { WEEKDAYS, type GridBlock } from './scheduleGeometry';
 

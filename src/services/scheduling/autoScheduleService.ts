@@ -1,12 +1,12 @@
 import { appState } from '../../core/state/appState.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
+import { openModal } from '../ui/uiState.svelte'
 import type { SelectedCourse } from '../../types/schedule'
 import type { WeeklyTimeSlot } from '../../types/schedule'
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { FilterService } from '../filtering/FilterService'
 import type { CourseColorService } from './CourseColorService'
 import type { AutoScheduleOrchestrator } from './AutoScheduleOrchestrator'
-import type { UIStateManager } from '../ui/UIStateManager'
 
 /**
  * Standalone auto-schedule modal orchestration for the schedule page.
@@ -16,27 +16,24 @@ import type { UIStateManager } from '../ui/UIStateManager'
  * CourseSelectionService and surfaces the generating overlay through the
  * `appState.scheduleGenerating` rune.
  *
- * Needs the non-singleton services injected once via init() from MainController.
+ * Needs the non-singleton services injected once via init() from AppBootstrap.
  */
 class AutoScheduleService {
     private courseSelectionService: CourseSelectionService | null = null
     private filterService: FilterService | null = null
     private colorService: CourseColorService | null = null
     private orchestrator: AutoScheduleOrchestrator | null = null
-    private uiStateManager: UIStateManager | null = null
 
     init(
         courseSelectionService: CourseSelectionService,
         filterService: FilterService,
         colorService: CourseColorService,
         orchestrator: AutoScheduleOrchestrator,
-        uiStateManager: UIStateManager,
     ): void {
         this.courseSelectionService = courseSelectionService
         this.filterService = filterService
         this.colorService = colorService
         this.orchestrator = orchestrator
-        this.uiStateManager = uiStateManager
     }
 
     async openAutoSchedule(): Promise<void> {
@@ -54,19 +51,13 @@ class AutoScheduleService {
             return
         }
 
-        if (!this.uiStateManager) {
-            console.error('[Auto-Schedule] UI state manager not available')
-            await this.doGenerateSchedules(selectedCourses, { blockedTimes: [] })
-            return
-        }
-
         // Intro modal → its onNext opens the filter modal with the term-filtered courses.
         modalState.autoScheduleIntro = {
             selectedCourses,
             getColor: (id) => this.colorService?.getCourseColor(id) ?? '',
             onNext: (filtered) => this.openScheduleFilterModal(filtered),
         }
-        this.uiStateManager?.modalOpened('auto-schedule-intro')
+        openModal('auto-schedule-intro')
     }
 
     /** Open the declarative FilterModal (auto-schedule mode) for the given courses. */
@@ -77,7 +68,7 @@ class AutoScheduleService {
             coursesToSchedule,
             onGenerate: () => this.doGenerateSchedules(coursesToSchedule),
         }
-        this.uiStateManager?.modalOpened('auto-schedule-filter')
+        openModal('auto-schedule-filter')
     }
 
     openAutoScheduleIntro(): void {
@@ -88,7 +79,7 @@ class AutoScheduleService {
             getColor: (id) => this.colorService?.getCourseColor(id) ?? '',
             onNext: (filtered) => this.openScheduleFilterModal(filtered),
         }
-        this.uiStateManager?.modalOpened('auto-schedule-intro')
+        openModal('auto-schedule-intro')
     }
 
     updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {

@@ -1,4 +1,4 @@
-import { Time, DayOfWeek } from '../../types/types';
+import { Time, DayOfWeek } from '../types/types';
 
 export class TimeUtils {
     // Schedule grid: 8 AM to 8 PM, hourly slots

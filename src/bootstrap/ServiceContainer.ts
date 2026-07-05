@@ -7,8 +7,6 @@ import { FilterService } from '../services/filtering/FilterService'
 import { ScheduleManagementService } from '../services/selection/ScheduleManagementService'
 import { ThemeManager } from '../themes/ThemeManager'
 import { OperationManager } from '../utils/RequestCancellation'
-import { UIStateManager } from '../services/ui/UIStateManager'
-import { TimestampManager } from '../ui/controllers/TimestampManager'
 import { CourseColorService } from '../services/scheduling/CourseColorService'
 import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator'
 import { DegreeImportService } from '../services/degree/degreeImportService'
@@ -25,8 +23,6 @@ export interface ServiceContainer {
     scheduleManagementService: ScheduleManagementService;
     themeManager: ThemeManager;
     operationManager: OperationManager;
-    uiStateManager: UIStateManager;
-    timestampManager: TimestampManager;
     colorService: CourseColorService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
     degreeImportService: DegreeImportService;

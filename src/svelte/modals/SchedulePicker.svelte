@@ -5,16 +5,15 @@
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { ThemeManager } from '../../themes/ThemeManager';
+  import { openModal, showAppError } from '../../services/ui/uiState.svelte';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
-  import type { UIStateManager } from '../../services/ui/UIStateManager';
   import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
 
-  let { scheduleManagementService, uiStateManager, profileStateManager, getTutorial, onRequestClose }: {
+  let { scheduleManagementService, profileStateManager, getTutorial, onRequestClose }: {
     scheduleManagementService: ScheduleManagementService;
-    uiStateManager: UIStateManager;
     profileStateManager: ProfileStateManager;
     getTutorial: () => TutorialSetup | undefined;
     onRequestClose: () => void;
@@ -294,20 +293,20 @@
   function undo(): void {
     profileStateManager.undo().catch(error => {
       console.error('Undo failed:', error);
-      uiStateManager.showErrorMessage('Failed to undo. Please try again.');
+      showAppError('Failed to undo. Please try again.');
     });
   }
   function redo(): void {
     profileStateManager.redo().catch(error => {
       console.error('Redo failed:', error);
-      uiStateManager.showErrorMessage('Failed to redo. Please try again.');
+      showAppError('Failed to redo. Please try again.');
     });
   }
 
-  function openChangelog(): void { uiStateManager.modalOpened('changelog'); }
+  function openChangelog(): void { openModal('changelog'); }
   function openTutorials(close: () => void): void {
     close();
-    if (getTutorial()) uiStateManager.modalOpened('tutorials');
+    if (getTutorial()) openModal('tutorials');
   }
 </script>
 

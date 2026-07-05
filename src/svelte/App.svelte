@@ -4,7 +4,7 @@
   import type { Course } from '../types/types';
   import type { SelectedCourse } from '../types/schedule';
   import type { ServiceContainer } from '../bootstrap/ServiceContainer';
-  import { uiState } from '../services/ui/uiState.svelte';
+  import { uiState, setPage, openModal, showAppError } from '../services/ui/uiState.svelte';
   import { appState } from '../core/state/appState.svelte';
   import { modalState } from './modals/modalState.svelte';
   import { componentWizardService } from '../services/scheduling/componentWizardService';
@@ -35,6 +35,7 @@
   import ScheduleGrids from './schedule/ScheduleGrids.svelte';
   import DegreePage from './degree/DegreePage.svelte';
   import ResizeHandle from './ResizeHandle.svelte';
+  import ErrorBanner from './ErrorBanner.svelte';
   import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
 
   // Restore any saved sidebar widths before first paint to avoid a layout flash.
@@ -62,38 +63,33 @@
   function handleUndo(): void {
     services.profileStateManager.undo().catch(error => {
       console.error('Undo failed:', error);
-      services.uiStateManager.showErrorMessage('Failed to undo. Please try again.');
+      showAppError('Failed to undo. Please try again.');
     });
   }
 
   function handleRedo(): void {
     services.profileStateManager.redo().catch(error => {
       console.error('Redo failed:', error);
-      services.uiStateManager.showErrorMessage('Failed to redo. Please try again.');
+      showAppError('Failed to redo. Please try again.');
     });
   }
 
   function openFilterModal(): void {
     modalState.filter = { mode: 'filter' };
-    services.uiStateManager.modalOpened('filter-modal');
+    openModal('filter-modal');
   }
 
   function openSchedulePicker(): void {
-    services.uiStateManager.modalOpened('schedule-picker');
+    openModal('schedule-picker');
   }
 
   function switchToPageView(page: PageId): void {
-    if (page === 'planner') {
-      // Close the wizard when switching back to the classes/planner page.
+    if (page !== 'schedule') {
+      // The wizard belongs to the planner/schedule flow; close it when
+      // switching to the classes/planner or degree page.
       componentWizardService.closeComponentWizard();
-      services.uiStateManager.setPage('planner');
-    } else if (page === 'degree') {
-      // The wizard belongs to the planner/schedule flow; close it here too.
-      componentWizardService.closeComponentWizard();
-      services.uiStateManager.setPage('degree');
-    } else {
-      services.uiStateManager.setPage('schedule');
     }
+    setPage(page);
   }
 
   function toggleTheme(): void {
@@ -119,6 +115,8 @@
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
+
+<ErrorBanner />
 
 <header class="app-header">
   <div class="header-content">
@@ -180,7 +178,7 @@
           <FilterButtons filterService={services.filterService} onFilter={openFilterModal} />
         </div>
         <div id="view-toggle" class="view-toggle">
-          <ViewToggle uiStateManager={services.uiStateManager} />
+          <ViewToggle />
         </div>
       </div>
     </div>

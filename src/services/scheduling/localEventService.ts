@@ -1,7 +1,7 @@
 import { appState } from '../../core/state/appState.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
+import { openModal } from '../ui/uiState.svelte'
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager'
-import type { UIStateManager } from '../ui/UIStateManager'
 import type { LocalCalendarEvent } from '../../types/schedule'
 
 /**
@@ -13,16 +13,13 @@ import type { LocalCalendarEvent } from '../../types/schedule'
  * re-derives and the reactive grid drops/adds the calendar-event blocks on its
  * own.
  *
- * Needs ProfileStateManager (not a singleton) + UIStateManager, injected once via
- * init().
+ * Needs ProfileStateManager (not a singleton), injected once via init().
  */
 class LocalEventService {
     private profileStateManager: ProfileStateManager | null = null
-    private uiStateManager: UIStateManager | null = null
 
-    init(profileStateManager: ProfileStateManager, uiStateManager: UIStateManager): void {
+    init(profileStateManager: ProfileStateManager): void {
         this.profileStateManager = profileStateManager
-        this.uiStateManager = uiStateManager
     }
 
     openAddModal(): void {
@@ -34,18 +31,18 @@ class LocalEventService {
         modalState.localEvent = {
             onSave: (eventData) => this.add(eventData),
         }
-        this.uiStateManager?.modalOpened('local-event')
+        openModal('local-event')
     }
 
     /** Delete-confirmation modal for a local event (the grid's external-event-block click target). */
     openDeleteModal(eventId: string): void {
         const schedule = appState.activeSchedule
-        if (!schedule || !this.uiStateManager) return
+        if (!schedule) return
 
         const localEvent = (schedule.localEvents || []).find(e => e.id === eventId)
         const title = localEvent?.title || 'Untitled Event'
         modalState.deleteLocalEvent = { title, onConfirm: () => this.delete(eventId) }
-        this.uiStateManager.modalOpened('delete-local-event')
+        openModal('delete-local-event')
     }
 
     private add(eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): void {

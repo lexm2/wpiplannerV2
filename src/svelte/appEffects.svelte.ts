@@ -3,6 +3,7 @@ import type { PageId } from '../types/uiState';
 import type { ServiceContainer } from '../bootstrap/ServiceContainer';
 import { uiState } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
+import { updateClientTimestamp } from './timestampState.svelte';
 
 /**
  * Installs the app's global side-effect bridges — the runes-native replacement
@@ -96,7 +97,7 @@ export function installAppEffects(services: ServiceContainer): void {
             if (!initialLoadDone) {
                 initialLoadDone = true;
                 services.courseSelectionService.reconstructSectionObjects();
-                services.timestampManager.updateClientTimestamp();
+                updateClientTimestamp();
 
                 // Backfill year for existing schedules that lack one.
                 const defaultYear = services.profileStateManager.getDefaultAcademicYear();

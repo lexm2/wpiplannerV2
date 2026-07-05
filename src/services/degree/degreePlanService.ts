@@ -1,7 +1,7 @@
 import { appState } from '../../core/state/appState.svelte';
+import { setPage } from '../ui/uiState.svelte';
 import type { ScheduleManagementService } from '../selection/ScheduleManagementService';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
-import type { UIStateManager } from '../ui/UIStateManager';
 import type { FilterService } from '../filtering/FilterService';
 import type { Requirement, StudentRecord } from '../../types/degree';
 import { matchPlannedCourses, type PlanMatchResult } from './planMatcher';
@@ -23,18 +23,15 @@ import { courseListState } from '../../svelte/courseListState.svelte';
 class DegreePlanService {
     private scheduleManagementService: ScheduleManagementService | null = null;
     private profileStateManager: ProfileStateManager | null = null;
-    private uiStateManager: UIStateManager | null = null;
     private filterService: FilterService | null = null;
 
     init(
         scheduleManagementService: ScheduleManagementService,
         profileStateManager: ProfileStateManager,
-        uiStateManager: UIStateManager,
         filterService: FilterService,
     ): void {
         this.scheduleManagementService = scheduleManagementService;
         this.profileStateManager = profileStateManager;
-        this.uiStateManager = uiStateManager;
         this.filterService = filterService;
     }
 
@@ -72,7 +69,7 @@ class DegreePlanService {
 
         await this.scheduleManagementService.setActiveSchedule(scheduleId);
         this.profileStateManager.save();
-        this.uiStateManager?.setPage('schedule');
+        setPage('schedule');
 
         return stats;
     }
@@ -131,7 +128,7 @@ class DegreePlanService {
             this.filterService.addFilter('academicYear', { year });
         }
 
-        this.uiStateManager?.setPage('planner');
+        setPage('planner');
     }
 
     /**
@@ -158,7 +155,7 @@ class DegreePlanService {
         }
 
         courseListState.selectedCourse = course;
-        this.uiStateManager?.setPage('planner');
+        setPage('planner');
         scrollCourseIntoView(course.id);
     }
 }

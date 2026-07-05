@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { uiState } from '../../services/ui/uiState.svelte';
+  import { uiState, closeModal } from '../../services/ui/uiState.svelte';
   import MobileNotice from './MobileNotice.svelte';
   import Changelog from './Changelog.svelte';
   import Tutorials from './Tutorials.svelte';
@@ -9,7 +9,6 @@
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
   import SchedulePicker from './SchedulePicker.svelte';
   import FilterModal from './FilterModal.svelte';
-  import type { UIStateManager } from '../../services/ui/UIStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { FilterService } from '../../services/filtering/FilterService';
@@ -19,7 +18,6 @@
   import type { Department } from '../../types/types';
 
   let {
-    uiStateManager,
     getTutorial,
     scheduleManagementService,
     filterService,
@@ -28,11 +26,10 @@
     profileStateManager,
     getDepartments,
   }: {
-    uiStateManager: UIStateManager;
-    // Thunk, not a value: services.tutorial is assigned after MainController is
-    // constructed (and after this layer mounts), so it must be read lazily at
-    // render time. The {#each} re-runs on every uiState.openModals change, so
-    // reading it when 'tutorials' opens returns the (by-then-set) instance.
+    // Thunk, not a value: services.tutorial is assigned after this layer
+    // mounts, so it must be read lazily at render time. The {#each} re-runs on
+    // every uiState.openModals change, so reading it when 'tutorials' opens
+    // returns the (by-then-set) instance.
     getTutorial: () => TutorialSetup | undefined;
     scheduleManagementService: ScheduleManagementService;
     filterService: FilterService;
@@ -47,7 +44,7 @@
   // open modal type-id in the registry below; uiState.openModals is the sole
   // modal source of truth.
   //
-  // Closing goes through uiStateManager.modalClosed(id) so uiState.openModals
+  // Closing goes through closeModal(id) so uiState.openModals
   // stays the single source of truth (keeping tutorial snapshots correct);
   // that removal unmounts the component, after its 200ms hide animation has
   // already played. Payload modals (section-info, delete-local-event) read
@@ -56,29 +53,28 @@
 
 {#each uiState.openModals as id (id)}
   {#if id === 'mobile-notice'}
-    <MobileNotice onRequestClose={() => uiStateManager.modalClosed('mobile-notice')} />
+    <MobileNotice onRequestClose={() => closeModal('mobile-notice')} />
   {:else if id === 'changelog'}
-    <Changelog onRequestClose={() => uiStateManager.modalClosed('changelog')} />
+    <Changelog onRequestClose={() => closeModal('changelog')} />
   {:else if id === 'tutorials'}
     {@const tutorial = getTutorial()}
     {#if tutorial}
-      <Tutorials {tutorial} onRequestClose={() => uiStateManager.modalClosed('tutorials')} />
+      <Tutorials {tutorial} onRequestClose={() => closeModal('tutorials')} />
     {/if}
   {:else if id === 'section-info'}
-    <SectionInfo onRequestClose={() => uiStateManager.modalClosed('section-info')} />
+    <SectionInfo onRequestClose={() => closeModal('section-info')} />
   {:else if id === 'delete-local-event'}
-    <DeleteLocalEvent onRequestClose={() => uiStateManager.modalClosed('delete-local-event')} />
+    <DeleteLocalEvent onRequestClose={() => closeModal('delete-local-event')} />
   {:else if id === 'local-event'}
-    <LocalEvent onRequestClose={() => uiStateManager.modalClosed('local-event')} />
+    <LocalEvent onRequestClose={() => closeModal('local-event')} />
   {:else if id === 'auto-schedule-intro'}
-    <AutoScheduleIntro onRequestClose={() => uiStateManager.modalClosed('auto-schedule-intro')} />
+    <AutoScheduleIntro onRequestClose={() => closeModal('auto-schedule-intro')} />
   {:else if id === 'schedule-picker'}
     <SchedulePicker
       {scheduleManagementService}
-      {uiStateManager}
       {profileStateManager}
       {getTutorial}
-      onRequestClose={() => uiStateManager.modalClosed('schedule-picker')}
+      onRequestClose={() => closeModal('schedule-picker')}
     />
   {:else if id === 'filter-modal'}
     <FilterModal
@@ -88,7 +84,7 @@
       {autoScheduleOrchestrator}
       {profileStateManager}
       {getDepartments}
-      onRequestClose={() => uiStateManager.modalClosed('filter-modal')}
+      onRequestClose={() => closeModal('filter-modal')}
     />
   {:else if id === 'auto-schedule-filter'}
     <FilterModal
@@ -98,7 +94,7 @@
       {autoScheduleOrchestrator}
       {profileStateManager}
       {getDepartments}
-      onRequestClose={() => uiStateManager.modalClosed('auto-schedule-filter')}
+      onRequestClose={() => closeModal('auto-schedule-filter')}
     />
   {/if}
 {/each}

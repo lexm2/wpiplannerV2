@@ -7,8 +7,8 @@ import { ProfileStateManager } from '../core/state/ProfileStateManager'
 import { StorageService } from '../services/selection/StorageService'
 import { ThemeManager } from '../themes/ThemeManager'
 import { OperationManager } from '../utils/RequestCancellation'
-import { UIStateManager } from '../services/ui/UIStateManager'
-import { TimestampManager } from '../ui/controllers/TimestampManager'
+import { showAppError } from '../services/ui/uiState.svelte'
+import { loadServerTimestamp } from '../svelte/timestampState.svelte'
 import { rateMyProfessorService } from '../services/external/RateMyProfessorService'
 import { StorageWorkerManager } from '../workers/StorageWorkerManager'
 import { TermBoundsService } from '../utils/termBounds'
@@ -43,8 +43,6 @@ export class AppBootstrap {
 
         const scheduleManagementService = new ScheduleManagementService(profileStateManager, courseSelectionService);
 
-        const uiStateManager = new UIStateManager();
-        const timestampManager = new TimestampManager();
         const operationManager = new OperationManager();
 
         // Derived UI services: depend only on courseSelectionService/filterService.
@@ -66,8 +64,6 @@ export class AppBootstrap {
             scheduleManagementService,
             themeManager,
             operationManager,
-            uiStateManager,
-            timestampManager,
             colorService,
             autoScheduleOrchestrator,
             degreeImportService,
@@ -79,15 +75,15 @@ export class AppBootstrap {
     static initStandaloneServices(services: ServiceContainer): void {
         const {
             courseSelectionService, courseDataService, filterService,
-            profileStateManager, uiStateManager, colorService, autoScheduleOrchestrator,
+            profileStateManager, colorService, autoScheduleOrchestrator,
             scheduleManagementService,
         } = services;
 
         componentWizardService.init(courseSelectionService, courseDataService, filterService);
-        localEventService.init(profileStateManager, uiStateManager);
-        sectionInfoService.init(courseSelectionService, colorService, uiStateManager);
-        autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator, uiStateManager);
-        degreePlanService.init(scheduleManagementService, profileStateManager, uiStateManager, filterService);
+        localEventService.init(profileStateManager);
+        sectionInfoService.init(courseSelectionService, colorService);
+        autoScheduleService.init(courseSelectionService, filterService, colorService, autoScheduleOrchestrator);
+        degreePlanService.init(scheduleManagementService, profileStateManager, filterService);
     }
 
     static initializeFilters(services: ServiceContainer): void {
@@ -110,7 +106,7 @@ export class AppBootstrap {
     }
 
     static async initializeAsyncServices(services: ServiceContainer): Promise<void> {
-        const { storageService, courseSelectionService, scheduleManagementService, courseDataService, timestampManager } = services;
+        const { storageService, courseSelectionService, scheduleManagementService, courseDataService } = services;
 
         const storageWorker = StorageWorkerManager.getInstance();
         await storageWorker.initialize();
@@ -123,7 +119,7 @@ export class AppBootstrap {
         await TermBoundsService.getInstance().loadTermBounds();
 
         await courseDataService.loadCourseData();
-        await timestampManager.loadServerTimestamp();
+        await loadServerTimestamp();
 
         // Rehydrate a previously-imported degree record (no-op if none/invalid).
         await services.degreeImportService.load();
@@ -165,7 +161,7 @@ export class AppBootstrap {
             }
         } catch (error) {
             console.error('Failed to initialize application:', error);
-            services.uiStateManager.showErrorMessage(
+            showAppError(
                 'Failed to initialize application. Some features may not work properly.',
                 () => services.scheduleManagementService.clearAllSchedules()
             );

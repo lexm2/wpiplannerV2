@@ -6,6 +6,7 @@ import { DeviceDetection } from './utils/deviceDetection'
 import { AppBootstrap } from './bootstrap/AppBootstrap'
 import { setupTutorial } from './services/tutorial/setupTutorial'
 import { appState } from './core/state/appState.svelte'
+import { openModal } from './services/ui/uiState.svelte'
 import type { ServiceContainer } from './bootstrap/ServiceContainer'
 
 DeviceDetection.initialize();
@@ -34,7 +35,6 @@ if (modalRootEl) {
     mount(ModalLayer, {
         target: modalRootEl,
         props: {
-            uiStateManager: services.uiStateManager,
             getTutorial: () => services.tutorial,
             scheduleManagementService: services.scheduleManagementService,
             filterService: services.filterService,
@@ -47,9 +47,9 @@ if (modalRootEl) {
 }
 
 if (DeviceDetection.isMobilePhone()) {
-    // Open the (now Svelte) mobile-notice modal declaratively: push its id into
-    // uiState.openModals via the manager. ModalLayer renders it reactively.
-    services.uiStateManager.modalOpened('mobile-notice');
+    // Open the mobile-notice modal declaratively: push its id into
+    // uiState.openModals. ModalLayer renders it reactively.
+    openModal('mobile-notice');
 }
 
 services.tutorial = setupTutorial(services);

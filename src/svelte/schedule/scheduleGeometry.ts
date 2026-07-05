@@ -7,7 +7,7 @@ import {
 } from '../../types/schedule';
 import type { ComponentSelections } from '../../types/scheduling';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
-import { TimeUtils } from '../../ui/utils/timeUtils';
+import { TimeUtils } from '../../utils/timeUtils';
 
 /**
  * Pure geometry/data helpers for the declarative schedule grid (no Svelte/DOM).
