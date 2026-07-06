@@ -6,13 +6,6 @@
   transform: rotate(180deg);
 }
 
-/* Menu visible state - shows the options dropdown */
-.show {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
 /* Individual theme option */
 .theme-option {
   padding: 0.75rem 1rem;

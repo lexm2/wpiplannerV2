@@ -2,7 +2,8 @@
    Sidebar Panel - Base styles for all sidebar overlay panels
    ============================================================================= */
 
-/* Base panel container - positioned over sidebar content */
+/* Base panel container - positioned over sidebar content; enter/exit
+   animation lives on each panel component. */
 .sidebar-panel {
     position: absolute;
     top: 0;
@@ -13,147 +14,6 @@
     z-index: 10;
     display: flex;
     flex-direction: column;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-.sidebar-panel.active {
-    opacity: 1;
-}
-
-/* =============================================================================
-   Slide Animations
-   ============================================================================= */
-
-/* Slide in from right */
-.sidebar-panel.slide-in-right {
-    animation: slideInRight 0.25s ease forwards;
-}
-
-/* Slide in from left */
-.sidebar-panel.slide-in-left {
-    animation: slideInLeft 0.25s ease forwards;
-}
-
-/* Slide out to left */
-.sidebar-panel.slide-out-left {
-    animation: slideOutLeft 0.25s ease forwards;
-}
-
-/* Slide out to right */
-.sidebar-panel.slide-out-right {
-    animation: slideOutRight 0.25s ease forwards;
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInLeft {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideOutLeft {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-}
-
-@keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-
-/* =============================================================================
-   Animated List Styles
-   ============================================================================= */
-
-/* Base list container */
-.sidebar-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-/* Base list item with stagger animation support */
-.sidebar-list-item {
-    opacity: 0;
-    transform: translateX(20px);
-    animation: slideInListItem 0.25s ease forwards;
-    animation-delay: calc(var(--card-index, 0) * 40ms);
-}
-
-@keyframes slideInListItem {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Group styles */
-.sidebar-list-group {
-    margin-bottom: 1rem;
-}
-
-.sidebar-list-group:last-child {
-    margin-bottom: 0;
-}
-
-.sidebar-list-group-header {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    padding: 0.75rem 0 0.5rem 0;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid var(--color-border);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Slide out animations for exit transitions */
-.sidebar-list--exiting .sidebar-list-item {
-    animation: slideOutListItem 0.25s ease forwards;
-    animation-delay: calc(var(--card-index, 0) * 40ms);
-}
-
-@keyframes slideOutListItem {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
 }
 
 /* =============================================================================

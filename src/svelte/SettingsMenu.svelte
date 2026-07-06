@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { fly } from 'svelte/transition';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
+  import { dur } from './transitions';
 
   // Declarative replacement for MainController.setupSettingsMenu (the vanilla DOM
   // build that appended a dropdown to document.body). The dropdown is
@@ -41,7 +43,12 @@
   onclick={toggle}
 >{@html getInlineSVG('SETTINGS', 'settings-icon')}</button>
 
-<div class="settings-dropdown-menu" id="settings-dropdown-menu" class:active={open}>
+{#if open}
+<div
+  class="settings-dropdown-menu"
+  id="settings-dropdown-menu"
+  transition:fly={{ y: -10, duration: dur(200) }}
+>
   <button class="settings-menu-item" onclick={onSchedules}>
     {@html getInlineSVG('CALENDAR_UP', 'menu-item-icon')}<span>Schedules</span>
   </button>
@@ -55,3 +62,4 @@
     {@html getInlineSVG('ARROW_FORWARD_UP', 'menu-item-icon')}<span>Redo</span>
   </button>
 </div>
+{/if}

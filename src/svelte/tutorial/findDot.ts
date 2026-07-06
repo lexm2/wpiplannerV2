@@ -45,27 +45,24 @@ export function animateFindDot(selector: string): void {
         { duration: 300, easing: 'ease-out', fill: 'forwards' }
     );
 
-    growIn.onfinish = () => {
-        const travel = dot.animate(
+    growIn.finished
+        .then(() => dot.animate(
             [
                 { transform: 'translate(-50%, -50%) scale(1)' },
                 { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
             ],
             { duration: 500, easing: 'cubic-bezier(0.76, 0, 0.24, 1)', fill: 'forwards' }
-        );
-
-        travel.onfinish = () => {
-            setTimeout(() => {
-                overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
-                const fadeOut = dot.animate(
-                    [
-                        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
-                        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)` },
-                    ],
-                    { duration: 300, easing: 'ease-in', fill: 'forwards' }
-                );
-                fadeOut.onfinish = cleanup;
-            }, 500);
-        };
-    };
+        ).finished)
+        .then(() => {
+            // The 500ms delay is the hold on the target before fading away.
+            overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 500, fill: 'forwards' });
+            return dot.animate(
+                [
+                    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)` },
+                    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)` },
+                ],
+                { duration: 300, delay: 500, easing: 'ease-in', fill: 'forwards' }
+            ).finished;
+        })
+        .then(cleanup, cleanup);
 }

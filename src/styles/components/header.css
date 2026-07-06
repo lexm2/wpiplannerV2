@@ -240,9 +240,10 @@
   fill: var(--color-primary);
 }
 
-/* Settings dropdown menu */
+/* Settings dropdown menu — open/close animation lives in SettingsMenu.svelte. */
 .settings-dropdown-menu {
-  display: none;
+  display: flex;
+  flex-direction: column;
   position: fixed;
   top: calc(var(--spacing-header-height) + 0.5rem);
   right: 2rem;
@@ -253,23 +254,6 @@
   z-index: 90;
   min-width: 200px;
   overflow: hidden;
-}
-
-.settings-dropdown-menu.active {
-  display: flex;
-  flex-direction: column;
-  animation: slideDown 0.2s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .settings-menu-item {
@@ -352,7 +336,8 @@
     margin-left: auto;
   }
 
-  .app-header .header-controls > :not(.settings-menu-btn):not(.hamburger-btn) {
+  /* The dropdown is a header-controls child (position:fixed) — keep it visible too. */
+  .app-header .header-controls > :not(.settings-menu-btn):not(.hamburger-btn):not(.settings-dropdown-menu) {
     display: none;
   }
 

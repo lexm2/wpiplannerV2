@@ -47,8 +47,4 @@
   box-shadow: var(--effect-shadow);
   min-width: 200px;
   z-index: 90;
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
 }

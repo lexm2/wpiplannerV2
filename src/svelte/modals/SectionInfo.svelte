@@ -1,5 +1,6 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
+  import { scaleFade } from '../transitions';
   import { modalState } from './modalState.svelte';
   import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../../utils/iconPaths';
@@ -82,7 +83,7 @@
             <span>Change Sections</span>
           </button>
 
-          <div class="section-card section-card--primary">
+          <div class="section-card section-card--primary" in:scaleFade|global={{ duration: 300 }}>
             <div class="section-card-header">
               {@html getInlineSVG('BOOKMARK', 'section-card-header-icon')}
               <span class="section-card-header-label">Section Overview</span>
@@ -142,7 +143,7 @@
             </div>
           </div>
 
-          <div class="section-card section-card--schedule">
+          <div class="section-card section-card--schedule" in:scaleFade|global={{ duration: 300 }}>
             <div class="section-card-header">
               {@html getInlineSVG('CLOCK', 'section-card-header-icon')}
               <span class="section-card-header-label">Meeting Times</span>
@@ -175,7 +176,7 @@
           </div>
 
           {#if data.section.note}
-            <div class="section-card section-card--note">
+            <div class="section-card section-card--note" in:scaleFade|global={{ duration: 300 }}>
               <div class="section-card-header">
                 <span class="section-card-header-label">Section Note</span>
               </div>

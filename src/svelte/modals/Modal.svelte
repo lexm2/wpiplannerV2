@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
   import type { Snippet } from 'svelte';
   import { trapFocus } from './trapFocus';
+  import { zoom, dur } from '../transitions';
 
   let {
     typeId,
@@ -37,25 +38,13 @@
     children: Snippet<[() => void]>;
   } = $props();
 
-  // Mirrors ModalService.showModal/hideModal animation sequencing:
-  //  - show: double rAF then add `.show` to backdrop + dialog
-  //  - hide: add `.hide`, wait 200ms, then remove from DOM (here: ask parent to
-  //    drop our id from uiState.openModals, which unmounts us).
-  let shown = $state(false);
-  let closing = $state(false);
-
-  onMount(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        shown = true;
-      });
-    });
-  });
+  // Backdrop fades, dialog zooms. `|global` because ModalLayer's {#each}
+  // unmounts us, so a local outro wouldn't play. `no-transform` dialogs
+  // (position:fixed descendants) skip the zoom; the backdrop fade still covers them.
+  const noTransform = $derived((dialogClass ?? '').includes('no-transform'));
 
   function close(): void {
-    if (closing) return;
-    closing = true;
-    setTimeout(() => onRequestClose(), 200);
+    onRequestClose();
   }
 
   function backdropClick(event: MouseEvent): void {
@@ -69,7 +58,7 @@
   }
 
   function onKeydown(event: KeyboardEvent): void {
-    if (closeOnEscape && event.key === 'Escape' && shown && !closing) {
+    if (closeOnEscape && event.key === 'Escape') {
       close();
     }
   }
@@ -80,16 +69,14 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (backdrop is click-to-close; Escape is handled on svelte:window) -->
 <div
   class="modal-backdrop modal-container {extraClass ?? ''}"
-  class:show={shown}
-  class:hide={closing}
   data-modal-type={typeId}
+  transition:fade|global={{ duration: dur(200) }}
   onclick={backdropClick}
 >
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus (dialog onclick only stops backdrop propagation) -->
   <div
     class="modal-dialog {dialogClass ?? ''}"
-    class:show={shown}
-    class:hide={closing}
+    transition:zoom|global={{ enabled: !noTransform }}
     role="dialog"
     aria-modal="true"
     aria-label={title}

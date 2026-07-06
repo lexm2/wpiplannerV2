@@ -7,6 +7,7 @@
   // All the imperative DOM-swapping the class did by hand is now plain $derived
   // reactivity over wizardState.{currentStep,selections} + the active filters.
   import { fade } from 'svelte/transition';
+  import { slideX, dur } from './transitions';
   import { wizardState } from './wizardState.svelte';
   import {
     determineAvailableSteps,
@@ -76,7 +77,9 @@
   const isFirstStep = $derived(currentIndex === 0);
   const isLastStep = $derived(currentIndex === availableSteps.length - 1);
   const hasSelection = $derived(selections[currentStep] !== null);
-  const enterClass = $derived(wizardState.direction === 'forward' ? styles['slide-in-right'] : styles['slide-in-left']);
+  // Steps (and their staggered cards) slide in from the side matching the
+  // navigation direction.
+  const dirSign = $derived(wizardState.direction === 'forward' ? 1 : -1);
 
   function selectSection(section: Section): void {
     const step = currentStep;
@@ -155,9 +158,8 @@
     if (e.key === 'Escape') cancel();
   }
 
-  // Mirror the old BaseSidebarPanel behavior: the sidebar content hides its overflow
-  // and footer while a panel is open, and the panel fades in one frame after mount.
-  let active = $state(false);
+  // The sidebar content hides its overflow and footer while a panel is open
+  // (mirrors the old BaseSidebarPanel behavior).
   $effect(() => {
     const el = document.getElementById('schedule-sidebar-content');
     // The panel is absolutely positioned at top:0 inside this scroll container,
@@ -167,9 +169,7 @@
     const prevScrollTop = el?.scrollTop ?? 0;
     if (el) el.scrollTop = 0;
     el?.classList.add('wizard-active');
-    const raf = requestAnimationFrame(() => (active = true));
     return () => {
-      cancelAnimationFrame(raf);
       el?.classList.remove('wizard-active');
       if (el) el.scrollTop = prevScrollTop;
     };
@@ -180,8 +180,7 @@
 
 <div
   class={["sidebar-panel", styles['sidebar-panel--component-wizard']]}
-  class:active
-  out:fade={{ duration: 250 }}
+  transition:fade={{ duration: dur(250) }}
 >
   <div class={styles['wizard-header']}>
     <button class={styles['wizard-close-btn']} onclick={cancel} aria-label="Close">&times;</button>
@@ -224,7 +223,11 @@
 
   <div class={styles['wizard-content']}>
     {#key currentStep}
-      <div class={[styles['wizard-step'], styles.active, enterClass]} data-step={currentStep}>
+      <div
+        class={styles['wizard-step']}
+        data-step={currentStep}
+        in:slideX|global={{ from: dirSign, duration: 250 }}
+      >
         {#if optionInfo.filtered.length === 0}
           {@render filteredNotice()}
         {:else}
@@ -242,7 +245,8 @@
                 <div
                   class={[styles['wizard-section-card'], { [styles.selected]: selected }]}
                   data-crn={section.crn}
-                  style="--card-index: {group.startIndex + i}"
+                  in:slideX|global={{ from: dirSign, duration: 250, delay: (group.startIndex + i) * 40 }}
+                  onintroend={(e) => (e.currentTarget as HTMLElement).setAttribute('data-settled', '')}
                   role="button"
                   tabindex="0"
                   onclick={() => selectSection(section)}

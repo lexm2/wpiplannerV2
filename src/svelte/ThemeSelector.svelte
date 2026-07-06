@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { fly } from 'svelte/transition';
   import styles from '../styles/components/theme-selector.module.css';
+  import { dur } from './transitions';
   import { ThemeManager } from '../themes/ThemeManager';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
@@ -34,7 +36,7 @@
 <!--
   Global classes (.theme-dropdown/.theme-options/.dropdown-arrow) live in
   theme-selector-base.css and are written as plain strings. The dynamic state
-  classes (.open/.show/.theme-option/.active/...) come from the CSS *module*, so
+  classes (.open/.theme-option/.active/...) come from the CSS *module*, so
   they're hashed and must be pulled from the imported `styles` object — meaning
   the `class:` directive (which needs a literal key) can't express them. We use
   the object form of the `class` attribute instead.
@@ -49,9 +51,11 @@
   <span class="dropdown-arrow" id="theme-dropdown-arrow">{@html getInlineSVG('CHEVRON_DOWN', 'dropdown-arrow-icon')}</span>
 </div>
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (options container only stops propagation; keyboard nav is a separate follow-up) -->
+{#if open}
 <div
-  class={["theme-options", { [styles.show]: open }]}
+  class="theme-options"
   id="theme-options"
+  transition:fly={{ y: -8, duration: dur(200) }}
   onclick={(e) => e.stopPropagation()}
 >
   {#each themes as t (t.id)}
@@ -66,3 +70,4 @@
     </div>
   {/each}
 </div>
+{/if}

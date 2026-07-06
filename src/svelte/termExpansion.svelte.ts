@@ -1,10 +1,14 @@
 import { tick } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
+import { reduceMotion } from './transitions';
 
 /**
  * Course-list term-expansion FLIP animation — extracted from CourseList.svelte so
  * the component stays render-only. This is the runes-native port of the old
  * MainController FLIP height animation + diagonal badge cascade.
+ *
+ * The FLIP needs a pre-swap height measurement, so it can't be a declarative
+ * Svelte transition; all motion here runs on WAAPI element.animate().
  *
  * `expandedTerm` (courseId -> 'A'|'B'|'C'|'D') is the reactive source the list
  * template reads; `toggleTerm` mutates it (running the collapse fade first), and
@@ -20,15 +24,12 @@ export const expandedTerm = new SvelteMap<string, string>();
 const pendingStartHeight = new Map<string, number>();
 
 const BADGE_STEP_MS = 30; // per-step delay of the diagonal crumb cascade
-
-// Svelte transitions don't auto-respect prefers-reduced-motion; snapshot at load.
-const reduceMotion = typeof matchMedia !== 'undefined'
-    && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BADGE_FADE_MS = 150;
 
 // ~2ms per pixel of height delta, clamped to [200, 500]ms — ports the old
 // MainController.getHeightAnimDuration so longer expansions take a bit longer.
 function heightAnimDuration(from: number, to: number): number {
-    return Math.min(500, Math.max(200, Math.abs(to - from) * 2)) / 1000;
+    return Math.min(500, Math.max(200, Math.abs(to - from) * 2));
 }
 
 // Group badges into their wrapped visual rows by offsetTop (flex-wrap lays them
@@ -71,18 +72,21 @@ export function toggleTerm(e: MouseEvent, courseId: string, term: string, availa
         );
         let maxStep = 0;
         rows.forEach((row, ri) => row.forEach((_, ci) => { maxStep = Math.max(maxStep, ri + ci); }));
-        rows.forEach((row, ri) => {
-            row.forEach((b, ci) => {
-                b.style.transition = 'opacity 0.15s ease';
-                // Reverse the diagonal: highest (rowIndex + colIndex) fades first.
-                window.setTimeout(() => { b.style.opacity = '0'; }, (maxStep - (ri + ci)) * BADGE_STEP_MS);
-            });
-        });
+        // Reverse the diagonal: highest (rowIndex + colIndex) fades first.
+        // fill:'forwards' holds each badge at 0 until the swap removes it.
+        const fades = rows.flatMap((row, ri) => row.map((b, ci) =>
+            b.animate([{ opacity: 1 }, { opacity: 0 }], {
+                duration: BADGE_FADE_MS,
+                delay: (maxStep - (ri + ci)) * BADGE_STEP_MS,
+                easing: 'ease',
+                fill: 'forwards',
+            })
+        ));
         // Once the crumbs have faded out, lock the height and flip to collapsed.
-        window.setTimeout(() => {
+        void Promise.all(fades.map(a => a.finished)).then(() => {
             lockForFlip(item, courseId);
             expandedTerm.delete(courseId);
-        }, maxStep * BADGE_STEP_MS + 150);
+        }).catch(() => { /* a fade was cancelled (e.g. row unmounted) — skip */ });
         return;
     }
 
@@ -96,7 +100,8 @@ export function toggleTerm(e: MouseEvent, courseId: string, term: string, availa
 // {#if expanded} content, then this action animates the .course-item height
 // from its old value to its new one (overflow clipped during the tween) and
 // fades the section badges ("crumbs") in one-by-one. Badges start at opacity:0
-// in CSS so they can never flash their finished state before the animation.
+// in CSS so they can never flash their finished state before the animation
+// (the reduced-motion media query flips them straight to 1).
 export function termFlip(item: HTMLElement, term: string | undefined) {
     let current = term;
     let cancel: (() => void) | null = null;
@@ -107,7 +112,8 @@ export function termFlip(item: HTMLElement, term: string | undefined) {
         // The row is already locked at startH with overflow:hidden (set in the
         // click handler, before the swap painted). Measure the new content's full
         // height while it's at auto — also the moment to read each badge's wrapped
-        // row position — then snap back to startH before adding the transition.
+        // row position — then WAAPI animates height from startH to the target
+        // (inline height is released so layout ends at its natural value).
         item.style.willChange = 'height';
         item.style.overflow = 'hidden';
         item.style.height = 'auto';
@@ -121,49 +127,43 @@ export function termFlip(item: HTMLElement, term: string | undefined) {
             Array.from(item.querySelectorAll('.term-sections-container .section-badge')) as HTMLElement[]
         );
 
-        item.style.height = `${startH}px`;
-        void item.offsetHeight; // commit start height before adding the transition
-        const dur = reduceMotion ? 0 : heightAnimDuration(startH, targetH);
-        item.style.transition = `height ${dur}s ease`;
+        item.style.height = '';
+        const heightAnim = item.animate(
+            [{ height: `${startH}px` }, { height: `${targetH}px` }],
+            { duration: reduceMotion ? 0 : heightAnimDuration(startH, targetH), easing: 'ease' },
+        );
 
-        // Prime the crumbs (inline transition; CSS already holds them at opacity 0)
-        // and compute the longest delay so cleanup waits for the whole cascade.
-        let maxDelay = 0;
+        const badgeAnims: Animation[] = [];
         if (!reduceMotion) {
             rows.forEach((row, rowIndex) => {
                 row.forEach((b, colIndex) => {
-                    b.style.transition = 'opacity 0.15s ease';
-                    maxDelay = Math.max(maxDelay, (rowIndex + colIndex) * BADGE_STEP_MS);
+                    const a = b.animate([{ opacity: 0 }, { opacity: 1 }], {
+                        duration: BADGE_FADE_MS,
+                        delay: (rowIndex + colIndex) * BADGE_STEP_MS,
+                        easing: 'ease',
+                        fill: 'forwards',
+                    });
+                    // Bake the final opacity inline and release the animation
+                    // so no fill lingers on long-lived badge elements.
+                    a.finished.then(() => { a.commitStyles(); a.cancel(); }).catch(() => {});
+                    badgeAnims.push(a);
                 });
             });
         }
 
-        const timers: ReturnType<typeof setTimeout>[] = [];
-        requestAnimationFrame(() => {
-            item.style.height = `${targetH}px`;
-            if (!reduceMotion) {
-                rows.forEach((row, rowIndex) => {
-                    row.forEach((b, colIndex) => {
-                        timers.push(setTimeout(() => {
-                            b.style.opacity = '1';
-                        }, (rowIndex + colIndex) * BADGE_STEP_MS));
-                    });
-                });
-            }
-        });
-
         const finish = (): void => {
-            for (const t of timers) clearTimeout(t);
             item.style.height = '';
-            item.style.transition = '';
             item.style.overflow = '';
             item.style.willChange = '';
             cancel = null;
         };
 
-        const total = Math.max(dur * 1000, maxDelay + 200) + 100;
-        const timer = setTimeout(finish, total);
-        cancel = () => { clearTimeout(timer); finish(); };
+        heightAnim.finished.then(finish).catch(() => {});
+        cancel = () => {
+            heightAnim.cancel();
+            for (const a of badgeAnims) a.cancel();
+            finish();
+        };
     }
 
     return {
