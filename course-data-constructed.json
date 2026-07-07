@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 7, 2026, 9:51 PM",
+  "generated": "Jul 7, 2026, 10:56 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -35661,15 +35661,15 @@
             },
             {
               "section": {
-                "crn": 360706,
-                "number": "F04 - ST: Professional Development in Biomedical Engineering",
+                "crn": 360709,
+                "number": "F04",
                 "seats": 25,
                 "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "F",
-                "isGps": true,
+                "isGps": false,
                 "isInterestList": false,
                 "periods": [
                   {
@@ -35684,7 +35684,7 @@
                     "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "F04 - ST: Professional Development in Biomedical Engineering",
+                    "specificSection": "F04",
                     "days": [
                       "M"
                     ],
@@ -93496,7 +93496,7 @@
                 "crn": 354365,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 20,
+                "seatsAvailable": 19,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -93513,7 +93513,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 30,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 19,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -326426,7 +326426,7 @@
                 "crn": 349772,
                 "number": "B01",
                 "seats": 20,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -326443,7 +326443,7 @@
                     "building": "",
                     "room": "Stratton Hall 207 (new)",
                     "seats": 20,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B01",
