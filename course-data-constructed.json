@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 8, 2026, 10:21 AM",
+  "generated": "Jul 8, 2026, 12:02 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8235,7 +8235,7 @@
                 "number": "D01",
                 "seats": 24,
                 "seatsAvailable": 9,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -8252,7 +8252,7 @@
                     "room": "Riley Commons",
                     "seats": 24,
                     "seatsAvailable": 9,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
                     "days": [
