@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 11, 2026, 11:06 AM",
+  "generated": "Jul 11, 2026, 12:03 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -12252,7 +12252,7 @@
                 "crn": 349315,
                 "number": "B01",
                 "seats": 25,
-                "seatsAvailable": 1,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -12269,7 +12269,7 @@
                     "building": "",
                     "room": "Kaven Hall 207",
                     "seats": 25,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "B01",
