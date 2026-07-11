@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 11, 2026, 4:51 PM",
+  "generated": "Jul 11, 2026, 5:51 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -36574,7 +36574,7 @@
                 "crn": 350292,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 28,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -36591,7 +36591,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 28,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -108815,7 +108815,7 @@
                 "number": "D01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "D",
@@ -108832,7 +108832,7 @@
                     "room": "Washburn 229",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
