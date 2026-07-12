@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 12, 2026, 2:12 PM",
+  "generated": "Jul 12, 2026, 3:16 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -146833,7 +146833,7 @@
                 "crn": 351119,
                 "number": "C14 - INQ SEM: History of Silicon Valley",
                 "seats": 12,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -146850,7 +146850,7 @@
                     "building": "",
                     "room": "Salisbury Labs 124 Conference Room",
                     "seats": 12,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "C14 - INQ SEM: History of Silicon Valley",
@@ -163143,7 +163143,7 @@
                 "crn": 352224,
                 "number": "D01",
                 "seats": 25,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -163160,7 +163160,7 @@
                     "building": "",
                     "room": "Stratton Hall 301",
                     "seats": 25,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "D01",
