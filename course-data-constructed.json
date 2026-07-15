@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 15, 2026, 7:22 AM",
+  "generated": "Jul 15, 2026, 9:27 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -314749,7 +314749,7 @@
                 "crn": 350403,
                 "number": "F01",
                 "seats": 25,
-                "seatsAvailable": 12,
+                "seatsAvailable": 11,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -314766,7 +314766,7 @@
                     "building": "",
                     "room": "Stratton Hall 207 (new)",
                     "seats": 25,
-                    "seatsAvailable": 12,
+                    "seatsAvailable": 11,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F01",
