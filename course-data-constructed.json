@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 17, 2026, 10:25 AM",
+  "generated": "Jul 17, 2026, 11:49 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -71831,7 +71831,7 @@
                 "number": "A01",
                 "seats": 18,
                 "seatsAvailable": 1,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 9,
                 "note": null,
                 "computedTerm": "A",
@@ -71848,7 +71848,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 18,
                     "seatsAvailable": 1,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 9,
                     "specificSection": "A01",
                     "days": [
@@ -90598,7 +90598,7 @@
                 "number": "A01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -90615,7 +90615,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -91034,7 +91034,7 @@
                 "crn": 354243,
                 "number": "A01",
                 "seats": 60,
-                "seatsAvailable": 20,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -91051,7 +91051,7 @@
                     "building": "",
                     "room": "Salisbury Labs 411",
                     "seats": 60,
-                    "seatsAvailable": 20,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
@@ -100308,7 +100308,7 @@
                 "number": "A01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -100325,7 +100325,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
