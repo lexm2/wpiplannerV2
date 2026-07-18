@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 18, 2026, 3:36 PM",
+  "generated": "Jul 18, 2026, 4:34 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -16525,7 +16525,7 @@
                 "number": "B01",
                 "seats": 140,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "B",
@@ -16542,7 +16542,7 @@
                     "room": "Olin Hall 107",
                     "seats": 140,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 20,
                     "specificSection": "B01",
                     "days": [
@@ -445462,7 +445462,7 @@
                 "number": "A01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -445479,7 +445479,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
