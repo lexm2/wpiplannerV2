@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 19, 2026, 7:51 PM",
+  "generated": "Jul 19, 2026, 8:40 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -315172,7 +315172,7 @@
                 "crn": 350082,
                 "number": "B01",
                 "seats": 30,
-                "seatsAvailable": 22,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -315189,7 +315189,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 30,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
