@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 19, 2026, 7:14 AM",
+  "generated": "Jul 19, 2026, 9:17 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -130436,7 +130436,7 @@
                 "crn": 350490,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 15,
+                "seatsAvailable": 14,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -130453,7 +130453,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 15,
+                    "seatsAvailable": 14,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "F01",
@@ -343832,7 +343832,7 @@
                 "number": "A01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -343849,7 +343849,7 @@
                     "room": "Alden Hall B06 Janet Earle Room",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -345352,7 +345352,7 @@
                 "number": "B01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -345369,7 +345369,7 @@
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
