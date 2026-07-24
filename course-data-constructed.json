@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 24, 2026, 9:34 PM",
+  "generated": "Jul 24, 2026, 10:41 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -354406,7 +354406,7 @@
                 "crn": 356556,
                 "number": "F01",
                 "seats": 15,
-                "seatsAvailable": 10,
+                "seatsAvailable": 9,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -354423,7 +354423,7 @@
                     "building": "",
                     "room": "Olin Hall 214 Conference Room",
                     "seats": 15,
-                    "seatsAvailable": 10,
+                    "seatsAvailable": 9,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F01",
