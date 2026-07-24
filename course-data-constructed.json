@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 23, 2026, 11:29 PM",
+  "generated": "Jul 24, 2026, 12:56 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -456837,7 +456837,7 @@
                 "number": "A01",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -456854,7 +456854,7 @@
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
