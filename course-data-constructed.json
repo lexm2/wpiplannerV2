@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 25, 2026, 6:38 PM",
+  "generated": "Jul 25, 2026, 7:55 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -295989,7 +295989,7 @@
                 "crn": 349080,
                 "number": "AL02",
                 "seats": 105,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5089",
@@ -296006,7 +296006,7 @@
                     "building": "",
                     "room": "Olin Hall 107",
                     "seats": 105,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL02",
@@ -296057,7 +296057,7 @@
                   "crn": 348388,
                   "number": "AD08",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5089",
@@ -296074,7 +296074,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD08",
