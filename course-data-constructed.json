@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 26, 2026, 11:08 AM",
+  "generated": "Jul 26, 2026, 12:15 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -96942,7 +96942,7 @@
                 "crn": 350488,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 46,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -96959,7 +96959,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 60,
-                    "seatsAvailable": 46,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -103211,7 +103211,7 @@
                 "crn": 350488,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 46,
+                "seatsAvailable": 45,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -103228,7 +103228,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 60,
-                    "seatsAvailable": 46,
+                    "seatsAvailable": 45,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
