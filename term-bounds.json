@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-28T15:32:41.509Z",
+  "generated": "2026-07-28T17:07:29.430Z",
   "years": {
     "2025": {
       "A": {
@@ -32,25 +32,25 @@
         "startDate": "2026-08-20",
         "endDate": "2026-10-09",
         "offeringPeriod": "2026 Fall A Term",
-        "sampleSize": 807
+        "sampleSize": 806
       },
       "B": {
         "startDate": "2026-10-19",
         "endDate": "2026-12-11",
         "offeringPeriod": "2026 Fall B Term",
-        "sampleSize": 819
+        "sampleSize": 817
       },
       "C": {
         "startDate": "2027-01-13",
         "endDate": "2027-03-05",
         "offeringPeriod": "2027 Spring C Term",
-        "sampleSize": 740
+        "sampleSize": 739
       },
       "D": {
         "startDate": "2027-03-15",
         "endDate": "2027-05-05",
         "offeringPeriod": "2027 Spring D Term",
-        "sampleSize": 689
+        "sampleSize": 687
       }
     },
     "2027": {

@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 28, 2026, 3:32 PM",
+  "generated": "Jul 28, 2026, 5:07 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -5178,7 +5178,7 @@
                 "crn": 349227,
                 "number": "A02",
                 "seats": 50,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -5195,7 +5195,7 @@
                     "building": "",
                     "room": "Online-synchronous",
                     "seats": 50,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "A02",
@@ -5250,7 +5250,7 @@
                 "crn": 350061,
                 "number": "B02",
                 "seats": 50,
-                "seatsAvailable": 33,
+                "seatsAvailable": 32,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -5267,7 +5267,7 @@
                     "building": "",
                     "room": "Online-synchronous",
                     "seats": 50,
-                    "seatsAvailable": 33,
+                    "seatsAvailable": 32,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "B02",
@@ -13136,7 +13136,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Priscilla Dunphy",
                     "startTime": "14:00",
                     "endTime": "17:50",
                     "location": "Kaven Hall 207",
@@ -13174,7 +13174,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Priscilla Dunphy",
                     "startTime": "14:00",
                     "endTime": "17:50",
                     "location": "Kaven Hall 202 Stats Computer Lab",
@@ -17269,7 +17269,7 @@
                 "number": "A01",
                 "seats": 85,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 25,
                 "note": null,
                 "computedTerm": "A",
@@ -17286,7 +17286,7 @@
                     "room": "Unity Hall 500",
                     "seats": 85,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 25,
                     "specificSection": "A01",
                     "days": [
@@ -40309,7 +40309,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Sujatha Krishnan",
                     "startTime": "12:00",
                     "endTime": "12:50",
                     "location": "Kaven Hall 116",
@@ -40910,7 +40910,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Sujatha Krishnan",
                     "startTime": "16:00",
                     "endTime": "17:50",
                     "location": "Salisbury Labs 305",
@@ -49774,8 +49774,8 @@
               "section": {
                 "crn": 348834,
                 "number": "AL01",
-                "seats": 132,
-                "seatsAvailable": 0,
+                "seats": 145,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -49791,8 +49791,8 @@
                     "location": "Atwater Kent 116 Newell Hall",
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
-                    "seats": 132,
-                    "seatsAvailable": 0,
+                    "seats": 145,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL01",
@@ -50706,8 +50706,8 @@
               "section": {
                 "crn": 348833,
                 "number": "AL02",
-                "seats": 134,
-                "seatsAvailable": 0,
+                "seats": 144,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -50723,8 +50723,8 @@
                     "location": "Salisbury Labs 115 Kinnicutt Hall",
                     "building": "",
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
-                    "seats": 134,
-                    "seatsAvailable": 0,
+                    "seats": 144,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL02",
@@ -51605,8 +51605,8 @@
               "section": {
                 "crn": 348824,
                 "number": "AL03",
-                "seats": 125,
-                "seatsAvailable": 0,
+                "seats": 145,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -51622,8 +51622,8 @@
                     "location": "Atwater Kent 116 Newell Hall",
                     "building": "",
                     "room": "Atwater Kent 116 Newell Hall",
-                    "seats": 125,
-                    "seatsAvailable": 0,
+                    "seats": 145,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "AL03",
@@ -97173,7 +97173,7 @@
                 "crn": 350488,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 45,
+                "seatsAvailable": 44,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -97190,7 +97190,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 60,
-                    "seatsAvailable": 45,
+                    "seatsAvailable": 44,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -103442,7 +103442,7 @@
                 "crn": 350488,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 45,
+                "seatsAvailable": 44,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -103459,7 +103459,7 @@
                     "building": "",
                     "room": "Salisbury Labs 104",
                     "seats": 60,
-                    "seatsAvailable": 45,
+                    "seatsAvailable": 44,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -104968,7 +104968,7 @@
                 "crn": 350315,
                 "number": "F01",
                 "seats": 40,
-                "seatsAvailable": 29,
+                "seatsAvailable": 28,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -104985,7 +104985,7 @@
                     "building": "",
                     "room": "Unity Hall 420",
                     "seats": 40,
-                    "seatsAvailable": 29,
+                    "seatsAvailable": 28,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -120938,7 +120938,7 @@
                 "crn": 357221,
                 "number": "A01",
                 "seats": 25,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -120955,7 +120955,7 @@
                     "building": "",
                     "room": "Higgins Labs 114",
                     "seats": 25,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
@@ -134494,7 +134494,7 @@
                 "crn": 350516,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -134511,7 +134511,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
@@ -135419,7 +135419,7 @@
                 "crn": 350512,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 21,
+                "seatsAvailable": 20,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -135436,7 +135436,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 21,
+                    "seatsAvailable": 20,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -158482,43 +158482,6 @@
               },
               "compatibleDiscussions": [],
               "compatibleLabs": []
-            },
-            {
-              "section": {
-                "crn": 351230,
-                "number": "C01",
-                "seats": 1,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 5,
-                "note": null,
-                "computedTerm": "C",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Atwater Kent 013 Computer Lab",
-                    "building": "",
-                    "room": "Atwater Kent 013 Computer Lab",
-                    "seats": 1,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 5,
-                    "specificSection": "C01",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
             }
           ]
         },
@@ -159397,108 +159360,6 @@
             },
             {
               "section": {
-                "crn": 349355,
-                "number": "BL01",
-                "seats": 2,
-                "seatsAvailable": 0,
-                "actualWaitlist": 0,
-                "maxWaitlist": 25,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5150",
-                "computedTerm": "B",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "12:00",
-                    "endTime": "13:50",
-                    "location": "Unity Hall 235 IMGD Computer Lab",
-                    "building": "",
-                    "room": "Unity Hall 235 IMGD Computer Lab",
-                    "seats": 2,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 25,
-                    "specificSection": "BL01",
-                    "days": [
-                      "M",
-                      "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": [
-                {
-                  "crn": 349356,
-                  "number": "BX01",
-                  "seats": 24,
-                  "seatsAvailable": 22,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5150",
-                  "computedTerm": "B",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "12:00",
-                      "endTime": "13:50",
-                      "location": "Unity Hall 235 IMGD Computer Lab",
-                      "building": "",
-                      "room": "Unity Hall 235 IMGD Computer Lab",
-                      "seats": 24,
-                      "seatsAvailable": 22,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "BX01",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 358216,
-                  "number": "CX02",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Rodney DuPlessis",
-                      "startTime": "14:00",
-                      "endTime": "15:50",
-                      "location": "Fuller Labs 222 IMGD Computer Lab",
-                      "building": "",
-                      "room": "Fuller Labs 222 IMGD Computer Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX02",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "section": {
                 "crn": 351229,
                 "number": "CL01",
                 "seats": 50,
@@ -159590,108 +159451,6 @@
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX02",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "section": {
-                "crn": 352022,
-                "number": "DL01",
-                "seats": 0,
-                "seatsAvailable": 0,
-                "actualWaitlist": 3,
-                "maxWaitlist": 24,
-                "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5448",
-                "computedTerm": "D",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Not Assigned",
-                    "startTime": "10:00",
-                    "endTime": "11:50",
-                    "location": "Unity Hall 235 IMGD Computer Lab",
-                    "building": "",
-                    "room": "Unity Hall 235 IMGD Computer Lab",
-                    "seats": 0,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 3,
-                    "maxWaitlist": 24,
-                    "specificSection": "DL01",
-                    "days": [
-                      "T",
-                      "F"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": [
-                {
-                  "crn": 358216,
-                  "number": "CX02",
-                  "seats": 25,
-                  "seatsAvailable": 25,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": null,
-                  "computedTerm": "C",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Rodney DuPlessis",
-                      "startTime": "14:00",
-                      "endTime": "15:50",
-                      "location": "Fuller Labs 222 IMGD Computer Lab",
-                      "building": "",
-                      "room": "Fuller Labs 222 IMGD Computer Lab",
-                      "seats": 25,
-                      "seatsAvailable": 25,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "CX02",
-                      "days": [
-                        "W"
-                      ],
-                      "isAsync": false
-                    }
-                  ]
-                },
-                {
-                  "crn": 352029,
-                  "number": "DX01",
-                  "seats": 0,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 0,
-                  "maxWaitlist": 0,
-                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5448",
-                  "computedTerm": "D",
-                  "isGps": false,
-                  "isInterestList": false,
-                  "periods": [
-                    {
-                      "type": "Lab",
-                      "professor": "Not Assigned",
-                      "startTime": "10:00",
-                      "endTime": "11:50",
-                      "location": "Unity Hall 235 IMGD Computer Lab",
-                      "building": "",
-                      "room": "Unity Hall 235 IMGD Computer Lab",
-                      "seats": 0,
-                      "seatsAvailable": 0,
-                      "actualWaitlist": 0,
-                      "maxWaitlist": 0,
-                      "specificSection": "DX01",
                       "days": [
                         "W"
                       ],
@@ -164072,7 +163831,7 @@
                 "periods": [
                   {
                     "type": "Lecture",
-                    "professor": "Not Assigned",
+                    "professor": "Caroline Murphy",
                     "startTime": "18:00",
                     "endTime": "20:50",
                     "location": "Kaven Hall 202 Stats Computer Lab",
@@ -165579,58 +165338,6 @@
                     "days": [
                       "M",
                       "R"
-                    ],
-                    "isAsync": false
-                  }
-                ]
-              },
-              "compatibleDiscussions": [],
-              "compatibleLabs": []
-            }
-          ]
-        },
-        {
-          "id": "ISE-1800-2026",
-          "number": "1800",
-          "name": "Academic Skills for English Language Learners",
-          "description": "The goal of this course is to provide international students for whom English is not their native language the necessary skills for academic success through reading and writing assignments . Students will focus on developing vocabulary, critical reading, paragraph, and essay writing skills . Emphasis is also given to a review of English grammar through intensive written and oral practice to promote accurate and appropriate language use. Strongly recommended for first-year international non-native English speakers . Admission determined by Writing Placement or consent of the instructor.",
-          "category": null,
-          "minCredits": 3,
-          "maxCredits": 3,
-          "isGraduate": false,
-          "academicYear": 2026,
-          "lectures": [
-            {
-              "section": {
-                "crn": 348905,
-                "number": "A01",
-                "seats": 15,
-                "seatsAvailable": 12,
-                "actualWaitlist": 0,
-                "maxWaitlist": 7,
-                "note": null,
-                "computedTerm": "A",
-                "isGps": false,
-                "isInterestList": false,
-                "periods": [
-                  {
-                    "type": "Lecture",
-                    "professor": "Althea Danielski",
-                    "startTime": "09:00",
-                    "endTime": "09:50",
-                    "location": "Kaven Hall 115",
-                    "building": "",
-                    "room": "Kaven Hall 115",
-                    "seats": 15,
-                    "seatsAvailable": 12,
-                    "actualWaitlist": 0,
-                    "maxWaitlist": 7,
-                    "specificSection": "A01",
-                    "days": [
-                      "M",
-                      "T",
-                      "R",
-                      "F"
                     ],
                     "isAsync": false
                   }
@@ -375192,7 +374899,7 @@
                   "crn": 351109,
                   "number": "CX06",
                   "seats": 24,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -375209,7 +374916,7 @@
                       "building": "",
                       "room": "Olin Hall 208 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX06",
@@ -376545,7 +376252,7 @@
                   "crn": 351109,
                   "number": "CX06",
                   "seats": 24,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -376562,7 +376269,7 @@
                       "building": "",
                       "room": "Olin Hall 208 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX06",
@@ -377928,7 +377635,7 @@
                   "crn": 351109,
                   "number": "CX06",
                   "seats": 24,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -377945,7 +377652,7 @@
                       "building": "",
                       "room": "Olin Hall 208 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX06",
@@ -379313,7 +379020,7 @@
                   "crn": 351109,
                   "number": "CX06",
                   "seats": 24,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -379330,7 +379037,7 @@
                       "building": "",
                       "room": "Olin Hall 208 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX06",
@@ -382119,7 +381826,7 @@
                   "crn": 351109,
                   "number": "CX06",
                   "seats": 24,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -382136,7 +381843,7 @@
                       "building": "",
                       "room": "Olin Hall 208 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX06",
@@ -382378,7 +382085,7 @@
                 "crn": 351062,
                 "number": "CT01-Multipurpose",
                 "seats": 54,
-                "seatsAvailable": 52,
+                "seatsAvailable": 51,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5302",
@@ -382395,7 +382102,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 54,
-                    "seatsAvailable": 52,
+                    "seatsAvailable": 51,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "CT01-Multipurpose",
@@ -382409,7 +382116,7 @@
                   "crn": 351053,
                   "number": "CT01",
                   "seats": 54,
-                  "seatsAvailable": 52,
+                  "seatsAvailable": 51,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5302",
@@ -382426,7 +382133,7 @@
                       "building": "",
                       "room": "Unity Hall 520",
                       "seats": 54,
-                      "seatsAvailable": 52,
+                      "seatsAvailable": 51,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CT01",
@@ -383628,7 +383335,7 @@
                   "crn": 351109,
                   "number": "CX06",
                   "seats": 24,
-                  "seatsAvailable": 21,
+                  "seatsAvailable": 20,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -383645,7 +383352,7 @@
                       "building": "",
                       "room": "Olin Hall 208 Physics Lab",
                       "seats": 24,
-                      "seatsAvailable": 21,
+                      "seatsAvailable": 20,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "CX06",
@@ -447714,7 +447421,7 @@
                 "crn": 352080,
                 "number": "D01",
                 "seats": 50,
-                "seatsAvailable": 33,
+                "seatsAvailable": 32,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -447731,7 +447438,7 @@
                     "building": "",
                     "room": "Salisbury Labs 411",
                     "seats": 50,
-                    "seatsAvailable": 33,
+                    "seatsAvailable": 32,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "D01",
@@ -449091,7 +448798,7 @@
                 "crn": 350386,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 16,
+                "seatsAvailable": 15,
                 "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
@@ -449108,7 +448815,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 15,
                     "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "F01",
