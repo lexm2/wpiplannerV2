@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 28, 2026, 9:05 AM",
+  "generated": "Jul 28, 2026, 11:26 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -64672,7 +64672,7 @@
                 "number": "DL01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5408",
                 "computedTerm": "D",
@@ -64689,7 +64689,7 @@
                     "room": "Salisbury Labs 406",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "DL01",
                     "days": [
@@ -455946,7 +455946,7 @@
                 "number": "C02",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 13,
+                "actualWaitlist": 12,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "C",
@@ -455963,7 +455963,7 @@
                     "room": "Recreation Center Track",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 13,
+                    "actualWaitlist": 12,
                     "maxWaitlist": 15,
                     "specificSection": "C02",
                     "days": [
