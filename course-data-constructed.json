@@ -1,5 +1,5 @@
 {
-  "generated": "Jul 30, 2026, 6:05 AM",
+  "generated": "Jul 30, 2026, 8:47 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -124400,7 +124400,7 @@
                 "crn": 348636,
                 "number": "AL01",
                 "seats": 70,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 15,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5142",
@@ -124417,7 +124417,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 70,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 15,
                     "maxWaitlist": 15,
                     "specificSection": "AL01",
@@ -124467,7 +124467,7 @@
                   "crn": 348634,
                   "number": "AX02",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5142",
@@ -124484,7 +124484,7 @@
                       "building": "",
                       "room": "Higgins Labs 230 Geom Modeling Computer Lab",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AX02",
