@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 1, 2026, 7:53 PM",
+  "generated": "Aug 1, 2026, 8:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -428315,7 +428315,7 @@
                 "crn": 350453,
                 "number": "F01",
                 "seats": 15,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -428332,7 +428332,7 @@
                     "building": "",
                     "room": "Olin Hall 214 Conference Room",
                     "seats": 15,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F01",
@@ -428716,7 +428716,7 @@
                 "crn": 350507,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 23,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -428733,7 +428733,7 @@
                     "building": "",
                     "room": "Olin Hall 218",
                     "seats": 30,
-                    "seatsAvailable": 23,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F01",
