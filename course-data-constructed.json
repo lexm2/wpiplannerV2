@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 1, 2026, 8:38 AM",
+  "generated": "Aug 1, 2026, 10:21 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -326161,7 +326161,7 @@
                   "crn": 356111,
                   "number": "BD01",
                   "seats": 40,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5722",
@@ -326178,7 +326178,7 @@
                       "building": "",
                       "room": "Innovation Studio 203 Active Learning Classroom South",
                       "seats": 40,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
@@ -326433,7 +326433,7 @@
                   "crn": 356111,
                   "number": "BD01",
                   "seats": 40,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5722",
@@ -326450,7 +326450,7 @@
                       "building": "",
                       "room": "Innovation Studio 203 Active Learning Classroom South",
                       "seats": 40,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD01",
