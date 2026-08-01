@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 1, 2026, 6:39 PM",
+  "generated": "Aug 1, 2026, 7:53 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -115037,7 +115037,7 @@
                 "crn": 350899,
                 "number": "S01",
                 "seats": 40,
-                "seatsAvailable": 11,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -115054,7 +115054,7 @@
                     "building": "",
                     "room": "Atwater Kent 233",
                     "seats": 40,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "S01",
