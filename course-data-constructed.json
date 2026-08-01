@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 1, 2026, 10:37 PM",
+  "generated": "Aug 1, 2026, 11:39 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -73410,7 +73410,7 @@
                 "number": "A02",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 9,
                 "note": null,
                 "computedTerm": "A",
@@ -73427,7 +73427,7 @@
                     "room": "Salisbury Labs 011",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 9,
                     "specificSection": "A02",
                     "days": [
