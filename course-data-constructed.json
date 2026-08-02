@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 2, 2026, 1:58 PM",
+  "generated": "Aug 2, 2026, 3:06 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -73371,7 +73371,7 @@
                 "number": "A01",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 2,
+                "actualWaitlist": 1,
                 "maxWaitlist": 9,
                 "note": null,
                 "computedTerm": "A",
@@ -73388,7 +73388,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 2,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 9,
                     "specificSection": "A01",
                     "days": [
@@ -73410,7 +73410,7 @@
                 "number": "A02",
                 "seats": 18,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 9,
                 "note": null,
                 "computedTerm": "A",
@@ -73427,7 +73427,7 @@
                     "room": "Salisbury Labs 011",
                     "seats": 18,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 9,
                     "specificSection": "A02",
                     "days": [
@@ -449220,7 +449220,7 @@
                 "crn": 350677,
                 "number": "S01",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 25,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -449237,7 +449237,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 25,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "S01",
