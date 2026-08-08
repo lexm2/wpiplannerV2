@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 8, 2026, 5:44 PM",
+  "generated": "Aug 8, 2026, 6:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -449354,7 +449354,7 @@
                 "crn": 350428,
                 "number": "F02 - ST: Technical Decision and Risk Analysis",
                 "seats": 30,
-                "seatsAvailable": 19,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -449371,7 +449371,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 30,
-                    "seatsAvailable": 19,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "F02 - ST: Technical Decision and Risk Analysis",
