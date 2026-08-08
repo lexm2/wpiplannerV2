@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 8, 2026, 7:33 PM",
+  "generated": "Aug 8, 2026, 8:01 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -49792,7 +49792,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 5,
+                "actualWaitlist": 4,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "computedTerm": "A",
@@ -49809,7 +49809,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 5,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
