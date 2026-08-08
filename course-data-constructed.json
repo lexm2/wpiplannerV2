@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 8, 2026, 5:14 AM",
+  "generated": "Aug 8, 2026, 5:57 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -138086,7 +138086,7 @@
                 "number": "C01",
                 "seats": 120,
                 "seatsAvailable": 0,
-                "actualWaitlist": 15,
+                "actualWaitlist": 14,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "C",
@@ -138103,7 +138103,7 @@
                     "room": "Salisbury Labs 115 Kinnicutt Hall",
                     "seats": 120,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 15,
+                    "actualWaitlist": 14,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
