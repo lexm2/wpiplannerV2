@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 8, 2026, 4:31 PM",
+  "generated": "Aug 8, 2026, 5:07 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -92220,7 +92220,7 @@
                 "number": "A01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -92237,7 +92237,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -95158,7 +95158,7 @@
                 "crn": 350215,
                 "number": "F02 - ST: Multi-Agent Decision Making",
                 "seats": 15,
-                "seatsAvailable": 5,
+                "seatsAvailable": 4,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -95175,7 +95175,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 15,
-                    "seatsAvailable": 5,
+                    "seatsAvailable": 4,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F02 - ST: Multi-Agent Decision Making",
@@ -101977,7 +101977,7 @@
                 "number": "A01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 8,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -101994,7 +101994,7 @@
                     "room": "Salisbury Labs 402",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 8,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -130318,7 +130318,7 @@
                 "number": "C01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 20,
+                "actualWaitlist": 19,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "C",
@@ -130335,7 +130335,7 @@
                     "room": "Higgins Labs 218 Discovery Classroom",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 20,
+                    "actualWaitlist": 19,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
                     "days": [
