@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 9, 2026, 8:37 PM",
+  "generated": "Aug 9, 2026, 9:06 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -165116,7 +165116,7 @@
                 "crn": 349209,
                 "number": "A01 - Topics In Global Studies: Promises & Politics of Global Health",
                 "seats": 20,
-                "seatsAvailable": 4,
+                "seatsAvailable": 5,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -165133,7 +165133,7 @@
                     "building": "",
                     "room": "Kaven Hall 115",
                     "seats": 20,
-                    "seatsAvailable": 4,
+                    "seatsAvailable": 5,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "A01 - Topics In Global Studies: Promises & Politics of Global Health",
