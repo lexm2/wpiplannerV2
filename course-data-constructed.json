@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 9, 2026, 3:45 PM",
+  "generated": "Aug 9, 2026, 4:12 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8631,7 +8631,7 @@
                 "number": "A01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 12,
                 "note": null,
                 "computedTerm": "A",
@@ -8648,7 +8648,7 @@
                     "room": "Salisbury Labs 123 Computer Lab",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 12,
                     "specificSection": "A01",
                     "days": [
@@ -8996,7 +8996,7 @@
                 "number": "A01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -9013,7 +9013,7 @@
                     "room": "Salisbury Labs 011",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -465761,7 +465761,7 @@
                 "number": "F01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 4,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "F",
@@ -465778,7 +465778,7 @@
                     "room": "Unknown",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 4,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
                     "days": [],
