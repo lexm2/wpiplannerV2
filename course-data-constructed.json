@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 11, 2026, 10:32 AM",
+  "generated": "Aug 11, 2026, 11:29 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -93696,7 +93696,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
@@ -93713,7 +93713,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
@@ -109022,7 +109022,7 @@
                   "crn": 352001,
                   "number": "DX01",
                   "seats": 33,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5443",
@@ -109039,7 +109039,7 @@
                       "building": "",
                       "room": "Atwater Kent 113 Semi-Conductor Lab",
                       "seats": 33,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DX01",
@@ -113752,7 +113752,7 @@
                 "number": "D01",
                 "seats": 95,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "D",
@@ -113769,7 +113769,7 @@
                     "room": "Unity Hall 500",
                     "seats": 95,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "D01",
                     "days": [
