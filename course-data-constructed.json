@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 13, 2026, 5:36 AM",
+  "generated": "Aug 13, 2026, 7:01 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -348572,7 +348572,7 @@
                 "crn": 350204,
                 "number": "F01",
                 "seats": 999,
-                "seatsAvailable": 998,
+                "seatsAvailable": 999,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -348589,7 +348589,7 @@
                     "building": "",
                     "room": "Alden Hall B19 Lora E. Spaulding Recital Hall",
                     "seats": 999,
-                    "seatsAvailable": 998,
+                    "seatsAvailable": 999,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F01",
@@ -348608,7 +348608,7 @@
                 "crn": 350214,
                 "number": "F02",
                 "seats": 999,
-                "seatsAvailable": 998,
+                "seatsAvailable": 999,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -348625,7 +348625,7 @@
                     "building": "",
                     "room": "Alden Hall B19 Lora E. Spaulding Recital Hall",
                     "seats": 999,
-                    "seatsAvailable": 998,
+                    "seatsAvailable": 999,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F02",
