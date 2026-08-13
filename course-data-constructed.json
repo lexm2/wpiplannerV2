@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 13, 2026, 10:57 AM",
+  "generated": "Aug 13, 2026, 11:46 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -142437,7 +142437,7 @@
                 "number": "B01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -142454,7 +142454,7 @@
                     "room": "Higgins Labs 114",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
@@ -143208,7 +143208,7 @@
                 "crn": 356614,
                 "number": "B01 - Topics In Environmental History: American Nature",
                 "seats": 35,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -143225,7 +143225,7 @@
                     "building": "",
                     "room": "Salisbury Labs 406",
                     "seats": 35,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01 - Topics In Environmental History: American Nature",
@@ -143572,7 +143572,7 @@
                 "number": "B01 - Topics In Modern European History: Mass Violence and Genocide",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
                 "computedTerm": "B",
@@ -143589,7 +143589,7 @@
                     "room": "Salisbury Labs 407",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "B01 - Topics In Modern European History: Mass Violence and Genocide",
                     "days": [
