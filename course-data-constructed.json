@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 15, 2026, 7:01 PM",
+  "generated": "Aug 15, 2026, 7:32 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -120323,7 +120323,7 @@
                 "number": "A01",
                 "seats": 20,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -120340,7 +120340,7 @@
                     "room": "Fuller Labs 320",
                     "seats": 20,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -121300,7 +121300,7 @@
                 "crn": 349049,
                 "number": "A01",
                 "seats": 20,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -121317,7 +121317,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 20,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
