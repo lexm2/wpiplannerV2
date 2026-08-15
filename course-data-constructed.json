@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 15, 2026, 7:32 PM",
+  "generated": "Aug 15, 2026, 7:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -125582,7 +125582,7 @@
                   "crn": 348430,
                   "number": "AD01",
                   "seats": 90,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5100",
@@ -125599,7 +125599,7 @@
                       "building": "",
                       "room": "Higgins Labs 116",
                       "seats": 90,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD01",
@@ -132228,7 +132228,7 @@
                 "crn": 350490,
                 "number": "F01",
                 "seats": 60,
-                "seatsAvailable": 9,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -132245,7 +132245,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 60,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "F01",
