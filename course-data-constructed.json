@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 15, 2026, 12:28 PM",
+  "generated": "Aug 15, 2026, 1:08 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -336720,7 +336720,7 @@
                 "crn": 350620,
                 "number": "F01",
                 "seats": 40,
-                "seatsAvailable": 11,
+                "seatsAvailable": 10,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -336737,7 +336737,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 40,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 10,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
