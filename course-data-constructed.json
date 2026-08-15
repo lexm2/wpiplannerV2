@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 15, 2026, 11:14 PM",
+  "generated": "Aug 15, 2026, 11:35 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -10830,7 +10830,7 @@
                 "crn": 356623,
                 "number": "A01 - Topics In Studio Art: Drawing From Nature",
                 "seats": 24,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 2,
                 "maxWaitlist": 10,
                 "note": null,
@@ -10847,7 +10847,7 @@
                     "building": "",
                     "room": "Fuller Labs 311",
                     "seats": 24,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 2,
                     "maxWaitlist": 10,
                     "specificSection": "A01 - Topics In Studio Art: Drawing From Nature",
@@ -143344,7 +143344,7 @@
                 "crn": 357462,
                 "number": "A01 - Topics in American Political History: Parties, Polarization, and Partisanship",
                 "seats": 35,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -143361,7 +143361,7 @@
                     "building": "",
                     "room": "Salisbury Labs 305",
                     "seats": 35,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01 - Topics in American Political History: Parties, Polarization, and Partisanship",
