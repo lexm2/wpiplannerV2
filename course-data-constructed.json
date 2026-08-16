@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 16, 2026, 7:17 PM",
+  "generated": "Aug 16, 2026, 7:42 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -21559,7 +21559,7 @@
               "number": "A01",
               "seats": 16,
               "seatsAvailable": -2,
-              "actualWaitlist": 2,
+              "actualWaitlist": 3,
               "maxWaitlist": 5,
               "note": null,
               "computedTerm": "A",
@@ -21576,7 +21576,7 @@
                   "room": "Goddard Hall 205 BB Lab",
                   "seats": 16,
                   "seatsAvailable": -2,
-                  "actualWaitlist": 2,
+                  "actualWaitlist": 3,
                   "maxWaitlist": 5,
                   "specificSection": "A01",
                   "days": [
@@ -92693,7 +92693,7 @@
                 "crn": 354243,
                 "number": "A01",
                 "seats": 45,
-                "seatsAvailable": 2,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -92710,7 +92710,7 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 45,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
@@ -106062,7 +106062,7 @@
                 "number": "AL01",
                 "seats": 205,
                 "seatsAvailable": 0,
-                "actualWaitlist": 0,
+                "actualWaitlist": 1,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5101",
                 "computedTerm": "A",
@@ -106079,7 +106079,7 @@
                     "room": "Atwater Kent 116 Newell Hall",
                     "seats": 205,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 0,
+                    "actualWaitlist": 1,
                     "maxWaitlist": 20,
                     "specificSection": "AL01",
                     "days": [
