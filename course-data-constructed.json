@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 17, 2026, 7:38 AM",
+  "generated": "Aug 17, 2026, 8:23 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -472241,7 +472241,7 @@
                 "number": "A01",
                 "seats": 25,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 3,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -472258,7 +472258,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 25,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 3,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
@@ -472315,7 +472315,7 @@
                 "number": "A03",
                 "seats": 28,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -472332,7 +472332,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 28,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "A03",
                     "days": [
