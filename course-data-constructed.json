@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 17, 2026, 10:56 AM",
+  "generated": "Aug 17, 2026, 11:25 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -354476,7 +354476,7 @@
                 "crn": 350250,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 26,
+                "seatsAvailable": 27,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -354493,7 +354493,7 @@
                     "building": "",
                     "room": "Olin Hall 223",
                     "seats": 30,
-                    "seatsAvailable": 26,
+                    "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
