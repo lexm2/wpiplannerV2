@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 18, 2026, 11:20 AM",
+  "generated": "Aug 18, 2026, 11:49 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -99779,7 +99779,7 @@
             {
               "section": {
                 "crn": 361453,
-                "number": "F02",
+                "number": "F01",
                 "seats": 30,
                 "seatsAvailable": 27,
                 "actualWaitlist": 0,
@@ -99801,7 +99801,7 @@
                     "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "F02",
+                    "specificSection": "F01",
                     "days": [],
                     "isAsync": true
                   }
@@ -99812,20 +99812,20 @@
             },
             {
               "section": {
-                "crn": 350284,
-                "number": "F01",
+                "crn": 361454,
+                "number": "S02",
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
-                "computedTerm": "F",
+                "computedTerm": "S",
                 "isGps": false,
                 "isInterestList": false,
                 "periods": [
                   {
-                    "type": "Experiential",
-                    "professor": "Larz White",
+                    "type": "Lecture",
+                    "professor": "Richard LaRowe",
                     "startTime": "12:00",
                     "endTime": "12:00",
                     "location": "Unknown",
@@ -99835,7 +99835,7 @@
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "F01",
+                    "specificSection": "S02",
                     "days": [],
                     "isAsync": true
                   }
@@ -117343,7 +117343,7 @@
             {
               "section": {
                 "crn": 361453,
-                "number": "F02",
+                "number": "F01",
                 "seats": 30,
                 "seatsAvailable": 27,
                 "actualWaitlist": 0,
@@ -117365,7 +117365,7 @@
                     "seatsAvailable": 27,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "F02",
+                    "specificSection": "F01",
                     "days": [],
                     "isAsync": true
                   }
@@ -117376,20 +117376,20 @@
             },
             {
               "section": {
-                "crn": 350284,
-                "number": "F01",
+                "crn": 361454,
+                "number": "S02",
                 "seats": 30,
                 "seatsAvailable": 30,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
-                "computedTerm": "F",
+                "computedTerm": "S",
                 "isGps": false,
                 "isInterestList": false,
                 "periods": [
                   {
-                    "type": "Experiential",
-                    "professor": "Larz White",
+                    "type": "Lecture",
+                    "professor": "Richard LaRowe",
                     "startTime": "12:00",
                     "endTime": "12:00",
                     "location": "Unknown",
@@ -117399,7 +117399,7 @@
                     "seatsAvailable": 30,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
-                    "specificSection": "F01",
+                    "specificSection": "S02",
                     "days": [],
                     "isAsync": true
                   }
@@ -307849,7 +307849,7 @@
                 "number": "Interest List-A Term",
                 "seats": 0,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 999,
                 "note": "IntList",
                 "computedTerm": "A",
@@ -307866,7 +307866,7 @@
                     "room": "Unknown",
                     "seats": 0,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 999,
                     "specificSection": "Interest List-A Term",
                     "days": [],
