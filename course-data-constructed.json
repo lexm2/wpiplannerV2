@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 19, 2026, 7:13 AM",
+  "generated": "Aug 19, 2026, 7:54 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -472331,7 +472331,7 @@
                 "number": "A03",
                 "seats": 28,
                 "seatsAvailable": 0,
-                "actualWaitlist": 6,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -472348,7 +472348,7 @@
                     "room": "Recreation Center Dance",
                     "seats": 28,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 6,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "A03",
                     "days": [
