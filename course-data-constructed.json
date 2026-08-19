@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 19, 2026, 10:22 AM",
+  "generated": "Aug 19, 2026, 10:53 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -94994,7 +94994,7 @@
                 "crn": 354363,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -95011,7 +95011,7 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 30,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -121366,7 +121366,7 @@
                 "crn": 349049,
                 "number": "A01",
                 "seats": 20,
-                "seatsAvailable": 1,
+                "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -121383,7 +121383,7 @@
                     "building": "",
                     "room": "Kaven Hall 204",
                     "seats": 20,
-                    "seatsAvailable": 1,
+                    "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
