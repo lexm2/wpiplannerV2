@@ -4,6 +4,7 @@
   import Changelog from './Changelog.svelte';
   import Tutorials from './Tutorials.svelte';
   import SectionInfo from './SectionInfo.svelte';
+  import ConfirmDialog from './ConfirmDialog.svelte';
   import DeleteLocalEvent from './DeleteLocalEvent.svelte';
   import LocalEvent from './LocalEvent.svelte';
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
@@ -63,6 +64,8 @@
     {/if}
   {:else if id === 'section-info'}
     <SectionInfo onRequestClose={() => closeModal('section-info')} />
+  {:else if id === 'confirm'}
+    <ConfirmDialog onRequestClose={() => closeModal('confirm')} />
   {:else if id === 'delete-local-event'}
     <DeleteLocalEvent onRequestClose={() => closeModal('delete-local-event')} />
   {:else if id === 'local-event'}

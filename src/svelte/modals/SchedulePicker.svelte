@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte';
   import Modal from './Modal.svelte';
-  import { modalState } from './modalState.svelte';
+  import { modalState, showConfirm } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { logger } from '../../utils/logger';
@@ -119,7 +119,7 @@
         refreshTick++;
       } catch (error) {
         logger.error('Failed to rename schedule:', error);
-        alert('Failed to rename schedule. Please try again.');
+        showAppError('Failed to rename schedule. Please try again.');
       }
     }
     editingId = null;
@@ -139,7 +139,7 @@
       scheduleManagementService.setActiveSchedule(scheduleId);
     } catch (error) {
       logger.error('Failed to switch schedule:', error);
-      alert('Failed to switch schedule. Please try again.');
+      showAppError('Failed to switch schedule. Please try again.');
     }
   }
 
@@ -156,7 +156,7 @@
       }
     } catch (error) {
       logger.error(`Failed to ${action} schedule:`, error);
-      alert(`Failed to ${action} schedule. Please try again.`);
+      showAppError(`Failed to ${action} schedule. Please try again.`);
     }
   }
 
@@ -165,19 +165,32 @@
     refreshTick++;
   }
 
-  async function deleteSchedule(schedule: Schedule): Promise<void> {
-    if (confirm(`Are you sure you want to delete "${schedule.name}"?`)) {
-      await scheduleManagementService.deleteSchedule(schedule.id);
-      refreshTick++;
-    }
+  function deleteSchedule(schedule: Schedule): void {
+    showConfirm({
+      title: 'Delete schedule',
+      message: `Are you sure you want to delete "${schedule.name}"?`,
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        await scheduleManagementService.deleteSchedule(schedule.id);
+        refreshTick++;
+      },
+    });
   }
 
-  async function createNewSchedule(): Promise<void> {
-    const name = prompt('Enter schedule name:');
-    if (name?.trim()) {
-      await scheduleManagementService.createNewSchedule(name.trim());
-      refreshTick++;
-    }
+  function createNewSchedule(): void {
+    showConfirm({
+      title: 'New schedule',
+      message: 'Enter a name for the new schedule:',
+      confirmLabel: 'Create',
+      input: true,
+      placeholder: 'Schedule name',
+      onConfirm: async (name) => {
+        if (!name) return;
+        await scheduleManagementService.createNewSchedule(name);
+        refreshTick++;
+      },
+    });
   }
 
   function triggerFileDownload(data: string, filename: string, mimeType: string): void {
@@ -198,7 +211,7 @@
       const schedule = scheduleManagementService.getScheduleById(scheduleId);
       triggerFileDownload(result.data, `${schedule?.name || 'schedule'}.json`, 'application/json');
     } else {
-      alert(`Export failed: ${result.error || 'Unknown error'}`);
+      showAppError(`Export failed: ${result.error || 'Unknown error'}`);
     }
   }
 
@@ -208,7 +221,7 @@
       const schedule = scheduleManagementService.getScheduleById(scheduleId);
       triggerFileDownload(result.data, `${schedule?.name || 'schedule'}.ics`, 'text/calendar');
     } else {
-      alert(`ICS Export failed: ${result.error || 'Unknown error'}`);
+      showAppError(`ICS Export failed: ${result.error || 'Unknown error'}`);
     }
   }
 
@@ -223,10 +236,10 @@
         const text = await file.text();
         const result = await scheduleManagementService.importScheduleInto(scheduleId, text);
         if (result.success) refreshTick++;
-        else alert(`Import failed: ${result.error}`);
+        else showAppError(`Import failed: ${result.error}`);
       } catch (error) {
         logger.error('Failed to import schedule:', error);
-        alert('Failed to import schedule. Please check the file format.');
+        showAppError('Failed to import schedule. Please check the file format.');
       }
     };
     input.click();
@@ -246,11 +259,11 @@
         const result = await scheduleManagementService.createNewSchedule(name);
         if (result.success && result.schedule?.id) {
           const importResult = await scheduleManagementService.importScheduleInto(result.schedule.id, text);
-          if (!importResult.success) alert(`Import failed: ${importResult.error}`);
+          if (!importResult.success) showAppError(`Import failed: ${importResult.error}`);
           refreshTick++;
         }
       } catch {
-        alert('Failed to import schedule. Please check the file format.');
+        showAppError('Failed to import schedule. Please check the file format.');
       }
     };
     input.click();
@@ -267,22 +280,24 @@
       const timestamp = new Date().toISOString().split('T')[0];
       triggerFileDownload(result.data, `wpi-schedules-${timestamp}.json`, 'application/json');
     } else {
-      alert(`Export failed: ${result.error || 'Unknown error'}`);
+      showAppError(`Export failed: ${result.error || 'Unknown error'}`);
     }
   }
 
-  async function clearAllData(): Promise<void> {
-    const confirmed = confirm(
-      'Are you sure you want to clear ALL schedules and data?\n\n' +
-      'This will:\n' +
-      '• Delete all schedules\n' +
-      '• Clear all selected courses\n' +
-      '• Reset all preferences\n\n' +
-      'This action CANNOT be undone!'
-    );
-    if (!confirmed) return;
-    await scheduleManagementService.clearAllSchedules();
-    refreshTick++;
+  function clearAllData(): void {
+    showConfirm({
+      title: 'Clear all data',
+      message:
+        'Are you sure you want to clear ALL schedules and data?\n' +
+        'This will delete all schedules, clear all selected courses and reset all preferences.\n' +
+        'This action CANNOT be undone.',
+      confirmLabel: 'Clear everything',
+      variant: 'danger',
+      onConfirm: async () => {
+        await scheduleManagementService.clearAllSchedules();
+        refreshTick++;
+      },
+    });
   }
 
   // Settings actions — call the real services directly (mirrors App.svelte's

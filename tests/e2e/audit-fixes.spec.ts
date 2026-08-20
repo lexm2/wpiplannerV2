@@ -259,3 +259,54 @@ test('a profile written before the key registry still reads back', async ({ page
     expect(state.expanded).toBe('false');      // panel state preserved
     expect(state.prefs).toContain('wpi-classic');
 });
+
+test('themed confirm dialog replaces native confirm', async ({ page }) => {
+    let nativeDialog = false;
+    page.on('dialog', async d => { nativeDialog = true; await d.dismiss(); });
+    await page.goto('/');
+    await page.waitForTimeout(2000);
+
+    await page.evaluate(async () => {
+        // @ts-expect-error runtime dev-server URL, not a tsc-resolvable module path
+        const m: any = await import('/wpiplannerV2/src/svelte/modals/modalState.svelte.ts');
+        (window as any).__confirmed = null;
+        m.showConfirm({
+            title: 'Delete schedule', message: 'Are you sure?',
+            confirmLabel: 'Delete', variant: 'danger',
+            onConfirm: () => { (window as any).__confirmed = true; },
+        });
+    });
+    await page.waitForTimeout(500);
+
+    const dialog = page.locator('.modal-dialog:has-text("Delete schedule")');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator('.btn-danger')).toHaveText('Delete');
+
+    await dialog.locator('.btn-danger').click();
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => (window as any).__confirmed)).toBe(true);
+    expect(nativeDialog).toBe(false);
+});
+
+test('confirm dialog supports a text input (prompt replacement)', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForTimeout(2000);
+    await page.evaluate(async () => {
+        // @ts-expect-error runtime dev-server URL, not a tsc-resolvable module path
+        const m: any = await import('/wpiplannerV2/src/svelte/modals/modalState.svelte.ts');
+        (window as any).__value = null;
+        m.showConfirm({
+            title: 'New schedule', message: 'Enter a name:', input: true,
+            confirmLabel: 'Create',
+            onConfirm: (v: string) => { (window as any).__value = v; },
+        });
+    });
+    await page.waitForTimeout(500);
+
+    const dialog = page.locator('.modal-dialog:has-text("New schedule")');
+    await expect(dialog.locator('#modal-primary-btn')).toBeDisabled();
+    await dialog.locator('input[type="text"]').fill('Fall Plan');
+    await dialog.locator('#modal-primary-btn').click();
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => (window as any).__value)).toBe('Fall Plan');
+});

@@ -1,6 +1,6 @@
 import { appState } from '../../core/state/appState.svelte'
 import { modalState } from '../../svelte/modals/modalState.svelte'
-import { openModal } from '../ui/uiState.svelte'
+import { openModal, showAppError } from '../ui/uiState.svelte'
 import type { SelectedCourse } from '../../types/schedule'
 import type { WeeklyTimeSlot } from '../../types/schedule'
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
@@ -40,7 +40,7 @@ class AutoScheduleService {
     async openAutoSchedule(): Promise<void> {
         if (!this.filterService || !this.courseSelectionService) {
             logger.error('[Auto-Schedule] Filter service not available')
-            alert('Filter service not available. Please try again.')
+            showAppError('Filter service not available. Please try again.')
             return
         }
 
@@ -48,7 +48,7 @@ class AutoScheduleService {
 
         if (selectedCourses.length === 0) {
             logger.warn('[Auto-Schedule] No courses selected')
-            alert('No courses selected. Please select courses first.')
+            showAppError('No courses selected. Please select courses first.')
             return
         }
 
@@ -113,14 +113,14 @@ class AutoScheduleService {
 
             if (!success) {
                 logger.warn('[Auto-Schedule] No valid schedules found')
-                alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts')
+                showAppError('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts')
             }
             // On success the grid and footer re-render on their own: the orchestrator
             // applied the schedule via batchSetSelectedComponents, and AutoScheduleControls
             // reacts via appState.autoScheduleCount/Index.
         } catch (error) {
             logger.error('[Auto-Schedule] Error generating schedules:', error)
-            alert('An error occurred while generating the schedule. Please try again.')
+            showAppError('An error occurred while generating the schedule. Please try again.')
         } finally {
             appState.scheduleGenerating = false
         }

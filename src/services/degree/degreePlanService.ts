@@ -1,5 +1,5 @@
 import { appState } from '../../core/state/appState.svelte';
-import { setPage } from '../ui/uiState.svelte';
+import { setPage, showAppError } from '../ui/uiState.svelte';
 import type { ScheduleManagementService } from '../selection/ScheduleManagementService';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { FilterService } from '../filtering/FilterService';
@@ -143,7 +143,7 @@ class DegreePlanService {
         const course = findCatalogCourse(code, preferredYear, appState.loadedDepartments);
 
         if (!course) {
-            if (typeof alert === 'function') alert(`${code} could not be found in the course catalog.`);
+            if (typeof alert === 'function') showAppError(`${code} could not be found in the course catalog.`);
             return;
         }
 

@@ -1,5 +1,26 @@
 import type { SectionData } from '../../types/modal';
+import { openModal } from '../../services/ui/uiState.svelte';
 import type { LocalCalendarEvent, SelectedCourse } from '../../types/schedule';
+
+/**
+ * Generic confirm / prompt payload. `input: true` turns it into a prompt and
+ * onConfirm receives the entered value; otherwise onConfirm takes no argument.
+ * Set this then call openModal('confirm') — works from plain .ts services too.
+ */
+export interface ConfirmPayload {
+    title: string;
+    /** Newline-separated; each line renders as its own paragraph. */
+    message: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    /** 'danger' styles the confirm button red, for destructive actions. */
+    variant?: 'default' | 'danger';
+    /** Render a text field and pass its value to onConfirm (prompt replacement). */
+    input?: boolean;
+    defaultValue?: string;
+    placeholder?: string;
+    onConfirm: (value?: string) => void;
+}
 
 export interface DeleteLocalEventPayload {
     title: string;
@@ -31,6 +52,7 @@ export interface AutoScheduleIntroPayload {
 
 class ModalState {
     sectionInfo = $state.raw<SectionData | null>(null);
+    confirm = $state.raw<ConfirmPayload | null>(null);
     deleteLocalEvent = $state.raw<DeleteLocalEventPayload | null>(null);
     localEvent = $state.raw<LocalEventPayload | null>(null);
     autoScheduleIntro = $state.raw<AutoScheduleIntroPayload | null>(null);
@@ -48,3 +70,12 @@ class ModalState {
 }
 
 export const modalState = new ModalState();
+
+/**
+ * Themed replacement for native confirm()/prompt(). Callable from components and
+ * plain .ts services alike — it just sets a payload and opens a modal.
+ */
+export function showConfirm(payload: ConfirmPayload): void {
+    modalState.confirm = payload;
+    openModal('confirm');
+}

@@ -9,6 +9,7 @@
   import { fade } from 'svelte/transition';
   import { slideX, dur } from './transitions';
   import { wizardState } from './wizardState.svelte';
+  import { showConfirm } from './modals/modalState.svelte';
   import {
     determineAvailableSteps,
     getOptionsWithFilterInfo,
@@ -115,10 +116,13 @@
       .map((step) =>
         step === 'lecture' ? 'a lecture' : step === 'discussion' ? 'a discussion section' : 'a lab section',
       );
-    if (
-      missing.length > 0 &&
-      !confirm(`This course is incomplete — you need to select ${missing.join(' and ')}. Are you sure you want to finish anyway?`)
-    ) {
+    if (missing.length > 0) {
+      showConfirm({
+        title: 'Incomplete course',
+        message: `You still need to select ${missing.join(' and ')}. Finish anyway?`,
+        confirmLabel: 'Finish anyway',
+        onConfirm: () => cfg.onComplete(wizardState.selections),
+      });
       return;
     }
     cfg.onComplete(wizardState.selections);

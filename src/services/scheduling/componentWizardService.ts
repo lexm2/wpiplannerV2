@@ -9,6 +9,7 @@ import type { CourseSelectionService } from '../selection/CourseSelectionService
 import type { CourseDataService } from '../data/courseDataService'
 import type { FilterService } from '../filtering/FilterService'
 import { logger } from '../../utils/logger'
+import { showAppError } from '../ui/uiState.svelte'
 
 /**
  * Standalone component-selection wizard launcher for the schedule page.
@@ -92,11 +93,11 @@ class ComponentWizardService {
                 // updated selection re-renders on its own — nothing to do here.
             } else {
                 logger.error('Failed to save component selections:', result.error)
-                alert('Failed to save selections. Please try again.')
+                showAppError('Failed to save selections. Please try again.')
             }
         } catch (error) {
             logger.error('Error saving component selections:', error)
-            alert('An error occurred while saving selections.')
+            showAppError('An error occurred while saving selections.')
         }
 
         this.closeComponentWizard()

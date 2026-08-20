@@ -2,18 +2,18 @@
   import { getInlineSVG } from '../utils/iconPaths';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import { logger } from '../utils/logger';
+  import { showConfirm } from './modals/modalState.svelte';
+  import { showAppError } from '../services/ui/uiState.svelte';
 
   let { courseSelectionService }: { courseSelectionService: CourseSelectionService } = $props();
 
   // Replaces ScheduleController.setupClearAllSectionsButton + handleClearAllSections.
-  // Behavior is identical: empty/no-sections paths alert and bail; otherwise
-  // confirm, then clear all components via the service (the reactive sidebar/grid
-  // re-render off appState.selectedCourses on their own).
-  async function handleClick(): Promise<void> {
+  // The reactive sidebar/grid re-render off appState.selectedCourses on their own.
+  function handleClick(): void {
     const selectedCourses = courseSelectionService.getSelectedCourses();
 
     if (selectedCourses.length === 0) {
-      alert('No courses selected.');
+      showAppError('No courses selected.');
       return;
     }
 
@@ -22,18 +22,24 @@
     );
 
     if (!hasAnySections) {
-      alert('No sections selected to clear.');
+      showAppError('No sections selected to clear.');
       return;
     }
 
-    if (confirm('Clear all selected sections for all courses?')) {
-      try {
-        await courseSelectionService.clearAllComponents();
-      } catch (error) {
-        logger.error('Failed to clear all components:', error);
-        alert('Failed to clear sections. Please try again.');
-      }
-    }
+    showConfirm({
+      title: 'Clear all sections',
+      message: 'Clear all selected sections for all courses?',
+      confirmLabel: 'Clear sections',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await courseSelectionService.clearAllComponents();
+        } catch (error) {
+          logger.error('Failed to clear all components:', error);
+          showAppError('Failed to clear sections. Please try again.');
+        }
+      },
+    });
   }
 </script>
 
