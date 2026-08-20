@@ -10,6 +10,7 @@
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import { logger } from '../utils/logger';
+  import { STORAGE_KEYS } from '../utils/storageKeys';
 
   let { courseSelectionService }: {
     courseSelectionService: CourseSelectionService;
@@ -21,11 +22,11 @@
 
   // Expander state persists in localStorage (default collapsed), matching the
   // old CourseController.initializeSelectedCoursesExpander.
-  let isExpanded = $state(localStorage.getItem('selectedCoursesExpanded') === 'true');
+  let isExpanded = $state(localStorage.getItem(STORAGE_KEYS.SELECTED_COURSES_EXPANDED) === 'true');
 
   function toggleExpander(): void {
     isExpanded = !isExpanded;
-    localStorage.setItem('selectedCoursesExpanded', String(isExpanded));
+    localStorage.setItem(STORAGE_KEYS.SELECTED_COURSES_EXPANDED, String(isExpanded));
   }
 
   function onHeaderKeydown(e: KeyboardEvent): void {

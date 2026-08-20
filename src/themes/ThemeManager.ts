@@ -6,6 +6,7 @@ import wpiDark from './definitions/wpi-dark.json'
 import wpiLight from './definitions/wpi-light.json'
 import highContrast from './definitions/high-contrast.json'
 import { logger } from '../utils/logger'
+import { STORAGE_KEYS } from '../utils/storageKeys'
 
 /**
  * Singleton theme system with JSON-based themes and pluggable storage strategy for persistence
@@ -32,7 +33,7 @@ export interface ThemeStorage {
  * svelte/panelWidths.ts.
  */
 class DefaultThemeStorage implements ThemeStorage {
-    private readonly preferencesKey = 'wpi-planner-preferences';
+    private readonly preferencesKey = STORAGE_KEYS.PREFERENCES;
 
     loadThemePreference(): string {
         try {

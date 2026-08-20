@@ -24,6 +24,7 @@ import { autoScheduleService } from '../services/scheduling/autoScheduleService'
 import { degreePlanService } from '../services/degree/degreePlanService'
 import type { ServiceContainer } from './ServiceContainer'
 import { logger } from '../utils/logger'
+import { STORAGE_KEYS } from '../utils/storageKeys'
 
 export class AppBootstrap {
     static createServices(): ServiceContainer {
@@ -164,7 +165,7 @@ export class AppBootstrap {
             services.autoScheduleOrchestrator.setCalendarEventProvider(calendarEventProvider);
             AppBootstrap.setupWindowUnloadHandler();
 
-            if (!localStorage.getItem('wpi_visited')) {
+            if (!localStorage.getItem(STORAGE_KEYS.VISITED)) {
                 await services.tutorial?.start('welcome');
             }
         } catch (error) {

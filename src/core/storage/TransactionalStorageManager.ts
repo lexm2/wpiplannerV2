@@ -4,6 +4,7 @@
 import { Schedule, UserScheduleState, SchedulePreferences } from '../../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { setReplacer, setReviver } from '../../utils/jsonSerializer'
+import { STORAGE_KEYS } from '../../utils/storageKeys'
 import type { StudentRecord } from '../../types/degree'
 import { logger } from '../../utils/logger'
 
@@ -29,14 +30,8 @@ export interface TransactionResult {
 }
 
 export class TransactionalStorageManager {
-    private static readonly STORAGE_KEYS = {
-        USER_STATE: 'wpi-planner-user-state',
-        PREFERENCES: 'wpi-planner-preferences',
-        SCHEDULES: 'wpi-planner-schedules',
-        ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
-        DEGREE_RECORD: 'wpi-planner-degree-record',
-        TRANSACTION_LOG: 'wpi-planner-transaction-log'
-    };
+    /** Shared registry — see utils/storageKeys.ts. */
+    private static readonly STORAGE_KEYS = STORAGE_KEYS;
 
     private activeTransactions = new Map<string, StorageTransaction>();
     private transactionCounter = 0;
@@ -236,9 +231,7 @@ export class TransactionalStorageManager {
     clearAllData(): TransactionResult {
         return this.executeSyncTransaction(() => {
             Object.values(TransactionalStorageManager.STORAGE_KEYS).forEach(key => {
-                if (key !== TransactionalStorageManager.STORAGE_KEYS.TRANSACTION_LOG) {
-                    localStorage.removeItem(key);
-                }
+                localStorage.removeItem(key);
             });
         });
     }

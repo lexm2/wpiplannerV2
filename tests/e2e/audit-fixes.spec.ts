@@ -235,3 +235,27 @@ test('schedule export/import round-trips after the ScheduleState trim', async ({
     expect(result.ok).toBe(true);
     expect(result.minimalFormat).toBe(true);
 });
+
+test('a profile written before the key registry still reads back', async ({ page }) => {
+    // Seed storage exactly as the OLD hand-typed literals would have written it.
+    await page.addInitScript(() => {
+        localStorage.setItem('wpi-planner-preferences', JSON.stringify({ theme: 'wpi-classic', bookmarkedCourseIds: [] }));
+        localStorage.setItem('wpi_visited', 'true');
+        localStorage.setItem('selectedCoursesExpanded', 'false');
+    });
+    await page.goto('/');
+    await page.waitForTimeout(2000);
+
+    const state = await page.evaluate(() => ({
+        theme: (window as any).services.themeManager.getCurrentThemeId(),
+        visited: localStorage.getItem('wpi_visited'),
+        expanded: localStorage.getItem('selectedCoursesExpanded'),
+        prefs: localStorage.getItem('wpi-planner-preferences'),
+    }));
+    console.log('CONTINUITY=' + JSON.stringify(state));
+
+    expect(state.theme).toBe('wpi-classic');   // preferences key still resolves
+    expect(state.visited).toBe('true');        // tutorial flag not reset
+    expect(state.expanded).toBe('false');      // panel state preserved
+    expect(state.prefs).toContain('wpi-classic');
+});

@@ -8,6 +8,7 @@ import { autoScheduleService } from '../../services/scheduling/autoScheduleServi
 import { modalState } from '../../svelte/modals/modalState.svelte';
 import { uiState, setPage, openModal, closeAllModals } from '../ui/uiState.svelte';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
+import { STORAGE_KEYS } from '../../utils/storageKeys'
 
 export interface TutorialEntry {
     id: string;
@@ -71,7 +72,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     async function cleanupTutorial(setVisited: boolean) {
         stateMachine.clear();
         if (setVisited) {
-            localStorage.setItem('wpi_visited', 'true');
+            localStorage.setItem(STORAGE_KEYS.VISITED, 'true');
         }
         componentWizardService.closeComponentWizard();
         services.filterService.clearFilters();
