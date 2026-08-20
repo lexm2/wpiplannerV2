@@ -23,9 +23,9 @@
   } from './wizardLogic';
   import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../utils/iconPaths';
-  import type { Section } from '../types/types';
+  import type { ComponentKind, Section } from '../types/types';
   import type { ComponentSelections } from '../types/scheduling';
-  import type { WizardStep } from '../types/uiState';
+  
   import styles from '../styles/components/component-wizard.module.css';
 
   // Snapshot the config for this open — the host {#if} mounts a fresh instance per
@@ -35,12 +35,12 @@
   const { course, courseDataService, filterService } = cfg;
   const isLabOnly = courseDataService.isLabOnlyCourse(course);
 
-  const STEP_LABELS: Record<WizardStep, string> = {
+  const STEP_LABELS: Record<ComponentKind, string> = {
     lecture: isLabOnly ? 'Lab Section' : 'Lecture',
     discussion: 'Discussion',
     lab: 'Lab',
   };
-  const STEP_TITLES: Record<WizardStep, string> = {
+  const STEP_TITLES: Record<ComponentKind, string> = {
     lecture: isLabOnly ? 'Select Lab Section' : 'Select Lecture',
     discussion: 'Select Discussion',
     lab: 'Select Lab',

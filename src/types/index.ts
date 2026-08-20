@@ -42,8 +42,10 @@ export type {
   TimeSlot,
   ScheduleDB,
   PlannerState,
+  ComponentKind,
+  SectionsByKind,
 } from './types';
-export { PeriodType, DayOfWeek, Semester, SectionType } from './types';
+export { PeriodType, DayOfWeek, Semester, SectionType, COMPONENT_KINDS } from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
   ComponentSelections,

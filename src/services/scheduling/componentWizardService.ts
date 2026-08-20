@@ -1,5 +1,5 @@
-import type { WizardStep } from '../../types/uiState'
-import type { Course, Section } from '../../types/types'
+
+import type { Course, ComponentKind, Section } from '../../types/types'
 import type { SelectedCourse } from '../../types/schedule'
 import type { ComponentSelections } from '../../types/scheduling'
 import { wizardState } from '../../svelte/wizardState.svelte'
@@ -36,7 +36,7 @@ class ComponentWizardService {
         this.filterService = filterService
     }
 
-    openComponentWizard(course: Course, existingSelections?: SelectedCourse, initialStep?: WizardStep): void {
+    openComponentWizard(course: Course, existingSelections?: SelectedCourse, initialStep?: ComponentKind): void {
         if (!this.courseDataService || !this.courseSelectionService) {
             logger.error('CourseDataService not available')
             return
@@ -134,7 +134,7 @@ class ComponentWizardService {
             selectedCourse.selectedLecture ?? null,
         )
 
-        const selectionForStep: Record<WizardStep, Section | null> = {
+        const selectionForStep: Record<ComponentKind, Section | null> = {
             lecture: selectedCourse.selectedLecture ?? null,
             discussion: selectedCourse.selectedDiscussion ?? null,
             lab: selectedCourse.selectedLab ?? null,

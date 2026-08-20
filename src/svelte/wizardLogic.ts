@@ -5,9 +5,9 @@
 // it's all course-structure / filtering math, which keeps it easy to reason about
 // and unit-test.
 
-import type { Course, Section, Period } from '../types/types';
+import type { ComponentKind, Course, Section, Period } from '../types/types';
 import type { ComponentSelections } from '../types/scheduling';
-import type { WizardStep } from '../types/uiState';
+
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
 import type { AcademicYearFilterCriteria } from '../types/filters';
@@ -30,8 +30,8 @@ export function determineAvailableSteps(
     course: Course,
     courseDataService: CourseDataService,
     selectedLecture: Section | null,
-): WizardStep[] {
-    const steps: WizardStep[] = [];
+): ComponentKind[] {
+    const steps: ComponentKind[] = [];
     const isHierarchical = courseDataService.isHierarchicalCourse(course);
     const isLabOnly = courseDataService.isLabOnlyCourse(course);
 
@@ -63,8 +63,8 @@ export function computeStepsForLecture(
     course: Course,
     courseDataService: CourseDataService,
     lecture: Section,
-): WizardStep[] {
-    const steps: WizardStep[] = ['lecture'];
+): ComponentKind[] {
+    const steps: ComponentKind[] = ['lecture'];
     const discussions = courseDataService.getDiscussionsForLecture(course, lecture)
         .filter(s => !s.isInterestList);
     const labs = courseDataService.getLabsForLecture(course, lecture)
@@ -82,7 +82,7 @@ export function getOptionsWithFilterInfo(
     course: Course,
     courseDataService: CourseDataService,
     filterService: FilterService | null,
-    step: WizardStep,
+    step: ComponentKind,
     selections: ComponentSelections,
 ): { filtered: Section[]; totalBeforeFilter: number } {
     let sections: Section[] = [];

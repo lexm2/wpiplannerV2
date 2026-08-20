@@ -1,11 +1,12 @@
+import type { ComponentKind } from './types';
+
 export type PageId = 'planner' | 'schedule' | 'degree';
 export type ViewMode = 'list' | 'grid';
-export type WizardStep = 'lecture' | 'discussion' | 'lab';
 
 export interface WizardState {
     isOpen: boolean;
     courseId: string | null;
-    step: WizardStep | null;
+    step: ComponentKind | null;
 }
 
 export interface UIState {

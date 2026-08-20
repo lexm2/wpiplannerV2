@@ -43,6 +43,23 @@ export interface Section {
     periods: Period[];
 }
 
+/**
+ * The component slots a course selection can fill. Ordered: anything that walks
+ * a selection lecture-first relies on this order, so iterate COMPONENT_KINDS
+ * rather than Object.keys/values, whose order follows insertion.
+ *
+ * Distinct from {@link SectionType}, which is the catalog's four-way tag
+ * (it splits standaloneLab out) attached externally by the filter pipeline. A
+ * standalone lab fills the 'lab' slot here — that is a selection-model fact,
+ * not a catalog one.
+ */
+export const COMPONENT_KINDS = ['lecture', 'discussion', 'lab'] as const;
+export type ComponentKind = (typeof COMPONENT_KINDS)[number];
+
+/** A course's chosen section per component kind. Unfilled kinds are absent keys. */
+export type SectionsByKind = Partial<Record<ComponentKind, Section>>;
+
+/** @see COMPONENT_KINDS for the selection-side three-way split. */
 export enum SectionType {
     LECTURE = 'lecture',
     STANDALONE_LAB = 'standaloneLab',

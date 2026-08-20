@@ -12,10 +12,10 @@
  * (e.g. via `wizardState.jumpToStep`) can drive navigation without a component
  * ref.
  */
-import type { Course } from '../types/types';
+import { COMPONENT_KINDS, type ComponentKind, type Course } from '../types/types';
 import type { SelectedCourse } from '../types/schedule';
 import type { ComponentSelections } from '../types/scheduling';
-import type { WizardStep } from '../types/uiState';
+
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
 import { determineAvailableSteps } from './wizardLogic';
@@ -31,13 +31,9 @@ export interface WizardConfig {
     onHoverPreview?: (selections: ComponentSelections) => void;
 }
 
-// Fixed step order — used to derive slide direction for any navigation, including
-// external jumps that don't know the course's available-steps list.
-const STEP_ORDER: WizardStep[] = ['lecture', 'discussion', 'lab'];
-
 class WizardState {
     config = $state.raw<WizardConfig | null>(null);
-    currentStep = $state.raw<WizardStep>('lecture');
+    currentStep = $state.raw<ComponentKind>('lecture');
     selections = $state<ComponentSelections>({ lecture: null, discussion: null, lab: null });
     /** Last navigation direction, drives the step slide-in animation. */
     direction = $state.raw<'forward' | 'backward'>('forward');
@@ -46,7 +42,7 @@ class WizardState {
         return this.config !== null;
     }
 
-    open(config: WizardConfig, initialStep?: WizardStep): void {
+    open(config: WizardConfig, initialStep?: ComponentKind): void {
         this.config = config;
         this.selections = {
             lecture: config.existingSelections?.selectedLecture ?? null,
@@ -72,10 +68,13 @@ class WizardState {
         this.config = null;
     }
 
-    /** Navigate to a step, computing direction from the fixed step order. */
-    jumpToStep(step: WizardStep): void {
+    /**
+     * Navigate to a step, computing direction from the canonical kind order —
+     * which covers external jumps that don't know the course's available steps.
+     */
+    jumpToStep(step: ComponentKind): void {
         if (step === this.currentStep) return;
-        this.direction = STEP_ORDER.indexOf(step) > STEP_ORDER.indexOf(this.currentStep)
+        this.direction = COMPONENT_KINDS.indexOf(step) > COMPONENT_KINDS.indexOf(this.currentStep)
             ? 'forward' : 'backward';
         this.currentStep = step;
     }
