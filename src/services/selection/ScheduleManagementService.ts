@@ -148,18 +148,6 @@ export class ScheduleManagementService {
         }
     }
 
-    async createScheduleFromCurrent(name: string): Promise<ScheduleOperationResult> {
-        return this.createNewSchedule(name, {
-            includeCurrentCourses: true,
-            autoActivate: false,
-            autoSave: true
-        });
-    }
-
-    async saveCurrentAsSchedule(name: string): Promise<ScheduleOperationResult> {
-        return this.createScheduleFromCurrent(name);
-    }
-
     async setActiveSchedule(scheduleId: string): Promise<ScheduleOperationResult> {
         await this.ensureInitialized();
 
@@ -364,10 +352,6 @@ export class ScheduleManagementService {
         return this.getScheduleById(scheduleId);
     }
 
-    async manualSaveCurrentProfile(): Promise<{ success: boolean; error?: string }> {
-        return this.save();
-    }
-
     private async updateScheduleCourses(scheduleId: string, selectedCourses: SelectedCourse[]): Promise<{ success: boolean; error?: string }> {
         try {
             const validation = this.dataValidator.validateBatch(
@@ -395,29 +379,6 @@ export class ScheduleManagementService {
             return {
                 success: false,
                 error: `Failed to update schedule courses: ${error}`
-            };
-        }
-    }
-
-    async syncActiveScheduleWithCurrentSelections(): Promise<{ success: boolean; error?: string }> {
-        await this.ensureInitialized();
-
-        try {
-            const activeScheduleId = this.getActiveScheduleId();
-            if (!activeScheduleId) {
-                return {
-                    success: false,
-                    error: 'No active schedule to sync'
-                };
-            }
-
-            const currentSelections = this.profileStateManager.getSelectedCourses();
-            return this.updateScheduleCourses(activeScheduleId, currentSelections);
-
-        } catch (error) {
-            return {
-                success: false,
-                error: `Failed to sync schedule: ${error}`
             };
         }
     }
@@ -559,36 +520,6 @@ export class ScheduleManagementService {
             return result;
         } catch (error) {
             return { success: false, error: `Import failed: ${error}` };
-        }
-    }
-
-    async importSchedule(jsonData: string): Promise<ScheduleOperationResult> {
-        try {
-            await this.ensureInitialized();
-
-            const data = JSON.parse(jsonData);
-
-            if (!data.v?.startsWith("4")) {
-                return {
-                    success: false,
-                    error: 'Unsupported import format. Please export your schedules again using the latest version.'
-                };
-            }
-
-            const result = await this.profileStateManager.importData(jsonData);
-            if (!result.success) {
-                return {
-                    success: false,
-                    error: result.error?.message || 'Import failed'
-                };
-            }
-            return { success: true };
-
-        } catch (error) {
-            return {
-                success: false,
-                error: `Import failed: ${error}`
-            };
         }
     }
 

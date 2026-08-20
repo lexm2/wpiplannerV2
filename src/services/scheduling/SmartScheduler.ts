@@ -93,12 +93,6 @@ export class SmartScheduler {
         return results;
     }
 
-    generateSchedules(selectedCourses: SelectedCourse[], maxResults: number): ScheduleResult[][] {
-        const input = this.buildCandidateData(selectedCourses);
-        if (!input) return [];
-        return SmartScheduler.findSchedules(input, maxResults);
-    }
-
     private static enumerateTermAssignments(termOptions: string[][], maxPerTerm: number): string[][] {
         const results: string[][] = [];
         const counts = new Map<string, number>();

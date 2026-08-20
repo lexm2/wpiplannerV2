@@ -244,12 +244,4 @@ export class SectionFilterPipeline {
         return filteredSections;
     }
 
-    filterCourses(
-        courses: Course[],
-        activeFilters: Map<string, unknown>
-    ): Course[] {
-        const sections = this.flattenCoursesToSections(courses);
-        const filteredSections = this.applyFilters(sections, activeFilters);
-        return this.reconstructCourses(filteredSections);
-    }
 }

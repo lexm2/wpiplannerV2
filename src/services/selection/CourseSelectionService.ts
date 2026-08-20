@@ -513,48 +513,6 @@ export class CourseSelectionService {
         console.log(`Loaded ${departments.length} departments`);
     }
 
-    async exportSelections(): Promise<{ success: boolean; data?: string; error?: string }> {
-        try {
-            await this.ensureInitialized();
-            const exportData = await this.profileStateManager.exportData();
-
-            if (exportData === null) {
-                return {
-                    success: false,
-                    error: 'Failed to export data'
-                };
-            }
-
-            return {
-                success: true,
-                data: exportData
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: `Export failed: ${error}`
-            };
-        }
-    }
-
-    async importSelections(jsonData: string): Promise<{ success: boolean; error?: string }> {
-        try {
-            await this.ensureInitialized();
-            
-            const result = await this.profileStateManager.importData(jsonData);
-            
-            return {
-                success: result.success,
-                error: result.error?.message
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: `Import failed: ${error}`
-            };
-        }
-    }
-
     async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
         const issues: string[] = [];
 

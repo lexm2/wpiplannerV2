@@ -1,9 +1,7 @@
-import { Period, Section } from '../../../types/types';
-import { SelectedCourse, AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
+import { AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
 import { ConflictCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
-import { logger } from '../../../utils/logger';
 import { periodToWeeklySlots, sectionToWeeklySlots, slotsOverlap } from '../../../utils/timeSlotUtils';
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
 
@@ -89,115 +87,6 @@ export class ConflictFilter implements SectionBasedFilter {
         }
 
         return slots;
-    }
-
-    applyToPeriods(periods: Period[], criteria: ConflictCriteria): Period[] {
-        if (!criteria.avoidConflicts) {
-            return periods;
-        }
-
-        const blockedSlots = this.getBlockedSlots(criteria);
-        if (blockedSlots.length === 0) {
-            return periods;
-        }
-
-        return periods.filter(period => {
-            const periodSlots = periodToWeeklySlots(period, AcademicTerm.ALL);
-            return !this.hasConflictWithBlockedSlots(periodSlots, blockedSlots);
-        });
-    }
-
-    applyToSections(sections: Section[], criteria: ConflictCriteria): Section[] {
-        if (!criteria.avoidConflicts) {
-            return sections;
-        }
-
-        const blockedSlots = this.getBlockedSlots(criteria);
-        if (blockedSlots.length === 0) {
-            return sections;
-        }
-
-        return sections.filter(section => {
-            const sectionSlots = sectionToWeeklySlots(section);
-            return !this.hasConflictWithBlockedSlots(sectionSlots, blockedSlots);
-        });
-    }
-
-    applyToPeriodsWithContext(
-        periodsWithContext: Array<{course: SelectedCourse, period: Period}>,
-        criteria: ConflictCriteria
-    ): Array<{course: SelectedCourse, period: Period}> {
-        if (!criteria.avoidConflicts) {
-            return periodsWithContext;
-        }
-
-        const blockedSlots = this.getBlockedSlots(criteria);
-        if (blockedSlots.length === 0) {
-            return periodsWithContext;
-        }
-
-        return periodsWithContext.filter(({course, period}) => {
-            const periodSlots = periodToWeeklySlots(period, course.course.lectures?.[0]?.section.computedTerm || AcademicTerm.ALL);
-
-            const selectedCrns = new Set<string>();
-            if (course.selectedLecture) selectedCrns.add(String(course.selectedLecture.crn));
-            if (course.selectedDiscussion) selectedCrns.add(String(course.selectedDiscussion.crn));
-            if (course.selectedLab) selectedCrns.add(String(course.selectedLab.crn));
-
-            const relevantBlockedSlots = blockedSlots.filter(slot => {
-                const crnFromSlot = slot.id.split('-')[0];
-                return !selectedCrns.has(crnFromSlot);
-            });
-
-            return !this.hasConflictWithBlockedSlots(periodSlots, relevantBlockedSlots);
-        });
-    }
-
-    applyToSectionsWithContext(
-        sectionsWithContext: Array<{course: SelectedCourse, section: Section}>,
-        criteria: ConflictCriteria
-    ): Array<{course: SelectedCourse, section: Section}> {
-        logger.log('[ConflictFilter] applyToSectionsWithContext called');
-        logger.log('[ConflictFilter] Criteria:', criteria);
-        logger.log('[ConflictFilter] avoidConflicts:', criteria.avoidConflicts);
-
-        if (!criteria.avoidConflicts) {
-            logger.log('[ConflictFilter] Early return - avoidConflicts false');
-            return sectionsWithContext;
-        }
-
-        const blockedSlots = this.getBlockedSlots(criteria);
-        logger.log('[ConflictFilter] blockedSlots:', blockedSlots.length);
-
-        if (blockedSlots.length === 0) {
-            logger.log('[ConflictFilter] Early return - no blocked slots');
-            return sectionsWithContext;
-        }
-
-        const result = sectionsWithContext.filter(item => {
-            const currentSection = item.section;
-
-            const relevantBlockedSlots = blockedSlots.filter(slot => {
-                const slotCrn = slot.id.split('-')[0];
-                return slotCrn !== String(currentSection.crn);
-            });
-
-            if (relevantBlockedSlots.length === 0) {
-                return true;
-            }
-
-            for (const currentPeriod of currentSection.periods) {
-                const periodSlots = periodToWeeklySlots(currentPeriod, currentSection.computedTerm || AcademicTerm.ALL);
-                if (this.hasConflictWithBlockedSlots(periodSlots, relevantBlockedSlots)) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
-
-        logger.log(`[ConflictFilter] Filtered ${sectionsWithContext.length} sections down to ${result.length}`);
-        return result;
     }
 
     private hasConflictWithBlockedSlots(

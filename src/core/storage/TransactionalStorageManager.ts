@@ -4,8 +4,6 @@
 import { Schedule, UserScheduleState, SchedulePreferences } from '../../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { setReplacer, setReviver } from '../../utils/jsonSerializer'
-import { ScheduleState } from '../../types/ScheduleState'
-import { ApplicationState } from '../../types/ApplicationState'
 import type { StudentRecord } from '../../types/degree'
 
 export interface StorageTransaction {
@@ -257,45 +255,6 @@ export class TransactionalStorageManager {
                 success: false,
                 transactionId: `clear-${Date.now()}`,
                 error: error as Error
-            };
-        }
-    }
-
-    async exportData(_options: { compressed?: boolean } = {}): Promise<{ data: string | null; valid: boolean; error?: string }> {
-        try {
-            const schedulesResult = await this.loadAllSchedules();
-            const fullSchedules = schedulesResult.data ?? [];
-            const preferences = this.loadPreferences().data;
-            const activeScheduleIdResult = this.loadActiveScheduleId();
-            const activeScheduleId = activeScheduleIdResult.data;
-
-            const scheduleStates = fullSchedules.map(s => ScheduleState.fromSchedule(s));
-
-            const appState = new ApplicationState(
-                activeScheduleId,
-                scheduleStates,
-                preferences
-            );
-
-            const minimalData = appState.toMinimalFormat();
-
-            console.log('[TransactionalStorageManager] Exported minimal data:', {
-                version: minimalData.v,
-                activeScheduleIndex: minimalData.a,
-                scheduleCount: minimalData.s.length,
-                totalCourses: minimalData.s.reduce((sum, [_, courses]) => sum + courses.length / 2, 0)
-            });
-
-            return {
-                data: JSON.stringify(minimalData, this.replacer, 2),
-                valid: true
-            };
-        } catch (error) {
-            console.error('[TransactionalStorageManager] Export failed:', error);
-            return {
-                data: null,
-                valid: false,
-                error: `Failed to export data: ${error}`
             };
         }
     }

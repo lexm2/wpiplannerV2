@@ -31,43 +31,6 @@ export interface MaskedCandidate {
 export class AutoScheduler {
   constructor(private filterService: FilterService) {}
 
-  generateSchedules(
-    selectedCourses: SelectedCourse[],
-    maxResults: number = 100
-  ): ScheduleResult[][] {
-    if (selectedCourses.length === 0) {
-      return [];
-    }
-
-    const blockedMasksByTerm = this.getBlockedMasksByTerm();
-    const candidatesPerCourse: MaskedCandidate[][] = [];
-
-    for (const selectedCourse of selectedCourses) {
-      const candidates = this.getMaskedCandidates(selectedCourse, blockedMasksByTerm);
-
-      if (candidates.length === 0) {
-        console.warn(`[AutoScheduler] No valid candidates for ${selectedCourse.course.departmentAbbr}${selectedCourse.course.number}`);
-        return [];
-      }
-
-      candidatesPerCourse.push(candidates);
-    }
-
-    const validSchedules: ScheduleResult[][] = [];
-
-    this.generateWithBacktracking(
-      selectedCourses,
-      candidatesPerCourse,
-      0,
-      new Map(),
-      [],
-      validSchedules,
-      maxResults
-    );
-
-    return validSchedules;
-  }
-
   getBlockedMasksByTerm(): Map<string, bigint> {
     const activeFilters = this.filterService.getActiveFilters();
 
@@ -90,54 +53,6 @@ export class AutoScheduler {
     }
 
     return new Map();
-  }
-
-  private generateWithBacktracking(
-    courses: SelectedCourse[],
-    candidatesPerCourse: MaskedCandidate[][],
-    courseIndex: number,
-    currentMaskByTerm: Map<string, bigint>,
-    currentSelections: MaskedCandidate[],
-    results: ScheduleResult[][],
-    maxResults: number
-  ): void {
-    if (results.length >= maxResults) return;
-
-    if (courseIndex >= courses.length) {
-      results.push(currentSelections.map((candidate, i) => ({
-        course: courses[i].course,
-        combination: candidate.combination
-      })));
-      return;
-    }
-
-    const candidates = candidatesPerCourse[courseIndex];
-
-    for (const candidate of candidates) {
-      const term = candidate.term;
-      const existingMask = currentMaskByTerm.get(term) || 0n;
-
-      if (masksConflict(candidate.mask, existingMask)) continue;
-
-      currentSelections.push(candidate);
-      const newMaskByTerm = new Map(currentMaskByTerm);
-      newMaskByTerm.set(term, existingMask | candidate.mask);
-
-      this.generateWithBacktracking(
-        courses, candidatesPerCourse, courseIndex + 1, newMaskByTerm,
-        currentSelections, results, maxResults
-      );
-
-      currentSelections.pop();
-      if (results.length >= maxResults) return;
-    }
-  }
-
-  generateSchedule(
-    selectedCourses: SelectedCourse[]
-  ): ScheduleResult[] | null {
-    const schedules = this.generateSchedules(selectedCourses, 1);
-    return schedules.length > 0 ? schedules[0] : null;
   }
 
   getMaskedCandidates(

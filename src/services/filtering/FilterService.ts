@@ -1,7 +1,7 @@
 import { Course } from '../../types/types';
 import { ActiveFilter, BookmarkFilterCriteria, SearchTextFilterCriteria } from '../../types/filters';
 import { FilterState } from '../../core/filtering/FilterState';
-import { rankCoursesByRelevance, getAvailableProfessors } from '../../utils/searchUtils';
+import { rankCoursesByRelevance } from '../../utils/searchUtils';
 import { SectionFilterPipeline, SectionBasedFilter } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { FilterableSection } from '../../types/filterableUnit';
@@ -233,20 +233,8 @@ export class FilterService {
         switch (filterId) {
             case 'department':
                 return this.getDepartmentOptions(courses);
-            case 'professor':
-                return this.getProfessorOptions(courses);
             case 'term':
                 return this.getTermOptions(courses);
-            case 'sectionCode':
-                return this.getSectionCodeOptions(courses);
-            case 'periodDays':
-                return [
-                    { value: 'mon', label: 'Monday' },
-                    { value: 'tue', label: 'Tuesday' },
-                    { value: 'wed', label: 'Wednesday' },
-                    { value: 'thu', label: 'Thursday' },
-                    { value: 'fri', label: 'Friday' }
-                ];
             default:
                 return null;
         }
@@ -267,10 +255,6 @@ export class FilterService {
         return Array.from(departments).sort();
     }
 
-    private getProfessorOptions(courses: Course[]): string[] {
-        return getAvailableProfessors(courses);
-    }
-
     private getTermOptions(courses: Course[]): string[] {
         const terms = new Set<string>();
         courses.forEach(course => {
@@ -284,17 +268,4 @@ export class FilterService {
         return Array.from(terms).sort();
     }
 
-    private getSectionCodeOptions(courses: Course[]): FilterOption[] {
-        const sectionCodes = new Set<string>();
-        courses.forEach(course => {
-            const sections = getAllSections(course);
-            sections.forEach(section => {
-                if (section.number && section.number.trim()) {
-                    sectionCodes.add(section.number.trim());
-                }
-            });
-        });
-        const codeArray = Array.from(sectionCodes).sort();
-        return codeArray.map(code => ({ value: code, label: code }));
-    }
 }
