@@ -1,7 +1,6 @@
 import type { ScheduleDB, Department, Course, Section, Period, Time, LectureGroup } from '../../types'
 import { DayOfWeek, PeriodType } from '../../types'
 import { AcademicTerm } from '../../types/schedule'
-import { getAllSections } from '../../utils'
 import type { RawDepartment, RawCourse, RawSection, RawLectureGroup, RawPeriod } from '../../types/rawData'
 import { appState } from '../../core/state/appState.svelte'
 
@@ -406,11 +405,6 @@ export class CourseDataService {
     isLabOnlyCourse(course: Course): boolean {
         return (!course.lectures || course.lectures.length === 0) &&
                (course.standaloneLabs && course.standaloneLabs.length > 0) || false;
-    }
-
-    /** All sections for a course regardless of structure (hierarchical or flat). */
-    getAllSectionsForCourse(course: Course): Section[] {
-        return getAllSections(course);
     }
 
     getLatestAcademicYear(): number | undefined {

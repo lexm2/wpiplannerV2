@@ -513,29 +513,6 @@ export class CourseSelectionService {
         console.log(`Loaded ${departments.length} departments`);
     }
 
-    getAllSections(): Section[] {
-        // This would be retrieved from the course data service
-        return [];
-    }
-
-    getAllSectionsForCourse(course: Course): Section[] {
-        const sections: Section[] = [];
-
-        if (course.lectures) {
-            course.lectures.forEach(lectureGroup => {
-                sections.push(lectureGroup.section);
-                sections.push(...lectureGroup.compatibleDiscussions);
-                sections.push(...lectureGroup.compatibleLabs);
-            });
-        }
-
-        if (course.standaloneLabs) {
-            sections.push(...course.standaloneLabs);
-        }
-
-        return sections;
-    }
-
     async exportSelections(): Promise<{ success: boolean; data?: string; error?: string }> {
         try {
             await this.ensureInitialized();
