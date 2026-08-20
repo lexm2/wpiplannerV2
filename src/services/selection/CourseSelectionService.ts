@@ -1,4 +1,4 @@
-import { Course, Section } from '../../types/types'
+import { Course, type SectionsByKind } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import type { CourseComponentSelections } from '../../types/scheduling'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
@@ -216,7 +216,7 @@ export class CourseSelectionService {
                 };
             }
 
-            this.profileStateManager.setSelectedComponents(course, null, null, null, 'service');
+            this.profileStateManager.setSelectedComponents(course, {}, 'service');
 
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
@@ -242,13 +242,7 @@ export class CourseSelectionService {
 
             await this.profileStateManager.withBatch(async () => {
                 for (const selectedCourse of selectedCourses) {
-                    this.profileStateManager.setSelectedComponents(
-                        selectedCourse.course,
-                        null,
-                        null,
-                        null,
-                        'service'
-                    );
+                    this.profileStateManager.setSelectedComponents(selectedCourse.course, {}, 'service');
                 }
             });
 
@@ -265,9 +259,7 @@ export class CourseSelectionService {
 
     async setSelectedComponents(
         course: Course,
-        lecture: Section | null,
-        discussion: Section | null,
-        lab: Section | null
+        selected: SectionsByKind
     ): Promise<CourseSelectionResult> {
         await this.ensureInitialized();
 
@@ -279,7 +271,7 @@ export class CourseSelectionService {
                 };
             }
 
-            this.profileStateManager.setSelectedComponents(course, lecture, discussion, lab, 'service');
+            this.profileStateManager.setSelectedComponents(course, selected, 'service');
 
             const selectedCourse = this.profileStateManager.getSelectedCourse(course);
 
@@ -318,13 +310,7 @@ export class CourseSelectionService {
 
             await this.profileStateManager.withBatch(async () => {
                 for (const selection of selections) {
-                    this.profileStateManager.setSelectedComponents(
-                        selection.course,
-                        selection.lecture,
-                        selection.discussion,
-                        selection.lab,
-                        'service'
-                    );
+                    this.profileStateManager.setSelectedComponents(selection.course, selection.selected, 'service');
                 }
             }, skipSnapshot);
 

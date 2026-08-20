@@ -48,7 +48,6 @@ export type {
 export { PeriodType, DayOfWeek, Semester, SectionType, COMPONENT_KINDS } from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
-  ComponentSelections,
   CourseComponentSelections,
   SectionOccupant,
   CalendarOccupant,

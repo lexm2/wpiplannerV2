@@ -1,6 +1,6 @@
 import type { SelectedCourse } from '../../types/schedule';
-import type { ComponentSelections } from '../../types/scheduling';
-import type { Course, Section } from '../../types/types';
+import type { Course, SectionsByKind } from '../../types/types';
+import { sectionsOf } from '../../utils/courseUtils';
 import { AutoScheduler, type ScheduleResult, type MaskedCandidate } from './AutoScheduler';
 import { masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
@@ -67,7 +67,7 @@ export class SmartScheduler {
                 termGroups.get(term)!.push(i);
             }
 
-            const allSelections: Array<{ courseIdx: number; combo: ComponentSelections }> = [];
+            const allSelections: Array<{ courseIdx: number; combo: SectionsByKind }> = [];
             let valid = true;
 
             for (const [term, indices] of termGroups) {
@@ -121,7 +121,7 @@ export class SmartScheduler {
     private static bestForTermGroup(
         candidatesPerCourse: MaskedCandidate[][],
         lockedMask: bigint
-    ): ComponentSelections[] | null {
+    ): SectionsByKind[] | null {
         const n = candidatesPerCourse.length;
         if (n === 0) return [];
 
@@ -129,12 +129,12 @@ export class SmartScheduler {
         const indices = new Array<number>(n).fill(0);
 
         let bestGap = Infinity;
-        let bestCombo: ComponentSelections[] | null = null;
+        let bestCombo: SectionsByKind[] | null = null;
 
         while (true) {
             let combinedMask = lockedMask;
             let conflict = false;
-            const selections: ComponentSelections[] = [];
+            const selections: SectionsByKind[] = [];
 
             for (let i = 0; i < n; i++) {
                 const candidate = candidatesPerCourse[i][indices[i]];
@@ -167,13 +167,11 @@ export class SmartScheduler {
         return bestCombo;
     }
 
-    private static gapForSelections(selections: ComponentSelections[]): number {
+    private static gapForSelections(selections: SectionsByKind[]): number {
         const byDay = new Map<string, { start: number; end: number }[]>();
 
         for (const combo of selections) {
-            const sections = [combo.lecture, combo.discussion, combo.lab]
-                .filter((s): s is Section => s !== null);
-            for (const section of sections) {
+            for (const section of sectionsOf(combo)) {
                 for (const period of section.periods) {
                     if (period.isAsync) continue;
                     for (const day of period.days) {

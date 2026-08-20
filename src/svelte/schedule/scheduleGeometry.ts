@@ -1,11 +1,10 @@
-import { DayOfWeek, Course, Section } from '../../types/types';
+import { DayOfWeek, Course, Section, type SectionsByKind } from '../../types/types';
 import {
     SelectedCourse,
     LocalCalendarEvent,
     AcademicTerm,
     EventType,
 } from '../../types/schedule';
-import type { ComponentSelections } from '../../types/scheduling';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
 import { getSelectedSections } from '../../utils/courseUtils';
 import { TimeUtils } from '../../utils/timeUtils';
@@ -141,7 +140,7 @@ export function courseShowsInTerm(sc: SelectedCourse, term: string): boolean {
 export function applyPreviewOverlay(
     courses: SelectedCourse[],
     previewCourse: Course | null,
-    selections: ComponentSelections | null,
+    selections: SectionsByKind | null,
 ): SelectedCourse[] {
     if (!previewCourse || !selections) return courses;
 
@@ -151,16 +150,16 @@ export function applyPreviewOverlay(
     if (idx >= 0) {
         result[idx] = {
             ...result[idx],
-            selectedLecture: selections.lecture,
-            selectedDiscussion: selections.discussion,
-            selectedLab: selections.lab,
+            selectedLecture: selections.lecture ?? null,
+            selectedDiscussion: selections.discussion ?? null,
+            selectedLab: selections.lab ?? null,
         };
     } else {
         result.push({
             course: previewCourse,
-            selectedLecture: selections.lecture,
-            selectedDiscussion: selections.discussion,
-            selectedLab: selections.lab,
+            selectedLecture: selections.lecture ?? null,
+            selectedDiscussion: selections.discussion ?? null,
+            selectedLab: selections.lab ?? null,
             isRequired: false,
             lockedSections: new Set(),
         });
@@ -176,7 +175,7 @@ export function applyPreviewOverlay(
 export function buildHoverCourse(
     selected: SelectedCourse[],
     previewCourse: Course | null,
-    hover: ComponentSelections | null,
+    hover: SectionsByKind | null,
 ): SelectedCourse | null {
     if (!previewCourse || !hover) return null;
 

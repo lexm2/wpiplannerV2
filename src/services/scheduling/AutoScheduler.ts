@@ -1,6 +1,6 @@
-import type { Course, Section } from '../../types/types';
+import type { Course, Section, SectionsByKind } from '../../types/types';
 import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
-import type { SectionCandidate, ComponentSelections } from '../../types/scheduling';
+import type { SectionCandidate } from '../../types/scheduling';
 import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
@@ -8,7 +8,7 @@ import type { ConflictCriteria } from '../../types/filters';
 
 export interface ScheduleResult {
   course: Course;
-  combination: ComponentSelections;
+  combination: SectionsByKind;
 }
 
 interface CourseTypeInfo {
@@ -19,7 +19,7 @@ interface CourseTypeInfo {
 }
 
 export interface MaskedCandidate {
-  combination: ComponentSelections;
+  combination: SectionsByKind;
   mask: bigint;
   term: string;
 }
@@ -74,7 +74,7 @@ export class AutoScheduler {
 
         const mask = sectionToMask(lab);
         const candidate: MaskedCandidate = {
-          combination: { lecture: null, discussion: null, lab },
+          combination: { lab },
           mask,
           term: lab.computedTerm
         };
@@ -136,7 +136,11 @@ export class AutoScheduler {
 
           const combinedMask = lectureMask | disc.mask | lab.mask;
           const candidate: MaskedCandidate = {
-            combination: { lecture, discussion: disc.section, lab: lab.section },
+            combination: {
+              lecture,
+              ...(disc.section && { discussion: disc.section }),
+              ...(lab.section && { lab: lab.section }),
+            },
             mask: combinedMask,
             term: lecture.computedTerm
           };

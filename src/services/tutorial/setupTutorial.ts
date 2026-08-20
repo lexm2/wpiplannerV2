@@ -50,7 +50,11 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
             const lab = cs.lab && group
                 ? group.compatibleLabs.find(l => l.number === cs.lab) ?? null
                 : null;
-            await services.courseSelectionService.setSelectedComponents(course, group?.section ?? null, disc, lab);
+            await services.courseSelectionService.setSelectedComponents(course, {
+                ...(group?.section && { lecture: group.section }),
+                ...(disc && { discussion: disc }),
+                ...(lab && { lab }),
+            });
         }
     }
 
@@ -210,7 +214,11 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                         await services.courseSelectionService.selectCourse(course);
                         const disc = discNum ? group.compatibleDiscussions.find(d => d.number === discNum) ?? null : null;
                         const lab = labNum ? group.compatibleLabs.find(l => l.number === labNum) ?? null : null;
-                        await services.courseSelectionService.setSelectedComponents(course, group.section, disc, lab);
+                        await services.courseSelectionService.setSelectedComponents(course, {
+                            lecture: group.section,
+                            ...(disc && { discussion: disc }),
+                            ...(lab && { lab }),
+                        });
                     }
                 });
             },
@@ -352,7 +360,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     const c = getTutorialCourse(id);
                     if (c) {
                         await services.courseSelectionService.selectCourse(c);
-                        await services.courseSelectionService.setSelectedComponents(c, null, null, null);
+                        await services.courseSelectionService.setSelectedComponents(c, {});
                     }
                 }
             });

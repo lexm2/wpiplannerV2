@@ -1,4 +1,4 @@
-import { Course, Section } from '../types/types';
+import { COMPONENT_KINDS, Course, Section, type SectionsByKind } from '../types/types';
 import type { SelectedCourse } from '../types/schedule';
 
 const EXCLUDED_PROFESSORS = new Set(['TBA', 'Not Assigned', '']);
@@ -78,6 +78,16 @@ export function getProfessorsByTerm(course: Course): string {
     });
 
     return parts.length > 0 ? parts.join(' | ') : 'No professors listed';
+}
+
+/**
+ * The sections a selection holds, in canonical kind order.
+ *
+ * Always reach for this rather than Object.values(): a plain object iterates in
+ * insertion order, and selections are not always built lecture-first.
+ */
+export function sectionsOf(selected: SectionsByKind): Section[] {
+    return COMPONENT_KINDS.map(kind => selected[kind]).filter((s): s is Section => s != null);
 }
 
 /** The selected lecture/discussion/lab sections, in that order, skipping unselected ones. */

@@ -12,9 +12,8 @@
  * (e.g. via `wizardState.jumpToStep`) can drive navigation without a component
  * ref.
  */
-import { COMPONENT_KINDS, type ComponentKind, type Course } from '../types/types';
+import { COMPONENT_KINDS, type ComponentKind, type Course, type SectionsByKind } from '../types/types';
 import type { SelectedCourse } from '../types/schedule';
-import type { ComponentSelections } from '../types/scheduling';
 
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
@@ -25,16 +24,16 @@ export interface WizardConfig {
     courseDataService: CourseDataService;
     filterService: FilterService | null;
     existingSelections?: SelectedCourse;
-    onComplete: (selections: ComponentSelections) => void;
+    onComplete: (selections: SectionsByKind) => void;
     onCancel: () => void;
-    onSelectionChange?: (selections: ComponentSelections) => void;
-    onHoverPreview?: (selections: ComponentSelections) => void;
+    onSelectionChange?: (selections: SectionsByKind) => void;
+    onHoverPreview?: (selections: SectionsByKind) => void;
 }
 
 class WizardState {
     config = $state.raw<WizardConfig | null>(null);
     currentStep = $state.raw<ComponentKind>('lecture');
-    selections = $state<ComponentSelections>({ lecture: null, discussion: null, lab: null });
+    selections = $state<SectionsByKind>({});
     /** Last navigation direction, drives the step slide-in animation. */
     direction = $state.raw<'forward' | 'backward'>('forward');
 
@@ -45,12 +44,12 @@ class WizardState {
     open(config: WizardConfig, initialStep?: ComponentKind): void {
         this.config = config;
         this.selections = {
-            lecture: config.existingSelections?.selectedLecture ?? null,
-            discussion: config.existingSelections?.selectedDiscussion ?? null,
-            lab: config.existingSelections?.selectedLab ?? null,
+            ...(config.existingSelections?.selectedLecture && { lecture: config.existingSelections.selectedLecture }),
+            ...(config.existingSelections?.selectedDiscussion && { discussion: config.existingSelections.selectedDiscussion }),
+            ...(config.existingSelections?.selectedLab && { lab: config.existingSelections.selectedLab }),
         };
 
-        const steps = determineAvailableSteps(config.course, config.courseDataService, this.selections.lecture);
+        const steps = determineAvailableSteps(config.course, config.courseDataService, this.selections.lecture ?? null);
         const start = (initialStep && steps.includes(initialStep)) ? initialStep : (steps[0] ?? 'lecture');
         this.currentStep = start;
         this.direction = 'forward';

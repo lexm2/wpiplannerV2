@@ -1,7 +1,7 @@
 import type { ScheduleResult } from './AutoScheduler';
 import type { AutoScheduleSettings } from '../../types/schedule';
-import type { Section } from '../../types/types';
 import { SectionScorer } from './SectionScorer';
+import { sectionsOf } from '../../utils/courseUtils';
 import { AcademicTerm } from '../../types/schedule';
 
 const TERM_EXPANSION: Partial<Record<AcademicTerm, AcademicTerm[]>> = {
@@ -22,9 +22,9 @@ export class ScheduleScorer {
     private termScore(schedule: ScheduleResult[]): number {
         const counts = new Map<string, number>();
         for (const result of schedule) {
-            const section = result.combination.lecture
-                ?? result.combination.lab
-                ?? result.combination.discussion;
+            // Canonical order puts the lecture first, and a standalone lab first
+            // when there is no lecture — a discussion never appears without one.
+            const [section] = sectionsOf(result.combination);
             if (!section) continue;
             const terms = TERM_EXPANSION[section.computedTerm] ?? [section.computedTerm];
             for (const t of terms) counts.set(t, (counts.get(t) ?? 0) + 1);
@@ -37,12 +37,7 @@ export class ScheduleScorer {
     private gapMinutes(schedule: ScheduleResult[]): number {
         const byTermDay = new Map<string, { start: number; end: number }[]>();
         for (const result of schedule) {
-            const sections = [
-                result.combination.lecture,
-                result.combination.discussion,
-                result.combination.lab,
-            ].filter((s): s is Section => s !== null);
-            for (const section of sections) {
+            for (const section of sectionsOf(result.combination)) {
                 for (const period of section.periods) {
                     if (period.isAsync) continue;
                     for (const day of period.days) {
@@ -71,8 +66,7 @@ export class ScheduleScorer {
         if (!settings.wakeUpTime) return 500;
         let total = 0, count = 0;
         for (const result of schedule) {
-            const { lecture, discussion, lab } = result.combination;
-            total += this.sectionScorer.scoreCombination(lecture, discussion, lab, settings.wakeUpTime);
+            total += this.sectionScorer.scoreCombination(result.combination, settings.wakeUpTime);
             count++;
         }
         return count > 0 ? Math.round(total / count) : 500;

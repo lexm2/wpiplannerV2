@@ -8,6 +8,7 @@ import type { ScheduleResult } from './AutoScheduler'
 import { SmartScheduler } from './SmartScheduler'
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager'
 import { logger } from '../../utils/logger'
+import { sectionsOf } from '../../utils/courseUtils'
 
 export interface CalendarEventProvider {
     getAllLocalEventBlockedTimes(): WeeklyTimeSlot[];
@@ -152,17 +153,10 @@ export class AutoScheduleOrchestrator {
             const selections: CourseComponentSelections[] = [];
 
             for (const result of schedule) {
-                const { lecture, discussion, lab } = result.combination;
-                if (lecture) this.autoAppliedCRNs.add(String(lecture.crn));
-                if (discussion) this.autoAppliedCRNs.add(String(discussion.crn));
-                if (lab) this.autoAppliedCRNs.add(String(lab.crn));
-
-                selections.push({
-                    course: result.course,
-                    lecture,
-                    discussion,
-                    lab
-                });
+                for (const section of sectionsOf(result.combination)) {
+                    this.autoAppliedCRNs.add(String(section.crn));
+                }
+                selections.push({ course: result.course, selected: result.combination });
             }
 
             if (selections.length > 0) {

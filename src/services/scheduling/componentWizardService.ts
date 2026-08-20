@@ -1,7 +1,6 @@
 
-import type { Course, ComponentKind, Section } from '../../types/types'
+import type { Course, ComponentKind, Section, SectionsByKind } from '../../types/types'
 import type { SelectedCourse } from '../../types/schedule'
-import type { ComponentSelections } from '../../types/scheduling'
 import { wizardState } from '../../svelte/wizardState.svelte'
 import { determineAvailableSteps } from '../../svelte/wizardLogic'
 import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState.svelte'
@@ -75,18 +74,13 @@ class ComponentWizardService {
         schedulePreviewState.clear()
     }
 
-    private async onWizardComplete(course: Course, selections: ComponentSelections): Promise<void> {
+    private async onWizardComplete(course: Course, selections: SectionsByKind): Promise<void> {
         schedulePreviewState.clear()
 
         if (!this.courseSelectionService) return
 
         try {
-            const result = await this.courseSelectionService.setSelectedComponents(
-                course,
-                selections.lecture,
-                selections.discussion,
-                selections.lab
-            )
+            const result = await this.courseSelectionService.setSelectedComponents(course, selections)
 
             if (result.success) {
                 // ScheduleSidebar is reactive on appState.selectedCourses, so the
@@ -103,14 +97,14 @@ class ComponentWizardService {
         this.closeComponentWizard()
     }
 
-    private onWizardSelectionChange(course: Course, selections: ComponentSelections): void {
+    private onWizardSelectionChange(course: Course, selections: SectionsByKind): void {
         // Committed wizard selection → solid preview blocks (the grid reacts).
         schedulePreviewState.previewCourse = course
         schedulePreviewState.selections = selections
         schedulePreviewState.hover = null
     }
 
-    private onWizardHoverPreview(course: Course, selections: ComponentSelections): void {
+    private onWizardHoverPreview(course: Course, selections: SectionsByKind): void {
         // Hovered (not-yet-committed) option → dashed preview blocks.
         schedulePreviewState.previewCourse = course
         schedulePreviewState.hover = selections

@@ -1,23 +1,13 @@
-import type { Course, Section, Period } from './types';
+import type { Course, Section, Period, SectionsByKind } from './types';
 import type { SelectedCourse, DisplayableTimeSlot } from './schedule';
-
-/**
- * Component selections for a course (lecture, discussion, lab).
- * Used throughout the scheduling system for wizard outputs, auto-scheduler results,
- * and component selection tracking.
- */
-export interface ComponentSelections {
-    lecture: Section | null;
-    discussion: Section | null;
-    lab: Section | null;
-}
 
 /**
  * Component selections paired with a course.
  * Used for batch operations like auto-schedule apply and bulk section updates.
  */
-export interface CourseComponentSelections extends ComponentSelections {
+export interface CourseComponentSelections {
     course: Course;
+    selected: SectionsByKind;
 }
 
 /**

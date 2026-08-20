@@ -1,5 +1,4 @@
-import type { Course } from '../../types/types';
-import type { ComponentSelections } from '../../types/scheduling';
+import type { Course, SectionsByKind } from '../../types/types';
 
 /**
  * Shared wizard-preview state for the schedule grid (Svelte 5 runes).
@@ -17,8 +16,8 @@ import type { ComponentSelections } from '../../types/scheduling';
  */
 class SchedulePreviewState {
     previewCourse = $state.raw<Course | null>(null);
-    selections = $state.raw<ComponentSelections | null>(null);
-    hover = $state.raw<ComponentSelections | null>(null);
+    selections = $state.raw<SectionsByKind | null>(null);
+    hover = $state.raw<SectionsByKind | null>(null);
 
     clear(): void {
         this.previewCourse = null;

@@ -1,4 +1,4 @@
-import type { Schedule, SchedulePreferences, SelectedCourse, Course, Section, Department } from '../../types'
+import type { Schedule, SchedulePreferences, SelectedCourse, Course, Section, SectionsByKind, Department } from '../../types'
 import { ApplicationState } from '../../types'
 import { ScheduleState } from '../../types/ScheduleState'
 import type { TransactionResult } from '../storage'
@@ -232,17 +232,15 @@ export class ProfileStateManager {
 
     setSelectedComponents(
         course: Course,
-        lecture: Section | null,
-        discussion: Section | null,
-        lab: Section | null,
+        selected: SectionsByKind,
         _source: string = 'user'
     ): void {
         this.withStateUpdate(() => {
             const found = this.patchSelectedCourse(course.id, sc => ({
                 ...sc,
-                selectedLecture: lecture,
-                selectedDiscussion: discussion,
-                selectedLab: lab,
+                selectedLecture: selected.lecture ?? null,
+                selectedDiscussion: selected.discussion ?? null,
+                selectedLab: selected.lab ?? null,
             }));
             if (found) {
                 this.updateActiveScheduleWithCurrentCourses();

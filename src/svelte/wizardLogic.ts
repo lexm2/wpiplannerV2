@@ -5,8 +5,7 @@
 // it's all course-structure / filtering math, which keeps it easy to reason about
 // and unit-test.
 
-import type { ComponentKind, Course, Section, Period } from '../types/types';
-import type { ComponentSelections } from '../types/scheduling';
+import type { ComponentKind, Course, Section, Period, SectionsByKind } from '../types/types';
 
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
@@ -83,7 +82,7 @@ export function getOptionsWithFilterInfo(
     courseDataService: CourseDataService,
     filterService: FilterService | null,
     step: ComponentKind,
-    selections: ComponentSelections,
+    selections: SectionsByKind,
 ): { filtered: Section[]; totalBeforeFilter: number } {
     let sections: Section[] = [];
 

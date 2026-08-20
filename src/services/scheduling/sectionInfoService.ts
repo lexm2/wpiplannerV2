@@ -4,6 +4,7 @@ import { openModal } from '../ui/uiState.svelte'
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { CourseColorService } from './CourseColorService'
 import type { Course, Section } from '../../types/types'
+import { sectionsOf } from '../../utils/courseUtils'
 import { logger } from '../../utils/logger'
 
 /**
@@ -41,13 +42,7 @@ class SectionInfoService {
         if (previewCourse?.id === courseId && previewSelections) {
             course = previewCourse
 
-            if (previewSelections.lecture?.number === sectionNumber) {
-                section = previewSelections.lecture
-            } else if (previewSelections.discussion?.number === sectionNumber) {
-                section = previewSelections.discussion
-            } else if (previewSelections.lab?.number === sectionNumber) {
-                section = previewSelections.lab
-            }
+            section = sectionsOf(previewSelections).find(s => s.number === sectionNumber) ?? null
         } else {
             const selectedCourses = this.courseSelectionService.getSelectedCourses()
             const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId)

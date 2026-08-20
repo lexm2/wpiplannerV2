@@ -1,4 +1,5 @@
-import { Section } from '../../types/types';
+import { Section, type SectionsByKind } from '../../types/types';
+import { sectionsOf } from '../../utils/courseUtils';
 
 export class SectionScorer {
     scoreSection(section: Section, wakeUpTime: { hours: number; minutes: number }): number {
@@ -24,12 +25,10 @@ export class SectionScorer {
     }
 
     scoreCombination(
-        lecture: Section | null,
-        discussion: Section | null,
-        lab: Section | null,
+        selected: SectionsByKind,
         wakeUpTime: { hours: number; minutes: number }
     ): number {
-        const sections = [lecture, discussion, lab].filter((s): s is Section => s !== null);
+        const sections = sectionsOf(selected);
 
         if (sections.length === 0) {
             return 1000;

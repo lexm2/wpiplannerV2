@@ -23,8 +23,7 @@
   } from './wizardLogic';
   import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../utils/iconPaths';
-  import type { ComponentKind, Section } from '../types/types';
-  import type { ComponentSelections } from '../types/scheduling';
+  import type { ComponentKind, Section, SectionsByKind } from '../types/types';
   
   import styles from '../styles/components/component-wizard.module.css';
 
@@ -51,7 +50,7 @@
 
   // Recomputes when the chosen lecture changes (drives breadcrumbs + navigation).
   const availableSteps = $derived(
-    determineAvailableSteps(course, courseDataService, selections.lecture),
+    determineAvailableSteps(course, courseDataService, selections.lecture ?? null),
   );
 
   // Reads filterService.getActiveFilters() transitively, so it re-runs live when
@@ -77,7 +76,7 @@
   const currentIndex = $derived(availableSteps.indexOf(currentStep));
   const isFirstStep = $derived(currentIndex === 0);
   const isLastStep = $derived(currentIndex === availableSteps.length - 1);
-  const hasSelection = $derived(selections[currentStep] !== null);
+  const hasSelection = $derived(selections[currentStep] !== undefined);
   // Steps (and their staggered cards) slide in from the side matching the
   // navigation direction.
   const dirSign = $derived(wizardState.direction === 'forward' ? 1 : -1);
@@ -88,11 +87,12 @@
 
     if (step === 'lecture') {
       // Picking/clearing a lecture always resets dependent discussion/lab.
-      wizardState.selections = isSame
-        ? { lecture: null, discussion: null, lab: null }
-        : { lecture: section, discussion: null, lab: null };
+      wizardState.selections = isSame ? {} : { lecture: section };
+    } else if (isSame) {
+      const { [step]: _cleared, ...rest } = selections;
+      wizardState.selections = rest;
     } else {
-      wizardState.selections = { ...selections, [step]: isSame ? null : section };
+      wizardState.selections = { ...selections, [step]: section };
     }
 
     cfg.onSelectionChange?.(wizardState.selections);
@@ -146,12 +146,7 @@
 
   function hoverPreview(section: Section): void {
     if (!cfg.onHoverPreview) return;
-    const preview: ComponentSelections = {
-      lecture: currentStep === 'lecture' ? section : null,
-      discussion: currentStep === 'discussion' ? section : null,
-      lab: currentStep === 'lab' ? section : null,
-    };
-    cfg.onHoverPreview(preview);
+    cfg.onHoverPreview({ [currentStep]: section } satisfies SectionsByKind);
   }
 
   function clearHoverPreview(): void {
