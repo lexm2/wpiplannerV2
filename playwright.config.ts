@@ -4,8 +4,16 @@ import { defineConfig, devices } from '@playwright/test';
 // to it to avoid a Chromium download. The dev server is reused if already up.
 export default defineConfig({
     testDir: './tests/e2e',
+    // Underscore-prefixed specs are local scratch files (gitignored, personal
+    // absolute paths). Without this they'd still be globbed on a local run.
+    testIgnore: '**/_*.spec.ts',
     timeout: 120_000,
     fullyParallel: false,
+    // One worker: fullyParallel:false only serialises tests WITHIN a file, so
+    // separate spec files would still run concurrently against the single shared
+    // dev server. tutorial-highlight walks 39 timed steps and fails under that
+    // contention. Also keeps CI (variable core count) deterministic.
+    workers: 1,
     retries: 0,
     reporter: 'list',
     use: {
