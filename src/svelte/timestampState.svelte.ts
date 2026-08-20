@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger'
 /**
  * Reactive home for the header's "client loaded" / "server updated" labels,
  * plus the functions that set them (formerly the TimestampManager class).
@@ -40,7 +41,7 @@ export async function loadServerTimestamp(): Promise<string | null> {
         }
         throw new Error(`Failed to fetch server timestamp: ${response.status}`);
     } catch (error) {
-        console.warn('Failed to load server timestamp:', error);
+        logger.warn('Failed to load server timestamp:', error);
         timestampState.serverLabel = 'Server timestamp unavailable';
         return null;
     }

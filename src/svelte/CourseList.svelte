@@ -10,6 +10,7 @@
   import type { FilterService } from '../services/filtering/FilterService';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
+  import { logger } from '../utils/logger';
 
   let { filterService, courseSelectionService, profileStateManager }: {
     filterService: FilterService;
@@ -78,7 +79,7 @@
     // The service drives appState.selectedById, so the button state below
     // (isSelected) updates reactively — no optimistic DOM patching needed.
     courseSelectionService.toggleCourseSelection(course).catch(error => {
-      console.error('Failed to toggle course selection:', error);
+      logger.error('Failed to toggle course selection:', error);
     });
   }
 
@@ -87,7 +88,7 @@
       if (isBookmarked) profileStateManager.unbookmarkCourse(courseId);
       else profileStateManager.bookmarkCourse(courseId);
     } catch (error) {
-      console.error('Failed to toggle bookmark:', error);
+      logger.error('Failed to toggle bookmark:', error);
     }
   }
 </script>

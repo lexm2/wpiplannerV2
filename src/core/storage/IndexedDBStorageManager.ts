@@ -7,6 +7,7 @@ import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import LZString from 'lz-string';
 import { StorageWorkerManager } from '../../workers/StorageWorkerManager';
 import { WorkerTaskType } from '../../workers/protocol';
+import { logger } from '../../utils/logger'
 
 interface StorageResult<T> {
     success: boolean;
@@ -344,7 +345,7 @@ export class IndexedDBStorageManager {
 
     async checkCompatibility(): Promise<boolean> {
         if (!window.indexedDB) {
-            console.warn('IndexedDB is not supported in this browser');
+            logger.warn('IndexedDB is not supported in this browser');
             return false;
         }
 
@@ -352,7 +353,7 @@ export class IndexedDBStorageManager {
             await this.initialize();
             return this.db !== null;
         } catch (error) {
-            console.error('IndexedDB compatibility check failed:', error);
+            logger.error('IndexedDB compatibility check failed:', error);
             return false;
         }
     }

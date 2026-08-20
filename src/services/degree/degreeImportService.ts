@@ -1,6 +1,7 @@
 import type { TransactionalStorageManager } from '../../core/storage/TransactionalStorageManager';
 import type { StudentRecord } from '../../types/degree';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
+import { logger } from '../../utils/logger'
 
 /**
  * Orchestrates importing, persisting, and loading the Workday "View My Academic
@@ -51,11 +52,11 @@ export class DegreeImportService {
                 degreeState.status = 'ready';
             } else {
                 // Stale/incompatible schema — drop it rather than crash.
-                console.warn('Discarding incompatible stored degree record');
+                logger.warn('Discarding incompatible stored degree record');
                 this.storage.saveDegreeRecord(null);
             }
         } catch (error) {
-            console.warn('Failed to validate stored degree record:', error);
+            logger.warn('Failed to validate stored degree record:', error);
         }
     }
 

@@ -23,6 +23,7 @@ import { sectionInfoService } from '../services/scheduling/sectionInfoService'
 import { autoScheduleService } from '../services/scheduling/autoScheduleService'
 import { degreePlanService } from '../services/degree/degreePlanService'
 import type { ServiceContainer } from './ServiceContainer'
+import { logger } from '../utils/logger'
 
 export class AppBootstrap {
     static createServices(): ServiceContainer {
@@ -167,7 +168,7 @@ export class AppBootstrap {
                 await services.tutorial?.start('welcome');
             }
         } catch (error) {
-            console.error('Failed to initialize application:', error);
+            logger.error('Failed to initialize application:', error);
             showAppError(
                 'Failed to initialize application. Some features may not work properly.',
                 () => services.scheduleManagementService.clearAllSchedules()

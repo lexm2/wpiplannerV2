@@ -3,6 +3,7 @@ import { getInlineSVG } from '../../utils';
 import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState.svelte';
 
 import type { UIState } from '../../types/uiState';
+import { logger } from '../../utils/logger'
 
 type StepApplyCallback = (index: number) => void;
 type UIStateTransitionCallback = (uiState: Partial<UIState>) => void;
@@ -155,7 +156,7 @@ export class TutorialService {
             this.highlightObserver = null;
             this.stopReveal();
             this.highlightTimeout = null;
-            console.warn(`[Tutorial] Element not found after 10s: ${selector}`);
+            logger.warn(`[Tutorial] Element not found after 10s: ${selector}`);
         }, 10_000);
     }
 
@@ -344,7 +345,7 @@ export class TutorialService {
                 this.actionObserver?.disconnect();
                 this.actionObserver = null;
                 this.actionTimeout = null;
-                console.warn(`[Tutorial] Waited element not found after 10s: ${selector}`);
+                logger.warn(`[Tutorial] Waited element not found after 10s: ${selector}`);
             }, 10_000);
             return;
         }

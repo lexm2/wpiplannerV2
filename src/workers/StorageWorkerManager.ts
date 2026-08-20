@@ -1,5 +1,6 @@
 import type { WorkerRequest, WorkerResponse, WorkerTaskType } from './protocol';
 import LZString from 'lz-string';
+import { logger } from '../utils/logger'
 
 interface PendingTask {
   resolve: (value: unknown) => void;
@@ -28,7 +29,7 @@ export class StorageWorkerManager {
 
   async initialize(): Promise<void> {
     if (typeof Worker === 'undefined') {
-      console.warn('[StorageWorker] Web Workers not supported, using fallback mode');
+      logger.warn('[StorageWorker] Web Workers not supported, using fallback mode');
       this.fallbackMode = true;
       return;
     }
@@ -54,7 +55,7 @@ export class StorageWorkerManager {
       };
 
       this.worker.onerror = (error: ErrorEvent) => {
-        console.error('[StorageWorker] Worker error:', error.message);
+        logger.error('[StorageWorker] Worker error:', error.message);
         this.fallbackMode = true;
 
         for (const [taskId, task] of this.pendingTasks.entries()) {
@@ -64,7 +65,7 @@ export class StorageWorkerManager {
       };
 
     } catch (error) {
-      console.error('[StorageWorker] Failed to initialize:', error);
+      logger.error('[StorageWorker] Failed to initialize:', error);
       this.fallbackMode = true;
     }
   }

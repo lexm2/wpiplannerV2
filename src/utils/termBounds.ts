@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { DateRange } from '../types/common';
+import { logger } from './logger'
 
 export interface TermBoundInfo {
     startDate: string;
@@ -58,16 +59,14 @@ export class TermBoundsService {
         try {
             const response = await fetch('./term-bounds.json');
             if (!response.ok) {
-                console.warn('[TermBoundsService] Failed to fetch term-bounds.json:', response.statusText);
+                logger.warn('[TermBoundsService] Failed to fetch term-bounds.json:', response.statusText);
                 return;
             }
 
             const data = await response.json();
             this.termBoundsCache = TermBoundsDataSchema.parse(data);
-            const years = Object.keys(this.termBoundsCache.years).join(', ');
-            console.log(`[TermBoundsService] Loaded term bounds for academic years: ${years}`);
         } catch (error) {
-            console.warn('[TermBoundsService] Error loading term-bounds.json, services will use fallback dates:', error);
+            logger.warn('[TermBoundsService] Error loading term-bounds.json, services will use fallback dates:', error);
             this.termBoundsCache = null;
         }
     }

@@ -3,6 +3,7 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { CourseSelectionService } from './CourseSelectionService'
 import { ICSGenerator, ICSExportOptions, ICSExportResult } from '../../utils/icsGenerator'
+import { logger } from '../../utils/logger'
 
 export interface ScheduleOperationResult {
     success: boolean;
@@ -64,7 +65,7 @@ export class ScheduleManagementService {
             return true;
 
         } catch (error) {
-            console.error('ScheduleManagementService initialization failed:', error);
+            logger.error('ScheduleManagementService initialization failed:', error);
             this.isInitialized = false;
             return false;
         } finally {
@@ -126,7 +127,7 @@ export class ScheduleManagementService {
             if (autoActivate) {
                 const activateResult = await this.setActiveSchedule(schedule.id);
                 if (!activateResult.success) {
-                    console.warn('Schedule created but failed to activate:', activateResult.error);
+                    logger.warn('Schedule created but failed to activate:', activateResult.error);
                 }
             }
 
@@ -140,7 +141,7 @@ export class ScheduleManagementService {
             };
 
         } catch (error) {
-            console.error('Error creating schedule:', error);
+            logger.error('Error creating schedule:', error);
             return {
                 success: false,
                 error: `Error creating schedule: ${error}`
@@ -179,7 +180,7 @@ export class ScheduleManagementService {
             };
 
         } catch (error) {
-            console.error('Error setting active schedule:', error);
+            logger.error('Error setting active schedule:', error);
             return {
                 success: false,
                 error: `Error setting active schedule: ${error}`
@@ -226,7 +227,7 @@ export class ScheduleManagementService {
             };
 
         } catch (error) {
-            console.error('Error updating schedule:', error);
+            logger.error('Error updating schedule:', error);
             return {
                 success: false,
                 error: `Error updating schedule: ${error}`
@@ -281,7 +282,7 @@ export class ScheduleManagementService {
             };
 
         } catch (error) {
-            console.error('Error duplicating schedule:', error);
+            logger.error('Error duplicating schedule:', error);
             return {
                 success: false,
                 error: `Error duplicating schedule: ${error}`
@@ -319,7 +320,7 @@ export class ScheduleManagementService {
             return { success: true };
 
         } catch (error) {
-            console.error('Error deleting schedule:', error);
+            logger.error('Error deleting schedule:', error);
             return {
                 success: false,
                 error: `Error deleting schedule: ${error}`

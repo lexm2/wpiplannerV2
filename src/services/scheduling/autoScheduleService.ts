@@ -7,6 +7,7 @@ import type { CourseSelectionService } from '../selection/CourseSelectionService
 import type { FilterService } from '../filtering/FilterService'
 import type { CourseColorService } from './CourseColorService'
 import type { AutoScheduleOrchestrator } from './AutoScheduleOrchestrator'
+import { logger } from '../../utils/logger'
 
 /**
  * Standalone auto-schedule modal orchestration for the schedule page.
@@ -38,7 +39,7 @@ class AutoScheduleService {
 
     async openAutoSchedule(): Promise<void> {
         if (!this.filterService || !this.courseSelectionService) {
-            console.error('[Auto-Schedule] Filter service not available')
+            logger.error('[Auto-Schedule] Filter service not available')
             alert('Filter service not available. Please try again.')
             return
         }
@@ -46,7 +47,7 @@ class AutoScheduleService {
         const selectedCourses = this.courseSelectionService.getSelectedCourses()
 
         if (selectedCourses.length === 0) {
-            console.warn('[Auto-Schedule] No courses selected')
+            logger.warn('[Auto-Schedule] No courses selected')
             alert('No courses selected. Please select courses first.')
             return
         }
@@ -111,14 +112,14 @@ class AutoScheduleService {
             const success = await this.orchestrator.generateSchedules(selectedCourses, settings)
 
             if (!success) {
-                console.warn('[Auto-Schedule] No valid schedules found')
+                logger.warn('[Auto-Schedule] No valid schedules found')
                 alert('Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts')
             }
             // On success the grid and footer re-render on their own: the orchestrator
             // applied the schedule via batchSetSelectedComponents, and AutoScheduleControls
             // reacts via appState.autoScheduleCount/Index.
         } catch (error) {
-            console.error('[Auto-Schedule] Error generating schedules:', error)
+            logger.error('[Auto-Schedule] Error generating schedules:', error)
             alert('An error occurred while generating the schedule. Please try again.')
         } finally {
             appState.scheduleGenerating = false

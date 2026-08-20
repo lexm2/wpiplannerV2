@@ -1,9 +1,10 @@
-import { Course, Department, Section } from '../../types/types'
+import { Course, Section } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
 import type { ComponentSelections, CourseComponentSelections } from '../../types/scheduling'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { Validators } from '../../utils/validators'
+import { logger } from '../../utils/logger'
 
 export interface CourseSelectionOptions {
     isRequired?: boolean;
@@ -47,7 +48,6 @@ export class CourseSelectionService {
 
     private async performInitialization(): Promise<boolean> {
         try {
-            console.log('Initializing CourseSelectionService...');
 
             // NOTE: ProfileStateManager is already loaded by AppBootstrap before this service
             // Redundant loadFromStorage() call removed to prevent duplicate schedule creation race condition
@@ -56,15 +56,14 @@ export class CourseSelectionService {
 
             const healthCheck = await this.performHealthCheck();
             if (!healthCheck.healthy) {
-                console.warn('Health check found issues:', healthCheck.issues);
+                logger.warn('Health check found issues:', healthCheck.issues);
                 await this.attemptDataRepair();
             }
 
-            console.log('CourseSelectionService initialized successfully');
             return true;
 
         } catch (error) {
-            console.error('Failed to initialize CourseSelectionService:', error);
+            logger.error('Failed to initialize CourseSelectionService:', error);
             this.isInitialized = false;
             return false;
         } finally {
@@ -109,7 +108,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error selecting course:', error);
+            logger.error('Error selecting course:', error);
             return {
                 success: false,
                 error: `Error selecting course: ${error}`
@@ -135,7 +134,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error unselecting course:', error);
+            logger.error('Error unselecting course:', error);
             return {
                 success: false,
                 error: `Error unselecting course: ${error}`
@@ -181,7 +180,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error setting selected section:', error);
+            logger.error('Error setting selected section:', error);
             return {
                 success: false,
                 error: `Error setting selected section: ${error}`
@@ -198,7 +197,7 @@ export class CourseSelectionService {
             return { success: true };
 
         } catch (error) {
-            console.error('Error clearing selections:', error);
+            logger.error('Error clearing selections:', error);
             return {
                 success: false,
                 error: `Error clearing selections: ${error}`
@@ -227,7 +226,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error clearing course components:', error);
+            logger.error('Error clearing course components:', error);
             return {
                 success: false,
                 error: `Error clearing course components: ${error}`
@@ -256,7 +255,7 @@ export class CourseSelectionService {
             return { success: true };
 
         } catch (error) {
-            console.error('Error clearing components:', error);
+            logger.error('Error clearing components:', error);
             return {
                 success: false,
                 error: `Error clearing components: ${error}`
@@ -290,7 +289,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error setting selected components:', error);
+            logger.error('Error setting selected components:', error);
             return {
                 success: false,
                 error: `Error setting selected components: ${error}`
@@ -334,7 +333,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error batch setting selected components:', error);
+            logger.error('Error batch setting selected components:', error);
             return {
                 success: false,
                 error: `Error batch setting selected components: ${error}`
@@ -408,7 +407,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error locking section:', error);
+            logger.error('Error locking section:', error);
             return {
                 success: false,
                 error: `Error locking section: ${error}`
@@ -437,7 +436,7 @@ export class CourseSelectionService {
             };
 
         } catch (error) {
-            console.error('Error unlocking section:', error);
+            logger.error('Error unlocking section:', error);
             return {
                 success: false,
                 error: `Error unlocking section: ${error}`
@@ -507,12 +506,6 @@ export class CourseSelectionService {
     }
 
 
-    setAllDepartments(departments: Department[]): void {
-        // This would typically be handled by a separate service
-        // For now, we'll store it in the profile state manager if needed
-        console.log(`Loaded ${departments.length} departments`);
-    }
-
     async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
         const issues: string[] = [];
 
@@ -566,16 +559,16 @@ export class CourseSelectionService {
 
     findCourseById(_courseId: string): Course | undefined {
         // This would need to be implemented with access to course data
-        console.warn('findCourseById: Course data access not implemented in this service');
+        logger.warn('findCourseById: Course data access not implemented in this service');
         return undefined;
     }
 
     unselectCourseById(_courseId: string): void {
-        console.warn('unselectCourseById: Use unselectCourse with course object instead');
+        logger.warn('unselectCourseById: Use unselectCourse with course object instead');
     }
 
     isCourseSelectedById(_courseId: string): boolean {
-        console.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
+        logger.warn('isCourseSelectedById: Use isCourseSelected with course object instead');
         return false;
     }
 
@@ -588,7 +581,7 @@ export class CourseSelectionService {
                 this.profileStateManager.save();
             }
         } catch (error) {
-            console.error('Failed to reconstruct section objects:', error);
+            logger.error('Failed to reconstruct section objects:', error);
         }
     }
 
@@ -609,13 +602,13 @@ export class CourseSelectionService {
             });
 
             if (repairedCount > 0) {
-                console.log(`Repaired ${repairedCount} selected courses`);
+                logger.warn(`Repaired ${repairedCount} selected courses`);
                 this.profileStateManager.save();
             }
 
             return true;
         } catch (error) {
-            console.error('Data repair failed:', error);
+            logger.error('Data repair failed:', error);
             return false;
         }
     }

@@ -727,12 +727,12 @@ export class ProfileStateManager {
                 this.state.activeScheduleId = null;
                 await this.loadFromStorage();
             } else {
-                console.error('[ProfileStateManager] Import failed:', result.error);
+                logger.error('[ProfileStateManager] Import failed:', result.error);
             }
 
             return result;
         } catch (error) {
-            console.error('[ProfileStateManager] importData() failed:', error);
+            logger.error('[ProfileStateManager] importData() failed:', error);
             return {
                 success: false,
                 transactionId: `import-${Date.now()}`,

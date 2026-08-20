@@ -6,6 +6,7 @@
   import type { FilterService } from '../services/filtering/FilterService';
   import type { DebouncedOperation } from '../utils/RequestCancellation';
   import type { SearchTextFilterCriteria } from '../types/filters';
+  import { logger } from '../utils/logger';
 
   let { filterService, debouncedSearch }: {
     filterService: FilterService;
@@ -84,7 +85,7 @@
       return Promise.resolve();
     }).catch(error => {
       if (error?.name !== 'CancellationError') {
-        console.error('Search error:', error);
+        logger.error('Search error:', error);
       }
     });
   }

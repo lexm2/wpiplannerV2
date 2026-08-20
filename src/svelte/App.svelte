@@ -37,6 +37,7 @@
   import ResizeHandle from './ResizeHandle.svelte';
   import ErrorBanner from './ErrorBanner.svelte';
   import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
+  import { logger } from '../utils/logger';
 
   // Restore any saved sidebar widths before first paint to avoid a layout flash.
   applyStoredPanelWidths();
@@ -62,14 +63,14 @@
 
   function handleUndo(): void {
     services.profileStateManager.undo().catch(error => {
-      console.error('Undo failed:', error);
+      logger.error('Undo failed:', error);
       showAppError('Failed to undo. Please try again.');
     });
   }
 
   function handleRedo(): void {
     services.profileStateManager.redo().catch(error => {
-      console.error('Redo failed:', error);
+      logger.error('Redo failed:', error);
       showAppError('Failed to redo. Please try again.');
     });
   }

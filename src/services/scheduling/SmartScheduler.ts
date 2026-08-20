@@ -4,6 +4,7 @@ import type { Course, Section } from '../../types/types';
 import { AutoScheduler, type ScheduleResult, type MaskedCandidate } from './AutoScheduler';
 import { masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
+import { logger } from '../../utils/logger'
 
 export interface SchedulerInput {
     candidatesPerCourse: MaskedCandidate[][];
@@ -25,7 +26,7 @@ export class SmartScheduler {
             if (sc.allowedTerms?.length === 0) continue;
             const candidates = autoScheduler.getMaskedCandidates(sc, blockedMasks);
             if (candidates.length === 0) {
-                console.warn(`[SmartScheduler] No valid candidates for ${sc.course.departmentAbbr}${sc.course.number}`);
+                logger.warn(`[SmartScheduler] No valid candidates for ${sc.course.departmentAbbr}${sc.course.number}`);
                 return null;
             }
             candidatesPerCourse.push(candidates);

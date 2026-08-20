@@ -7,6 +7,7 @@ import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { FilterableSection } from '../../types/filterableUnit';
 import { getAllSections } from '../../utils/courseUtils';
 import type { FilterOption } from '../../types/common';
+import { logger } from '../../utils/logger'
 
 export class FilterService {
     private filterState: FilterState;
@@ -58,12 +59,12 @@ export class FilterService {
 
         const filter = this.registeredFilters.get(filterId);
         if (!filter) {
-            console.error(`Filter '${filterId}' is not registered`);
+            logger.error(`Filter '${filterId}' is not registered`);
             return false;
         }
 
         if (!filter.isValidCriteria(criteria)) {
-            console.error(`Invalid criteria for filter '${filterId}'`);
+            logger.error(`Invalid criteria for filter '${filterId}'`);
             return false;
         }
 

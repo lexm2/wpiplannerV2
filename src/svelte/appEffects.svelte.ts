@@ -92,7 +92,6 @@ export function installAppEffects(services: ServiceContainer): void {
             }
             const departments = appState.loadedDepartments;
             services.profileStateManager.setCourseData(departments);
-            services.courseSelectionService.setAllDepartments(departments);
 
             if (!initialLoadDone) {
                 initialLoadDone = true;

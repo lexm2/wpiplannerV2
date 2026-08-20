@@ -7,6 +7,7 @@
   import type { SelectedCourse } from '../types/schedule';
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
+  import { logger } from '../utils/logger';
 
   let { courseSelectionService, getIncompleteInfo, onOpenWizard }: {
     courseSelectionService: CourseSelectionService;
@@ -47,12 +48,12 @@
 
   function handleRemove(course: Course): void {
     courseSelectionService.unselectCourse(course).catch((err) =>
-      console.error('Failed to unselect course:', err)
+      logger.error('Failed to unselect course:', err)
     );
   }
   function handleClearSections(course: Course): void {
     courseSelectionService.clearCourseComponents(course).catch((err) =>
-      console.error('Failed to clear course components:', err)
+      logger.error('Failed to clear course components:', err)
     );
   }
 </script>

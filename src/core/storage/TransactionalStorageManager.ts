@@ -5,6 +5,7 @@ import { Schedule, UserScheduleState, SchedulePreferences } from '../../types/sc
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { setReplacer, setReviver } from '../../utils/jsonSerializer'
 import type { StudentRecord } from '../../types/degree'
+import { logger } from '../../utils/logger'
 
 export interface StorageTransaction {
     id: string;
@@ -57,9 +58,8 @@ export class TransactionalStorageManager {
                 throw new Error('IndexedDB not available in this browser');
             }
             this.indexedDBInitialized = true;
-            console.log('IndexedDB initialized successfully');
         } catch (error) {
-            console.error('Failed to initialize IndexedDB:', error);
+            logger.error('Failed to initialize IndexedDB:', error);
             throw new Error('IndexedDB initialization failed - schedule operations unavailable');
         }
     }
@@ -88,15 +88,13 @@ export class TransactionalStorageManager {
                 throw new Error(`Data integrity check failed: ${integrityCheck.error}`);
             }
 
-            this.commitTransaction(transaction);
-            
             return {
                 success: true,
                 transactionId
             };
 
         } catch (error) {
-            console.warn(`Transaction ${transactionId} failed, rolling back:`, error);
+            logger.warn(`Transaction ${transactionId} failed, rolling back:`, error);
             const rollbackSuccess = this.rollbackTransaction(transaction);
             
             return {
@@ -282,22 +280,19 @@ export class TransactionalStorageManager {
                 for (const schedule of schedules) {
                     await this.saveSchedule(schedule);
                 }
-                console.log('[TransactionalStorageManager] All schedules saved');
             }
 
             if (activeScheduleId !== undefined) {
                 this.saveActiveScheduleId(activeScheduleId);
-                console.log('[TransactionalStorageManager] Saved activeScheduleId:', activeScheduleId);
             }
 
-            console.log('[TransactionalStorageManager] Import completed successfully');
 
             return {
                 success: true,
                 transactionId: `import-${Date.now()}`
             };
         } catch (error) {
-            console.error('[TransactionalStorageManager] importData() failed:', error);
+            logger.error('[TransactionalStorageManager] importData() failed:', error);
             return {
                 success: false,
                 transactionId: `import-${Date.now()}`,
@@ -331,7 +326,7 @@ export class TransactionalStorageManager {
             };
 
         } catch (error) {
-            console.warn(`Sync transaction ${transactionId} failed, rolling back:`, error);
+            logger.warn(`Sync transaction ${transactionId} failed, rolling back:`, error);
             const rollbackSuccess = this.rollbackTransaction(transaction);
             
             return {
@@ -353,7 +348,7 @@ export class TransactionalStorageManager {
             const parsed = JSON.parse(stored, this.reviver);
             return { data: parsed, valid: true };
         } catch (error) {
-            console.warn(`Failed to load ${dataType}:`, error);
+            logger.warn(`Failed to load ${dataType}:`, error);
             return { 
                 data: defaultValue,
                 valid: false,
@@ -386,7 +381,7 @@ export class TransactionalStorageManager {
                 const value = localStorage.getItem(key);
                 transaction.backupData.set(key, value);
             } catch (error) {
-                console.warn(`Failed to backup key ${key}:`, error);
+                logger.warn(`Failed to backup key ${key}:`, error);
             }
         }
     }
@@ -407,13 +402,9 @@ export class TransactionalStorageManager {
             }
             return true;
         } catch (error) {
-            console.error(`Failed to rollback transaction ${transaction.id}:`, error);
+            logger.error(`Failed to rollback transaction ${transaction.id}:`, error);
             return false;
         }
-    }
-
-    private commitTransaction(transaction: StorageTransaction): void {
-        console.log(`Transaction ${transaction.id} committed successfully`);
     }
 
     private verifyDataIntegrity(): { valid: boolean; error?: string } {

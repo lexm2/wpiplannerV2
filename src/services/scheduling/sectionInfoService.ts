@@ -4,6 +4,7 @@ import { openModal } from '../ui/uiState.svelte'
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { CourseColorService } from './CourseColorService'
 import type { Course, Section } from '../../types/types'
+import { logger } from '../../utils/logger'
 
 /**
  * Standalone section-info modal opener for the schedule grid.
@@ -52,7 +53,7 @@ class SectionInfoService {
             const selectedCourse = selectedCourses.find(sc => sc.course.id === courseId)
 
             if (!selectedCourse) {
-                console.warn('Course not found:', courseId)
+                logger.warn('Course not found:', courseId)
                 return
             }
 
@@ -68,7 +69,7 @@ class SectionInfoService {
         }
 
         if (!section || !course) {
-            console.warn('Section not found:', sectionNumber)
+            logger.warn('Section not found:', sectionNumber)
             return
         }
 

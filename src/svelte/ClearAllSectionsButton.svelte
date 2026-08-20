@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getInlineSVG } from '../utils/iconPaths';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
+  import { logger } from '../utils/logger';
 
   let { courseSelectionService }: { courseSelectionService: CourseSelectionService } = $props();
 
@@ -29,7 +30,7 @@
       try {
         await courseSelectionService.clearAllComponents();
       } catch (error) {
-        console.error('Failed to clear all components:', error);
+        logger.error('Failed to clear all components:', error);
         alert('Failed to clear sections. Please try again.');
       }
     }

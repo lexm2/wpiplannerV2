@@ -4,6 +4,7 @@
   import { modalState } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { logger } from '../../utils/logger';
   import { ThemeManager } from '../../themes/ThemeManager';
   import { openModal, showAppError } from '../../services/ui/uiState.svelte';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
@@ -117,7 +118,7 @@
         await scheduleManagementService.renameSchedule(schedule.id, newName);
         refreshTick++;
       } catch (error) {
-        console.error('Failed to rename schedule:', error);
+        logger.error('Failed to rename schedule:', error);
         alert('Failed to rename schedule. Please try again.');
       }
     }
@@ -137,7 +138,7 @@
     try {
       scheduleManagementService.setActiveSchedule(scheduleId);
     } catch (error) {
-      console.error('Failed to switch schedule:', error);
+      logger.error('Failed to switch schedule:', error);
       alert('Failed to switch schedule. Please try again.');
     }
   }
@@ -154,7 +155,7 @@
         case 'delete': await deleteSchedule(schedule); break;
       }
     } catch (error) {
-      console.error(`Failed to ${action} schedule:`, error);
+      logger.error(`Failed to ${action} schedule:`, error);
       alert(`Failed to ${action} schedule. Please try again.`);
     }
   }
@@ -224,7 +225,7 @@
         if (result.success) refreshTick++;
         else alert(`Import failed: ${result.error}`);
       } catch (error) {
-        console.error('Failed to import schedule:', error);
+        logger.error('Failed to import schedule:', error);
         alert('Failed to import schedule. Please check the file format.');
       }
     };
@@ -292,13 +293,13 @@
   }
   function undo(): void {
     profileStateManager.undo().catch(error => {
-      console.error('Undo failed:', error);
+      logger.error('Undo failed:', error);
       showAppError('Failed to undo. Please try again.');
     });
   }
   function redo(): void {
     profileStateManager.redo().catch(error => {
-      console.error('Redo failed:', error);
+      logger.error('Redo failed:', error);
       showAppError('Failed to redo. Please try again.');
     });
   }

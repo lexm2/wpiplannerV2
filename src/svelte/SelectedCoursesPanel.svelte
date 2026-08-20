@@ -9,6 +9,7 @@
   import { formatCredits } from './selectedCourseUtils';
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
+  import { logger } from '../utils/logger';
 
   let { courseSelectionService }: {
     courseSelectionService: CourseSelectionService;
@@ -50,7 +51,7 @@
   // fire when the remove button is clicked.
   function handleRemove(e: MouseEvent, course: Course): void {
     e.stopPropagation();
-    courseSelectionService.unselectCourse(course).catch(err => console.error('Failed to unselect course:', err));
+    courseSelectionService.unselectCourse(course).catch(err => logger.error('Failed to unselect course:', err));
   }
 </script>
 

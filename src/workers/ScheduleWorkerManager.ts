@@ -4,6 +4,7 @@ import { SmartScheduler, type SchedulerInput } from '../services/scheduling/Smar
 import { ScheduleScorer } from '../services/scheduling/ScheduleScorer';
 import type { ScheduleResult } from '../services/scheduling/AutoScheduler';
 import type { AutoScheduleSettings } from '../types/schedule';
+import { logger } from '../utils/logger'
 
 interface PendingTask {
     resolve: (value: ScheduleResult[][]) => void;
@@ -41,7 +42,7 @@ export class ScheduleWorkerManager {
             };
 
             this.worker.onerror = (error: ErrorEvent) => {
-                console.error('[ScheduleWorker] Worker error:', error.message);
+                logger.error('[ScheduleWorker] Worker error:', error.message);
                 this.fallbackMode = true;
                 for (const [taskId, task] of this.pendingTasks.entries()) {
                     task.reject(new Error(`Worker crashed: ${error.message}`));

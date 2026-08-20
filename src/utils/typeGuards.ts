@@ -1,5 +1,6 @@
 import { SelectedCourse } from '../types/schedule';
 import { Course, Section } from '../types/types';
+import { logger } from './logger'
 
 /** Type guards and validation utilities for runtime data integrity checks. */
 
@@ -47,7 +48,7 @@ export function isValidSelectedCourse(sc: unknown): sc is SelectedCourse {
 /** Validates an array of SelectedCourse objects, repairing invalid ones when possible. */
 export function validateSelectedCourses(selectedCourses: unknown[], attemptRepair: boolean = true): SelectedCourse[] {
     if (!Array.isArray(selectedCourses)) {
-        console.warn('validateSelectedCourses: Expected array, got:', typeof selectedCourses);
+        logger.warn('validateSelectedCourses: Expected array, got:', typeof selectedCourses);
         return [];
     }
 
@@ -62,13 +63,10 @@ export function validateSelectedCourses(selectedCourses: unknown[], attemptRepai
             if (attemptRepair) {
                 const repaired = repairSelectedCourse(sc);
                 if (repaired && isValidSelectedCourse(repaired)) {
-                    const scAny = sc as Record<string, unknown>;
-                    const courseInfo = scAny.course as Record<string, unknown> | undefined;
-                    console.log(`validateSelectedCourses: Successfully repaired course at index ${index} (${courseInfo?.departmentAbbr}${courseInfo?.number})`);
                     validCourses.push(repaired);
                     repairedCourses.push(repaired);
                 } else {
-                    console.warn(`validateSelectedCourses: Failed to repair course at index ${index}`, sc);
+                    logger.warn(`validateSelectedCourses: Failed to repair course at index ${index}`, sc);
                     invalidCourses.push({ index, data: sc });
                 }
             } else {
@@ -78,11 +76,11 @@ export function validateSelectedCourses(selectedCourses: unknown[], attemptRepai
     });
 
     if (repairedCourses.length > 0) {
-        console.log(`validateSelectedCourses: Successfully repaired ${repairedCourses.length} invalid course(s)`);
+        logger.warn(`validateSelectedCourses: repaired ${repairedCourses.length} invalid course(s)`);
     }
 
     if (invalidCourses.length > 0) {
-        console.warn(`validateSelectedCourses: Found ${invalidCourses.length} unrepairable invalid course(s):`, invalidCourses);
+        logger.warn(`validateSelectedCourses: Found ${invalidCourses.length} unrepairable invalid course(s):`, invalidCourses);
     }
 
     return validCourses;
@@ -115,21 +113,21 @@ export function repairSelectedCourse(sc: unknown): SelectedCourse | null {
     }
 
     if (scObj.selectedLecture && !isValidSection(scObj.selectedLecture)) {
-        console.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
+        logger.warn(`repairSelectedCourse: Invalid selectedLecture, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedLecture = null;
     } else if (scObj.selectedLecture) {
         repaired.selectedLecture = scObj.selectedLecture;
     }
 
     if (scObj.selectedDiscussion && !isValidSection(scObj.selectedDiscussion)) {
-        console.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
+        logger.warn(`repairSelectedCourse: Invalid selectedDiscussion, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedDiscussion = null;
     } else if (scObj.selectedDiscussion) {
         repaired.selectedDiscussion = scObj.selectedDiscussion;
     }
 
     if (scObj.selectedLab && !isValidSection(scObj.selectedLab)) {
-        console.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
+        logger.warn(`repairSelectedCourse: Invalid selectedLab, clearing it for course ${(scObj.course as Course).departmentAbbr}${(scObj.course as Course).number}`);
         repaired.selectedLab = null;
     } else if (scObj.selectedLab) {
         repaired.selectedLab = scObj.selectedLab;

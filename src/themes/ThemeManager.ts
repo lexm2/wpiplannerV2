@@ -5,6 +5,7 @@ import wpiClassic from './definitions/wpi-classic.json'
 import wpiDark from './definitions/wpi-dark.json'
 import wpiLight from './definitions/wpi-light.json'
 import highContrast from './definitions/high-contrast.json'
+import { logger } from '../utils/logger'
 
 /**
  * Singleton theme system with JSON-based themes and pluggable storage strategy for persistence
@@ -40,7 +41,7 @@ class DefaultThemeStorage implements ThemeStorage {
             const parsed = JSON.parse(raw) as { theme?: string };
             return typeof parsed.theme === 'string' ? parsed.theme : 'wpi-dark';
         } catch (error) {
-            console.warn('Failed to load theme preference:', error);
+            logger.warn('Failed to load theme preference:', error);
             return 'wpi-dark';
         }
     }
@@ -54,7 +55,7 @@ class DefaultThemeStorage implements ThemeStorage {
             const existing = raw ? JSON.parse(raw) : {};
             localStorage.setItem(this.preferencesKey, JSON.stringify({ ...existing, theme: themeId }));
         } catch (error) {
-            console.warn('Failed to save theme preference:', error);
+            logger.warn('Failed to save theme preference:', error);
         }
     }
 }
@@ -111,7 +112,7 @@ export class ThemeManager {
 
     registerTheme(theme: ThemeDefinition): void {
         if (!this.isValidTheme(theme)) {
-            console.error('Invalid theme definition:', theme);
+            logger.error('Invalid theme definition:', theme);
             return;
         }
         
@@ -144,7 +145,7 @@ export class ThemeManager {
 
     setTheme(themeId: ThemeId): boolean {
         if (!this.themes.has(themeId)) {
-            console.error(`Theme '${themeId}' not found`);
+            logger.error(`Theme '${themeId}' not found`);
             return false;
         }
 
@@ -247,7 +248,7 @@ export class ThemeManager {
             }
             return false;
         } catch (error) {
-            console.error('Failed to import theme:', error);
+            logger.error('Failed to import theme:', error);
             return false;
         }
     }
@@ -264,7 +265,7 @@ export class ThemeManager {
         // Don't allow removal of built-in themes
         const builtInThemes = ['wpi-classic', 'wpi-dark', 'wpi-light', 'high-contrast'];
         if (builtInThemes.includes(themeId)) {
-            console.warn(`Cannot remove built-in theme: ${themeId}`);
+            logger.warn(`Cannot remove built-in theme: ${themeId}`);
             return false;
         }
 

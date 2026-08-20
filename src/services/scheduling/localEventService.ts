@@ -3,6 +3,7 @@ import { modalState } from '../../svelte/modals/modalState.svelte'
 import { openModal } from '../ui/uiState.svelte'
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import type { LocalCalendarEvent } from '../../types/schedule'
+import { logger } from '../../utils/logger'
 
 /**
  * Standalone local calendar-event CRUD for the schedule page.
@@ -24,7 +25,7 @@ class LocalEventService {
 
     openAddModal(): void {
         if (!appState.activeSchedule) {
-            console.warn('[localEventService] Cannot open add event modal - no active schedule')
+            logger.warn('[localEventService] Cannot open add event modal - no active schedule')
             return
         }
 

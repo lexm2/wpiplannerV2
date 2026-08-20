@@ -7,6 +7,7 @@ import { appState } from '../../core/state/appState.svelte'
 import type { ScheduleResult } from './AutoScheduler'
 import { SmartScheduler } from './SmartScheduler'
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager'
+import { logger } from '../../utils/logger'
 
 export interface CalendarEventProvider {
     getAllLocalEventBlockedTimes(): WeeklyTimeSlot[];
@@ -130,7 +131,7 @@ export class AutoScheduleOrchestrator {
             return true;
 
         } catch (error) {
-            console.error('[Auto-Schedule] Error generating schedules:', error);
+            logger.error('[Auto-Schedule] Error generating schedules:', error);
             this.generatedSchedules = [];
             this.currentScheduleIndex = 0;
             this.notifyStateChange();
@@ -141,7 +142,7 @@ export class AutoScheduleOrchestrator {
     private async applyScheduleAtIndex(index: number): Promise<void> {
         const schedule = this.generatedSchedules[index];
         if (!schedule) {
-            console.warn(`[Auto-Schedule] No schedule found at index ${index}`);
+            logger.warn(`[Auto-Schedule] No schedule found at index ${index}`);
             return;
         }
 

@@ -3,6 +3,7 @@ import { DayOfWeek, PeriodType } from '../../types'
 import { AcademicTerm } from '../../types/schedule'
 import type { RawDepartment, RawCourse, RawSection, RawLectureGroup, RawPeriod } from '../../types/rawData'
 import { appState } from '../../core/state/appState.svelte'
+import { logger } from '../../utils/logger'
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
@@ -24,7 +25,7 @@ export class CourseDataService {
 
             return freshData;
         } catch (error) {
-            console.error('Failed to load course data:', error);
+            logger.error('Failed to load course data:', error);
             throw new Error('No course data available');
         }
     }
@@ -50,7 +51,7 @@ export class CourseDataService {
     private parseJSONData(jsonData: { departments?: RawDepartment[]; generated?: string }): ScheduleDB {
 
         if (!jsonData.departments || !Array.isArray(jsonData.departments)) {
-            console.error('Invalid JSON data structure:', jsonData);
+            logger.error('Invalid JSON data structure:', jsonData);
             throw new Error('Invalid JSON data structure - missing departments array');
         }
 
@@ -102,8 +103,8 @@ export class CourseDataService {
                     } else {
                         // Production fallback: derive a synthetic unique ID
                         const fallbackId = `${department.abbreviation}-${courseData.number}`;
-                        console.error(`DUPLICATE ID: "${courseId}" for ${department.abbreviation}${courseData.number}`);
-                        console.error(`   Using fallback ID: "${fallbackId}"`);
+                        logger.error(`DUPLICATE ID: "${courseId}" for ${department.abbreviation}${courseData.number}`);
+                        logger.error(`   Using fallback ID: "${fallbackId}"`);
                         courseId = fallbackId;
                         duplicatesFixed++;
 
@@ -114,7 +115,7 @@ export class CourseDataService {
                             counter++;
                         }
 
-                        console.error('[Data Quality Issue]', {
+                        logger.error('[Data Quality Issue]', {
                             type: 'duplicate_course_id',
                             originalId: courseId,
                             fallbackId: courseId,
@@ -152,13 +153,9 @@ export class CourseDataService {
         });
 
         if (duplicatesFixed > 0) {
-            console.log(`Course ID Deduplication Summary:`);
-            console.log(`   Total courses processed: ${totalCoursesProcessed}`);
-            console.log(`   Duplicate IDs fixed: ${duplicatesFixed}`);
-            console.log(`   Affected original IDs: [${Array.from(duplicateIds).join(', ')}]`);
-        } else {
-            console.log(`Course ID validation complete: ${totalCoursesProcessed} courses, no duplicates found`);
+            logger.warn(`Course ID deduplication: fixed ${duplicatesFixed} of ${totalCoursesProcessed} courses; affected IDs: [${Array.from(duplicateIds).join(', ')}]`);
         }
+
         
         return result;
     }
@@ -247,7 +244,7 @@ export class CourseDataService {
             case 'Thesis':
                 return PeriodType.THESIS;
             default:
-                console.warn(`Unknown period type: "${typeString}", defaulting to Lecture`);
+                logger.warn(`Unknown period type: "${typeString}", defaulting to Lecture`);
                 return PeriodType.LECTURE;
         }
     }
@@ -340,55 +337,17 @@ export class CourseDataService {
     }
 
     getDiscussionsForLecture(course: Course, lectureSection: Section): Section[] {
-        if (!course.lectures) {
-            console.log('[CourseDataService] No lectures array on course');
-            return [];
-        }
-
-        console.log(`[CourseDataService] Searching for CRN:`, lectureSection.crn, `(type: ${typeof lectureSection.crn})`);
-        console.log(`[CourseDataService] Available lectures:`, course.lectures.map(lg => ({
-            crn: lg.section.crn,
-            type: typeof lg.section.crn,
-            number: lg.section.number,
-            discussions: lg.compatibleDiscussions.length,
-            labs: lg.compatibleLabs.length
-        })));
+        if (!course.lectures) return [];
 
         const lectureGroup = course.lectures.find(lg => lg.section.crn === lectureSection.crn);
-
-        if (!lectureGroup) {
-            console.log('[CourseDataService] Lecture group NOT FOUND - CRN mismatch!');
-            return [];
-        }
-
-        console.log(`[CourseDataService] Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleDiscussions.length} discussions`);
-        return lectureGroup.compatibleDiscussions || [];
+        return lectureGroup?.compatibleDiscussions ?? [];
     }
 
     getLabsForLecture(course: Course, lectureSection: Section): Section[] {
-        if (!course.lectures) {
-            console.log('[CourseDataService] No lectures array on course');
-            return [];
-        }
-
-        console.log(`[CourseDataService] Searching for CRN:`, lectureSection.crn, `(type: ${typeof lectureSection.crn})`);
-        console.log(`[CourseDataService] Available lectures:`, course.lectures.map(lg => ({
-            crn: lg.section.crn,
-            type: typeof lg.section.crn,
-            number: lg.section.number,
-            discussions: lg.compatibleDiscussions.length,
-            labs: lg.compatibleLabs.length
-        })));
+        if (!course.lectures) return [];
 
         const lectureGroup = course.lectures.find(lg => lg.section.crn === lectureSection.crn);
-
-        if (!lectureGroup) {
-            console.log('[CourseDataService] Lecture group NOT FOUND - CRN mismatch!');
-            return [];
-        }
-
-        console.log(`[CourseDataService] Found lecture group "${lectureGroup.section.number}", has ${lectureGroup.compatibleLabs.length} labs`);
-        return lectureGroup.compatibleLabs || [];
+        return lectureGroup?.compatibleLabs ?? [];
     }
 
     /** Empty if the course has lectures or no standalone labs. */
@@ -462,7 +421,7 @@ export class CourseDataService {
      */
     notifyDataRefreshed(): void {
         if (!this.scheduleDB) {
-            console.warn('[CourseDataService] Cannot notify refresh - no data loaded');
+            logger.warn('[CourseDataService] Cannot notify refresh - no data loaded');
             return;
         }
 

@@ -8,6 +8,7 @@ import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState
 import type { CourseSelectionService } from '../selection/CourseSelectionService'
 import type { CourseDataService } from '../data/courseDataService'
 import type { FilterService } from '../filtering/FilterService'
+import { logger } from '../../utils/logger'
 
 /**
  * Standalone component-selection wizard launcher for the schedule page.
@@ -36,7 +37,7 @@ class ComponentWizardService {
 
     openComponentWizard(course: Course, existingSelections?: SelectedCourse, initialStep?: WizardStep): void {
         if (!this.courseDataService || !this.courseSelectionService) {
-            console.error('CourseDataService not available')
+            logger.error('CourseDataService not available')
             return
         }
 
@@ -47,7 +48,7 @@ class ComponentWizardService {
             .find(c => c.id === course.id)
 
         if (!freshCourse) {
-            console.error('Could not find fresh course data for:', course.id)
+            logger.error('Could not find fresh course data for:', course.id)
             return
         }
 
@@ -90,11 +91,11 @@ class ComponentWizardService {
                 // ScheduleSidebar is reactive on appState.selectedCourses, so the
                 // updated selection re-renders on its own — nothing to do here.
             } else {
-                console.error('Failed to save component selections:', result.error)
+                logger.error('Failed to save component selections:', result.error)
                 alert('Failed to save selections. Please try again.')
             }
         } catch (error) {
-            console.error('Error saving component selections:', error)
+            logger.error('Error saving component selections:', error)
             alert('An error occurred while saving selections.')
         }
 
