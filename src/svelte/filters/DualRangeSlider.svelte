@@ -54,10 +54,35 @@
     return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
   }
 
-  function onThumbDown(side: 'left' | 'right', e: Event): void {
+  // Pointer Events with capture, matching ResizeHandle and the tutorial box.
+  // Capture routes move/up back to the thumb even when the pointer leaves it, so
+  // no document-level listeners (and no teardown bookkeeping) are needed, and
+  // mouse, touch and pen are all handled by one set of handlers.
+  function onThumbDown(side: 'left' | 'right', e: PointerEvent): void {
     e.preventDefault();
     if (side === 'left') draggingLeft = true;
     else draggingRight = true;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      /* capture is best-effort; dragging still works without it */
+    }
+  }
+
+  function onThumbMove(e: PointerEvent): void {
+    if (draggingLeft) setMinFromPct(pctFromClientX(e.clientX));
+    else if (draggingRight) setMaxFromPct(pctFromClientX(e.clientX));
+  }
+
+  function onThumbUp(e: PointerEvent): void {
+    if (!draggingLeft && !draggingRight) return;
+    draggingLeft = false;
+    draggingRight = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* no-op if capture was never established */
+    }
   }
 
   function onThumbKeyDown(side: 'left' | 'right', e: KeyboardEvent): void {
@@ -90,38 +115,6 @@
     else setMaxFromPct(pct);
   }
 
-  // Document-level drag tracking lives in an $effect so the listeners are torn
-  // down with the component — the leak the old imperative class risked (document
-  // mousemove/touchmove that lingered if destroy() was missed) is now impossible.
-  $effect(() => {
-    function move(clientX: number): void {
-      if (draggingLeft) setMinFromPct(pctFromClientX(clientX));
-      else if (draggingRight) setMaxFromPct(pctFromClientX(clientX));
-    }
-    function onMouseMove(e: MouseEvent): void {
-      if (!draggingLeft && !draggingRight) return;
-      move(e.clientX);
-    }
-    function onTouchMove(e: TouchEvent): void {
-      if (!draggingLeft && !draggingRight) return;
-      e.preventDefault();
-      move(e.touches[0].clientX);
-    }
-    function onUp(): void {
-      draggingLeft = false;
-      draggingRight = false;
-    }
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchmove', onTouchMove, { passive: false });
-    document.addEventListener('touchend', onUp);
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onUp);
-      document.removeEventListener('touchmove', onTouchMove);
-      document.removeEventListener('touchend', onUp);
-    };
-  });
 </script>
 
 <div class={styles['dual-range-slider']}>
@@ -141,8 +134,10 @@
     aria-valuenow={minValue}
     aria-label={leftLabel}
     style:left="{minPct}%"
-    onmousedown={(e) => onThumbDown('left', e)}
-    ontouchstart={(e) => onThumbDown('left', e)}
+    onpointerdown={(e) => onThumbDown('left', e)}
+    onpointermove={onThumbMove}
+    onpointerup={onThumbUp}
+    onpointercancel={onThumbUp}
     onkeydown={(e) => onThumbKeyDown('left', e)}
     onmouseenter={() => (hoverLeft = true)}
     onmouseleave={() => (hoverLeft = false)}
@@ -157,8 +152,10 @@
     aria-valuenow={maxValue}
     aria-label={rightLabel}
     style:left="{maxPct}%"
-    onmousedown={(e) => onThumbDown('right', e)}
-    ontouchstart={(e) => onThumbDown('right', e)}
+    onpointerdown={(e) => onThumbDown('right', e)}
+    onpointermove={onThumbMove}
+    onpointerup={onThumbUp}
+    onpointercancel={onThumbUp}
     onkeydown={(e) => onThumbKeyDown('right', e)}
     onmouseenter={() => (hoverRight = true)}
     onmouseleave={() => (hoverRight = false)}

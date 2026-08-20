@@ -37,6 +37,9 @@
 
 /* Thumbs - draggable handles */
 .dual-range-thumb {
+  /* Required by the pointer-event drag: without it the browser claims touch
+     gestures on the thumb for panning and the drag never starts. */
+  touch-action: none;
   position: absolute;
   width: 20px;
   height: 20px;
