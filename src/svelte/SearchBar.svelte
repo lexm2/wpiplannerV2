@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { slideFade } from './transitions';
   import { untrack } from 'svelte';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
@@ -132,20 +133,22 @@
   placeholder={professorMode ? 'Search professors...' : 'Search courses...'}
   aria-label="Search courses"
 />
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (professor options are click-driven; keyboard nav is a follow-up) -->
-<div
-  id="search-professor-dropdown"
-  class="professor-dropdown"
-  style:display={dropdownOpen && professorMatches.length > 0 ? 'block' : 'none'}
->
-  {#each professorMatches as professor (professor)}
-    <div
-      class="professor-option"
-      data-professor={professor}
-      onclick={() => selectProfessor(professor)}
-    >{professor}</div>
-  {/each}
-</div>
+{#if dropdownOpen && professorMatches.length > 0}
+  <div
+    id="search-professor-dropdown"
+    class="professor-dropdown"
+    transition:slideFade={{ duration: 150 }}
+  >
+    {#each professorMatches as professor (professor)}
+      <button
+        type="button"
+        class="professor-option"
+        data-professor={professor}
+        onclick={() => selectProfessor(professor)}
+      >{professor}</button>
+    {/each}
+  </div>
+{/if}
 <button
   id="search-mode-btn"
   class="search-mode-btn"

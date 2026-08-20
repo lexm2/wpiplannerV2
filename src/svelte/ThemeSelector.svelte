@@ -41,16 +41,18 @@
   the `class:` directive (which needs a literal key) can't express them. We use
   the object form of the `class` attribute instead.
 -->
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (dropdown is click-driven; keyboard nav is a separate follow-up) -->
-<div
+<button
+  type="button"
   class={["theme-dropdown", { [styles['open']]: open }]}
   id="theme-dropdown"
+  aria-haspopup="true"
+  aria-expanded={open}
   onclick={toggle}
 >
   <span id="current-theme-name">{currentName}</span>
   <span class="dropdown-arrow" id="theme-dropdown-arrow">{@html getInlineSVG('CHEVRON_DOWN', 'dropdown-arrow-icon')}</span>
-</div>
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (options container only stops propagation; keyboard nav is a separate follow-up) -->
+</button>
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (container only stops propagation; its children are real buttons) -->
 {#if open}
 <div
   class="theme-options"
@@ -59,15 +61,15 @@
   onclick={(e) => e.stopPropagation()}
 >
   {#each themes as t (t.id)}
-    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (theme options are click-driven; keyboard nav is a separate follow-up) -->
-    <div
+    <button
+      type="button"
       class={[styles['theme-option'], { [styles['active']]: t.id === currentId }]}
       data-theme-id={t.id}
       onclick={() => selectTheme(t.id)}
     >
-      <div class={styles['theme-option-name']}>{t.name}</div>
-      <div class={styles['theme-option-description']}>{t.description}</div>
-    </div>
+      <span class={styles['theme-option-name']}>{t.name}</span>
+      <span class={styles['theme-option-description']}>{t.description}</span>
+    </button>
   {/each}
 </div>
 {/if}

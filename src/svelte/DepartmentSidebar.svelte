@@ -82,41 +82,41 @@
 {:else}
   <div class="department-category">
     <div class="department-list expanded">
-      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (department items are click-driven; keyboard nav is a separate follow-up) -->
-      <div
+      <button
+        type="button"
         class="department-item all-departments"
         class:active={activeSet.size === 0}
         data-dept-id="all"
         onclick={(e) => selectDepartment('all', e)}
       >
         All Departments ({counts.total})
-      </div>
+      </button>
     </div>
   </div>
 
   {#each Object.entries(categories) as [categoryName, depts] (categoryName)}
     {#if depts.length > 0}
       <div class="department-category">
-        <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (department items are click-driven; keyboard nav is a separate follow-up) -->
-        <div
+        <button
+          type="button"
           class="category-header"
           data-category={categoryName}
           aria-expanded={isExpanded(categoryName)}
           onclick={() => toggleCategory(categoryName)}
         >
           {categoryName}
-        </div>
+        </button>
         <div class="department-list" class:expanded={isExpanded(categoryName)}>
           {#each depts as dept (dept.abbreviation)}
-            <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (department items are click-driven; keyboard nav is a separate follow-up) -->
-            <div
+            <button
+              type="button"
               class="department-item"
               class:active={activeSet.has(dept.abbreviation)}
               data-dept-id={dept.abbreviation}
               onclick={(e) => selectDepartment(dept.abbreviation, e)}
             >
               {dept.name} ({counts.map.get(dept.abbreviation) ?? dept.courses.length})
-            </div>
+            </button>
           {/each}
         </div>
       </div>

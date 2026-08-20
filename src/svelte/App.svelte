@@ -1,5 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
+  import { wizardState } from './wizardState.svelte';
+  import { wizardScrollLock } from './wizardScrollLock';
   import type { PageId } from '../types/uiState';
   import type { Course } from '../types/types';
   import type { SelectedCourse } from '../types/schedule';
@@ -217,7 +219,12 @@
           <ClearAllSectionsButton courseSelectionService={services.courseSelectionService} />
         </div>
       </div>
-      <div class="schedule-sidebar-content" id="schedule-sidebar-content">
+      <div
+        class="schedule-sidebar-content"
+        id="schedule-sidebar-content"
+        class:wizard-active={wizardState.isOpen}
+        use:wizardScrollLock={wizardState.isOpen}
+      >
         <ScheduleSidebar
           courseSelectionService={services.courseSelectionService}
           getIncompleteInfo={(sc: SelectedCourse) => componentWizardService.getIncompleteSelectionInfo(sc)}

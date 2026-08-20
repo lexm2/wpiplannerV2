@@ -6,7 +6,11 @@
   display: inline-block;
 }
 
+/* Real <button> now — reset default button chrome (layout comes from the rules below). */
 .theme-dropdown {
+  border: none;
+  font: inherit;
+  color: inherit;
   padding: 0.5rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);

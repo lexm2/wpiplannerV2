@@ -96,12 +96,8 @@
 </script>
 
 {#if payload}
-  <Modal typeId="auto-schedule-intro" title="Auto-Schedule" extraClass="filter-modal" {onRequestClose}>
+  <Modal typeId="auto-schedule-intro" title="Auto-Schedule" showHeader extraClass="filter-modal" {onRequestClose}>
     {#snippet children(close)}
-      <div class="modal-header">
-        <h2 class="modal-title">Auto-Schedule</h2>
-        <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
-      </div>
       <div class="modal-body as-course-picker-body">
         <p class="as-picker-hint">Courses with selected sections are locked by default. Click a course to include it in auto-scheduling.</p>
         <div class="as-course-grid">

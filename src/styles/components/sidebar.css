@@ -16,6 +16,20 @@
   margin-bottom: 1.5rem;
 }
 
+/* .category-header and .department-item are real <button>s (keyboard-reachable).
+   Buttons default to inline-block with browser chrome, so reset to the
+   block-level, full-width, inherited-type layout these rules were written for. */
+.category-header,
+.department-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
 .category-header {
   font-weight: var(--font-weight-medium);
   color: var(--color-primary);

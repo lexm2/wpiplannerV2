@@ -140,12 +140,8 @@
 </script>
 
 {#if payload}
-  <Modal typeId="local-event" title={isEditMode ? 'Edit Event' : 'Add Event'} {onRequestClose}>
+  <Modal typeId="local-event" title={isEditMode ? 'Edit Event' : 'Add Event'} showHeader {onRequestClose}>
     {#snippet children(close)}
-      <div class="modal-header">
-        <h3 class="modal-title">{isEditMode ? 'Edit Event' : 'Add Event'}</h3>
-        <button class="modal-close" onclick={close}>&times;</button>
-      </div>
       <div class="modal-body {styles['local-event-form']}" data-type={eventType}>
         <div class="form-group">
           <label for="event-title">Title <span class="required">*</span></label>

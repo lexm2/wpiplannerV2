@@ -193,15 +193,14 @@
     });
   }
 
+  let downloadLink = $state<HTMLAnchorElement | null>(null);
+
   function triggerFileDownload(data: string, filename: string, mimeType: string): void {
-    const blob = new Blob([data], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!downloadLink) return;
+    const url = URL.createObjectURL(new Blob([data], { type: mimeType }));
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    downloadLink.click();
     URL.revokeObjectURL(url);
   }
 
@@ -225,48 +224,50 @@
     }
   }
 
+  // One template-bound file input serves both import paths (see the hidden
+  // <input> at the bottom of this component). `pendingImport` records which
+  // path asked for it: a schedule id imports INTO that schedule, 'new' creates
+  // one from the file name.
+  let fileInput = $state<HTMLInputElement | null>(null);
+  let pendingImport = $state<string | 'new' | null>(null);
+
   function importSchedule(scheduleId: string): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const result = await scheduleManagementService.importScheduleInto(scheduleId, text);
-        if (result.success) refreshTick++;
-        else showAppError(`Import failed: ${result.error}`);
-      } catch (error) {
-        logger.error('Failed to import schedule:', error);
-        showAppError('Failed to import schedule. Please check the file format.');
-      }
-    };
-    input.click();
+    pendingImport = scheduleId;
+    fileInput?.click();
   }
 
   // Settings-page "Import" — creates a NEW schedule from the chosen file.
   function importNewFromSettings(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      const name = file.name.replace(/\.json$/i, '');
-      try {
-        const text = await file.text();
-        const result = await scheduleManagementService.createNewSchedule(name);
-        if (result.success && result.schedule?.id) {
-          const importResult = await scheduleManagementService.importScheduleInto(result.schedule.id, text);
-          if (!importResult.success) showAppError(`Import failed: ${importResult.error}`);
+    pendingImport = 'new';
+    fileInput?.click();
+  }
+
+  async function onFileChosen(): Promise<void> {
+    const file = fileInput?.files?.[0];
+    const target = pendingImport;
+    pendingImport = null;
+    if (fileInput) fileInput.value = ''; // allow re-picking the same file
+    if (!file || !target) return;
+
+    try {
+      const text = await file.text();
+      if (target === 'new') {
+        const name = file.name.replace(/\.json$/i, '');
+        const created = await scheduleManagementService.createNewSchedule(name);
+        if (created.success && created.schedule?.id) {
+          const imported = await scheduleManagementService.importScheduleInto(created.schedule.id, text);
+          if (!imported.success) showAppError(`Import failed: ${imported.error}`);
           refreshTick++;
         }
-      } catch {
-        showAppError('Failed to import schedule. Please check the file format.');
+      } else {
+        const result = await scheduleManagementService.importScheduleInto(target, text);
+        if (result.success) refreshTick++;
+        else showAppError(`Import failed: ${result.error}`);
       }
-    };
-    input.click();
+    } catch (error) {
+      logger.error('Failed to import schedule:', error);
+      showAppError('Failed to import schedule. Please check the file format.');
+    }
   }
 
   function exportActiveICS(): void {
@@ -436,5 +437,17 @@
         <button class="nav-tab" class:active={activeTab === 'settings'} data-tab="settings" onclick={() => activeTab = 'settings'}>Settings</button>
       </div>
     </div>
+
+    <!-- Template-bound file IO, replacing document.createElement() throwaways.
+         Hidden but real, so they are inspectable and follow DegreeImport's pattern. -->
+    <input
+      bind:this={fileInput}
+      type="file"
+      accept=".json"
+      hidden
+      onchange={onFileChosen}
+    />
+    <!-- svelte-ignore a11y_missing_attribute (programmatic download target, never focused) -->
+    <a bind:this={downloadLink} hidden aria-hidden="true"></a>
   {/snippet}
 </Modal>
