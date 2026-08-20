@@ -58,13 +58,13 @@
 /* Hover effects */
 .dual-range-thumb:hover {
   transform: translateX(-50%) scale(1.1);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--effect-shadow);
 }
 
 /* Active/dragging state */
 .dual-range-thumb:active {
   transform: translateX(-50%) scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--effect-shadow-hover);
 }
 
 /* Focus state for accessibility */
@@ -131,25 +131,8 @@ html.is-mobile .dual-range-tooltip {
   padding: 3px 6px;
 }
 
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  .dual-range-track {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .dual-range-bar {
-    opacity: 0.8;
-  }
-
-  .dual-range-thumb {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  }
-
-  .dual-range-thumb:hover {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
-  }
-
-  .dual-range-tooltip {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  }
-}
+/* No prefers-color-scheme block here on purpose: this component follows the
+   THEME the user picked in-app, not the OS setting. The track already themes via
+   --color-border, and the shadows use --effect-shadow, which ThemeManager sets
+   per theme. Keying off the OS meant a light-OS user on the WPI Dark theme (or
+   the reverse) got the wrong slider treatment. */

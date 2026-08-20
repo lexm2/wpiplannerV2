@@ -443,7 +443,7 @@ html.is-mobile .modal-btn {
   height: 26px;
   padding: 0;
   border: 2px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--effect-border-radius);
   cursor: pointer;
   background: transparent;
   transition: all 0.15s ease;
@@ -471,7 +471,7 @@ html.is-mobile .modal-btn {
   margin-top: 1rem;
   padding: 0.625rem 0.875rem;
   background: var(--color-background);
-  border-radius: 8px;
+  border-radius: var(--effect-border-radius-large);
   border: 1px solid var(--color-border);
 }
 
@@ -533,7 +533,7 @@ html.is-mobile .modal-btn {
   gap: 0.75rem;
   padding: 0.75rem;
   background: var(--color-background);
-  border-radius: 8px;
+  border-radius: var(--effect-border-radius-large);
   border: 1px solid transparent;
   transition: all 0.15s ease;
 }
@@ -800,6 +800,12 @@ html.is-mobile .section-enrollment-waitlist {
   padding: 1rem;
   background: var(--color-surface);
   border-radius: 0 0 var(--effect-border-radius) var(--effect-border-radius);
+}
+
+/* Second (and later) visually distinct group inside a filter section. Replaces a
+   `style="margin-top: 0.75rem"` that two filter components had each hand-added. */
+.filter-subsection {
+  margin-top: 0.75rem;
 }
 
 .filter-search-container {

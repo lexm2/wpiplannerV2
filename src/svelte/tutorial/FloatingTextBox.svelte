@@ -115,32 +115,32 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div bind:this={boxEl} class="{styles.container} {visible ? '' : styles.hidden}">
+<div bind:this={boxEl} class="{styles['container']} {visible ? '' : styles['hidden']}">
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class={styles.header}
+    class={styles['header']}
     onpointerdown={onDragStart}
     onpointermove={onDragMove}
     onpointerup={onDragEnd}
     onpointercancel={onDragEnd}
   >
-    <span class={styles.title}>Tutorial</span>
-    <button class={styles.findBtn} data-tutorial-find onpointerdown={stopPointerdown} onclick={onFindElement}>
+    <span class={styles['title']}>Tutorial</span>
+    <button class={styles['findBtn']} data-tutorial-find onpointerdown={stopPointerdown} onclick={onFindElement}>
       Find Element
     </button>
-    <button class={styles.skipBtn} onpointerdown={stopPointerdown} onclick={() => tutorialService.skip()}>
+    <button class={styles['skipBtn']} onpointerdown={stopPointerdown} onclick={() => tutorialService.skip()}>
       Skip tutorial
     </button>
   </div>
-  <div class={styles.body}>
-    <div class={styles.stepTitle}>{step?.title ?? ''}</div>
+  <div class={styles['body']}>
+    <div class={styles['stepTitle']}>{step?.title ?? ''}</div>
     <!-- eslint-disable-next-line svelte/no-at-html-tags — tutorial copy is author-controlled -->
-    <div class={styles.stepDescription}>{@html step?.description ?? ''}</div>
+    <div class={styles['stepDescription']}>{@html step?.description ?? ''}</div>
   </div>
-  <div class={styles.footer}>
-    <span class={styles.stepCounter}>Step {index + 1} of {total}</span>
+  <div class={styles['footer']}>
+    <span class={styles['stepCounter']}>Step {index + 1} of {total}</span>
     <button
-      class={styles.backBtn}
+      class={styles['backBtn']}
       data-tutorial-back
       style:display={showBack ? '' : 'none'}
       disabled={backDisabled}
@@ -150,7 +150,7 @@
       <span>Back</span>
     </button>
     <button
-      class={styles.nextBtn}
+      class={styles['nextBtn']}
       data-tutorial-next
       style:margin-left={showBack ? '' : 'auto'}
       onpointerdown={stopPointerdown}

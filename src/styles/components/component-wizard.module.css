@@ -73,7 +73,7 @@
     padding: 0.4rem 0.75rem;
     background: none;
     border: 1px solid var(--color-border);
-    border-radius: 6px;
+    border-radius: var(--effect-border-radius);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 0.85rem;
@@ -195,7 +195,7 @@
 .wizard-section-card {
     background-color: var(--color-surface);
     border: 2px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: var(--effect-border-radius-large);
     padding: 0.65rem;
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -261,7 +261,7 @@
     padding: 0.4rem 0.65rem;
     background-color: transparent;
     border: 1.5px solid var(--color-primary);
-    border-radius: 6px;
+    border-radius: var(--effect-border-radius);
     color: var(--color-primary);
     font-size: 0.8rem;
     font-weight: 500;
@@ -282,7 +282,7 @@
     padding: 0.4rem 0.65rem;
     background-color: transparent;
     border: 1.5px solid var(--color-warning);
-    border-radius: 6px;
+    border-radius: var(--effect-border-radius);
     color: var(--color-warning);
     font-size: 0.8rem;
     font-weight: 500;
@@ -344,7 +344,7 @@
 .wizard-btn {
     padding: 0.6rem 1.2rem;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--effect-border-radius);
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;

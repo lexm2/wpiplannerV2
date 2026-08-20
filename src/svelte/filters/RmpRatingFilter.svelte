@@ -121,7 +121,7 @@
         />
       </div>
     </div>
-    <label class="filter-toggle-label" style="margin-top: 0.75rem;">
+    <label class="filter-toggle-label filter-subsection">
       <input type="checkbox" class="filter-toggle" bind:checked={includeWithoutData} />
       <span class="filter-toggle-text">Include professors without RMP data</span>
     </label>

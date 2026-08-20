@@ -216,7 +216,7 @@
           <span class={styles['breadcrumb-arrow']}>{@html getInlineSVG('ARROW_BAR_RIGHT', 'breadcrumb-arrow-icon')}</span>
         {/if}
         <button
-          class={[styles['wizard-breadcrumb'], { [styles.active]: step === currentStep, [styles.completed]: selections[step] !== null }]}
+          class={[styles['wizard-breadcrumb'], { [styles['active']]: step === currentStep, [styles['completed']]: selections[step] !== null }]}
           disabled={step === currentStep}
           onclick={() => wizardState.jumpToStep(step)}
         >
@@ -249,7 +249,7 @@
                 {@const rmpUrl = professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null}
                 {@const selected = selections[currentStep]?.crn === section.crn}
                 <div
-                  class={[styles['wizard-section-card'], { [styles.selected]: selected }]}
+                  class={[styles['wizard-section-card'], { [styles['selected']]: selected }]}
                   data-crn={section.crn}
                   in:slideX|global={{ from: dirSign, duration: 250, delay: (group.startIndex + i) * 40 }}
                   onintroend={(e) => (e.currentTarget as HTMLElement).setAttribute('data-settled', '')}
@@ -294,7 +294,7 @@
                   </div>
 
                   <div class={styles['section-card-footer']}>
-                    <span class={[styles['section-card-seats'], { [styles.full]: section.seatsAvailable === 0 }]}>
+                    <span class={[styles['section-card-seats'], { [styles['full']]: section.seatsAvailable === 0 }]}>
                       {getSeatsInfo(section)}
                     </span>
                     <span class={styles['section-card-crn']}>CRN: {section.crn}</span>

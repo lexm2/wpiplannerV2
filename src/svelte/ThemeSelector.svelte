@@ -43,7 +43,7 @@
 -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (dropdown is click-driven; keyboard nav is a separate follow-up) -->
 <div
-  class={["theme-dropdown", { [styles.open]: open }]}
+  class={["theme-dropdown", { [styles['open']]: open }]}
   id="theme-dropdown"
   onclick={toggle}
 >
@@ -61,7 +61,7 @@
   {#each themes as t (t.id)}
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (theme options are click-driven; keyboard nav is a separate follow-up) -->
     <div
-      class={[styles['theme-option'], { [styles.active]: t.id === currentId }]}
+      class={[styles['theme-option'], { [styles['active']]: t.id === currentId }]}
       data-theme-id={t.id}
       onclick={() => selectTheme(t.id)}
     >

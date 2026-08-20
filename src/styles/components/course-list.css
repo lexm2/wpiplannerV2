@@ -564,7 +564,7 @@ html.is-mobile .course-card {
   border: 2px solid var(--color-primary);
   background: var(--color-surface);
   color: var(--color-primary);
-  border-radius: 6px;
+  border-radius: var(--effect-border-radius);
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 200px;

@@ -118,7 +118,7 @@
     onchange={onAvailableOnly}
   />
 
-  <div class="filter-range-container" style="margin-top: 0.75rem;">
+  <div class="filter-range-container filter-subsection">
     <div class="filter-range-input">
       <label for="min-seats-filter">Minimum Available Seats</label>
       <input
