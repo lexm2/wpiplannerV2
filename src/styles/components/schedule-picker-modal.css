@@ -170,7 +170,6 @@
   margin-left: 1rem;
 }
 
-.schedule-picker-modal-dialog .menu-btn,
 .schedule-picker-modal-dialog .inline-action-btn {
   background: none;
   border: none;
@@ -183,7 +182,6 @@
   white-space: nowrap;
 }
 
-.schedule-picker-modal-dialog .menu-btn:hover,
 .schedule-picker-modal-dialog .inline-action-btn:hover {
   background: var(--color-background);
   color: var(--color-primary);
@@ -199,66 +197,6 @@
 }
 
 .schedule-picker-modal-dialog .inline-action-btn.danger:hover {
-  background: #ffebee;
-}
-
-.schedule-picker-modal-dialog .menu-btn {
-  font-size: 1.5rem;
-  padding: 0.25rem 0.5rem;
-  line-height: 1;
-}
-
-.schedule-picker-modal-dialog .menu-btn:active {
-  background: var(--color-primary-light);
-  transform: scale(0.95);
-}
-
-/* Schedule Item Menu - Dropdown */
-.schedule-picker-modal-dialog .schedule-item-menu {
-  position: fixed;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 95;
-  min-width: 160px;
-  padding: 0.5rem 0;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.schedule-picker-modal-dialog .schedule-item-menu[style*="display: none"] {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.schedule-picker-modal-dialog .schedule-item-menu[style*="display: block"] {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.schedule-picker-modal-dialog .menu-action {
-  display: block;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: none;
-  border: none;
-  text-align: left;
-  font-size: 0.95rem;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.schedule-picker-modal-dialog .menu-action:hover {
-  background: var(--color-surface-hover);
-}
-
-.schedule-picker-modal-dialog .menu-action.danger {
-  color: var(--color-error);
-}
-
-.schedule-picker-modal-dialog .menu-action.danger:hover {
   background: #ffebee;
 }
 
@@ -327,10 +265,6 @@
   flex: 1;
 }
 
-/* Focus States for Accessibility */
-.schedule-picker-modal-dialog .switch-btn:focus-visible,
-.schedule-picker-modal-dialog .menu-btn:focus-visible,
-.schedule-picker-modal-dialog .menu-action:focus-visible,
 .schedule-picker-modal-dialog .modal-close:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -374,7 +308,6 @@
   }
 }
 
-
 /* Medium Screens (992px - 1199px) - Reduced Size */
 @media (max-width: 1199px) and (min-width: 992px) {
   .schedule-picker-modal-dialog {
@@ -411,10 +344,6 @@ html.is-mobile .schedule-picker-modal-dialog {
 }
 
 html.is-mobile .schedule-picker-modal-dialog .modal-header {
-  padding: 1rem 1.25rem;
-}
-
-html.is-mobile .schedule-picker-modal-dialog .schedule-picker-toolbar {
   padding: 1rem 1.25rem;
 }
 
@@ -469,10 +398,4 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
 /* Mobile footer */
 html.is-mobile .schedule-picker-modal-dialog .modal-footer {
   display: none;
-}
-
-html.is-mobile .schedule-picker-modal-dialog .new-schedule-btn-header {
-  display: block !important;
-  margin-left: auto;
-  margin-right: 0.5rem;
 }

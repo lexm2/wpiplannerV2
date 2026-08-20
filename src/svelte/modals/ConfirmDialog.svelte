@@ -7,9 +7,11 @@
    * sites differ only in wording, button colour and whether a text input is
    * needed. DeleteLocalEvent.svelte predates this and is left alone; it works.
    *
-   * Reuses modal.css's .modal-confirm/.modal-warning scheme, which was built for
-   * exactly this and had been dead ever since the app reached for native dialogs
-   * instead.
+   * Styled entirely with modal.css's existing shared classes (.modal-header,
+   * .modal-body, .modal-text, .modal-footer, .modal-btn + .btn-danger), so it
+   * needed no new CSS. The variant drives the confirm button's colour; the
+   * old .modal-confirm/.modal-warning classes only ever styled a .modal-icon
+   * child we don't render, so they are not used here.
    */
   import Modal from './Modal.svelte';
   import { modalState } from './modalState.svelte';
@@ -50,7 +52,6 @@
   <Modal
     typeId="confirm"
     title={payload.title}
-    dialogClass={payload.variant === 'danger' ? 'modal-warning' : 'modal-confirm'}
     {onRequestClose}
   >
     {#snippet children(close)}

@@ -21,8 +21,6 @@
 /* dual-range-slider.module.css - imported directly in svelte/filters/DualRangeSlider.svelte */
 /* component-wizard.module.css - imported directly in ComponentSelectionWizard.svelte */
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
-/* calendar-events-panel.css migrated to CSS Module - imported directly in CalendarEventsPanel.ts */
-@import url('./styles/components/calendar-select-modal.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/states.css');
 @import url('./styles/components/conflict-modal.css'); /* Schedule conflict resolution modal */
