@@ -1,4 +1,33 @@
-/* Responsive design */
+/* Responsive design
+ *
+ * The app narrows by two independent mechanisms, and they are NOT interchangeable:
+ *
+ *   1. Viewport media queries — the primary mechanism. Breakpoints in use across
+ *      the stylesheets, widest first:
+ *        1600  main-content.css, header.css
+ *        1440  responsive.css      (hides .course-sections)
+ *        1400  header.css
+ *        1250  header.css          (also paired with min-width: 769px)
+ *        1200  responsive.css      (single-column; hides sidebar + right panel)
+ *              course-list.css and schedule-picker-modal.css use it as MIN-width
+ *        1024  responsive.css, schedule-page.css, component-wizard.module.css
+ *         991  schedule-picker-modal.css (paired with min-width: 768px)
+ *         700  modal.css
+ *         560  degree-page.css
+ *      Plus max-height rules: 1100 (component-wizard), 599/499 (schedule-picker).
+ *
+ *   2. html.is-mobile — set by utils/deviceDetection.ts from the user agent, so
+ *      it means "this is a phone", NOT "this window is narrow". Around 51 rules
+ *      across 11 files depend on it, and ScheduleGrids.svelte also reads it in JS
+ *      to disable term focus. Most of those rules have no media-query equivalent,
+ *      so they cannot simply be deleted.
+ *
+ * Prefer a media query for anything about available WIDTH. Reserve .is-mobile for
+ * things that are genuinely about the device (touch input, no hover). The two
+ * previously both hid .sidebar/.right-panel, so a tablet at 1150px and a
+ * UA-detected phone in a wide window took different paths to the same outcome;
+ * that duplicate is resolved below in favour of the media query.
+ */
 
 @media (max-width: 1440px) {
   .course-sections {
@@ -19,11 +48,6 @@
 html.is-mobile .app-body {
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
-}
-
-html.is-mobile .sidebar,
-html.is-mobile .right-panel {
-  display: none;
 }
 
 html.is-mobile .header-controls {
