@@ -4,6 +4,7 @@
 
 import { Schedule } from '../../types/schedule';
 import { setReplacer, setReviver } from '../../utils/jsonSerializer';
+import { migrateStoredSchedule, SCHEDULE_SCHEMA_VERSION } from './scheduleMigration';
 import LZString from 'lz-string';
 import { StorageWorkerManager } from '../../workers/StorageWorkerManager';
 import { WorkerTaskType } from '../../workers/protocol';
@@ -110,7 +111,8 @@ export class IndexedDBStorageManager {
                     id: schedule.id,
                     serializedData: compressed,
                     timestamp: scheduleWithTimestamp.timestamp,
-                    compressed: true
+                    compressed: true,
+                    schemaVersion: SCHEDULE_SCHEMA_VERSION
                 };
 
                 const request = store.put(dataToStore);
@@ -166,14 +168,14 @@ export class IndexedDBStorageManager {
                                     return;
                                 }
 
-                                const deserialized = JSON.parse(decompressed, setReviver) as Schedule;
-                                resolve({ success: true, data: deserialized });
+                                const deserialized = JSON.parse(decompressed, setReviver);
+                                resolve({ success: true, data: migrateStoredSchedule(deserialized, stored.schemaVersion) });
                             } else {
-                                const deserialized = JSON.parse(stored.serializedData, setReviver) as Schedule;
-                                resolve({ success: true, data: deserialized });
+                                const deserialized = JSON.parse(stored.serializedData, setReviver);
+                                resolve({ success: true, data: migrateStoredSchedule(deserialized, stored.schemaVersion) });
                             }
                         } else {
-                            resolve({ success: true, data: stored });
+                            resolve({ success: true, data: migrateStoredSchedule(stored, stored.schemaVersion) });
                         }
                     } else {
                         resolve({ success: false, error: 'Schedule not found' });
@@ -211,6 +213,7 @@ export class IndexedDBStorageManager {
                 request.onsuccess = () => {
                     const results = request.result || [];
                     const deserialized = results.map((stored: Record<string, unknown>) => {
+                        const version = stored.schemaVersion as number | undefined;
                         if (stored.serializedData) {
                             // Handle both compressed and legacy uncompressed data
                             const serialized = stored.serializedData as string;
@@ -218,9 +221,9 @@ export class IndexedDBStorageManager {
                                 ? LZString.decompress(serialized)
                                 : serialized;
 
-                            return JSON.parse(json || serialized, setReviver);
+                            return migrateStoredSchedule(JSON.parse(json || serialized, setReviver), version);
                         }
-                        return stored;
+                        return migrateStoredSchedule(stored, version);
                     });
                     resolve({ success: true, data: deserialized });
                 };

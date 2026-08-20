@@ -1,9 +1,6 @@
 export { logger } from './logger';
 export {
   isValidSection,
-  isValidSelectedCourse,
-  validateSelectedCourses,
-  repairSelectedCourse,
   getComputedTerm,
   isValidComputedTerm,
   getDisplayTerms,

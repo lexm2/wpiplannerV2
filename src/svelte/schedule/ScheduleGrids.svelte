@@ -2,7 +2,6 @@
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { buildConflictMatrix, type BitMaskEngine } from '../../core/scheduling/BitMaskEngine';
-  import { validateSelectedCourses } from '../../utils/typeGuards';
   import type { CourseColorService } from '../../services/scheduling/CourseColorService';
   import { schedulePreviewState } from './schedulePreviewState.svelte';
   import {
@@ -26,14 +25,13 @@
 
   let focusedTerm = $state<string | null>(null);
 
-  // Selected courses with the committed wizard preview overlaid, validated once.
-  const selected = $derived.by(() =>
-    validateSelectedCourses(
-      applyPreviewOverlay(
-        appState.selectedCourses,
-        schedulePreviewState.previewCourse,
-        schedulePreviewState.selections,
-      ),
+  // Selected courses with the committed wizard preview overlaid. Shape repair
+  // belongs to the storage boundary (scheduleMigration), not to a render pass.
+  const selected = $derived(
+    applyPreviewOverlay(
+      appState.selectedCourses,
+      schedulePreviewState.previewCourse,
+      schedulePreviewState.selections,
     )
   );
 
