@@ -940,27 +940,6 @@ export class ProfileStateManager {
         return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     }
 
-    debugState(): void {
-        logger.log('=== PROFILE STATE DEBUG ===');
-        logger.log('Active Schedule ID:', this.state.activeScheduleId);
-
-        const scheduleStates = this.state.schedules.map(s => ({
-            id: s.id,
-            name: s.name,
-            courseCount: s.selectedCourses.length,
-            isEmpty: s.selectedCourses.length === 0,
-            requiredCount: s.selectedCourses.filter(sc => sc.isRequired).length,
-            electiveCount: s.selectedCourses.filter(sc => !sc.isRequired).length
-        }));
-
-        logger.log('Schedules:', scheduleStates);
-        logger.log('Selected Courses:', this.state.selectedCourses.length);
-        logger.log('Has Unsaved Changes:', this.state.hasUnsavedChanges);
-        logger.log('Last Saved:', new Date(this.state.lastSaved).toISOString());
-        logger.log('Health Check:', this.isHealthy());
-        logger.log('===============================');
-    }
-
     async getStorageStats() {
         return this.storageManager.getStorageStats();
     }

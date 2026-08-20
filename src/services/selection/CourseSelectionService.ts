@@ -663,16 +663,4 @@ export class CourseSelectionService {
     }
 
 
-    debugState(): void {
-        console.log('=== COURSE SELECTION SERVICE DEBUG ===');
-        console.log('Initialized:', this.isInitialized);
-        console.log('Selected Courses:', this.getSelectedCoursesCount());
-        console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
-        console.log('Storage: Synchronous (Firefox-safe)');
-
-        this.profileStateManager.debugState();
-
-        console.log('Health Check:', this.performHealthCheck());
-        console.log('=============================================');
-    }
 }

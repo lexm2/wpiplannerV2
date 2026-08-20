@@ -670,19 +670,6 @@ export class ScheduleManagementService {
         return candidateName;
     }
 
-    debugState(): void {
-        console.log('=== SCHEDULE MANAGEMENT SERVICE DEBUG ===');
-        console.log('Initialized:', this.isInitialized);
-        console.log('Active Schedule ID:', this.getActiveScheduleId());
-        console.log('Total Schedules:', this.getAllSchedules().length);
-        console.log('Has Unsaved Changes:', this.hasUnsavedChanges());
-        
-        this.profileStateManager.debugState();
-        
-        console.log('Health Check:', this.performHealthCheck());
-        console.log('===============================================');
-    }
-
     async getStorageStats() {
         return this.profileStateManager.getStorageStats();
     }

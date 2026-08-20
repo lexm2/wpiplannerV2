@@ -17,15 +17,12 @@ export {
   getLabSections,
   getProfessorsByTerm,
 } from './courseUtils';
-export { DateUtils } from './dateUtils';
 export {
   CancellationToken,
   CancellationError,
   CancellationTokenSource,
   OperationManager,
   DebouncedOperation,
-  createCancellablePromise,
-  delay,
 } from './RequestCancellation';
 export { Validators } from './validators';
 export {

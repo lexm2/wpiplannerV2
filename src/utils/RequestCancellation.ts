@@ -109,10 +109,10 @@ export class DebouncedOperation {
                     this.operationManager.completeOperation(this.operationId);
                     resolve(result);
                 } catch (error) {
-                    if (error instanceof CancellationError) {
-                        // Don't reject on cancellation, just ignore
-                        return;
-                    }
+                    // Reject on cancellation too. Returning here left the promise
+                    // permanently unsettled — leaking it and its closure on every
+                    // superseded keystroke — and made callers' CancellationError
+                    // branch unreachable. Callers filter by error.name.
                     reject(error);
                 }
             }, this.delay);
@@ -130,40 +130,4 @@ export class DebouncedOperation {
     setDelay(delay: number): void {
         this.delay = Math.max(0, Math.min(5000, delay)); // Clamp between 0-5000ms
     }
-}
-
-export function createCancellablePromise<T>(
-    executor: (resolve: (value: T) => void, reject: (reason?: unknown) => void, cancellationToken: CancellationToken) => void,
-    cancellationToken: CancellationToken
-): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-        if (cancellationToken.isCancelled) {
-            reject(new CancellationError(cancellationToken.reason));
-            return;
-        }
-        
-        try {
-            executor(resolve, reject, cancellationToken);
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-export function delay(ms: number, cancellationToken?: CancellationToken): Promise<void> {
-    return createCancellablePromise<void>((resolve, reject, token) => {
-        const timeoutId = setTimeout(() => {
-            if (token.isCancelled) {
-                reject(new CancellationError(token.reason));
-            } else {
-                resolve();
-            }
-        }, ms);
-        
-        // If cancelled before timeout, clear it
-        if (token.isCancelled) {
-            clearTimeout(timeoutId);
-            reject(new CancellationError(token.reason));
-        }
-    }, cancellationToken || new CancellationToken());
 }
