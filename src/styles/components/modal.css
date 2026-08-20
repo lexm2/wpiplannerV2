@@ -284,16 +284,6 @@
   opacity: 0.9;
 }
 
-/* Professor Link */
-.professor-link {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-.professor-link:hover {
-  text-decoration: underline;
-}
-
 /* Responsive Design */
 html.is-mobile .modal-backdrop {
   padding: 0.5rem;

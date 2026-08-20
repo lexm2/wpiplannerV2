@@ -66,13 +66,18 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Professor Links */
+/* Professor Links
+   `color: inherit` is deliberate: these links appear inside .section-badge in
+   the course list, and .section-badge.full uses --color-primary as its
+   BACKGROUND — a primary-coloured link there would be invisible. The underline
+   carries the "this is clickable" affordance instead, which is safe on every
+   background. */
 .professor-link {
   color: inherit;
-  text-decoration: none;
+  text-decoration: underline;
   transition: var(--effect-transition);
 }
 
 .professor-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
