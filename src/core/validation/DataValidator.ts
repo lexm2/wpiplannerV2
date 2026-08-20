@@ -391,26 +391,6 @@ export class DataValidator {
         }
     }
 
-    detectSchemaVersion(data: unknown): string {
-        if (!data || typeof data !== 'object') return '1.0';
-
-        const dataObj = data as Record<string, unknown>;
-        if (dataObj.version && typeof dataObj.version === 'string') return dataObj.version;
-
-        // Try to detect version based on data structure
-        if (dataObj.selectedCourses && Array.isArray(dataObj.selectedCourses)) {
-            // Check if selectedCourses has component-based structure
-            const hasModernStructure = dataObj.selectedCourses.some((sc: unknown) => {
-                if (!sc || typeof sc !== 'object') return false;
-                const scObj = sc as Record<string, unknown>;
-                return scObj.hasOwnProperty('selectedLecture') && scObj.hasOwnProperty('selectedLab');
-            });
-            if (hasModernStructure) return '2.0';
-        }
-
-        return '1.0'; // Default to oldest version
-    }
-
     private validateRequiredField(obj: Record<string, unknown>, field: string, expectedType: string, result: ValidationResult): void {
         if (obj[field] === undefined || obj[field] === null) {
             result.errors.push({

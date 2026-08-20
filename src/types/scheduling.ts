@@ -21,16 +21,6 @@ export interface CourseComponentSelections extends ComponentSelections {
 }
 
 /**
- * Snapshot of selected section numbers for change detection.
- * Used to track previous state for efficient UI updates.
- */
-export interface SelectionSnapshot {
-    lecture: string | null;
-    discussion: string | null;
-    lab: string | null;
-}
-
-/**
  * Section occupying a time slot on the schedule grid.
  */
 export interface SectionOccupant {

@@ -1,6 +1,6 @@
 import { Course, Section } from '../../types/types'
 import { SelectedCourse } from '../../types/schedule'
-import type { ComponentSelections, CourseComponentSelections } from '../../types/scheduling'
+import type { CourseComponentSelections } from '../../types/scheduling'
 import { ProfileStateManager } from '../../core/state/ProfileStateManager'
 import { DataValidator } from '../../core/validation/DataValidator'
 import { Validators } from '../../utils/validators'
@@ -341,49 +341,6 @@ export class CourseSelectionService {
         }
     }
 
-    getSelectedComponents(course: Course): ComponentSelections {
-        if (!this.isInitialized) {
-            return { lecture: null, discussion: null, lab: null };
-        }
-
-        const selectedCourse = this.profileStateManager.getSelectedCourses().find(
-            sc => sc.course.id === course.id
-        );
-
-        return {
-            lecture: selectedCourse?.selectedLecture || null,
-            discussion: selectedCourse?.selectedDiscussion || null,
-            lab: selectedCourse?.selectedLab || null
-        };
-    }
-
-    /**
-     * Check if a course has incomplete component selections
-     * (i.e., course is selected but doesn't have all required components)
-     */
-    hasIncompleteSelections(course: Course): boolean {
-        if (!this.isCourseSelected(course)) return false;
-
-        const components = this.getSelectedComponents(course);
-
-        // For hierarchical courses, lecture is always required
-        if (!components.lecture) return true;
-
-        // TODO: Add logic to check if discussion/lab are required based on course structure
-        // For now, we'll consider it complete if lecture is selected
-        return false;
-    }
-
-    getIncompleteCourses(): SelectedCourse[] {
-        if (!this.isInitialized) return [];
-
-        const selectedCourses = this.profileStateManager.getSelectedCourses();
-        return selectedCourses.filter(sc => {
-            const hasAnyComponent = sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab;
-            return !hasAnyComponent;
-        });
-    }
-
     // Section locking methods to prevent auto-scheduler from changing manual selections
 
     async lockSection(course: Course, sectionCrn: string): Promise<CourseSelectionResult> {
@@ -478,22 +435,6 @@ export class CourseSelectionService {
         return this.profileStateManager.getSelectedCourses();
     }
 
-
-    getSelectedSection(course: Course): string | null {
-        const selectedCourse = this.getSelectedCourse(course);
-        return selectedCourse?.selectedLecture?.number ||
-               selectedCourse?.selectedDiscussion?.number ||
-               selectedCourse?.selectedLab?.number ||
-               null;
-    }
-
-    getSelectedSectionObject(course: Course): Section | null {
-        const selectedCourse = this.getSelectedCourse(course);
-        return selectedCourse?.selectedLecture ||
-               selectedCourse?.selectedDiscussion ||
-               selectedCourse?.selectedLab ||
-               null;
-    }
 
     getSelectedCoursesCount(): number {
         if (!this.isInitialized) return 0;

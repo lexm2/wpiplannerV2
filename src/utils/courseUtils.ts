@@ -86,27 +86,6 @@ export function getSelectedSections(course: SelectedCourse): Section[] {
         .filter((s): s is Section => s !== null);
 }
 
-/** Returns the CRN for each selected component (lecture, discussion, lab). */
-export function getCombinedCRNs(course: SelectedCourse): {
-    lecture: string | null;
-    discussion: string | null;
-    lab: string | null;
-} {
-    return {
-        lecture: course.selectedLecture?.crn?.toString() ?? null,
-        discussion: course.selectedDiscussion?.crn?.toString() ?? null,
-        lab: course.selectedLab?.crn?.toString() ?? null
-    };
-}
-
-/** Returns the first available CRN, preferring lecture, then discussion, then lab. */
-export function getPrimaryCRN(course: SelectedCourse): string | null {
-    return course.selectedLecture?.crn?.toString() ??
-           course.selectedDiscussion?.crn?.toString() ??
-           course.selectedLab?.crn?.toString() ??
-           null;
-}
-
 /** Encodes a selection for export as [courseId, lectureCRN, discussionCRN, labCRN]. */
 export function encodeCourseSelection(course: SelectedCourse): [string, string | null, string | null, string | null] {
     return [

@@ -1,7 +1,7 @@
 /**
  * Hybrid storage layer with IndexedDB for schedules and localStorage for preferences, providing atomic transactions
  */
-import { Schedule, UserScheduleState, SchedulePreferences } from '../../types/schedule'
+import { Schedule, SchedulePreferences } from '../../types/schedule'
 import { IndexedDBStorageManager } from './IndexedDBStorageManager'
 import { setReplacer, setReviver } from '../../utils/jsonSerializer'
 import { STORAGE_KEYS } from '../../utils/storageKeys'
@@ -101,21 +101,6 @@ export class TransactionalStorageManager {
         } finally {
             this.activeTransactions.delete(transactionId);
         }
-    }
-
-    saveUserState(state: UserScheduleState): TransactionResult {
-        return this.executeSyncTransaction(() => {
-            const serializedState = JSON.stringify(state, this.replacer);
-            localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.USER_STATE, serializedState);
-        });
-    }
-
-    loadUserState(): { data: UserScheduleState | null; valid: boolean; error?: string } {
-        return this.safeLoad<UserScheduleState | null>(
-            TransactionalStorageManager.STORAGE_KEYS.USER_STATE,
-            null,
-            'user state'
-        );
     }
 
     async saveSchedule(schedule: Schedule): Promise<TransactionResult> {

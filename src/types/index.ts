@@ -48,7 +48,6 @@ export { ApplicationState } from './ApplicationState';
 export type {
   ComponentSelections,
   CourseComponentSelections,
-  SelectionSnapshot,
   SectionOccupant,
   CalendarOccupant,
   CellData,
