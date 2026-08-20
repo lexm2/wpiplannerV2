@@ -1,12 +1,6 @@
 /**
- * Tests for the localStorage half of TransactionalStorageManager, including the
- * rollback path — previously zero coverage, and the audit called it the highest
- * silent-corruption risk in the app.
- *
- * Scope note: schedules live in IndexedDB and are exercised through async
- * methods that need a real IDB; these cover the synchronous, transactional
- * localStorage surface (preferences, user state, active schedule id, degree
- * record, clear-all) which is where the rollback logic actually runs.
+ * The localStorage half of TransactionalStorageManager, including rollback.
+ * Schedules live in IndexedDB and need a real IDB, so they are not covered here.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TransactionalStorageManager } from '../../src/core/storage/TransactionalStorageManager';

@@ -1,8 +1,6 @@
 /**
- * Characterization tests for ConflictFilter's term-expansion → blocked-bitmask logic.
- *
- * Pinned before the audit sweep deletes BitMaskEngine's duplicate implementation of
- * the same F→[A,B] / S→[C,D] / ALL→[A,B,C,D] rule, so the surviving copy is covered.
+ * ConflictFilter's term expansion into blocked bitmasks: F -> [A,B],
+ * S -> [C,D], ALL -> [A,B,C,D].
  */
 import { describe, it, expect } from 'vitest';
 import { ConflictFilter } from '../../src/core/filtering/filters/ConflictFilter';
@@ -75,7 +73,7 @@ describe('ConflictFilter term expansion', () => {
         expect(masksFor().size).toBe(0);
     });
 
-    it('returns a copy — mutating the result does not corrupt the filter', () => {
+    it('returns a copy, so mutating the result does not corrupt the filter', () => {
         const filter = new ConflictFilter();
         const criteria = { avoidConflicts: true, blockedSlots: [slot(AcademicTerm.A)] };
         const first = filter.getBlockedMasksByTerm(criteria);

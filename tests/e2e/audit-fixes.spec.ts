@@ -190,7 +190,7 @@ test('theme persists across reload with no flash (ProfileStateManager-backed ada
     const persisted = await page.evaluate(() => localStorage.getItem('wpi-planner-preferences'));
     expect(persisted).toContain('wpi-light');
 
-    // Reload WITHOUT clearing storage — the saved theme must be live immediately.
+    // Reload WITHOUT clearing storage; the saved theme must be live immediately.
     await page.reload({ waitUntil: 'domcontentloaded' });
     const early = await page.evaluate(() =>
         getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim());

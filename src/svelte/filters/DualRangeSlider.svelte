@@ -54,10 +54,8 @@
     return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
   }
 
-  // Pointer Events with capture, matching ResizeHandle and the tutorial box.
-  // Capture routes move/up back to the thumb even when the pointer leaves it, so
-  // no document-level listeners (and no teardown bookkeeping) are needed, and
-  // mouse, touch and pen are all handled by one set of handlers.
+  // Pointer capture routes move/up back to the thumb even when the pointer
+  // leaves it, so no document listeners are needed. Matches ResizeHandle.
   function onThumbDown(side: 'left' | 'right', e: PointerEvent): void {
     e.preventDefault();
     if (side === 'left') draggingLeft = true;

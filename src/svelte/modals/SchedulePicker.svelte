@@ -224,10 +224,8 @@
     }
   }
 
-  // One template-bound file input serves both import paths (see the hidden
-  // <input> at the bottom of this component). `pendingImport` records which
-  // path asked for it: a schedule id imports INTO that schedule, 'new' creates
-  // one from the file name.
+  // One hidden input (bottom of this component) serves both import paths.
+  // pendingImport is the target: a schedule id, or 'new' to create one.
   let fileInput = $state<HTMLInputElement | null>(null);
   let pendingImport = $state<string | 'new' | null>(null);
 
@@ -438,8 +436,7 @@
       </div>
     </div>
 
-    <!-- Template-bound file IO, replacing document.createElement() throwaways.
-         Hidden but real, so they are inspectable and follow DegreeImport's pattern. -->
+    <!-- Hidden but real file IO elements, following DegreeImport's pattern. -->
     <input
       bind:this={fileInput}
       type="file"

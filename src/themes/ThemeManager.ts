@@ -18,19 +18,12 @@ export interface ThemeStorage {
 }
 
 /**
- * Bootstrap storage, used only until AppBootstrap swaps in the
- * ProfileStateManager-backed adapter.
+ * Bootstrap storage, used until AppBootstrap swaps in its own adapter.
  *
- * Reads the SAME localStorage blob ProfileStateManager persists preferences to,
- * synchronously. That matters: the ThemeManager singleton is constructed before
- * the app shell mounts, so this read is what decides the theme at first paint.
- * It previously read a `wpi-planner-theme` key that nothing had written since
- * the runes migration, so it always fell back to wpi-dark and every non-default
- * user got a flash of the wrong theme until the async bootstrap corrected it.
- *
- * The blob is plain uncompressed JSON (lz-string is only used for IndexedDB
- * schedules), so parsing it here is cheap. Same pre-paint pattern as
- * svelte/panelWidths.ts.
+ * Reads the preferences blob synchronously: ThemeManager is constructed before
+ * the shell mounts, so this read decides the theme at first paint. The blob is
+ * plain JSON (lz-string is only used for IndexedDB schedules), so it is cheap.
+ * Same pre-paint pattern as svelte/panelWidths.ts.
  */
 class DefaultThemeStorage implements ThemeStorage {
     private readonly preferencesKey = STORAGE_KEYS.PREFERENCES;
@@ -48,8 +41,8 @@ class DefaultThemeStorage implements ThemeStorage {
     }
 
     // Read-modify-write so a save through this bootstrap path can't drop the
-    // other preference fields. In practice the ProfileStateManager-backed
-    // adapter has taken over by the time any user-driven setTheme() runs.
+    // other preference fields. In practice AppBootstrap's adapter has taken
+    // over by the time any user-driven setTheme() runs.
     saveThemePreference(themeId: string): void {
         try {
             const raw = localStorage.getItem(this.preferencesKey);
@@ -84,11 +77,9 @@ export class ThemeManager {
     }
 
     /**
-     * Swaps the persistence backend only — deliberately does NOT re-derive the
-     * theme. Its sole caller (AppBootstrap.createServices) runs before
-     * ProfileStateManager has loaded from storage, so re-reading here would get
-     * the in-memory default and stomp the correct theme the constructor just
-     * applied from localStorage.
+     * Swaps the persistence backend only. It must NOT re-derive the theme: its
+     * caller runs before ProfileStateManager has loaded, so a re-read would get
+     * the in-memory default and stomp what the constructor already applied.
      */
     setStorage(storage: ThemeStorage): void {
         this.storage = storage;

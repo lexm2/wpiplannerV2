@@ -6,7 +6,7 @@
   display: inline-block;
 }
 
-/* Real <button> now — reset default button chrome (layout comes from the rules below). */
+/* Real <button> now, so reset default button chrome. */
 .theme-dropdown {
   border: none;
   font: inherit;

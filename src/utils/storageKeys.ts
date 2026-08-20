@@ -1,16 +1,10 @@
 /**
- * Every localStorage key the app owns, in one place.
+ * Every localStorage key the app owns.
  *
- * These keys were previously hand-typed at their use sites, which meant
- * `wpi_visited` existed as two independent literals in different files and
- * `wpi-planner-preferences` was declared separately by ThemeManager and
- * TransactionalStorageManager — a rename in one silently orphaning the other's
- * data. Follows the config-object pattern already used by svelte/panelWidths.ts
- * (which owns its own keys, since they are per-panel).
+ * The string VALUES address data already on real users' machines: changing one
+ * resets that user's state. Add keys here, never edit an existing value.
  *
- * The string VALUES are load-bearing: they address data already on real users'
- * machines. Changing one resets that user's state on their next visit. Add keys
- * here; never edit an existing value.
+ * (panelWidths.ts keeps its own keys, since they are per-panel config.)
  */
 export const STORAGE_KEYS = {
     /** Serialized SchedulePreferences, including the selected theme. */
@@ -25,11 +19,7 @@ export const STORAGE_KEYS = {
     VISITED: 'wpi_visited',
     /** Expanded/collapsed state of the selected-courses panel. */
     SELECTED_COURSES_EXPANDED: 'selectedCoursesExpanded',
-    /**
-     * Legacy. Schedules live in IndexedDB now and nothing writes this key, but
-     * it stays in the registry so clearAllData still purges data left behind on
-     * long-time users' machines.
-     */
+    /** Legacy: schedules live in IndexedDB, but clearAllData still purges this. */
     LEGACY_SCHEDULES: 'wpi-planner-schedules',
 } as const;
 

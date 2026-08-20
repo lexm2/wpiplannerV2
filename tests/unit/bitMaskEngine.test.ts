@@ -1,9 +1,6 @@
 /**
- * Characterization tests for the bitmask conflict engine.
- *
- * Written BEFORE the audit dead-code sweep trims this file, so the deletions are
- * verified by assertions rather than by eyeball. These assert current behaviour,
- * including the quirks (see the 07:00 boundary and out-of-range cases below).
+ * Characterization tests for the bitmask conflict engine. Assert current
+ * behaviour, quirks included (see the 07:00 boundary cases below).
  */
 import { describe, it, expect } from 'vitest';
 import {
@@ -103,7 +100,7 @@ describe('weeklySlotToMask', () => {
 });
 
 describe('BitMaskEngine', () => {
-    it('caches by CRN — getMask returns the same object across calls', () => {
+    it('caches by CRN, so getMask returns the same object across calls', () => {
         const engine = new BitMaskEngine();
         const s = MON_9_10();
         const first = engine.getMask(s);
@@ -118,14 +115,14 @@ describe('BitMaskEngine', () => {
         expect(engine.sectionsConflict(MON_9_10(), MON_10_11())).toBe(false);
     });
 
-    it('segregates by exact term string — identical times in different terms do not conflict', () => {
+    it('segregates by exact term string, so identical times in different terms do not conflict', () => {
         const engine = new BitMaskEngine();
         const a = section(10, [period([DayOfWeek.MONDAY], 9, 0, 10, 0)], AcademicTerm.A);
         const b = section(11, [period([DayOfWeek.MONDAY], 9, 0, 10, 0)], AcademicTerm.B);
         expect(engine.sectionsConflict(a, b)).toBe(false);
     });
 
-    it('compares terms by string equality only — an A section and an F section spanning A do not conflict', () => {
+    it('compares terms by string equality, so an A section and an F section spanning A do not conflict', () => {
         // Documents a real limitation: F spans A+B and S spans C+D, but
         // sectionsConflict early-returns on `computedTerm` inequality, so the
         // overlap is invisible here. Term expansion is the caller's job

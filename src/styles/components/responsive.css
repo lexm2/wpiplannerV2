@@ -1,32 +1,16 @@
 /* Responsive design
  *
- * The app narrows by two independent mechanisms, and they are NOT interchangeable:
+ * Two mechanisms, not interchangeable:
+ *   1. Media queries. Breakpoints in use: 1600, 1440, 1400, 1250, 1200, 1024,
+ *      991, 700, 560 (plus max-height 1100, 599, 499). Note 1200 is also used
+ *      as a MIN-width in course-list.css and schedule-picker-modal.css.
+ *   2. html.is-mobile, set from the user agent by utils/deviceDetection.ts, so
+ *      it means "phone", not "narrow window". ~51 rules across 11 files use it,
+ *      plus a JS read in ScheduleGrids.svelte.
  *
- *   1. Viewport media queries — the primary mechanism. Breakpoints in use across
- *      the stylesheets, widest first:
- *        1600  main-content.css, header.css
- *        1440  responsive.css      (hides .course-sections)
- *        1400  header.css
- *        1250  header.css          (also paired with min-width: 769px)
- *        1200  responsive.css      (single-column; hides sidebar + right panel)
- *              course-list.css and schedule-picker-modal.css use it as MIN-width
- *        1024  responsive.css, schedule-page.css, component-wizard.module.css
- *         991  schedule-picker-modal.css (paired with min-width: 768px)
- *         700  modal.css
- *         560  degree-page.css
- *      Plus max-height rules: 1100 (component-wizard), 599/499 (schedule-picker).
- *
- *   2. html.is-mobile — set by utils/deviceDetection.ts from the user agent, so
- *      it means "this is a phone", NOT "this window is narrow". Around 51 rules
- *      across 11 files depend on it, and ScheduleGrids.svelte also reads it in JS
- *      to disable term focus. Most of those rules have no media-query equivalent,
- *      so they cannot simply be deleted.
- *
- * Prefer a media query for anything about available WIDTH. Reserve .is-mobile for
- * things that are genuinely about the device (touch input, no hover). The two
- * previously both hid .sidebar/.right-panel, so a tablet at 1150px and a
- * UA-detected phone in a wide window took different paths to the same outcome;
- * that duplicate is resolved below in favour of the media query.
+ * Use a media query for anything about width. Reserve .is-mobile for the device
+ * itself (touch, no hover). Both used to hide .sidebar/.right-panel, so a tablet
+ * and a UA-detected phone reached the same result by different paths.
  */
 
 @media (max-width: 1440px) {

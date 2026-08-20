@@ -30,12 +30,9 @@ export class AppBootstrap {
     static createServices(): ServiceContainer {
         const profileStateManager = ProfileStateManager.getInstance();
 
-        // Theme persistence adapter. ThemeManager reads the saved theme
-        // synchronously from localStorage before first paint (see its
-        // DefaultThemeStorage); this swaps in the ProfileStateManager-backed
-        // writer so later setTheme() calls persist through the normal
-        // preferences path. Deliberately does NOT re-read here — that would
-        // pick up the in-memory default before storage has loaded.
+        // ThemeManager already applied the saved theme synchronously before
+        // first paint; this only swaps in the writer for later setTheme() calls.
+        // It must not re-read: storage has not loaded yet.
         const themeManager = ThemeManager.getInstance();
         themeManager.setStorage({
             loadThemePreference: () => profileStateManager.getPreferences().theme || 'wpi-dark',

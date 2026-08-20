@@ -1061,7 +1061,7 @@ html.is-mobile .section-enrollment-waitlist {
   box-shadow: var(--effect-shadow-large);
 }
 
-/* Real <button>s now — reset default button chrome. */
+/* Real <button>s now, so reset default button chrome. */
 .professor-option {
   display: block;
   width: 100%;

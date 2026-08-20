@@ -24,8 +24,7 @@
 
   let backDisabled = $state(false);
 
-  // Bound inside an {#if}, so it must be reactive: it is set on mount and
-  // cleared on unmount as the tutorial starts and stops.
+  // Bound inside an {#if}, so it must be reactive.
   let boxEl = $state<HTMLElement | null>(null);
 
   const visible = $derived(step !== null);

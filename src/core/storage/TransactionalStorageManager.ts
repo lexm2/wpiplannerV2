@@ -30,7 +30,7 @@ export interface TransactionResult {
 }
 
 export class TransactionalStorageManager {
-    /** Shared registry — see utils/storageKeys.ts. */
+    /** Shared registry; see utils/storageKeys.ts. */
     private static readonly STORAGE_KEYS = STORAGE_KEYS;
 
     private activeTransactions = new Map<string, StorageTransaction>();

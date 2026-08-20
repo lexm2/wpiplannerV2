@@ -110,9 +110,9 @@ export class DebouncedOperation {
                     resolve(result);
                 } catch (error) {
                     // Reject on cancellation too. Returning here left the promise
-                    // permanently unsettled — leaking it and its closure on every
-                    // superseded keystroke — and made callers' CancellationError
-                    // branch unreachable. Callers filter by error.name.
+                    // permanently unsettled, leaking it and its closure on
+                    // every superseded keystroke, and made callers'
+                    // CancellationError branch unreachable. They filter by name.
                     reject(error);
                 }
             }, this.delay);

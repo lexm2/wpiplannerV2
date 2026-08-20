@@ -7,8 +7,7 @@
 }
 
 /* Individual theme option */
-/* Real <button>s now — reset the default inline-block chrome so these keep the
-   block-level layout these rules were written for. */
+/* Real <button>s now, so reset the default inline-block chrome. */
 .theme-option {
   display: block;
   width: 100%;

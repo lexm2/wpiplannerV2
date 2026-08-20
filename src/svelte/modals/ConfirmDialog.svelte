@@ -1,18 +1,14 @@
 <script lang="ts">
   /**
-   * Generic confirm / prompt dialog — the themed replacement for native
-   * confirm() and prompt().
+   * Themed replacement for native confirm() and prompt().
    *
-   * Deliberately one parameterized component rather than one per case: the call
-   * sites differ only in wording, button colour and whether a text input is
-   * needed. DeleteLocalEvent.svelte predates this and is left alone; it works.
+   * One parameterized component rather than one per case: the call sites differ
+   * only in wording, button colour and whether a text input is needed.
+   * DeleteLocalEvent.svelte predates this and is left as-is.
    *
-   * Styled entirely with modal.css's existing shared classes (.modal-header,
-   * .modal-body, .modal-text, .modal-footer, .modal-btn + .btn-danger), so it
-   * needed no new CSS. The variant drives the confirm button's colour; the
-   * old .modal-confirm/.modal-warning classes only ever styled a .modal-icon
-   * child we don't render, so they are not used here.
+   * Uses modal.css's existing shared classes, so it needed no new CSS.
    */
+
   import Modal from './Modal.svelte';
   import { modalState } from './modalState.svelte';
 
@@ -20,8 +16,7 @@
 
   const payload = $derived(modalState.confirm);
 
-  // Seeded per open. Keyed on payload identity so reopening for a different
-  // action re-seeds rather than keeping the previous entry.
+  // Keyed on payload identity so reopening re-seeds the field.
   let inputValue = $state('');
   let seededFor: unknown = null;
   $effect(() => {

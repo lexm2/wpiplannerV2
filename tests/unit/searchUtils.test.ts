@@ -1,7 +1,6 @@
 /**
- * Characterization tests for search relevance ranking — previously zero coverage.
- * Asserts the tier ORDERING rather than exact point values, so the tests stay
- * meaningful if the weights are retuned.
+ * Search relevance ranking. Asserts tier ORDERING rather than exact point
+ * values, so these survive the weights being retuned.
  */
 import { describe, it, expect } from 'vitest';
 import { rankCoursesByRelevance, calculateRelevanceScore, getAvailableProfessors } from '../../src/utils/searchUtils';
@@ -65,7 +64,7 @@ describe('rankCoursesByRelevance', () => {
         expect(rankCoursesByRelevance([cs, ma], 'calculus')[0].id).toBe('MA1021');
     });
 
-    it('sorts in place — the caller receives the same array instance', () => {
+    it('sorts in place, so the caller receives the same array instance', () => {
         // Documents current behaviour: callers must copy first if they need the original order.
         const list = [course({ id: 'A', name: 'Zebra' }), course({ id: 'B', name: 'Apple' })];
         expect(rankCoursesByRelevance(list, 'apple')).toBe(list);

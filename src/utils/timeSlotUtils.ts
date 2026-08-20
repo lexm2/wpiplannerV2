@@ -1,10 +1,4 @@
-/**
- * Weekly time-slot helpers used by conflict detection.
- *
- * Seven further exports (slot construction, DisplayableTimeSlot conversion,
- * minute<->SimpleTime math, calendar-event expansion) were deleted in the audit
- * cleanup: all had zero call sites, and callers build these objects inline.
- */
+/** Weekly time-slot helpers used by conflict detection. */
 import type { WeeklyTimeSlot } from '../types/schedule';
 import { AcademicTerm } from '../types/schedule';
 
