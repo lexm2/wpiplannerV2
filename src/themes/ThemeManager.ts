@@ -1,5 +1,4 @@
 import { ThemeDefinition, ThemeId } from './types'
-import { ProfileStateManager } from '../core/state/ProfileStateManager'
 import { uiState } from '../services/ui/uiState.svelte'
 
 import wpiClassic from './definitions/wpi-classic.json'
@@ -16,38 +15,46 @@ export interface ThemeStorage {
     saveThemePreference(themeId: string): void;
 }
 
+/**
+ * Bootstrap storage, used only until AppBootstrap swaps in StorageService.
+ *
+ * Reads the SAME localStorage blob ProfileStateManager persists preferences to,
+ * synchronously. That matters: the ThemeManager singleton is constructed before
+ * the app shell mounts, so this read is what decides the theme at first paint.
+ * It previously read a `wpi-planner-theme` key that nothing had written since
+ * the runes migration, so it always fell back to wpi-dark and every non-default
+ * user got a flash of the wrong theme until the async bootstrap corrected it.
+ *
+ * The blob is plain uncompressed JSON (lz-string is only used for IndexedDB
+ * schedules), so parsing it here is cheap. Same pre-paint pattern as
+ * svelte/panelWidths.ts.
+ */
 class DefaultThemeStorage implements ThemeStorage {
-    private readonly storageKey = 'wpi-planner-theme';
+    private readonly preferencesKey = 'wpi-planner-preferences';
 
     loadThemePreference(): string {
         try {
-            const savedTheme = localStorage.getItem(this.storageKey);
-            return savedTheme || 'wpi-dark';
+            const raw = localStorage.getItem(this.preferencesKey);
+            if (!raw) return 'wpi-dark';
+            const parsed = JSON.parse(raw) as { theme?: string };
+            return typeof parsed.theme === 'string' ? parsed.theme : 'wpi-dark';
         } catch (error) {
             console.warn('Failed to load theme preference:', error);
             return 'wpi-dark';
         }
     }
 
+    // Read-modify-write so a save through this bootstrap path can't drop the
+    // other preference fields. In practice StorageService has taken over by the
+    // time any user-driven setTheme() runs.
     saveThemePreference(themeId: string): void {
         try {
-            localStorage.setItem(this.storageKey, themeId);
+            const raw = localStorage.getItem(this.preferencesKey);
+            const existing = raw ? JSON.parse(raw) : {};
+            localStorage.setItem(this.preferencesKey, JSON.stringify({ ...existing, theme: themeId }));
         } catch (error) {
             console.warn('Failed to save theme preference:', error);
         }
-    }
-}
-
-class ProfileStateManagerThemeStorage implements ThemeStorage {
-    constructor(private profileStateManager: ProfileStateManager) {}
-
-    loadThemePreference(): string {
-        const preferences = this.profileStateManager.getPreferences();
-        return preferences.theme || 'wpi-dark';
-    }
-
-    saveThemePreference(themeId: string): void {
-        this.profileStateManager.updatePreferences({ theme: themeId }, 'theme-manager');
     }
 }
 
@@ -73,14 +80,15 @@ export class ThemeManager {
         ThemeManager.instance = null!;
     }
 
+    /**
+     * Swaps the persistence backend only — deliberately does NOT re-derive the
+     * theme. Its sole caller (AppBootstrap.createServices) runs before
+     * ProfileStateManager has loaded from storage, so re-reading here would get
+     * the in-memory default and stomp the correct theme the constructor just
+     * applied from localStorage.
+     */
     setStorage(storage: ThemeStorage): void {
         this.storage = storage;
-        this.loadSavedTheme();
-    }
-
-    setProfileStateManager(profileStateManager: ProfileStateManager): void {
-        this.storage = new ProfileStateManagerThemeStorage(profileStateManager);
-        this.loadSavedTheme();
     }
 
     private initializeThemes(): void {

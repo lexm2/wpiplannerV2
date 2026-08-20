@@ -34,7 +34,6 @@ export class TransactionalStorageManager {
         USER_STATE: 'wpi-planner-user-state',
         PREFERENCES: 'wpi-planner-preferences',
         SCHEDULES: 'wpi-planner-schedules',
-        THEME: 'wpi-planner-theme',
         ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
         DEGREE_RECORD: 'wpi-planner-degree-record',
         TRANSACTION_LOG: 'wpi-planner-transaction-log'
@@ -187,28 +186,6 @@ export class TransactionalStorageManager {
             valid: result.valid,
             error: result.error
         };
-    }
-
-    saveThemePreference(themeId: string): TransactionResult {
-        return this.executeSyncTransaction(() => {
-            localStorage.setItem(TransactionalStorageManager.STORAGE_KEYS.THEME, themeId);
-        });
-    }
-
-    loadThemePreference(): { data: string; valid: boolean; error?: string } {
-        try {
-            const savedTheme = localStorage.getItem(TransactionalStorageManager.STORAGE_KEYS.THEME);
-            return {
-                data: savedTheme ?? 'wpi-dark',
-                valid: true
-            };
-        } catch (error) {
-            return {
-                data: 'wpi-dark',
-                valid: false,
-                error: `Failed to load theme preference: ${error}`
-            };
-        }
     }
 
     saveActiveScheduleId(scheduleId: string | null): TransactionResult {
