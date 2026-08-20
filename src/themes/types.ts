@@ -25,11 +25,16 @@ export interface ThemeTypography {
     fontFamilyMono: string;
 }
 
+/**
+ * Panel widths are deliberately NOT here. They belong to the resizable-panel
+ * system (svelte/panelWidths.ts + the --spacing-*-width defaults in
+ * themes/styles/base.css) and never varied per theme. Declaring them here meant
+ * applyTheme() wrote them as inline custom properties on documentElement,
+ * silently overriding base.css.
+ */
 export interface ThemeSpacing {
     baseUnit: string;
     headerHeight: string;
-    sidebarWidth: string;
-    rightPanelWidth: string;
 }
 
 export interface ThemeEffects {

@@ -34,9 +34,7 @@
   },
   "spacing": {
     "baseUnit": "1rem",
-    "headerHeight": "64px",
-    "sidebarWidth": "280px",
-    "rightPanelWidth": "320px"
+    "headerHeight": "64px"
   },
   "effects": {
     "borderRadius": "8px",
