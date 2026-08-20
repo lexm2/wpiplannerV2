@@ -8,6 +8,8 @@
  * Run: bun run generate-icons
  */
 
+import { logger } from './logger';
+
 import adjustmentsAltIcon from '../assets/icons/adjustments-alt.svg?url';
 import alertCircleIcon from '../assets/icons/alert-circle.svg?url';
 import alertSquareRoundedIcon from '../assets/icons/alert-square-rounded.svg?url';
@@ -180,7 +182,7 @@ function sanitizeClassName(className: string): string {
 // runs this ~6x per row x 100 rows), and each call otherwise re-does a string
 // .replace(). The set of (icon, class) pairs is small and fixed, so the cache is
 // bounded. Only successful resolutions are cached - the missing-icon path stays
-// uncached so its console.warn keeps surfacing the bug.
+// uncached so its logger.warn keeps surfacing the bug.
 const inlineSVGCache = new Map<string, string>();
 
 /** Returns inline SVG markup for an icon, optionally with custom CSS classes. */
@@ -192,7 +194,7 @@ export function getInlineSVG(iconName: IconName, className?: string): string {
   const svg = INLINE_SVGS[iconName];
 
   if (!svg) {
-    console.warn(`Icon "${iconName}" not found, using fallback`);
+    logger.warn(`Icon "${iconName}" not found, using fallback`);
     const fallback = '<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>';
     return className ? fallback.replace('<svg', `<svg class="${sanitizeClassName(className)}"`) : fallback;
   }

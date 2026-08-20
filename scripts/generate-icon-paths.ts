@@ -82,25 +82,19 @@ function generateIconPaths(): void {
  * Run: bun run generate-icons
  */
 
+import { logger } from './logger';
+
 ${imports}
 
 export type IconName =
 ${iconNames};
 
-/**
- * Icon paths for SVG assets with Vite base path resolution.
- *
- * Available icons:
-${icons.map((icon) => ` * - ${icon.constantName}: ${icon.filename}`).join("\n")}
- */
+/** Icon URL paths for SVG assets, with Vite base path resolution (use in img tags). */
 export const ICONS: Record<IconName, string> = {
 ${iconsObject}
 } as const;
 
-/**
- * Inline SVG content for icons that need CSS styling support.
- * These use currentColor and can be styled with CSS fill/stroke properties.
- */
+/** Inline SVG markup using currentColor, so icons can be styled via CSS fill/stroke. */
 export const INLINE_SVGS: Record<IconName, string> = {
 ${inlineSvgsObject}
 } as const;
@@ -114,15 +108,10 @@ function sanitizeClassName(className: string): string {
 // runs this ~6x per row x 100 rows), and each call otherwise re-does a string
 // .replace(). The set of (icon, class) pairs is small and fixed, so the cache is
 // bounded. Only successful resolutions are cached - the missing-icon path stays
-// uncached so its console.warn keeps surfacing the bug.
+// uncached so its logger.warn keeps surfacing the bug.
 const inlineSVGCache = new Map<string, string>();
 
-/**
- * Helper function to create an inline SVG with custom classes.
- * @param iconName The icon to render
- * @param className Optional CSS classes to apply
- * @returns HTML string with inline SVG
- */
+/** Returns inline SVG markup for an icon, optionally with custom CSS classes. */
 export function getInlineSVG(iconName: IconName, className?: string): string {
   const cacheKey = \`\${iconName}|\${className ?? ''}\`;
   const cached = inlineSVGCache.get(cacheKey);
@@ -131,7 +120,7 @@ export function getInlineSVG(iconName: IconName, className?: string): string {
   const svg = INLINE_SVGS[iconName];
 
   if (!svg) {
-    console.warn(\`Icon "\${iconName}" not found, using fallback\`);
+    logger.warn(\`Icon "\${iconName}" not found, using fallback\`);
     const fallback = '<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>';
     return className ? fallback.replace('<svg', \`<svg class="\${sanitizeClassName(className)}"\`) : fallback;
   }
