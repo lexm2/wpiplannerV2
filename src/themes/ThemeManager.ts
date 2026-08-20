@@ -16,7 +16,8 @@ export interface ThemeStorage {
 }
 
 /**
- * Bootstrap storage, used only until AppBootstrap swaps in StorageService.
+ * Bootstrap storage, used only until AppBootstrap swaps in the
+ * ProfileStateManager-backed adapter.
  *
  * Reads the SAME localStorage blob ProfileStateManager persists preferences to,
  * synchronously. That matters: the ThemeManager singleton is constructed before
@@ -45,8 +46,8 @@ class DefaultThemeStorage implements ThemeStorage {
     }
 
     // Read-modify-write so a save through this bootstrap path can't drop the
-    // other preference fields. In practice StorageService has taken over by the
-    // time any user-driven setTheme() runs.
+    // other preference fields. In practice the ProfileStateManager-backed
+    // adapter has taken over by the time any user-driven setTheme() runs.
     saveThemePreference(themeId: string): void {
         try {
             const raw = localStorage.getItem(this.preferencesKey);

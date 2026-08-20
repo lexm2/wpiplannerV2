@@ -180,3 +180,58 @@ test('tutorial box still drags (pointer events, mouse input)', async ({ page }) 
     expect(after.left).toBeGreaterThan(before.left + 80);
     expect(after.top).toBeLessThan(before.top - 50);
 });
+
+test('theme persists across reload with no flash (ProfileStateManager-backed adapter)', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForTimeout(1800);
+    await page.evaluate(() => (window as any).services.themeManager.setTheme('wpi-light'));
+    await page.waitForTimeout(600);
+
+    const persisted = await page.evaluate(() => localStorage.getItem('wpi-planner-preferences'));
+    expect(persisted).toContain('wpi-light');
+
+    // Reload WITHOUT clearing storage — the saved theme must be live immediately.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    const early = await page.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim());
+    await page.waitForTimeout(1800);
+    const settled = await page.evaluate(() => ({
+        bg: getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim(),
+        id: (window as any).services.themeManager.getCurrentThemeId(),
+    }));
+    console.log('theme reload:', early, JSON.stringify(settled));
+
+    expect(settled.id).toBe('wpi-light');
+    expect(early).toBe(settled.bg);
+});
+
+test('schedule export/import round-trips after the ScheduleState trim', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForTimeout(2000);
+
+    const result = await page.evaluate(async () => {
+        const svc: any = (window as any).services;
+        const sms = svc.scheduleManagementService;
+        const id = sms.getActiveScheduleId();
+
+        const exported = await sms.exportSchedule(id);
+        if (!exported.success || !exported.data) return { stage: 'export', ok: false };
+
+        const parsed = JSON.parse(exported.data);
+        const back = await sms.importScheduleInto(id, exported.data);
+        return {
+            stage: 'done',
+            ok: back.success === true,
+            // ApplicationState.toMinimalFormat(): v=version, a=activeScheduleId,
+            // s=schedules, p=preferences. Those four methods are exactly what the
+            // trim kept, so this asserts the surviving surface still works.
+            minimalFormat: Array.isArray(parsed.s) && typeof parsed.v !== 'undefined',
+            keys: Object.keys(parsed).slice(0, 6),
+        };
+    });
+    console.log('round-trip:', JSON.stringify(result));
+
+    expect(result.stage).toBe('done');
+    expect(result.ok).toBe(true);
+    expect(result.minimalFormat).toBe(true);
+});

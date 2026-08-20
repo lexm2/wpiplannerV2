@@ -49,7 +49,7 @@ export class CourseSelectionService {
         try {
             console.log('Initializing CourseSelectionService...');
 
-            // NOTE: ProfileStateManager is already initialized by StorageService before this service
+            // NOTE: ProfileStateManager is already loaded by AppBootstrap before this service
             // Redundant loadFromStorage() call removed to prevent duplicate schedule creation race condition
 
             this.isInitialized = true;

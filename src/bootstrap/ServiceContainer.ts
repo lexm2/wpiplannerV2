@@ -1,5 +1,4 @@
 import { ProfileStateManager } from '../core/state/ProfileStateManager'
-import { StorageService } from '../services/selection/StorageService'
 import { CourseDataService } from '../services/data/courseDataService'
 import { CourseSelectionService } from '../services/selection/CourseSelectionService'
 import { BitMaskEngine } from '../core/scheduling/BitMaskEngine'
@@ -15,7 +14,6 @@ import type { TutorialSetup } from '../services/tutorial/setupTutorial'
 export interface ServiceContainer {
     tutorial?: TutorialSetup;
     profileStateManager: ProfileStateManager;
-    storageService: StorageService;
     courseDataService: CourseDataService;
     courseSelectionService: CourseSelectionService;
     conflictDetector: BitMaskEngine;

@@ -4,7 +4,6 @@ import { BitMaskEngine } from '../core/scheduling/BitMaskEngine'
 import { FilterService } from '../services/filtering/FilterService'
 import { ScheduleManagementService } from '../services/selection/ScheduleManagementService'
 import { ProfileStateManager } from '../core/state/ProfileStateManager'
-import { StorageService } from '../services/selection/StorageService'
 import { ThemeManager } from '../themes/ThemeManager'
 import { OperationManager } from '../utils/RequestCancellation'
 import { showAppError } from '../services/ui/uiState.svelte'
@@ -28,10 +27,19 @@ import type { ServiceContainer } from './ServiceContainer'
 export class AppBootstrap {
     static createServices(): ServiceContainer {
         const profileStateManager = ProfileStateManager.getInstance();
-        const storageService = StorageService.getInstance(profileStateManager);
 
+        // Theme persistence adapter. ThemeManager reads the saved theme
+        // synchronously from localStorage before first paint (see its
+        // DefaultThemeStorage); this swaps in the ProfileStateManager-backed
+        // writer so later setTheme() calls persist through the normal
+        // preferences path. Deliberately does NOT re-read here — that would
+        // pick up the in-memory default before storage has loaded.
         const themeManager = ThemeManager.getInstance();
-        themeManager.setStorage(storageService);
+        themeManager.setStorage({
+            loadThemePreference: () => profileStateManager.getPreferences().theme || 'wpi-dark',
+            saveThemePreference: (themeId: string) =>
+                profileStateManager.updatePreferences({ theme: themeId }, 'theme-manager'),
+        });
 
         const courseDataService = new CourseDataService();
         const courseSelectionService = new CourseSelectionService(profileStateManager);
@@ -56,7 +64,6 @@ export class AppBootstrap {
 
         return {
             profileStateManager,
-            storageService,
             courseDataService,
             courseSelectionService,
             conflictDetector,
@@ -106,12 +113,12 @@ export class AppBootstrap {
     }
 
     static async initializeAsyncServices(services: ServiceContainer): Promise<void> {
-        const { storageService, courseSelectionService, scheduleManagementService, courseDataService } = services;
+        const { profileStateManager, courseSelectionService, scheduleManagementService, courseDataService } = services;
 
         const storageWorker = StorageWorkerManager.getInstance();
         await storageWorker.initialize();
 
-        await storageService.initialize();
+        await profileStateManager.loadFromStorage();
         await rateMyProfessorService.loadData();
         await courseSelectionService.initialize();
         await scheduleManagementService.initialize();
