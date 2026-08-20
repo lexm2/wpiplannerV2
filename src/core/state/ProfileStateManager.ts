@@ -804,14 +804,16 @@ export class ProfileStateManager {
                 ? selectedCourse.lockedSections
                 : new Set(Array.isArray(selectedCourse.lockedSections) ? selectedCourse.lockedSections : []);
 
+            // Spread the stored course rather than naming each field: this used to
+            // be an allowlist rebuild, which silently dropped every field it didn't
+            // mention (allowedTerms) and would drop the next one anyone adds.
             const resolved: SelectedCourse = {
+                ...selectedCourse,
                 course: liveCourse,
                 selectedLecture: resolveSection(selectedCourse.selectedLecture),
                 selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
                 selectedLab: resolveSection(selectedCourse.selectedLab),
-                isRequired: selectedCourse.isRequired,
                 lockedSections,
-                ...(selectedCourse.customColor && { customColor: selectedCourse.customColor })
             };
 
             return resolved;
