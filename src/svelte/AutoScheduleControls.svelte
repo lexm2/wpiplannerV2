@@ -34,15 +34,16 @@
 </script>
 
 <div class="schedule-footer-row">
+  {#if !hasSchedules}
   <button
     id="auto-schedule-btn"
     class="btn btn-primary auto-schedule-btn"
-    style:display={hasSchedules ? 'none' : ''}
     title="Automatically generate a schedule"
     aria-label="Auto-generate schedule"
     onclick={onOpenAutoSchedule}
   >{@html getInlineSVG('WAND', 'auto-schedule-icon')}<span>Auto-Schedule</span></button>
-  <div class="schedule-nav-buttons" style:display={hasSchedules ? 'flex' : 'none'}>
+  {:else}
+  <div class="schedule-nav-buttons">
     <button
       class="btn btn-secondary schedule-nav-btn"
       title="Previous schedule"
@@ -62,7 +63,10 @@
       onclick={next}
     >{@html getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon')}</button>
   </div>
+  {/if}
 </div>
-<div class="schedule-progress-track" style:display={hasSchedules ? '' : 'none'}>
-  <div class="schedule-progress-bar" style:width={`${progressPct}%`}></div>
-</div>
+{#if hasSchedules}
+  <div class="schedule-progress-track">
+    <div class="schedule-progress-bar" style:width={`${progressPct}%`}></div>
+  </div>
+{/if}

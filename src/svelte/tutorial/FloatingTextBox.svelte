@@ -3,6 +3,7 @@
   import type { TutorialService } from '../../services/tutorial/TutorialService';
   import { tutorialOverlayState } from './tutorialOverlayState.svelte';
   import { animateFindDot } from './findDot';
+  import { scaleFade } from '../transitions';
   import { clampToViewport, repositionIfObstructed, decorateInlineHighlights } from './floatingBox.position';
   import styles from '../../styles/components/floating-text-box.module.css';
 
@@ -23,7 +24,9 @@
 
   let backDisabled = $state(false);
 
-  let boxEl: HTMLElement;
+  // Bound inside an {#if}, so it must be reactive: it is set on mount and
+  // cleared on unmount as the tutorial starts and stops.
+  let boxEl = $state<HTMLElement | null>(null);
 
   const visible = $derived(step !== null);
   const isLastStep = $derived(index + 1 === total);
@@ -59,8 +62,8 @@
   // Same pattern as ResizeHandle.svelte.
   function onDragStart(e: PointerEvent): void {
     e.preventDefault();
+    if (!boxEl) return;
     const rect = boxEl.getBoundingClientRect();
-    boxEl.style.transition = 'none';
     boxEl.style.top = `${rect.top}px`;
     boxEl.style.bottom = 'auto';
     dragOffsetX = e.clientX - rect.left;
@@ -74,7 +77,7 @@
   }
 
   function onDragMove(e: PointerEvent): void {
-    if (!dragging) return;
+    if (!dragging || !boxEl) return;
     const x = Math.max(0, Math.min(window.innerWidth - boxEl.offsetWidth, e.clientX - dragOffsetX));
     const y = Math.max(0, Math.min(window.innerHeight - boxEl.offsetHeight, e.clientY - dragOffsetY));
     boxEl.style.left = `${x}px`;
@@ -84,7 +87,6 @@
   function onDragEnd(e: PointerEvent): void {
     if (!dragging) return;
     dragging = false;
-    boxEl.style.transition = '';
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
@@ -114,8 +116,9 @@
   const stopPointerdown = (e: PointerEvent) => e.stopPropagation();
 </script>
 
+{#if visible}
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div bind:this={boxEl} class="{styles['container']} {visible ? '' : styles['hidden']}">
+<div bind:this={boxEl} class={styles['container']} transition:scaleFade={{ duration: 200 }}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class={styles['header']}
@@ -160,3 +163,4 @@
     </button>
   </div>
 </div>
+{/if}

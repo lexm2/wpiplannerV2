@@ -23,7 +23,7 @@ export const expandedTerm = new SvelteMap<string, string>();
 // The FLIP needs the *pre-swap* height; an action's update() runs post-swap.
 const pendingStartHeight = new Map<string, number>();
 
-const BADGE_STEP_MS = 30; // per-step delay of the diagonal crumb cascade
+const BADGE_STEP_MS = 40; // per-step delay of the diagonal crumb cascade (the app-wide stagger step)
 const BADGE_FADE_MS = 150;
 
 // ~2ms per pixel of height delta, clamped to [200, 500]ms — ports the old

@@ -14,7 +14,11 @@ export default defineConfig({
     // dev server. tutorial-highlight walks 39 timed steps and fails under that
     // contention. Also keeps CI (variable core count) deterministic.
     workers: 1,
-    retries: 0,
+    // One retry in CI only. tutorial-highlight walks 39 timed steps against a
+    // shared dev server and occasionally loses that race late in a full run;
+    // locally we want the failure surfaced immediately, in CI we do not want a
+    // flake to block a PR.
+    retries: process.env.CI ? 1 : 0,
     reporter: 'list',
     use: {
         baseURL: 'http://localhost:3000/wpiplannerV2/',

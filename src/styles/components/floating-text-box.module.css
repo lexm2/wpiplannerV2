@@ -2,7 +2,6 @@
     position: fixed;
     bottom: 20px;
     left: 20px;
-    transition: left 0.35s ease, top 0.35s ease;
     width: 40vw;
     height: auto;
     min-height: 30vh;
@@ -145,6 +144,3 @@
     opacity: 0.85;
 }
 
-.hidden {
-    display: none !important;
-}

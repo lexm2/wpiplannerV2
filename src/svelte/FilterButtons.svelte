@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { scaleFade } from './transitions';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
   import type { FilterService } from '../services/filtering/FilterService';
@@ -33,15 +34,16 @@
   }
 </script>
 
-<button
-  id="clear-filters-btn"
-  class="filter-btn"
-  disabled={!hasNonDefault}
-  style:display={hasNonDefault ? '' : 'none'}
-  title="Clear all filters"
-  aria-label="Clear all filters"
-  onclick={clearFilters}
->{@html getInlineSVG('ERASER', 'eraser-icon')}</button>
+{#if hasNonDefault}
+  <button
+    id="clear-filters-btn"
+    class="filter-btn"
+    title="Clear all filters"
+    aria-label="Clear all filters"
+    transition:scaleFade={{ duration: 150 }}
+    onclick={clearFilters}
+  >{@html getInlineSVG('ERASER', 'eraser-icon')}</button>
+{/if}
 <div class="filter-buttons">
   <button
     id="filter-btn"
