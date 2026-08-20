@@ -60,9 +60,16 @@ class WizardState {
         this.direction = 'forward';
     }
 
+    /**
+     * Only clears `config` (which drives `isOpen`). `selections` is deliberately
+     * NOT reset here: the wizard plays a 250ms fade-out, during which the
+     * component is still mounted and still reading these values — resetting now
+     * would visibly blank the selected badges and flip the footer button
+     * mid-outro. `open()` re-seeds selections on every launch anyway, so the
+     * reset was always redundant.
+     */
     close(): void {
         this.config = null;
-        this.selections = { lecture: null, discussion: null, lab: null };
     }
 
     /** Navigate to a step, computing direction from the fixed step order. */

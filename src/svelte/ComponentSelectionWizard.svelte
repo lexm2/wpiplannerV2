@@ -178,9 +178,11 @@
 
 <svelte:window onkeydown={onKeydown} />
 
+<!-- `|global` because WizardHost's {#if} unmounts us from an ancestor block, so a
+     local outro would never play — the panel would just vanish. -->
 <div
   class={["sidebar-panel", styles['sidebar-panel--component-wizard']]}
-  transition:fade={{ duration: dur(250) }}
+  transition:fade|global={{ duration: dur(250) }}
 >
   <div class={styles['wizard-header']}>
     <button class={styles['wizard-close-btn']} onclick={cancel} aria-label="Close">&times;</button>
