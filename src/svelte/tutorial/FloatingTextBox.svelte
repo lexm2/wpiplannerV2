@@ -52,7 +52,12 @@
   let dragOffsetX = 0;
   let dragOffsetY = 0;
 
-  function onDragStart(e: MouseEvent): void {
+  // Pointer Events (not mouse) so the box is draggable by touch and pen too —
+  // it can obstruct the very element the tutorial is highlighting. Pointer
+  // capture keeps move/up coming to the header even once the pointer leaves it,
+  // so no document-level listeners (and no teardown bookkeeping) are needed.
+  // Same pattern as ResizeHandle.svelte.
+  function onDragStart(e: PointerEvent): void {
     e.preventDefault();
     const rect = boxEl.getBoundingClientRect();
     boxEl.style.transition = 'none';
@@ -61,11 +66,14 @@
     dragOffsetX = e.clientX - rect.left;
     dragOffsetY = e.clientY - rect.top;
     dragging = true;
-    document.addEventListener('mousemove', onDragMove);
-    document.addEventListener('mouseup', onDragEnd);
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      /* capture is best-effort; dragging still works without it */
+    }
   }
 
-  function onDragMove(e: MouseEvent): void {
+  function onDragMove(e: PointerEvent): void {
     if (!dragging) return;
     const x = Math.max(0, Math.min(window.innerWidth - boxEl.offsetWidth, e.clientX - dragOffsetX));
     const y = Math.max(0, Math.min(window.innerHeight - boxEl.offsetHeight, e.clientY - dragOffsetY));
@@ -73,20 +81,16 @@
     boxEl.style.top = `${y}px`;
   }
 
-  function onDragEnd(): void {
+  function onDragEnd(e: PointerEvent): void {
+    if (!dragging) return;
     dragging = false;
     boxEl.style.transition = '';
-    document.removeEventListener('mousemove', onDragMove);
-    document.removeEventListener('mouseup', onDragEnd);
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* no-op if capture was never established */
+    }
   }
-
-  // Clean up any in-flight drag listeners if the box is ever torn down.
-  $effect(() => {
-    return () => {
-      document.removeEventListener('mousemove', onDragMove);
-      document.removeEventListener('mouseup', onDragEnd);
-    };
-  });
 
   // "Find element" dot animation — flies a dot to the current step's target.
   function onFindElement(): void {
@@ -107,18 +111,24 @@
     }
   }
 
-  const stopMousedown = (e: MouseEvent) => e.stopPropagation();
+  const stopPointerdown = (e: PointerEvent) => e.stopPropagation();
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div bind:this={boxEl} class="{styles.container} {visible ? '' : styles.hidden}">
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class={styles.header} onmousedown={onDragStart}>
+  <div
+    class={styles.header}
+    onpointerdown={onDragStart}
+    onpointermove={onDragMove}
+    onpointerup={onDragEnd}
+    onpointercancel={onDragEnd}
+  >
     <span class={styles.title}>Tutorial</span>
-    <button class={styles.findBtn} data-tutorial-find onmousedown={stopMousedown} onclick={onFindElement}>
+    <button class={styles.findBtn} data-tutorial-find onpointerdown={stopPointerdown} onclick={onFindElement}>
       Find Element
     </button>
-    <button class={styles.skipBtn} onmousedown={stopMousedown} onclick={() => tutorialService.skip()}>
+    <button class={styles.skipBtn} onpointerdown={stopPointerdown} onclick={() => tutorialService.skip()}>
       Skip tutorial
     </button>
   </div>
@@ -134,7 +144,7 @@
       data-tutorial-back
       style:display={showBack ? '' : 'none'}
       disabled={backDisabled}
-      onmousedown={stopMousedown}
+      onpointerdown={stopPointerdown}
       onclick={onBack}
     >
       <span>Back</span>
@@ -143,7 +153,7 @@
       class={styles.nextBtn}
       data-tutorial-next
       style:margin-left={showBack ? '' : 'auto'}
-      onmousedown={stopMousedown}
+      onpointerdown={stopPointerdown}
       onclick={onNext}
     >
       <span>{nextLabel}</span>
