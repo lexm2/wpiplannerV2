@@ -123,7 +123,7 @@
     }
     editingId = null;
   }
-  function onEditKeydown(e: KeyboardEvent, schedule: Schedule): void {
+  function onEditKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter') { e.preventDefault(); (e.currentTarget as HTMLInputElement).blur(); }
     else if (e.key === 'Escape') { editingId = null; }
   }
@@ -346,7 +346,7 @@
                         bind:value={editValue}
                         onclick={(e) => e.stopPropagation()}
                         onblur={() => commitEdit(schedule)}
-                        onkeydown={(e) => onEditKeydown(e, schedule)}
+                        onkeydown={onEditKeydown}
                         use:focusSelect
                       />
                     {:else}
