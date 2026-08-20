@@ -80,6 +80,12 @@ export function getProfessorsByTerm(course: Course): string {
     return parts.length > 0 ? parts.join(' | ') : 'No professors listed';
 }
 
+/** The selected lecture/discussion/lab sections, in that order, skipping unselected ones. */
+export function getSelectedSections(course: SelectedCourse): Section[] {
+    return [course.selectedLecture, course.selectedDiscussion, course.selectedLab]
+        .filter((s): s is Section => s !== null);
+}
+
 /** Returns the CRN for each selected component (lecture, discussion, lab). */
 export function getCombinedCRNs(course: SelectedCourse): {
     lecture: string | null;

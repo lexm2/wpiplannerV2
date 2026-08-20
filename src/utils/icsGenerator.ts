@@ -3,6 +3,7 @@ import { Schedule, SelectedCourse, EventType } from '../types/schedule';
 import { Section, Period, DayOfWeek } from '../types/types';
 import type { DateRange } from '../types/common';
 import { TermBoundsService } from './termBounds';
+import { getSelectedSections } from './courseUtils';
 
 export interface ICSExportOptions {
     includeDescription?: boolean;
@@ -127,17 +128,7 @@ export class ICSGenerator {
         const totalCourses = schedule.selectedCourses.length;
 
         for (const selectedCourse of schedule.selectedCourses) {
-            const componentsToExport: Section[] = [];
-
-            if (selectedCourse.selectedLecture) {
-                componentsToExport.push(selectedCourse.selectedLecture);
-            }
-            if (selectedCourse.selectedDiscussion) {
-                componentsToExport.push(selectedCourse.selectedDiscussion);
-            }
-            if (selectedCourse.selectedLab) {
-                componentsToExport.push(selectedCourse.selectedLab);
-            }
+            const componentsToExport = getSelectedSections(selectedCourse);
 
             if (componentsToExport.length === 0) {
                 skippedCourses++;

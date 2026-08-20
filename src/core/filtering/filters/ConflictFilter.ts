@@ -4,6 +4,7 @@ import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
 import { periodToWeeklySlots, sectionToWeeklySlots, slotsOverlap } from '../../../utils/timeSlotUtils';
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
+import { getSelectedSections } from '../../../utils/courseUtils';
 
 export class ConflictFilter implements SectionBasedFilter {
     readonly id = 'periodConflict';
@@ -28,14 +29,9 @@ export class ConflictFilter implements SectionBasedFilter {
         }
 
         // Build set of selected section CRNs so we don't filter them out
-        const selectedCrns = new Set<string>();
-        if (criteria.selectedCourses) {
-            for (const sc of criteria.selectedCourses) {
-                if (sc.selectedLecture) selectedCrns.add(String(sc.selectedLecture.crn));
-                if (sc.selectedDiscussion) selectedCrns.add(String(sc.selectedDiscussion.crn));
-                if (sc.selectedLab) selectedCrns.add(String(sc.selectedLab.crn));
-            }
-        }
+        const selectedCrns = new Set(
+            (criteria.selectedCourses ?? []).flatMap(sc => getSelectedSections(sc)).map(s => String(s.crn))
+        );
 
         return sections.filter(fs => {
             const currentCrn = String(fs.section.crn);
@@ -72,17 +68,9 @@ export class ConflictFilter implements SectionBasedFilter {
             slots.push(...criteria.blockedSlots);
         }
 
-        if (criteria.selectedCourses) {
-            for (const sc of criteria.selectedCourses) {
-                if (sc.selectedLecture) {
-                    slots.push(...sectionToWeeklySlots(sc.selectedLecture));
-                }
-                if (sc.selectedDiscussion) {
-                    slots.push(...sectionToWeeklySlots(sc.selectedDiscussion));
-                }
-                if (sc.selectedLab) {
-                    slots.push(...sectionToWeeklySlots(sc.selectedLab));
-                }
+        for (const sc of criteria.selectedCourses ?? []) {
+            for (const section of getSelectedSections(sc)) {
+                slots.push(...sectionToWeeklySlots(section));
             }
         }
 

@@ -7,6 +7,7 @@ import {
 } from '../../types/schedule';
 import type { ComponentSelections } from '../../types/scheduling';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
+import { getSelectedSections } from '../../utils/courseUtils';
 import { TimeUtils } from '../../utils/timeUtils';
 
 /**
@@ -121,19 +122,9 @@ function packColumns(items: { startMin: number; endMin: number }[]): { col: numb
     return result;
 }
 
-function selectedSections(sc: SelectedCourse): Section[] {
-    return [sc.selectedLecture, sc.selectedDiscussion, sc.selectedLab].filter(Boolean) as Section[];
-}
-
 /** All selected lecture/discussion/lab sections — input to the conflict matrix. */
 export function collectSelectedSections(courses: SelectedCourse[]): Section[] {
-    const sections: Section[] = [];
-    for (const sc of courses) {
-        if (sc.selectedLecture) sections.push(sc.selectedLecture);
-        if (sc.selectedDiscussion) sections.push(sc.selectedDiscussion);
-        if (sc.selectedLab) sections.push(sc.selectedLab);
-    }
-    return sections;
+    return courses.flatMap(sc => getSelectedSections(sc));
 }
 
 /** Which display columns (A/B/C/D) a course renders in. F→A,B and S→C,D. */
@@ -260,7 +251,7 @@ export function buildTermBlocks(
     for (const sc of termCourses) {
         const color = colorOf(sc.course.id);
         const label = `${sc.course.departmentAbbr}${sc.course.number}`;
-        for (const section of selectedSections(sc)) {
+        for (const section of getSelectedSections(sc)) {
             for (const r of sectionDayRanges(section)) {
                 const block: GridBlock = {
                     key: `sec-${sc.course.id}-${section.crn}-${r.dayIndex}`,
@@ -365,7 +356,7 @@ export function buildTermBlocks(
     if (termHoverCourse) {
         const color = colorOf(termHoverCourse.course.id);
         const label = `${termHoverCourse.course.departmentAbbr}${termHoverCourse.course.number}`;
-        for (const section of selectedSections(termHoverCourse)) {
+        for (const section of getSelectedSections(termHoverCourse)) {
             for (const r of sectionDayRanges(section)) {
                 blocks.push({
                     key: `prev-${termHoverCourse.course.id}-${section.crn}-${r.dayIndex}`,
