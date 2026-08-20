@@ -101,8 +101,8 @@ describe('matchPlannedCourses', () => {
         const sc = res.selections[0];
         expect(sc.isRequired).toBe(true);
         expect(sc.allowedTerms).toEqual(['B']);
-        expect(sc.selectedLecture).not.toBeNull();
-        expect(sc.selectedDiscussion).not.toBeNull(); // single compatible discussion -> auto-picked
+        expect(sc.selected.lecture).toBeDefined();
+        expect(sc.selected.discussion).toBeDefined(); // single compatible discussion -> auto-picked
         expect(res.year).toBe(2026);
     });
 
@@ -112,7 +112,7 @@ describe('matchPlannedCourses', () => {
 
         expect(res.stats).toMatchObject({ matched: 1, autoSectioned: 0, pinnedOnly: 1 });
         expect(res.selections[0].allowedTerms).toEqual(['A']);
-        expect(res.selections[0].selectedLecture).toBeNull();
+        expect(res.selections[0].selected.lecture).toBeUndefined();
     });
 
     it('falls back to the cross-listed alternate code', () => {

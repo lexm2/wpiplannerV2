@@ -43,11 +43,9 @@ class WizardState {
 
     open(config: WizardConfig, initialStep?: ComponentKind): void {
         this.config = config;
-        this.selections = {
-            ...(config.existingSelections?.selectedLecture && { lecture: config.existingSelections.selectedLecture }),
-            ...(config.existingSelections?.selectedDiscussion && { discussion: config.existingSelections.selectedDiscussion }),
-            ...(config.existingSelections?.selectedLab && { lab: config.existingSelections.selectedLab }),
-        };
+        // Copied, not aliased: this object is edited as the user navigates, and
+        // it must not be the one living in appState.selectedCourses.
+        this.selections = { ...config.existingSelections?.selected };
 
         const steps = determineAvailableSteps(config.course, config.courseDataService, this.selections.lecture ?? null);
         const start = (initialStep && steps.includes(initialStep)) ? initialStep : (steps[0] ?? 'lecture');

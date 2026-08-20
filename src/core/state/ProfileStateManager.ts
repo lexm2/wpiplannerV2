@@ -1,5 +1,5 @@
-import type { Schedule, SchedulePreferences, SelectedCourse, Course, Section, SectionsByKind, Department } from '../../types'
-import { ApplicationState } from '../../types'
+import type { Schedule, SchedulePreferences, SelectedCourse, ComponentKind, Course, Section, SectionsByKind, Department } from '../../types'
+import { ApplicationState, COMPONENT_KINDS } from '../../types'
 import { ScheduleState } from '../../types/ScheduleState'
 import type { TransactionResult } from '../storage'
 import { TransactionalStorageManager } from '../storage'
@@ -149,6 +149,26 @@ export class ProfileStateManager {
         return found;
     }
 
+    /**
+     * Set one component kind, leaving the others alone.
+     *
+     * `selected` is nested, so `{ ...sc, ...patch }` with a partial map would
+     * replace the whole thing and silently drop the other kinds. Going through
+     * here — rather than building a patch at the call site — is what keeps that
+     * unrepresentable.
+     */
+    private setComponent(courseId: string, kind: ComponentKind, section: Section): boolean {
+        return this.patchSelectedCourse(courseId, sc => ({
+            ...sc,
+            selected: { ...sc.selected, [kind]: section },
+        }));
+    }
+
+    /** Clear every component kind for a course. */
+    private clearComponents(courseId: string): boolean {
+        return this.patchSelectedCourse(courseId, sc => ({ ...sc, selected: {} }));
+    }
+
     selectCourse(course: Course, isRequired: boolean = false, _source: string = 'user'): void {
         this.withStateUpdate(() => {
             const existing = this.state.selectedCourses.find(sc => sc.course.id === course.id);
@@ -158,9 +178,7 @@ export class ProfileStateManager {
             } else {
                 const selectedCourse: SelectedCourse = {
                     course,
-                    selectedLecture: null,
-                    selectedDiscussion: null,
-                    selectedLab: null,
+                    selected: {},
                     isRequired,
                     lockedSections: new Set()
                 };
@@ -186,46 +204,50 @@ export class ProfileStateManager {
             const selectedCourse = this.state.selectedCourses.find(sc => sc.course.id === course.id);
             if (!selectedCourse) return;
 
-            // Compute the field patch for this section change.
-            let patch: Partial<SelectedCourse> | null = null;
+            // A bare section number carries no kind, so it has to be recovered
+            // from where the section sits in the course tree.
+            let hit: { kind: ComponentKind; section: Section } | 'clear' | null = null;
 
             if (!sectionNumber) {
-                patch = { selectedLecture: null, selectedDiscussion: null, selectedLab: null };
+                hit = 'clear';
             } else if (course.lectures) {
-                // Check lectures, then their discussions/labs
                 for (const lectureGroup of course.lectures) {
                     if (lectureGroup.section.number === sectionNumber) {
-                        patch = { selectedLecture: lectureGroup.section };
+                        hit = { kind: 'lecture', section: lectureGroup.section };
                         break;
                     }
                     const discussion = lectureGroup.compatibleDiscussions.find(d => d.number === sectionNumber);
                     if (discussion) {
-                        patch = { selectedDiscussion: discussion };
+                        hit = { kind: 'discussion', section: discussion };
                         break;
                     }
                     const lab = lectureGroup.compatibleLabs.find(l => l.number === sectionNumber);
                     if (lab) {
-                        patch = { selectedLab: lab };
+                        hit = { kind: 'lab', section: lab };
                         break;
                     }
                 }
             }
 
-            // Check standalone labs if not matched yet
-            if (!patch && sectionNumber && course.standaloneLabs) {
+            // A standalone lab fills the same slot as a lecture group's lab.
+            if (!hit && sectionNumber && course.standaloneLabs) {
                 const lab = course.standaloneLabs.find(l => l.number === sectionNumber);
                 if (lab) {
-                    patch = { selectedLab: lab };
+                    hit = { kind: 'lab', section: lab };
                 }
             }
 
-            if (!patch) {
+            if (!hit) {
                 logger.warn(`Section ${sectionNumber} not found in course ${course.departmentAbbr}${course.number}`);
                 return;
             }
 
-            const appliedPatch = patch;
-            this.patchSelectedCourse(course.id, sc => ({ ...sc, ...appliedPatch }));
+            // Setting one kind deliberately leaves the others in place.
+            if (hit === 'clear') {
+                this.clearComponents(course.id);
+            } else {
+                this.setComponent(course.id, hit.kind, hit.section);
+            }
             this.updateActiveScheduleWithCurrentCourses();
         });
     }
@@ -236,12 +258,7 @@ export class ProfileStateManager {
         _source: string = 'user'
     ): void {
         this.withStateUpdate(() => {
-            const found = this.patchSelectedCourse(course.id, sc => ({
-                ...sc,
-                selectedLecture: selected.lecture ?? null,
-                selectedDiscussion: selected.discussion ?? null,
-                selectedLab: selected.lab ?? null,
-            }));
+            const found = this.patchSelectedCourse(course.id, sc => ({ ...sc, selected }));
             if (found) {
                 this.updateActiveScheduleWithCurrentCourses();
             }
@@ -638,11 +655,7 @@ export class ProfileStateManager {
                     selectedCourses: s.selectedCourses.map(sc => ({
                         courseId: sc.course.id,
                         courseName: `${sc.course.departmentAbbr}${sc.course.number}`,
-                        selectedComponents: {
-                            lecture: sc.selectedLecture?.number || null,
-                            discussion: sc.selectedDiscussion?.number || null,
-                            lab: sc.selectedLab?.number || null
-                        },
+                        selectedComponents: sc.selected,
                         isRequired: sc.isRequired
                     }))
                 })),
@@ -650,11 +663,7 @@ export class ProfileStateManager {
                 selectedCourses: loadedCourses.map(sc => ({
                     courseId: sc.course.id,
                     courseName: `${sc.course.departmentAbbr}${sc.course.number}`,
-                    selectedComponents: {
-                        lecture: sc.selectedLecture?.number || null,
-                        discussion: sc.selectedDiscussion?.number || null,
-                        lab: sc.selectedLab?.number || null
-                    }
+                    selectedComponents: sc.selected
                 }))
             };
             logger.log(JSON.stringify(loadedData, null, 2));
@@ -805,12 +814,18 @@ export class ProfileStateManager {
             // Spread the stored course rather than naming each field: this used to
             // be an allowlist rebuild, which silently dropped every field it didn't
             // mention (allowedTerms) and would drop the next one anyone adds.
+            // A section that no longer exists in the catalog loses its key
+            // rather than becoming an explicit null.
+            const selected: SectionsByKind = {};
+            for (const kind of COMPONENT_KINDS) {
+                const live = resolveSection(selectedCourse.selected[kind] ?? null);
+                if (live) selected[kind] = live;
+            }
+
             const resolved: SelectedCourse = {
                 ...selectedCourse,
                 course: liveCourse,
-                selectedLecture: resolveSection(selectedCourse.selectedLecture),
-                selectedDiscussion: resolveSection(selectedCourse.selectedDiscussion),
-                selectedLab: resolveSection(selectedCourse.selectedLab),
+                selected,
                 lockedSections,
             };
 

@@ -16,7 +16,7 @@
  * indistinguishable from a user losing their schedule.
  */
 import { logger } from '../../utils/logger';
-import type { Course } from '../../types/types';
+import { COMPONENT_KINDS, type ComponentKind, type Course, type Section } from '../../types/types';
 import type { Schedule } from '../../types/schedule';
 
 /**
@@ -25,28 +25,60 @@ import type { Schedule } from '../../types/schedule';
  * whenever their stamp is older than this.
  *
  * 2 — component selections split out of the pre-2.0 single `selectedSection`.
+ * 3 — the three selected* fields collapsed into one keyed `selected` map.
  */
-export const SCHEDULE_SCHEMA_VERSION = 2;
+export const SCHEDULE_SCHEMA_VERSION = 3;
 
 type StoredCourse = Record<string, unknown> & { course?: Course };
 
-/** Upgrades one stored course in place-free fashion, returning a new object. */
-function migrateSelectedCourse(stored: StoredCourse): StoredCourse {
-    // Pre-2.0: one `selectedSection` covered whatever component the course had.
-    // Which slot it belongs in is only recoverable from the course structure —
-    // a course with lectures put its lecture there, a lab-only course its lab.
-    if (stored.selectedSection && !stored.selectedLecture && !stored.selectedLab) {
-        const { selectedSection, ...rest } = stored;
-        const hasLectures = Boolean(stored.course?.lectures?.length);
-        return {
-            ...rest,
-            selectedLecture: hasLectures ? selectedSection : null,
-            selectedDiscussion: stored.selectedDiscussion ?? null,
-            selectedLab: hasLectures ? null : selectedSection,
-        };
+/** The v2 field name each component kind used to live under. */
+const V2_FIELDS: Record<ComponentKind, string> = {
+    lecture: 'selectedLecture',
+    discussion: 'selectedDiscussion',
+    lab: 'selectedLab',
+};
+
+/**
+ * Pre-2.0: one `selectedSection` covered whatever component the course had.
+ * Which slot it belongs in is only recoverable from the course structure — a
+ * course with lectures put its lecture there, a lab-only course its lab.
+ */
+function upgradeSelectedSection(stored: StoredCourse): StoredCourse {
+    if (!stored.selectedSection || stored.selectedLecture || stored.selectedLab) return stored;
+
+    const { selectedSection, ...rest } = stored;
+    const hasLectures = Boolean(stored.course?.lectures?.length);
+    return {
+        ...rest,
+        selectedLecture: hasLectures ? selectedSection : null,
+        selectedDiscussion: stored.selectedDiscussion ?? null,
+        selectedLab: hasLectures ? null : selectedSection,
+    };
+}
+
+/**
+ * v2 → v3: three parallel nullable fields become one keyed map. A kind that was
+ * null becomes an absent key, so `Object.keys(selected).length` is meaningful
+ * and the serialized form carries no empty slots.
+ */
+function collapseToSelectedMap(stored: StoredCourse): StoredCourse {
+    if (stored.selected) return stored;
+    if (!COMPONENT_KINDS.some(kind => V2_FIELDS[kind] in stored)) return stored;
+
+    const rest = { ...stored };
+    const selected: Partial<Record<ComponentKind, Section>> = {};
+    for (const kind of COMPONENT_KINDS) {
+        const section = rest[V2_FIELDS[kind]];
+        delete rest[V2_FIELDS[kind]];
+        if (section) selected[kind] = section as Section;
     }
 
-    return stored;
+    return { ...rest, selected };
+}
+
+/** Upgrades one stored course, returning a new object only when it changed. */
+function migrateSelectedCourse(stored: StoredCourse): StoredCourse {
+    return collapseToSelectedMap(upgradeSelectedSection(stored));
 }
 
 /**

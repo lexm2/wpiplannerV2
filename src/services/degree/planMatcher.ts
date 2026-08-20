@@ -10,7 +10,7 @@
  * unit-testable.
  */
 import type { StudentRecord } from '../../types/degree';
-import type { Course, Department, Section } from '../../types/types';
+import type { Course, Department, SectionsByKind } from '../../types/types';
 import type { SelectedCourse } from '../../types/schedule';
 import { academicYearForPeriod, findCatalogCourse } from './catalogLookup';
 
@@ -55,27 +55,24 @@ export function matchPlannedCourses(record: StudentRecord, departments: Departme
         if (ay !== null) yearVotes.set(ay, (yearVotes.get(ay) ?? 0) + 1);
 
         const term = pc.period?.term ?? null;
-        let selectedLecture: Section | null = null;
-        let selectedDiscussion: Section | null = null;
-        let selectedLab: Section | null = null;
+        const selected: SectionsByKind = {};
 
         if (term) {
             const groups = (course.lectures ?? []).filter(g => termMatches(g.section.computedTerm, term));
             if (groups.length === 1) {
-                selectedLecture = groups[0].section;
-                if (groups[0].compatibleDiscussions.length === 1) selectedDiscussion = groups[0].compatibleDiscussions[0];
-                if (groups[0].compatibleLabs.length === 1) selectedLab = groups[0].compatibleLabs[0];
+                const [group] = groups;
+                selected.lecture = group.section;
+                if (group.compatibleDiscussions.length === 1) selected.discussion = group.compatibleDiscussions[0];
+                if (group.compatibleLabs.length === 1) selected.lab = group.compatibleLabs[0];
             }
         }
 
-        if (selectedLecture) autoSectioned++;
+        if (selected.lecture) autoSectioned++;
         else pinnedOnly++;
 
         selections.push({
             course,
-            selectedLecture,
-            selectedDiscussion,
-            selectedLab,
+            selected,
             isRequired: true,
             lockedSections: new Set<string>(),
             allowedTerms: term ? [term] : undefined,

@@ -1,10 +1,9 @@
-import { Course, Section, SimpleTime, DayOfWeek } from './types'
+import { Course, Section, SectionsByKind, SimpleTime, DayOfWeek } from './types'
 
 export interface SelectedCourse {
     course: Course;
-    selectedLecture: Section | null;
-    selectedDiscussion: Section | null;
-    selectedLab: Section | null;
+    /** Chosen section per component kind; an unfilled kind is an absent key. */
+    selected: SectionsByKind;
     isRequired: boolean;
     lockedSections: Set<string>;
     customColor?: string;

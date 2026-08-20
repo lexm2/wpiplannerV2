@@ -54,13 +54,7 @@ class SectionInfoService {
 
             course = selectedCourse.course
 
-            if (selectedCourse.selectedLecture?.number === sectionNumber) {
-                section = selectedCourse.selectedLecture
-            } else if (selectedCourse.selectedDiscussion?.number === sectionNumber) {
-                section = selectedCourse.selectedDiscussion
-            } else if (selectedCourse.selectedLab?.number === sectionNumber) {
-                section = selectedCourse.selectedLab
-            }
+            section = sectionsOf(selectedCourse.selected).find(s => s.number === sectionNumber) ?? null
         }
 
         if (!section || !course) {

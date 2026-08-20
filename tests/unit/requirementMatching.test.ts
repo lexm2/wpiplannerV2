@@ -54,7 +54,7 @@ function course(dept: string, number: string): Course {
 
 function selected(...courses: Course[]): SelectedCourse[] {
     return courses.map(c => ({
-        course: c, selectedLecture: null, selectedDiscussion: null, selectedLab: null,
+        course: c, selected: {},
         isRequired: true, lockedSections: new Set<string>(),
     }));
 }

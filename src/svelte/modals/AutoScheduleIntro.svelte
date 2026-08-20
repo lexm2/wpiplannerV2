@@ -3,6 +3,7 @@
   import Modal from './Modal.svelte';
   import { modalState } from './modalState.svelte';
   import type { SelectedCourse } from '../../types/schedule';
+  import { sectionsOf } from '../../utils/courseUtils';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
@@ -11,7 +12,7 @@
   const TERMS = ['A', 'B', 'C', 'D'];
 
   function hasPickedSections(sc: SelectedCourse): boolean {
-    return !!(sc.selectedLecture || sc.selectedDiscussion || sc.selectedLab);
+    return sectionsOf(sc.selected).length > 0;
   }
 
   function availableTerms(sc: SelectedCourse): Set<string> {

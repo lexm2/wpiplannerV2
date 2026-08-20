@@ -84,7 +84,7 @@ export class ApplicationState {
 
                 selectedCourses.push({
                     course,
-                    ...sections,
+                    selected: sections,
                     isRequired: false,
                     lockedSections: new Set()
                 });

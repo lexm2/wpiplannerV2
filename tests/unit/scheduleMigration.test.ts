@@ -42,24 +42,38 @@ const courseById = (schedule: Record<string, any>, id: string) =>
 describe('migrateStoredSchedule', () => {
     it('preserves every component selection in a real captured profile', () => {
         const out = migrate(rowById('schedule_1781409321359'));
-        const num = (sc: any, k: string) => sc[k]?.number ?? null;
+        const numbers = (sc: any) =>
+            Object.fromEntries(Object.entries(sc.selected).map(([k, v]: any) => [k, v.number]));
 
         // One course per selection shape the wizard can produce.
         expect(
-            out.selectedCourses.map((sc: any) => [
-                sc.course.id,
-                num(sc, 'selectedLecture'),
-                num(sc, 'selectedDiscussion'),
-                num(sc, 'selectedLab'),
-            ]),
+            out.selectedCourses.map((sc: any) => [sc.course.id, numbers(sc)]),
         ).toEqual([
-            ['CH-1010-2025', 'AL01', 'AD02', 'AX02'], // lecture + discussion + lab
-            ['AE-2320-2025', 'CL01', null, 'CX01'],   // lecture + lab
-            ['BB-2920-2025', 'A01', 'CD01', null],    // lecture + discussion
-            ['AB-1531-2025', 'A01', null, null],      // lecture only
-            ['BB-1801-2025', null, null, 'BX01'],     // standalone lab, no lecture
-            ['CS-1101-2025', null, null, null],       // selected, nothing picked
+            ['CH-1010-2025', { lecture: 'AL01', discussion: 'AD02', lab: 'AX02' }],
+            ['AE-2320-2025', { lecture: 'CL01', lab: 'CX01' }],
+            ['BB-2920-2025', { lecture: 'A01', discussion: 'CD01' }],
+            ['AB-1531-2025', { lecture: 'A01' }],
+            ['BB-1801-2025', { lab: 'BX01' }],  // standalone lab fills the lab slot
+            ['CS-1101-2025', {}],               // selected, nothing picked
         ]);
+    });
+
+    it('drops the old fields and leaves unfilled kinds absent, not undefined', () => {
+        const out = migrate(rowById('schedule_1781409321359'));
+
+        for (const sc of out.selectedCourses) {
+            expect('selectedLecture' in sc).toBe(false);
+            expect('selectedDiscussion' in sc).toBe(false);
+            expect('selectedLab' in sc).toBe(false);
+        }
+
+        // An absent key, so Object.keys stays meaningful and nothing serializes
+        // an empty slot.
+        const lecOnly = courseById(out, 'AB-1531-2025');
+        expect(Object.keys(lecOnly.selected)).toEqual(['lecture']);
+        expect('lab' in lecOnly.selected).toBe(false);
+
+        expect(Object.keys(courseById(out, 'CS-1101-2025').selected)).toEqual([]);
     });
 
     it('carries through the fields that are not selections', () => {
@@ -88,7 +102,7 @@ describe('migrateStoredSchedule', () => {
         // A section whose CRN no longer exists in the catalog is not the
         // migration's problem — resolveCourseReferences drops it later.
         const stale = courseById(out, 'BB-2920-2025');
-        expect(stale.selectedLecture.crn).toBe(999999);
+        expect(stale.selected.lecture.crn).toBe(999999);
         expect(stale.customColor).toBe('#00b3a4');
     });
 
@@ -99,6 +113,7 @@ describe('migrateStoredSchedule', () => {
         expect(corrupt.course.id).toBe('AB-1531-2025');
         expect(corrupt.isRequired).toBe(false);
         expect('selectedLecture' in corrupt).toBe(false);
+        // Nothing to migrate, so nothing is invented either.
         expect('selected' in corrupt).toBe(false);
     });
 
@@ -108,8 +123,7 @@ describe('migrateStoredSchedule', () => {
             const hier = courseById(out, 'AB-1531-2025');
 
             expect(hier.course.lectures.length).toBeGreaterThan(0);
-            expect(hier.selectedLecture?.number).toBe('A01');
-            expect(hier.selectedLab).toBeNull();
+            expect(hier.selected).toEqual({ lecture: expect.objectContaining({ number: 'A01' }) });
             expect('selectedSection' in hier).toBe(false);
         });
 
@@ -118,8 +132,7 @@ describe('migrateStoredSchedule', () => {
             const labOnly = courseById(out, 'BB-1801-2025');
 
             expect(labOnly.course.lectures?.length ?? 0).toBe(0);
-            expect(labOnly.selectedLab?.number).toBe('BX01');
-            expect(labOnly.selectedLecture).toBeNull();
+            expect(labOnly.selected).toEqual({ lab: expect.objectContaining({ number: 'BX01' }) });
             expect('selectedSection' in labOnly).toBe(false);
             // The upgrade must not cost the course its locks.
             expect([...labOnly.lockedSections]).toEqual(['999001']);
@@ -144,15 +157,16 @@ describe('migrateStoredSchedule', () => {
 
         it('migrates rows stamped older than the current version', () => {
             const out = migrateStoredSchedule(
-                revive(rowById('schedule_legacy_pre2')),
+                revive(rowById('schedule_1781409321359')),
                 SCHEDULE_SCHEMA_VERSION - 1,
             ) as Record<string, any>;
-            expect('selectedSection' in out.selectedCourses[0]).toBe(false);
+            expect(out.selectedCourses[0].selected.lecture.number).toBe('AL01');
         });
 
         it('treats an unstamped row as the oldest possible', () => {
             const out = migrate(rowById('schedule_legacy_pre2'), undefined);
             expect('selectedSection' in out.selectedCourses[0]).toBe(false);
+            expect(out.selectedCourses[0].selected.lecture.number).toBe('A01');
         });
     });
 
@@ -197,6 +211,6 @@ describe('migrateStoredSchedule', () => {
         expect(ch.lockedSections).toBeInstanceOf(Set);
         expect([...ch.lockedSections]).toEqual(['334625']);
         // Sets are pervasive deeper in the graph too, not just on lockedSections.
-        expect(ch.selectedLecture.periods[0].days).toBeInstanceOf(Set);
+        expect(ch.selected.lecture.periods[0].days).toBeInstanceOf(Set);
     });
 });

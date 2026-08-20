@@ -6,7 +6,7 @@ import {
     EventType,
 } from '../../types/schedule';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
-import { getSelectedSections } from '../../utils/courseUtils';
+import { getSelectedSections, sectionsOf } from '../../utils/courseUtils';
 import { TimeUtils } from '../../utils/timeUtils';
 
 /**
@@ -144,27 +144,25 @@ export function applyPreviewOverlay(
 ): SelectedCourse[] {
     if (!previewCourse || !selections) return courses;
 
-    const result = courses.map(sc => ({ ...sc }));
-    const idx = result.findIndex(sc => sc.course.id === previewCourse.id);
+    // Replace `selected` wholesale rather than merging into it: the wizard's
+    // committed state is the complete picture, so kinds it no longer holds must
+    // disappear from the preview. Note the copies below are shallow, so
+    // `selected` is shared with the input — never mutate it in place.
+    const idx = courses.findIndex(sc => sc.course.id === previewCourse.id);
 
     if (idx >= 0) {
-        result[idx] = {
-            ...result[idx],
-            selectedLecture: selections.lecture ?? null,
-            selectedDiscussion: selections.discussion ?? null,
-            selectedLab: selections.lab ?? null,
-        };
-    } else {
-        result.push({
-            course: previewCourse,
-            selectedLecture: selections.lecture ?? null,
-            selectedDiscussion: selections.discussion ?? null,
-            selectedLab: selections.lab ?? null,
-            isRequired: false,
-            lockedSections: new Set(),
-        });
+        return courses.map((sc, i) => (i === idx ? { ...sc, selected: selections } : sc));
     }
-    return result;
+
+    return [
+        ...courses,
+        {
+            course: previewCourse,
+            selected: selections,
+            isRequired: false,
+            lockedSections: new Set<string>(),
+        },
+    ];
 }
 
 /**
@@ -179,15 +177,12 @@ export function buildHoverCourse(
 ): SelectedCourse | null {
     if (!previewCourse || !hover) return null;
 
-    const lecture = hover.lecture || null;
-    const discussion = hover.discussion || null;
-    const lab = hover.lab || null;
-    if (!lecture && !discussion && !lab) return null;
+    if (sectionsOf(hover).length === 0) return null;
 
     const base = selected.find(sc => sc.course.id === previewCourse.id);
     if (!base) return null;
 
-    return { ...base, selectedLecture: lecture, selectedDiscussion: discussion, selectedLab: lab };
+    return { ...base, selected: hover };
 }
 
 /**

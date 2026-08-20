@@ -1,5 +1,6 @@
 import { SelectedCourse } from '../types/schedule';
 import { Section } from '../types/types';
+import { sectionsOf } from './courseUtils';
 
 /** Type guards and validation utilities for runtime data integrity checks. */
 
@@ -20,22 +21,12 @@ export function isValidSection(section: unknown): section is Section {
     );
 }
 
-/** Safe getter for computed term, checking lecture, then discussion, then lab. */
+/**
+ * Safe getter for computed term. Canonical kind order puts the lecture first —
+ * the primary component when there is one — then discussion, then lab.
+ */
 export function getComputedTerm(sc: SelectedCourse): string | null {
-    // Lecture is the primary source since it's typically the main component
-    if (sc.selectedLecture?.computedTerm) {
-        return sc.selectedLecture.computedTerm;
-    }
-
-    if (sc.selectedDiscussion?.computedTerm) {
-        return sc.selectedDiscussion.computedTerm;
-    }
-
-    if (sc.selectedLab?.computedTerm) {
-        return sc.selectedLab.computedTerm;
-    }
-
-    return null;
+    return sectionsOf(sc.selected).find(s => s.computedTerm)?.computedTerm ?? null;
 }
 
 export function isValidComputedTerm(term: unknown): term is string {

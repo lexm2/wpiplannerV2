@@ -1,5 +1,5 @@
 
-import type { Course, ComponentKind, Section, SectionsByKind } from '../../types/types'
+import type { Course, ComponentKind, SectionsByKind } from '../../types/types'
 import type { SelectedCourse } from '../../types/schedule'
 import { wizardState } from '../../svelte/wizardState.svelte'
 import { determineAvailableSteps } from '../../svelte/wizardLogic'
@@ -125,16 +125,10 @@ class ComponentWizardService {
         const steps = determineAvailableSteps(
             selectedCourse.course,
             this.courseDataService,
-            selectedCourse.selectedLecture ?? null,
+            selectedCourse.selected.lecture ?? null,
         )
 
-        const selectionForStep: Record<ComponentKind, Section | null> = {
-            lecture: selectedCourse.selectedLecture ?? null,
-            discussion: selectedCourse.selectedDiscussion ?? null,
-            lab: selectedCourse.selectedLab ?? null,
-        }
-
-        const missing = steps.filter(step => !selectionForStep[step])
+        const missing = steps.filter(step => !selectedCourse.selected[step])
         if (missing.length === 0) return { isIncomplete: false, message: '' }
 
         return { isIncomplete: true, message: `Incomplete: Missing ${missing.join(', ')} selection` }

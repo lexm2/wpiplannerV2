@@ -90,19 +90,25 @@ export function sectionsOf(selected: SectionsByKind): Section[] {
     return COMPONENT_KINDS.map(kind => selected[kind]).filter((s): s is Section => s != null);
 }
 
-/** The selected lecture/discussion/lab sections, in that order, skipping unselected ones. */
+/** The sections a course has selected, in canonical kind order. */
 export function getSelectedSections(course: SelectedCourse): Section[] {
-    return [course.selectedLecture, course.selectedDiscussion, course.selectedLab]
-        .filter((s): s is Section => s !== null);
+    return sectionsOf(course.selected);
 }
 
-/** Encodes a selection for export as [courseId, lectureCRN, discussionCRN, labCRN]. */
+/**
+ * Encodes a selection for export as [courseId, lectureCRN, discussionCRN, labCRN].
+ *
+ * The tuple order is a wire contract for exported .json files, independent of
+ * COMPONENT_KINDS — reordering the kinds must not reorder these positions, and
+ * widening the tuple breaks the stride-4 decode in ApplicationState along with
+ * every file a user has already saved.
+ */
 export function encodeCourseSelection(course: SelectedCourse): [string, string | null, string | null, string | null] {
     return [
         course.course.id,
-        course.selectedLecture?.crn?.toString() ?? null,
-        course.selectedDiscussion?.crn?.toString() ?? null,
-        course.selectedLab?.crn?.toString() ?? null
+        course.selected.lecture?.crn?.toString() ?? null,
+        course.selected.discussion?.crn?.toString() ?? null,
+        course.selected.lab?.crn?.toString() ?? null
     ];
 }
 
@@ -112,15 +118,15 @@ export function decodeCourseSelection(
     discussionCRN: string | null,
     labCRN: string | null,
     course: Course
-): {
-    selectedLecture: Section | null;
-    selectedDiscussion: Section | null;
-    selectedLab: Section | null;
-} {
+): SectionsByKind {
+    const lecture = lectureCRN ? findSectionByCRN(course, lectureCRN) : null;
+    const discussion = discussionCRN ? findSectionByCRN(course, discussionCRN) : null;
+    const lab = labCRN ? findSectionByCRN(course, labCRN) : null;
+
     return {
-        selectedLecture: lectureCRN ? findSectionByCRN(course, lectureCRN) : null,
-        selectedDiscussion: discussionCRN ? findSectionByCRN(course, discussionCRN) : null,
-        selectedLab: labCRN ? findSectionByCRN(course, labCRN) : null
+        ...(lecture && { lecture }),
+        ...(discussion && { discussion }),
+        ...(lab && { lab }),
     };
 }
 
