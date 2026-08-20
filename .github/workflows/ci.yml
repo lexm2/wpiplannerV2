@@ -1,0 +1,70 @@
+name: CI
+
+# Gates code changes before they can reach master. The deploy pipeline
+# (update-course-data.yml) carries its own lighter gate — typecheck + unit tests
+# only — because it runs every 15 minutes and must not download a browser or be
+# blocked by an e2e flake. The full suite lives here instead.
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - master
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, svelte-check, unit tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: TypeScript typecheck
+        run: bun run typecheck
+
+      - name: svelte-check
+        run: bun run check
+
+      - name: Unit tests
+        run: bun run test
+
+      - name: Build
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+        run: bun run build
+
+  e2e:
+    name: Playwright e2e (Firefox)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # CI runners have no Playwright browser cache; --with-deps also pulls the
+      # OS libraries Firefox needs on bare Ubuntu.
+      - name: Install Firefox
+        run: bunx playwright install --with-deps firefox
+
+      # playwright.config.ts's webServer spawns its own vite on :3000. Course
+      # data and the degree fixture are committed, so no live WPI fetch happens.
+      - name: Run e2e tests
+        run: bun run test:e2e

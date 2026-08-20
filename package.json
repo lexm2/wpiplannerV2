@@ -9,6 +9,8 @@
     "preview": "bun ./node_modules/vite/bin/vite.js preview",
     "test": "bun ./node_modules/vitest/vitest.mjs run",
     "test:e2e": "playwright test --project=firefox",
+    "typecheck": "tsc --noEmit",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "convert": "bun run scripts/convert-course-data.ts",
     "generate-icons": "bun run scripts/generate-icon-paths.ts",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
@@ -22,6 +24,7 @@
     "happy-dom": "^20.10.3",
     "jsdom": "^29.1.1",
     "svelte": "^5.56.3",
+    "svelte-check": "^4.7.6",
     "typescript": "^5.0.0",
     "vite": "^7.2.7",
     "vitest": "^4.1.8"

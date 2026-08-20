@@ -143,3 +143,6 @@ __pycache__
 .playwright-mcp/
 test-results/
 playwright-report/
+
+# Local Playwright scratch specs (underscore-prefixed, personal paths)
+tests/e2e/_*.spec.ts

@@ -65,6 +65,17 @@ jobs:
           git pull --rebase origin master
           git push
 
+      # Gate the deploy. Deliberately typecheck + unit tests only: this job runs
+      # every 15 minutes, so no browser download and no e2e flake blocking a
+      # data refresh. The full suite runs in ci.yml on pull requests.
+      # A failure here stops the deploy but leaves the data commit above intact,
+      # so course data stays fresh even while app code is broken.
+      - name: TypeScript typecheck
+        run: bun run typecheck
+
+      - name: Unit tests
+        run: bun run test
+
       - name: Build TypeScript application
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
