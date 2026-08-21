@@ -9,10 +9,15 @@
  * being a pure function and that is itself the bug.
  *
  * The fixture was captured by dumping the `schedules` object store of a real
- * profile and decompressing `serializedData`; the pre-2.0 and edge-case rows
- * were derived from those same real courses. Rows carry `schemaVersion`
- * undefined, i.e. written before stamping existed — the case every current user
- * is in.
+ * profile and decompressing `serializedData`; the v1 and edge-case rows were
+ * derived from those same real courses.
+ *
+ * Each row is NAMED for the stored schema version whose shape it holds —
+ * `v1-schedule` is the single `selectedSection`, `v2-*` are the three parallel
+ * selected* fields. Adding a rung to the migration means adding a `v3-*` row
+ * here. The names are the only version marker: every row's `schemaVersion` is
+ * deliberately undefined, because they predate stamping, which is the case
+ * every current user is in.
  */
 import { describe, it, expect } from 'vitest';
 import {
@@ -25,15 +30,17 @@ import fixture from '../fixtures/legacy-schedules.json';
 type Row = { id: string; timestamp: number; compressed: boolean; schedule: unknown };
 
 const rows = fixture as unknown as Row[];
-const rowById = (id: string) => rows.find(r => r.id.startsWith(id))!;
+
+/** Rows are addressed by the version in their name, not by their opaque id. */
+const row = (name: string) => rows.find(r => (r.schedule as any).name === name)!;
 
 /** Re-hydrates a fixture row the way the storage layer does, Sets and all. */
-function revive(row: Row): Record<string, any> {
-    return JSON.parse(JSON.stringify(row.schedule), setReviver);
+function revive(fixtureRow: Row): Record<string, any> {
+    return JSON.parse(JSON.stringify(fixtureRow.schedule), setReviver);
 }
 
-function migrate(row: Row, version?: number): Record<string, any> {
-    return migrateStoredSchedule(revive(row), version) as Record<string, any>;
+function migrate(fixtureRow: Row, version?: number): Record<string, any> {
+    return migrateStoredSchedule(revive(fixtureRow), version) as Record<string, any>;
 }
 
 const courseById = (schedule: Record<string, any>, id: string) =>
@@ -41,7 +48,7 @@ const courseById = (schedule: Record<string, any>, id: string) =>
 
 describe('migrateStoredSchedule', () => {
     it('preserves every component selection in a real captured profile', () => {
-        const out = migrate(rowById('schedule_1781409321359'));
+        const out = migrate(row('v2-schedule'));
         const numbers = (sc: any) =>
             Object.fromEntries(Object.entries(sc.selected).map(([k, v]: any) => [k, v.number]));
 
@@ -59,7 +66,7 @@ describe('migrateStoredSchedule', () => {
     });
 
     it('drops the old fields and leaves unfilled kinds absent, not undefined', () => {
-        const out = migrate(rowById('schedule_1781409321359'));
+        const out = migrate(row('v2-schedule'));
 
         for (const sc of out.selectedCourses) {
             expect('selectedLecture' in sc).toBe(false);
@@ -77,7 +84,7 @@ describe('migrateStoredSchedule', () => {
     });
 
     it('carries through the fields that are not selections', () => {
-        const out = migrate(rowById('schedule_1781409321359'));
+        const out = migrate(row('v2-schedule'));
         const ch = courseById(out, 'CH-1010-2025');
 
         expect(ch.customColor).toBe('#ff8800');
@@ -86,14 +93,14 @@ describe('migrateStoredSchedule', () => {
         expect(ch.course.lectures.length).toBeGreaterThan(0);
 
         // Schedule-level fields the migration has no business touching.
-        expect(out.name).toBe('My Schedule');
+        expect(out.name).toBe('v2-schedule');
         expect(out.year).toBe(2026);
         expect(out.localEvents).toEqual([]);
         expect(out.generatedSchedules).toEqual([]);
     });
 
     it('preserves allowedTerms, isRequired and a stale CRN', () => {
-        const out = migrate(rowById('schedule_edge_cases'));
+        const out = migrate(row('v2-edge-cases'));
 
         const pinned = courseById(out, 'AE-2320-2025');
         expect(pinned.isRequired).toBe(true);
@@ -107,7 +114,7 @@ describe('migrateStoredSchedule', () => {
     });
 
     it('leaves a course with no selection fields at all alone', () => {
-        const out = migrate(rowById('schedule_edge_cases'));
+        const out = migrate(row('v2-edge-cases'));
         const corrupt = out.selectedCourses[2];
 
         expect(corrupt.course.id).toBe('AB-1531-2025');
@@ -117,9 +124,9 @@ describe('migrateStoredSchedule', () => {
         expect('selected' in corrupt).toBe(false);
     });
 
-    describe('pre-2.0 selectedSection', () => {
+    describe('v1 selectedSection', () => {
         it('becomes the lecture when the course has lectures', () => {
-            const out = migrate(rowById('schedule_legacy_pre2'));
+            const out = migrate(row('v1-schedule'));
             const hier = courseById(out, 'AB-1531-2025');
 
             expect(hier.course.lectures.length).toBeGreaterThan(0);
@@ -128,7 +135,7 @@ describe('migrateStoredSchedule', () => {
         });
 
         it('becomes the lab when the course is lab-only', () => {
-            const out = migrate(rowById('schedule_legacy_pre2'));
+            const out = migrate(row('v1-schedule'));
             const labOnly = courseById(out, 'BB-1801-2025');
 
             expect(labOnly.course.lectures?.length ?? 0).toBe(0);
@@ -139,7 +146,7 @@ describe('migrateStoredSchedule', () => {
         });
 
         it('is idempotent', () => {
-            const once = migrate(rowById('schedule_legacy_pre2'));
+            const once = migrate(row('v1-schedule'));
             const twice = migrateStoredSchedule(once);
             expect(twice).toEqual(once);
         });
@@ -147,7 +154,7 @@ describe('migrateStoredSchedule', () => {
 
     describe('version stamp', () => {
         it('skips rows already stamped at the current version', () => {
-            const revived = revive(rowById('schedule_legacy_pre2'));
+            const revived = revive(row('v1-schedule'));
             const out = migrateStoredSchedule(revived, SCHEDULE_SCHEMA_VERSION);
 
             // Short-circuited, so the pre-2.0 field is still sitting there.
@@ -157,14 +164,14 @@ describe('migrateStoredSchedule', () => {
 
         it('migrates rows stamped older than the current version', () => {
             const out = migrateStoredSchedule(
-                revive(rowById('schedule_1781409321359')),
+                revive(row('v2-schedule')),
                 SCHEDULE_SCHEMA_VERSION - 1,
             ) as Record<string, any>;
             expect(out.selectedCourses[0].selected.lecture.number).toBe('AL01');
         });
 
         it('treats an unstamped row as the oldest possible', () => {
-            const out = migrate(rowById('schedule_legacy_pre2'), undefined);
+            const out = migrate(row('v1-schedule'), undefined);
             expect('selectedSection' in out.selectedCourses[0]).toBe(false);
             expect(out.selectedCourses[0].selected.lecture.number).toBe('A01');
         });
@@ -172,9 +179,9 @@ describe('migrateStoredSchedule', () => {
 
     describe('robustness', () => {
         it('passes through a schedule with no courses', () => {
-            const out = migrate(rowById('tutorial_'));
+            const out = migrate(row('v2-tutorial'));
             expect(out.selectedCourses).toEqual([]);
-            expect(out.name).toBe('Tutorial');
+            expect(out.name).toBe('v2-tutorial');
         });
 
         it('never throws on input it cannot understand', () => {
@@ -204,7 +211,7 @@ describe('migrateStoredSchedule', () => {
     });
 
     it('keeps Sets as Sets across that round trip', () => {
-        const migrated = migrate(rowById('schedule_1781409321359'));
+        const migrated = migrate(row('v2-schedule'));
         const roundTripped = JSON.parse(JSON.stringify(migrated, setReplacer), setReviver);
         const ch = courseById(roundTripped, 'CH-1010-2025');
 

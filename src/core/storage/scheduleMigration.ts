@@ -24,8 +24,12 @@ import type { Schedule } from '../../types/schedule';
  * to `migrateSelectedCourse`. Rows are stamped on save and re-migrated on read
  * whenever their stamp is older than this.
  *
- * 2 — component selections split out of the pre-2.0 single `selectedSection`.
- * 3 — the three selected* fields collapsed into one keyed `selected` map.
+ * 1 — a single `selectedSection`, whatever component the course had.
+ * 2 — component selections split into three parallel selected* fields.
+ * 3 — those three collapsed into one keyed `selected` map.
+ *
+ * `tests/fixtures/legacy-schedules.json` holds a row per version, named for it
+ * (`v1-schedule`, `v2-schedule`, …); add one alongside each new rung.
  */
 export const SCHEDULE_SCHEMA_VERSION = 3;
 

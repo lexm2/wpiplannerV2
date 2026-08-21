@@ -5,7 +5,7 @@
   "compressed": true,
   "schedule": {
    "id": "schedule_1781409321359_ndoaoq2zy",
-   "name": "My Schedule",
+   "name": "v2-schedule",
    "selectedCourses": [
     {
      "course": {
@@ -11355,7 +11355,7 @@
   "compressed": true,
   "schedule": {
    "id": "tutorial_1781662178258_umojff1ew",
-   "name": "Tutorial",
+   "name": "v2-tutorial",
    "selectedCourses": [],
    "generatedSchedules": [],
    "year": 2026,
@@ -11368,7 +11368,7 @@
   "compressed": true,
   "schedule": {
    "id": "schedule_legacy_pre2_000000",
-   "name": "Pre-2.0 selectedSection",
+   "name": "v1-schedule",
    "selectedCourses": [
     {
      "course": {
@@ -11693,7 +11693,7 @@
   "compressed": true,
   "schedule": {
    "id": "schedule_edge_cases_000000",
-   "name": "Edge cases",
+   "name": "v2-edge-cases",
    "selectedCourses": [
     {
      "course": {
