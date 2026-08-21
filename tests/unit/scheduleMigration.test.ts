@@ -9,13 +9,16 @@
  * being a pure function and that is itself the bug.
  *
  * The fixture was captured by dumping the `schedules` object store of a real
- * profile and decompressing `serializedData`; the v1 and edge-case rows were
- * derived from those same real courses.
+ * profile and decompressing `serializedData`; the edge-case row was derived
+ * from those same real courses.
  *
- * Each row is NAMED for the stored schema version whose shape it holds —
- * `v1-schedule` is the single `selectedSection`, `v2-*` are the three parallel
- * selected* fields. Adding a rung to the migration means adding a `v3-*` row
- * here. The names are the only version marker: every row's `schemaVersion` is
+ * Each row is NAMED for the stored schema version whose shape it holds. The
+ * fixture only covers the version this migration reads from — `v2-*`, the three
+ * parallel selected* fields — because that is the shape live data is actually
+ * in. Adding a rung means adding a `v3-*` row alongside it; older versions are
+ * settled history and are not re-litigated here.
+ *
+ * The names are the only version marker: every row's `schemaVersion` is
  * deliberately undefined, because they predate stamping, which is the case
  * every current user is in.
  */
@@ -124,42 +127,20 @@ describe('migrateStoredSchedule', () => {
         expect('selected' in corrupt).toBe(false);
     });
 
-    describe('v1 selectedSection', () => {
-        it('becomes the lecture when the course has lectures', () => {
-            const out = migrate(row('v1-schedule'));
-            const hier = courseById(out, 'AB-1531-2025');
-
-            expect(hier.course.lectures.length).toBeGreaterThan(0);
-            expect(hier.selected).toEqual({ lecture: expect.objectContaining({ number: 'A01' }) });
-            expect('selectedSection' in hier).toBe(false);
-        });
-
-        it('becomes the lab when the course is lab-only', () => {
-            const out = migrate(row('v1-schedule'));
-            const labOnly = courseById(out, 'BB-1801-2025');
-
-            expect(labOnly.course.lectures?.length ?? 0).toBe(0);
-            expect(labOnly.selected).toEqual({ lab: expect.objectContaining({ number: 'BX01' }) });
-            expect('selectedSection' in labOnly).toBe(false);
-            // The upgrade must not cost the course its locks.
-            expect([...labOnly.lockedSections]).toEqual(['999001']);
-        });
-
-        it('is idempotent', () => {
-            const once = migrate(row('v1-schedule'));
-            const twice = migrateStoredSchedule(once);
-            expect(twice).toEqual(once);
-        });
+    it('is idempotent', () => {
+        const once = migrate(row('v2-schedule'));
+        const twice = migrateStoredSchedule(once);
+        expect(twice).toEqual(once);
     });
 
     describe('version stamp', () => {
         it('skips rows already stamped at the current version', () => {
-            const revived = revive(row('v1-schedule'));
+            const revived = revive(row('v2-schedule'));
             const out = migrateStoredSchedule(revived, SCHEDULE_SCHEMA_VERSION);
 
-            // Short-circuited, so the pre-2.0 field is still sitting there.
+            // Short-circuited, so the v2 fields are still sitting there.
             expect(out).toBe(revived);
-            expect('selectedSection' in (out as any).selectedCourses[0]).toBe(true);
+            expect('selectedLecture' in (out as any).selectedCourses[0]).toBe(true);
         });
 
         it('migrates rows stamped older than the current version', () => {
@@ -171,9 +152,9 @@ describe('migrateStoredSchedule', () => {
         });
 
         it('treats an unstamped row as the oldest possible', () => {
-            const out = migrate(row('v1-schedule'), undefined);
-            expect('selectedSection' in out.selectedCourses[0]).toBe(false);
-            expect(out.selectedCourses[0].selected.lecture.number).toBe('A01');
+            const out = migrate(row('v2-schedule'), undefined);
+            expect('selectedLecture' in out.selectedCourses[0]).toBe(false);
+            expect(out.selectedCourses[0].selected.lecture.number).toBe('AL01');
         });
     });
 

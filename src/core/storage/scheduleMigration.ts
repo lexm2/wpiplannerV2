@@ -28,8 +28,8 @@ import type { Schedule } from '../../types/schedule';
  * 2 — component selections split into three parallel selected* fields.
  * 3 — those three collapsed into one keyed `selected` map.
  *
- * `tests/fixtures/legacy-schedules.json` holds a row per version, named for it
- * (`v1-schedule`, `v2-schedule`, …); add one alongside each new rung.
+ * `tests/fixtures/legacy-schedules.json` covers the version this migration
+ * currently reads from (`v2-*`); add a `v3-*` row alongside each new rung.
  */
 export const SCHEDULE_SCHEMA_VERSION = 3;
 
