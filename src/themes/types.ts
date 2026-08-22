@@ -20,10 +20,9 @@ export interface ThemeColors {
     info: string;
 }
 
-export interface ThemeTypography {
-    fontFamily: string;
-    fontFamilyMono: string;
-}
+/**
+ * Fonts are deliberately NOT here, for the same reason panel widths aren't.
+ */
 
 /**
  * Panel widths are deliberately NOT here. They belong to the resizable-panel
@@ -50,7 +49,6 @@ export interface ThemeDefinition {
     id: string;
     description: string;
     colors: ThemeColors;
-    typography: ThemeTypography;
     spacing: ThemeSpacing;
     effects: ThemeEffects;
 }

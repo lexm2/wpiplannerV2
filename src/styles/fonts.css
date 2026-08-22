@@ -1,31 +1,36 @@
+/*
+ * Self-hosted webfonts. Both families ship as variable fonts so a single file
+ * per style covers every weight the themes ask for — see --font-weight-* in
+ * src/themes/styles/base.css.
+ *
+ * Both are SIL Open Font License 1.1; the license texts are served verbatim
+ * from public/licenses/ as OFL section 2 requires.
+ */
+
+/* Source Sans 3 — Copyright 2010-2024 Adobe, RFN "Source". */
 @font-face {
-  font-family: 'Myriad Pro';
-  src: url('./fonts/MyriadPro-Light.otf') format('opentype');
-  font-weight: 300;
+  font-family: 'Source Sans 3';
+  src: url('./fonts/SourceSans3VF-Upright.otf.woff2') format('woff2');
+  font-weight: 200 900;
   font-style: normal;
   font-display: swap;
 }
 
+/* Real italic face — the display font previously had none, so every
+   `font-style: italic` rule rendered a browser-synthesised oblique. */
 @font-face {
-  font-family: 'Myriad Pro';
-  src: url('./fonts/MYRIADPRO-REGULAR.OTF') format('opentype');
-  font-weight: 400;
-  font-style: normal;
+  font-family: 'Source Sans 3';
+  src: url('./fonts/SourceSans3VF-Italic.otf.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: italic;
   font-display: swap;
 }
 
+/* JetBrains Mono — Copyright 2020 The JetBrains Mono Project Authors. */
 @font-face {
-  font-family: 'Myriad Pro';
-  src: url('./fonts/MYRIADPRO-SEMIBOLD.OTF') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Myriad Pro';
-  src: url('./fonts/MYRIADPRO-BOLD.OTF') format('opentype');
-  font-weight: 700;
+  font-family: 'JetBrains Mono';
+  src: url('./fonts/JetBrainsMonoVF.woff2') format('woff2');
+  font-weight: 100 800;
   font-style: normal;
   font-display: swap;
 }

@@ -118,7 +118,6 @@ export class ThemeManager {
             typeof t.id === 'string' &&
             typeof t.description === 'string' &&
             !!t.colors &&
-            !!t.typography &&
             !!t.spacing &&
             !!t.effects;
     }
@@ -159,10 +158,6 @@ export class ThemeManager {
 
         Object.entries(theme.colors).forEach(([key, value]) => {
             root.style.setProperty(`--color-${this.kebabCase(key)}`, value);
-        });
-
-        Object.entries(theme.typography).forEach(([key, value]) => {
-            root.style.setProperty(`--font-${this.kebabCase(key)}`, value);
         });
 
         Object.entries(theme.spacing).forEach(([key, value]) => {
