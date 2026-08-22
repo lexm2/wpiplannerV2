@@ -76,6 +76,7 @@
 
 .schedule-picker-modal-dialog .schedule-list-add-btn {
   display: flex;
+  align-items: center;
   gap: 0.4rem;
   margin: 0.75rem auto 1rem;
 }
