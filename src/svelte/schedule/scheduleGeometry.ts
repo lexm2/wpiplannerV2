@@ -15,16 +15,16 @@ import { TimeUtils } from '../../utils/timeUtils';
  * Replaces ScheduleController's imperative cell-occupancy renderer
  * (`buildCellOccupancyMap` / `getCellFromMap`). The grid uses an absolute-overlay
  * model: each section/event/preview/conflict is one block positioned over the
- * full 12-hour (8 AM–8 PM) term body by percentage, so there is no per-cell
+ * full 12-hour (8 AM-8 PM) term body by percentage, so there is no per-cell
  * occupancy map and no `isFirstSlot` gating.
  */
 
 // Single source of truth for the grid's time bounds — shared with TermGrid's
 // hour labels so the block math and the grid scaffold can never drift.
 const START_MIN = TimeUtils.START_HOUR * 60;   // top of the grid body (8:00 AM)
-const SPAN_MIN = TimeUtils.TOTAL_HOURS * 60;   // 8 AM–8 PM = 12 hours
+const SPAN_MIN = TimeUtils.TOTAL_HOURS * 60;   // 8 AM-8 PM = 12 hours
 
-/** Monday–Friday, in grid-column order. */
+/** Monday-Friday, in grid-column order. */
 export const WEEKDAYS: DayOfWeek[] = [
     DayOfWeek.MONDAY,
     DayOfWeek.TUESDAY,

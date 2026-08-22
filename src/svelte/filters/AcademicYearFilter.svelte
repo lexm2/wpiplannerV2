@@ -45,7 +45,7 @@
     <div class="filter-segmented-control">
       <button class="segmented-btn" class:active={currentYear === 'all'} onclick={() => setYear('all')}>All</button>
       {#each years as y (y)}
-        <button class="segmented-btn" class:active={currentYear === y} onclick={() => setYear(y)}>{y}–{y + 1}</button>
+        <button class="segmented-btn" class:active={currentYear === y} onclick={() => setYear(y)}>{y}-{y + 1}</button>
       {/each}
     </div>
   </FilterSection>

@@ -7,11 +7,11 @@
 
   const criteria = $derived(filterService.getCriteria<CreditRangeFilterCriteria>('creditRange'));
   const minCredits = $derived(criteria?.min ?? 1);
-  // Default max is 4 (the top of the full 1–4 range) so the off-state below is
+  // Default max is 4 (the top of the full 1-4 range) so the off-state below is
   // reachable from the max input.
   const maxCredits = $derived(criteria?.max ?? 4);
 
-  // Off when at the full default range (1–4), matching the controller.
+  // Off when at the full default range (1-4), matching the controller.
   function update(min: number, max: number): void {
     if (min && max && (min !== 1 || max !== 4)) {
       filterService.addFilter('creditRange', { min, max });

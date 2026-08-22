@@ -771,7 +771,7 @@
 
 /* Absolute overlay layer for the declarative grid (ScheduleGrids/TermGrid):
    spans the 5 day columns × 12 time rows; blocks are positioned inside it by
-   percentage over the full 8 AM–8 PM body. Replaces per-cell block placement. */
+   percentage over the full 8 AM-8 PM body. Replaces per-cell block placement. */
 .block-layer {
   grid-column: 2 / -1;
   grid-row: 2 / -1;

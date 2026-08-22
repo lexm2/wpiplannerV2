@@ -20,6 +20,6 @@ export class AcademicYearFilter implements SectionBasedFilter {
     }
 
     getDisplayValue(criteria: AcademicYearFilterCriteria): string {
-        return criteria.year === 'all' ? 'All Years' : `${criteria.year}–${Number(criteria.year) + 1}`;
+        return criteria.year === 'all' ? 'All Years' : `${criteria.year}-${Number(criteria.year) + 1}`;
     }
 }

@@ -27,7 +27,7 @@
 - First tutorial step now introduces the Find Element button by asking you to click it
 
 ### Changed
-- Normalized z-indexes across the app to a clean tiered system (1–95 for UI, 100–300 for tutorial layers)
+- Normalized z-indexes across the app to a clean tiered system (1-95 for UI, 100-300 for tutorial layers)
 - Tutorial step descriptions now support inline HTML, with a marching ants highlight on the welcome step
 
 ## [2026-03-25]
@@ -60,7 +60,7 @@
 ## [2026-03-23]
 
 ### Fixed
-- Fixed courses from 2026–2027 not appearing when the year filter defaulted to 2026. The course data converter now correctly separates sections by academic year, so each year's offering of a course is listed independently with accurate sections and calendar dates.
+- Fixed courses from 2026-2027 not appearing when the year filter defaulted to 2026. The course data converter now correctly separates sections by academic year, so each year's offering of a course is listed independently with accurate sections and calendar dates.
 
 ## [2026-03-18]
 
@@ -203,7 +203,7 @@
 ### Improved
 - Moved separator bar in sidebar calendar events section to appear below the button instead of above
 - Schedules modal footer redesigned with a pill-style tab nav; body now slides between Schedules and Settings pages
-- Academic Year filter in course and schedule filter modals — filter courses by 2025–2026 or 2026–2027
+- Academic Year filter in course and schedule filter modals — filter courses by 2025-2026 or 2026-2027
 - Reduced course data file size by removing redundant fields from sections (legacy term code and duplicate description)
 
 ## [2026-02-07]

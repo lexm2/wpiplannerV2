@@ -320,11 +320,11 @@
   {#if yearMismatch}
     <div class={styles['wizard-filtered-notice']}>
       <span class={styles['wizard-filtered-notice-text']}>
-        This course is from {yearMismatch.courseYear}–{yearMismatch.courseYear + 1} but you're viewing
-        {yearMismatch.filterYear}–{yearMismatch.filterYear + 1}
+        This course is from {yearMismatch.courseYear}-{yearMismatch.courseYear + 1} but you're viewing
+        {yearMismatch.filterYear}-{yearMismatch.filterYear + 1}
       </span>
       <button class={styles['wizard-filtered-notice-btn']} onclick={switchYear}>
-        Switch to {yearMismatch.courseYear}–{yearMismatch.courseYear + 1}
+        Switch to {yearMismatch.courseYear}-{yearMismatch.courseYear + 1}
       </button>
     </div>
   {:else}

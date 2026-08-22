@@ -157,7 +157,7 @@ export function getTermName(term: string): string {
     return TERM_NAMES[term] || `${term} Term`;
 }
 
-/** Async = explicit flag or a 12:00–12:00 placeholder time. */
+/** Async = explicit flag or a 12:00-12:00 placeholder time. */
 export function isAsyncPeriod(period: Period | undefined): boolean {
     return Boolean(
         period?.isAsync ||

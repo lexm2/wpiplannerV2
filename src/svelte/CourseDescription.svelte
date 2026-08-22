@@ -26,7 +26,7 @@
       : ''
   );
   const yearLabel = $derived(
-    course?.academicYear ? `${course.academicYear}–${course.academicYear + 1}` : ''
+    course?.academicYear ? `${course.academicYear}-${course.academicYear + 1}` : ''
   );
 
   const isHierarchical = $derived(course ? courseDataService.isHierarchicalCourse(course) : false);

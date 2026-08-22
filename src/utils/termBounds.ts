@@ -86,7 +86,7 @@ export class TermBoundsService {
     }
 
     /**
-     * Returns the current academic year (the fall year, e.g. 2026 for "2026–2027").
+     * Returns the current academic year (the fall year, e.g. 2026 for "2026-2027").
      * The year flips into `y` at the start of summer, i.e. right after the previous
      * year's Spring D-term ends, so summer/fall/spring all map to the same academic year.
      */

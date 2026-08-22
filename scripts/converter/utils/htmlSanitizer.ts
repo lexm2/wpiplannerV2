@@ -58,7 +58,7 @@ export function sanitizeHTML(html: string | null): string {
     cleaned = cleaned.trim();
 
     // Strip leading punctuation artifacts left after category marker removal (e.g. ", " or "- ")
-    cleaned = cleaned.replace(/^[,;:\-–—.]+\s*/, '').trim();
+    cleaned = cleaned.replace(/^[,;:\--—.]+\s*/, '').trim();
 
     return cleaned;
 }
