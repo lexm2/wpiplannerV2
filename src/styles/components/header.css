@@ -170,15 +170,6 @@
   opacity: 1;
 }
 
-#cloud-status-button-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 160px;
-  flex-shrink: 0;
-  transition: min-width 0.3s ease;
-}
-
 .undo-redo-controls {
   display: flex;
   gap: 0.25rem;
@@ -303,10 +294,6 @@
   .timestamps-container {
     display: none;
   }
-
-  #cloud-status-button-container {
-    min-width: 140px;
-  }
 }
 
 @media (max-width: 1400px) {
@@ -320,10 +307,6 @@
 
   .header-controls {
     gap: 0.75rem;
-  }
-
-  #cloud-status-button-container {
-    min-width: 140px;
   }
 }
 
@@ -342,10 +325,6 @@
   }
 
   #schedule-picker-btn {
-    display: none;
-  }
-
-  #cloud-status-button-container {
     display: none;
   }
 

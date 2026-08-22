@@ -331,7 +331,7 @@ export class CourseDataService {
         return this.scheduleDB?.departments || [];
     }
 
-    /** Empty if the course uses the old flat structure or is lab-only. */
+    /** Empty if the course is lab-only. */
     getLecturesForCourse(course: Course): LectureGroup[] {
         return course.lectures || [];
     }
@@ -417,7 +417,7 @@ export class CourseDataService {
     }
 
     /**
-     * Signal that data should be refreshed (e.g., after cloud sync)
+     * Signal that data should be refreshed
      */
     notifyDataRefreshed(): void {
         if (!this.scheduleDB) {
