@@ -148,6 +148,11 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 title: 'Pick a lecture',
                 description: 'Select the second lecture section.',
                 waitFor: 'click',
+                // The wizard toggles a section off when it is clicked while already
+                // selected, and the next step's appState selects this very section.
+                // Whichever lands first, letting both run cancels the pick — so the
+                // tutorial's declarative state is the only thing that selects here.
+                stopPropagation: true,
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' } },
                 appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
             },
@@ -156,6 +161,10 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 title: 'Continue to labs',
                 description: 'Click Next to move on to selecting a lab.',
                 waitFor: 'click',
+                // The next step moves the wizard to its lab step, which flips this
+                // button from Next to Finish. If the app's own handler runs after
+                // that, the click completes and closes the wizard instead.
+                stopPropagation: true,
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' } },
                 appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01' }] },
             },
@@ -164,6 +173,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 title: 'Pick a lab',
                 description: 'Select the bottom lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
                 waitFor: 'click',
+                stopPropagation: true,
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' } },
                 appState: { selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01' }] },
             },
@@ -284,6 +294,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     description: 'Click the + button on Blinking LEDs 101 to add it.',
                     waitFor: 'click',
                     scrollArrow: true,
+                    stopPropagation: true,
                     uiState: { currentPage: 'planner' },
                     appState: { filters: [
                         { id: 'term', criteria: { terms: ['B'] } },
@@ -312,6 +323,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     title: 'Pick a lecture',
                     description: 'Select the B term lecture section.',
                     waitFor: 'click',
+                    stopPropagation: true,
                     uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lecture' } },
                     appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
                 },
@@ -320,6 +332,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     title: 'Continue to labs',
                     description: 'Click Next to move on to selecting a lab.',
                     waitFor: 'click',
+                    stopPropagation: true,
                     uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lecture' } },
                     appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }] },
                 },
@@ -328,6 +341,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                     title: 'Pick a lab',
                     description: 'Select the first lab section. Notice how you can hover sections to preview them on the schedule.',
                     waitFor: 'click',
+                    stopPropagation: true,
                     uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lab' } },
                     appState: { selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }] },
                 },
@@ -381,6 +395,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
                 title: 'Pick a lecture',
                 description: 'We are going to use this lecture.',
                 waitFor: 'click',
+                stopPropagation: true,
                 uiState: { currentPage: 'schedule', wizard: { isOpen: true, courseId: 'TUT-2008', step: 'lecture' } },
                 appState: { selectedCourses: [{ courseId: 'TUT-2008' }] },
             },

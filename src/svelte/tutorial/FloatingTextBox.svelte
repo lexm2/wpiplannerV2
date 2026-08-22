@@ -38,6 +38,13 @@
   // spans with the marching-ants dashed-rect SVG, and reposition the box off the
   // highlighted target. tick() (not rAF) is used so this runs after Svelte has
   // flushed the {@html} update — the inline span only exists then.
+  //
+  // Positioning once isn't enough: the target keeps moving after this runs.
+  // TutorialService scrolls an off-screen target into view, and a scroll inside
+  // the course list or schedule sidebar can slide the target straight under the
+  // box — which then covers the very thing the step asks the user to click. So
+  // re-check on any scroll (captured, since scroll doesn't bubble) and on resize.
+  // The rAF here only throttles measurement; it drives no animation.
   $effect(() => {
     if (!step || !boxEl) return;
     const box = boxEl;
@@ -47,6 +54,23 @@
       repositionIfObstructed(box, selector);
       clampToViewport(box);
     });
+
+    let frame = 0;
+    const recheck = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        repositionIfObstructed(box, selector, false);
+        clampToViewport(box);
+      });
+    };
+    document.addEventListener('scroll', recheck, { capture: true, passive: true });
+    window.addEventListener('resize', recheck);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      document.removeEventListener('scroll', recheck, { capture: true });
+      window.removeEventListener('resize', recheck);
+    };
   });
 
   // Dragging (header grab)

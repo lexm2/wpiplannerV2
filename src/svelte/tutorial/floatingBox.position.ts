@@ -27,24 +27,30 @@ export function clampToViewport(box: HTMLElement): void {
 
 /**
  * If the box overlaps the highlighted target, move it to the first viewport
- * corner that clears the target. If the target hasn't laid out yet (0×0), watch
- * for it (bounded to 1s) and retry.
+ * corner that clears the target. If the target isn't mounted or laid out yet,
+ * watch for it (bounded to 1s) and retry — a step's target is routinely still
+ * being built by that same step's state transition when this first runs. Pass
+ * `waitForTarget: false` from repeat callers (scroll/resize) so only the once-per-
+ * step call arms that watcher.
  */
-export function repositionIfObstructed(box: HTMLElement, selector: string): void {
+export function repositionIfObstructed(box: HTMLElement, selector: string, waitForTarget = true): void {
     const target = document.querySelector(selector) as HTMLElement | null;
-    if (!target || box.contains(target)) return;
+    if (target && box.contains(target)) return;
 
-    const targetRect = target.getBoundingClientRect();
+    const targetRect = target?.getBoundingClientRect();
 
-    if (targetRect.width === 0 && targetRect.height === 0) {
+    if (!targetRect || (targetRect.width === 0 && targetRect.height === 0)) {
+        if (!waitForTarget) return;
         const obs = new MutationObserver(() => {
-            const r = target.getBoundingClientRect();
+            const el = document.querySelector(selector) as HTMLElement | null;
+            if (!el) return;
+            const r = el.getBoundingClientRect();
             if (r.width === 0 && r.height === 0) return;
             obs.disconnect();
             repositionIfObstructed(box, selector);
             clampToViewport(box);
         });
-        obs.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class', 'style'] });
+        obs.observe(document.body, { childList: true, attributes: true, subtree: true, attributeFilter: ['class', 'style'] });
         setTimeout(() => obs.disconnect(), 1000);
         return;
     }
