@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 22, 2026, 2:15 PM",
+  "generated": "Aug 22, 2026, 2:45 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -230420,7 +230420,7 @@
                 "crn": 350621,
                 "number": "F42",
                 "seats": 25,
-                "seatsAvailable": 2,
+                "seatsAvailable": 3,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -230437,7 +230437,7 @@
                     "building": "",
                     "room": "Kaven Hall 115",
                     "seats": 25,
-                    "seatsAvailable": 2,
+                    "seatsAvailable": 3,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "F42",
