@@ -113,8 +113,9 @@
   // Global side-effect bridges (activation→year filter, page-nav→filter reset,
   // selection→color/auto-schedule, data-load→service sync, active-schedule→
   // tutorial). Extracted to keep this root as pure composition; runs once here so
-  // the effects register in this component's scope.
-  installAppEffects(services);
+  // the effects register in this component's scope. Untracked for the same reason
+  // as debouncedSearch above: one-time wiring off the stable singleton container.
+  untrack(() => installAppEffects(services));
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
