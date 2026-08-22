@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 22, 2026, 9:44 PM",
+  "generated": "Aug 22, 2026, 9:58 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -9884,7 +9884,7 @@
               "crn": 351950,
               "number": "DX02",
               "seats": 16,
-              "seatsAvailable": 13,
+              "seatsAvailable": 12,
               "actualWaitlist": 0,
               "maxWaitlist": 3,
               "note": null,
@@ -9901,7 +9901,7 @@
                   "building": "",
                   "room": "Goddard Hall 206 BB Lab",
                   "seats": 16,
-                  "seatsAvailable": 13,
+                  "seatsAvailable": 12,
                   "actualWaitlist": 0,
                   "maxWaitlist": 3,
                   "specificSection": "DX02",
