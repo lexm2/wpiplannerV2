@@ -1,10 +1,46 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * Regression guards for the defects fixed from audits/2026-08-20-code-surface-audit.md.
  * Each of these bugs was invisible to tsc/svelte-check/unit tests, which is how
  * they survived; these assertions are the thing that keeps them fixed.
  */
+
+/**
+ * Resolve a source module's URL from the page's OWN module graph.
+ *
+ * Tests that poke at app internals must import the exact module instance the
+ * mounted app uses. A dev server that has served an HMR update stamps every
+ * import specifier with a `?t=<timestamp>` cache-bust query, so importing the
+ * bare path loads a SECOND copy of the module -- with its own `$state`
+ * singletons -- that no mounted component ever reads. Since
+ * playwright.config.ts reuses an already-running dev server, that is the
+ * normal local case, not an edge case. Looking the URL up from resource timing
+ * gets whichever form the app actually loaded.
+ */
+async function appModuleUrl(page: Page, path: string): Promise<string> {
+    const url = await page.evaluate((p) => {
+        return performance.getEntriesByType('resource')
+            .map(e => e.name)
+            .find(n => n.includes(p)) ?? null;
+    }, path);
+    // Deliberately no bare-path fallback: importing the bare path is exactly the
+    // bug this helper exists to prevent, and it fails SILENTLY (the detached copy
+    // accepts every mutation, so state-only assertions still pass). Fail loudly.
+    if (!url) {
+        throw new Error(
+            `${path} is not in the page's module graph, so its live instance cannot ` +
+            `be addressed. If the app grew past the resource-timing buffer, raise the ` +
+            `size in this file's beforeEach.`);
+    }
+    return url;
+}
+
+// The helper above reads resource timing, which stops recording once its buffer
+// fills. The app was at 242 of the 250-entry default, so raise it well clear.
+test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => performance.setResourceTimingBufferSize(2000));
+});
 
 test('right panel default width is 700px, not the old 320px', async ({ page }) => {
     await page.addInitScript(() => localStorage.clear());
@@ -108,9 +144,9 @@ test('closing the wizard keeps selections intact for the fade-out', async ({ pag
     await page.goto('/');
     await page.waitForTimeout(800);
 
-    const result = await page.evaluate(async () => {
-        // @ts-expect-error runtime dev-server URL, not a tsc-resolvable module path
-        const mod: any = await import('/wpiplannerV2/src/svelte/wizardState.svelte.ts');
+    const wizardUrl = await appModuleUrl(page, '/src/svelte/wizardState.svelte.ts');
+    const result = await page.evaluate(async (url) => {
+        const mod: any = await import(url);
         const ws = mod.wizardState;
         ws.selections = { lecture: { crn: 'TEST123' }, discussion: null, lab: null };
         ws.close();
@@ -118,7 +154,7 @@ test('closing the wizard keeps selections intact for the fade-out', async ({ pag
             isOpen: ws.isOpen,
             lectureAfterClose: ws.selections.lecture ? ws.selections.lecture.crn : null,
         };
-    });
+    }, wizardUrl);
     console.log('wizard close:', JSON.stringify(result));
 
     expect(result.isOpen).toBe(false);              // config cleared => panel closes
@@ -266,16 +302,16 @@ test('themed confirm dialog replaces native confirm', async ({ page }) => {
     await page.goto('/');
     await page.waitForTimeout(2000);
 
-    await page.evaluate(async () => {
-        // @ts-expect-error runtime dev-server URL, not a tsc-resolvable module path
-        const m: any = await import('/wpiplannerV2/src/svelte/modals/modalState.svelte.ts');
+    const modalUrl = await appModuleUrl(page, '/src/svelte/modals/modalState.svelte.ts');
+    await page.evaluate(async (url) => {
+        const m: any = await import(url);
         (window as any).__confirmed = null;
         m.showConfirm({
             title: 'Delete schedule', message: 'Are you sure?',
             confirmLabel: 'Delete', variant: 'danger',
             onConfirm: () => { (window as any).__confirmed = true; },
         });
-    });
+    }, modalUrl);
     await page.waitForTimeout(500);
 
     const dialog = page.locator('.modal-dialog:has-text("Delete schedule")');
@@ -291,16 +327,16 @@ test('themed confirm dialog replaces native confirm', async ({ page }) => {
 test('confirm dialog supports a text input (prompt replacement)', async ({ page }) => {
     await page.goto('/');
     await page.waitForTimeout(2000);
-    await page.evaluate(async () => {
-        // @ts-expect-error runtime dev-server URL, not a tsc-resolvable module path
-        const m: any = await import('/wpiplannerV2/src/svelte/modals/modalState.svelte.ts');
+    const modalUrl = await appModuleUrl(page, '/src/svelte/modals/modalState.svelte.ts');
+    await page.evaluate(async (url) => {
+        const m: any = await import(url);
         (window as any).__value = null;
         m.showConfirm({
             title: 'New schedule', message: 'Enter a name:', input: true,
             confirmLabel: 'Create',
             onConfirm: (v: string) => { (window as any).__value = v; },
         });
-    });
+    }, modalUrl);
     await page.waitForTimeout(500);
 
     const dialog = page.locator('.modal-dialog:has-text("New schedule")');
