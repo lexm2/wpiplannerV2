@@ -48,7 +48,7 @@ export class CourseDataService {
       return freshData;
     } catch (error) {
       logger.error('Failed to load course data:', error);
-      throw new Error('No course data available');
+      throw new Error('No course data available', { cause: error });
     }
   }
 

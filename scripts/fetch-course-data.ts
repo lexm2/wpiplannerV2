@@ -64,6 +64,7 @@ async function fetchWithRetry(
         clearTimeout(timeout);
         throw new Error(
           `Failed after ${maxRetries} attempts. Last error: ${errorMessage}`,
+          { cause: error },
         );
       }
 

@@ -1,5 +1,6 @@
 import type { Course, Section, SectionsByKind } from '../../types/types';
 import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
+import { AcademicTerm } from '../../types/schedule';
 import type { SectionCandidate } from '../../types/scheduling';
 import {
   sectionToMask,
@@ -183,11 +184,11 @@ export class AutoScheduler {
     // Check blocked time conflict using bitmask - O(1)
     const sectionMask = sectionToMask(section);
     let blockedMask: bigint;
-    if (section.computedTerm === 'F') {
+    if (section.computedTerm === AcademicTerm.F) {
       blockedMask =
         (blockedMasksByTerm.get('A') || 0n) |
         (blockedMasksByTerm.get('B') || 0n);
-    } else if (section.computedTerm === 'S') {
+    } else if (section.computedTerm === AcademicTerm.S) {
       blockedMask =
         (blockedMasksByTerm.get('C') || 0n) |
         (blockedMasksByTerm.get('D') || 0n);

@@ -34,7 +34,7 @@ class SectionInfoService {
     if (!this.courseSelectionService || !this.colorService) return;
 
     let course: Course | undefined;
-    let section: Section | null = null;
+    let section: Section | null;
 
     // Course being edited in wizard mode (preview rune) takes precedence over saved selection
     const previewCourse = schedulePreviewState.previewCourse;

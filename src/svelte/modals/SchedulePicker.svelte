@@ -315,7 +315,7 @@
   // One hidden input (bottom of this component) serves both import paths.
   // pendingImport is the target: a schedule id, or 'new' to create one.
   let fileInput = $state<HTMLInputElement | null>(null);
-  let pendingImport = $state<string | 'new' | null>(null);
+  let pendingImport = $state<string | null>(null);
 
   function importSchedule(scheduleId: string): void {
     pendingImport = scheduleId;

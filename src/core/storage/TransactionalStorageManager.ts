@@ -58,10 +58,12 @@ export class TransactionalStorageManager {
       logger.error('Failed to initialize IndexedDB:', error);
       throw new Error(
         'IndexedDB initialization failed - schedule operations unavailable',
+        { cause: error },
       );
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- transaction API is async by contract even when a given path is not
   async executeTransaction(
     operations: (() => void)[],
   ): Promise<TransactionResult> {

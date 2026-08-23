@@ -2,7 +2,7 @@ import LZString from 'lz-string';
 import { WorkerRequest, WorkerResponse, WorkerTaskType } from './protocol';
 import { setReplacer } from '../utils/jsonSerializer';
 
-self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
+self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const { id, type, payload } = event.data;
   const typedPayload = payload as { data?: unknown; compressed?: string };
 

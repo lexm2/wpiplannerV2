@@ -1,4 +1,5 @@
-import type { WorkerRequest, WorkerResponse, WorkerTaskType } from './protocol';
+import type { WorkerRequest, WorkerResponse } from './protocol';
+import { WorkerTaskType } from './protocol';
 import LZString from 'lz-string';
 import { logger } from '../utils/logger';
 
@@ -27,6 +28,7 @@ export class StorageWorkerManager {
     return StorageWorkerManager.instance;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- lifecycle API, awaited on every storage operation
   async initialize(): Promise<void> {
     if (typeof Worker === 'undefined') {
       logger.warn(
@@ -100,18 +102,19 @@ export class StorageWorkerManager {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- must stay async: executeTask returns it directly as Promise<T>
   private async executeFallback<T>(
     type: WorkerTaskType,
     payload: unknown,
   ): Promise<T> {
     const typedPayload = payload as { data?: unknown; compressed?: string };
     switch (type) {
-      case 'compress_data': {
+      case WorkerTaskType.COMPRESS_DATA: {
         const serialized = JSON.stringify(typedPayload.data);
         return LZString.compress(serialized) as T;
       }
 
-      case 'decompress_data': {
+      case WorkerTaskType.DECOMPRESS_DATA: {
         const decompressed = LZString.decompress(typedPayload.compressed!);
         return JSON.parse(decompressed || 'null') as T;
       }

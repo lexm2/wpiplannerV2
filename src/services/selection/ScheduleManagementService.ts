@@ -526,6 +526,7 @@ export class ScheduleManagementService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by its caller
   async exportScheduleICS(
     scheduleId: string,
     options: ICSExportOptions = {},
@@ -609,6 +610,7 @@ export class ScheduleManagementService {
     return this.courseSelectionService;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- paired with CourseSelectionService.performHealthCheck; awaited
   async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
     const issues: string[] = [];
 
@@ -649,6 +651,7 @@ export class ScheduleManagementService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by its caller
   async initializeDefaultScheduleIfNeeded(): Promise<void> {
     const existingSchedules = this.profileStateManager.getAllSchedules();
 

@@ -599,6 +599,7 @@ export class ProfileStateManager {
     return [...(this.state.preferences.bookmarkedCourseIds ?? [])];
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- public async API; all four call sites consume it with .catch()
   async undo(): Promise<boolean> {
     const snapshot = this.undoRedoManager.undo();
     if (!snapshot) return false;
@@ -613,6 +614,7 @@ export class ProfileStateManager {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- public async API; all four call sites consume it with .catch()
   async redo(): Promise<boolean> {
     const snapshot = this.undoRedoManager.redo();
     if (!snapshot) return false;
@@ -826,6 +828,7 @@ export class ProfileStateManager {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- public async API, awaited by both callers
   async exportData(): Promise<string | null> {
     const applicationState = this.createApplicationState();
     const minimalData = applicationState.toMinimalFormat();

@@ -88,7 +88,7 @@ export function readSheet(buf: ArrayBuffer): string[][] {
     const rowIdx = pos.row - 1;
     const type = cell.getAttribute('t');
 
-    let value = '';
+    let value: string;
     if (type === 's') {
       const v = cell.getElementsByTagName('v')[0];
       const idx = v ? parseInt(v.textContent ?? '', 10) : NaN;

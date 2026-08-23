@@ -29,6 +29,7 @@ export class TutorialStateMachine {
     this.snapshots.set(stepIndex, snapshot);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by its caller
   async restoreSnapshot(stepIndex: number): Promise<void> {
     const snapshot = this.snapshots.get(stepIndex);
     if (!snapshot) return;

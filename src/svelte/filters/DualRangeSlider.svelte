@@ -85,7 +85,7 @@
 
   function onThumbKeyDown(side: 'left' | 'right', e: KeyboardEvent): void {
     const current = side === 'left' ? minValue : maxValue;
-    let next = current;
+    let next: number;
     switch (e.key) {
       case 'ArrowLeft':
       case 'ArrowDown':
