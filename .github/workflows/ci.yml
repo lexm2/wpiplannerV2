@@ -50,6 +50,31 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: bun run build
 
+  code-health:
+    name: Code health (lint, dead code) -- report only
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # No `|| true` here: the steps are allowed to fail so the job summary
+      # shows a red X when findings exist, while continue-on-error keeps the
+      # workflow itself green.
+      - name: ESLint
+        run: bun run lint
+
+      - name: Knip (unused files, exports, dependencies)
+        run: bun run lint:dead
+
   e2e:
     name: Playwright e2e (Firefox)
     runs-on: ubuntu-latest
