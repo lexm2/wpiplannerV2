@@ -14,6 +14,11 @@ import { compile } from 'svelte/compiler';
 export default {
   entry: [
     // index.html already pulls in src/main.ts, so main is not listed here.
+    //
+    // Note there is no `knip --production` script: production mode does not
+    // resolve this HTML entry, so it walks an empty module graph and reports
+    // every runtime dependency as unused. Adding src/main.ts explicitly does
+    // not fix it. Use the default mode, which is correct.
     'index.html',
     // Workers are instantiated by URL, not imported, so nothing in the module
     // graph points at them.

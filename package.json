@@ -16,7 +16,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:dead": "knip",
-    "lint:dead:prod": "knip --production",
     "check:unwanted-chars": "bun run scripts/check-unwanted-chars.ts",
     "convert": "bun run scripts/convert-course-data.ts",
     "generate-icons": "bun run scripts/generate-icon-paths.ts",

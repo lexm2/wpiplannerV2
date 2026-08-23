@@ -95,7 +95,21 @@ export default [
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-useless-assignment': 'warn',
       'preserve-caught-error': 'warn',
-      'svelte/prefer-svelte-reactivity': 'warn',
+
+      // Off after reading all 10 findings: every one was a false positive.
+      // They were $derived.by() locals that never escape their closure,
+      // copy-on-write state (`const next = new Set(prev); ...; state = next`,
+      // which is the correct Svelte 5 idiom -- SvelteSet would make it
+      // mutation-based and change behavior), module-level bookkeeping maps, and
+      // two `new Date()` passed straight into toLocaleDateString.
+      // The distinction is already being drawn correctly by hand: see
+      // termExpansion.svelte.ts:20, which uses SvelteMap for the one collection
+      // in that file that really is read reactively.
+      'svelte/prefer-svelte-reactivity': 'off',
+
+      // termsByCourse in AutoScheduleIntro.svelte is reassigned, so dropping
+      // the $state() wrapper around its SvelteMap would break reactivity.
+      'svelte/no-unnecessary-state-wrap': ['error', { allowReassign: true }],
 
       // Every {@html} in this repo is either getInlineSVG() over the generated
       // icon path table or an authored tutorial step description -- no user
@@ -134,6 +148,21 @@ export default [
       // A bare `someState;` inside $effect is the idiomatic way to register a
       // dependency without using the value. The base rule reads it as dead code.
       '@typescript-eslint/no-unused-expressions': 'off',
+
+      // The no-unsafe-* family cannot work through svelte-eslint-parser. Types
+      // are lost crossing the compiler's intermediate representation, so fully
+      // typed source still reads as `any`: Modal.svelte declares
+      // `children: Snippet<[() => void]>` yet `{#snippet children(close)}`
+      // yields `close: any`, and TextField.svelte declares
+      // `onchange?: (event: Event) => void` yet inline arrows at call sites get
+      // `e: any`. tsc and svelte-check accept every one of these. There is
+      // nothing to annotate -- the only fix would be ~18 inline disables that
+      // catch no real defects.
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
     },
   },
 
@@ -155,7 +184,37 @@ export default [
 
   // Scripts are CLI tools; printing IS their output.
   {
-    files: ['scripts/**/*.ts'],
+    files: ['scripts/**/*'],
+    rules: { 'no-console': 'off' },
+  },
+
+  // One-off data-munging CLI tools. They parse external JSON and scraped
+  // GraphQL, `any` is the honest type for that, and nothing under src/ imports
+  // them -- their only output is public/*.json, which the app fetches at
+  // runtime. Same argument the tests/ block above already makes.
+  //
+  // scripts/**/types.ts is deliberately excluded: rateMyProfessor/types.ts is
+  // not a munging script but the schema for public/rateMyProfessor.json, whose
+  // consumer (RateMyProfessorService.ts) is a genuine unsafe boundary. Relaxing
+  // it would disarm the producer side of a live contract.
+  {
+    files: ['scripts/**/*.ts', 'scripts/**/*.mjs'],
+    ignores: ['scripts/**/types.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
+    },
+  },
+
+  // logger.ts IS the logging abstraction -- it wraps console.* behind an
+  // import.meta.env.DEV guard. It is the one correct place for a raw console.
+  {
+    files: ['src/utils/logger.ts'],
     rules: { 'no-console': 'off' },
   },
 
