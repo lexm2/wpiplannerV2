@@ -2,6 +2,7 @@ export interface ThemeColors {
   primary: string;
   primaryHover: string;
   primaryLight: string;
+  primaryBackground: string;
   /** Comma-separated channels for rgba() composition, e.g. "212, 66, 79". */
   primaryRgb: string;
   secondary: string;
@@ -18,8 +19,14 @@ export interface ThemeColors {
   borderHover: string;
   success: string;
   warning: string;
+  warningBackground: string;
   error: string;
+  danger: string;
+  dangerHover: string;
+  dangerBackground: string;
   info: string;
+  gradientStart: string;
+  gradientEnd: string;
 }
 
 /**
@@ -43,6 +50,7 @@ export interface ThemeEffects {
   borderRadiusLarge: string;
   shadow: string;
   shadowHover: string;
+  shadowLarge: string;
   transition: string;
 }
 

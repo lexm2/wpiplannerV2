@@ -117,7 +117,7 @@
 
 .term-separator-label {
   font-size: 0.7rem;
-  font-weight: var(--font-weight-semibold, 600);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -830,7 +830,7 @@
   border-radius: 3px;
   font-size: 0.8rem;
   font-weight: bold;
-  color: var(--color-text-primary);
+  color: var(--color-text);
   display: flex;
   justify-content: center;
   align-items: center;

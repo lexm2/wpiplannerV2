@@ -54,7 +54,6 @@
 
   // Error flags. Each drives the `error` prop on its surrounding Field.
   let titleError = $state(false);
-  let dayError = $state(false);
   let termError = $state(false);
   let dateError = $state(false);
   let endError = $state(false);
@@ -78,7 +77,7 @@
       : '10:00';
     selectedDays = new Set(ev?.days?.length ? ev.days : [DayOfWeek.MONDAY]);
     selectedTerms = new Set(ev?.terms?.length ? ev.terms : TERMS);
-    titleError = dayError = termError = dateError = endError = false;
+    titleError = termError = dateError = endError = false;
   });
 
   function toggleDay(day: DayOfWeek): void {
@@ -89,7 +88,6 @@
       next.add(day);
     }
     selectedDays = next;
-    dayError = false;
   }
 
   function toggleTerm(term: string): void {
@@ -105,8 +103,8 @@
     if (titleError) return false;
 
     if (eventType === EventType.RECURRING) {
-      dayError = selectedDays.size === 0;
-      if (dayError) return false;
+      // No dayError check: toggleDay keeps at least one day selected, so the
+      // set can never be empty here.
       termError = selectedTerms.size === 0;
       if (termError) return false;
     } else {
@@ -229,13 +227,7 @@
           </div>
         {:else}
           <div class={styles['recurring-fields']}>
-            <Field
-              group
-              required
-              label="Days"
-              controlId="event-days"
-              error={dayError ? 'Pick at least one day.' : undefined}
-            >
+            <Field group required label="Days" controlId="event-days">
               <div class={styles['day-selector']}>
                 {#each WEEKDAYS as day (day.value)}
                   <button
@@ -253,6 +245,7 @@
 
             <Field
               group
+              required
               label="Terms"
               controlId="event-terms"
               error={termError ? 'Pick at least one term.' : undefined}

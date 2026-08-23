@@ -419,9 +419,9 @@ test('confirm dialog supports a text input (prompt replacement)', async ({
   await page.waitForTimeout(500);
 
   const dialog = page.locator('.modal-dialog:has-text("New schedule")');
-  await expect(dialog.locator('#modal-primary-btn')).toBeDisabled();
+  await expect(dialog.locator('#confirm-primary-btn')).toBeDisabled();
   await dialog.locator('input[type="text"]').fill('Fall Plan');
-  await dialog.locator('#modal-primary-btn').click();
+  await dialog.locator('#confirm-primary-btn').click();
   await page.waitForTimeout(400);
   expect(await page.evaluate(() => (window as any).__value)).toBe('Fall Plan');
 });

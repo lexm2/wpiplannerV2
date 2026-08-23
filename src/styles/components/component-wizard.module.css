@@ -99,23 +99,6 @@
   border-color: var(--color-success);
 }
 
-.breadcrumb-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 50%;
-  background-color: var(--color-surface-elevated);
-  font-weight: 600;
-  font-size: 0.75rem;
-}
-
-.wizard-breadcrumb.active .breadcrumb-number {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
 .breadcrumb-label {
   font-weight: 500;
 }
@@ -277,27 +260,6 @@
   height: 14px;
 }
 
-/* Interest List Badge */
-.section-card-interest-list-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.65rem;
-  background-color: transparent;
-  border: 1.5px solid var(--color-warning);
-  border-radius: var(--effect-border-radius);
-  color: var(--color-warning);
-  font-size: 0.8rem;
-  font-weight: 500;
-  margin-bottom: 0.375rem;
-}
-
-.section-card-interest-list-badge svg {
-  flex-shrink: 0;
-  width: 14px;
-  height: 14px;
-}
-
 .section-card-seats {
   font-size: 0.8rem;
   color: var(--color-success);
@@ -321,12 +283,6 @@
 }
 
 /* Empty State */
-.wizard-empty-state {
-  padding: 3rem 1rem;
-  text-align: center;
-  color: var(--color-text-secondary);
-}
-
 /* Footer */
 .wizard-footer {
   position: absolute;
@@ -463,7 +419,7 @@
 /* Filter Status Indicator */
 .wizard-filter-status {
   padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary-transparent, rgba(74, 144, 226, 0.1));
+  background-color: var(--color-primary-background);
   border-left: 3px solid var(--color-primary);
   display: flex;
   align-items: center;
@@ -512,7 +468,7 @@
   justify-content: space-between;
   padding: 0.75rem 1rem;
   margin: 0.75rem 0;
-  background-color: var(--color-surface-alt, var(--color-surface));
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   color: var(--color-text-secondary);
@@ -538,6 +494,6 @@
 
 .wizard-filtered-notice-btn:hover {
   background: var(--color-primary);
-  color: var(--color-on-primary, #fff);
+  color: #fff;
   border-color: var(--color-primary);
 }

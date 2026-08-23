@@ -70,7 +70,7 @@
           {payload.cancelLabel ?? 'Cancel'}
         </button>
         <button
-          id="modal-primary-btn"
+          id="confirm-primary-btn"
           class="modal-btn {payload.variant === 'danger'
             ? 'btn-danger'
             : 'btn-primary'}"

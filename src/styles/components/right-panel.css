@@ -86,7 +86,7 @@
   border-radius: var(--effect-border-radius);
   font-size: 0.8rem;
   line-height: 1.4;
-  color: var(--color-text-primary);
+  color: var(--color-text);
   text-align: left;
   white-space: normal;
   z-index: 50;

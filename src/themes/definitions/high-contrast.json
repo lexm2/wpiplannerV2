@@ -22,8 +22,10 @@
     "borderHover": "#333333",
     "success": "#006600",
     "warning": "#cc6600",
+    "warningBackground": "rgba(204, 102, 0, 0.15)",
     "error": "#cc0000",
     "danger": "#cc0000",
+    "dangerHover": "#990000",
     "dangerBackground": "rgba(204, 0, 0, 0.1)",
     "info": "#0066cc",
     "gradientStart": "rgba(0, 0, 0, 0.08)",
@@ -38,6 +40,7 @@
     "borderRadiusLarge": "4px",
     "shadow": "0 0 0 2px #000000",
     "shadowHover": "0 0 0 3px #000000",
+    "shadowLarge": "0 0 0 3px #000000",
     "transition": "all 0.1s ease"
   }
 }

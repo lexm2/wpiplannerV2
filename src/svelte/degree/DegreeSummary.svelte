@@ -102,6 +102,7 @@
         bind:this={fileInput}
         type="file"
         accept=".xlsx"
+        id="degree-reimport-file"
         class="degree-file-input"
         onchange={onInputChange}
       />

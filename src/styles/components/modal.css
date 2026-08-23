@@ -211,8 +211,8 @@
 }
 
 .btn-danger:hover {
-  background: var(--color-error-hover, #c82333);
-  border-color: var(--color-error-hover, #c82333);
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
   transform: translateY(-1px);
 }
 
@@ -333,7 +333,7 @@ html.is-mobile .modal-btn {
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-primary-contrast, #fff);
+  color: #fff;
   background: var(--color-primary);
   border: none;
   border-radius: 10px;
@@ -518,7 +518,7 @@ html.is-mobile .modal-btn {
 
 .section-enrollment-indicator--available .section-enrollment-dot {
   background: var(--color-success);
-  box-shadow: 0 0 0 3px var(--color-success-glow, rgba(48, 209, 88, 0.15));
+  box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.15);
 }
 
 .section-enrollment-indicator--available {
@@ -667,11 +667,11 @@ html.is-mobile .modal-btn {
 /* ===== Note Card ===== */
 .section-card--note {
   border-left: 3px solid var(--color-warning);
-  background: var(--color-warning-background, rgba(255, 149, 0, 0.06));
+  background: rgba(255, 149, 0, 0.06);
 }
 
 .section-info-modal .section-card--note .section-card-header {
-  background: var(--color-warning-background, rgba(255, 149, 0, 0.08));
+  background: rgba(255, 149, 0, 0.08);
 }
 
 .section-info-modal .section-card--note .section-card-header-label {
@@ -873,7 +873,7 @@ html.is-mobile .section-enrollment-waitlist {
 .department-checkbox:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 0, 123, 255), 0.2);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .department-checkbox:checked {
@@ -1366,7 +1366,7 @@ html.is-mobile .changelog-modal-body {
 .filter-clear-btn {
   margin-top: 0.5rem;
   padding: 0.4rem 0.8rem;
-  background: var(--color-surface-tertiary);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   cursor: pointer;

@@ -24,7 +24,7 @@ test('imports an Academic Progress file and persists it across reload', async ({
   await page.click('#degree-tab');
   await expect(page.locator('.degree-dropzone')).toBeVisible();
 
-  await page.setInputFiles('.degree-file-input', fixture);
+  await page.setInputFiles('#degree-import-file', fixture);
 
   // Summary + requirement cards render from the parsed record.
   await expect(page.locator('.degree-summary-title')).toContainText(
@@ -46,7 +46,7 @@ test('hides umbrella (degree-wide) requirements until toggled', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('.degree-file-input', fixture);
+  await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
 
   // "Total Credits" / "Residency" are hidden by default.
@@ -66,7 +66,7 @@ test('status filters are multi-select and collapse to All when all chosen', asyn
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('.degree-file-input', fixture);
+  await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
 
   const cards = page.locator('.requirement-card');
@@ -93,7 +93,7 @@ test('builds a schedule from the planned courses and swaps to it', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('.degree-file-input', fixture);
+  await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
 
   // The fixture has one planned (in-progress) course → the build button appears.
@@ -113,7 +113,7 @@ test('overlays the current schedule onto requirements and browses from an empty 
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('.degree-file-input', fixture);
+  await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
 
   // Build "Enrolled" so there's an active schedule with courses, then return to Degree.
@@ -141,7 +141,7 @@ test('clicking a course name opens its catalog entry on the classes page', async
 
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('.degree-file-input', fixture);
+  await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
 
   // Build "Enrolled" + overlay so we have schedule tiles linked to real catalog courses.

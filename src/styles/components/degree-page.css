@@ -87,7 +87,7 @@
 .degree-privacy-note {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 /* ---- Summary ---- */
@@ -187,7 +187,7 @@
 .degree-build-unmatched {
   margin: 0.3rem 0 0;
   font-size: 0.82rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 /* ---- Progress bars ---- */
@@ -356,7 +356,7 @@
 
 .requirement-card-scope {
   font-size: 0.78rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -419,7 +419,7 @@
 }
 
 .requirement-course.is-transfer {
-  border-left: 3px solid var(--color-text-muted);
+  border-left: 3px solid var(--color-text-secondary);
 }
 
 /* draggable tiles (planned + schedule overlay) - grab cursor + drag affordance */
@@ -494,7 +494,7 @@
 
 .requirement-course-term {
   font-size: 0.72rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 /* empty placeholder tile - a clickable slot still needing a course */
@@ -520,7 +520,7 @@
 
 .requirement-course-empty-label {
   font-size: 1.05rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   transition: var(--effect-transition);
 }
 
@@ -556,7 +556,7 @@
 
 .course-badge-transfer {
   background: var(--color-background-alt);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .course-badge-progress {

@@ -73,6 +73,7 @@
       bind:this={fileInput}
       type="file"
       accept=".xlsx"
+      id="degree-import-file"
       class="degree-file-input"
       onchange={onInputChange}
     />

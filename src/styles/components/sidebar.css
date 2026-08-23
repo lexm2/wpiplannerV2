@@ -136,7 +136,7 @@
 
 /* Enhanced visual feedback for multiple selections */
 .department-list.multi-select-active .department-item.active {
-  border-left: 3px solid var(--color-accent, var(--color-text-inverse));
+  border-left: 3px solid var(--color-text-inverse);
   padding-left: calc(0.75rem - 3px);
 }
 

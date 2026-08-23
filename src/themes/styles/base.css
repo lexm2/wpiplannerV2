@@ -20,8 +20,10 @@
   --color-border-hover: #48484a;
   --color-success: #30d158;
   --color-warning: #ff9f0a;
+  --color-warning-background: rgba(255, 159, 10, 0.15);
   --color-error: #ff453a;
   --color-danger: #ff453a;
+  --color-danger-hover: #e03428;
   --color-danger-background: rgba(255, 69, 58, 0.15);
   --color-info: #64d2ff;
 
@@ -52,6 +54,7 @@
   --effect-border-radius-large: 8px;
   --effect-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   --effect-shadow-hover: 0 4px 16px rgba(212, 66, 79, 0.2);
+  --effect-shadow-large: 0 8px 32px rgba(0, 0, 0, 0.5);
   --effect-transition: all 0.5s ease;
 }
 
