@@ -123,8 +123,9 @@
   }
 
   function tryComplete(): void {
+    // Truthiness, not `=== null`: an unfilled kind is an ABSENT key.
     const missing = availableSteps
-      .filter(step => selections[step] === null)
+      .filter(step => !selections[step])
       .map(step =>
         step === 'lecture'
           ? 'a lecture'
@@ -237,15 +238,15 @@
             styles['wizard-breadcrumb'],
             {
               [styles['active']]: step === currentStep,
-              [styles['completed']]: selections[step] !== null,
+              [styles['completed']]: !!selections[step],
             },
           ]}
+          data-step={step}
           disabled={step === currentStep}
           onclick={() => wizardState.jumpToStep(step)}
         >
           <span class={styles['breadcrumb-label']}>{STEP_LABELS[step]}</span>
-          {#if selections[step] !== null}<span
-              class={styles['breadcrumb-check']}>✓</span
+          {#if selections[step]}<span class={styles['breadcrumb-check']}>✓</span
             >{/if}
         </button>
       {/each}

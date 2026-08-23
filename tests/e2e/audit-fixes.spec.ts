@@ -425,3 +425,123 @@ test('confirm dialog supports a text input (prompt replacement)', async ({
   await page.waitForTimeout(400);
   expect(await page.evaluate(() => (window as any).__value)).toBe('Fall Plan');
 });
+
+/**
+ * The wizard's selection used to be deep `$state`, i.e. a Proxy. It is handed
+ * to the state layer as-is and ends up inside a persisted Schedule, which
+ * crosses `postMessage` into the storage worker - and a Proxy is not
+ * structured-cloneable. Every save of that schedule threw DataCloneError,
+ * `executeSave` swallowed it, and the selection showed on the calendar until
+ * the next reload. CS 2022's discussion was the reproducer.
+ */
+test('a discussion picked in the wizard survives a reload', async ({
+  page,
+}) => {
+  // Otherwise the welcome tutorial auto-starts and its floating box covers the
+  // wizard's footer buttons. This runs on every navigation, which is fine -
+  // unlike clearing storage here, which would also wipe the reload this test
+  // exists to survive.
+  await page.addInitScript(() => localStorage.setItem('wpi_visited', 'true'));
+  // Tall enough that the sidebar's auto-schedule footer doesn't overlap the
+  // wizard's own footer buttons.
+  await page.setViewportSize({ width: 1600, height: 1400 });
+  await page.goto('/');
+  await page.waitForFunction(
+    () =>
+      (window as any).services?.courseDataService?.getAllDepartments()?.length >
+      0,
+    undefined,
+    { timeout: 30000 },
+  );
+  // Start from a known-empty profile, then reload so the app boots from it.
+  // (Reloading also removes the race where clearAllData drops `wpi_visited`
+  // before startApp reads it and the welcome tutorial launches over the panel.)
+  await page.evaluate(() =>
+    (window as any).services.profileStateManager.clearAllData(),
+  );
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () =>
+      (window as any).services?.courseDataService?.getAllDepartments()?.length >
+      0,
+    undefined,
+    { timeout: 30000 },
+  );
+
+  const wizardServiceUrl = await appModuleUrl(
+    page,
+    '/src/services/scheduling/componentWizardService.ts',
+  );
+  // WizardHost only renders inside the schedule page's sidebar.
+  const uiStateUrl = await appModuleUrl(
+    page,
+    '/src/services/ui/uiState.svelte',
+  );
+
+  // CS 2022 Discrete Mathematics: lecture AL01 (348532) + discussion AD01 (348534).
+  const opened = await page.evaluate(
+    async ([wizardUrl, uiUrl]) => {
+      const svc: any = (window as any).services;
+      const course = svc.courseDataService
+        .getAllDepartments()
+        .flatMap((d: any) => d.courses)
+        .find((c: any) => c.id === 'CS-2022-2026');
+      if (!course) return null;
+      const ui: any = await import(uiUrl);
+      ui.setPage('schedule');
+      await svc.courseSelectionService.selectCourse(course);
+      const mod: any = await import(wizardUrl);
+      mod.componentWizardService.openComponentWizard(course);
+      return course.id;
+    },
+    [wizardServiceUrl, uiStateUrl],
+  );
+  expect(opened).toBe('CS-2022-2026');
+  await page.waitForTimeout(600);
+
+  // Before anything is picked, no crumb may claim completion.
+  const discussionCrumb = page.locator('button[data-step="discussion"]');
+  await page.locator('[data-crn="348532"]').click(); // lecture AL01
+  await page.waitForTimeout(300);
+  await expect(discussionCrumb).toHaveCount(1);
+  expect(await discussionCrumb.getAttribute('class')).not.toMatch(/completed/);
+  await expect(discussionCrumb.locator('text=✓')).toHaveCount(0);
+
+  await page.locator('#wizard-next-btn').click(); // -> discussion step
+  await page.waitForTimeout(400);
+  await page.locator('[data-crn="348534"]').click(); // discussion AD01
+  await page.waitForTimeout(300);
+  expect(await discussionCrumb.getAttribute('class')).toMatch(/completed/);
+
+  await page.locator('#wizard-next-btn').click(); // Finish
+  await page.waitForFunction(
+    () => !(window as any).services.profileStateManager.hasPendingSaves(),
+    undefined,
+    { timeout: 15000 },
+  );
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () =>
+      (window as any).services?.courseDataService?.getAllDepartments()?.length >
+      0,
+    undefined,
+    { timeout: 30000 },
+  );
+
+  const afterReload = await page.evaluate(() => {
+    const svc: any = (window as any).services;
+    const sc = svc.profileStateManager
+      .getSelectedCourses()
+      .find((c: any) => c.course.id === 'CS-2022-2026');
+    return {
+      lecture: sc?.selected?.lecture?.crn ?? null,
+      discussion: sc?.selected?.discussion?.crn ?? null,
+    };
+  });
+  console.log('after reload:', JSON.stringify(afterReload));
+
+  expect(afterReload.lecture).toBe(348532);
+  expect(afterReload.discussion).toBe(348534); // the whole point
+  await expect(page.locator('.error-banner')).toHaveCount(0);
+});

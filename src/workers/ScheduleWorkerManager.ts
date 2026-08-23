@@ -8,6 +8,7 @@ import { ScheduleScorer } from '../services/scheduling/ScheduleScorer';
 import type { ScheduleResult } from '../services/scheduling/AutoScheduler';
 import type { AutoScheduleSettings } from '../types/schedule';
 import { logger } from '../utils/logger';
+import { errorMessage } from '../utils/errorMessage';
 
 interface PendingTask {
   resolve: (value: ScheduleResult[][]) => void;
@@ -82,15 +83,37 @@ export class ScheduleWorkerManager {
     };
 
     return new Promise((resolve, reject) => {
-      this.pendingTasks.set(taskId, { resolve, reject });
-      this.worker!.postMessage(request);
-
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         if (this.pendingTasks.has(taskId)) {
           this.pendingTasks.delete(taskId);
           reject(new Error(`Schedule generation timed out`));
         }
       }, 60_000);
+
+      this.pendingTasks.set(taskId, {
+        resolve: value => {
+          clearTimeout(timeout);
+          resolve(value);
+        },
+        reject: reason => {
+          clearTimeout(timeout);
+          reject(reason);
+        },
+      });
+
+      // postMessage structured-clones the payload; an unclonable value throws
+      // here, after the task was registered. Unwind rather than leak it.
+      try {
+        this.worker!.postMessage(request);
+      } catch (error) {
+        this.pendingTasks.delete(taskId);
+        clearTimeout(timeout);
+        reject(
+          new Error(
+            `Failed to post schedule generation to the worker: ${errorMessage(error)}`,
+          ),
+        );
+      }
     });
   }
 

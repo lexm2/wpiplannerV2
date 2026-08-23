@@ -19,6 +19,7 @@ import { MinimalSyncDataSchema } from '../../types/export';
 import { UndoRedoManager } from './UndoRedoManager';
 import { appState } from './appState.svelte';
 import { TermBoundsService } from '../../utils/termBounds';
+import { showAppError } from '../../services/ui/uiState.svelte';
 
 export interface ProfileState {
   activeScheduleId: string | null;
@@ -715,9 +716,24 @@ export class ProfileStateManager {
         };
         return this.storageManager.saveSchedule(scheduleToSave);
       });
-      await Promise.all(savePromises);
+      const results = await Promise.all(savePromises);
 
       this.storageManager.savePreferences(this.state.preferences);
+
+      // A rejected write comes back as a result, not a throw, so this used to
+      // fall through and mark the state clean - the schedule was silently gone
+      // on the next reload. Stay dirty and say so instead.
+      const failed = results.filter(r => !r.success);
+      if (failed.length > 0) {
+        logger.error(
+          `Save failed for ${failed.length} schedule(s):`,
+          failed.map(f => f.error),
+        );
+        showAppError(
+          'Your latest change could not be saved and will be lost if you reload.',
+        );
+        return;
+      }
 
       this.state.hasUnsavedChanges = false;
       this.state.lastSaved = Date.now();

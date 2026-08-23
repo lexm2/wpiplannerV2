@@ -2,6 +2,7 @@ import type { WorkerRequest, WorkerResponse } from './protocol';
 import { WorkerTaskType } from './protocol';
 import LZString from 'lz-string';
 import { logger } from '../utils/logger';
+import { errorMessage } from '../utils/errorMessage';
 
 interface PendingTask {
   resolve: (value: unknown) => void;
@@ -87,18 +88,38 @@ export class StorageWorkerManager {
     };
 
     return new Promise((resolve, reject) => {
-      this.pendingTasks.set(taskId, {
-        resolve: resolve as (value: unknown) => void,
-        reject,
-      });
-      this.worker!.postMessage(request);
-
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         if (this.pendingTasks.has(taskId)) {
           this.pendingTasks.delete(taskId);
           reject(new Error(`Task ${taskId} timed out after 30s`));
         }
       }, 30000);
+
+      this.pendingTasks.set(taskId, {
+        resolve: value => {
+          clearTimeout(timeout);
+          (resolve as (value: unknown) => void)(value);
+        },
+        reject: reason => {
+          clearTimeout(timeout);
+          reject(reason);
+        },
+      });
+
+      // postMessage structured-clones the payload, so an unclonable value
+      // (a Svelte deep-state Proxy, say) throws here - after the task was
+      // registered. Unwind it rather than leaving a pending entry behind.
+      try {
+        this.worker!.postMessage(request);
+      } catch (error) {
+        this.pendingTasks.delete(taskId);
+        clearTimeout(timeout);
+        reject(
+          new Error(
+            `Failed to post ${type} to the storage worker: ${errorMessage(error)}`,
+          ),
+        );
+      }
     });
   }
 

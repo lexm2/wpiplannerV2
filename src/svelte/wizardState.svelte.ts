@@ -38,7 +38,15 @@ export interface WizardConfig {
 class WizardState {
   config = $state.raw<WizardConfig | null>(null);
   currentStep = $state.raw<ComponentKind>('lecture');
-  selections = $state<SectionsByKind>({});
+  /**
+   * `.raw`, not deep `$state`: on complete this object is handed to the state
+   * layer as-is and ends up inside a persisted Schedule, which crosses
+   * `postMessage` to the storage worker. A deep-state Proxy is not
+   * structured-cloneable, so every save of that schedule would throw
+   * DataCloneError. `.raw` is also all this needs - every write reassigns the
+   * whole object - and it keeps the sections `===` the catalog's.
+   */
+  selections = $state.raw<SectionsByKind>({});
   /** Last navigation direction, drives the step slide-in animation. */
   direction = $state.raw<'forward' | 'backward'>('forward');
 
