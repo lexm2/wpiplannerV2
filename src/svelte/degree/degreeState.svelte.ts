@@ -1,43 +1,54 @@
-import type { StudentRecord } from '../../types/degree';
+import type { DegreeBucketConfig, StudentRecord } from '../../types/degree';
+import { EMPTY_BUCKET_CONFIG } from '../../types/degree';
 import {
+  buildBuckets,
   computePlacements,
-  type ScheduleMatch,
+  computeUnassigned,
+  type DegreeBucket,
   type DegreeTile,
-} from '../../services/degree/requirementMatching';
+} from '../../services/degree/degreeBuckets';
+import { appState } from '../../core/state/appState.svelte';
 
 /**
- * Reactive state for the Degree page. `record` is $state.raw because it's
- * replaced wholesale (and must stay structured-cloneable for persistence),
- * matching the appState.schedules convention.
+ * Reactive state for the Degree page.
  *
- * The schedule overlay (scheduleMatch + manualMoves) is an ephemeral,
- * non-destructive preview of "what the current schedule fills" - it is never
- * written into `record` and is lost on reload by design.
+ * `record` (the Workday import) and `config` (the user's bucket layout and
+ * placements) are both $state.raw: each is replaced wholesale and persisted, so
+ * they must stay plain and structured-cloneable.
+ *
+ * Everything else derives from them plus appState.selectedCourses, so the
+ * buckets and the rail track the active schedule live.
  */
 class DegreeState {
   record = $state.raw<StudentRecord | null>(null);
   status = $state<'empty' | 'parsing' | 'ready' | 'error'>('empty');
   errorMessage = $state<string | null>(null);
 
-  /** Active-schedule overlay match; null = "Check current schedule" off. */
-  scheduleMatch = $state.raw<ScheduleMatch | null>(null);
-  /** Manual drag re-bucketing: tile key → target requirement rawName. */
-  manualMoves = $state.raw<Record<string, string>>({});
+  /** Bucket layout + placements; persisted by DegreeBucketService. */
+  config = $state.raw<DegreeBucketConfig>(EMPTY_BUCKET_CONFIG);
 
-  /** Draggable tiles per requirement (planned + schedule), after manual moves. */
-  placements = $derived.by<Map<string, DegreeTile[]>>(() =>
-    computePlacements(this.record, this.scheduleMatch, this.manualMoves),
+  /** Imported + custom buckets, in display order. */
+  buckets = $derived.by<DegreeBucket[]>(() =>
+    buildBuckets(this.record, this.config),
   );
 
-  /** Re-bucket a draggable tile onto a different requirement (drag-drop). */
-  reassign(tileKey: string, rawName: string): void {
-    this.manualMoves = { ...this.manualMoves, [tileKey]: rawName };
-  }
+  /** Bucket id -> the courses placed in it. */
+  placements = $derived.by<Map<string, DegreeTile[]>>(() =>
+    computePlacements(
+      this.buckets,
+      appState.selectedCourses,
+      this.config.assignments,
+    ),
+  );
 
-  /** Turn the schedule overlay off (planned tiles + their moves stay). */
-  clearOverlay(): void {
-    this.scheduleMatch = null;
-  }
+  /** Schedule courses still waiting to be placed. */
+  unassigned = $derived.by<DegreeTile[]>(() =>
+    computeUnassigned(
+      this.record,
+      appState.selectedCourses,
+      this.config.assignments,
+    ),
+  );
 }
 
 export const degreeState = new DegreeState();

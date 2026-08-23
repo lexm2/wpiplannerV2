@@ -19,6 +19,7 @@
   --color-border: #3a3a3c;
   --color-border-hover: #48484a;
   --color-success: #30d158;
+  --color-success-background: rgba(48, 209, 88, 0.15);
   --color-warning: #ff9f0a;
   --color-warning-background: rgba(255, 159, 10, 0.15);
   --color-error: #ff453a;

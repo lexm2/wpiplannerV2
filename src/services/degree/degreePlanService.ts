@@ -3,12 +3,9 @@ import { setPage, showAppError } from '../ui/uiState.svelte';
 import type { ScheduleManagementService } from '../selection/ScheduleManagementService';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { FilterService } from '../filtering/FilterService';
-import type { Requirement, StudentRecord } from '../../types/degree';
+import type { StudentRecord } from '../../types/degree';
 import { matchPlannedCourses, type PlanMatchResult } from './planMatcher';
-import {
-  inferRequirementDepartments,
-  matchScheduleToRequirements,
-} from './requirementMatching';
+import { inferBucketDepartments, type DegreeBucket } from './degreeBuckets';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
@@ -86,50 +83,34 @@ class DegreePlanService {
   }
 
   /**
-   * Toggle the non-destructive "what does my current schedule fill?" preview.
-   * Computes which requirements the active schedule's courses match and stores
-   * the result on degreeState (overlay tiles read it); a second call clears it.
+   * From an empty bucket slot: filter the courses page to the departments that
+   * give credit for the bucket (+ the active academic year) and navigate there
+   * so the user can pick a course.
    */
-  checkActiveSchedule(): void {
-    if (degreeState.scheduleMatch) {
-      degreeState.clearOverlay();
-      return;
-    }
-    const record = degreeState.record;
-    if (!record) return;
-    degreeState.scheduleMatch = matchScheduleToRequirements(
-      record,
-      appState.selectedCourses,
-      appState.loadedDepartments,
-    );
-  }
-
-  /**
-   * From an empty requirement slot: filter the courses page to the departments
-   * that give credit for the requirement (+ the active academic year) and
-   * navigate there so the user can pick a course.
-   */
-  browseForRequirement(req: Requirement): void {
+  browseForBucket(bucket: DegreeBucket): void {
     if (!this.filterService) return;
 
-    // Prefer authoritative tracking-sheet rules (valid departments + excluded
-    // course codes) via the backend-only degreeBucket filter; fall back to the
-    // applied-course heuristic when the sheets carry no rule for this bucket.
+    // Imported buckets prefer the tracking-sheet rules (valid departments +
+    // excluded courses) via the backend-only degreeBucket filter. Custom buckets
+    // have no sheet rule, so they take the department path below.
     const record = degreeState.record;
     const classYear = record?.startYear != null ? record.startYear + 4 : null;
-    const bucketCriteria = record
-      ? getDegreeBucketCriteria(record.major, classYear, req.category, req.name)
-      : null;
+    const bucketCriteria =
+      record && bucket.source === 'import'
+        ? getDegreeBucketCriteria(
+            record.major,
+            classYear,
+            bucket.category,
+            bucket.name,
+          )
+        : null;
 
     if (bucketCriteria) {
       this.filterService.addFilter('degreeBucket', bucketCriteria);
       this.filterService.removeFilter('department');
     } else {
       this.filterService.removeFilter('degreeBucket');
-      const depts = inferRequirementDepartments(
-        req,
-        appState.loadedDepartments,
-      );
+      const depts = inferBucketDepartments(bucket, appState.loadedDepartments);
       if (depts.length) {
         this.filterService.addFilter('department', { departments: depts });
       } else {

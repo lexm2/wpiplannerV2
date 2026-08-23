@@ -2,8 +2,7 @@
   import type { StudentRecord } from '../../types/degree';
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
-  import { degreeState } from './degreeState.svelte';
-  import { appState } from '../../core/state/appState.svelte';
+  import { showConfirm } from '../modals/modalState.svelte';
 
   let {
     record,
@@ -18,18 +17,6 @@
   const plannedCount = $derived(
     record.courses.filter(c => c.isInProgress).length,
   );
-
-  // "Check current schedule" preview - overlay of what the active schedule fills.
-  const scheduleCourseCount = $derived(appState.selectedCourses.length);
-  const overlayOn = $derived(degreeState.scheduleMatch !== null);
-  const overlayMatched = $derived.by(() => {
-    const m = degreeState.scheduleMatch;
-    if (!m) return 0;
-    const ids = new Set<string>();
-    for (const entries of m.values())
-      for (const e of entries) ids.add(e.courseId);
-    return ids.size;
-  });
 
   let building = $state(false);
   let buildResult = $state<string | null>(null);
@@ -67,6 +54,17 @@
       'Academic Progress',
   );
 
+  function clearRecord(): void {
+    showConfirm({
+      title: 'Clear degree record',
+      message:
+        'This removes the imported academic progress record. Your buckets and course placements are kept.',
+      confirmLabel: 'Clear',
+      variant: 'danger',
+      onConfirm: () => degreeImportService.clear(),
+    });
+  }
+
   async function onInputChange(e: Event): Promise<void> {
     const input = e.currentTarget as HTMLInputElement;
     const file = input.files?.[0];
@@ -90,13 +88,13 @@
       {/if}
     </div>
     <div class="degree-summary-actions">
-      <button type="button" class="btn" onclick={() => fileInput?.click()}
-        >Re-import</button
-      >
       <button
         type="button"
-        class="btn btn-ghost"
-        onclick={() => degreeImportService.clear()}>Clear</button
+        class="btn btn-primary"
+        onclick={() => fileInput?.click()}>Re-import</button
+      >
+      <button type="button" class="btn btn-secondary" onclick={clearRecord}
+        >Clear</button
       >
       <input
         bind:this={fileInput}
@@ -143,30 +141,17 @@
     </div>
   </div>
 
-  {#if plannedCount > 0 || scheduleCourseCount > 0}
+  {#if plannedCount > 0}
     <div class="degree-build">
-      {#if plannedCount > 0}
-        <button
-          type="button"
-          class="btn btn-primary degree-build-btn"
-          disabled={building}
-          onclick={buildSchedule}
-        >
-          {building
-            ? 'Building…'
-            : `Build schedule from plan (${plannedCount} planned)`}
-        </button>
-      {/if}
       <button
         type="button"
-        class="btn degree-check-btn"
-        class:active={overlayOn}
-        disabled={scheduleCourseCount === 0}
-        onclick={() => degreePlanService.checkActiveSchedule()}
+        class="btn btn-primary degree-build-btn"
+        disabled={building}
+        onclick={buildSchedule}
       >
-        {overlayOn
-          ? `Hide schedule overlay (${overlayMatched} matched)`
-          : 'Check current schedule'}
+        {building
+          ? 'Building…'
+          : `Build schedule from plan (${plannedCount} planned)`}
       </button>
       {#if buildResult}
         <p class="degree-build-result">{buildResult}</p>
@@ -174,11 +159,6 @@
       {#if buildUnmatched.length}
         <p class="degree-build-unmatched">
           Not found in catalog: {buildUnmatched.join(', ')}
-        </p>
-      {/if}
-      {#if overlayOn}
-        <p class="degree-build-unmatched">
-          Drag a schedule tile to another requirement to re-bucket it.
         </p>
       {/if}
     </div>

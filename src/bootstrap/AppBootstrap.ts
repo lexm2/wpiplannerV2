@@ -25,6 +25,7 @@ import { componentWizardService } from '../services/scheduling/componentWizardSe
 import { localEventService } from '../services/scheduling/localEventService';
 import { sectionInfoService } from '../services/scheduling/sectionInfoService';
 import { autoScheduleService } from '../services/scheduling/autoScheduleService';
+import { degreeBucketService } from '../services/degree/degreeBucketService';
 import { degreePlanService } from '../services/degree/degreePlanService';
 import type { ServiceContainer } from './ServiceContainer';
 import { logger } from '../utils/logger';
@@ -76,9 +77,9 @@ export class AppBootstrap {
     // Degree page: imports/persists the Workday Academic Progress export.
     // Uses its own storage-manager handle (degree data lives in localStorage,
     // independent of the schedule/IndexedDB collection).
-    const degreeImportService = new DegreeImportService(
-      new TransactionalStorageManager(),
-    );
+    const degreeStorage = new TransactionalStorageManager();
+    const degreeImportService = new DegreeImportService(degreeStorage);
+    degreeBucketService.init(degreeStorage);
 
     return {
       profileStateManager,
@@ -171,6 +172,8 @@ export class AppBootstrap {
 
     // Rehydrate a previously-imported degree record (no-op if none/invalid).
     await services.degreeImportService.load();
+    // ...and the manual bucket layout / course placements layered over it.
+    degreeBucketService.load();
   }
 
   static setupWindowUnloadHandler(): void {
@@ -214,9 +217,13 @@ export class AppBootstrap {
       }
     } catch (error) {
       logger.error('Failed to initialize application:', error);
+      // Storage is loaded first in initializeAsyncServices, so by the time a
+      // later step throws the in-memory state is populated and the export the
+      // banner offers is a real backup rather than an empty shell.
       showAppError(
         'Failed to initialize application. Some features may not work properly.',
         () => services.scheduleManagementService.clearAllSchedules(),
+        () => services.scheduleManagementService.exportAllSchedules(),
       );
     }
   }

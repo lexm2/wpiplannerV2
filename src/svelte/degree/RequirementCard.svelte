@@ -1,23 +1,23 @@
 <script lang="ts">
-  import type { Requirement } from '../../types/degree';
+  import type { DegreeBucket } from '../../services/degree/degreeBuckets';
   import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
+  import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
   import { academicYearForPeriod } from '../../services/degree/catalogLookup';
-  import { startDragAutoScroll, stopDragAutoScroll } from './dragAutoScroll';
+  import AssignMenu from './AssignMenu.svelte';
+  import { courseDrag, draggableCourse } from './courseDrag.svelte';
 
-  let { req }: { req: Requirement } = $props();
+  let { bucket }: { bucket: DegreeBucket } = $props();
 
-  // Completed/transfer courses stay fixed; planned (in-progress) + schedule
-  // overlay courses are the draggable tiles, sourced from degreeState.placements.
+  // Completed/transfer courses stay fixed; the rest render as tiles.
   const fixedCourses = $derived(
-    req.appliedCourses.filter(c => !c.isInProgress),
+    bucket.appliedCourses.filter(c => !c.isInProgress),
   );
-  const tiles = $derived(degreeState.placements.get(req.rawName) ?? []);
+  const tiles = $derived(degreeState.placements.get(bucket.id) ?? []);
 
-  // Live status/percent/remaining recomputed from the courses currently placed
-  // in this requirement - updates as tiles are dragged in/out or the overlay toggles.
-  const progress = $derived(effectiveProgress(req, tiles));
+  // Recomputed from the courses currently placed here.
+  const progress = $derived(effectiveProgress(bucket, tiles));
   const pct = $derived(
     progress.fraction === null ? null : Math.round(progress.fraction * 100),
   );
@@ -41,45 +41,24 @@
 
   const emptyTiles = $derived(Array.from({ length: progress.emptySlots }));
 
-  let dragOver = $state(false);
-
-  function badgeFor(kind: string, confidence: string | null): string {
-    if (kind === 'planned') return 'Planned';
-    if (confidence === 'manual') return 'Moved';
-    return confidence === 'exact' ? 'Schedule' : 'Likely';
-  }
-
-  function onDragStart(e: DragEvent, key: string): void {
-    e.dataTransfer?.setData('text/plain', key);
-    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
-    startDragAutoScroll();
-  }
-
-  function onDrop(e: DragEvent): void {
-    e.preventDefault();
-    dragOver = false;
-    stopDragAutoScroll();
-    const key = e.dataTransfer?.getData('text/plain');
-    if (key) degreeState.reassign(key, req.rawName);
-  }
+  // Highlighted while a dragged course hovers this card.
+  const dragOver = $derived(
+    courseDrag.courseId !== null && courseDrag.target === bucket.id,
+  );
 </script>
 
 <article
   class="requirement-card"
   class:is-satisfied={progress.status === 'satisfied'}
   class:drag-over={dragOver}
-  ondragover={e => {
-    e.preventDefault();
-    dragOver = true;
-  }}
-  ondragleave={() => (dragOver = false)}
-  ondrop={onDrop}
+  data-bucket-id={bucket.id}
   role="group"
 >
   <header class="requirement-card-head">
     <div class="requirement-card-titles">
-      <h3 class="requirement-card-name">{req.name}</h3>
-      {#if req.scope}<span class="requirement-card-scope">{req.scope}</span
+      <h3 class="requirement-card-name">{bucket.name}</h3>
+      {#if bucket.scope}<span class="requirement-card-scope"
+          >{bucket.scope}</span
         >{/if}
     </div>
     <span class="req-status req-status-{progress.status}">{statusLabel}</span>
@@ -135,17 +114,23 @@
       {/each}
 
       {#each tiles as tile (tile.key)}
+        <!-- Only schedule tiles are movable; Workday's planned courses stay put. -->
+        {@const movable =
+          tile.kind === 'schedule' && tile.courseId
+            ? {
+                role: 'button',
+                tabindex: 0,
+                title: 'Drag to another bucket, or use the Assign menu',
+              }
+            : {}}
         <div
-          class="requirement-course requirement-course-draggable"
+          class="requirement-course"
           class:is-progress={tile.kind === 'planned'}
           class:is-schedule={tile.kind === 'schedule'}
-          class:is-tentative={tile.confidence === 'heuristic'}
-          draggable="true"
-          ondragstart={e => onDragStart(e, tile.key)}
-          ondragend={stopDragAutoScroll}
-          role="button"
-          tabindex="0"
-          title="Drag to another requirement to re-bucket"
+          class:requirement-course-draggable={tile.kind === 'schedule'}
+          data-course-id={tile.courseId}
+          use:draggableCourse={{ courseId: tile.courseId, from: bucket.id }}
+          {...movable}
         >
           <div class="requirement-course-top">
             <button
@@ -160,12 +145,30 @@
               class="course-badge"
               class:course-badge-progress={tile.kind === 'planned'}
               class:course-badge-schedule={tile.kind === 'schedule'}
-              >{badgeFor(tile.kind, tile.confidence)}</span
+              >{tile.kind === 'planned' ? 'Planned' : 'Schedule'}</span
             >
           </div>
           <span class="requirement-course-title">{tile.title}</span>
           {#if tile.term}<span class="requirement-course-term">{tile.term}</span
             >{/if}
+          {#if tile.kind === 'schedule' && tile.courseId}
+            {@const courseId = tile.courseId}
+            <div class="requirement-course-actions">
+              <AssignMenu
+                {courseId}
+                currentBucketId={bucket.id}
+                label="Move {tile.code}"
+              />
+              <button
+                type="button"
+                class="requirement-course-remove"
+                title="Remove from this bucket"
+                aria-label="Remove {tile.code} from {bucket.name}"
+                onclick={() => degreeBucketService.unassign(courseId)}
+                >&times;</button
+              >
+            </div>
+          {/if}
         </div>
       {/each}
 
@@ -173,10 +176,12 @@
         <button
           type="button"
           class="requirement-course requirement-course-empty"
-          onclick={() => degreePlanService.browseForRequirement(req)}
+          onclick={() => degreePlanService.browseForBucket(bucket)}
         >
           <span class="requirement-course-empty-label">Course needed</span>
-          <span class="requirement-course-empty-hint">Browse courses →</span>
+          <span class="requirement-course-empty-hint"
+            >Browse courses &rarr;</span
+          >
         </button>
       {/each}
     </div>

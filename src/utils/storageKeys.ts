@@ -15,6 +15,8 @@ export const STORAGE_KEYS = {
   ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',
   /** Imported Workday academic-progress record for the Degree page. */
   DEGREE_RECORD: 'wpi-planner-degree-record',
+  /** Manual degree-bucket layout + course placements (survives a re-import). */
+  DEGREE_BUCKET_CONFIG: 'wpi-planner-degree-buckets',
   /** Set on first visit; gates the welcome tutorial auto-start. */
   VISITED: 'wpi_visited',
   /** Expanded/collapsed state of the selected-courses panel. */

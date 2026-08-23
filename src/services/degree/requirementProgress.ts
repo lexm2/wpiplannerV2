@@ -1,6 +1,15 @@
 import type { Requirement, RequirementStatus } from '../../types/degree';
 
 /**
+ * The fields progress is computed from. Structural rather than `Requirement` so
+ * a user-created DegreeBucket shares the same math.
+ */
+export type ProgressTarget = Pick<
+  Requirement,
+  'appliedCourses' | 'creditsRequired' | 'coursesRemaining' | 'status'
+>;
+
+/**
  * Live completion state of a requirement, recomputed from the courses *currently
  * placed* in it: the completed/transfer courses (earned) plus the planned and
  * schedule-overlay tiles sitting in it after any drag re-bucketing (in progress).
@@ -114,7 +123,7 @@ function makeSegments(
 }
 
 export function effectiveProgress(
-  req: Requirement,
+  req: ProgressTarget,
   tiles: ProgressTile[],
 ): EffectiveProgress {
   const earnedCredits = req.appliedCourses

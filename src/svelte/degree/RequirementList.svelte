@@ -1,14 +1,11 @@
 <script lang="ts">
   import type {
-    StudentRecord,
     RequirementStatus,
     RequirementCategory,
   } from '../../types/degree';
   import RequirementCard from './RequirementCard.svelte';
   import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
-
-  let { record }: { record: StudentRecord } = $props();
 
   // Status filter is multi-select: pick any combination of statuses. An empty
   // selection means "All"; selecting every status collapses back to All.
@@ -28,38 +25,33 @@
     selected = next;
   }
 
-  // "Umbrella" requirements are degree-wide aggregates (total credits, residency)
-  // that accumulate every course rather than naming a specific bucket to fill, so
-  // they're hidden by default behind a toggle.
+  // "Umbrella" buckets are degree-wide aggregates (total credits, residency)
+  // that accumulate every course rather than naming something to fill, so
+  // they're hidden behind a toggle.
   const UMBRELLA = new Set<RequirementCategory>(['total_credits', 'residency']);
   let showUmbrella = $state(false);
   const umbrellaCount = $derived(
-    record.requirements.filter(r => UMBRELLA.has(r.category)).length,
+    degreeState.buckets.filter(b => UMBRELLA.has(b.category)).length,
   );
 
-  // Hide the synthetic "Unused Courses" bucket - it's always Not Satisfied and
-  // isn't a real requirement - plus umbrella requirements unless toggled on.
   const visible = $derived(
-    record.requirements.filter(
-      r =>
-        r.category !== 'unused' && (showUmbrella || !UMBRELLA.has(r.category)),
-    ),
+    degreeState.buckets.filter(b => showUmbrella || !UMBRELLA.has(b.category)),
   );
 
-  // Filter/count by the *live* status (reflects schedule overlay + drag moves),
-  // so a requirement that becomes satisfied moves between filters in real time.
+  // Filter/count by the live status, so a bucket that becomes satisfied moves
+  // between filters in real time.
   const withStatus = $derived(
-    visible.map(r => ({
-      r,
-      status: effectiveProgress(r, degreeState.placements.get(r.rawName) ?? [])
+    visible.map(b => ({
+      b,
+      status: effectiveProgress(b, degreeState.placements.get(b.id) ?? [])
         .status,
     })),
   );
 
   const filtered = $derived(
     allActive
-      ? withStatus.map(x => x.r)
-      : withStatus.filter(x => selected.includes(x.status)).map(x => x.r),
+      ? withStatus.map(x => x.b)
+      : withStatus.filter(x => selected.includes(x.status)).map(x => x.b),
   );
 
   const counts = $derived({
@@ -121,11 +113,11 @@
   </div>
 
   {#if filtered.length === 0}
-    <p class="degree-empty-list">No requirements match this filter.</p>
+    <p class="empty-state">No requirements match this filter.</p>
   {:else}
     <div class="degree-card-list">
-      {#each filtered as req (req.rawName)}
-        <RequirementCard {req} />
+      {#each filtered as bucket (bucket.id)}
+        <RequirementCard {bucket} />
       {/each}
     </div>
   {/if}

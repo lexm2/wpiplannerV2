@@ -18,6 +18,7 @@ export interface ThemeColors {
   border: string;
   borderHover: string;
   success: string;
+  successBackground: string;
   warning: string;
   warningBackground: string;
   error: string;

@@ -1,8 +1,8 @@
 /**
  * The single place that maps a degree course (a Workday code string + academic
  * period) onto a catalog {@link Course}. Both directions of the Degree feature
- * use it: planMatcher (plan → schedule) and requirementMatching / degreePlanService
- * (schedule/tiles → catalog entry). Pure (no service/state deps) so it's unit-testable.
+ * use it: planMatcher (plan → schedule) and degreeBuckets / degreePlanService
+ * (tiles → catalog entry). Pure (no service/state deps) so it's unit-testable.
  */
 import type { AppliedCourse } from '../../types/degree';
 import type { Course, Department } from '../../types/types';

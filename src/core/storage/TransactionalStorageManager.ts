@@ -5,7 +5,7 @@ import { Schedule, SchedulePreferences } from '../../types/schedule';
 import { IndexedDBStorageManager } from './IndexedDBStorageManager';
 import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
-import type { StudentRecord } from '../../types/degree';
+import type { DegreeBucketConfig, StudentRecord } from '../../types/degree';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
 
@@ -246,6 +246,35 @@ export class TransactionalStorageManager {
       TransactionalStorageManager.STORAGE_KEYS.DEGREE_RECORD,
       null,
       'degree record',
+    );
+  }
+
+  /** Persist the manual degree-bucket config (layout + course placements). */
+  saveDegreeBucketConfig(config: DegreeBucketConfig | null): TransactionResult {
+    return this.executeSyncTransaction(() => {
+      if (config) {
+        localStorage.setItem(
+          TransactionalStorageManager.STORAGE_KEYS.DEGREE_BUCKET_CONFIG,
+          JSON.stringify(config, this.replacer),
+        );
+      } else {
+        localStorage.removeItem(
+          TransactionalStorageManager.STORAGE_KEYS.DEGREE_BUCKET_CONFIG,
+        );
+      }
+    });
+  }
+
+  /** Load the raw persisted bucket config. Caller validates the schema. */
+  loadDegreeBucketConfig(): {
+    data: DegreeBucketConfig | null;
+    valid: boolean;
+    error?: string;
+  } {
+    return this.safeLoad<DegreeBucketConfig | null>(
+      TransactionalStorageManager.STORAGE_KEYS.DEGREE_BUCKET_CONFIG,
+      null,
+      'degree bucket config',
     );
   }
 

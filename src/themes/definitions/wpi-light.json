@@ -21,6 +21,7 @@
     "border": "#d1d1d6",
     "borderHover": "#c7c7cc",
     "success": "#28a745",
+    "successBackground": "rgba(40, 167, 69, 0.15)",
     "warning": "#fd7e14",
     "warningBackground": "rgba(253, 126, 20, 0.15)",
     "error": "#dc3545",

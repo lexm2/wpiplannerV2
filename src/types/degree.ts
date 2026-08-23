@@ -80,3 +80,27 @@ export interface StudentRecord {
 }
 
 export const DEGREE_SCHEMA_VERSION = 1 as const;
+
+/**
+ * The user's course placements.
+ *
+ * Persisted separately from StudentRecord so a re-import replaces the
+ * transcript without discarding the courses you placed. `assignments` keys on
+ * the catalog course id, which is stable across reloads and independent of
+ * which bucket a course sits in.
+ */
+export interface DegreeBucketConfig {
+  schemaVersion: 1;
+  /** Catalog course id -> bucket id. */
+  assignments: Record<string, string>;
+}
+
+export const DEGREE_BUCKET_CONFIG_VERSION = 1 as const;
+
+/** Bucket id for a Workday-imported requirement. */
+export const importedBucketId = (rawName: string): string => `req:${rawName}`;
+
+export const EMPTY_BUCKET_CONFIG: DegreeBucketConfig = {
+  schemaVersion: DEGREE_BUCKET_CONFIG_VERSION,
+  assignments: {},
+};

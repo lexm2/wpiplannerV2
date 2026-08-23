@@ -21,6 +21,7 @@
     "border": "#000000",
     "borderHover": "#333333",
     "success": "#006600",
+    "successBackground": "rgba(0, 102, 0, 0.1)",
     "warning": "#cc6600",
     "warningBackground": "rgba(204, 102, 0, 0.15)",
     "error": "#cc0000",

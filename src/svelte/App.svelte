@@ -318,7 +318,7 @@
 <div
   class="app-body degree-page"
   id="degree-page"
-  style:display={currentPage === 'degree' ? 'block' : 'none'}
+  style:display={currentPage === 'degree' ? 'flex' : 'none'}
 >
   <DegreePage degreeImportService={services.degreeImportService} />
 </div>

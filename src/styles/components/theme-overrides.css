@@ -21,7 +21,10 @@
 .theme-high-contrast .course-item,
 .theme-high-contrast .btn,
 .theme-high-contrast .field-shell,
-.theme-high-contrast .section-badge {
+.theme-high-contrast .section-badge,
+.theme-high-contrast .requirement-card,
+.theme-high-contrast .requirement-course,
+.theme-high-contrast .degree-filter-chip {
   border-width: 2px;
 }
 
@@ -37,6 +40,9 @@
 
 .theme-high-contrast .course-item:hover,
 .theme-high-contrast .btn:hover,
-.theme-high-contrast .section-badge:hover {
+.theme-high-contrast .section-badge:hover,
+.theme-high-contrast .requirement-card:hover,
+.theme-high-contrast .requirement-course-draggable:hover,
+.theme-high-contrast .degree-filter-chip:hover {
   border-width: 3px;
 }
