@@ -12,7 +12,8 @@ import { ApplicationState, COMPONENT_KINDS } from '../../types';
 import { ScheduleState } from '../../types/ScheduleState';
 import type { TransactionResult } from '../storage';
 import { TransactionalStorageManager } from '../storage';
-import { getAllSections, setReplacer, setReviver, logger } from '../../utils';
+import { getAllSections, logger } from '../../utils';
+import { deepClone } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
 import { UndoRedoManager } from './UndoRedoManager';
 import { appState } from './appState.svelte';
@@ -634,8 +635,8 @@ export class ProfileStateManager {
     this.state.activeScheduleId = snapshot.activeScheduleId;
 
     const schedulesArray = Array.from(snapshot.schedules.values());
-    this.state.schedules = this.deepClone(schedulesArray);
-    this.state.preferences = this.deepClone(snapshot.preferences);
+    this.state.schedules = deepClone(schedulesArray);
+    this.state.preferences = deepClone(snapshot.preferences);
 
     if (this.state.activeScheduleId) {
       const activeSchedule = this.state.schedules.find(
@@ -651,10 +652,6 @@ export class ProfileStateManager {
     } else {
       this.state.selectedCourses = [];
     }
-  }
-
-  private deepClone<T>(obj: T): T {
-    return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
   }
 
   restoreTutorialState(data: {

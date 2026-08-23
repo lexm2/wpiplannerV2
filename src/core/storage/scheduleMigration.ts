@@ -113,7 +113,9 @@ export function migrateStoredSchedule(
   if (!Array.isArray(schedule.selectedCourses)) return raw as Schedule;
 
   let changed = 0;
-  const selectedCourses = schedule.selectedCourses.map(sc => {
+  // Annotated because Array.isArray() narrows `unknown` to `any[]`, which would
+  // otherwise make every element `any` from here down.
+  const selectedCourses = schedule.selectedCourses.map((sc: unknown) => {
     if (!sc || typeof sc !== 'object') return sc;
     const migrated = migrateSelectedCourse(sc as StoredCourse);
     if (migrated !== sc) changed++;

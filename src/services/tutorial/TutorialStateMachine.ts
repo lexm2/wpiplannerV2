@@ -9,7 +9,7 @@ import {
   closeAllModals,
   openModal,
 } from '../ui/uiState.svelte';
-import { setReplacer, setReviver } from '../../utils';
+import { deepClone } from '../../utils/jsonSerializer';
 
 export class TutorialStateMachine {
   private snapshots: Map<number, TutorialSnapshot> = new Map();
@@ -21,12 +21,10 @@ export class TutorialStateMachine {
     const snapshot: TutorialSnapshot = {
       stepIndex,
       activeScheduleId: state.activeScheduleId,
-      schedules: this.deepClone(state.schedules),
-      preferences: this.deepClone(state.preferences),
+      schedules: deepClone(state.schedules),
+      preferences: deepClone(state.preferences),
       uiState: getUiSnapshot(),
-      activeFilters: this.deepClone(
-        this.services.filterService.getActiveFilters(),
-      ),
+      activeFilters: deepClone(this.services.filterService.getActiveFilters()),
     };
     this.snapshots.set(stepIndex, snapshot);
   }
@@ -40,8 +38,8 @@ export class TutorialStateMachine {
 
     this.services.profileStateManager.restoreTutorialState({
       activeScheduleId: snapshot.activeScheduleId,
-      schedules: this.deepClone(snapshot.schedules),
-      preferences: this.deepClone(snapshot.preferences),
+      schedules: deepClone(snapshot.schedules),
+      preferences: deepClone(snapshot.preferences),
     });
 
     this.services.filterService.clearFilters();
@@ -97,9 +95,5 @@ export class TutorialStateMachine {
         autoScheduleService.openAutoScheduleFilter();
         break;
     }
-  }
-
-  private deepClone<T>(obj: T): T {
-    return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
   }
 }

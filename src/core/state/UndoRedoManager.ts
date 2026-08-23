@@ -1,4 +1,4 @@
-import { setReplacer, setReviver } from '../../utils/jsonSerializer';
+import { deepClone } from '../../utils/jsonSerializer';
 import type { Schedule, SchedulePreferences } from '../../types/schedule';
 import { appState } from './appState.svelte';
 
@@ -27,7 +27,7 @@ export class UndoRedoManager {
       timestamp: Date.now(),
       activeScheduleId,
       schedules: this.deepCloneSchedulesMap(schedules),
-      preferences: this.deepClone(preferences),
+      preferences: deepClone(preferences),
     };
 
     this.history.push(snapshot);
@@ -81,15 +81,11 @@ export class UndoRedoManager {
     appState.canRedo = this.canRedo();
   }
 
-  private deepClone<T>(obj: T): T {
-    return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
-  }
-
   private deepCloneSchedulesMap(
     schedules: Map<string, Schedule>,
   ): Map<string, Schedule> {
     const schedulesArray = Array.from(schedules.entries());
-    const clonedArray = this.deepClone(schedulesArray);
+    const clonedArray = deepClone(schedulesArray);
     return new Map(clonedArray);
   }
 }
