@@ -161,10 +161,8 @@
 
   // Schedule actions
   //
-  // setActiveSchedule is async and reports failure by returning
-  // {success:false, error}, not by throwing. The previous sync try/catch could
-  // catch neither, so a switch that failed validation or hit a missing
-  // schedule did nothing visible at all.
+  // setActiveSchedule reports failure by returning {success:false, error}
+  // rather than throwing, so the result needs checking as well as the catch.
   async function switchToSchedule(scheduleId: string): Promise<void> {
     try {
       const result =
@@ -219,9 +217,9 @@
     refreshTick++;
   }
 
-  // showConfirm returns immediately and fires onConfirm later, from the modal.
-  // handleAction's try/catch is off the stack by then, so each confirm handler
-  // has to surface its own failure or the action fails silently.
+  // showConfirm fires onConfirm later, from the modal, by which point
+  // handleAction's try/catch is off the stack -- so each confirm handler has to
+  // surface its own failure.
   async function confirmDelete(schedule: Schedule): Promise<void> {
     try {
       await scheduleManagementService.deleteSchedule(schedule.id);

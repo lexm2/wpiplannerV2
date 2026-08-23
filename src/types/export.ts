@@ -16,11 +16,9 @@ export interface MinimalSyncData {
 }
 
 /**
- * This format arrives from outside the app -- users paste files they exported
- * earlier, possibly from an older build -- so it is parsed rather than
- * asserted. Callers should use safeParse and report a friendly message; the
- * version check on `v` is deliberately left to them, so an old-but-well-formed
- * file gets "please re-export" rather than a schema error.
+ * Untrusted input: users paste files they exported earlier, possibly from an
+ * older build. The `v` check is left to callers so a well-formed but outdated
+ * file can get "please re-export" rather than a schema error.
  */
 export const MinimalSyncDataSchema = z.object({
   v: z.string(),

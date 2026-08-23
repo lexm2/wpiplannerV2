@@ -352,11 +352,8 @@ export class ScheduleManagementService {
         };
       }
 
-      // Must be awaited: deleteSchedule awaits storage and only then
-      // reassigns activeScheduleId, so an unawaited call let save() below
-      // persist pre-delete state and returned success before the delete had
-      // landed. Its false result (e.g. refusing to remove the only remaining
-      // schedule) was being discarded too.
+      // Must be awaited: deleteSchedule reassigns activeScheduleId only after
+      // storage resolves, so save() below would persist pre-delete state.
       const deleted = await this.profileStateManager.deleteSchedule(
         scheduleId,
         'api',
@@ -567,8 +564,8 @@ export class ScheduleManagementService {
     try {
       await this.ensureInitialized();
 
-      // safeParse, not parse: a malformed or older file should get the same
-      // friendly "re-export" message as a version mismatch, not a schema throw.
+      // safeParse so a malformed file gets the same friendly message as an
+      // out-of-date one, rather than a schema throw.
       const parsed = MinimalSyncDataSchema.safeParse(JSON.parse(jsonData));
       if (!parsed.success || !parsed.data.v.startsWith('4')) {
         return {
@@ -613,7 +610,7 @@ export class ScheduleManagementService {
     return this.courseSelectionService;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- paired with CourseSelectionService.performHealthCheck; awaited
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited; paired with the CourseSelectionService method
   async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
     const issues: string[] = [];
 

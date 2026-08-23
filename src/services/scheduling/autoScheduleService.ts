@@ -67,9 +67,7 @@ class AutoScheduleService {
     modalState.filter = {
       mode: 'auto-schedule',
       coursesToSchedule,
-      // onGenerate is typed () => void and called fire-and-forget;
-      // doGenerateSchedules is fully try/caught into showAppError internally,
-      // so it cannot reject.
+      // onGenerate returns void; doGenerateSchedules handles its own errors.
       onGenerate: () => {
         void this.doGenerateSchedules(coursesToSchedule);
       },

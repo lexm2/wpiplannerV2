@@ -96,15 +96,10 @@ export default [
       'no-useless-assignment': 'warn',
       'preserve-caught-error': 'warn',
 
-      // Off after reading all 10 findings: every one was a false positive.
-      // They were $derived.by() locals that never escape their closure,
-      // copy-on-write state (`const next = new Set(prev); ...; state = next`,
-      // which is the correct Svelte 5 idiom -- SvelteSet would make it
-      // mutation-based and change behavior), module-level bookkeeping maps, and
-      // two `new Date()` passed straight into toLocaleDateString.
-      // The distinction is already being drawn correctly by hand: see
-      // termExpansion.svelte.ts:20, which uses SvelteMap for the one collection
-      // in that file that really is read reactively.
+      // All 10 findings were $derived.by locals, copy-on-write state, or
+      // internal bookkeeping -- none read reactively, and SvelteSet would make
+      // the copy-on-write ones mutation-based. Collections that really are
+      // reactive already use SvelteMap (termExpansion.svelte.ts).
       'svelte/prefer-svelte-reactivity': 'off',
 
       // termsByCourse in AutoScheduleIntro.svelte is reassigned, so dropping
@@ -149,15 +144,10 @@ export default [
       // dependency without using the value. The base rule reads it as dead code.
       '@typescript-eslint/no-unused-expressions': 'off',
 
-      // The no-unsafe-* family cannot work through svelte-eslint-parser. Types
-      // are lost crossing the compiler's intermediate representation, so fully
-      // typed source still reads as `any`: Modal.svelte declares
-      // `children: Snippet<[() => void]>` yet `{#snippet children(close)}`
-      // yields `close: any`, and TextField.svelte declares
-      // `onchange?: (event: Event) => void` yet inline arrows at call sites get
-      // `e: any`. tsc and svelte-check accept every one of these. There is
-      // nothing to annotate -- the only fix would be ~18 inline disables that
-      // catch no real defects.
+      // Types are lost crossing svelte-eslint-parser's intermediate
+      // representation, so snippet parameters and component callback props
+      // read as `any` however well they are declared. tsc and svelte-check
+      // accept all of them; there is nothing to annotate.
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
@@ -188,15 +178,11 @@ export default [
     rules: { 'no-console': 'off' },
   },
 
-  // One-off data-munging CLI tools. They parse external JSON and scraped
-  // GraphQL, `any` is the honest type for that, and nothing under src/ imports
-  // them -- their only output is public/*.json, which the app fetches at
-  // runtime. Same argument the tests/ block above already makes.
+  // One-off CLI tools parsing external JSON and scraped GraphQL, imported by
+  // nothing under src/. Same argument as the tests/ block above.
   //
-  // scripts/**/types.ts is deliberately excluded: rateMyProfessor/types.ts is
-  // not a munging script but the schema for public/rateMyProfessor.json, whose
-  // consumer (RateMyProfessorService.ts) is a genuine unsafe boundary. Relaxing
-  // it would disarm the producer side of a live contract.
+  // types.ts is excluded: it is the schema for public/rateMyProfessor.json,
+  // not a munging script, and the app reads that file.
   {
     files: ['scripts/**/*.ts', 'scripts/**/*.mjs'],
     ignores: ['scripts/**/types.ts'],
@@ -211,8 +197,7 @@ export default [
     },
   },
 
-  // logger.ts IS the logging abstraction -- it wraps console.* behind an
-  // import.meta.env.DEV guard. It is the one correct place for a raw console.
+  // The logging abstraction itself: the one correct place for a raw console.
   {
     files: ['src/utils/logger.ts'],
     rules: { 'no-console': 'off' },

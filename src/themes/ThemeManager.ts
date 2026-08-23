@@ -60,11 +60,9 @@ class DefaultThemeStorage implements ThemeStorage {
 }
 
 /**
- * Object.entries() has no overload matching an interface without an index
- * signature -- and interfaces, unlike type aliases, never get an implicit one --
- * so it falls back to [string, any][] and the CSS values below arrive untyped.
- * This recovers the value type; the assertion is exactly what Object.entries
- * already guarantees.
+ * Object.entries has no overload for an interface without an index signature --
+ * and interfaces, unlike type aliases, never get an implicit one -- so it falls
+ * back to [string, any][]. This recovers the value type.
  */
 function cssEntries<T extends object>(obj: T): [string, T[keyof T]][] {
   return Object.entries(obj) as [string, T[keyof T]][];

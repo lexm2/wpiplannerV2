@@ -600,7 +600,7 @@ export class ProfileStateManager {
     return [...(this.state.preferences.bookmarkedCourseIds ?? [])];
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- public async API; all four call sites consume it with .catch()
+  // eslint-disable-next-line @typescript-eslint/require-await -- consumed as a promise by callers
   async undo(): Promise<boolean> {
     const snapshot = this.undoRedoManager.undo();
     if (!snapshot) return false;
@@ -615,7 +615,7 @@ export class ProfileStateManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- public async API; all four call sites consume it with .catch()
+  // eslint-disable-next-line @typescript-eslint/require-await -- consumed as a promise by callers
   async redo(): Promise<boolean> {
     const snapshot = this.undoRedoManager.redo();
     if (!snapshot) return false;
@@ -829,7 +829,7 @@ export class ProfileStateManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- public async API, awaited by both callers
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by callers
   async exportData(): Promise<string | null> {
     const applicationState = this.createApplicationState();
     const minimalData = applicationState.toMinimalFormat();

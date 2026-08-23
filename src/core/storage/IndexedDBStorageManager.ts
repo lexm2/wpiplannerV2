@@ -21,14 +21,10 @@ interface StorageResult<T> {
 }
 
 /**
- * Shape of a row in the SCHEDULES object store. This is what saveSchedule()
- * writes and what both load paths read back; it had previously only ever
- * existed as an anonymous object literal, so reads came back as `any`.
+ * A row in the SCHEDULES object store, as saveSchedule() writes it.
  *
- * Everything but `id` and `timestamp` is optional because rows written by older
- * builds predate those fields: `serializedData`/`compressed` are absent on rows
- * that stored the schedule object directly, and `schemaVersion` is absent
- * before migrations were introduced.
+ * The optional fields are absent on rows from older builds: serializedData and
+ * compressed predate serialization, schemaVersion predates migrations.
  */
 interface StoredScheduleRow {
   id: string;
@@ -192,11 +188,9 @@ export class IndexedDBStorageManager {
         const request = store.get(scheduleId);
 
         request.onsuccess = async () => {
-          // Every path below must reach resolve(). The enclosing try/catch in
-          // loadSchedule() cannot see a throw from this callback -- it runs
-          // long after that block returned -- so without this handler a
-          // rejecting worker task or a JSON.parse on a corrupt row would leave
-          // the promise pending forever and hang the caller.
+          // Every path must reach resolve(). loadSchedule's try/catch cannot
+          // see a throw from here -- it runs long after that block returned --
+          // so an uncaught one would leave the promise pending forever.
           try {
             const stored = request.result as StoredScheduleRow | undefined;
 
@@ -205,8 +199,7 @@ export class IndexedDBStorageManager {
               return;
             }
 
-            // A row with no serializedData predates serialization: it stored
-            // the schedule object directly.
+            // Pre-serialization row: it stored the schedule object directly.
             if (!stored.serializedData) {
               resolve({
                 success: true,
@@ -436,8 +429,7 @@ export class IndexedDBStorageManager {
     }
   }
 
-  // Mirrors initialize(): Promise<void> as the other half of the lifecycle
-  // pair; the teardown just happens not to need awaiting today.
+  // The other half of initialize()'s lifecycle pair.
   // eslint-disable-next-line @typescript-eslint/require-await
   async close(): Promise<void> {
     if (this.db) {

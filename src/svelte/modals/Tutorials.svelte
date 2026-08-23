@@ -23,8 +23,7 @@
           data-tutorial-id={t.id}
           onclick={() => {
             close();
-            // The modal is already closed by the time start() can reject, so
-            // without this a failure leaves the user looking at nothing.
+            // The modal is already closed by the time start() can reject.
             tutorial.start(t.id).catch((error: unknown) => {
               logger.error('Failed to start tutorial:', error);
               showAppError('Failed to start tutorial. Please try again.');

@@ -63,7 +63,7 @@ export class TransactionalStorageManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- transaction API is async by contract even when a given path is not
+  // eslint-disable-next-line @typescript-eslint/require-await -- async by contract
   async executeTransaction(
     operations: (() => void)[],
   ): Promise<TransactionResult> {
@@ -364,8 +364,8 @@ export class TransactionalStorageManager {
         return { data: defaultValue, valid: true };
       }
 
-      // JSON.parse returns any; T is the caller's declared expectation for
-      // this key, and a mismatch surfaces as a validation failure downstream.
+      // T is the caller's expectation for this key; a mismatch surfaces as a
+      // validation failure downstream.
       const parsed = JSON.parse(stored, this.reviver) as T;
       return { data: parsed, valid: true };
     } catch (error) {

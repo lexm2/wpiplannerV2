@@ -51,8 +51,7 @@ export class TutorialService {
     if (tutorial.onStart) {
       const result = tutorial.onStart();
       if (result instanceof Promise) {
-        // onStart is supplied by the tutorial definition, so this is external
-        // code and a rejection is not ours to assume away.
+        // onStart comes from the tutorial definition, so it is external code.
         result.then(
           () =>
             requestAnimationFrame(() => {

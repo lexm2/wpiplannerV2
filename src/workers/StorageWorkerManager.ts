@@ -28,7 +28,7 @@ export class StorageWorkerManager {
     return StorageWorkerManager.instance;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- lifecycle API, awaited on every storage operation
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited on every storage operation
   async initialize(): Promise<void> {
     if (typeof Worker === 'undefined') {
       logger.warn(
@@ -102,7 +102,7 @@ export class StorageWorkerManager {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- must stay async: executeTask returns it directly as Promise<T>
+  // eslint-disable-next-line @typescript-eslint/require-await -- executeTask returns it directly as Promise<T>
   private async executeFallback<T>(
     type: WorkerTaskType,
     payload: unknown,

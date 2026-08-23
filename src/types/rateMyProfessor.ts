@@ -1,11 +1,7 @@
 /**
- * The contract for public/rateMyProfessor.json.
- *
- * Lives here, rather than in scripts/, because it has two sides:
- * scripts/rateMyProfessor/fetchRateMyProfessor.ts writes the file and
- * src/services/external/RateMyProfessorService.ts reads it. The two used to
- * carry near-identical private copies of these interfaces, which could drift
- * without anything noticing.
+ * The contract for public/rateMyProfessor.json, shared so the two sides cannot
+ * drift: scripts/rateMyProfessor/fetchRateMyProfessor.ts writes the file and
+ * services/external/RateMyProfessorService.ts reads it.
  */
 import { z } from 'zod';
 

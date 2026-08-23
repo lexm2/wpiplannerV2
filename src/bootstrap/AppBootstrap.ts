@@ -174,10 +174,8 @@ export class AppBootstrap {
   }
 
   static setupWindowUnloadHandler(): void {
-    // Deliberately not async: the handler body has nothing to await, and an
-    // async handler returns a Promise, which is truthy -- the legacy signal for
-    // forcing the browser's unload dialog in engines that still honor a
-    // returned value.
+    // Not async: a returned Promise is truthy, which is the legacy signal for
+    // forcing the browser's unload dialog.
     window.addEventListener('beforeunload', e => {
       const profileStateManager = ProfileStateManager.getInstance();
 

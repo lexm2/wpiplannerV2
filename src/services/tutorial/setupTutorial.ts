@@ -129,9 +129,8 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     if (appState.activeScheduleId !== tutorialScheduleId) {
       tutorialService.cancel();
       cleaningUp = true;
-      // cleanupTutorial has no internal try/catch and awaits both
-      // setActiveSchedule and deleteSchedule, and .finally rethrows -- so
-      // without a catch a teardown failure escapes as an unhandled rejection.
+      // cleanupTutorial has no internal try/catch and .finally rethrows, so a
+      // teardown failure would escape as an unhandled rejection.
       cleanupTutorial(true)
         .catch((error: unknown) => {
           logger.error('Tutorial cleanup failed:', error);

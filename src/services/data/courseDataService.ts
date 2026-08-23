@@ -67,10 +67,8 @@ export class CourseDataService {
       );
     }
 
-    // Envelope only. The payload is ~1275 departments of nested courses,
-    // sections and periods, so deep-validating it on every load would cost far
-    // more than it catches -- parseConstructedDepartments below already parses
-    // each record defensively. This just stops `any` leaking out of json().
+    // Envelope only: the payload is ~1275 departments of nested records, and
+    // parseConstructedDepartments below already parses each one defensively.
     const jsonData = CourseDataEnvelopeSchema.parse(await response.json());
     return this.parseJSONData(jsonData);
   }

@@ -108,8 +108,8 @@ export class DebouncedOperation {
         clearTimeout(this.timeoutId);
       }
 
-      // The callback settles the promise on every path, so it cannot reject;
-      // the void-wrapped IIFE is what lets setTimeout keep its void contract.
+      // The callback settles on every path; the void-wrapped IIFE keeps
+      // setTimeout's void contract.
       this.timeoutId = window.setTimeout(() => {
         void (async () => {
           try {
@@ -126,10 +126,8 @@ export class DebouncedOperation {
             // every superseded keystroke, and made callers'
             // CancellationError branch unreachable. They filter by name.
             //
-            // Preserving Error identity matters: callers branch on
-            // error.name === 'CancellationError' (see SearchBar), so wrapping
-            // a real Error would break the cancellation path and surface a
-            // spurious search error on every superseded keystroke.
+            // Keep Error identity: callers branch on error.name, so wrapping a
+            // real Error would break the cancellation path.
             reject(error instanceof Error ? error : new Error(String(error)));
           }
         })();

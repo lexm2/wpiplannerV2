@@ -248,7 +248,7 @@ export class CourseSelectionService {
     try {
       const selectedCourses = this.profileStateManager.getSelectedCourses();
 
-      // eslint-disable-next-line @typescript-eslint/require-await -- withBatch takes () => Promise<T>, so the callback must be async
+      // eslint-disable-next-line @typescript-eslint/require-await -- withBatch takes () => Promise<T>
       await this.profileStateManager.withBatch(async () => {
         for (const selectedCourse of selectedCourses) {
           this.profileStateManager.setSelectedComponents(
@@ -323,7 +323,7 @@ export class CourseSelectionService {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/require-await -- withBatch takes () => Promise<T>, so the callback must be async
+      // eslint-disable-next-line @typescript-eslint/require-await -- withBatch takes () => Promise<T>
       await this.profileStateManager.withBatch(async () => {
         for (const selection of selections) {
           this.profileStateManager.setSelectedComponents(
@@ -454,7 +454,7 @@ export class CourseSelectionService {
     return this.getSelectedCourses().map(sc => sc.course.id);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- paired with ScheduleManagementService.performHealthCheck; awaited
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited; paired with the ScheduleManagementService method
   async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
     const issues: string[] = [];
 
@@ -547,7 +547,7 @@ export class CourseSelectionService {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by performHealthCheck above
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by performHealthCheck
   private async attemptDataRepair(): Promise<boolean> {
     try {
       const selectedCourses = this.getSelectedCourses();
