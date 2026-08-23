@@ -1,5 +1,6 @@
 <script lang="ts">
   import FilterSection from './FilterSection.svelte';
+  import TextField from '../ui/TextField.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CreditRangeFilterCriteria } from '../../types/filters';
 
@@ -24,28 +25,26 @@
 <FilterSection title="Credit Hours">
   <div class="filter-range-container">
     <div class="filter-range-inputs">
-      <div class="filter-range-input">
-        <label for="credit-min">Min Credits</label>
-        <input
-          id="credit-min"
-          type="number"
-          min="1"
-          max="4"
-          value={minCredits}
-          onchange={(e) => update(parseInt(e.currentTarget.value), maxCredits)}
-        />
-      </div>
-      <div class="filter-range-input">
-        <label for="credit-max">Max Credits</label>
-        <input
-          id="credit-max"
-          type="number"
-          min="1"
-          max="4"
-          value={maxCredits}
-          onchange={(e) => update(minCredits, parseInt(e.currentTarget.value))}
-        />
-      </div>
+      <TextField
+        id="credit-min"
+        type="number"
+        label="Min Credits"
+        panel
+        min={1}
+        max={4}
+        value={String(minCredits)}
+        onchange={(e) => update(parseInt((e.currentTarget as HTMLInputElement).value), maxCredits)}
+      />
+      <TextField
+        id="credit-max"
+        type="number"
+        label="Max Credits"
+        panel
+        min={1}
+        max={4}
+        value={String(maxCredits)}
+        onchange={(e) => update(minCredits, parseInt((e.currentTarget as HTMLInputElement).value))}
+      />
     </div>
     <div class="filter-quick-select">
       <button class="filter-quick-btn" onclick={() => update(1, 1)}>1</button>

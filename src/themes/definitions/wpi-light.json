@@ -7,6 +7,7 @@
     "primaryHover": "#9c2f3d",
     "primaryLight": "#d4556b",
     "primaryBackground": "rgba(184, 57, 74, 0.1)",
+    "primaryRgb": "184, 57, 74",
     "secondary": "#f8f8fa",
     "secondaryHover": "#ededef",
     "background": "#ffffff",

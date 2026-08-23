@@ -1,5 +1,6 @@
 <script lang="ts">
   import FilterSection from './FilterSection.svelte';
+  import TextField from '../ui/TextField.svelte';
   import FilterToggle from './FilterToggle.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
@@ -119,17 +120,16 @@
   />
 
   <div class="filter-range-container filter-subsection">
-    <div class="filter-range-input">
-      <label for="min-seats-filter">Minimum Available Seats</label>
-      <input
-        type="number"
-        id="min-seats-filter"
-        min="0"
-        max="999"
-        placeholder="Any"
-        value={minAvailable ?? ''}
-        oninput={(e) => onMinSeats(e.currentTarget.value)}
-      />
-    </div>
+    <TextField
+      id="min-seats-filter"
+      type="number"
+      label="Minimum Available Seats"
+      panel
+      min={0}
+      max={999}
+      placeholder="Any"
+      value={String(minAvailable ?? '')}
+      oninput={(e) => onMinSeats((e.currentTarget as HTMLInputElement).value)}
+    />
   </div>
 </FilterSection>

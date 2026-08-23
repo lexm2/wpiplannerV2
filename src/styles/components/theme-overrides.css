@@ -7,6 +7,12 @@
   color-scheme: light;
 }
 
+/* Classic is a light-ground theme too. Without this its native date/time
+   pickers render with the UA's default chrome instead of the theme's. */
+.theme-wpi-classic {
+  color-scheme: light;
+}
+
 .theme-high-contrast {
   /* Additional high contrast specific styles */
   --effect-transition: all 0.1s ease;
@@ -14,8 +20,19 @@
 
 .theme-high-contrast .course-item,
 .theme-high-contrast .btn,
+.theme-high-contrast .field-shell,
 .theme-high-contrast .section-badge {
   border-width: 2px;
+}
+
+/* In this theme --color-primary and --color-border are both #000000, so the
+   focus border-colour change is a no-op and the ring resolves to a barely
+   visible rgba(0,0,0,0.2). An explicit outline is the only unambiguous focus
+   signal here. */
+.theme-high-contrast .field-shell:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .theme-high-contrast .course-item:hover,

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getDepartmentCategory, CATEGORY_ORDER } from '../../utils/departmentUtils';
   import FilterSection from './FilterSection.svelte';
+  import TextField from '../ui/TextField.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { Course } from '../../types/types';
   import type { DepartmentFilterCriteria } from '../../types/filters';
@@ -110,9 +111,10 @@
       <span class="filter-toggle-text">Search by Credit Requirements</span>
     </label>
     <div class="filter-search-container">
-      <input
-        type="text"
-        class="filter-search"
+      <TextField
+        type="search"
+        panel
+        ariaLabel={isCategoryMode ? 'Search categories' : 'Search departments'}
         placeholder={isCategoryMode ? 'Search categories...' : 'Search departments...'}
         bind:value={search}
       />

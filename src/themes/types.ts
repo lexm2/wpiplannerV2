@@ -2,6 +2,8 @@ export interface ThemeColors {
     primary: string;
     primaryHover: string;
     primaryLight: string;
+    /** Comma-separated channels for rgba() composition, e.g. "212, 66, 79". */
+    primaryRgb: string;
     secondary: string;
     secondaryHover: string;
     background: string;

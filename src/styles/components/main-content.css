@@ -24,10 +24,6 @@
   flex: 1;
 }
 
-.content-controls .search-input {
-  width: 100%;
-}
-
 /* The FilterButtons Svelte component mounts here; `display: contents` lets its
    children (clear-filters-btn + .filter-buttons) participate in the
    .content-controls flex row exactly as the original inline DOM did. */
@@ -110,63 +106,18 @@
   align-items: center;
 }
 
-.search-input {
-  padding: 0.5rem 3.5rem 0.5rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  font-size: 14px;
-  min-width: 200px;
-  transition: var(--effect-transition);
-  background: var(--color-surface);
-  color: var(--color-text);
+/* Chrome and affix placement come from the shared TextField; only the field's
+   share of the controls row belongs here. Left padding matches the 1rem the
+   search box used before the buttons stopped being absolute overlays. */
+.search-field {
+  flex: 1;
+  min-width: 12.5rem;
 }
 
-.search-mode-btn,
-.search-clear-btn {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--color-text-secondary);
-  transition: var(--effect-transition);
-}
-
-.search-mode-btn {
-  right: 1.9rem;
-}
-
-.search-clear-btn {
-  right: 0.5rem;
-}
-
-.search-mode-btn:hover,
-.search-clear-btn:hover {
-  color: var(--color-text);
-}
-
-.search-mode-btn.active {
-  color: var(--color-primary);
-}
-
-.search-mode-btn .school-icon,
-.search-mode-btn .school-full-icon,
-.search-clear-btn .x-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary)20;
-}
-
-.search-input::placeholder {
-  color: var(--color-text-secondary);
+/* input.css is imported after this file, so `.field--panel .field-shell` would
+   win at equal specificity; the extra `.field` raises this above it. */
+.field.search-field .field-shell {
+  padding-left: 1rem;
 }
 
 @media (max-width: 1600px) {

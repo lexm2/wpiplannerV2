@@ -6,6 +6,7 @@
   import { DayOfWeek } from '../../types/types';
   import { getInlineSVG } from '../../utils/iconPaths';
   import styles from '../../styles/components/local-event-modal.module.css';
+  import TextField from '../ui/TextField.svelte';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
@@ -143,31 +144,25 @@
   <Modal typeId="local-event" title={isEditMode ? 'Edit Event' : 'Add Event'} showHeader {onRequestClose}>
     {#snippet children(close)}
       <div class="modal-body {styles['local-event-form']}" data-type={eventType}>
-        <div class="form-group">
-          <label for="event-title">Title <span class="required">*</span></label>
-          <!-- svelte-ignore a11y_autofocus -->
-          <input
-            type="text"
-            id="event-title"
-            class="form-input"
-            class:form-error={titleError}
-            placeholder="Event title"
-            autofocus
-            bind:value={title}
-            oninput={() => (titleError = false)}
-            onkeydown={(e) => onTitleKeydown(e, close)}
-          />
-        </div>
+        <TextField
+          id="event-title"
+          label="Title"
+          required
+          autofocus
+          placeholder="Event title"
+          error={titleError ? 'Enter a title.' : undefined}
+          bind:value={title}
+          oninput={() => (titleError = false)}
+          onkeydown={(e) => onTitleKeydown(e, close)}
+        />
 
-        <div class="form-group">
-          <label for="event-description">Description</label>
-          <textarea
-            id="event-description"
-            class="form-input form-textarea"
-            placeholder="Optional description"
-            bind:value={description}
-          ></textarea>
-        </div>
+        <TextField
+          id="event-description"
+          label="Description"
+          multiline
+          placeholder="Optional description"
+          bind:value={description}
+        />
 
         <div class="form-group">
           <span class="form-label" id="event-type-label">Event Type</span>
@@ -199,17 +194,14 @@
 
         {#if eventType === EventType.ONE_TIME}
           <div class={styles['one-time-fields']}>
-            <div class="form-group">
-              <label for="event-date">Date</label>
-              <input
-                type="date"
-                id="event-date"
-                class="form-input"
-                class:form-error={dateError}
-                bind:value={date}
-                oninput={() => (dateError = false)}
-              />
-            </div>
+            <TextField
+              id="event-date"
+              type="date"
+              label="Date"
+              error={dateError ? 'Pick a date.' : undefined}
+              bind:value={date}
+              oninput={() => (dateError = false)}
+            />
           </div>
         {:else}
           <div class={styles['recurring-fields']}>
@@ -264,20 +256,23 @@
         <div class="form-group">
           <span class="form-label" id="event-time-label">Time</span>
           <div class={styles['time-row']} role="group" aria-labelledby="event-time-label">
-            <div class={styles['form-group-time']}>
-              <input type="time" id="event-start" class="form-input" bind:value={startTime} />
-            </div>
+            <TextField
+              id="event-start"
+              type="time"
+              ariaLabel="Start time"
+              fieldClass={styles['form-group-time']}
+              bind:value={startTime}
+            />
             <span class={styles['time-separator']}>to</span>
-            <div class={styles['form-group-time']}>
-              <input
-                type="time"
-                id="event-end"
-                class="form-input"
-                class:form-error={endError}
-                bind:value={endTime}
-                oninput={() => (endError = false)}
-              />
-            </div>
+            <TextField
+              id="event-end"
+              type="time"
+              ariaLabel="End time"
+              fieldClass={styles['form-group-time']}
+              error={endError ? 'End time must be after the start time.' : undefined}
+              bind:value={endTime}
+              oninput={() => (endError = false)}
+            />
           </div>
         </div>
       </div>

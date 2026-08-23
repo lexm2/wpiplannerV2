@@ -22,6 +22,7 @@
 /* component-wizard.module.css - imported directly in ComponentSelectionWizard.svelte */
 @import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
 @import url('./styles/components/buttons.css');
+@import url('./styles/components/input.css'); /* TextField primitive - svelte/ui/TextField.svelte */
 @import url('./styles/components/states.css');
 @import url('./styles/components/conflict-modal.css'); /* Schedule conflict resolution modal */
 @import url('./styles/components/responsive.css');

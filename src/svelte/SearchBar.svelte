@@ -1,5 +1,6 @@
 <script lang="ts">
   import { slideFade } from './transitions';
+  import TextField from './ui/TextField.svelte';
   import { untrack } from 'svelte';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
@@ -123,15 +124,16 @@
   }
 </script>
 
-<input
-  type="text"
+<TextField
   id="search-input"
-  class="search-input"
+  panel
+  fieldClass="search-field"
+  ariaLabel="Search courses"
+  placeholder={professorMode ? 'Search professors...' : 'Search courses...'}
   bind:value={query}
   oninput={onInput}
   onblur={onBlur}
-  placeholder={professorMode ? 'Search professors...' : 'Search courses...'}
-  aria-label="Search courses"
+  {trailing}
 />
 {#if dropdownOpen && professorMatches.length > 0}
   <div
@@ -149,21 +151,24 @@
     {/each}
   </div>
 {/if}
-<button
-  id="search-mode-btn"
-  class="search-mode-btn"
-  class:active={professorMode}
-  title="Search professors"
-  aria-label="Toggle professor search"
-  onclick={toggleMode}
->{@html professorMode
-  ? getInlineSVG('SCHOOL_FULL', 'school-full-icon')
-  : getInlineSVG('SCHOOL', 'school-icon')}</button>
-<button
-  id="search-clear-btn"
-  class="search-clear-btn"
-  title="Clear search"
-  aria-label="Clear search"
-  hidden={query === ''}
-  onclick={clear}
->{@html getInlineSVG('X', 'x-icon')}</button>
+{#snippet trailing()}
+  <button
+    id="search-mode-btn"
+    class:active={professorMode}
+    title="Search professors"
+    aria-label="Toggle professor search"
+    onclick={toggleMode}
+  >{@html professorMode
+    ? getInlineSVG('SCHOOL_FULL', 'school-full-icon')
+    : getInlineSVG('SCHOOL', 'school-icon')}</button>
+  <!-- No `hidden={query === ''}` here: the old attribute never took effect
+       (.search-clear-btn set `display: flex`, which outranks the UA's [hidden]
+       rule), so the button has always been permanently visible. Kept as-is
+       rather than silently changing behaviour. -->
+  <button
+    id="search-clear-btn"
+    title="Clear search"
+    aria-label="Clear search"
+    onclick={clear}
+  >{@html getInlineSVG('X', 'x-icon')}</button>
+{/snippet}

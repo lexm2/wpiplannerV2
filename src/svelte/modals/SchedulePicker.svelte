@@ -12,6 +12,7 @@
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
+  import TextField from '../ui/TextField.svelte';
 
   let { scheduleManagementService, profileStateManager, getTutorial, onRequestClose }: {
     scheduleManagementService: ScheduleManagementService;
@@ -127,10 +128,6 @@
   function onEditKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter') { e.preventDefault(); (e.currentTarget as HTMLInputElement).blur(); }
     else if (e.key === 'Escape') { editingId = null; }
-  }
-  function focusSelect(node: HTMLInputElement) {
-    node.focus();
-    node.select();
   }
 
   // Schedule actions
@@ -354,15 +351,15 @@
                 >
                   <div class="schedule-item-info">
                     {#if editingId === schedule.id}
-                      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (inline rename input) -->
-                      <input
-                        class="schedule-name-input"
-                        type="text"
+                      <TextField
+                        fieldClass="schedule-name-field"
+                        ariaLabel="Schedule name"
+                        autofocus
                         bind:value={editValue}
+                        onfocus={(e) => (e.currentTarget as HTMLInputElement).select()}
                         onclick={(e) => e.stopPropagation()}
                         onblur={() => commitEdit(schedule)}
                         onkeydown={onEditKeydown}
-                        use:focusSelect
                       />
                     {:else}
                       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (double-click to rename) -->

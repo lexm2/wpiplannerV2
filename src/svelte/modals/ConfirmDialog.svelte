@@ -5,11 +5,10 @@
    * One parameterized component rather than one per case: the call sites differ
    * only in wording, button colour and whether a text input is needed.
    * DeleteLocalEvent.svelte predates this and is left as-is.
-   *
-   * Uses modal.css's existing shared classes, so it needed no new CSS.
    */
 
   import Modal from './Modal.svelte';
+  import TextField from '../ui/TextField.svelte';
   import { modalState } from './modalState.svelte';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
@@ -59,11 +58,10 @@
             <p>{line}</p>
           {/each}
           {#if payload.input}
-            <!-- svelte-ignore a11y_autofocus (a prompt replacement should focus its field) -->
-            <input
-              class="filter-range-input"
-              type="text"
+            <TextField
+              fieldClass="confirm-input"
               autofocus
+              ariaLabel={payload.placeholder ?? payload.title}
               bind:value={inputValue}
               placeholder={payload.placeholder ?? ''}
               onkeydown={(e) => onKeydown(e, close)}

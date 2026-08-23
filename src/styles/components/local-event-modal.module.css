@@ -12,6 +12,14 @@
   gap: 1.25rem;
 }
 
+/* .modal-body sets `align-items: flex-start`, which makes every child shrink to
+   its intrinsic width — an input's default is ~20 characters, so the fields
+   ended up ~180px wide inside a 600px modal. Only the fields are stretched; the
+   pill rows below (event type, days, terms) are meant to hug their content. */
+.local-event-form > :global(.field) {
+  align-self: stretch;
+}
+
 /* =============================================================================
    Form Inputs
    ============================================================================= */
@@ -32,35 +40,6 @@
 .local-event-form :global(.form-group) :global(label) :global(.required),
 .local-event-form :global(.form-group) :global(.form-label) :global(.required) {
     color: var(--color-danger, #ef4444);
-}
-
-.local-event-form :global(.form-input) {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--effect-border-radius);
-    background: var(--color-background);
-    color: var(--color-text);
-    font-size: 0.9rem;
-    transition: var(--effect-transition);
-}
-
-.local-event-form :global(.form-input:focus) {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-primary-alpha, rgba(var(--color-primary-rgb), 0.2));
-}
-
-.local-event-form :global(.form-input.form-error) {
-    border-color: var(--color-danger, #ef4444);
-}
-
-.local-event-form :global(.form-textarea) {
-    min-height: 60px;
-    max-height: 300px;
-    resize: none;
-    overflow: hidden;
-    width: 100%;
 }
 
 /* =============================================================================

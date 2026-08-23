@@ -97,6 +97,11 @@
   line-height: 1.5;
 }
 
+/* The prompt field in ConfirmDialog, sitting under the message paragraphs. */
+.confirm-input {
+  margin-top: 0.85rem;
+}
+
 /* Modal Header Type Variants */
 .modal-header.info {
   background: linear-gradient(135deg, var(--color-info, #007bff), var(--color-primary));
@@ -814,23 +819,6 @@ html.is-mobile .section-enrollment-waitlist {
   z-index: 50;
 }
 
-.filter-search {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  font-size: 0.9rem;
-  background: var(--color-surface);
-  color: var(--color-text);
-  transition: var(--effect-transition);
-}
-
-.filter-search:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary)20;
-}
-
 .filter-checkbox-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -995,31 +983,9 @@ html.is-mobile .section-enrollment-waitlist {
   gap: 1rem;
 }
 
-.filter-range-input {
+/* The min/max pair shares the row evenly. */
+.filter-range-inputs > .field {
   flex: 1;
-}
-
-.filter-range-input label {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.25rem;
-}
-
-.filter-range-input input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  font-size: 0.9rem;
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.filter-range-input input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary)20;
 }
 
 .filter-quick-select {
@@ -1298,28 +1264,6 @@ html.is-mobile .filter-actions {
   }
 }
 
-.wake-up-time-label {
-  font-size: 0.95rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-}
-
-.wake-up-time-input {
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: 0.95rem;
-  transition: var(--effect-transition);
-}
-
-.wake-up-time-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 0, 123, 255), 0.2);
-}
-
 .wake-up-time-hint {
   margin: 0;
   color: var(--color-text-secondary);
@@ -1396,32 +1340,10 @@ html.is-mobile .changelog-modal-body {
 }
 
 /* Wake-Up Time Filter Styles */
-.wake-up-time-label {
-  display: block;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  color: var(--color-text-secondary);
-}
-
-.wake-up-time-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  font-size: 1rem;
-  background: var(--color-surface-secondary);
-  color: var(--color-text);
-}
-
-.wake-up-time-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
 .wake-up-time-hint {
   margin-top: 0.5rem;
   font-size: 0.85rem;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
 }
 
 .filter-clear-btn {

@@ -201,22 +201,18 @@
   background: #ffebee;
 }
 
-/* Schedule Name Input - Inline Editing */
-.schedule-picker-modal-dialog .schedule-name-input {
-  background: var(--color-surface);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--effect-border-radius);
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-text);
-  min-width: 200px;
+/* Schedule Name Input - Inline Editing. The chrome comes from the shared
+   TextField; only the row's sizing and type scale belong here. */
+.schedule-picker-modal-dialog .schedule-name-field {
+  min-width: 12.5rem;
   width: 100%;
 }
 
-.schedule-picker-modal-dialog .schedule-name-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+/* Matches .schedule-item-name, the static text this field replaces on
+   double-click, so the row doesn't change size when editing starts. */
+.schedule-picker-modal-dialog .schedule-name-field .field-control {
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 /* Modal Footer - Pill Tab Nav */

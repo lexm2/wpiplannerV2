@@ -1,5 +1,6 @@
 <script lang="ts">
   import FilterSection from './FilterSection.svelte';
+  import TextField from '../ui/TextField.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { WakeUpTimeFilterCriteria } from '../../types/filters';
 
@@ -32,13 +33,13 @@
 </script>
 
 <FilterSection title="Wake-Up Time">
-  <label class="wake-up-time-label" for="wake-up-time-input">Earliest class start time</label>
-  <input
-    type="time"
+  <TextField
     id="wake-up-time-input"
-    class="wake-up-time-input"
+    type="time"
+    label="Earliest class start time"
+    panel
     value={timeValue}
-    onchange={(e) => onChange(e.currentTarget.value)}
+    onchange={(e) => onChange((e.currentTarget as HTMLInputElement).value)}
   />
   <p class="wake-up-time-hint">Excludes sections that start before this time</p>
   {#if timeValue}
