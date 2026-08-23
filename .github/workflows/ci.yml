@@ -36,6 +36,9 @@ jobs:
       - name: svelte-check
         run: bun run check
 
+      - name: ESLint
+        run: bun run lint
+
       - name: Prettier format check
         run: bun run format:check
 
@@ -51,7 +54,13 @@ jobs:
         run: bun run build
 
   code-health:
-    name: Code health (lint, dead code) -- report only
+    # ESLint has graduated into the blocking `checks` job above, now that its
+    # backlog is zero and `lint` runs with --max-warnings 0.
+    #
+    # Knip stays here and stays report-only: it still reports ~150 unused
+    # files, exports and types, mostly a dead barrel-file layer. Move it up
+    # once that is cleared, the same way.
+    name: Code health (dead code) -- report only
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -66,12 +75,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # No `|| true` here: the steps are allowed to fail so the job summary
-      # shows a red X when findings exist, while continue-on-error keeps the
-      # workflow itself green.
-      - name: ESLint
-        run: bun run lint
-
+      # No `|| true` here: the step is allowed to fail so the job summary shows
+      # a red X when findings exist, while continue-on-error keeps the workflow
+      # itself green.
       - name: Knip (unused files, exports, dependencies)
         run: bun run lint:dead
 
