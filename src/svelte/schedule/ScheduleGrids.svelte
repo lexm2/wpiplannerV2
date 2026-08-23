@@ -128,7 +128,7 @@
       >{focusedTerm ? `${focusedTerm} Term` : ''}</span
     >
   </div>
-  {#each TERMS as term}
+  {#each TERMS as term (term)}
     <TermGrid
       {term}
       blocks={blocksByTerm[term].blocks}

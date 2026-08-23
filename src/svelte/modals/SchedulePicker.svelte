@@ -390,7 +390,7 @@
   }
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (window click closes any open ⋮ menu) -->
+<!-- A click anywhere closes any open per-schedule menu. -->
 <svelte:window onclick={closeMenus} />
 
 <Modal
@@ -434,7 +434,7 @@
                         onkeydown={onEditKeydown}
                       />
                     {:else}
-                      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (double-click to rename) -->
+                      <!-- Double-click to rename. -->
                       <div
                         class="schedule-item-name"
                         ondblclick={e => {

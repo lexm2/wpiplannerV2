@@ -84,7 +84,7 @@
       onclick={() => (selected = [])}
       >All <span class="degree-filter-count">{counts.all}</span></button
     >
-    {#each STATUSES as s}
+    {#each STATUSES as s (s.key)}
       <button
         type="button"
         class="degree-filter-chip"

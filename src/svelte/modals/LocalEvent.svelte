@@ -194,28 +194,26 @@
           controlId="event-type"
           fieldClass={styles.hug}
         >
-          {#snippet children()}
-            <div class={styles['event-type-selector']}>
-              <button
-                type="button"
-                class={styles['event-type-option']}
-                class:selected={eventType === EventType.ONE_TIME}
-                onclick={() => (eventType = EventType.ONE_TIME)}
-              >
-                {@html getInlineSVG('CALENDAR_DOWN', 'type-icon')}
-                One-time
-              </button>
-              <button
-                type="button"
-                class={styles['event-type-option']}
-                class:selected={eventType === EventType.RECURRING}
-                onclick={() => (eventType = EventType.RECURRING)}
-              >
-                {@html getInlineSVG('CALENDAR_REPEAT', 'type-icon')}
-                Recurring
-              </button>
-            </div>
-          {/snippet}
+          <div class={styles['event-type-selector']}>
+            <button
+              type="button"
+              class={styles['event-type-option']}
+              class:selected={eventType === EventType.ONE_TIME}
+              onclick={() => (eventType = EventType.ONE_TIME)}
+            >
+              {@html getInlineSVG('CALENDAR_DOWN', 'type-icon')}
+              One-time
+            </button>
+            <button
+              type="button"
+              class={styles['event-type-option']}
+              class:selected={eventType === EventType.RECURRING}
+              onclick={() => (eventType = EventType.RECURRING)}
+            >
+              {@html getInlineSVG('CALENDAR_REPEAT', 'type-icon')}
+              Recurring
+            </button>
+          </div>
         </Field>
 
         {#if eventType === EventType.ONE_TIME}
@@ -238,21 +236,19 @@
               controlId="event-days"
               error={dayError ? 'Pick at least one day.' : undefined}
             >
-              {#snippet children()}
-                <div class={styles['day-selector']}>
-                  {#each WEEKDAYS as day}
-                    <button
-                      type="button"
-                      class={styles['day-pill']}
-                      class:selected={selectedDays.has(day.value)}
-                      title={day.label}
-                      onclick={() => toggleDay(day.value)}
-                    >
-                      {day.short}
-                    </button>
-                  {/each}
-                </div>
-              {/snippet}
+              <div class={styles['day-selector']}>
+                {#each WEEKDAYS as day (day.value)}
+                  <button
+                    type="button"
+                    class={styles['day-pill']}
+                    class:selected={selectedDays.has(day.value)}
+                    title={day.label}
+                    onclick={() => toggleDay(day.value)}
+                  >
+                    {day.short}
+                  </button>
+                {/each}
+              </div>
             </Field>
 
             <Field
@@ -261,23 +257,21 @@
               controlId="event-terms"
               error={termError ? 'Pick at least one term.' : undefined}
             >
-              {#snippet children()}
-                <div class={styles['event-term-checkboxes']}>
-                  {#each TERMS as term}
-                    <label class={styles['event-term-label']}>
-                      <span class={styles['event-term-text']}>Term {term}</span>
-                      <input
-                        type="checkbox"
-                        class={styles['event-term-toggle']}
-                        name="terms"
-                        value={term}
-                        checked={selectedTerms.has(term)}
-                        onchange={() => toggleTerm(term)}
-                      />
-                    </label>
-                  {/each}
-                </div>
-              {/snippet}
+              <div class={styles['event-term-checkboxes']}>
+                {#each TERMS as term (term)}
+                  <label class={styles['event-term-label']}>
+                    <span class={styles['event-term-text']}>Term {term}</span>
+                    <input
+                      type="checkbox"
+                      class={styles['event-term-toggle']}
+                      name="terms"
+                      value={term}
+                      checked={selectedTerms.has(term)}
+                      onchange={() => toggleTerm(term)}
+                    />
+                  </label>
+                {/each}
+              </div>
             </Field>
           </div>
         {/if}
@@ -288,29 +282,27 @@
           controlId="event-time"
           fieldClass={styles.hug}
         >
-          {#snippet children()}
-            <div class={styles['time-row']}>
-              <TextField
-                id="event-start"
-                type="time"
-                ariaLabel="Start time"
-                fieldClass={styles['form-group-time']}
-                bind:value={startTime}
-              />
-              <span class={styles['time-separator']}>to</span>
-              <TextField
-                id="event-end"
-                type="time"
-                ariaLabel="End time"
-                fieldClass={styles['form-group-time']}
-                error={endError
-                  ? 'End time must be after the start time.'
-                  : undefined}
-                bind:value={endTime}
-                oninput={() => (endError = false)}
-              />
-            </div>
-          {/snippet}
+          <div class={styles['time-row']}>
+            <TextField
+              id="event-start"
+              type="time"
+              ariaLabel="Start time"
+              fieldClass={styles['form-group-time']}
+              bind:value={startTime}
+            />
+            <span class={styles['time-separator']}>to</span>
+            <TextField
+              id="event-end"
+              type="time"
+              ariaLabel="End time"
+              fieldClass={styles['form-group-time']}
+              error={endError
+                ? 'End time must be after the start time.'
+                : undefined}
+              bind:value={endTime}
+              oninput={() => (endError = false)}
+            />
+          </div>
         </Field>
       </div>
       <div class="modal-footer">

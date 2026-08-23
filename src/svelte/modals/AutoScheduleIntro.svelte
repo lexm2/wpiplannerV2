@@ -135,7 +135,7 @@
                 </div>
               </div>
               <div class="as-card-terms term-badges-container">
-                {#each TERMS as term}
+                {#each TERMS as term (term)}
                   {#if isAvailable(sc, term)}
                     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (term badge toggles one term; stops card toggle) -->
                     <span

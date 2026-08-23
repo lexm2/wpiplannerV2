@@ -50,7 +50,7 @@
       </div>
       <div class="modal-body">
         <div class="modal-text">
-          {#each payload.message.split('\n') as line}
+          {#each payload.message.split('\n') as line, i (i)}
             <p>{line}</p>
           {/each}
           {#if payload.input}

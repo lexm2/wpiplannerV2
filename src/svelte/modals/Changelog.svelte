@@ -78,13 +78,13 @@
         {#each changelogData as entry (entry.date)}
           <div class="changelog-entry">
             <h3 class="changelog-date">{formatDate(entry.date)}</h3>
-            {#each entry.sections as section}
+            {#each entry.sections as section, i (i)}
               <div class="changelog-section">
                 {#if section.title}
                   <h4 class="changelog-section-title">{section.title}</h4>
                 {/if}
                 <ul class="changelog-list">
-                  {#each section.items as item}
+                  {#each section.items as item, i (i)}
                     <li class="changelog-item">{item}</li>
                   {/each}
                 </ul>

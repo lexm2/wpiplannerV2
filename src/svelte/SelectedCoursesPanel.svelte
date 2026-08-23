@@ -98,7 +98,6 @@
     {/if}
     {#each courses as sc (sc.course.id)}
       {@const course = sc.course}
-      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
       <div
         class="selected-course-item"
         data-course-id={course.id}

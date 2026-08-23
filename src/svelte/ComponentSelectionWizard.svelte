@@ -213,7 +213,7 @@
       </svg>
       <span class={styles['filter-text']}>
         Filters:
-        {#each filterDescriptions as desc, i}
+        {#each filterDescriptions as desc, i (i)}
           {#if i > 0}<span class={styles['filter-separator']}>●</span
             >{/if}{desc}
         {/each}

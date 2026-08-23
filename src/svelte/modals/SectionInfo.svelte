@@ -122,7 +122,7 @@
                   <span class="section-info-label">Professor</span>
                   <span class="section-info-value">
                     {#if professors.length > 0}
-                      {#each professors as prof, i}
+                      {#each professors as prof, i (i)}
                         {#if i > 0},
                         {/if}
                         {#if prof.rmpUrl}
@@ -158,17 +158,15 @@
                   controlId="section-info-color"
                   fieldClass="section-info-item"
                 >
-                  {#snippet children()}
-                    <div class="section-color-inline">
-                      <input
-                        type="color"
-                        id="section-info-color"
-                        class="section-color-input"
-                        value={data.currentColor}
-                        onchange={onColorInput}
-                      />
-                    </div>
-                  {/snippet}
+                  <div class="section-color-inline">
+                    <input
+                      type="color"
+                      id="section-info-color"
+                      class="section-color-input"
+                      value={data.currentColor}
+                      onchange={onColorInput}
+                    />
+                  </div>
                 </Field>
               </div>
               <div class="section-enrollment-badge">
@@ -196,7 +194,7 @@
             </div>
             <div class="section-card-content">
               <div class="section-periods-list">
-                {#each data.section.periods as period}
+                {#each data.section.periods as period, i (i)}
                   {#if isAsyncPeriod(period)}
                     <div class="section-period section-period--async">
                       <div

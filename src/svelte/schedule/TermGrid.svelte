@@ -77,12 +77,12 @@
   {/if}
   <div class="schedule-grid">
     <div class="time-label term-letter-label">{term}</div>
-    {#each WEEKDAYS as day}
+    {#each WEEKDAYS as day (day)}
       <div class="day-header">{TimeUtils.getDayAbbr(day)}</div>
     {/each}
-    {#each timeSlots as slot}
+    {#each timeSlots as slot (slot)}
       <div class="time-label">{timeLabel(slot)}</div>
-      {#each WEEKDAYS as day}
+      {#each WEEKDAYS as day (day)}
         <div class="schedule-cell" data-day={day} data-slot={slot}></div>
       {/each}
     {/each}
