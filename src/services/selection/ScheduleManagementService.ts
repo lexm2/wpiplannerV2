@@ -8,6 +8,7 @@ import {
   ICSExportResult,
 } from '../../utils/icsGenerator';
 import { logger } from '../../utils/logger';
+import { errorMessage } from '../../utils/errorMessage';
 
 export interface ScheduleOperationResult {
   success: boolean;
@@ -160,7 +161,7 @@ export class ScheduleManagementService {
       logger.error('Error creating schedule:', error);
       return {
         success: false,
-        error: `Error creating schedule: ${error}`,
+        error: `Error creating schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -200,7 +201,7 @@ export class ScheduleManagementService {
       logger.error('Error setting active schedule:', error);
       return {
         success: false,
-        error: `Error setting active schedule: ${error}`,
+        error: `Error setting active schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -252,7 +253,7 @@ export class ScheduleManagementService {
       logger.error('Error updating schedule:', error);
       return {
         success: false,
-        error: `Error updating schedule: ${error}`,
+        error: `Error updating schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -318,7 +319,7 @@ export class ScheduleManagementService {
       logger.error('Error duplicating schedule:', error);
       return {
         success: false,
-        error: `Error duplicating schedule: ${error}`,
+        error: `Error duplicating schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -359,7 +360,7 @@ export class ScheduleManagementService {
       logger.error('Error deleting schedule:', error);
       return {
         success: false,
-        error: `Error deleting schedule: ${error}`,
+        error: `Error deleting schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -417,7 +418,7 @@ export class ScheduleManagementService {
     } catch (error) {
       return {
         success: false,
-        error: `Failed to update schedule courses: ${error}`,
+        error: `Failed to update schedule courses: ${errorMessage(error)}`,
       };
     }
   }
@@ -432,7 +433,7 @@ export class ScheduleManagementService {
     } catch (error) {
       return {
         success: false,
-        error: `Save failed: ${error}`,
+        error: `Save failed: ${errorMessage(error)}`,
       };
     }
   }
@@ -480,7 +481,7 @@ export class ScheduleManagementService {
     } catch (error) {
       return {
         success: false,
-        error: `Export failed: ${error}`,
+        error: `Export failed: ${errorMessage(error)}`,
       };
     }
   }
@@ -505,7 +506,7 @@ export class ScheduleManagementService {
     } catch (error) {
       return {
         success: false,
-        error: `Export all failed: ${error}`,
+        error: `Export all failed: ${errorMessage(error)}`,
       };
     }
   }
@@ -537,7 +538,7 @@ export class ScheduleManagementService {
         success: false,
         skippedCourses: 0,
         totalCourses: 0,
-        error: `ICS export failed: ${error}`,
+        error: `ICS export failed: ${errorMessage(error)}`,
       };
     }
   }
@@ -585,7 +586,7 @@ export class ScheduleManagementService {
 
       return result;
     } catch (error) {
-      return { success: false, error: `Import failed: ${error}` };
+      return { success: false, error: `Import failed: ${errorMessage(error)}` };
     }
   }
 
@@ -618,7 +619,7 @@ export class ScheduleManagementService {
         issues.push('Active schedule ID references non-existent schedule');
       }
     } catch (error) {
-      issues.push(`Health check error: ${error}`);
+      issues.push(`Health check error: ${errorMessage(error)}`);
     }
 
     return {

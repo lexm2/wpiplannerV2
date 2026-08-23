@@ -5,6 +5,7 @@ import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { DataValidator } from '../../core/validation/DataValidator';
 import { Validators } from '../../utils/validators';
 import { logger } from '../../utils/logger';
+import { errorMessage } from '../../utils/errorMessage';
 
 export interface CourseSelectionOptions {
   isRequired?: boolean;
@@ -109,7 +110,7 @@ export class CourseSelectionService {
       logger.error('Error selecting course:', error);
       return {
         success: false,
-        error: `Error selecting course: ${error}`,
+        error: `Error selecting course: ${errorMessage(error)}`,
       };
     }
   }
@@ -134,7 +135,7 @@ export class CourseSelectionService {
       logger.error('Error unselecting course:', error);
       return {
         success: false,
-        error: `Error unselecting course: ${error}`,
+        error: `Error unselecting course: ${errorMessage(error)}`,
       };
     }
   }
@@ -192,7 +193,7 @@ export class CourseSelectionService {
       logger.error('Error setting selected section:', error);
       return {
         success: false,
-        error: `Error setting selected section: ${error}`,
+        error: `Error setting selected section: ${errorMessage(error)}`,
       };
     }
   }
@@ -208,7 +209,7 @@ export class CourseSelectionService {
       logger.error('Error clearing selections:', error);
       return {
         success: false,
-        error: `Error clearing selections: ${error}`,
+        error: `Error clearing selections: ${errorMessage(error)}`,
       };
     }
   }
@@ -236,7 +237,7 @@ export class CourseSelectionService {
       logger.error('Error clearing course components:', error);
       return {
         success: false,
-        error: `Error clearing course components: ${error}`,
+        error: `Error clearing course components: ${errorMessage(error)}`,
       };
     }
   }
@@ -262,7 +263,7 @@ export class CourseSelectionService {
       logger.error('Error clearing components:', error);
       return {
         success: false,
-        error: `Error clearing components: ${error}`,
+        error: `Error clearing components: ${errorMessage(error)}`,
       };
     }
   }
@@ -297,7 +298,7 @@ export class CourseSelectionService {
       logger.error('Error setting selected components:', error);
       return {
         success: false,
-        error: `Error setting selected components: ${error}`,
+        error: `Error setting selected components: ${errorMessage(error)}`,
       };
     }
   }
@@ -338,7 +339,7 @@ export class CourseSelectionService {
       logger.error('Error batch setting selected components:', error);
       return {
         success: false,
-        error: `Error batch setting selected components: ${error}`,
+        error: `Error batch setting selected components: ${errorMessage(error)}`,
       };
     }
   }
@@ -371,7 +372,7 @@ export class CourseSelectionService {
       logger.error('Error locking section:', error);
       return {
         success: false,
-        error: `Error locking section: ${error}`,
+        error: `Error locking section: ${errorMessage(error)}`,
       };
     }
   }
@@ -402,7 +403,7 @@ export class CourseSelectionService {
       logger.error('Error unlocking section:', error);
       return {
         success: false,
-        error: `Error unlocking section: ${error}`,
+        error: `Error unlocking section: ${errorMessage(error)}`,
       };
     }
   }
@@ -476,7 +477,7 @@ export class CourseSelectionService {
         );
       }
     } catch (error) {
-      issues.push(`Health check error: ${error}`);
+      issues.push(`Health check error: ${errorMessage(error)}`);
     }
 
     return {

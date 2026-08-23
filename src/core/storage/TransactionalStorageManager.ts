@@ -7,6 +7,7 @@ import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
 import type { StudentRecord } from '../../types/degree';
 import { logger } from '../../utils/logger';
+import { errorMessage } from '../../utils/errorMessage';
 
 export interface StorageTransaction {
   id: string;
@@ -212,7 +213,7 @@ export class TransactionalStorageManager {
       return {
         data: null,
         valid: false,
-        error: `Failed to load active schedule ID: ${error}`,
+        error: `Failed to load active schedule ID: ${errorMessage(error)}`,
       };
     }
   }
@@ -368,7 +369,7 @@ export class TransactionalStorageManager {
       return {
         data: defaultValue,
         valid: false,
-        error: `Failed to load ${dataType}: ${error}`,
+        error: `Failed to load ${dataType}: ${errorMessage(error)}`,
       };
     }
   }
@@ -446,7 +447,10 @@ export class TransactionalStorageManager {
 
       return { valid: true };
     } catch (error) {
-      return { valid: false, error: `Integrity check failed: ${error}` };
+      return {
+        valid: false,
+        error: `Integrity check failed: ${errorMessage(error)}`,
+      };
     }
   }
 
@@ -458,7 +462,7 @@ export class TransactionalStorageManager {
       localStorage.setItem(testKey, 'test');
       localStorage.removeItem(testKey);
     } catch (error) {
-      issues.push(`localStorage unavailable: ${error}`);
+      issues.push(`localStorage unavailable: ${errorMessage(error)}`);
     }
 
     const integrityCheck = this.verifyDataIntegrity();

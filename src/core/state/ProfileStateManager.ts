@@ -13,6 +13,7 @@ import { ScheduleState } from '../../types/ScheduleState';
 import type { TransactionResult } from '../storage';
 import { TransactionalStorageManager } from '../storage';
 import { getAllSections, setReplacer, setReviver, logger } from '../../utils';
+import { errorMessage } from '../../utils/errorMessage';
 import { UndoRedoManager } from './UndoRedoManager';
 import { appState } from './appState.svelte';
 import { TermBoundsService } from '../../utils/termBounds';
@@ -1150,7 +1151,7 @@ export class ProfileStateManager {
     } catch (error) {
       return {
         success: false,
-        error: `Failed to clear data: ${error}`,
+        error: `Failed to clear data: ${errorMessage(error)}`,
       };
     }
   }
