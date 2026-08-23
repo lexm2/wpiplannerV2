@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 23, 2026, 4:31 AM",
+  "generated": "Aug 23, 2026, 5:06 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -100724,7 +100724,7 @@
                   "crn": 348841,
                   "number": "AD04",
                   "seats": 35,
-                  "seatsAvailable": 0,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5103",
@@ -100741,7 +100741,7 @@
                       "building": "",
                       "room": "Washburn 323",
                       "seats": 35,
-                      "seatsAvailable": 0,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD04",
@@ -100756,7 +100756,7 @@
                   "crn": 348672,
                   "number": "AD06",
                   "seats": 35,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 0,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5103",
@@ -100773,7 +100773,7 @@
                       "building": "",
                       "room": "Stratton Hall 207 (new)",
                       "seats": 35,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "AD06",
