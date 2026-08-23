@@ -1,0 +1,64 @@
+/**
+ * The contract for public/rateMyProfessor.json.
+ *
+ * Lives here, rather than in scripts/, because it has two sides:
+ * scripts/rateMyProfessor/fetchRateMyProfessor.ts writes the file and
+ * src/services/external/RateMyProfessorService.ts reads it. The two used to
+ * carry near-identical private copies of these interfaces, which could drift
+ * without anything noticing.
+ */
+import { z } from 'zod';
+
+export interface Professor {
+  id: string;
+  legacyId: number;
+  firstName: string;
+  lastName: string;
+  department: string;
+  avgRating: number;
+  avgDifficulty: number;
+  numRatings: number;
+  wouldTakeAgainPercent: number | null;
+  profileUrl: string;
+}
+
+export interface School {
+  id: string;
+  name: string;
+  city?: string;
+  state?: string;
+}
+
+export interface RateMyProfessorData {
+  lastUpdated: string;
+  school: School;
+  professors: Professor[];
+  totalProfessors: number;
+}
+
+export const ProfessorSchema = z.object({
+  id: z.string(),
+  legacyId: z.number(),
+  firstName: z.string(),
+  lastName: z.string(),
+  department: z.string(),
+  avgRating: z.number(),
+  avgDifficulty: z.number(),
+  numRatings: z.number(),
+  wouldTakeAgainPercent: z.number().nullable(),
+  profileUrl: z.string(),
+}) satisfies z.ZodType<Professor>;
+
+export const SchoolSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+}) satisfies z.ZodType<School>;
+
+export const RateMyProfessorDataSchema = z.object({
+  lastUpdated: z.string(),
+  school: SchoolSchema,
+  professors: z.array(ProfessorSchema),
+  totalProfessors: z.number(),
+}) satisfies z.ZodType<RateMyProfessorData>;

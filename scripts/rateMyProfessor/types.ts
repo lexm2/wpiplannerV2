@@ -1,42 +1,14 @@
 /**
- * Types for Rate My Professor data structures
+ * Rate My Professors API response shapes, used only while scraping.
+ *
+ * The output contract (Professor, School, RateMyProfessorData) lives in
+ * src/types/rateMyProfessor.ts, because the app reads the file this produces.
  */
-
-/**
- * Professor data from Rate My Professors API
- */
-export interface Professor {
-  id: string;
-  legacyId: number;
-  firstName: string;
-  lastName: string;
-  department: string;
-  avgRating: number;
-  avgDifficulty: number;
-  numRatings: number;
-  wouldTakeAgainPercent: number | null;
-  profileUrl: string;
-}
-
-/**
- * School information
- */
-export interface School {
-  id: string;
-  name: string;
-  city?: string;
-  state?: string;
-}
-
-/**
- * Complete Rate My Professor data export format
- */
-export interface RateMyProfessorData {
-  lastUpdated: string; // ISO 8601 timestamp
-  school: School;
-  professors: Professor[];
-  totalProfessors: number;
-}
+export type {
+  Professor,
+  School,
+  RateMyProfessorData,
+} from '../../src/types/rateMyProfessor';
 
 /**
  * API response types from @mtucourses/rate-my-professors

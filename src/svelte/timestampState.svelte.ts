@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { logger } from '../utils/logger';
 /**
  * Reactive home for the header's "client loaded" / "server updated" labels,
@@ -22,6 +23,9 @@ const TIMESTAMP_FORMAT: Intl.DateTimeFormatOptions = {
   hour12: true,
 };
 
+// public/last-updated.json, rewritten by the deploy job every 15 minutes.
+const LastUpdatedSchema = z.object({ timestamp: z.string() });
+
 function formatTimestamp(date: Date): string {
   return date.toLocaleDateString('en-US', TIMESTAMP_FORMAT).replace(',', ' at');
 }
@@ -35,9 +39,9 @@ export async function loadServerTimestamp(): Promise<string | null> {
     const response = await fetch('./last-updated.json', { cache: 'no-cache' });
 
     if (response.ok) {
-      const timestampData = await response.json();
-      timestampState.serverLabel = `Server updated: ${formatTimestamp(new Date(timestampData.timestamp))}`;
-      return timestampData.timestamp;
+      const { timestamp } = LastUpdatedSchema.parse(await response.json());
+      timestampState.serverLabel = `Server updated: ${formatTimestamp(new Date(timestamp))}`;
+      return timestamp;
     }
     throw new Error(`Failed to fetch server timestamp: ${response.status}`);
   } catch (error) {

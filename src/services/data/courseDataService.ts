@@ -18,6 +18,13 @@ import type {
 } from '../../types/rawData';
 import { appState } from '../../core/state/appState.svelte';
 import { logger } from '../../utils/logger';
+import { z } from 'zod';
+
+// Departments stay loosely typed on purpose -- see fetchFreshData.
+const CourseDataEnvelopeSchema = z.object({
+  departments: z.array(z.custom<RawDepartment>()).optional(),
+  generated: z.string().optional(),
+});
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
@@ -60,7 +67,11 @@ export class CourseDataService {
       );
     }
 
-    const jsonData = await response.json();
+    // Envelope only. The payload is ~1275 departments of nested courses,
+    // sections and periods, so deep-validating it on every load would cost far
+    // more than it catches -- parseConstructedDepartments below already parses
+    // each record defensively. This just stops `any` leaking out of json().
+    const jsonData = CourseDataEnvelopeSchema.parse(await response.json());
     return this.parseJSONData(jsonData);
   }
 
