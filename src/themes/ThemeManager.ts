@@ -89,16 +89,16 @@ export class ThemeManager {
   }
 
   private initializeThemes(): void {
-    this.registerTheme(wpiClassic as ThemeDefinition);
-    this.registerTheme(wpiDark as ThemeDefinition);
-    this.registerTheme(wpiLight as ThemeDefinition);
-    this.registerTheme(highContrast as ThemeDefinition);
+    this.registerTheme(wpiClassic);
+    this.registerTheme(wpiDark);
+    this.registerTheme(wpiLight);
+    this.registerTheme(highContrast);
   }
 
   private loadSavedTheme(): void {
     const savedTheme = this.storage.loadThemePreference();
-    if (savedTheme && this.themes.has(savedTheme as ThemeId)) {
-      this.currentTheme = savedTheme as ThemeId;
+    if (savedTheme && this.themes.has(savedTheme)) {
+      this.currentTheme = savedTheme;
     }
 
     this.applyTheme(this.currentTheme);

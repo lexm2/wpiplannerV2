@@ -79,7 +79,7 @@ export function toggleTerm(
   // instant the rune flips, so the fade must run here, before that mutation.
   if (collapsing && item && container && !reduceMotion) {
     const rows = groupBadgeRows(
-      Array.from(container.querySelectorAll('.section-badge')) as HTMLElement[],
+      Array.from(container.querySelectorAll('.section-badge')),
     );
     let maxStep = 0;
     rows.forEach((row, ri) =>
@@ -147,7 +147,7 @@ export function termFlip(item: HTMLElement, term: string | undefined) {
     const rows = groupBadgeRows(
       Array.from(
         item.querySelectorAll('.term-sections-container .section-badge'),
-      ) as HTMLElement[],
+      ),
     );
 
     item.style.height = '';

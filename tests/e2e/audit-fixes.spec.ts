@@ -55,7 +55,7 @@ test('right panel default width is 700px, not the old 320px', async ({
 
   const result = await page.evaluate(() => {
     const cs = getComputedStyle(document.documentElement);
-    const panel = document.querySelector('.right-panel') as HTMLElement | null;
+    const panel = document.querySelector('.right-panel');
     return {
       spacingVar: cs.getPropertyValue('--spacing-right-panel-width').trim(),
       inlineOverride: document.documentElement.style.getPropertyValue(
@@ -83,7 +83,7 @@ test('a stored drag width still wins over the default', async ({ page }) => {
   await page.waitForTimeout(500);
 
   const w = await page.evaluate(() => {
-    const panel = document.querySelector('.right-panel') as HTMLElement | null;
+    const panel = document.querySelector('.right-panel');
     return panel ? Math.round(panel.getBoundingClientRect().width) : null;
   });
   expect(w).toBe(500);
@@ -135,12 +135,10 @@ test('professor links carry an underline affordance on every background', async 
   await page.waitForTimeout(800);
 
   const info = await page.evaluate(() => {
-    const links = Array.from(
-      document.querySelectorAll('a.professor-link'),
-    ) as HTMLElement[];
+    const links = Array.from(document.querySelectorAll('a.professor-link'));
     return links.slice(0, 5).map(el => {
       const cs = getComputedStyle(el);
-      const badge = el.closest('.section-badge') as HTMLElement | null;
+      const badge = el.closest('.section-badge');
       return {
         decoration: cs.textDecorationLine,
         color: cs.color,
@@ -200,9 +198,7 @@ test('tutorial box header is set up for pointer dragging', async ({ page }) => {
     const svc: any = (window as any).services;
     await svc.tutorial.start('welcome');
     await new Promise(r => setTimeout(r, 400));
-    const findBtn = document.querySelector(
-      '[data-tutorial-find]',
-    ) as HTMLElement | null;
+    const findBtn = document.querySelector('[data-tutorial-find]');
     const header = findBtn ? (findBtn.parentElement as HTMLElement) : null;
     if (!header) return { found: false };
     return {

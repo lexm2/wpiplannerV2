@@ -12,7 +12,7 @@ import { reduceMotion } from '../transitions';
  * travel. Zeroing the holds too would collapse the whole sequence to nothing.
  */
 export function animateFindDot(selector: string): void {
-  const target = document.querySelector(selector) as HTMLElement | null;
+  const target = document.querySelector(selector);
   if (!target) return;
 
   const targetRect = target.getBoundingClientRect();

@@ -38,7 +38,7 @@ export function repositionIfObstructed(
   selector: string,
   waitForTarget = true,
 ): void {
-  const target = document.querySelector(selector) as HTMLElement | null;
+  const target = document.querySelector(selector);
   if (target && box.contains(target)) return;
 
   const targetRect = target?.getBoundingClientRect();
@@ -46,7 +46,7 @@ export function repositionIfObstructed(
   if (!targetRect || (targetRect.width === 0 && targetRect.height === 0)) {
     if (!waitForTarget) return;
     const obs = new MutationObserver(() => {
-      const el = document.querySelector(selector) as HTMLElement | null;
+      const el = document.querySelector(selector);
       if (!el) return;
       const r = el.getBoundingClientRect();
       if (r.width === 0 && r.height === 0) return;

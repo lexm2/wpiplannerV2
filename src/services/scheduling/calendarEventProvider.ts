@@ -25,7 +25,7 @@ export const calendarEventProvider: CalendarEventProvider = {
       const terms = event.terms || [AcademicTerm.ALL];
 
       for (const term of terms) {
-        const academicTerm = term as AcademicTerm;
+        const academicTerm = term;
         for (const day of days) {
           blockedTimes.push({
             id: `${event.id}-${term}-${day}`,

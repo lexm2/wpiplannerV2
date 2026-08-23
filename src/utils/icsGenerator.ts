@@ -283,7 +283,7 @@ export class ICSGenerator {
         } else {
           const terms = localEvent.terms || [];
           for (const term of terms) {
-            const termDates = this.getTermDates(term as string, academicYear);
+            const termDates = this.getTermDates(term, academicYear);
             if (!termDates) continue;
 
             const days = localEvent.days || [];

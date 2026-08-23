@@ -633,9 +633,7 @@ export class ProfileStateManager {
   }): void {
     this.state.activeScheduleId = snapshot.activeScheduleId;
 
-    const schedulesArray = Array.from(
-      snapshot.schedules.values(),
-    ) as Schedule[];
+    const schedulesArray = Array.from(snapshot.schedules.values());
     this.state.schedules = this.deepClone(schedulesArray);
     this.state.preferences = this.deepClone(snapshot.preferences);
 

@@ -36,7 +36,7 @@
     if (active) {
       profileStateManager.updateSchedule(
         active.id,
-        { year: year === 'all' ? undefined : (year as number) },
+        { year: year === 'all' ? undefined : year },
         'filter-sync',
       );
     }

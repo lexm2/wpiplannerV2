@@ -21,7 +21,7 @@ function course(over: Partial<Course> = {}): Course {
     minCredits: 3,
     maxCredits: 3,
     ...over,
-  } as Course;
+  };
 }
 
 describe('calculateRelevanceScore', () => {

@@ -11,9 +11,8 @@
   // that and write back to the service (debounced). Matches the controller,
   // which seeded the sliders from criteria and never re-synced them while open.
   // svelte-ignore state_referenced_locally - intentional one-time seed read.
-  const initial =
-    filterService.getCriteria<RMPRatingFilterCriteria>('rmpRating') ??
-    ({} as RMPRatingFilterCriteria);
+  const initial: RMPRatingFilterCriteria =
+    filterService.getCriteria<RMPRatingFilterCriteria>('rmpRating') ?? {};
 
   let ratingMin = $state(initial.minRating ?? 0);
   let ratingMax = $state(initial.maxRating ?? 5);
