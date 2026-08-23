@@ -1,5 +1,6 @@
 <script lang="ts">
   import DualRangeSlider from './DualRangeSlider.svelte';
+  import Field from '../ui/Field.svelte';
   import FilterSection from './FilterSection.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { RMPRatingFilterCriteria } from '../../types/filters';
@@ -63,63 +64,63 @@
 
 <FilterSection title="Rate My Professor">
   <div class="filter-slider-container">
-      <div class="filter-slider-group">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label>Rating</label>
-        <div class="filter-slider-values">
-          <span>{ratingMin.toFixed(1)}</span>
-          <span>-</span>
-          <span>{ratingMax.toFixed(1)}</span>
-          <span class="filter-input-hint">stars</span>
-        </div>
-        <DualRangeSlider
-          min={0}
-          max={5}
-          step={0.1}
-          bind:minValue={ratingMin}
-          bind:maxValue={ratingMax}
-          leftLabel="Minimum Rating"
-          rightLabel="Maximum Rating"
-        />
-      </div>
-      <div class="filter-slider-group">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label>Difficulty</label>
-        <div class="filter-slider-values">
-          <span>{difficultyMin.toFixed(1)}</span>
-          <span>-</span>
-          <span>{difficultyMax.toFixed(1)}</span>
-          <span class="filter-input-hint">scale</span>
-        </div>
-        <DualRangeSlider
-          min={0}
-          max={5}
-          step={0.1}
-          bind:minValue={difficultyMin}
-          bind:maxValue={difficultyMax}
-          leftLabel="Minimum Difficulty"
-          rightLabel="Maximum Difficulty"
-        />
-      </div>
-      <div class="filter-slider-group">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label>Would Take Again</label>
-        <div class="filter-slider-values">
-          <span>{retakeMin}</span>
-          <span>-</span>
-          <span>{retakeMax}</span>
-          <span class="filter-input-hint">%</span>
-        </div>
-        <DualRangeSlider
-          min={0}
-          max={100}
-          step={1}
-          bind:minValue={retakeMin}
-          bind:maxValue={retakeMax}
-          leftLabel="Minimum Would Take Again"
-          rightLabel="Maximum Would Take Again"
-        />
-      </div>
+      <Field group label="Rating" controlId="rmp-rating" fieldClass="filter-slider-group">
+        {#snippet children()}
+          <div class="filter-slider-values">
+            <span>{ratingMin.toFixed(1)}</span>
+            <span>-</span>
+            <span>{ratingMax.toFixed(1)}</span>
+            <span class="filter-input-hint">stars</span>
+          </div>
+          <DualRangeSlider
+            min={0}
+            max={5}
+            step={0.1}
+            bind:minValue={ratingMin}
+            bind:maxValue={ratingMax}
+            leftLabel="Minimum Rating"
+            rightLabel="Maximum Rating"
+          />
+        {/snippet}
+      </Field>
+      <Field group label="Difficulty" controlId="rmp-difficulty" fieldClass="filter-slider-group">
+        {#snippet children()}
+          <div class="filter-slider-values">
+            <span>{difficultyMin.toFixed(1)}</span>
+            <span>-</span>
+            <span>{difficultyMax.toFixed(1)}</span>
+            <span class="filter-input-hint">scale</span>
+          </div>
+          <DualRangeSlider
+            min={0}
+            max={5}
+            step={0.1}
+            bind:minValue={difficultyMin}
+            bind:maxValue={difficultyMax}
+            leftLabel="Minimum Difficulty"
+            rightLabel="Maximum Difficulty"
+          />
+        {/snippet}
+      </Field>
+      <Field group label="Would Take Again" controlId="rmp-retake" fieldClass="filter-slider-group">
+        {#snippet children()}
+          <div class="filter-slider-values">
+            <span>{retakeMin}</span>
+            <span>-</span>
+            <span>{retakeMax}</span>
+            <span class="filter-input-hint">%</span>
+          </div>
+          <DualRangeSlider
+            min={0}
+            max={100}
+            step={1}
+            bind:minValue={retakeMin}
+            bind:maxValue={retakeMax}
+            leftLabel="Minimum Would Take Again"
+            rightLabel="Maximum Would Take Again"
+          />
+        {/snippet}
+      </Field>
     </div>
     <label class="filter-toggle-label filter-subsection">
       <input type="checkbox" class="filter-toggle" bind:checked={includeWithoutData} />

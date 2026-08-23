@@ -123,6 +123,7 @@
     <TextField
       id="min-seats-filter"
       type="number"
+      inputmode="numeric"
       label="Minimum Available Seats"
       panel
       min={0}

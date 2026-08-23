@@ -2,44 +2,23 @@
    Local Event Modal - Add/Edit local calendar events (CSS Module)
    ============================================================================= */
 
-.local-event-modal {
-  max-width: 600px;
-}
-
 .local-event-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-/* .modal-body sets `align-items: flex-start`, which makes every child shrink to
-   its intrinsic width — an input's default is ~20 characters, so the fields
-   ended up ~180px wide inside a 600px modal. Only the fields are stretched; the
-   pill rows below (event type, days, terms) are meant to hug their content. */
+/* .modal-body sets `align-items: flex-start`, so every child shrinks to its
+   intrinsic width — an input's default ~20 characters inside a 600px modal.
+   Only the fields stretch; the pill rows are meant to hug their content. */
 .local-event-form > :global(.field) {
   align-self: stretch;
 }
 
-/* =============================================================================
-   Form Inputs
-   ============================================================================= */
-
-.local-event-form :global(.form-group) {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
-.local-event-form :global(.form-group) :global(label),
-.local-event-form :global(.form-group) :global(.form-label) {
-    font-size: 0.85rem;
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text);
-}
-
-.local-event-form :global(.form-group) :global(label) :global(.required),
-.local-event-form :global(.form-group) :global(.form-label) :global(.required) {
-    color: var(--color-danger, #ef4444);
+/* The event-type and time rows are Fields now, so the rule above began matching
+   them. Both selectors are (0,2,0); this one is later, so it wins. */
+.local-event-form > .hug {
+  align-self: flex-start;
 }
 
 /* =============================================================================
@@ -113,7 +92,7 @@
   flex-wrap: wrap;
 }
 
-.day-selector.form-error {
+:global(.field--error) .day-selector {
   padding: 0.25rem;
   border: 1px solid var(--color-danger, #ef4444);
   border-radius: var(--effect-border-radius);
@@ -157,7 +136,7 @@
   gap: 0.5rem;
 }
 
-.event-term-checkboxes.form-error {
+:global(.field--error) .event-term-checkboxes {
   padding: 0.25rem;
   border: 1px solid var(--color-danger, #ef4444);
   border-radius: var(--effect-border-radius);
@@ -241,21 +220,4 @@
   font-size: 0.95rem;
   padding-top: 0.25rem;
   user-select: none;
-}
-
-/* =============================================================================
-   Modal Button Icons
-   ============================================================================= */
-
-:global(.modal-dialog).local-event-modal :global(.modal-btn) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-:global(.modal-dialog).local-event-modal :global(.btn-icon) {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    margin-right: 0.35rem;
 }

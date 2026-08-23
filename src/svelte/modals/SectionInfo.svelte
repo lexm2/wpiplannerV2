@@ -1,5 +1,6 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
+  import Field from '../ui/Field.svelte';
   import { scaleFade } from '../transitions';
   import { modalState } from './modalState.svelte';
   import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
@@ -119,17 +120,19 @@
                   <span class="section-info-label">Credits</span>
                   <span class="section-info-value">{creditsDisplay}</span>
                 </div>
-                <div class="section-info-item">
-                  <span class="section-info-label">Color</span>
-                  <div class="section-color-inline">
-                    <input
-                      type="color"
-                      class="section-color-input course-color-input"
-                      value={data.currentColor}
-                      onchange={onColorInput}
-                    />
-                  </div>
-                </div>
+                <Field label="Color" controlId="section-info-color" fieldClass="section-info-item">
+                  {#snippet children()}
+                    <div class="section-color-inline">
+                      <input
+                        type="color"
+                        id="section-info-color"
+                        class="section-color-input"
+                        value={data.currentColor}
+                        onchange={onColorInput}
+                      />
+                    </div>
+                  {/snippet}
+                </Field>
               </div>
               <div class="section-enrollment-badge">
                 <span class="section-enrollment-indicator {enrollmentClass}">

@@ -401,13 +401,17 @@ html.is-mobile .modal-btn {
   gap: 1rem 0.75rem;
 }
 
-.section-info-item {
+/* The colour cell is a Field now; both branches out-specify .field/.field-label
+   so it keeps matching the four cells beside it. */
+.section-info-item,
+.field.section-info-item {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
 
-.section-info-label {
+.section-info-label,
+.field.section-info-item .field-label {
   font-size: 0.65rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -920,7 +924,7 @@ html.is-mobile .section-enrollment-waitlist {
   font-size: 0.9rem;
   color: var(--color-text);
   user-select: none;
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-regular);
 }
 
 /* Availability Filter Toggle */
@@ -1134,16 +1138,11 @@ html.is-mobile .filter-actions {
   padding: 0.5rem 0;
 }
 
-.filter-slider-group {
-  display: flex;
-  flex-direction: column;
+/* Field supplies the label and the flex column; only the rhythm belongs here.
+   input.css loads after this file (style.css:25 vs :20), so the extra class is
+   needed to win at equal specificity — same hack as main-content.css:119. */
+.field.filter-slider-group {
   gap: 0.5rem;
-}
-
-.filter-slider-group label {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--color-text);
 }
 
 .filter-slider-values {
@@ -1160,6 +1159,20 @@ html.is-mobile .filter-actions {
   color: var(--color-primary);
   min-width: 2.5rem;
   text-align: center;
+}
+
+/* Both were used in RmpRatingFilter markup with no rule anywhere, so they
+   rendered as raw body text. Not Field hints — .filter-input-hint is a unit
+   suffix inside a readout, .filter-hint is a section note. */
+.filter-input-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.filter-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
 /* ===== Segmented Control (3-position switch) ===== */
@@ -1264,13 +1277,6 @@ html.is-mobile .filter-actions {
   }
 }
 
-.wake-up-time-hint {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
-  font-style: italic;
-}
-
 .changelog-modal-body {
   flex-direction: column;
   align-items: flex-start;
@@ -1340,12 +1346,6 @@ html.is-mobile .changelog-modal-body {
 }
 
 /* Wake-Up Time Filter Styles */
-.wake-up-time-hint {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-}
-
 .filter-clear-btn {
   margin-top: 0.5rem;
   padding: 0.4rem 0.8rem;

@@ -73,7 +73,7 @@
 /* Focus state for accessibility */
 .dual-range-thumb:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(172, 43, 55, 0.3);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
 }
 
 /* Tooltips - show values on hover/drag */

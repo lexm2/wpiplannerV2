@@ -38,10 +38,10 @@
     type="time"
     label="Earliest class start time"
     panel
+    hint="Excludes sections that start before this time"
     value={timeValue}
     onchange={(e) => onChange((e.currentTarget as HTMLInputElement).value)}
   />
-  <p class="wake-up-time-hint">Excludes sections that start before this time</p>
   {#if timeValue}
     <button class="filter-clear-btn" onclick={clear}>Clear</button>
   {/if}

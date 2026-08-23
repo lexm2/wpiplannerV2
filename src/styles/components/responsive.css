@@ -45,10 +45,6 @@ html.is-mobile .content-header {
   gap: 1rem;
 }
 
-html.is-mobile .search-controls {
-  max-width: none;
-}
-
 html.is-mobile .content-header .search-field {
   max-width: none;
 }

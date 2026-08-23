@@ -28,6 +28,7 @@
       <TextField
         id="credit-min"
         type="number"
+        inputmode="numeric"
         label="Min Credits"
         panel
         min={1}
@@ -38,6 +39,7 @@
       <TextField
         id="credit-max"
         type="number"
+        inputmode="numeric"
         label="Max Credits"
         panel
         min={1}

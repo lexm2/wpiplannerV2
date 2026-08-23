@@ -18,6 +18,5 @@
     {checked}
     onchange={(e) => onchange(e.currentTarget.checked)}
   />
-  <span class="filter-toggle-slider"></span>
   <span class="filter-toggle-text">{label}</span>
 </label>

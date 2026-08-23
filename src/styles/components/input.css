@@ -1,16 +1,8 @@
 /* Text fields — the shared vocabulary behind svelte/ui/TextField.svelte.
-   Global rather than a CSS module because e2e specs and JS selectors have to be
-   able to reach these class names, and module locals are Vite-hashed.
+   Global, not a module: e2e specs and JS selectors need these names unhashed.
 
-   The visual recipe is the Add Event modal's original .form-input: a recessed
-   1px-bordered box on the house radius, turning primary with a soft ring on
-   focus. What is new is that the ring actually renders — the old declaration
-   read `var(--color-primary-alpha, rgba(var(--color-primary-rgb), 0.2))` and
-   neither token was defined anywhere, so the whole box-shadow was invalid and
-   dropped. --color-primary-rgb is now a real theme token.
-
-   The SHELL carries the box, not the control, so any affix buttons sit inside
-   the same border and share its focus state via :focus-within. */
+   The SHELL carries the box, not the control, so affix buttons sit inside the
+   same border and share its focus state via :focus-within. */
 
 .field {
   display: flex;
@@ -30,14 +22,9 @@
   margin-left: 0.15rem;
 }
 
-/* Everything dimensional in this file is rem, so the whole field scales with
-   the root type size — the one exception is the 1px border and the 2px focus
-   ring, which are hairlines and should stay a fixed device size rather than
-   thicken with the text.
-
-   reset.css:6 puts a universal 0.5s transition on border-color and none at all
-   on box-shadow, which is why focus used to feel laggy and why the ring would
-   snap. Declaring both here replaces that. */
+/* Dimensions are rem so the field scales with root type; the 1px border and 2px
+   ring stay px as hairlines. reset.css:6 sets a universal 0.5s border-color
+   transition and none on box-shadow — declaring both here replaces that. */
 .field-shell {
   display: flex;
   align-items: center;
@@ -81,8 +68,8 @@
   line-height: 1.4;
 }
 
-/* The shell's border and ring are the focus affordance; a UA outline on the
-   control would sit inside them and double up. */
+/* The shell's border and ring are the focus affordance; a UA outline would
+   double up inside them. */
 .field-control:focus {
   outline: none;
 }
@@ -92,11 +79,8 @@
   opacity: 1;
 }
 
-/* The description field in Add Event used to set `overflow: hidden` with no
-   auto-grow script behind it, so anything past ~3 lines was clipped and
-   unreachable. `field-sizing` grows it for real; browsers without it fall back
-   to a fixed height that scrolls. 2.75rem + the shell's padding reproduces the
-   old 60px min-height. */
+/* field-sizing grows the textarea for real; browsers without it fall back to a
+   fixed height that scrolls. 2.75rem + shell padding = the old 60px min-height. */
 .field-control--multiline {
   field-sizing: content;
   min-height: 2.75rem;
@@ -127,10 +111,8 @@
   opacity: 1;
 }
 
-/* Icon buttons handed to the `trailing` snippet. The component owns their
-   placement and resting look — they sit inside the border, flush to the field's
-   own padding, so callers supply only the icon and any state class. This
-   replaces the absolute `right:` offsets the search bar used to hardcode. */
+/* Icon buttons from the `trailing` snippet. The component owns placement and
+   resting look, so callers supply only the icon and any state class. */
 .field-affix {
   display: flex;
   align-items: center;
@@ -155,9 +137,8 @@
   color: var(--color-text);
 }
 
-/* For toggles that stay lit while engaged, e.g. the professor-search switch.
-   Same specificity as the :hover rule above and declared after it, so an
-   engaged toggle keeps its accent colour while the pointer is over it. */
+/* Same specificity as :hover above and declared after it, so an engaged toggle
+   keeps its accent colour while the pointer is over it. */
 .field-affix button.active {
   color: var(--color-primary);
 }
@@ -172,6 +153,15 @@
   font-size: 0.75rem;
   line-height: 1.35;
   color: var(--color-danger);
+}
+
+/* Help text, below the control — where every hand-rolled hint in this app
+   already sat. Stays visible during an error; aria-describedby lists hint then
+   message. Not a .field-message variant: that class means "the error". */
+.field-hint {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
 }
 
 .field--disabled .field-shell {

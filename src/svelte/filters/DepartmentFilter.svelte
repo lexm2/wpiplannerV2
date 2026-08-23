@@ -107,7 +107,6 @@
   {/snippet}
     <label class="filter-toggle-label">
       <input type="checkbox" class="filter-toggle" bind:checked={isCategoryMode} />
-      <span class="filter-toggle-slider"></span>
       <span class="filter-toggle-text">Search by Credit Requirements</span>
     </label>
     <div class="filter-search-container">
