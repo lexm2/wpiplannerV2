@@ -135,4 +135,7 @@ async function fetchCourseData(): Promise<void> {
   }
 }
 
-fetchCourseData();
+fetchCourseData().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

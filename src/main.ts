@@ -66,4 +66,4 @@ window.services = services;
 // Async startup (data load, theme, auto-scheduler wiring, welcome tutorial).
 // Runs after the shell is mounted + the tutorial is wired, so the welcome
 // auto-start sees services.tutorial set. Fire-and-forget (errors handled inside).
-AppBootstrap.startApp(services);
+void AppBootstrap.startApp(services);

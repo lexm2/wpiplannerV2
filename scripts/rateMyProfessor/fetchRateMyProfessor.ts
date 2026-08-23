@@ -330,4 +330,7 @@ async function main() {
 }
 
 // Run the script
-main();
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

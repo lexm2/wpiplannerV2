@@ -22,14 +22,14 @@
 
   function onInputChange(e: Event): void {
     const input = e.currentTarget as HTMLInputElement;
-    handleFile(input.files?.[0]);
+    void handleFile(input.files?.[0]);
     input.value = '';
   }
 
   function onDrop(e: DragEvent): void {
     e.preventDefault();
     dragOver = false;
-    handleFile(e.dataTransfer?.files?.[0]);
+    void handleFile(e.dataTransfer?.files?.[0]);
   }
 </script>
 

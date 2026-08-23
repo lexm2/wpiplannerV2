@@ -182,10 +182,10 @@
           await exportScheduleICS(schedule.id);
           break;
         case 'import':
-          await importSchedule(schedule.id);
+          importSchedule(schedule.id);
           break;
         case 'delete':
-          await deleteSchedule(schedule);
+          deleteSchedule(schedule);
           break;
       }
     } catch (error) {
@@ -457,35 +457,35 @@
                       class="btn-link inline-action-btn"
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('rename', schedule);
+                        void handleAction('rename', schedule);
                       }}>Rename</button
                     >
                     <button
                       class="btn-link inline-action-btn"
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('duplicate', schedule);
+                        void handleAction('duplicate', schedule);
                       }}>Duplicate</button
                     >
                     <button
                       class="btn-link inline-action-btn"
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('export', schedule);
+                        void handleAction('export', schedule);
                       }}>Export</button
                     >
                     <button
                       class="btn-link inline-action-btn"
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('export-ics', schedule);
+                        void handleAction('export-ics', schedule);
                       }}>Export ICS</button
                     >
                     <button
                       class="btn-link inline-action-btn"
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('import', schedule);
+                        void handleAction('import', schedule);
                       }}>Import</button
                     >
                     {#if schedules.length > 1}
@@ -493,7 +493,7 @@
                         class="btn-link inline-action-btn danger"
                         onclick={e => {
                           e.stopPropagation();
-                          handleAction('delete', schedule);
+                          void handleAction('delete', schedule);
                         }}>Delete</button
                       >
                     {/if}
@@ -514,35 +514,35 @@
                       class={styles['menuAction']}
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('rename', schedule);
+                        void handleAction('rename', schedule);
                       }}>Rename</button
                     >
                     <button
                       class={styles['menuAction']}
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('duplicate', schedule);
+                        void handleAction('duplicate', schedule);
                       }}>Duplicate</button
                     >
                     <button
                       class={styles['menuAction']}
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('export', schedule);
+                        void handleAction('export', schedule);
                       }}>Export</button
                     >
                     <button
                       class={styles['menuAction']}
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('export-ics', schedule);
+                        void handleAction('export-ics', schedule);
                       }}>Export ICS</button
                     >
                     <button
                       class={styles['menuAction']}
                       onclick={e => {
                         e.stopPropagation();
-                        handleAction('import', schedule);
+                        void handleAction('import', schedule);
                       }}>Import</button
                     >
                     {#if schedules.length > 1}
@@ -550,7 +550,7 @@
                         class="{styles['menuAction']} danger"
                         onclick={e => {
                           e.stopPropagation();
-                          handleAction('delete', schedule);
+                          void handleAction('delete', schedule);
                         }}>Delete</button
                       >
                     {/if}

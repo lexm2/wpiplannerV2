@@ -37,7 +37,7 @@ class AutoScheduleService {
     this.orchestrator = orchestrator;
   }
 
-  async openAutoSchedule(): Promise<void> {
+  openAutoSchedule(): void {
     if (!this.filterService || !this.courseSelectionService) {
       logger.error('[Auto-Schedule] Filter service not available');
       showAppError('Filter service not available. Please try again.');
@@ -67,7 +67,12 @@ class AutoScheduleService {
     modalState.filter = {
       mode: 'auto-schedule',
       coursesToSchedule,
-      onGenerate: () => this.doGenerateSchedules(coursesToSchedule),
+      // onGenerate is typed () => void and called fire-and-forget;
+      // doGenerateSchedules is fully try/caught into showAppError internally,
+      // so it cannot reject.
+      onGenerate: () => {
+        void this.doGenerateSchedules(coursesToSchedule);
+      },
     };
     openModal('auto-schedule-filter');
   }
@@ -99,7 +104,7 @@ class AutoScheduleService {
   runAutoSchedule(): void {
     if (!this.courseSelectionService) return;
     const selectedCourses = this.courseSelectionService.getSelectedCourses();
-    this.doGenerateSchedules(selectedCourses);
+    void this.doGenerateSchedules(selectedCourses);
   }
 
   private async doGenerateSchedules(

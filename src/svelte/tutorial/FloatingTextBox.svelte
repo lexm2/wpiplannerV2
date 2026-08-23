@@ -55,7 +55,7 @@
     if (!step || !boxEl) return;
     const box = boxEl;
     const selector = step.selector;
-    tick().then(() => {
+    void tick().then(() => {
       decorateInlineHighlights(box);
       repositionIfObstructed(box, selector);
       clampToViewport(box);

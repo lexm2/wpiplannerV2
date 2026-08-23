@@ -62,8 +62,11 @@ class ComponentWizardService {
         courseDataService: this.courseDataService,
         filterService: this.filterService,
         existingSelections,
-        onComplete: selections =>
-          this.onWizardComplete(freshCourse, selections),
+        // onComplete is typed to return void; onWizardComplete handles its own
+        // errors internally, so it cannot reject.
+        onComplete: selections => {
+          void this.onWizardComplete(freshCourse, selections);
+        },
         onCancel: () => this.closeComponentWizard(),
         onSelectionChange: selections =>
           this.onWizardSelectionChange(freshCourse, selections),

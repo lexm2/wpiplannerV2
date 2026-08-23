@@ -108,22 +108,31 @@ export class DebouncedOperation {
         clearTimeout(this.timeoutId);
       }
 
-      this.timeoutId = window.setTimeout(async () => {
-        try {
-          const token = this.operationManager.startOperation(
-            this.operationId,
-            'Debounced operation',
-          );
-          const result = await operation(token);
-          this.operationManager.completeOperation(this.operationId);
-          resolve(result);
-        } catch (error) {
-          // Reject on cancellation too. Returning here left the promise
-          // permanently unsettled, leaking it and its closure on
-          // every superseded keystroke, and made callers'
-          // CancellationError branch unreachable. They filter by name.
-          reject(error);
-        }
+      // The callback settles the promise on every path, so it cannot reject;
+      // the void-wrapped IIFE is what lets setTimeout keep its void contract.
+      this.timeoutId = window.setTimeout(() => {
+        void (async () => {
+          try {
+            const token = this.operationManager.startOperation(
+              this.operationId,
+              'Debounced operation',
+            );
+            const result = await operation(token);
+            this.operationManager.completeOperation(this.operationId);
+            resolve(result);
+          } catch (error) {
+            // Reject on cancellation too. Returning here left the promise
+            // permanently unsettled, leaking it and its closure on
+            // every superseded keystroke, and made callers'
+            // CancellationError branch unreachable. They filter by name.
+            //
+            // Preserving Error identity matters: callers branch on
+            // error.name === 'CancellationError' (see SearchBar), so wrapping
+            // a real Error would break the cancellation path and surface a
+            // spurious search error on every superseded keystroke.
+            reject(error instanceof Error ? error : new Error(String(error)));
+          }
+        })();
       }, this.delay);
     });
   }

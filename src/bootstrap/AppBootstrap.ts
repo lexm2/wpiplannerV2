@@ -174,7 +174,11 @@ export class AppBootstrap {
   }
 
   static setupWindowUnloadHandler(): void {
-    window.addEventListener('beforeunload', async e => {
+    // Deliberately not async: the handler body has nothing to await, and an
+    // async handler returns a Promise, which is truthy -- the legacy signal for
+    // forcing the browser's unload dialog in engines that still honor a
+    // returned value.
+    window.addEventListener('beforeunload', e => {
       const profileStateManager = ProfileStateManager.getInstance();
 
       if (profileStateManager.hasPendingSaves()) {

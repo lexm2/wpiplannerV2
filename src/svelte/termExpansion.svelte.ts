@@ -208,7 +208,7 @@ export function termFlip(item: HTMLElement, term: string | undefined) {
         item.getBoundingClientRect().height;
       if (courseId != null) pendingStartHeight.delete(courseId);
       // Wait for the {#if} swap to land, then animate to the new height.
-      tick().then(() => run(startH));
+      void tick().then(() => run(startH));
     },
     destroy(): void {
       cancel?.();
