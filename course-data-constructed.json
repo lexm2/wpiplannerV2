@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 23, 2026, 11:16 AM",
+  "generated": "Aug 23, 2026, 11:43 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -54620,7 +54620,7 @@
                 "crn": 352194,
                 "number": "DL01",
                 "seats": 87,
-                "seatsAvailable": 22,
+                "seatsAvailable": 21,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5484",
@@ -54637,7 +54637,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 87,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 21,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
@@ -54688,7 +54688,7 @@
                   "crn": 352383,
                   "number": "DD02",
                   "seats": 28,
-                  "seatsAvailable": 6,
+                  "seatsAvailable": 5,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5484",
@@ -54705,7 +54705,7 @@
                       "building": "",
                       "room": "Atwater Kent 219",
                       "seats": 28,
-                      "seatsAvailable": 6,
+                      "seatsAvailable": 5,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "DD02",
