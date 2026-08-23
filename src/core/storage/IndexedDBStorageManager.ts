@@ -12,11 +12,30 @@ import LZString from 'lz-string';
 import { StorageWorkerManager } from '../../workers/StorageWorkerManager';
 import { WorkerTaskType } from '../../workers/protocol';
 import { logger } from '../../utils/logger';
+import { errorMessage } from '../../utils/errorMessage';
 
 interface StorageResult<T> {
   success: boolean;
   data?: T;
   error?: string;
+}
+
+/**
+ * Shape of a row in the SCHEDULES object store. This is what saveSchedule()
+ * writes and what both load paths read back; it had previously only ever
+ * existed as an anonymous object literal, so reads came back as `any`.
+ *
+ * Everything but `id` and `timestamp` is optional because rows written by older
+ * builds predate those fields: `serializedData`/`compressed` are absent on rows
+ * that stored the schedule object directly, and `schemaVersion` is absent
+ * before migrations were introduced.
+ */
+interface StoredScheduleRow {
+  id: string;
+  serializedData?: string;
+  timestamp: number;
+  compressed?: boolean;
+  schemaVersion?: number;
 }
 
 interface StorageStats {
@@ -128,7 +147,7 @@ export class IndexedDBStorageManager {
           IndexedDBStorageManager.STORE_NAMES.SCHEDULES,
         );
 
-        const dataToStore = {
+        const dataToStore: StoredScheduleRow = {
           id: schedule.id,
           serializedData: compressed,
           timestamp: scheduleWithTimestamp.timestamp,
@@ -152,7 +171,7 @@ export class IndexedDBStorageManager {
     } catch (error) {
       return {
         success: false,
-        error: `Exception saving schedule: ${(error as Error).message}`,
+        error: `Exception saving schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -162,7 +181,7 @@ export class IndexedDBStorageManager {
       await this.initialize();
       const db = this.ensureDbInitialized();
 
-      return new Promise(async resolve => {
+      return new Promise(resolve => {
         const transaction = db.transaction(
           [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
           'readonly',
@@ -173,53 +192,57 @@ export class IndexedDBStorageManager {
         const request = store.get(scheduleId);
 
         request.onsuccess = async () => {
-          if (request.result) {
-            const stored = request.result;
-            if (stored.serializedData) {
-              if (stored.compressed) {
-                const workerPool = StorageWorkerManager.getInstance();
-                const decompressed = await workerPool.executeTask<string>(
-                  WorkerTaskType.DECOMPRESS_DATA,
-                  { compressed: stored.serializedData },
-                );
+          // Every path below must reach resolve(). The enclosing try/catch in
+          // loadSchedule() cannot see a throw from this callback -- it runs
+          // long after that block returned -- so without this handler a
+          // rejecting worker task or a JSON.parse on a corrupt row would leave
+          // the promise pending forever and hang the caller.
+          try {
+            const stored = request.result as StoredScheduleRow | undefined;
 
-                if (!decompressed) {
-                  resolve({
-                    success: false,
-                    error: 'Failed to decompress schedule data',
-                  });
-                  return;
-                }
+            if (!stored) {
+              resolve({ success: false, error: 'Schedule not found' });
+              return;
+            }
 
-                const deserialized = JSON.parse(decompressed, setReviver);
-                resolve({
-                  success: true,
-                  data: migrateStoredSchedule(
-                    deserialized,
-                    stored.schemaVersion,
-                  ),
-                });
-              } else {
-                const deserialized = JSON.parse(
-                  stored.serializedData,
-                  setReviver,
-                );
-                resolve({
-                  success: true,
-                  data: migrateStoredSchedule(
-                    deserialized,
-                    stored.schemaVersion,
-                  ),
-                });
-              }
-            } else {
+            // A row with no serializedData predates serialization: it stored
+            // the schedule object directly.
+            if (!stored.serializedData) {
               resolve({
                 success: true,
                 data: migrateStoredSchedule(stored, stored.schemaVersion),
               });
+              return;
             }
-          } else {
-            resolve({ success: false, error: 'Schedule not found' });
+
+            let serialized = stored.serializedData;
+            if (stored.compressed) {
+              const workerPool = StorageWorkerManager.getInstance();
+              const decompressed = await workerPool.executeTask<string>(
+                WorkerTaskType.DECOMPRESS_DATA,
+                { compressed: stored.serializedData },
+              );
+
+              if (!decompressed) {
+                resolve({
+                  success: false,
+                  error: 'Failed to decompress schedule data',
+                });
+                return;
+              }
+              serialized = decompressed;
+            }
+
+            const deserialized: unknown = JSON.parse(serialized, setReviver);
+            resolve({
+              success: true,
+              data: migrateStoredSchedule(deserialized, stored.schemaVersion),
+            });
+          } catch (error) {
+            resolve({
+              success: false,
+              error: `Failed to read schedule: ${errorMessage(error)}`,
+            });
           }
         };
 
@@ -233,7 +256,7 @@ export class IndexedDBStorageManager {
     } catch (error) {
       return {
         success: false,
-        error: `Exception loading schedule: ${(error as Error).message}`,
+        error: `Exception loading schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -286,7 +309,7 @@ export class IndexedDBStorageManager {
     } catch (error) {
       return {
         success: false,
-        error: `Exception loading schedules: ${(error as Error).message}`,
+        error: `Exception loading schedules: ${errorMessage(error)}`,
         data: [],
       };
     }
@@ -321,7 +344,7 @@ export class IndexedDBStorageManager {
     } catch (error) {
       return {
         success: false,
-        error: `Exception deleting schedule: ${(error as Error).message}`,
+        error: `Exception deleting schedule: ${errorMessage(error)}`,
       };
     }
   }
@@ -359,7 +382,7 @@ export class IndexedDBStorageManager {
     } catch (error) {
       return {
         success: false,
-        error: `Exception calculating storage stats: ${(error as Error).message}`,
+        error: `Exception calculating storage stats: ${errorMessage(error)}`,
       };
     }
   }
@@ -393,7 +416,7 @@ export class IndexedDBStorageManager {
     } catch (error) {
       return {
         success: false,
-        error: `Exception clearing schedules: ${(error as Error).message}`,
+        error: `Exception clearing schedules: ${errorMessage(error)}`,
       };
     }
   }
@@ -413,6 +436,9 @@ export class IndexedDBStorageManager {
     }
   }
 
+  // Mirrors initialize(): Promise<void> as the other half of the lifecycle
+  // pair; the teardown just happens not to need awaiting today.
+  // eslint-disable-next-line @typescript-eslint/require-await
   async close(): Promise<void> {
     if (this.db) {
       this.db.close();
