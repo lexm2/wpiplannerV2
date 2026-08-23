@@ -5,7 +5,7 @@
 //      scripts/degree-bucket-data/sheet-urls.tsv (wpi.edu 403s without a Referer
 //      header; send Referer: the tracking-sheets index page).
 //   2. Extract page-1 text from each PDF (pdfjs-dist, group items into lines by y).
-//   3. Per-sheet LLM extraction into scripts/degree-bucket-data/extractions.json —
+//   3. Per-sheet LLM extraction into scripts/degree-bucket-data/extractions.json -
 //      the two-column text is too interleaved for regex, so each sheet is parsed by
 //      a model into { file, major, classYear, buckets:[{sheetHeader, category,
 //      validDepartments, excludedCourses}] }. This step is done out-of-band; its
@@ -26,54 +26,107 @@ const OUT = path.join(here, '..', 'src', 'constants', 'degreeBucketRules.ts');
 const sheets = JSON.parse(fs.readFileSync(IN, 'utf8'));
 
 const VALID_CATS = new Set([
-  'total_credits','residency','mqp','mqp_completion','iqp','iqp_completion','hua','hua_completion',
-  'social_science','physical_education','major_specific','free_electives','unused',
+  'total_credits',
+  'residency',
+  'mqp',
+  'mqp_completion',
+  'iqp',
+  'iqp_completion',
+  'hua',
+  'hua_completion',
+  'social_science',
+  'physical_education',
+  'major_specific',
+  'free_electives',
+  'unused',
 ]);
-const normDept = d => String(d).toUpperCase().replace(/[^A-Z]/g, '');
+const normDept = d =>
+  String(d)
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '');
 const uniqSort = a => [...new Set(a)].sort();
 const normCode = c => {
-  const m = /^\s*([A-Za-z]+)\s*([A-Za-z0-9]+)\s*$/.exec(String(c).replace(/\s+/g, ' ').trim());
+  const m = /^\s*([A-Za-z]+)\s*([A-Za-z0-9]+)\s*$/.exec(
+    String(c).replace(/\s+/g, ' ').trim(),
+  );
   return m ? `${m[1].toUpperCase()} ${m[2].toUpperCase()}` : null;
 };
 const normBucket = b => ({
   category: VALID_CATS.has(b.category) ? b.category : 'major_specific',
-  label: String(b.sheetHeader ?? b.label ?? '').replace(/\s+/g, ' ').trim(),
-  validDepartments: uniqSort((b.validDepartments ?? []).map(normDept).filter(Boolean)),
-  excludedCourses: uniqSort((b.excludedCourses ?? []).map(normCode).filter(Boolean)),
+  label: String(b.sheetHeader ?? b.label ?? '')
+    .replace(/\s+/g, ' ')
+    .trim(),
+  validDepartments: uniqSort(
+    (b.validDepartments ?? []).map(normDept).filter(Boolean),
+  ),
+  excludedCourses: uniqSort(
+    (b.excludedCourses ?? []).map(normCode).filter(Boolean),
+  ),
 });
-const ruleKey = r => `${r.category}|${r.validDepartments.join(',')}|${r.excludedCourses.join(',')}`;
+const ruleKey = r =>
+  `${r.category}|${r.validDepartments.join(',')}|${r.excludedCourses.join(',')}`;
 const bucketsKey = list => list.map(ruleKey).sort().join(';;');
 
 for (const s of sheets) {
   s.major = String(s.major).replace(/\s+/g, ' ').trim();
   s.classYear = Number(s.classYear);
-  s.buckets = (s.buckets ?? []).map(normBucket)
+  s.buckets = (s.buckets ?? [])
+    .map(normBucket)
     .filter(b => b.validDepartments.length || b.excludedCourses.length);
 }
 
 // WPI-wide modal defaults for institution-wide categories.
 const modalFor = cat => {
   const counts = new Map();
-  for (const s of sheets) for (const b of s.buckets) {
-    if (b.category !== cat || !b.validDepartments.length) continue;
-    const k = b.validDepartments.join(',');
-    counts.set(k, (counts.get(k) || 0) + 1);
-  }
-  let best = null, bc = -1;
-  for (const [k, c] of counts) if (c > bc) { bc = c; best = k; }
+  for (const s of sheets)
+    for (const b of s.buckets) {
+      if (b.category !== cat || !b.validDepartments.length) continue;
+      const k = b.validDepartments.join(',');
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+  let best = null,
+    bc = -1;
+  for (const [k, c] of counts)
+    if (c > bc) {
+      bc = c;
+      best = k;
+    }
   return best ? best.split(',') : [];
 };
 const WPI_WIDE = [
-  { category: 'social_science', label: 'Social Science', validDepartments: modalFor('social_science'), excludedCourses: [] },
-  { category: 'hua', label: 'Humanities & Arts', validDepartments: modalFor('hua'), excludedCourses: [] },
-  { category: 'physical_education', label: 'Physical Education', validDepartments: ['WPE'], excludedCourses: [] },
-  { category: 'free_electives', label: 'Free Electives', validDepartments: [], excludedCourses: [] },
+  {
+    category: 'social_science',
+    label: 'Social Science',
+    validDepartments: modalFor('social_science'),
+    excludedCourses: [],
+  },
+  {
+    category: 'hua',
+    label: 'Humanities & Arts',
+    validDepartments: modalFor('hua'),
+    excludedCourses: [],
+  },
+  {
+    category: 'physical_education',
+    label: 'Physical Education',
+    validDepartments: ['WPE'],
+    excludedCourses: [],
+  },
+  {
+    category: 'free_electives',
+    label: 'Free Electives',
+    validDepartments: [],
+    excludedCourses: [],
+  },
 ];
 const wpiByCat = new Map(WPI_WIDE.map(r => [r.category, r]));
 const sameAsWpiWide = r => {
   const w = wpiByCat.get(r.category);
-  return w && r.validDepartments.join(',') === w.validDepartments.join(',')
-    && r.excludedCourses.join(',') === w.excludedCourses.join(',');
+  return (
+    w &&
+    r.validDepartments.join(',') === w.validDepartments.join(',') &&
+    r.excludedCourses.join(',') === w.excludedCourses.join(',')
+  );
 };
 
 // Per major: major_specific buckets + shared-cat deviations; collapse identical years.
@@ -83,23 +136,33 @@ for (const s of sheets) {
   byMajor.get(s.major).push(s);
 }
 const MAJOR_RULES = {};
-for (const [major, recs] of [...byMajor.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+for (const [major, recs] of [...byMajor.entries()].sort((a, b) =>
+  a[0].localeCompare(b[0]),
+)) {
   recs.sort((a, b) => a.classYear - b.classYear);
   const years = {};
   let prevKey = null;
   for (const s of recs) {
     const eff = s.buckets
-      .filter(b => b.category === 'major_specific' ? true : !sameAsWpiWide(b))
-      .sort((a, b) => a.category.localeCompare(b.category) || a.label.localeCompare(b.label));
+      .filter(b => (b.category === 'major_specific' ? true : !sameAsWpiWide(b)))
+      .sort(
+        (a, b) =>
+          a.category.localeCompare(b.category) ||
+          a.label.localeCompare(b.label),
+      );
     const key = bucketsKey(eff);
-    if (key !== prevKey) { years[s.classYear] = eff; prevKey = key; }
+    if (key !== prevKey) {
+      years[s.classYear] = eff;
+      prevKey = key;
+    }
   }
   if (Object.keys(years).length) MAJOR_RULES[major] = years;
 }
 
-const fmtRule = (r, ind) => `${' '.repeat(ind)}{ category: '${r.category}', label: ${JSON.stringify(r.label)}, validDepartments: ${JSON.stringify(r.validDepartments)}, excludedCourses: ${JSON.stringify(r.excludedCourses)} },`;
+const fmtRule = (r, ind) =>
+  `${' '.repeat(ind)}{ category: '${r.category}', label: ${JSON.stringify(r.label)}, validDepartments: ${JSON.stringify(r.validDepartments)}, excludedCourses: ${JSON.stringify(r.excludedCourses)} },`;
 
-let ts = `// AUTO-GENERATED by scripts/generateDegreeBucketRules.mjs — do not edit by hand.
+let ts = `// AUTO-GENERATED by scripts/generateDegreeBucketRules.mjs - do not edit by hand.
 // Source: WPI program tracking sheets (all degrees, classes 2026-2030).
 // For each degree-requirement bucket: which DEPARTMENTS may fill it, plus specific
 // course-code EXCLUSIONS that do not count even though their department qualifies.
@@ -138,7 +201,9 @@ export const MAJOR_RULES: DegreeBucketRuleSet = {
 `;
 for (const [major, years] of Object.entries(MAJOR_RULES)) {
   ts += `    ${JSON.stringify(major)}: {\n`;
-  for (const [year, eff] of Object.entries(years).sort((a, b) => Number(a[0]) - Number(b[0]))) {
+  for (const [year, eff] of Object.entries(years).sort(
+    (a, b) => Number(a[0]) - Number(b[0]),
+  )) {
     ts += `        ${year}: [\n${eff.map(r => fmtRule(r, 12)).join('\n')}\n        ],\n`;
   }
   ts += `    },\n`;
@@ -146,4 +211,6 @@ for (const [major, years] of Object.entries(MAJOR_RULES)) {
 ts += `};\n`;
 
 fs.writeFileSync(OUT, ts);
-console.log(`Wrote ${OUT} (${Object.keys(MAJOR_RULES).length} majors, ${ts.length} bytes)`);
+console.log(
+  `Wrote ${OUT} (${Object.keys(MAJOR_RULES).length} majors, ${ts.length} bytes)`,
+);

@@ -1,4 +1,4 @@
-/* Degree page — imports the student's Workday Academic Progress export and
+/* Degree page - imports the student's Workday Academic Progress export and
    displays requirement completion. Single-column flow layout (the planner's
    3-pane shell doesn't fit this view). */
 
@@ -211,15 +211,21 @@
   overflow: hidden;
 }
 
-/* segmented fill — earned / planned / schedule contributions */
+/* segmented fill - earned / planned / schedule contributions */
 .degree-progress-seg {
   height: 100%;
   transition: width var(--effect-transition);
 }
 
-.degree-progress-seg.seg-earned { background: var(--color-success); }
-.degree-progress-seg.seg-planned { background: var(--color-warning); }
-.degree-progress-seg.seg-schedule { background: var(--color-primary); }
+.degree-progress-seg.seg-earned {
+  background: var(--color-success);
+}
+.degree-progress-seg.seg-planned {
+  background: var(--color-warning);
+}
+.degree-progress-seg.seg-schedule {
+  background: var(--color-primary);
+}
 
 /* legend mapping the segment colors to their source */
 .degree-progress-legend {
@@ -244,9 +250,15 @@
   flex-shrink: 0;
 }
 
-.degree-legend-swatch.seg-earned { background: var(--color-success); }
-.degree-legend-swatch.seg-planned { background: var(--color-warning); }
-.degree-legend-swatch.seg-schedule { background: var(--color-primary); }
+.degree-legend-swatch.seg-earned {
+  background: var(--color-success);
+}
+.degree-legend-swatch.seg-planned {
+  background: var(--color-warning);
+}
+.degree-legend-swatch.seg-schedule {
+  background: var(--color-primary);
+}
 
 .degree-progress-fill {
   height: 100%;
@@ -380,7 +392,7 @@
   color: var(--color-danger);
 }
 
-/* applied courses — outlined grid tiles */
+/* applied courses - outlined grid tiles */
 .requirement-courses {
   margin: 0.85rem 0 0;
   padding: 0;
@@ -410,7 +422,7 @@
   border-left: 3px solid var(--color-text-muted);
 }
 
-/* draggable tiles (planned + schedule overlay) — grab cursor + drag affordance */
+/* draggable tiles (planned + schedule overlay) - grab cursor + drag affordance */
 .requirement-course-draggable {
   cursor: grab;
 }
@@ -436,7 +448,8 @@
 /* drop-target highlight while dragging a schedule tile over a card */
 .requirement-card.drag-over {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-primary) 35%, transparent);
 }
 
 .requirement-course-top {
@@ -452,7 +465,7 @@
   font-weight: var(--font-weight-medium);
 }
 
-/* clickable course code — opens the catalog entry on the classes page */
+/* clickable course code - opens the catalog entry on the classes page */
 .requirement-course-link {
   background: none;
   border: none;
@@ -484,7 +497,7 @@
   color: var(--color-text-muted);
 }
 
-/* empty placeholder tile — a clickable slot still needing a course */
+/* empty placeholder tile - a clickable slot still needing a course */
 .requirement-course-empty {
   align-items: center;
   justify-content: center;

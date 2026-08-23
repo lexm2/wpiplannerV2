@@ -22,13 +22,15 @@ import { GraduateLevelFilter } from './GraduateLevelFilter';
 import { RateMyProfessorService } from '../../../services/external';
 
 // All default filters (excludes SearchTextFilter and ConflictFilter which are registered separately)
-export const createDefaultFilters = (rmpService: RateMyProfessorService): SectionBasedFilter[] => [
-    new DepartmentFilter(),
-    new AvailabilityFilter(),
-    new CreditRangeFilter(),
-    new TermFilter(),
-    new RMPRatingFilter(rmpService),
-    new WakeUpTimeFilter(),
-    new AcademicYearFilter(),
-    new GraduateLevelFilter(),
+export const createDefaultFilters = (
+  rmpService: RateMyProfessorService,
+): SectionBasedFilter[] => [
+  new DepartmentFilter(),
+  new AvailabilityFilter(),
+  new CreditRangeFilter(),
+  new TermFilter(),
+  new RMPRatingFilter(rmpService),
+  new WakeUpTimeFilter(),
+  new AcademicYearFilter(),
+  new GraduateLevelFilter(),
 ];

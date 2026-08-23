@@ -112,7 +112,6 @@
     if (side === 'left') setMinFromPct(pct);
     else setMaxFromPct(pct);
   }
-
 </script>
 
 <div class={styles['dual-range-slider']}>
@@ -132,11 +131,11 @@
     aria-valuenow={minValue}
     aria-label={leftLabel}
     style:left="{minPct}%"
-    onpointerdown={(e) => onThumbDown('left', e)}
+    onpointerdown={e => onThumbDown('left', e)}
     onpointermove={onThumbMove}
     onpointerup={onThumbUp}
     onpointercancel={onThumbUp}
-    onkeydown={(e) => onThumbKeyDown('left', e)}
+    onkeydown={e => onThumbKeyDown('left', e)}
     onmouseenter={() => (hoverLeft = true)}
     onmouseleave={() => (hoverLeft = false)}
   ></div>
@@ -150,11 +149,11 @@
     aria-valuenow={maxValue}
     aria-label={rightLabel}
     style:left="{maxPct}%"
-    onpointerdown={(e) => onThumbDown('right', e)}
+    onpointerdown={e => onThumbDown('right', e)}
     onpointermove={onThumbMove}
     onpointerup={onThumbUp}
     onpointercancel={onThumbUp}
-    onkeydown={(e) => onThumbKeyDown('right', e)}
+    onkeydown={e => onThumbKeyDown('right', e)}
     onmouseenter={() => (hoverRight = true)}
     onmouseleave={() => (hoverRight = false)}
   ></div>
@@ -163,11 +162,15 @@
     class="{styles['dual-range-tooltip']} {styles['dual-range-tooltip-left']}"
     style:left="{minPct}%"
     style:display={showLeftTip ? 'block' : 'none'}
-  >{minValue.toFixed(1)}</div>
+  >
+    {minValue.toFixed(1)}
+  </div>
 
   <div
     class="{styles['dual-range-tooltip']} {styles['dual-range-tooltip-right']}"
     style:left="{maxPct}%"
     style:display={showRightTip ? 'block' : 'none'}
-  >{maxValue.toFixed(1)}</div>
+  >
+    {maxValue.toFixed(1)}
+  </div>
 </div>

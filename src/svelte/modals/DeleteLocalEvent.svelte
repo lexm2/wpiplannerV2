@@ -18,7 +18,13 @@
       </div>
       <div class="modal-footer">
         <button class="modal-btn btn-secondary" onclick={close}>Cancel</button>
-        <button class="modal-btn btn-danger" onclick={() => { payload.onConfirm(); close(); }}>Delete</button>
+        <button
+          class="modal-btn btn-danger"
+          onclick={() => {
+            payload.onConfirm();
+            close();
+          }}>Delete</button
+        >
       </div>
     {/snippet}
   </Modal>

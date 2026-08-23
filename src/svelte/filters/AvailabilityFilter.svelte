@@ -5,7 +5,10 @@
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
   import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
-  import type { AvailabilityFilterCriteria, ConflictCriteria } from '../../types/filters';
+  import type {
+    AvailabilityFilterCriteria,
+    ConflictCriteria,
+  } from '../../types/filters';
   import type { WeeklyTimeSlot } from '../../types/schedule';
 
   let {
@@ -21,22 +24,31 @@
   const isCalendarSlot = (slot: WeeklyTimeSlot): boolean =>
     !!(slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/));
 
-  const availCriteria = $derived(filterService.getCriteria<AvailabilityFilterCriteria>('availability'));
+  const availCriteria = $derived(
+    filterService.getCriteria<AvailabilityFilterCriteria>('availability'),
+  );
   const availableOnly = $derived(availCriteria?.availableOnly ?? false);
   const minAvailable = $derived(availCriteria?.minAvailable);
 
-  const conflictCriteria = $derived(filterService.getCriteria<ConflictCriteria>('periodConflict'));
+  const conflictCriteria = $derived(
+    filterService.getCriteria<ConflictCriteria>('periodConflict'),
+  );
   const avoidConflicts = $derived(conflictCriteria?.avoidConflicts ?? false);
   const blockedSlots = $derived(conflictCriteria?.blockedSlots ?? []);
   const hasCalendarEvents = $derived(blockedSlots.some(isCalendarSlot));
 
-  const calendarEventCount = $derived(autoScheduleOrchestrator?.getLocalEventCount() ?? 0);
+  const calendarEventCount = $derived(
+    autoScheduleOrchestrator?.getLocalEventCount() ?? 0,
+  );
   const showCalendarToggle = $derived(calendarEventCount > 0);
   const calendarCountText = $derived(
-    calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`
+    calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`,
   );
 
-  function writeAvailability(onlyAvail: boolean, minAvail: number | undefined): void {
+  function writeAvailability(
+    onlyAvail: boolean,
+    minAvail: number | undefined,
+  ): void {
     if (onlyAvail || minAvail) {
       filterService.addFilter('availability', {
         availableOnly: onlyAvail,
@@ -64,7 +76,10 @@
         blockedSlots, // preserve existing (e.g. calendar) slots
       });
     } else if (blockedSlots.length > 0) {
-      filterService.addFilter('periodConflict', { avoidConflicts: false, blockedSlots });
+      filterService.addFilter('periodConflict', {
+        avoidConflicts: false,
+        blockedSlots,
+      });
     } else {
       filterService.removeFilter('periodConflict');
     }
@@ -74,11 +89,14 @@
     if (!autoScheduleOrchestrator) return;
     const avoid = avoidConflicts;
     const selectedCourses =
-      conflictCriteria?.selectedCourses ?? courseSelectionService.getSelectedCourses() ?? [];
-    const nonCalendarSlots = blockedSlots.filter((s) => !isCalendarSlot(s));
+      conflictCriteria?.selectedCourses ??
+      courseSelectionService.getSelectedCourses() ??
+      [];
+    const nonCalendarSlots = blockedSlots.filter(s => !isCalendarSlot(s));
 
     if (checked) {
-      const calendarSlots = autoScheduleOrchestrator.getAllCalendarBlockedTimes();
+      const calendarSlots =
+        autoScheduleOrchestrator.getAllCalendarBlockedTimes();
       filterService.addFilter('periodConflict', {
         avoidConflicts: avoid,
         selectedCourses,
@@ -130,7 +148,7 @@
       max={999}
       placeholder="Any"
       value={String(minAvailable ?? '')}
-      oninput={(e) => onMinSeats((e.currentTarget as HTMLInputElement).value)}
+      oninput={e => onMinSeats((e.currentTarget as HTMLInputElement).value)}
     />
   </div>
 </FilterSection>

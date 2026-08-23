@@ -5,11 +5,11 @@
   // controls (the Add Event groups, the RMP slider groups, the colour swatch).
   // Styles live in styles/components/input.css.
   //
-  // Renders NO wrapper beyond `.field` — local-event-modal.module.css:19 and
+  // Renders NO wrapper beyond `.field` - local-event-modal.module.css:19 and
   // modal.css:987 both reach it with a direct-child combinator.
 
   interface FieldParts {
-    /** hint id then error id, whichever exist — for the control's aria-describedby. */
+    /** hint id then error id, whichever exist - for the control's aria-describedby. */
     describedBy?: string;
   }
 
@@ -37,7 +37,7 @@
     hint?: string;
     /** Error message. Truthy renders `.field-message` and sets `field--error`. */
     error?: string;
-    /** Renders the asterisk. Not the native attribute — the app validates on submit. */
+    /** Renders the asterisk. Not the native attribute - the app validates on submit. */
     required?: boolean;
     disabled?: boolean;
     /** Filter-panel recipe: flush on the section ground instead of recessed. */
@@ -52,15 +52,21 @@
   const labelId = $derived(label ? `${base}-label` : undefined);
   const hintId = $derived(hint ? `${base}-hint` : undefined);
   const messageId = $derived(error ? `${base}-error` : undefined);
-  // Hint before message — aria-describedby is announced in list order.
-  const describedBy = $derived([hintId, messageId].filter(Boolean).join(' ') || undefined);
+  // Hint before message - aria-describedby is announced in list order.
+  const describedBy = $derived(
+    [hintId, messageId].filter(Boolean).join(' ') || undefined,
+  );
 </script>
 
 <div
   class={[
     'field',
     fieldClass,
-    { 'field--error': !!error, 'field--disabled': disabled, 'field--panel': panel },
+    {
+      'field--error': !!error,
+      'field--disabled': disabled,
+      'field--panel': panel,
+    },
   ]}
   role={group ? 'group' : undefined}
   aria-labelledby={group ? labelId : undefined}
@@ -68,7 +74,7 @@
 >
   {#if label}
     {#if group}
-      <!-- Named by a descendant span, not a <label> — the children aren't one
+      <!-- Named by a descendant span, not a <label> - the children aren't one
            labelable control. No aria-invalid/aria-required: ARIA `group`
            supports neither, and emitting them trips axe's aria-allowed-attr. -->
       <span class="field-label" id={labelId}>

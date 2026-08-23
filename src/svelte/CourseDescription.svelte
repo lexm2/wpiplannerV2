@@ -6,7 +6,9 @@
   import type { CourseDataService } from '../services/data/courseDataService';
   import type { Course, Section } from '../types/types';
 
-  let { courseDataService }: {
+  let {
+    courseDataService,
+  }: {
     courseDataService: CourseDataService;
   } = $props();
 
@@ -23,34 +25,63 @@
       ? course.minCredits === course.maxCredits
         ? `${course.minCredits} credits`
         : `${course.minCredits}-${course.maxCredits} credits`
-      : ''
+      : '',
   );
   const yearLabel = $derived(
-    course?.academicYear ? `${course.academicYear}-${course.academicYear + 1}` : ''
+    course?.academicYear
+      ? `${course.academicYear}-${course.academicYear + 1}`
+      : '',
   );
 
-  const isHierarchical = $derived(course ? courseDataService.isHierarchicalCourse(course) : false);
-  const isLabOnly = $derived(course ? courseDataService.isLabOnlyCourse(course) : false);
+  const isHierarchical = $derived(
+    course ? courseDataService.isHierarchicalCourse(course) : false,
+  );
+  const isLabOnly = $derived(
+    course ? courseDataService.isLabOnlyCourse(course) : false,
+  );
 
   // The course's lecture groups, computed once per course change and reused by
   // every tab-visibility derived + sectionsForTab below.
-  const lectures = $derived(course ? courseDataService.getLecturesForCourse(course) : []);
+  const lectures = $derived(
+    course ? courseDataService.getLecturesForCourse(course) : [],
+  );
 
-  // Tab visibility — mirrors CourseController.renderComponentTabs lines 465-468.
+  // Tab visibility - mirrors CourseController.renderComponentTabs lines 465-468.
   const showLectures = $derived(isHierarchical);
-  const showDiscussions = $derived(isHierarchical && lectures.some(lg => lg.compatibleDiscussions.length > 0));
-  const showLabs = $derived(course ? (isHierarchical ? lectures.some(lg => lg.compatibleLabs.length > 0) : isLabOnly) : false);
-  const showInterestLists = $derived(isHierarchical && lectures.some(lg => lg.section.isInterestList));
+  const showDiscussions = $derived(
+    isHierarchical && lectures.some(lg => lg.compatibleDiscussions.length > 0),
+  );
+  const showLabs = $derived(
+    course
+      ? isHierarchical
+        ? lectures.some(lg => lg.compatibleLabs.length > 0)
+        : isLabOnly
+      : false,
+  );
+  const showInterestLists = $derived(
+    isHierarchical && lectures.some(lg => lg.section.isInterestList),
+  );
 
   const showTabs = $derived(isHierarchical || isLabOnly);
 
-  interface TabDef { id: string; label: string; }
+  interface TabDef {
+    id: string;
+    label: string;
+  }
   const tabs = $derived.by<TabDef[]>(() => {
     const all: { id: string; label: string; show: boolean }[] = [
       { id: 'lectures', label: 'Lectures', show: showLectures },
       { id: 'discussions', label: 'Discussions', show: showDiscussions },
-      { id: 'labs', label: isLabOnly ? 'Lab Sections' : 'Labs', show: showLabs },
-      { id: 'interest-lists', label: 'Interest Lists', show: showInterestLists },
+      {
+        id: 'labs',
+        label: isLabOnly ? 'Lab Sections' : 'Labs',
+        show: showLabs,
+      },
+      {
+        id: 'interest-lists',
+        label: 'Interest Lists',
+        show: showInterestLists,
+      },
     ];
     return all.filter(t => t.show).map(({ id, label }) => ({ id, label }));
   });
@@ -64,7 +95,11 @@
     });
   });
 
-  interface SectionGroup { heading: string; type: string; sections: Section[]; }
+  interface SectionGroup {
+    heading: string;
+    type: string;
+    sections: Section[];
+  }
 
   function sectionsForTab(c: Course, tabId: string): SectionGroup {
     if (tabId === 'lectures') {
@@ -86,10 +121,18 @@
     if (tabId === 'labs') {
       if (courseDataService.isLabOnlyCourse(c)) {
         const labs = courseDataService.getStandaloneLabs(c);
-        return { heading: `Available Lab Sections (${labs.length})`, type: 'Lab', sections: labs };
+        return {
+          heading: `Available Lab Sections (${labs.length})`,
+          type: 'Lab',
+          sections: labs,
+        };
       }
       const labs = lectures.flatMap(lg => lg.compatibleLabs);
-      return { heading: `Available Labs (${labs.length})`, type: 'Lab', sections: labs };
+      return {
+        heading: `Available Labs (${labs.length})`,
+        type: 'Lab',
+        sections: labs,
+      };
     }
     if (tabId === 'interest-lists') {
       const interestLists = lectures.filter(lg => lg.section.isInterestList);
@@ -102,14 +145,21 @@
     return { heading: '', type: '', sections: [] };
   }
 
-  const activeGroup = $derived(course ? sectionsForTab(course, activeTab) : null);
+  const activeGroup = $derived(
+    course ? sectionsForTab(course, activeTab) : null,
+  );
 
-  // Section-card derived data — mirrors CourseController.renderSectionCard.
+  // Section-card derived data - mirrors CourseController.renderSectionCard.
   function isAsyncSection(section: Section): boolean {
     const period = section.periods[0];
-    return !!(period?.isAsync || (period &&
-      period.startTime.hours === 12 && period.startTime.minutes === 0 &&
-      period.endTime.hours === 12 && period.endTime.minutes === 0));
+    return !!(
+      period?.isAsync ||
+      (period &&
+        period.startTime.hours === 12 &&
+        period.startTime.minutes === 0 &&
+        period.endTime.hours === 12 &&
+        period.endTime.minutes === 0)
+    );
   }
   function sectionDays(section: Section): string {
     const period = section.periods[0];
@@ -117,7 +167,9 @@
   }
   function sectionTime(section: Section): string {
     const period = section.periods[0];
-    return period ? `${period.startTime.displayTime} - ${period.endTime.displayTime}` : 'TBA';
+    return period
+      ? `${period.startTime.displayTime} - ${period.endTime.displayTime}`
+      : 'TBA';
   }
   function sectionLocation(section: Section): string {
     return section.periods[0]?.location || 'TBA';
@@ -127,7 +179,9 @@
   }
   function professorRmpUrl(section: Section): string | null {
     const professor = sectionProfessor(section);
-    return professor !== 'Not Assigned' ? rateMyProfessorService.getProfessorRMPUrl(professor) : null;
+    return professor !== 'Not Assigned'
+      ? rateMyProfessorService.getProfessorRMPUrl(professor)
+      : null;
   }
 </script>
 
@@ -136,13 +190,17 @@
 {:else}
   <div class="course-info">
     <div class="course-desc-title">{course.name}</div>
-    <div class="course-code">{course.departmentAbbr}{course.number} ({credits})</div>
+    <div class="course-code">
+      {course.departmentAbbr}{course.number} ({credits})
+    </div>
     <div class="course-meta">
       {#if yearLabel}<div class="course-year">{yearLabel}</div>{/if}
       {#if course.category != null}
         <div class="course-category">
           Cat {course.category}
-          <div class="course-category-tooltip">{CATEGORY_DESCRIPTIONS[course.category]}</div>
+          <div class="course-category-tooltip">
+            {CATEGORY_DESCRIPTIONS[course.category]}
+          </div>
         </div>
       {/if}
     </div>
@@ -157,8 +215,8 @@
             class="component-tab"
             class:active={activeTab === tab.id}
             data-tab={tab.id}
-            onclick={() => (activeTab = tab.id)}
-          >{tab.label}</button>
+            onclick={() => (activeTab = tab.id)}>{tab.label}</button
+          >
         {/each}
       </div>
       <div class="component-tab-content">
@@ -173,7 +231,9 @@
                 <div class="section-list-item">
                   <div class="section-header">
                     <span class="section-number">{section.number}</span>
-                    {#if !interest}<span class="section-type">{activeGroup.type}</span>{/if}
+                    {#if !interest}<span class="section-type"
+                        >{activeGroup.type}</span
+                      >{/if}
                     <span class="section-crn">CRN: {section.crn}</span>
                   </div>
                   <div class="section-details">
@@ -186,14 +246,23 @@
                       </div>
                     {:else}
                       <div class="section-time">
-                        <strong>{sectionDays(section)}</strong> {sectionTime(section)}
+                        <strong>{sectionDays(section)}</strong>
+                        {sectionTime(section)}
                       </div>
-                      <div class="section-location">{sectionLocation(section)}</div>
+                      <div class="section-location">
+                        {sectionLocation(section)}
+                      </div>
                     {/if}
                     {#if !interest}
                       <div class="section-professor">
                         {#if rmpUrl}
-                          <a href={rmpUrl} target="_blank" rel="noopener noreferrer" class="professor-link">{sectionProfessor(section)}</a>
+                          <a
+                            href={rmpUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="professor-link"
+                            >{sectionProfessor(section)}</a
+                          >
                         {:else}
                           {sectionProfessor(section)}
                         {/if}

@@ -17,7 +17,7 @@ export class UndoRedoManager {
   captureSnapshot(
     activeScheduleId: string | null,
     schedules: Map<string, Schedule>,
-    preferences: SchedulePreferences
+    preferences: SchedulePreferences,
   ): void {
     if (this.currentIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.currentIndex + 1);
@@ -27,7 +27,7 @@ export class UndoRedoManager {
       timestamp: Date.now(),
       activeScheduleId,
       schedules: this.deepCloneSchedulesMap(schedules),
-      preferences: this.deepClone(preferences)
+      preferences: this.deepClone(preferences),
     };
 
     this.history.push(snapshot);
@@ -85,7 +85,9 @@ export class UndoRedoManager {
     return JSON.parse(JSON.stringify(obj, setReplacer), setReviver);
   }
 
-  private deepCloneSchedulesMap(schedules: Map<string, Schedule>): Map<string, Schedule> {
+  private deepCloneSchedulesMap(
+    schedules: Map<string, Schedule>,
+  ): Map<string, Schedule> {
     const schedulesArray = Array.from(schedules.entries());
     const clonedArray = this.deepClone(schedulesArray);
     return new Map(clonedArray);

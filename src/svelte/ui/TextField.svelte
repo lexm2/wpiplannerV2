@@ -35,7 +35,7 @@
     value?: string;
     /** Visible label. Omit for an unlabelled field and pass `ariaLabel` instead. */
     label?: string;
-    /** Lands on the control itself, never a wrapper — tutorial steps target `#id`. */
+    /** Lands on the control itself, never a wrapper - tutorial steps target `#id`. */
     id?: string;
     type?: 'text' | 'number' | 'date' | 'time' | 'search';
     placeholder?: string;
@@ -43,7 +43,7 @@
     hint?: string;
     /** Error message. Truthy renders the message and marks the control invalid. */
     error?: string;
-    /** Renders the asterisk and sets `aria-required`. Not the native attribute — the app validates on submit. */
+    /** Renders the asterisk and sets `aria-required`. Not the native attribute - the app validates on submit. */
     required?: boolean;
     disabled?: boolean;
     /** Render a `<textarea>` instead of an `<input>`. */
@@ -54,9 +54,17 @@
     max?: number;
     step?: number;
     /** Which on-screen keyboard to raise on touch devices. */
-    inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
+    inputmode?:
+      | 'none'
+      | 'text'
+      | 'decimal'
+      | 'numeric'
+      | 'tel'
+      | 'search'
+      | 'email'
+      | 'url';
     ariaLabel?: string;
-    /** Literal attribute, not an action — `trapFocus` resolves `[autofocus]`. */
+    /** Literal attribute, not an action - `trapFocus` resolves `[autofocus]`. */
     autofocus?: boolean;
     /** Extra class(es) on the outer `.field`, for layout at the call site. */
     fieldClass?: string;
@@ -72,14 +80,24 @@
 
   // `bind:value` can't be used on an <input> with a dynamic `type`, so write-back
   // is manual. One-way callers (the filters) pass `value={x}` and read
-  // e.currentTarget.value themselves — for them this assignment doesn't propagate.
+  // e.currentTarget.value themselves - for them this assignment doesn't propagate.
   function handleInput(event: Event): void {
-    value = (event.currentTarget as HTMLInputElement | HTMLTextAreaElement).value;
+    value = (event.currentTarget as HTMLInputElement | HTMLTextAreaElement)
+      .value;
     oninput?.(event);
   }
 </script>
 
-<Field {label} controlId={id} {hint} {error} {required} {disabled} {panel} {fieldClass}>
+<Field
+  {label}
+  controlId={id}
+  {hint}
+  {error}
+  {required}
+  {disabled}
+  {panel}
+  {fieldClass}
+>
   {#snippet children({ describedBy })}
     <div class={['field-shell', { 'field-shell--multiline': multiline }]}>
       {#if multiline}
@@ -101,8 +119,7 @@
           {onkeydown}
           {onblur}
           {onfocus}
-          {onclick}
-        ></textarea>
+          {onclick}></textarea>
       {:else}
         <!-- svelte-ignore a11y_autofocus (callers opt in deliberately; trapFocus resolves [autofocus]) -->
         <input

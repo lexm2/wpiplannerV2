@@ -12,7 +12,11 @@
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
   import { logger } from '../utils/logger';
 
-  let { filterService, courseSelectionService, profileStateManager }: {
+  let {
+    filterService,
+    courseSelectionService,
+    profileStateManager,
+  }: {
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     profileStateManager: ProfileStateManager;
@@ -32,21 +36,27 @@
   // `filterService.getActiveFilters()` (a SvelteMap) are reactive.
   const baseCourses = $derived.by(() => {
     const departments = appState.loadedDepartments;
-    const deptIds = filterService.getCriteria<DepartmentFilterCriteria>('department')?.departments ?? [];
+    const deptIds =
+      filterService.getCriteria<DepartmentFilterCriteria>('department')
+        ?.departments ?? [];
     if (deptIds.length === 1) {
       const targetId = deptIds[0].toLowerCase();
-      const dept = departments.find(d => d.abbreviation.toLowerCase() === targetId);
+      const dept = departments.find(
+        d => d.abbreviation.toLowerCase() === targetId,
+      );
       if (dept) return dept.courses;
     }
     return departments.flatMap(d => d.courses);
   });
 
   const filtered = $derived(
-    filterService.isEmpty() ? baseCourses : filterService.filterCourses(baseCourses)
+    filterService.isEmpty()
+      ? baseCourses
+      : filterService.filterCourses(baseCourses),
   );
 
   // When searching, preserve relevance ranking from searchUtils; otherwise sort
-  // by department then number. Copy before sorting — `dept.courses` is a
+  // by department then number. Copy before sorting - `dept.courses` is a
   // `$state.raw` array we must not mutate in place.
   const sorted = $derived(
     filterService.hasFilter('searchText')
@@ -55,7 +65,7 @@
           const deptCompare = a.departmentAbbr.localeCompare(b.departmentAbbr);
           if (deptCompare !== 0) return deptCompare;
           return a.number.localeCompare(b.number);
-        })
+        }),
   );
 
   const displayed = $derived(sorted.slice(0, displayCount));
@@ -64,7 +74,7 @@
   const loadMoreText = $derived(
     remaining < INITIAL_PAGE_SIZE
       ? `Load ${remaining} more courses`
-      : `Load next ${INITIAL_PAGE_SIZE} courses`
+      : `Load next ${INITIAL_PAGE_SIZE} courses`,
   );
 
   // Per-course view models (term availability + deduped section badges), memoized
@@ -77,7 +87,7 @@
 
   function toggleSelect(course: Course): void {
     // The service drives appState.selectedById, so the button state below
-    // (isSelected) updates reactively — no optimistic DOM patching needed.
+    // (isSelected) updates reactively - no optimistic DOM patching needed.
     courseSelectionService.toggleCourseSelection(course).catch(error => {
       logger.error('Failed to toggle course selection:', error);
     });
@@ -115,8 +125,11 @@
           <div class="course-card-info">
             <div class="course-title-main">{course.name}</div>
             <div class="course-code-row">
-              <div class="course-code-badge">{course.departmentAbbr}{course.number}</div>
-              {#if cv.hasWarning}<span class="capacity-badge">At capacity</span>{/if}
+              <div class="course-code-badge">
+                {course.departmentAbbr}{course.number}
+              </div>
+              {#if cv.hasWarning}<span class="capacity-badge">At capacity</span
+                >{/if}
             </div>
           </div>
           <div class="course-card-buttons">
@@ -124,14 +137,26 @@
               class="course-select-btn"
               class:selected={isSelected}
               title={isSelected ? 'Remove from selection' : 'Add to selection'}
-              onclick={(e) => { e.stopPropagation(); toggleSelect(course); }}
-            >{@html isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}</button>
+              onclick={e => {
+                e.stopPropagation();
+                toggleSelect(course);
+              }}
+              >{@html isSelected
+                ? getInlineSVG('CHECK', 'check-icon')
+                : getInlineSVG('PLUS', 'plus-icon')}</button
+            >
             <button
               class="course-bookmark-btn"
               class:bookmarked={isBookmarked}
               title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-              onclick={(e) => { e.stopPropagation(); toggleBookmark(course.id, isBookmarked); }}
-            >{@html isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button>
+              onclick={e => {
+                e.stopPropagation();
+                toggleBookmark(course.id, isBookmarked);
+              }}
+              >{@html isBookmarked
+                ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon')
+                : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button
+            >
           </div>
         </div>
       </div>
@@ -159,20 +184,38 @@
               class="course-select-btn"
               class:selected={isSelected}
               title={isSelected ? 'Remove from selection' : 'Add to selection'}
-              onclick={(e) => { e.stopPropagation(); toggleSelect(course); }}
-            >{@html isSelected ? getInlineSVG('CHECK', 'check-icon') : getInlineSVG('PLUS', 'plus-icon')}</button>
+              onclick={e => {
+                e.stopPropagation();
+                toggleSelect(course);
+              }}
+              >{@html isSelected
+                ? getInlineSVG('CHECK', 'check-icon')
+                : getInlineSVG('PLUS', 'plus-icon')}</button
+            >
             <button
               class="course-bookmark-btn"
               class:bookmarked={isBookmarked}
               title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-              onclick={(e) => { e.stopPropagation(); toggleBookmark(course.id, isBookmarked); }}
-            >{@html isBookmarked ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon') : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button>
-            <div class="course-code">{course.departmentAbbr}{course.number}</div>
+              onclick={e => {
+                e.stopPropagation();
+                toggleBookmark(course.id, isBookmarked);
+              }}
+              >{@html isBookmarked
+                ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon')
+                : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button
+            >
+            <div class="course-code">
+              {course.departmentAbbr}{course.number}
+            </div>
             <div class="course-name">
               <span class="course-name-text">{course.name}</span>
             </div>
           </div>
-          <div class="course-sections" class:expanded={!!expanded} data-course-id={course.id}>
+          <div
+            class="course-sections"
+            class:expanded={!!expanded}
+            data-course-id={course.id}
+          >
             {#if expanded}
               {@const sec = cv.sectionsByTerm.get(expanded)}
               <div class="term-sections-container" data-term={expanded}>
@@ -182,7 +225,10 @@
                   class:full={sec?.allFull}
                   data-term={expanded}
                   title={sec?.allFull ? 'All sections full' : undefined}
-                  onclick={(e) => { e.stopPropagation(); toggleTerm(e, course.id, expanded, true); }}
+                  onclick={e => {
+                    e.stopPropagation();
+                    toggleTerm(e, course.id, expanded, true);
+                  }}
                 >
                   <span class="term-letter">{expanded}</span>
                   {@html getInlineSVG('PLUS', 'term-icon')}
@@ -193,15 +239,29 @@
                     class:full={badge.isFull}
                     data-section={badge.number}
                     title={`${badge.profPlain}: ${badge.number}`}
-                  >{#each badge.profs as p, i (i)}{#if p.url}<a href={p.url} target="_blank" rel="noopener noreferrer" class="professor-link" onclick={(e) => e.stopPropagation()}>{p.text}</a>{:else}{p.text}{/if}{#if i < badge.profs.length - 1}, {/if}{/each}: {badge.number}</span>
+                    >{#each badge.profs as p, i (i)}{#if p.url}<a
+                          href={p.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="professor-link"
+                          onclick={e => e.stopPropagation()}>{p.text}</a
+                        >{:else}{p.text}{/if}{#if i < badge.profs.length - 1},
+                      {/if}{/each}: {badge.number}</span
+                  >
                 {/each}
                 {#if sec && sec.overflow > 0}
-                  <span class="section-badge section-badge-overflow" title="View course details for all sections">+{sec.overflow} more — see course details</span>
+                  <span
+                    class="section-badge section-badge-overflow"
+                    title="View course details for all sections"
+                    >+{sec.overflow} more - see course details</span
+                  >
                 {/if}
               </div>
             {:else}
               <div class="term-badges-container">
-                {#if cv.hasWarning}<span class="capacity-badge">At capacity</span>{/if}
+                {#if cv.hasWarning}<span class="capacity-badge"
+                    >At capacity</span
+                  >{/if}
                 {#each cv.terms as t (t.term)}
                   {#if t.available}
                     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
@@ -210,7 +270,10 @@
                       class:full={t.allFull}
                       data-term={t.term}
                       title={t.allFull ? 'All sections full' : undefined}
-                      onclick={(e) => { e.stopPropagation(); toggleTerm(e, course.id, t.term, true); }}
+                      onclick={e => {
+                        e.stopPropagation();
+                        toggleTerm(e, course.id, t.term, true);
+                      }}
                     >
                       <span class="term-letter">{t.term}</span>
                       {@html getInlineSVG('PLUS', 'term-icon')}
@@ -232,7 +295,10 @@
 
 {#if hasMore}
   <div class="load-more-container">
-    <button class="load-more-button btn btn-secondary" onclick={() => (displayCount += INITIAL_PAGE_SIZE)}>
+    <button
+      class="load-more-button btn btn-secondary"
+      onclick={() => (displayCount += INITIAL_PAGE_SIZE)}
+    >
       {loadMoreText}
     </button>
   </div>

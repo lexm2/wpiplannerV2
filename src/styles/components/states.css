@@ -1,5 +1,6 @@
 /* Loading and empty states */
-.loading-message, .empty-state {
+.loading-message,
+.empty-state {
   text-align: center;
   padding: 2rem;
   color: var(--color-text-secondary);

@@ -3,16 +3,30 @@
   import { getComputedTerm } from '../utils/typeGuards';
   import { AcademicTerm } from '../types/schedule';
   import SelectedCourseItem from './SelectedCourseItem.svelte';
-  import { compareSelectedCourses, TERM_ORDER, TERM_LABELS } from './selectedCourseUtils';
+  import {
+    compareSelectedCourses,
+    TERM_ORDER,
+    TERM_LABELS,
+  } from './selectedCourseUtils';
   import type { SelectedCourse } from '../types/schedule';
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import { logger } from '../utils/logger';
 
-  let { courseSelectionService, getIncompleteInfo, onOpenWizard }: {
+  let {
+    courseSelectionService,
+    getIncompleteInfo,
+    onOpenWizard,
+  }: {
     courseSelectionService: CourseSelectionService;
-    getIncompleteInfo: (sc: SelectedCourse) => { isIncomplete: boolean; message: string };
-    onOpenWizard: (course: Course, existing: SelectedCourse | undefined) => void;
+    getIncompleteInfo: (sc: SelectedCourse) => {
+      isIncomplete: boolean;
+      message: string;
+    };
+    onOpenWizard: (
+      course: Course,
+      existing: SelectedCourse | undefined,
+    ) => void;
   } = $props();
 
   // Group selected courses by computed term, sorted dept->number within each
@@ -23,7 +37,8 @@
 
     const byTerm = new Map<AcademicTerm | 'UNSCHEDULED', SelectedCourse[]>();
     for (const sc of sorted) {
-      const term = (getComputedTerm(sc) as AcademicTerm | null) ?? 'UNSCHEDULED';
+      const term =
+        (getComputedTerm(sc) as AcademicTerm | null) ?? 'UNSCHEDULED';
       if (!byTerm.has(term)) byTerm.set(term, []);
       byTerm.get(term)!.push(sc);
     }
@@ -37,7 +52,7 @@
       return ai - bi;
     });
 
-    return sortedKeys.map((termKey) => ({
+    return sortedKeys.map(termKey => ({
       termKey,
       label: termKey === 'UNSCHEDULED' ? 'Unscheduled' : TERM_LABELS[termKey],
       courses: byTerm.get(termKey)!,
@@ -47,14 +62,14 @@
   const isEmpty = $derived(appState.selectedCourses.length === 0);
 
   function handleRemove(course: Course): void {
-    courseSelectionService.unselectCourse(course).catch((err) =>
-      logger.error('Failed to unselect course:', err)
-    );
+    courseSelectionService
+      .unselectCourse(course)
+      .catch(err => logger.error('Failed to unselect course:', err));
   }
   function handleClearSections(course: Course): void {
-    courseSelectionService.clearCourseComponents(course).catch((err) =>
-      logger.error('Failed to clear course components:', err)
-    );
+    courseSelectionService
+      .clearCourseComponents(course)
+      .catch(err => logger.error('Failed to clear course components:', err));
   }
 </script>
 

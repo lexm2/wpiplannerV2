@@ -54,7 +54,9 @@
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .department-list.expanded {
@@ -88,8 +90,12 @@
 /* All Departments special styling */
 .department-item.all-departments {
   font-weight: var(--font-weight-medium);
-  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-background) 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(
+    135deg,
+    var(--color-surface) 0%,
+    var(--color-primary-background) 100%
+  );
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -99,7 +105,7 @@
 .department-item.all-departments.active {
   background: var(--color-primary) !important;
   color: var(--color-text-inverse) !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Multi-selection indicators */

@@ -24,7 +24,8 @@
     grid-template-columns: 1fr;
   }
 
-  .sidebar, .right-panel {
+  .sidebar,
+  .right-panel {
     display: none;
   }
 }

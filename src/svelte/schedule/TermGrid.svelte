@@ -4,7 +4,15 @@
   import { scheduleSidebarState } from '../scheduleSidebarState.svelte';
   import { WEEKDAYS, type GridBlock } from './scheduleGeometry';
 
-  let { term, blocks, hasConflict, focused, onFocus, onOpenSectionInfo, onOpenDeleteEvent }: {
+  let {
+    term,
+    blocks,
+    hasConflict,
+    focused,
+    onFocus,
+    onOpenSectionInfo,
+    onOpenDeleteEvent,
+  }: {
     term: string;
     blocks: GridBlock[];
     hasConflict: boolean;
@@ -16,19 +24,28 @@
 
   // Static scaffold: term label + 5 day headers + 60 background cells (gridlines
   // + hover). It never changes; only the block overlay re-renders.
-  const timeSlots = Array.from({ length: TimeUtils.TOTAL_TIME_SLOTS }, (_, i) => i);
+  const timeSlots = Array.from(
+    { length: TimeUtils.TOTAL_TIME_SLOTS },
+    (_, i) => i,
+  );
   function timeLabel(slot: number): string {
-    return TimeUtils.formatTime({ hours: slot + TimeUtils.START_HOUR, minutes: 0, displayTime: '' });
+    return TimeUtils.formatTime({
+      hours: slot + TimeUtils.START_HOUR,
+      minutes: 0,
+      displayTime: '',
+    });
   }
 
   function sectionClick(e: MouseEvent, b: GridBlock): void {
     e.stopPropagation(); // don't bubble to the term-graph focus handler
-    if (b.courseId && b.sectionNumber) onOpenSectionInfo(b.courseId, b.sectionNumber);
+    if (b.courseId && b.sectionNumber)
+      onOpenSectionInfo(b.courseId, b.sectionNumber);
   }
   function sectionKey(e: KeyboardEvent, b: GridBlock): void {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      if (b.courseId && b.sectionNumber) onOpenSectionInfo(b.courseId, b.sectionNumber);
+      if (b.courseId && b.sectionNumber)
+        onOpenSectionInfo(b.courseId, b.sectionNumber);
     }
   }
   function eventClick(e: MouseEvent, b: GridBlock): void {
@@ -44,9 +61,19 @@
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-<div class="term-graph" data-term={term} class:focused-term={focused} onclick={onFocus}>
+<div
+  class="term-graph"
+  data-term={term}
+  class:focused-term={focused}
+  onclick={onFocus}
+>
   {#if hasConflict}
-    <div class="term-conflict-warning" title="This term has overlapping courses">{@html getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon')}</div>
+    <div
+      class="term-conflict-warning"
+      title="This term has overlapping courses"
+    >
+      {@html getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon')}
+    </div>
   {/if}
   <div class="schedule-grid">
     <div class="time-label term-letter-label">{term}</div>
@@ -73,11 +100,14 @@
             style:left={b.left}
             style:width={b.width}
             style:background-color={b.color}
-            onmouseenter={() => (scheduleSidebarState.hoveredCourseId = b.courseId ?? null)}
+            onmouseenter={() =>
+              (scheduleSidebarState.hoveredCourseId = b.courseId ?? null)}
             onmouseleave={() => (scheduleSidebarState.hoveredCourseId = null)}
-            onclick={(e) => sectionClick(e, b)}
-            onkeydown={(e) => sectionKey(e, b)}
-          >{b.label}</div>
+            onclick={e => sectionClick(e, b)}
+            onkeydown={e => sectionKey(e, b)}
+          >
+            {b.label}
+          </div>
         {:else if b.kind === 'preview'}
           <div
             class="section-preview"
@@ -87,7 +117,9 @@
             style:width={b.width}
             style:border-color={b.color}
             style:--preview-color={b.color}
-          >{b.label}</div>
+          >
+            {b.label}
+          </div>
         {:else if b.kind === 'conflict'}
           <div
             class="conflict-overlay"
@@ -109,9 +141,11 @@
             style:height={b.height}
             style:left={b.left}
             style:width={b.width}
-            onclick={(e) => eventClick(e, b)}
-            onkeydown={(e) => eventKey(e, b)}
-          >{b.label}</div>
+            onclick={e => eventClick(e, b)}
+            onkeydown={e => eventKey(e, b)}
+          >
+            {b.label}
+          </div>
         {/if}
       {/each}
     </div>

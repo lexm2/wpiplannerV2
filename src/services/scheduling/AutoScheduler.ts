@@ -1,7 +1,10 @@
 import type { Course, Section, SectionsByKind } from '../../types/types';
 import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
 import type { SectionCandidate } from '../../types/scheduling';
-import { sectionToMask, masksConflict } from '../../core/scheduling/BitMaskEngine';
+import {
+  sectionToMask,
+  masksConflict,
+} from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import type { ConflictCriteria } from '../../types/filters';
@@ -34,21 +37,28 @@ export class AutoScheduler {
   getBlockedMasksByTerm(): Map<string, bigint> {
     const activeFilters = this.filterService.getActiveFilters();
 
-    const conflictFilter = this.filterService.getRegisteredFilter('periodConflict');
+    const conflictFilter =
+      this.filterService.getRegisteredFilter('periodConflict');
     if (conflictFilter instanceof ConflictFilter) {
-      const criteria = activeFilters.find(f => f.id === 'periodConflict')?.criteria;
+      const criteria = activeFilters.find(
+        f => f.id === 'periodConflict',
+      )?.criteria;
       if (criteria && conflictFilter.isValidCriteria(criteria)) {
-        return conflictFilter.getBlockedMasksByTerm(criteria as ConflictCriteria);
+        return conflictFilter.getBlockedMasksByTerm(
+          criteria as ConflictCriteria,
+        );
       }
     }
 
-    const blockedTimesCriteria = activeFilters.find(f => f.id === 'blockedTimes')?.criteria as { blockedTimes?: WeeklyTimeSlot[] } | undefined;
+    const blockedTimesCriteria = activeFilters.find(
+      f => f.id === 'blockedTimes',
+    )?.criteria as { blockedTimes?: WeeklyTimeSlot[] } | undefined;
     const blockedTimes = blockedTimesCriteria?.blockedTimes;
     if (blockedTimes && blockedTimes.length > 0) {
       const tempFilter = new ConflictFilter();
       return tempFilter.getBlockedMasksByTerm({
         avoidConflicts: true,
-        blockedSlots: blockedTimes
+        blockedSlots: blockedTimes,
       });
     }
 
@@ -57,7 +67,7 @@ export class AutoScheduler {
 
   getMaskedCandidates(
     selectedCourse: SelectedCourse,
-    blockedMasksByTerm: Map<string, bigint>
+    blockedMasksByTerm: Map<string, bigint>,
   ): MaskedCandidate[] {
     const course = selectedCourse.course;
     const candidates: MaskedCandidate[] = [];
@@ -70,13 +80,14 @@ export class AutoScheduler {
 
       for (const lab of labs) {
         if (allowedTerms && !allowedTerms.includes(lab.computedTerm)) continue;
-        if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse)) continue;
+        if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse))
+          continue;
 
         const mask = sectionToMask(lab);
         const candidate: MaskedCandidate = {
           combination: { lab },
           mask,
-          term: lab.computedTerm
+          term: lab.computedTerm,
         };
 
         candidates.push(candidate);
@@ -91,8 +102,10 @@ export class AutoScheduler {
 
     for (const lectureGroup of course.lectures) {
       const lecture = lectureGroup.section;
-      if (allowedTerms && !allowedTerms.includes(lecture.computedTerm)) continue;
-      if (!this.isValidSection(lecture, blockedMasksByTerm, selectedCourse)) continue;
+      if (allowedTerms && !allowedTerms.includes(lecture.computedTerm))
+        continue;
+      if (!this.isValidSection(lecture, blockedMasksByTerm, selectedCourse))
+        continue;
 
       const lectureMask = sectionToMask(lecture);
 
@@ -103,7 +116,8 @@ export class AutoScheduler {
 
         for (const d of discussions) {
           if (d.computedTerm !== lecture.computedTerm) continue;
-          if (!this.isValidSection(d, blockedMasksByTerm, selectedCourse)) continue;
+          if (!this.isValidSection(d, blockedMasksByTerm, selectedCourse))
+            continue;
           const mask = sectionToMask(d);
           if (masksConflict(lectureMask, mask)) continue;
           discussionCandidates.push({ section: d, mask });
@@ -119,7 +133,8 @@ export class AutoScheduler {
 
         for (const l of labs) {
           if (l.computedTerm !== lecture.computedTerm) continue;
-          if (!this.isValidSection(l, blockedMasksByTerm, selectedCourse)) continue;
+          if (!this.isValidSection(l, blockedMasksByTerm, selectedCourse))
+            continue;
           const mask = sectionToMask(l);
           if (masksConflict(lectureMask, mask)) continue;
           labCandidates.push({ section: l, mask });
@@ -128,11 +143,13 @@ export class AutoScheduler {
         labCandidates.push({ section: null, mask: 0n });
       }
 
-      if (discussionCandidates.length === 0 || labCandidates.length === 0) continue;
+      if (discussionCandidates.length === 0 || labCandidates.length === 0)
+        continue;
 
       for (const disc of discussionCandidates) {
         for (const lab of labCandidates) {
-          if (disc.section && lab.section && masksConflict(disc.mask, lab.mask)) continue;
+          if (disc.section && lab.section && masksConflict(disc.mask, lab.mask))
+            continue;
 
           const combinedMask = lectureMask | disc.mask | lab.mask;
           const candidate: MaskedCandidate = {
@@ -142,7 +159,7 @@ export class AutoScheduler {
               ...(lab.section && { lab: lab.section }),
             },
             mask: combinedMask,
-            term: lecture.computedTerm
+            term: lecture.computedTerm,
           };
 
           candidates.push(candidate);
@@ -159,7 +176,7 @@ export class AutoScheduler {
   private isValidSection(
     section: Section,
     blockedMasksByTerm: Map<string, bigint>,
-    selectedCourse: SelectedCourse
+    selectedCourse: SelectedCourse,
   ): boolean {
     if (!this.hasValidTimeSlot(section)) return false;
 
@@ -167,9 +184,13 @@ export class AutoScheduler {
     const sectionMask = sectionToMask(section);
     let blockedMask: bigint;
     if (section.computedTerm === 'F') {
-      blockedMask = (blockedMasksByTerm.get('A') || 0n) | (blockedMasksByTerm.get('B') || 0n);
+      blockedMask =
+        (blockedMasksByTerm.get('A') || 0n) |
+        (blockedMasksByTerm.get('B') || 0n);
     } else if (section.computedTerm === 'S') {
-      blockedMask = (blockedMasksByTerm.get('C') || 0n) | (blockedMasksByTerm.get('D') || 0n);
+      blockedMask =
+        (blockedMasksByTerm.get('C') || 0n) |
+        (blockedMasksByTerm.get('D') || 0n);
     } else {
       blockedMask = blockedMasksByTerm.get(section.computedTerm) || 0n;
     }
@@ -192,7 +213,7 @@ export class AutoScheduler {
       }
     }
 
-    const isStandaloneLab = !hasLectures && !!(course.standaloneLabs?.length);
+    const isStandaloneLab = !hasLectures && !!course.standaloneLabs?.length;
     if (isStandaloneLab) hasLabs = true;
 
     return { hasLectures, hasDiscussions, hasLabs, isStandaloneLab };
@@ -208,14 +229,18 @@ export class AutoScheduler {
       // Async periods are always valid (no time slot needed)
       if (period.isAsync) return true;
 
-      const hasTime = period.startTime.hours !== period.endTime.hours ||
-             period.startTime.minutes !== period.endTime.minutes;
+      const hasTime =
+        period.startTime.hours !== period.endTime.hours ||
+        period.startTime.minutes !== period.endTime.minutes;
       const hasDays = period.days?.size > 0;
       return hasTime && hasDays;
     });
   }
 
-  private sectionPassesFilters(section: Section, selectedCourse: SelectedCourse): boolean {
+  private sectionPassesFilters(
+    section: Section,
+    selectedCourse: SelectedCourse,
+  ): boolean {
     if (!this.hasValidTimeSlot(section)) return false;
 
     const filteredSections = this.filterService.apply([selectedCourse.course]);

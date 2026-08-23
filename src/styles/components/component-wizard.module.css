@@ -3,539 +3,541 @@
 
 /* Wizard-specific panel overrides */
 .sidebar-panel--component-wizard {
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Header */
 .wizard-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--color-border);
-    position: relative;
-    background-color: var(--color-surface);
-    flex-shrink: 0;
-    display: none;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  background-color: var(--color-surface);
+  flex-shrink: 0;
+  display: none;
 }
 
 .wizard-close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    line-height: 1;
-    padding: 0.25rem;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .wizard-close-btn:hover {
-    background-color: var(--color-surface-hover);
-    color: var(--color-text);
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .wizard-header h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.25rem;
-    color: var(--color-primary);
-    font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .wizard-course-name {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-    margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
 }
 
 /* Breadcrumbs */
 .wizard-breadcrumbs {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    background-color: var(--color-surface);
-    flex-shrink: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background-color: var(--color-surface);
+  flex-shrink: 0;
 }
 
 .wizard-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.75rem;
-    background: none;
-    border: 1px solid var(--color-border);
-    border-radius: var(--effect-border-radius);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 
 .wizard-breadcrumb:disabled {
-    cursor: default;
+  cursor: default;
 }
 
 .wizard-breadcrumb:not(:disabled):hover {
-    background-color: var(--color-surface-hover);
-    border-color: var(--color-primary);
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
 }
 
 .wizard-breadcrumb.active {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: white;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
 }
 
 .wizard-breadcrumb.completed {
-    border-color: var(--color-success);
+  border-color: var(--color-success);
 }
 
 .breadcrumb-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.2rem;
-    height: 1.2rem;
-    border-radius: 50%;
-    background-color: var(--color-surface-elevated);
-    font-weight: 600;
-    font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background-color: var(--color-surface-elevated);
+  font-weight: 600;
+  font-size: 0.75rem;
 }
 
 .wizard-breadcrumb.active .breadcrumb-number {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 .breadcrumb-label {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .breadcrumb-check {
-    color: var(--color-success);
-    font-weight: bold;
+  color: var(--color-success);
+  font-weight: bold;
 }
 
 .wizard-breadcrumb.active .breadcrumb-check {
-    color: white;
+  color: white;
 }
 
 .breadcrumb-arrow {
-    color: var(--color-text-secondary);
-    font-size: 1rem;
-    display: inline-flex;
-    align-items: center;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Injected via {@html getInlineSVG(...)} with a literal class name, so it can't be
-   module-hashed — keep it global. */
+   module-hashed - keep it global. */
 :global(.breadcrumb-arrow-icon) {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    color: inherit;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  color: inherit;
 }
 
 /* Content */
 .wizard-content {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 1.5rem;
-    padding-bottom: 80px;
-    background-color: var(--color-background);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.5rem;
+  padding-bottom: 80px;
+  background-color: var(--color-background);
 }
 
 /* Step enter animation (slideX + card stagger) lives in ComponentSelectionWizard.svelte. */
 .wizard-step {
-    display: block;
+  display: block;
 }
 
 .wizard-step-title {
-    margin: 0 0 1.5rem 0;
-    font-size: 1.1rem;
-    color: var(--color-text);
-    font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 /* Term Separator */
 .wizard-term-separator {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    padding: 0.75rem 0 0.5rem 0;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid var(--color-border);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  padding: 0.75rem 0 0.5rem 0;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .wizard-term-separator:first-child {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 /* Sections Grid */
 .wizard-sections-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .wizard-section-card {
-    background-color: var(--color-surface);
-    border: 2px solid var(--color-border);
-    border-radius: var(--effect-border-radius-large);
-    padding: 0.65rem;
-    cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    position: relative;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--effect-border-radius-large);
+  padding: 0.65rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  position: relative;
 }
 
 /* data-settled (set on intro end) gates the hover lift so it can't fight the slide-in. */
 .wizard-section-card[data-settled]:hover {
-    border-color: var(--color-primary);
-    box-shadow: var(--effect-shadow-hover);
-    transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: var(--effect-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .wizard-section-card.selected {
-    border-color: var(--color-primary);
-    background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  background-color: var(--color-surface-hover);
 }
 
 .section-card-header {
-    margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .section-card-number {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 .section-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.375rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.375rem;
 }
 
 .section-card-crn {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
 .section-card-time {
-    margin-bottom: 0.375rem;
-    font-size: 0.85rem;
-    color: var(--color-text);
+  margin-bottom: 0.375rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
 }
 
 .section-card-time strong {
-    color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .section-card-location,
 .section-card-professor {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 0.15rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.15rem;
 }
 
 /* Async Badge */
 .section-card-async-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.65rem;
-    background-color: transparent;
-    border: 1.5px solid var(--color-primary);
-    border-radius: var(--effect-border-radius);
-    color: var(--color-primary);
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  background-color: transparent;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
 }
 
 .section-card-async-badge svg {
-    flex-shrink: 0;
-    width: 14px;
-    height: 14px;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
 }
 
 /* Interest List Badge */
 .section-card-interest-list-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.65rem;
-    background-color: transparent;
-    border: 1.5px solid var(--color-warning);
-    border-radius: var(--effect-border-radius);
-    color: var(--color-warning);
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  background-color: transparent;
+  border: 1.5px solid var(--color-warning);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-warning);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
 }
 
 .section-card-interest-list-badge svg {
-    flex-shrink: 0;
-    width: 14px;
-    height: 14px;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
 }
 
 .section-card-seats {
-    font-size: 0.8rem;
-    color: var(--color-success);
-    font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--color-success);
+  font-weight: 500;
 }
 
 .section-card-seats.full {
-    color: var(--color-error);
+  color: var(--color-error);
 }
 
 .section-card-selected-badge {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background-color: var(--color-primary);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 /* Empty State */
 .wizard-empty-state {
-    padding: 3rem 1rem;
-    text-align: center;
-    color: var(--color-text-secondary);
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--color-text-secondary);
 }
 
 /* Footer */
 .wizard-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.75rem;
-    background-color: var(--color-surface);
-    border-top: 1px solid var(--color-border);
-    z-index: 5;
-    pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  z-index: 5;
+  pointer-events: none;
 }
 
 .wizard-btn {
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: var(--effect-border-radius);
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    pointer-events: auto;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--effect-border-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  pointer-events: auto;
 }
 
 .wizard-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .wizard-btn-primary {
-    background-color: var(--color-primary);
-    color: white;
+  background-color: var(--color-primary);
+  color: white;
 }
 
 .wizard-btn-primary:hover:not(:disabled) {
-    background-color: var(--color-primary-hover);
+  background-color: var(--color-primary-hover);
 }
 
 .wizard-btn-secondary {
-    background-color: var(--color-surface-elevated);
-    color: var(--color-text);
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text);
 }
 
 .wizard-btn-secondary:hover:not(:disabled) {
-    background-color: var(--color-surface-hover);
+  background-color: var(--color-surface-hover);
 }
 
 .wizard-btn-text {
-    background-color: var(--color-surface-elevated);
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border-hover);
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-hover);
 }
 
 .wizard-btn-text:hover {
-    color: var(--color-text);
-    background-color: var(--color-surface-hover);
-    border-color: var(--color-primary);
+  color: var(--color-text);
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
 }
 
-/* (The sidebar container's `position: relative` lives in schedule-page.css —
+/* (The sidebar container's `position: relative` lives in schedule-page.css -
    it's a global element outside this module's scope.) */
 
 /* Rate My Professor Badge */
 .rmp-badge {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    margin-top: 0.375rem;
-    padding: 0.375rem;
-    background-color: var(--color-surface-hover);
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.375rem;
+  padding: 0.375rem;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.75rem;
 }
 
 .rmp-rating {
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .rmp-rating.excellent {
-    color: #4caf50; /* Green */
+  color: #4caf50; /* Green */
 }
 
 .rmp-rating.good {
-    color: #ff9800; /* Orange */
+  color: #ff9800; /* Orange */
 }
 
 .rmp-rating.poor {
-    color: #f44336; /* Red */
+  color: #f44336; /* Red */
 }
 
 .rmp-details {
-    color: var(--color-text-secondary);
-    font-size: 0.7rem;
-    line-height: 1.3;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  line-height: 1.3;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .wizard-breadcrumbs {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-    }
+  .wizard-breadcrumbs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
 
-    .wizard-breadcrumb {
-        flex-shrink: 0;
-    }
+  .wizard-breadcrumb {
+    flex-shrink: 0;
+  }
 }
 
 /* `html.is-mobile` is a global class set on <html>, so it can't be module-scoped. */
 :global(html.is-mobile) .wizard-header h2 {
-    font-size: 1.1rem;
+  font-size: 1.1rem;
 }
 
 :global(html.is-mobile) .wizard-step-title {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 :global(html.is-mobile) .wizard-content {
-    padding: 1rem;
+  padding: 1rem;
 }
 
 :global(html.is-mobile) .wizard-sections-grid {
-    gap: 0.75rem;
+  gap: 0.75rem;
 }
 
 /* Filter Status Indicator */
 .wizard-filter-status {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--color-primary-transparent, rgba(74, 144, 226, 0.1));
-    border-left: 3px solid var(--color-primary);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--color-text);
-    margin: 0;
-    border-bottom: 1px solid var(--color-border);
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary-transparent, rgba(74, 144, 226, 0.1));
+  border-left: 3px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  margin: 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .wizard-filter-status .filter-icon {
-    flex-shrink: 0;
-    color: var(--color-primary);
+  flex-shrink: 0;
+  color: var(--color-primary);
 }
 
 .wizard-filter-status .filter-text {
-    flex: 1;
-    line-height: 1.4;
+  flex: 1;
+  line-height: 1.4;
 }
 
 .wizard-filter-status .filter-separator {
-    display: inline-block;
-    margin: 0 0.5rem;
-    color: var(--color-primary);
-    font-size: 0.6em;
-    font-weight: 900;
-    vertical-align: middle;
+  display: inline-block;
+  margin: 0 0.5rem;
+  color: var(--color-primary);
+  font-size: 0.6em;
+  font-weight: 900;
+  vertical-align: middle;
 }
 
 /* Height breakpoint */
 @media (max-height: 1100px) {
-    .wizard-content {
-        padding-bottom: 0;
-    }
+  .wizard-content {
+    padding-bottom: 0;
+  }
 
-    .wizard-footer {
-        background-color: transparent;
-        border-top: none;
-    }
+  .wizard-footer {
+    background-color: transparent;
+    border-top: none;
+  }
 }
 
 /* Filtered out notice */
 .wizard-filtered-notice {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1rem;
-    margin: 0.75rem 0;
-    background-color: var(--color-surface-alt, var(--color-surface));
-    border: 1px solid var(--color-border);
-    border-radius: var(--effect-border-radius);
-    color: var(--color-text-secondary);
-    font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  background-color: var(--color-surface-alt, var(--color-surface));
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
 }
 
 .wizard-filtered-notice-text {
-    flex: 1;
+  flex: 1;
 }
 
 .wizard-filtered-notice-btn {
-    background: transparent;
-    border: 1px solid var(--color-border);
-    border-radius: var(--effect-border-radius);
-    color: var(--color-primary);
-    cursor: pointer;
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
-    margin-left: 0.75rem;
-    transition: var(--effect-transition);
-    white-space: nowrap;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  margin-left: 0.75rem;
+  transition: var(--effect-transition);
+  white-space: nowrap;
 }
 
 .wizard-filtered-notice-btn:hover {
-    background: var(--color-primary);
-    color: var(--color-on-primary, #fff);
-    border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  border-color: var(--color-primary);
 }
-

@@ -12,21 +12,28 @@
   import { logger } from '../utils/logger';
   import { STORAGE_KEYS } from '../utils/storageKeys';
 
-  let { courseSelectionService }: {
+  let {
+    courseSelectionService,
+  }: {
     courseSelectionService: CourseSelectionService;
   } = $props();
 
-  // Insertion order — the store appends, so new courses land at the bottom.
+  // Insertion order - the store appends, so new courses land at the bottom.
   const courses = $derived(appState.selectedCourses);
   const count = $derived(courses.length);
 
   // Expander state persists in localStorage (default collapsed), matching the
   // old CourseController.initializeSelectedCoursesExpander.
-  let isExpanded = $state(localStorage.getItem(STORAGE_KEYS.SELECTED_COURSES_EXPANDED) === 'true');
+  let isExpanded = $state(
+    localStorage.getItem(STORAGE_KEYS.SELECTED_COURSES_EXPANDED) === 'true',
+  );
 
   function toggleExpander(): void {
     isExpanded = !isExpanded;
-    localStorage.setItem(STORAGE_KEYS.SELECTED_COURSES_EXPANDED, String(isExpanded));
+    localStorage.setItem(
+      STORAGE_KEYS.SELECTED_COURSES_EXPANDED,
+      String(isExpanded),
+    );
   }
 
   function onHeaderKeydown(e: KeyboardEvent): void {
@@ -52,7 +59,9 @@
   // fire when the remove button is clicked.
   function handleRemove(e: MouseEvent, course: Course): void {
     e.stopPropagation();
-    courseSelectionService.unselectCourse(course).catch(err => logger.error('Failed to unselect course:', err));
+    courseSelectionService
+      .unselectCourse(course)
+      .catch(err => logger.error('Failed to unselect course:', err));
   }
 </script>
 
@@ -66,8 +75,14 @@
   onclick={toggleExpander}
   onkeydown={onHeaderKeydown}
 >
-  <h3 class="selected-courses-title">Selected Courses <span id="selected-count" class="course-count">({count})</span></h3>
-  <span class="chevron-icon" id="selected-courses-chevron">{@html getInlineSVG('CHEVRON_DOWN')}</span>
+  <h3 class="selected-courses-title">
+    Selected Courses <span id="selected-count" class="course-count"
+      >({count})</span
+    >
+  </h3>
+  <span class="chevron-icon" id="selected-courses-chevron"
+    >{@html getInlineSVG('CHEVRON_DOWN')}</span
+  >
 </div>
 
 {#if isExpanded}
@@ -77,7 +92,9 @@
     transition:slide={{ duration: dur(280), easing: cubicOut }}
   >
     {#if courses.length === 0}
-      <div class="empty-state" transition:slideFade={{ duration: 220 }}>No courses selected yet</div>
+      <div class="empty-state" transition:slideFade={{ duration: 220 }}>
+        No courses selected yet
+      </div>
     {/if}
     {#each courses as sc (sc.course.id)}
       {@const course = sc.course}
@@ -90,10 +107,12 @@
         transition:slideFade={{ duration: 260 }}
         animate:flip={{ duration: dur(260), easing: cubicOut }}
         onclick={() => handleSelect(course)}
-        onkeydown={(e) => onItemKeydown(e, course)}
+        onkeydown={e => onItemKeydown(e, course)}
       >
         <div class="selected-course-info">
-          <div class="selected-course-code">{course.departmentAbbr}{course.number}</div>
+          <div class="selected-course-code">
+            {course.departmentAbbr}{course.number}
+          </div>
           <div class="selected-course-name">{course.name}</div>
           <div class="selected-course-credits">{formatCredits(course)}</div>
         </div>
@@ -101,8 +120,9 @@
           class="course-remove-btn"
           data-course-id={course.id}
           title="Remove from selection"
-          onclick={(e) => handleRemove(e, course)}
-        >{@html getInlineSVG('TRASH', 'trash-icon')}</button>
+          onclick={e => handleRemove(e, course)}
+          >{@html getInlineSVG('TRASH', 'trash-icon')}</button
+        >
       </div>
     {/each}
   </div>

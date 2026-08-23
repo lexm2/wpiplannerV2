@@ -162,12 +162,12 @@
   display: block;
 }
 
-.selected-courses-header[aria-expanded="true"] .chevron-icon {
+.selected-courses-header[aria-expanded='true'] .chevron-icon {
   transform: rotate(180deg);
 }
 
 /* Expand/collapse is driven by Svelte's `slide` transition (mounts/unmounts the
-   element), which animates height + padding together — no max-height overshoot,
+   element), which animates height + padding together - no max-height overshoot,
    no wrapper, no permanent gap. Items fly/fade in staggered on top of it. */
 .selected-courses-content {
   padding: 1rem 1.5rem;

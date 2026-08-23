@@ -10,7 +10,10 @@
   border-radius: var(--effect-border-radius-large);
   padding: 0.75rem 1rem;
   background: var(--color-surface);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .course-item:hover {
@@ -49,7 +52,10 @@
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
-  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+  transition:
+    background 100ms ease,
+    border-color 100ms ease,
+    color 100ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,7 +108,10 @@
   background: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+  transition:
+    background 100ms ease,
+    border-color 100ms ease,
+    color 100ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,7 +214,6 @@
   width: 100%;
 }
 
-
 .section-badge {
   background: var(--color-secondary);
   color: var(--color-text);
@@ -214,7 +222,10 @@
   font-size: 0.75rem;
   font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
   border: 1px solid var(--color-border);
   white-space: nowrap;
   max-width: 200px;
@@ -251,7 +262,11 @@
   font-size: 0.75rem;
   font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
   border: 1px solid var(--color-border);
   white-space: nowrap;
   font-family: var(--font-family-mono);
@@ -329,7 +344,7 @@
   width: 100%;
 }
 
-/* Section badges start hidden — declared in CSS (not JS) so the very first
+/* Section badges start hidden - declared in CSS (not JS) so the very first
    painted frame after the {#if} swap is already invisible and they can never
    flash their finished state. termFlip fades them in one-by-one, cascading
    diagonally across wrapped rows. */
@@ -574,7 +589,7 @@ html.is-mobile .course-card {
   background: var(--color-primary);
   color: var(--color-text-inverse);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .load-more-button:disabled {

@@ -40,7 +40,7 @@
     getDepartments: () => Department[];
   } = $props();
 
-  // Single declarative modal layer — the ONLY modal renderer in the app now
+  // Single declarative modal layer - the ONLY modal renderer in the app now
   // that BaseModal/ModalService are gone. Renders a Svelte component for each
   // open modal type-id in the registry below; uiState.openModals is the sole
   // modal source of truth.
@@ -71,7 +71,9 @@
   {:else if id === 'local-event'}
     <LocalEvent onRequestClose={() => closeModal('local-event')} />
   {:else if id === 'auto-schedule-intro'}
-    <AutoScheduleIntro onRequestClose={() => closeModal('auto-schedule-intro')} />
+    <AutoScheduleIntro
+      onRequestClose={() => closeModal('auto-schedule-intro')}
+    />
   {:else if id === 'schedule-picker'}
     <SchedulePicker
       {scheduleManagementService}

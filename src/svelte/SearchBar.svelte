@@ -10,14 +10,17 @@
   import type { SearchTextFilterCriteria } from '../types/filters';
   import { logger } from '../utils/logger';
 
-  let { filterService, debouncedSearch }: {
+  let {
+    filterService,
+    debouncedSearch,
+  }: {
     filterService: FilterService;
     debouncedSearch: DebouncedOperation;
   } = $props();
 
   // `query` is the LOCAL display value, updated on every keystroke via bind:value.
   // The `searchText` FILTER only changes on the DEBOUNCED write (or an external
-  // write from the FilterModal / a page-switch reset) — never per keystroke. So
+  // write from the FilterModal / a page-switch reset) - never per keystroke. So
   // the $effect below can safely adopt the filter's query into `query` without
   // clobbering mid-typing.
   let query = $state('');
@@ -25,19 +28,20 @@
   let dropdownOpen = $state(false);
 
   // EXTERNAL sync (replaces MainController.syncSearchInputFromFilters): when the
-  // shared `searchText` filter changes from outside this component — the
+  // shared `searchText` filter changes from outside this component - the
   // page-switch reset (removeFilter) or the still-vanilla FilterModal editing
-  // the same filter — adopt its query. Reading getActiveFilters() (a SvelteMap)
+  // the same filter - adopt its query. Reading getActiveFilters() (a SvelteMap)
   // makes this reactive. The guard avoids no-op churn and, crucially, this only
   // fires on debounced/external filter writes, so it never overwrites a
   // keystroke that hasn't been committed to the filter yet.
   $effect(() => {
     // Track ONLY the filter (the SvelteMap). The compare/assign to `query` must
-    // be untracked — otherwise reading `query` here makes it a dependency, and
+    // be untracked - otherwise reading `query` here makes it a dependency, and
     // every keystroke would re-run this effect and reset `query` back to the
     // (not-yet-debounced) filter value, clobbering what the user typed.
     const f = filterService.getActiveFilters().find(x => x.id === 'searchText');
-    const filterQuery = (f?.criteria as SearchTextFilterCriteria | undefined)?.query ?? '';
+    const filterQuery =
+      (f?.criteria as SearchTextFilterCriteria | undefined)?.query ?? '';
     untrack(() => {
       if (filterQuery !== query) {
         query = filterQuery;
@@ -70,7 +74,10 @@
   // filter reactively, so no manual modal sync is needed.
   function applySearch(): void {
     if (query.trim().length > 0) {
-      filterService.addFilter('searchText', { query, professorOnly: professorMode });
+      filterService.addFilter('searchText', {
+        query,
+        professorOnly: professorMode,
+      });
     } else {
       filterService.removeFilter('searchText');
     }
@@ -79,23 +86,27 @@
   function onInput(): void {
     // bind:value already updated `query`; the dropdown reacts via the $derived.
     if (professorMode) dropdownOpen = professorMatches.length > 0;
-    // Debounced write to the filter — keep the existing DebouncedOperation
+    // Debounced write to the filter - keep the existing DebouncedOperation
     // timing/cancellation (300ms) rather than a naive setTimeout.
-    debouncedSearch.execute(async (cancellationToken) => {
-      cancellationToken.throwIfCancelled();
-      applySearch();
-      return Promise.resolve();
-    }).catch(error => {
-      if (error?.name !== 'CancellationError') {
-        logger.error('Search error:', error);
-      }
-    });
+    debouncedSearch
+      .execute(async cancellationToken => {
+        cancellationToken.throwIfCancelled();
+        applySearch();
+        return Promise.resolve();
+      })
+      .catch(error => {
+        if (error?.name !== 'CancellationError') {
+          logger.error('Search error:', error);
+        }
+      });
   }
 
   // Hide the dropdown shortly after blur so a click on an option still registers
   // (matches the old 150ms blur timeout).
   function onBlur(): void {
-    setTimeout(() => { dropdownOpen = false; }, 150);
+    setTimeout(() => {
+      dropdownOpen = false;
+    }, 150);
   }
 
   // Toggle course <-> professor mode: clear the query + filter, swap the
@@ -146,8 +157,8 @@
         type="button"
         class="professor-option"
         data-professor={professor}
-        onclick={() => selectProfessor(professor)}
-      >{professor}</button>
+        onclick={() => selectProfessor(professor)}>{professor}</button
+      >
     {/each}
   </div>
 {/if}
@@ -158,9 +169,10 @@
     title="Search professors"
     aria-label="Toggle professor search"
     onclick={toggleMode}
-  >{@html professorMode
-    ? getInlineSVG('SCHOOL_FULL', 'school-full-icon')
-    : getInlineSVG('SCHOOL', 'school-icon')}</button>
+    >{@html professorMode
+      ? getInlineSVG('SCHOOL_FULL', 'school-full-icon')
+      : getInlineSVG('SCHOOL', 'school-icon')}</button
+  >
   <!-- No `hidden={query === ''}` here: the old attribute never took effect
        (.search-clear-btn set `display: flex`, which outranks the UA's [hidden]
        rule), so the button has always been permanently visible. Kept as-is
@@ -169,6 +181,6 @@
     id="search-clear-btn"
     title="Clear search"
     aria-label="Clear search"
-    onclick={clear}
-  >{@html getInlineSVG('X', 'x-icon')}</button>
+    onclick={clear}>{@html getInlineSVG('X', 'x-icon')}</button
+  >
 {/snippet}

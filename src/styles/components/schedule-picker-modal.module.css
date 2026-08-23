@@ -13,13 +13,13 @@
   display: none;
 }
 
-.scheduleItemMenu[data-visible="true"] {
+.scheduleItemMenu[data-visible='true'] {
   display: block;
   opacity: 1;
   pointer-events: auto;
 }
 
-.scheduleItemMenu[data-visible="false"] {
+.scheduleItemMenu[data-visible='false'] {
   display: none;
   opacity: 0;
   pointer-events: none;

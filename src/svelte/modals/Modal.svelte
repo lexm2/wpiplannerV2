@@ -90,7 +90,9 @@
         <div class="modal-header">
           <h2 class="modal-title">{title}</h2>
           {#if !hideClose}
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <button class="modal-close" aria-label="Close" onclick={close}
+              >&times;</button
+            >
           {/if}
         </div>
       {/if}

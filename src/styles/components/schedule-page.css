@@ -9,7 +9,9 @@
 
 .schedule-page-layout {
   display: grid;
-  grid-template-columns: var(--panel-schedule-sidebar-width, var(--spacing-schedule-sidebar-width)) 1fr;
+  grid-template-columns:
+    var(--panel-schedule-sidebar-width, var(--spacing-schedule-sidebar-width))
+    1fr;
   height: 100%;
   gap: 0;
   overflow: hidden;
@@ -437,18 +439,18 @@
   transition: var(--effect-transition);
 }
 
-.period-info[data-period-type*="lec"] {
+.period-info[data-period-type*='lec'] {
   border-left-color: var(--color-primary);
   background: rgba(var(--color-primary-rgb), 0.03);
 }
 
-.period-info[data-period-type*="lab"] {
+.period-info[data-period-type*='lab'] {
   border-left-color: #10b981;
   background: rgba(16, 185, 129, 0.03);
 }
 
-.period-info[data-period-type*="dis"], 
-.period-info[data-period-type*="rec"] {
+.period-info[data-period-type*='dis'],
+.period-info[data-period-type*='rec'] {
   border-left-color: #f59e0b;
   background: rgba(245, 158, 11, 0.03);
 }
@@ -473,16 +475,16 @@
   flex-shrink: 0;
 }
 
-.period-info[data-period-type*="lec"] .period-type-label {
+.period-info[data-period-type*='lec'] .period-type-label {
   background: var(--color-primary);
 }
 
-.period-info[data-period-type*="lab"] .period-type-label {
+.period-info[data-period-type*='lab'] .period-type-label {
   background: #10b981;
 }
 
-.period-info[data-period-type*="dis"] .period-type-label,
-.period-info[data-period-type*="rec"] .period-type-label {
+.period-info[data-period-type*='dis'] .period-type-label,
+.period-info[data-period-type*='rec'] .period-type-label {
   background: #f59e0b;
 }
 
@@ -512,7 +514,7 @@
 }
 
 .period-location::before {
-  content: "• ";
+  content: '• ';
   color: var(--color-border);
 }
 
@@ -543,7 +545,6 @@
   background: var(--color-primary);
   color: var(--color-text-inverse);
 }
-
 
 /* Main content area for term graphs */
 .schedule-main {
@@ -633,7 +634,8 @@
 }
 
 @keyframes pulse-warning {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -791,13 +793,12 @@
   pointer-events: auto;
 }
 
-
 /* Section blocks */
 .section-block {
   background: var(--color-primary);
   color: white;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-  border: 1px solid rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 3px;
   font-size: 0.8rem;
   font-weight: bold;
@@ -852,11 +853,10 @@
   background: rgba(255, 152, 0, 0.1);
 }
 
-
 /* Conflict overlay - displayed on top of conflicting sections */
 .conflict-overlay {
   position: absolute;
-  border: 3px solid #FFEB3B;
+  border: 3px solid #ffeb3b;
   border-radius: 3px;
   pointer-events: none;
   z-index: 20;
@@ -883,7 +883,7 @@
 /* External calendar events - distinct styling from course sections */
 .external-event-block {
   background: rgba(107, 114, 128, 0.15);
-  border: 2px dashed #6B7280;
+  border: 2px dashed #6b7280;
   color: var(--color-text-secondary);
   padding: 2px 4px;
   cursor: pointer;
@@ -905,7 +905,7 @@
 
 .external-event-block:hover {
   background: rgba(107, 114, 128, 0.25);
-  border-color: #4B5563;
+  border-color: #4b5563;
   color: var(--color-text);
 }
 

@@ -24,16 +24,26 @@
     <div class="error-banner-text">
       <p>{error.message}</p>
       {#if error.onClearData}
-        <p>Your saved data may be outdated or deprecated. Clearing it will reset the app to a fresh state.</p>
+        <p>
+          Your saved data may be outdated or deprecated. Clearing it will reset
+          the app to a fresh state.
+        </p>
       {/if}
     </div>
     <div class="error-banner-actions">
       {#if error.onClearData}
-        <button class="btn" id="error-clear-data-btn" disabled={clearing} onclick={clearDataAndReload}>
+        <button
+          class="btn"
+          id="error-clear-data-btn"
+          disabled={clearing}
+          onclick={clearDataAndReload}
+        >
           {clearing ? 'Clearing…' : 'Clear Data & Reload'}
         </button>
       {/if}
-      <button class="btn" onclick={() => (uiState.appError = null)}>Dismiss</button>
+      <button class="btn" onclick={() => (uiState.appError = null)}
+        >Dismiss</button
+      >
     </div>
   </div>
 {/if}

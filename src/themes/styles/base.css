@@ -50,7 +50,7 @@
   /* Effects */
   --effect-border-radius: 6px;
   --effect-border-radius-large: 8px;
-  --effect-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --effect-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   --effect-shadow-hover: 0 4px 16px rgba(212, 66, 79, 0.2);
   --effect-transition: all 0.5s ease;
 }

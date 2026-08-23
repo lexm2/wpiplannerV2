@@ -9,20 +9,20 @@
 import type { Section } from '../../types/types';
 import type { WeeklyTimeSlot } from '../../types/schedule';
 
-const START_HOUR = 7;          // 7:00 AM
-const END_HOUR = 22;           // 10:00 PM
+const START_HOUR = 7; // 7:00 AM
+const END_HOUR = 22; // 10:00 PM
 const SLOT_MINUTES = 5;
 const SLOTS_PER_DAY = ((END_HOUR - START_HOUR) * 60) / SLOT_MINUTES; // 180
-const DAYS_PER_WEEK = 5;       // M, T, W, R, F
+const DAYS_PER_WEEK = 5; // M, T, W, R, F
 
 const DAY_INDEX: Record<string, number> = {
-  'M': 0,
-  'T': 1,
-  'W': 2,
-  'R': 3,
-  'F': 4,
-  'S': 5, // weekends not used in main calculation
-  'U': 6,
+  M: 0,
+  T: 1,
+  W: 2,
+  R: 3,
+  F: 4,
+  S: 5, // weekends not used in main calculation
+  U: 6,
 };
 
 export interface SectionMask {
@@ -59,11 +59,15 @@ export function sectionToMask(section: Section): bigint {
   for (const period of section.periods) {
     if (!period.days || period.days.size === 0) continue;
 
-    const startSlot = timeToSlot(period.startTime.hours, period.startTime.minutes);
+    const startSlot = timeToSlot(
+      period.startTime.hours,
+      period.startTime.minutes,
+    );
     const endSlot = timeToSlot(period.endTime.hours, period.endTime.minutes);
 
     // Skip invalid time ranges
-    if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY) continue;
+    if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY)
+      continue;
 
     for (const day of period.days) {
       const dayIndex = DAY_INDEX[day];
@@ -73,7 +77,7 @@ export function sectionToMask(section: Section): bigint {
 
       for (let slot = startSlot; slot < endSlot; slot++) {
         const bitIndex = dayOffset + slot;
-        mask |= (1n << BigInt(bitIndex));
+        mask |= 1n << BigInt(bitIndex);
       }
     }
   }
@@ -90,13 +94,14 @@ export function weeklySlotToMask(slot: WeeklyTimeSlot): bigint {
   const startSlot = timeToSlot(slot.startTime.hours, slot.startTime.minutes);
   const endSlot = timeToSlot(slot.endTime.hours, slot.endTime.minutes);
 
-  if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY) return mask;
+  if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY)
+    return mask;
 
   const dayOffset = dayIndex * SLOTS_PER_DAY;
 
   for (let slot = startSlot; slot < endSlot; slot++) {
     const bitIndex = dayOffset + slot;
-    mask |= (1n << BigInt(bitIndex));
+    mask |= 1n << BigInt(bitIndex);
   }
 
   return mask;
@@ -116,7 +121,7 @@ export class BitMaskEngine {
     const sectionMask: SectionMask = {
       section,
       mask,
-      term: section.computedTerm
+      term: section.computedTerm,
     };
 
     this.sectionMasks.set(section.crn, sectionMask);
@@ -135,13 +140,12 @@ export class BitMaskEngine {
     const mask2 = this.getMask(section2);
     return masksConflict(mask1.mask, mask2.mask);
   }
-
 }
 
 /** Build conflict matrix - O(n^2) but each check is O(1) */
 export function buildConflictMatrix(
   sections: Section[],
-  engine: BitMaskEngine
+  engine: BitMaskEngine,
 ): Map<number, Set<number>> {
   const matrix = new Map<number, Set<number>>();
 

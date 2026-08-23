@@ -10,8 +10,10 @@
   // Read the active criteria ONCE at mount; the sliders own their values after
   // that and write back to the service (debounced). Matches the controller,
   // which seeded the sliders from criteria and never re-synced them while open.
-  // svelte-ignore state_referenced_locally — intentional one-time seed read.
-  const initial = filterService.getCriteria<RMPRatingFilterCriteria>('rmpRating') ?? {} as RMPRatingFilterCriteria;
+  // svelte-ignore state_referenced_locally - intentional one-time seed read.
+  const initial =
+    filterService.getCriteria<RMPRatingFilterCriteria>('rmpRating') ??
+    ({} as RMPRatingFilterCriteria);
 
   let ratingMin = $state(initial.minRating ?? 0);
   let ratingMax = $state(initial.maxRating ?? 5);
@@ -64,68 +66,87 @@
 
 <FilterSection title="Rate My Professor">
   <div class="filter-slider-container">
-      <Field group label="Rating" controlId="rmp-rating" fieldClass="filter-slider-group">
-        {#snippet children()}
-          <div class="filter-slider-values">
-            <span>{ratingMin.toFixed(1)}</span>
-            <span>-</span>
-            <span>{ratingMax.toFixed(1)}</span>
-            <span class="filter-input-hint">stars</span>
-          </div>
-          <DualRangeSlider
-            min={0}
-            max={5}
-            step={0.1}
-            bind:minValue={ratingMin}
-            bind:maxValue={ratingMax}
-            leftLabel="Minimum Rating"
-            rightLabel="Maximum Rating"
-          />
-        {/snippet}
-      </Field>
-      <Field group label="Difficulty" controlId="rmp-difficulty" fieldClass="filter-slider-group">
-        {#snippet children()}
-          <div class="filter-slider-values">
-            <span>{difficultyMin.toFixed(1)}</span>
-            <span>-</span>
-            <span>{difficultyMax.toFixed(1)}</span>
-            <span class="filter-input-hint">scale</span>
-          </div>
-          <DualRangeSlider
-            min={0}
-            max={5}
-            step={0.1}
-            bind:minValue={difficultyMin}
-            bind:maxValue={difficultyMax}
-            leftLabel="Minimum Difficulty"
-            rightLabel="Maximum Difficulty"
-          />
-        {/snippet}
-      </Field>
-      <Field group label="Would Take Again" controlId="rmp-retake" fieldClass="filter-slider-group">
-        {#snippet children()}
-          <div class="filter-slider-values">
-            <span>{retakeMin}</span>
-            <span>-</span>
-            <span>{retakeMax}</span>
-            <span class="filter-input-hint">%</span>
-          </div>
-          <DualRangeSlider
-            min={0}
-            max={100}
-            step={1}
-            bind:minValue={retakeMin}
-            bind:maxValue={retakeMax}
-            leftLabel="Minimum Would Take Again"
-            rightLabel="Maximum Would Take Again"
-          />
-        {/snippet}
-      </Field>
-    </div>
-    <label class="filter-toggle-label filter-subsection">
-      <input type="checkbox" class="filter-toggle" bind:checked={includeWithoutData} />
-      <span class="filter-toggle-text">Include professors without RMP data</span>
-    </label>
+    <Field
+      group
+      label="Rating"
+      controlId="rmp-rating"
+      fieldClass="filter-slider-group"
+    >
+      {#snippet children()}
+        <div class="filter-slider-values">
+          <span>{ratingMin.toFixed(1)}</span>
+          <span>-</span>
+          <span>{ratingMax.toFixed(1)}</span>
+          <span class="filter-input-hint">stars</span>
+        </div>
+        <DualRangeSlider
+          min={0}
+          max={5}
+          step={0.1}
+          bind:minValue={ratingMin}
+          bind:maxValue={ratingMax}
+          leftLabel="Minimum Rating"
+          rightLabel="Maximum Rating"
+        />
+      {/snippet}
+    </Field>
+    <Field
+      group
+      label="Difficulty"
+      controlId="rmp-difficulty"
+      fieldClass="filter-slider-group"
+    >
+      {#snippet children()}
+        <div class="filter-slider-values">
+          <span>{difficultyMin.toFixed(1)}</span>
+          <span>-</span>
+          <span>{difficultyMax.toFixed(1)}</span>
+          <span class="filter-input-hint">scale</span>
+        </div>
+        <DualRangeSlider
+          min={0}
+          max={5}
+          step={0.1}
+          bind:minValue={difficultyMin}
+          bind:maxValue={difficultyMax}
+          leftLabel="Minimum Difficulty"
+          rightLabel="Maximum Difficulty"
+        />
+      {/snippet}
+    </Field>
+    <Field
+      group
+      label="Would Take Again"
+      controlId="rmp-retake"
+      fieldClass="filter-slider-group"
+    >
+      {#snippet children()}
+        <div class="filter-slider-values">
+          <span>{retakeMin}</span>
+          <span>-</span>
+          <span>{retakeMax}</span>
+          <span class="filter-input-hint">%</span>
+        </div>
+        <DualRangeSlider
+          min={0}
+          max={100}
+          step={1}
+          bind:minValue={retakeMin}
+          bind:maxValue={retakeMax}
+          leftLabel="Minimum Would Take Again"
+          rightLabel="Maximum Would Take Again"
+        />
+      {/snippet}
+    </Field>
+  </div>
+  <label class="filter-toggle-label filter-subsection">
+    <input
+      type="checkbox"
+      class="filter-toggle"
+      bind:checked={includeWithoutData}
+    />
+    <span class="filter-toggle-text">Include professors without RMP data</span>
+  </label>
   <div class="filter-hint">
     <small>Note: Filters are off when at default ranges.</small>
   </div>

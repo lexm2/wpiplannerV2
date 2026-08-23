@@ -1,146 +1,145 @@
 .container {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    width: 40vw;
-    height: auto;
-    min-height: 30vh;
-    min-width: 200px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--effect-border-radius-large);
-    box-shadow: var(--effect-shadow);
-    z-index: 100;
-    resize: both;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    container-type: inline-size;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 40vw;
+  height: auto;
+  min-height: 30vh;
+  min-width: 200px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius-large);
+  box-shadow: var(--effect-shadow);
+  z-index: 100;
+  resize: both;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
 }
 
 .header {
-    padding: 6px 10px;
-    background: var(--color-surface-elevated);
-    border-bottom: 1px solid var(--color-border);
-    cursor: move;
-    user-select: none;
-    /* Required for the pointer-event drag: without it the browser claims touch
+  padding: 6px 10px;
+  background: var(--color-surface-elevated);
+  border-bottom: 1px solid var(--color-border);
+  cursor: move;
+  user-select: none;
+  /* Required for the pointer-event drag: without it the browser claims touch
        gestures on this element for panning and the drag never starts. */
-    touch-action: none;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
+  touch-action: none;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .skipBtn {
-    margin-left: 6px;
-    background: none;
-    border: 1px solid var(--color-border-hover);
-    color: var(--color-text);
-    font-size: 0.7rem;
-    cursor: pointer;
-    padding: 2px 8px;
-    border-radius: var(--effect-border-radius);
+  margin-left: 6px;
+  background: none;
+  border: 1px solid var(--color-border-hover);
+  color: var(--color-text);
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: var(--effect-border-radius);
 }
 
 .skipBtn:hover {
-    background: rgba(212, 66, 79, 0.6);
-    border-color: var(--color-primary);
+  background: rgba(212, 66, 79, 0.6);
+  border-color: var(--color-primary);
 }
 
 .findBtn {
-    margin-left: auto;
-    background: none;
-    border: 1px solid var(--color-border-hover);
-    color: var(--color-text);
-    font-size: 0.7rem;
-    cursor: pointer;
-    padding: 2px 8px;
-    border-radius: var(--effect-border-radius);
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--color-border-hover);
+  color: var(--color-text);
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: var(--effect-border-radius);
 }
 
 .findBtn:hover {
-    background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
-    border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
+  border-color: var(--color-primary);
 }
 
 .title {
-    font-size: 0.7rem;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .body {
-    padding: 10px;
-    flex: 1;
+  padding: 10px;
+  flex: 1;
 }
 
 .stepTitle {
-    font-size: clamp(0.9rem, 2.8cqi, 2rem);
-    font-weight: 550;
-    color: var(--color-text);
-    letter-spacing: clamp(-0.04em, -0.11cqi, -0.005em);
-    line-height: 1.15;
-    font-optical-sizing: auto;
-    margin-bottom: 4px;
+  font-size: clamp(0.9rem, 2.8cqi, 2rem);
+  font-weight: 550;
+  color: var(--color-text);
+  letter-spacing: clamp(-0.04em, -0.11cqi, -0.005em);
+  line-height: 1.15;
+  font-optical-sizing: auto;
+  margin-bottom: 4px;
 }
 
 .stepDescription {
-    font-size: clamp(0.8rem, 2.4cqi, 1.8rem);
-    color: var(--color-text-secondary);
-    letter-spacing: clamp(-0.02em, -0.05cqi, 0em);
-    line-height: 1.35;
-    font-optical-sizing: auto;
+  font-size: clamp(0.8rem, 2.4cqi, 1.8rem);
+  color: var(--color-text-secondary);
+  letter-spacing: clamp(-0.02em, -0.05cqi, 0em);
+  line-height: 1.35;
+  font-optical-sizing: auto;
 }
 
 .footer {
-    padding: 6px 10px;
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+  padding: 6px 10px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .stepCounter {
-    font-size: 0.7rem;
-    color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
 }
 
 .backBtn {
-    margin-left: auto;
-    background: none;
-    border: 1px solid var(--color-border-hover);
-    color: var(--color-text);
-    font-size: 0.75rem;
-    cursor: pointer;
-    padding: 3px 10px;
-    border-radius: var(--effect-border-radius);
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--color-border-hover);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-radius: var(--effect-border-radius);
 }
 
 .backBtn:hover {
-    background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
-    border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
+  border-color: var(--color-primary);
 }
 
 .backBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .nextBtn {
-    background: var(--color-primary);
-    border: none;
-    color: #fff;
-    font-size: 0.75rem;
-    cursor: pointer;
-    padding: 3px 10px;
-    border-radius: var(--effect-border-radius);
+  background: var(--color-primary);
+  border: none;
+  color: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-radius: var(--effect-border-radius);
 }
 
 .nextBtn:hover {
-    opacity: 0.85;
+  opacity: 0.85;
 }
-

@@ -7,7 +7,7 @@
  * `ScheduleController.sidebarCourseItems` map + classList add/remove.
  */
 class ScheduleSidebarState {
-    hoveredCourseId = $state.raw<string | null>(null);
+  hoveredCourseId = $state.raw<string | null>(null);
 }
 
 export const scheduleSidebarState = new ScheduleSidebarState();

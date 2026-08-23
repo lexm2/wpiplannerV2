@@ -62,14 +62,18 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Professor Links
    `color: inherit` is deliberate: these links appear inside .section-badge in
    the course list, and .section-badge.full uses --color-primary as its
-   BACKGROUND — a primary-coloured link there would be invisible. The underline
+   BACKGROUND - a primary-coloured link there would be invisible. The underline
    carries the "this is clickable" affordance instead, which is safe on every
    background. */
 .professor-link {

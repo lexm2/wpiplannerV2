@@ -16,13 +16,16 @@
   } = $props();
 
   const years = $derived(
-    [...new Set(allCourses.map((c) => c.academicYear).filter(Boolean) as number[])].sort(
-      (a, b) => a - b
-    )
+    [
+      ...new Set(
+        allCourses.map(c => c.academicYear).filter(Boolean) as number[],
+      ),
+    ].sort((a, b) => a - b),
   );
 
   const currentYear = $derived<number | 'all'>(
-    filterService.getCriteria<AcademicYearFilterCriteria>('academicYear')?.year ?? 'all'
+    filterService.getCriteria<AcademicYearFilterCriteria>('academicYear')
+      ?.year ?? 'all',
   );
 
   function setYear(year: number | 'all'): void {
@@ -34,7 +37,7 @@
       profileStateManager.updateSchedule(
         active.id,
         { year: year === 'all' ? undefined : (year as number) },
-        'filter-sync'
+        'filter-sync',
       );
     }
   }
@@ -43,9 +46,17 @@
 {#if years.length > 1}
   <FilterSection title="Academic Year">
     <div class="filter-segmented-control">
-      <button class="segmented-btn" class:active={currentYear === 'all'} onclick={() => setYear('all')}>All</button>
+      <button
+        class="segmented-btn"
+        class:active={currentYear === 'all'}
+        onclick={() => setYear('all')}>All</button
+      >
       {#each years as y (y)}
-        <button class="segmented-btn" class:active={currentYear === y} onclick={() => setYear(y)}>{y}-{y + 1}</button>
+        <button
+          class="segmented-btn"
+          class:active={currentYear === y}
+          onclick={() => setYear(y)}>{y}-{y + 1}</button
+        >
       {/each}
     </div>
   </FilterSection>

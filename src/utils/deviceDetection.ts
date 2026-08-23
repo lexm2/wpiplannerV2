@@ -6,7 +6,9 @@ export class DeviceDetection {
       return false;
     }
 
-    return /Android.*Mobile|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    return /Android.*Mobile|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+      ua,
+    );
   }
 
   static initialize(): void {

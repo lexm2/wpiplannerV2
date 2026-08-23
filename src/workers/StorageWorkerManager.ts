@@ -1,6 +1,6 @@
 import type { WorkerRequest, WorkerResponse, WorkerTaskType } from './protocol';
 import LZString from 'lz-string';
-import { logger } from '../utils/logger'
+import { logger } from '../utils/logger';
 
 interface PendingTask {
   resolve: (value: unknown) => void;
@@ -29,7 +29,9 @@ export class StorageWorkerManager {
 
   async initialize(): Promise<void> {
     if (typeof Worker === 'undefined') {
-      logger.warn('[StorageWorker] Web Workers not supported, using fallback mode');
+      logger.warn(
+        '[StorageWorker] Web Workers not supported, using fallback mode',
+      );
       this.fallbackMode = true;
       return;
     }
@@ -37,7 +39,7 @@ export class StorageWorkerManager {
     try {
       this.worker = new Worker(
         new URL('./storage.worker.ts', import.meta.url),
-        { type: 'module' }
+        { type: 'module' },
       );
 
       this.worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
@@ -63,7 +65,6 @@ export class StorageWorkerManager {
           this.pendingTasks.delete(taskId);
         }
       };
-
     } catch (error) {
       logger.error('[StorageWorker] Failed to initialize:', error);
       this.fallbackMode = true;
@@ -80,11 +81,14 @@ export class StorageWorkerManager {
       id: taskId,
       type,
       payload,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     return new Promise((resolve, reject) => {
-      this.pendingTasks.set(taskId, { resolve: resolve as (value: unknown) => void, reject });
+      this.pendingTasks.set(taskId, {
+        resolve: resolve as (value: unknown) => void,
+        reject,
+      });
       this.worker!.postMessage(request);
 
       setTimeout(() => {
@@ -96,7 +100,10 @@ export class StorageWorkerManager {
     });
   }
 
-  private async executeFallback<T>(type: WorkerTaskType, payload: unknown): Promise<T> {
+  private async executeFallback<T>(
+    type: WorkerTaskType,
+    payload: unknown,
+  ): Promise<T> {
     const typedPayload = payload as { data?: unknown; compressed?: string };
     switch (type) {
       case 'compress_data': {

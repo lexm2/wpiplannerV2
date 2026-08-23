@@ -48,7 +48,8 @@
   font-size: 0.85rem;
 }
 
-#client-timestamp, #server-timestamp {
+#client-timestamp,
+#server-timestamp {
   font-weight: var(--font-weight-medium);
 }
 
@@ -231,7 +232,7 @@
   fill: var(--color-primary);
 }
 
-/* Settings dropdown menu — open/close animation lives in SettingsMenu.svelte. */
+/* Settings dropdown menu - open/close animation lives in SettingsMenu.svelte. */
 .settings-dropdown-menu {
   display: flex;
   flex-direction: column;
@@ -319,8 +320,12 @@
     margin-left: auto;
   }
 
-  /* The dropdown is a header-controls child (position:fixed) — keep it visible too. */
-  .app-header .header-controls > :not(.settings-menu-btn):not(.hamburger-btn):not(.settings-dropdown-menu) {
+  /* The dropdown is a header-controls child (position:fixed) - keep it visible too. */
+  .app-header
+    .header-controls
+    > :not(.settings-menu-btn):not(.hamburger-btn):not(
+      .settings-dropdown-menu
+    ) {
     display: none;
   }
 
@@ -342,4 +347,3 @@
 html.is-mobile .header-navigation {
   max-width: none;
 }
-

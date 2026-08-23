@@ -1,110 +1,110 @@
 /* Schedule Conflict Modal Styles */
 
 .schedule-conflict-modal .modal-dialog {
-    max-width: 450px;
-    width: 95%;
+  max-width: 450px;
+  width: 95%;
 }
 
 .schedule-conflict-modal .modal-content {
-    width: 100%;
-    max-width: 100%;
+  width: 100%;
+  max-width: 100%;
 }
 
 .conflict-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem;
-    border-bottom: 2px solid var(--color-border);
-    background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 .conflict-modal-title {
-    font-size: 1.25rem;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .conflict-title-icon {
-    width: 24px;
-    height: 24px;
-    color: var(--color-warning);
-    flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--color-warning);
+  flex-shrink: 0;
 }
 
 /* Modal Body Content */
 .schedule-conflict-modal .modal-body {
-    padding: 1.5rem;
+  padding: 1.5rem;
 }
 
 .conflict-message {
-    font-size: 0.95rem;
-    color: var(--color-text);
-    line-height: 1.6;
-    margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
 }
 
 .conflict-warning {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    margin: 0;
-    padding: 0.75rem;
-    background: var(--color-surface);
-    border-radius: var(--effect-border-radius);
-    border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--color-surface);
+  border-radius: var(--effect-border-radius);
+  border: 1px solid var(--color-border);
 }
 
 .conflict-warning .warning-icon {
-    width: 16px;
-    height: 16px;
-    color: var(--color-warning);
-    flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--color-warning);
+  flex-shrink: 0;
 }
 
 /* Schedule Conflict Footer */
 .conflict-modal-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
 }
 
 .conflict-actions {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: flex-end;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
 }
 
 .conflict-actions .modal-btn {
-    min-width: 120px;
-    transition: all 0.2s ease;
+  min-width: 120px;
+  transition: all 0.2s ease;
 }
 
 .conflict-actions .btn-primary {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .conflict-actions .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive adjustments */
 html.is-mobile .schedule-conflict-modal .modal-content {
-    max-width: 95%;
+  max-width: 95%;
 }
 
 html.is-mobile .conflict-actions {
-    flex-direction: column;
+  flex-direction: column;
 }
 
 html.is-mobile .conflict-actions .modal-btn {
-    width: 100%;
+  width: 100%;
 }

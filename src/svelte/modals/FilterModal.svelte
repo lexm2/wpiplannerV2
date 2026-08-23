@@ -32,7 +32,12 @@
   const payload = modalState.filter ?? { mode: 'filter' as const };
 </script>
 
-<Modal {typeId} extraClass="filter-modal" dialogClass="filter-modal-dialog" {onRequestClose}>
+<Modal
+  {typeId}
+  extraClass="filter-modal"
+  dialogClass="filter-modal-dialog"
+  {onRequestClose}
+>
   {#snippet children(close)}
     <FilterPanel
       mode={payload.mode}

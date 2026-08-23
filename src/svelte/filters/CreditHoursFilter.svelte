@@ -6,7 +6,9 @@
 
   let { filterService }: { filterService: FilterService } = $props();
 
-  const criteria = $derived(filterService.getCriteria<CreditRangeFilterCriteria>('creditRange'));
+  const criteria = $derived(
+    filterService.getCriteria<CreditRangeFilterCriteria>('creditRange'),
+  );
   const minCredits = $derived(criteria?.min ?? 1);
   // Default max is 4 (the top of the full 1-4 range) so the off-state below is
   // reachable from the max input.
@@ -34,7 +36,11 @@
         min={1}
         max={4}
         value={String(minCredits)}
-        onchange={(e) => update(parseInt((e.currentTarget as HTMLInputElement).value), maxCredits)}
+        onchange={e =>
+          update(
+            parseInt((e.currentTarget as HTMLInputElement).value),
+            maxCredits,
+          )}
       />
       <TextField
         id="credit-max"
@@ -45,7 +51,11 @@
         min={1}
         max={4}
         value={String(maxCredits)}
-        onchange={(e) => update(minCredits, parseInt((e.currentTarget as HTMLInputElement).value))}
+        onchange={e =>
+          update(
+            minCredits,
+            parseInt((e.currentTarget as HTMLInputElement).value),
+          )}
       />
     </div>
     <div class="filter-quick-select">

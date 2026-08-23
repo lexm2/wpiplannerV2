@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
   base: '/wpiplannerV2/',
@@ -7,7 +7,7 @@ export default defineConfig({
   publicDir: 'public',
   worker: {
     format: 'es',
-    plugins: () => []
+    plugins: () => [],
   },
   build: {
     outDir: 'dist',
@@ -17,17 +17,13 @@ export default defineConfig({
       output: {
         manualChunks: {
           // Other vendor libraries
-          'vendor-utils': [
-            'lz-string',
-            'rrule',
-            'zod'
-          ],
-          'worker-storage': ['src/workers/storage.worker.ts']
-        }
-      }
-    }
+          'vendor-utils': ['lz-string', 'rrule', 'zod'],
+          'worker-storage': ['src/workers/storage.worker.ts'],
+        },
+      },
+    },
   },
   server: {
-    port: 3000
-  }
-})
+    port: 3000,
+  },
+});

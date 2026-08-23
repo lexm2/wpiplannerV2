@@ -15,7 +15,10 @@
 >
   {#snippet children(close)}
     <div class="modal-body">
-      <p>Mobile support was temporarily removed to make it easier to ship new features. Please use a desktop browser for the best experience.</p>
+      <p>
+        Mobile support was temporarily removed to make it easier to ship new
+        features. Please use a desktop browser for the best experience.
+      </p>
     </div>
     <div class="modal-footer">
       <button class="modal-btn btn-primary" onclick={close}>Got it</button>

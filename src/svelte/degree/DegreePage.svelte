@@ -5,7 +5,8 @@
   import DegreeSummary from './DegreeSummary.svelte';
   import RequirementList from './RequirementList.svelte';
 
-  let { degreeImportService }: { degreeImportService: DegreeImportService } = $props();
+  let { degreeImportService }: { degreeImportService: DegreeImportService } =
+    $props();
 
   const record = $derived(degreeState.record);
   const ready = $derived(degreeState.status === 'ready' && record !== null);

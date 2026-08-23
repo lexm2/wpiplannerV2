@@ -20,13 +20,13 @@ permissions:
 jobs:
   update-data-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -42,7 +42,7 @@ jobs:
 
       - name: Run TypeScript converter
         run: bun run convert
-      
+
       - name: Check for changes
         id: changes
         run: |
@@ -51,7 +51,7 @@ jobs:
           else
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Commit course data changes
         if: steps.changes.outputs.changed == 'true'
         run: |
@@ -80,7 +80,7 @@ jobs:
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: bun run build
-      
+
       - name: Copy course data to build output
         run: |
           cp public/course-data.json dist/
@@ -89,7 +89,7 @@ jobs:
           cp public/term-bounds.json dist/
           echo "Course data files copied to dist/"
           ls -la dist/*.json
-      
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

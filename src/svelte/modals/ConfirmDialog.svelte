@@ -43,11 +43,7 @@
 </script>
 
 {#if payload}
-  <Modal
-    typeId="confirm"
-    title={payload.title}
-    {onRequestClose}
-  >
+  <Modal typeId="confirm" title={payload.title} {onRequestClose}>
     {#snippet children(close)}
       <div class="modal-header">
         <h2 class="modal-title">{payload.title}</h2>
@@ -64,7 +60,7 @@
               ariaLabel={payload.placeholder ?? payload.title}
               bind:value={inputValue}
               placeholder={payload.placeholder ?? ''}
-              onkeydown={(e) => onKeydown(e, close)}
+              onkeydown={e => onKeydown(e, close)}
             />
           {/if}
         </div>
@@ -75,7 +71,9 @@
         </button>
         <button
           id="modal-primary-btn"
-          class="modal-btn {payload.variant === 'danger' ? 'btn-danger' : 'btn-primary'}"
+          class="modal-btn {payload.variant === 'danger'
+            ? 'btn-danger'
+            : 'btn-primary'}"
           disabled={payload.input && !inputValue.trim()}
           onclick={() => submit(close)}
         >

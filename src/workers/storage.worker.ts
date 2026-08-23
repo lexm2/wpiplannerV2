@@ -29,17 +29,16 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
       id,
       type,
       success: true,
-      data: result
+      data: result,
     };
 
     self.postMessage(response);
-
   } catch (error) {
     const response: WorkerResponse = {
       id,
       type,
       success: false,
-      error: (error as Error).message
+      error: (error as Error).message,
     };
 
     self.postMessage(response);

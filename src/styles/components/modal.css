@@ -24,7 +24,7 @@
   pointer-events: auto;
 }
 
-/* Modal Dialog — enter/exit lives in Modal.svelte (backdrop fade + dialog
+/* Modal Dialog - enter/exit lives in Modal.svelte (backdrop fade + dialog
    zoom; a `no-transform` dialog class opts out of the zoom). */
 .modal-dialog {
   background: var(--color-surface);
@@ -104,12 +104,20 @@
 
 /* Modal Header Type Variants */
 .modal-header.info {
-  background: linear-gradient(135deg, var(--color-info, #007bff), var(--color-primary));
+  background: linear-gradient(
+    135deg,
+    var(--color-info, #007bff),
+    var(--color-primary)
+  );
   color: var(--color-text-inverse);
 }
 
 .modal-header.warning {
-  background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
+  background: linear-gradient(
+    135deg,
+    var(--color-warning),
+    var(--color-warning)
+  );
   color: var(--color-text-inverse);
 }
 
@@ -119,7 +127,11 @@
 }
 
 .modal-header.success {
-  background: linear-gradient(135deg, var(--color-success), var(--color-success));
+  background: linear-gradient(
+    135deg,
+    var(--color-success),
+    var(--color-success)
+  );
   color: var(--color-text-inverse);
 }
 
@@ -237,11 +249,11 @@ html.is-mobile .modal-btn {
   .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.8);
   }
-  
+
   .modal-dialog {
     border: 2px solid var(--color-border);
   }
-  
+
   .modal-btn {
     border-width: 2px;
   }
@@ -326,7 +338,10 @@ html.is-mobile .modal-btn {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -354,7 +369,9 @@ html.is-mobile .modal-btn {
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.04),
     0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
   /* Entrance pop is in:scaleFade (Svelte transition) in SectionInfo.svelte. */
 }
 
@@ -727,8 +744,8 @@ html.is-mobile .section-enrollment-waitlist {
   }
 
   .section-card--primary,
-.section-card--schedule,
-.section-card--note {
+  .section-card--schedule,
+  .section-card--note {
     border-left-width: 4px;
   }
 
@@ -883,7 +900,7 @@ html.is-mobile .section-enrollment-waitlist {
 }
 
 .department-checkbox:indeterminate::before {
-  content: '—';
+  content: '-';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1140,7 +1157,7 @@ html.is-mobile .filter-actions {
 
 /* Field supplies the label and the flex column; only the rhythm belongs here.
    input.css loads after this file (style.css:25 vs :20), so the extra class is
-   needed to win at equal specificity — same hack as main-content.css:119. */
+   needed to win at equal specificity - same hack as main-content.css:119. */
 .field.filter-slider-group {
   gap: 0.5rem;
 }
@@ -1162,7 +1179,7 @@ html.is-mobile .filter-actions {
 }
 
 /* Both were used in RmpRatingFilter markup with no rule anywhere, so they
-   rendered as raw body text. Not Field hints — .filter-input-hint is a unit
+   rendered as raw body text. Not Field hints - .filter-input-hint is a unit
    suffix inside a readout, .filter-hint is a section note. */
 .filter-input-hint {
   font-size: 0.8rem;
@@ -1389,7 +1406,11 @@ html.is-mobile .changelog-modal-body {
   border-radius: var(--effect-border-radius-large);
   background: var(--color-surface);
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   overflow: hidden;
   opacity: 0.45;
   user-select: none;
@@ -1446,4 +1467,3 @@ html.is-mobile .changelog-modal-body {
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
 }
-

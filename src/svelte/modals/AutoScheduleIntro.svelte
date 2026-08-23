@@ -35,7 +35,10 @@
     seededFor = p;
     const next = new SvelteMap<string, SvelteSet<string>>();
     for (const sc of p.selectedCourses) {
-      next.set(sc.course.id, new SvelteSet(hasPickedSections(sc) ? [] : availableTerms(sc)));
+      next.set(
+        sc.course.id,
+        new SvelteSet(hasPickedSections(sc) ? [] : availableTerms(sc)),
+      );
     }
     termsByCourse = next;
   });
@@ -75,7 +78,8 @@
   function toggleTerm(sc: SelectedCourse, term: string): void {
     const set = termsByCourse.get(sc.course.id);
     if (!set) return;
-    if (set.has(term)) set.delete(term); else set.add(term);
+    if (set.has(term)) set.delete(term);
+    else set.add(term);
   }
 
   function next(close: () => void): void {
@@ -97,10 +101,19 @@
 </script>
 
 {#if payload}
-  <Modal typeId="auto-schedule-intro" title="Auto-Schedule" showHeader extraClass="filter-modal" {onRequestClose}>
+  <Modal
+    typeId="auto-schedule-intro"
+    title="Auto-Schedule"
+    showHeader
+    extraClass="filter-modal"
+    {onRequestClose}
+  >
     {#snippet children(close)}
       <div class="modal-body as-course-picker-body">
-        <p class="as-picker-hint">Courses with selected sections are locked by default. Click a course to include it in auto-scheduling.</p>
+        <p class="as-picker-hint">
+          Courses with selected sections are locked by default. Click a course
+          to include it in auto-scheduling.
+        </p>
         <div class="as-course-grid">
           {#each payload.selectedCourses as sc (sc.course.id)}
             <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (card is a click-to-toggle surface; term badges below are the granular controls) -->
@@ -110,11 +123,16 @@
               data-course-id={sc.course.id}
               onclick={() => toggleCard(sc)}
             >
-              <div class="as-course-card-accent" style="background:{payload.getColor(sc.course.id)}"></div>
+              <div
+                class="as-course-card-accent"
+                style="background:{payload.getColor(sc.course.id)}"
+              ></div>
               <div class="as-course-card-content">
                 <div class="as-course-code">{courseCode(sc)}</div>
                 <div class="as-course-name">{sc.course.name}</div>
-                <div class="as-course-year">{sc.course.academicYear ?? '—'}</div>
+                <div class="as-course-year">
+                  {sc.course.academicYear ?? '-'}
+                </div>
               </div>
               <div class="as-card-terms term-badges-container">
                 {#each TERMS as term}
@@ -125,12 +143,19 @@
                       class:selected={isSelected(sc, term)}
                       data-term={term}
                       data-course-id={sc.course.id}
-                      onclick={(e) => { e.stopPropagation(); toggleTerm(sc, term); }}
+                      onclick={e => {
+                        e.stopPropagation();
+                        toggleTerm(sc, term);
+                      }}
                     >
                       <span class="term-letter">{term}</span>
                     </span>
                   {:else}
-                    <span class="term-badge unavailable" data-term={term} data-course-id={sc.course.id}>
+                    <span
+                      class="term-badge unavailable"
+                      data-term={term}
+                      data-course-id={sc.course.id}
+                    >
                       <span class="term-letter">{term}</span>
                     </span>
                   {/if}
@@ -141,7 +166,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn btn-primary" data-action="next" onclick={() => next(close)}>Next</button>
+        <button
+          class="modal-btn btn-primary"
+          data-action="next"
+          onclick={() => next(close)}>Next</button
+        >
       </div>
     {/snippet}
   </Modal>

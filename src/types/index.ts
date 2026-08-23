@@ -45,7 +45,13 @@ export type {
   ComponentKind,
   SectionsByKind,
 } from './types';
-export { PeriodType, DayOfWeek, Semester, SectionType, COMPONENT_KINDS } from './types';
+export {
+  PeriodType,
+  DayOfWeek,
+  Semester,
+  SectionType,
+  COMPONENT_KINDS,
+} from './types';
 export { ApplicationState } from './ApplicationState';
 export type {
   CourseComponentSelections,
@@ -55,10 +61,7 @@ export type {
   CellContentResult,
   SectionCandidate,
 } from './scheduling';
-export type {
-  DateRange,
-  FilterOption,
-} from './common';
+export type { DateRange, FilterOption } from './common';
 export type {
   RawPeriod,
   RawSection,

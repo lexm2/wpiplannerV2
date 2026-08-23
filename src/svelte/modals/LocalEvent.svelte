@@ -13,7 +13,11 @@
 
   const payload = $derived(modalState.localEvent);
 
-  interface DayOption { value: DayOfWeek; label: string; short: string; }
+  interface DayOption {
+    value: DayOfWeek;
+    label: string;
+    short: string;
+  }
   const WEEKDAYS: DayOption[] = [
     { value: DayOfWeek.MONDAY, label: 'Monday', short: 'M' },
     { value: DayOfWeek.TUESDAY, label: 'Tuesday', short: 'T' },
@@ -66,8 +70,12 @@
     description = ev?.description ?? '';
     eventType = ev?.eventType ?? EventType.RECURRING;
     date = ev?.date ?? todayDate();
-    startTime = ev?.startTime ? formatTime(ev.startTime.hours, ev.startTime.minutes) : '09:00';
-    endTime = ev?.endTime ? formatTime(ev.endTime.hours, ev.endTime.minutes) : '10:00';
+    startTime = ev?.startTime
+      ? formatTime(ev.startTime.hours, ev.startTime.minutes)
+      : '09:00';
+    endTime = ev?.endTime
+      ? formatTime(ev.endTime.hours, ev.endTime.minutes)
+      : '10:00';
     selectedDays = new Set(ev?.days?.length ? ev.days : [DayOfWeek.MONDAY]);
     selectedTerms = new Set(ev?.terms?.length ? ev.terms : TERMS);
     titleError = dayError = termError = dateError = endError = false;
@@ -86,7 +94,8 @@
 
   function toggleTerm(term: string): void {
     const next = new Set(selectedTerms);
-    if (next.has(term)) next.delete(term); else next.add(term);
+    if (next.has(term)) next.delete(term);
+    else next.add(term);
     selectedTerms = next;
     termError = false;
   }
@@ -107,7 +116,7 @@
 
     const s = parseTime(startTime);
     const e = parseTime(endTime);
-    endError = (e.hours * 60 + e.minutes) <= (s.hours * 60 + s.minutes);
+    endError = e.hours * 60 + e.minutes <= s.hours * 60 + s.minutes;
     if (endError) return false;
 
     return true;
@@ -116,7 +125,10 @@
   function save(close: () => void): void {
     if (!payload || !validate()) return;
 
-    const eventData: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'> = {
+    const eventData: Omit<
+      LocalCalendarEvent,
+      'id' | 'createdAt' | 'updatedAt'
+    > = {
       title: title.trim(),
       description: description.trim() || undefined,
       eventType,
@@ -137,14 +149,25 @@
   }
 
   function onTitleKeydown(e: KeyboardEvent, close: () => void): void {
-    if (e.key === 'Enter') { e.preventDefault(); save(close); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      save(close);
+    }
   }
 </script>
 
 {#if payload}
-  <Modal typeId="local-event" title={isEditMode ? 'Edit Event' : 'Add Event'} showHeader {onRequestClose}>
+  <Modal
+    typeId="local-event"
+    title={isEditMode ? 'Edit Event' : 'Add Event'}
+    showHeader
+    {onRequestClose}
+  >
     {#snippet children(close)}
-      <div class="modal-body {styles['local-event-form']}" data-type={eventType}>
+      <div
+        class="modal-body {styles['local-event-form']}"
+        data-type={eventType}
+      >
         <TextField
           id="event-title"
           label="Title"
@@ -154,7 +177,7 @@
           error={titleError ? 'Enter a title.' : undefined}
           bind:value={title}
           oninput={() => (titleError = false)}
-          onkeydown={(e) => onTitleKeydown(e, close)}
+          onkeydown={e => onTitleKeydown(e, close)}
         />
 
         <TextField
@@ -165,7 +188,12 @@
           bind:value={description}
         />
 
-        <Field group label="Event Type" controlId="event-type" fieldClass={styles.hug}>
+        <Field
+          group
+          label="Event Type"
+          controlId="event-type"
+          fieldClass={styles.hug}
+        >
           {#snippet children()}
             <div class={styles['event-type-selector']}>
               <button
@@ -254,7 +282,12 @@
           </div>
         {/if}
 
-        <Field group label="Time" controlId="event-time" fieldClass={styles.hug}>
+        <Field
+          group
+          label="Time"
+          controlId="event-time"
+          fieldClass={styles.hug}
+        >
           {#snippet children()}
             <div class={styles['time-row']}>
               <TextField
@@ -270,7 +303,9 @@
                 type="time"
                 ariaLabel="End time"
                 fieldClass={styles['form-group-time']}
-                error={endError ? 'End time must be after the start time.' : undefined}
+                error={endError
+                  ? 'End time must be after the start time.'
+                  : undefined}
                 bind:value={endTime}
                 oninput={() => (endError = false)}
               />

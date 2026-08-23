@@ -9,7 +9,7 @@
 }
 
 /* .modal-body sets `align-items: flex-start`, so every child shrinks to its
-   intrinsic width — an input's default ~20 characters inside a 600px modal.
+   intrinsic width - an input's default ~20 characters inside a 600px modal.
    Only the fields stretch; the pill rows are meant to hug their content. */
 .local-event-form > :global(.field) {
   align-self: stretch;
@@ -67,11 +67,11 @@
    Conditional Field Visibility
    ============================================================================= */
 
-.local-event-form[data-type="one-time"] .recurring-fields {
+.local-event-form[data-type='one-time'] .recurring-fields {
   display: none;
 }
 
-.local-event-form[data-type="recurring"] .one-time-fields {
+.local-event-form[data-type='recurring'] .one-time-fields {
   display: none;
 }
 

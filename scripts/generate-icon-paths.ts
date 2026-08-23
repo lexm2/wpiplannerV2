@@ -4,49 +4,53 @@
  * Run: bun run generate-icons
  */
 
-import { readdirSync, readFileSync, writeFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { readdirSync, readFileSync, writeFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const ICONS_DIR = join(__dirname, "../src/assets/icons");
-const OUTPUT_FILE = join(__dirname, "../src/utils/iconPaths.ts");
+const ICONS_DIR = join(__dirname, '../src/assets/icons');
+const OUTPUT_FILE = join(__dirname, '../src/utils/iconPaths.ts');
 
 function kebabToUpperSnake(filename: string): string {
   return filename
-    .replace(".svg", "")
-    .split("-")
-    .map((part) => part.toUpperCase())
-    .join("_");
+    .replace('.svg', '')
+    .split('-')
+    .map(part => part.toUpperCase())
+    .join('_');
 }
 
 function kebabToCamel(filename: string): string {
-  const parts = filename.replace(".svg", "").split("-");
-  return parts
-    .map((part, i) => i === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
-    .join("") + "Icon";
+  const parts = filename.replace('.svg', '').split('-');
+  return (
+    parts
+      .map((part, i) =>
+        i === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1),
+      )
+      .join('') + 'Icon'
+  );
 }
 
 function generateIconPaths(): void {
   const svgFiles = readdirSync(ICONS_DIR)
-    .filter((file) => file.endsWith(".svg"))
+    .filter(file => file.endsWith('.svg'))
     .sort();
 
   if (svgFiles.length === 0) {
-    console.error("No SVG files found in", ICONS_DIR);
+    console.error('No SVG files found in', ICONS_DIR);
     process.exit(1);
   }
 
   console.log(`Found ${svgFiles.length} SVG files`);
 
-  const icons = svgFiles.map((filename) => {
+  const icons = svgFiles.map(filename => {
     const constantName = kebabToUpperSnake(filename);
     const variableName = kebabToCamel(filename);
-    const svgContent = readFileSync(join(ICONS_DIR, filename), "utf-8")
+    const svgContent = readFileSync(join(ICONS_DIR, filename), 'utf-8')
       .trim()
-      .replace(/\s+class="[^"]*"/g, "") // Remove class attributes from source SVG
+      .replace(/\s+class="[^"]*"/g, '') // Remove class attributes from source SVG
       .replace(/stroke="#000000"/g, 'stroke="currentColor"') // Replace black stroke with currentColor
       .replace(/fill="#000000"/g, 'fill="currentColor"'); // Replace black fill with currentColor
 
@@ -59,18 +63,21 @@ function generateIconPaths(): void {
   });
 
   const imports = icons
-    .map((icon) => `import ${icon.variableName} from '../assets/icons/${icon.filename}?url';`)
-    .join("\n");
+    .map(
+      icon =>
+        `import ${icon.variableName} from '../assets/icons/${icon.filename}?url';`,
+    )
+    .join('\n');
 
-  const iconNames = icons.map((icon) => `  | '${icon.constantName}'`).join("\n");
+  const iconNames = icons.map(icon => `  | '${icon.constantName}'`).join('\n');
 
   const iconsObject = icons
-    .map((icon) => `  ${icon.constantName}: ${icon.variableName},`)
-    .join("\n");
+    .map(icon => `  ${icon.constantName}: ${icon.variableName},`)
+    .join('\n');
 
   const inlineSvgsObject = icons
-    .map((icon) => `  ${icon.constantName}: \`${icon.svgContent}\`,`)
-    .join("\n");
+    .map(icon => `  ${icon.constantName}: \`${icon.svgContent}\`,`)
+    .join('\n');
 
   const output = `/**
  * Centralized icon path constants for type-safe asset references.
@@ -133,14 +140,14 @@ export function getInlineSVG(iconName: IconName, className?: string): string {
 }
 `;
 
-  writeFileSync(OUTPUT_FILE, output, "utf-8");
+  writeFileSync(OUTPUT_FILE, output, 'utf-8');
   console.log(`Generated ${OUTPUT_FILE}`);
-  console.log(`  Icons: ${icons.map((i) => i.constantName).join(", ")}`);
+  console.log(`  Icons: ${icons.map(i => i.constantName).join(', ')}`);
 }
 
 try {
   generateIconPaths();
 } catch (error) {
-  console.error("Error generating icon paths:", error);
+  console.error('Error generating icon paths:', error);
   process.exit(1);
 }

@@ -1,1 +1,4 @@
-export { RateMyProfessorService, rateMyProfessorService } from './RateMyProfessorService';
+export {
+  RateMyProfessorService,
+  rateMyProfessorService,
+} from './RateMyProfessorService';

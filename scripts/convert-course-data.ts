@@ -21,25 +21,25 @@ const INPUT_PATH = join(projectRoot, 'public', 'course-data.json');
 const OUTPUT_PATH = join(projectRoot, 'public', 'course-data-constructed.json');
 
 async function main() {
-    console.log('='.repeat(60));
-    console.log('WPI Course Data Converter');
-    console.log('Workday → Planner Hierarchical Format');
-    console.log('='.repeat(60));
-    console.log();
+  console.log('='.repeat(60));
+  console.log('WPI Course Data Converter');
+  console.log('Workday → Planner Hierarchical Format');
+  console.log('='.repeat(60));
+  console.log();
 
-    try {
-        const converter = new WorkdayConverter(converterConfig);
-        await converter.convert(INPUT_PATH, OUTPUT_PATH);
+  try {
+    const converter = new WorkdayConverter(converterConfig);
+    await converter.convert(INPUT_PATH, OUTPUT_PATH);
 
-        console.log('Conversion successful!');
-        process.exit(0);
-    } catch (error) {
-        console.error('Conversion failed:', error);
-        if (error instanceof Error) {
-            console.error('Stack trace:', error.stack);
-        }
-        process.exit(1);
+    console.log('Conversion successful!');
+    process.exit(0);
+  } catch (error) {
+    console.error('Conversion failed:', error);
+    if (error instanceof Error) {
+      console.error('Stack trace:', error.stack);
     }
+    process.exit(1);
+  }
 }
 
 main();

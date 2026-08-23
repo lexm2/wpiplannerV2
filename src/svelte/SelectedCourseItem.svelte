@@ -13,7 +13,13 @@
     lab: { label: 'Lab', cls: 'lab' },
   };
 
-  let { selectedCourse, incompleteInfo, onOpenWizard, onRemove, onClearSections }: {
+  let {
+    selectedCourse,
+    incompleteInfo,
+    onOpenWizard,
+    onRemove,
+    onClearSections,
+  }: {
     selectedCourse: SelectedCourse;
     incompleteInfo: { isIncomplete: boolean; message: string };
     onOpenWizard: () => void;
@@ -25,9 +31,13 @@
   const credits = $derived(formatCredits(course));
   // Value-based, not Object.keys: a key holding undefined must not read as
   // "has sections".
-  const hasComponents = $derived(sectionsOf(selectedCourse.selected).length > 0);
+  const hasComponents = $derived(
+    sectionsOf(selectedCourse.selected).length > 0,
+  );
   // The grid sets the hovered course id; this item highlights when it matches.
-  const highlighted = $derived(scheduleSidebarState.hoveredCourseId === course.id);
+  const highlighted = $derived(
+    scheduleSidebarState.hoveredCourseId === course.id,
+  );
 
   // The whole header opens the wizard; the control buttons stopPropagation so a
   // click on them doesn't also open the wizard.
@@ -61,19 +71,33 @@
     onkeydown={handleHeaderKeydown}
   >
     <div class="schedule-course-info">
-      <div class="schedule-course-code">{course.departmentAbbr}{course.number}</div>
+      <div class="schedule-course-code">
+        {course.departmentAbbr}{course.number}
+      </div>
       <div class="schedule-course-name">{course.name}</div>
       {#if hasComponents || incompleteInfo.isIncomplete}
         <div class="schedule-course-components">
           {#each COMPONENT_KINDS as kind (kind)}
             {@const section = selectedCourse.selected[kind]}
             {#if section}
-              <span class="selected-component {BADGES[kind].cls}">{BADGES[kind].label} {section.number}</span>
+              <span class="selected-component {BADGES[kind].cls}"
+                >{BADGES[kind].label} {section.number}</span
+              >
             {/if}
           {/each}
           {#if incompleteInfo.isIncomplete}
             <span class="incomplete-warning" title={incompleteInfo.message}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="warning-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                class="warning-icon"
+                ><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
+                  d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z"
+                /></svg
+              >
             </span>
           {/if}
         </div>
@@ -86,13 +110,15 @@
         data-course-id={course.id}
         title="Clear selected sections"
         onclick={handleClear}
-      >{@html getInlineSVG('ERASER', 'eraser-icon')}</button>
+        >{@html getInlineSVG('ERASER', 'eraser-icon')}</button
+      >
       <button
         class="course-remove-btn"
         data-course-id={course.id}
         title="Remove from selection"
         onclick={handleRemove}
-      >{@html getInlineSVG('TRASH', 'trash-icon')}</button>
+        >{@html getInlineSVG('TRASH', 'trash-icon')}</button
+      >
     </div>
   </div>
 </div>

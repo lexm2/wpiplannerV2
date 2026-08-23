@@ -6,7 +6,12 @@
   import type { Course } from '../types/types';
   import type { SelectedCourse } from '../types/schedule';
   import type { ServiceContainer } from '../bootstrap/ServiceContainer';
-  import { uiState, setPage, openModal, showAppError } from '../services/ui/uiState.svelte';
+  import {
+    uiState,
+    setPage,
+    openModal,
+    showAppError,
+  } from '../services/ui/uiState.svelte';
   import { appState } from '../core/state/appState.svelte';
   import { modalState } from './modals/modalState.svelte';
   import { componentWizardService } from '../services/scheduling/componentWizardService';
@@ -51,10 +56,12 @@
 
   // `services` is a stable singleton container (built once in main.ts), so this
   // one-time construction reads it non-reactively; untrack makes that explicit.
-  const debouncedSearch = untrack(() => new DebouncedOperation(services.operationManager, 'search', 300));
+  const debouncedSearch = untrack(
+    () => new DebouncedOperation(services.operationManager, 'search', 300),
+  );
 
   // Page region display: keep BOTH pages mounted and toggle display off
-  // uiState.currentPage (a rune) — replaces UIStateManager.applyPageEffects'
+  // uiState.currentPage (a rune) - replaces UIStateManager.applyPageEffects'
   // imperative #planner-page/#schedule-page style writes. {#if} is avoided so a
   // page's reactive child components are never torn down on a page switch.
   const currentPage = $derived(uiState.currentPage);
@@ -97,7 +104,9 @@
 
   function toggleTheme(): void {
     const currentThemeId = services.themeManager.getCurrentThemeId();
-    services.themeManager.setTheme(currentThemeId === 'wpi-dark' ? 'wpi-light' : 'wpi-dark');
+    services.themeManager.setTheme(
+      currentThemeId === 'wpi-dark' ? 'wpi-light' : 'wpi-dark',
+    );
   }
 
   function handleKeydown(e: KeyboardEvent): void {
@@ -148,12 +157,24 @@
       <div class="undo-redo-controls">
         <UndoRedoButtons onUndo={handleUndo} onRedo={handleRedo} />
       </div>
-      <button id="schedule-picker-btn" class="btn btn-icon" title="Select Schedule" onclick={openSchedulePicker}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-          <line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/>
-          <line x1="3" y1="10" x2="21" y2="10"/>
+      <button
+        id="schedule-picker-btn"
+        class="btn btn-icon"
+        title="Select Schedule"
+        onclick={openSchedulePicker}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
         </svg>
         <span id="schedule-picker-label">{scheduleName}</span>
       </button>
@@ -164,12 +185,20 @@
   </div>
 </header>
 
-<div class="app-body" id="planner-page" style:display={currentPage === 'planner' ? 'grid' : 'none'}>
+<div
+  class="app-body"
+  id="planner-page"
+  style:display={currentPage === 'planner' ? 'grid' : 'none'}
+>
   <aside class="sidebar" aria-label="Department navigation">
     <div class="department-categories" id="department-list">
       <DepartmentSidebar filterService={services.filterService} />
     </div>
-    <ResizeHandle config={PANEL_WIDTHS.sidebar} edge="right" label="Resize department sidebar" />
+    <ResizeHandle
+      config={PANEL_WIDTHS.sidebar}
+      edge="right"
+      label="Resize department sidebar"
+    />
   </aside>
 
   <main class="main-content">
@@ -179,7 +208,10 @@
           <SearchBar filterService={services.filterService} {debouncedSearch} />
         </div>
         <div id="filter-buttons-host" class="content-controls-filter-host">
-          <FilterButtons filterService={services.filterService} onFilter={openFilterModal} />
+          <FilterButtons
+            filterService={services.filterService}
+            onFilter={openFilterModal}
+          />
         </div>
         <div id="view-toggle" class="view-toggle">
           <ViewToggle />
@@ -196,9 +228,15 @@
   </main>
 
   <aside class="right-panel" aria-label="Course details and selection">
-    <ResizeHandle config={PANEL_WIDTHS.rightPanel} edge="left" label="Resize course details panel" />
+    <ResizeHandle
+      config={PANEL_WIDTHS.rightPanel}
+      edge="left"
+      label="Resize course details panel"
+    />
     <section class="selected-courses-section">
-      <SelectedCoursesPanel courseSelectionService={services.courseSelectionService} />
+      <SelectedCoursesPanel
+        courseSelectionService={services.courseSelectionService}
+      />
     </section>
     <section class="course-description-section">
       <div class="course-description-content" id="course-description">
@@ -208,16 +246,30 @@
   </aside>
 </div>
 
-<div class="app-body schedule-page" id="schedule-page" style:display={currentPage === 'schedule' ? 'flex' : 'none'}>
+<div
+  class="app-body schedule-page"
+  id="schedule-page"
+  style:display={currentPage === 'schedule' ? 'flex' : 'none'}
+>
   <div class="schedule-page-layout">
     <aside class="schedule-sidebar">
       <div class="schedule-sidebar-header">
         <div class="schedule-filter-controls">
-          <div id="calendar-events-header-slot" class="calendar-events-header-slot">
-            <CalendarEventsButton onClick={() => localEventService.openAddModal()} />
+          <div
+            id="calendar-events-header-slot"
+            class="calendar-events-header-slot"
+          >
+            <CalendarEventsButton
+              onClick={() => localEventService.openAddModal()}
+            />
           </div>
-          <ScheduleFilterButton filterService={services.filterService} onFilter={openFilterModal} />
-          <ClearAllSectionsButton courseSelectionService={services.courseSelectionService} />
+          <ScheduleFilterButton
+            filterService={services.filterService}
+            onFilter={openFilterModal}
+          />
+          <ClearAllSectionsButton
+            courseSelectionService={services.courseSelectionService}
+          />
         </div>
       </div>
       <div
@@ -228,8 +280,12 @@
       >
         <ScheduleSidebar
           courseSelectionService={services.courseSelectionService}
-          getIncompleteInfo={(sc: SelectedCourse) => componentWizardService.getIncompleteSelectionInfo(sc)}
-          onOpenWizard={(course: Course, existing: SelectedCourse | undefined) => componentWizardService.openComponentWizard(course, existing)}
+          getIncompleteInfo={(sc: SelectedCourse) =>
+            componentWizardService.getIncompleteSelectionInfo(sc)}
+          onOpenWizard={(
+            course: Course,
+            existing: SelectedCourse | undefined,
+          ) => componentWizardService.openComponentWizard(course, existing)}
         />
         <WizardHost />
       </div>
@@ -239,20 +295,30 @@
           onOpenAutoSchedule={() => autoScheduleService.openAutoSchedule()}
         />
       </div>
-      <ResizeHandle config={PANEL_WIDTHS.scheduleSidebar} edge="right" label="Resize schedule sidebar" />
+      <ResizeHandle
+        config={PANEL_WIDTHS.scheduleSidebar}
+        edge="right"
+        label="Resize schedule sidebar"
+      />
     </aside>
 
     <main class="schedule-main">
       <ScheduleGrids
         colorService={services.colorService}
         conflictEngine={services.conflictDetector}
-        onOpenSectionInfo={(courseId: string, sectionNumber: string) => sectionInfoService.show(courseId, sectionNumber)}
-        onOpenDeleteEvent={(eventId: string) => localEventService.openDeleteModal(eventId)}
+        onOpenSectionInfo={(courseId: string, sectionNumber: string) =>
+          sectionInfoService.show(courseId, sectionNumber)}
+        onOpenDeleteEvent={(eventId: string) =>
+          localEventService.openDeleteModal(eventId)}
       />
     </main>
   </div>
 </div>
 
-<div class="app-body degree-page" id="degree-page" style:display={currentPage === 'degree' ? 'block' : 'none'}>
+<div
+  class="app-body degree-page"
+  id="degree-page"
+  style:display={currentPage === 'degree' ? 'block' : 'none'}
+>
   <DegreePage degreeImportService={services.degreeImportService} />
 </div>

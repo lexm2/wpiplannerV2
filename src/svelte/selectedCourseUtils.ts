@@ -10,28 +10,36 @@ import type { Course } from '../types/types';
  */
 
 export function formatCredits(course: Course): string {
-    return course.minCredits === course.maxCredits
-        ? `${course.minCredits} credits`
-        : `${course.minCredits}-${course.maxCredits} credits`;
+  return course.minCredits === course.maxCredits
+    ? `${course.minCredits} credits`
+    : `${course.minCredits}-${course.maxCredits} credits`;
 }
 
 /** Sort selected courses by department abbreviation, then course number. */
-export function compareSelectedCourses(a: SelectedCourse, b: SelectedCourse): number {
-    const dept = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
-    return dept !== 0 ? dept : a.course.number.localeCompare(b.course.number);
+export function compareSelectedCourses(
+  a: SelectedCourse,
+  b: SelectedCourse,
+): number {
+  const dept = a.course.departmentAbbr.localeCompare(b.course.departmentAbbr);
+  return dept !== 0 ? dept : a.course.number.localeCompare(b.course.number);
 }
 
 export const TERM_ORDER: AcademicTerm[] = [
-    AcademicTerm.A, AcademicTerm.B, AcademicTerm.C, AcademicTerm.D,
-    AcademicTerm.F, AcademicTerm.S, AcademicTerm.ALL,
+  AcademicTerm.A,
+  AcademicTerm.B,
+  AcademicTerm.C,
+  AcademicTerm.D,
+  AcademicTerm.F,
+  AcademicTerm.S,
+  AcademicTerm.ALL,
 ];
 
 export const TERM_LABELS: Record<AcademicTerm, string> = {
-    [AcademicTerm.A]: 'A Term',
-    [AcademicTerm.B]: 'B Term',
-    [AcademicTerm.C]: 'C Term',
-    [AcademicTerm.D]: 'D Term',
-    [AcademicTerm.F]: 'Fall',
-    [AcademicTerm.S]: 'Spring',
-    [AcademicTerm.ALL]: 'All Terms',
+  [AcademicTerm.A]: 'A Term',
+  [AcademicTerm.B]: 'B Term',
+  [AcademicTerm.C]: 'C Term',
+  [AcademicTerm.D]: 'D Term',
+  [AcademicTerm.F]: 'Fall',
+  [AcademicTerm.S]: 'Spring',
+  [AcademicTerm.ALL]: 'All Terms',
 };

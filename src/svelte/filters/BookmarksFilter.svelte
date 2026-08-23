@@ -7,15 +7,21 @@
   let { filterService }: { filterService: FilterService } = $props();
 
   const showBookmarkedOnly = $derived(
-    filterService.getCriteria<BookmarkFilterCriteria>('bookmark')?.showBookmarkedOnly ?? false
+    filterService.getCriteria<BookmarkFilterCriteria>('bookmark')
+      ?.showBookmarkedOnly ?? false,
   );
 
   function toggle(checked: boolean): void {
-    if (checked) filterService.addFilter('bookmark', { showBookmarkedOnly: true });
+    if (checked)
+      filterService.addFilter('bookmark', { showBookmarkedOnly: true });
     else filterService.removeFilter('bookmark');
   }
 </script>
 
 <FilterSection title="Bookmarks">
-  <FilterToggle label="Show only bookmarked courses" checked={showBookmarkedOnly} onchange={toggle} />
+  <FilterToggle
+    label="Show only bookmarked courses"
+    checked={showBookmarkedOnly}
+    onchange={toggle}
+  />
 </FilterSection>

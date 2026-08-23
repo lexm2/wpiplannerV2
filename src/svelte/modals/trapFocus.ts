@@ -10,12 +10,12 @@
  */
 
 const FOCUSABLE = [
-    'a[href]',
-    'button:not([disabled])',
-    'input:not([disabled]):not([type="hidden"])',
-    'select:not([disabled])',
-    'textarea:not([disabled])',
-    '[tabindex]:not([tabindex="-1"])',
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
 // Reference count so the body scroll lock is released only when the LAST open
@@ -24,62 +24,66 @@ let lockCount = 0;
 let priorBodyOverflow = '';
 
 function focusableWithin(node: HTMLElement): HTMLElement[] {
-    return [...node.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
-        el => el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement,
-    );
+  return [...node.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+    el =>
+      el.offsetWidth > 0 ||
+      el.offsetHeight > 0 ||
+      el === document.activeElement,
+  );
 }
 
 export function trapFocus(node: HTMLElement) {
-    const previouslyFocused = document.activeElement as HTMLElement | null;
+  const previouslyFocused = document.activeElement as HTMLElement | null;
 
-    if (lockCount === 0) {
-        priorBodyOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+  if (lockCount === 0) {
+    priorBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  lockCount++;
+
+  // Move focus into the dialog: prefer an explicit autofocus target, else the
+  // first focusable, else the dialog itself (made programmatically focusable).
+  const initial =
+    node.querySelector<HTMLElement>('[autofocus]') ?? focusableWithin(node)[0];
+  if (initial) {
+    initial.focus();
+  } else {
+    node.tabIndex = -1;
+    node.focus();
+  }
+
+  function onKeydown(e: KeyboardEvent): void {
+    if (e.key !== 'Tab') return;
+    const focusables = focusableWithin(node);
+    if (focusables.length === 0) {
+      e.preventDefault();
+      return;
     }
-    lockCount++;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement as HTMLElement | null;
 
-    // Move focus into the dialog: prefer an explicit autofocus target, else the
-    // first focusable, else the dialog itself (made programmatically focusable).
-    const initial = node.querySelector<HTMLElement>('[autofocus]') ?? focusableWithin(node)[0];
-    if (initial) {
-        initial.focus();
-    } else {
-        node.tabIndex = -1;
-        node.focus();
+    if (e.shiftKey) {
+      if (active === first || !node.contains(active)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else if (active === last || !node.contains(active)) {
+      e.preventDefault();
+      first.focus();
     }
+  }
 
-    function onKeydown(e: KeyboardEvent): void {
-        if (e.key !== 'Tab') return;
-        const focusables = focusableWithin(node);
-        if (focusables.length === 0) {
-            e.preventDefault();
-            return;
-        }
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        const active = document.activeElement as HTMLElement | null;
+  node.addEventListener('keydown', onKeydown);
 
-        if (e.shiftKey) {
-            if (active === first || !node.contains(active)) {
-                e.preventDefault();
-                last.focus();
-            }
-        } else if (active === last || !node.contains(active)) {
-            e.preventDefault();
-            first.focus();
-        }
-    }
-
-    node.addEventListener('keydown', onKeydown);
-
-    return {
-        destroy(): void {
-            node.removeEventListener('keydown', onKeydown);
-            lockCount = Math.max(0, lockCount - 1);
-            if (lockCount === 0) {
-                document.body.style.overflow = priorBodyOverflow;
-            }
-            previouslyFocused?.focus?.();
-        },
-    };
+  return {
+    destroy(): void {
+      node.removeEventListener('keydown', onKeydown);
+      lockCount = Math.max(0, lockCount - 1);
+      if (lockCount === 0) {
+        document.body.style.overflow = priorBodyOverflow;
+      }
+      previouslyFocused?.focus?.();
+    },
+  };
 }

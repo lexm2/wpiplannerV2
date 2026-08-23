@@ -4,7 +4,11 @@
   import { tutorialOverlayState } from './tutorialOverlayState.svelte';
   import { animateFindDot } from './findDot';
   import { scaleFade } from '../transitions';
-  import { clampToViewport, repositionIfObstructed, decorateInlineHighlights } from './floatingBox.position';
+  import {
+    clampToViewport,
+    repositionIfObstructed,
+    decorateInlineHighlights,
+  } from './floatingBox.position';
   import styles from '../../styles/components/floating-text-box.module.css';
 
   let {
@@ -16,7 +20,7 @@
   } = $props();
 
   // Step state is driven by the tutorialOverlayState rune store (written by
-  // TutorialService) — the runes-native replacement for the old onStepChange
+  // TutorialService) - the runes-native replacement for the old onStepChange
   // callback slot.
   const step = $derived(tutorialOverlayState.step);
   const index = $derived(tutorialOverlayState.index);
@@ -30,19 +34,21 @@
   const visible = $derived(step !== null);
   const isLastStep = $derived(index + 1 === total);
   const nextLabel = $derived(
-    isLastStep ? (tutorialService.getActiveTutorial()?.lastStepLabel ?? 'Next Tutorial') : 'Next'
+    isLastStep
+      ? (tutorialService.getActiveTutorial()?.lastStepLabel ?? 'Next Tutorial')
+      : 'Next',
   );
   const showBack = $derived(index > 0);
 
   // After each step's {@html} description renders, decorate any inline-highlight
   // spans with the marching-ants dashed-rect SVG, and reposition the box off the
   // highlighted target. tick() (not rAF) is used so this runs after Svelte has
-  // flushed the {@html} update — the inline span only exists then.
+  // flushed the {@html} update - the inline span only exists then.
   //
   // Positioning once isn't enough: the target keeps moving after this runs.
   // TutorialService scrolls an off-screen target into view, and a scroll inside
   // the course list or schedule sidebar can slide the target straight under the
-  // box — which then covers the very thing the step asks the user to click. So
+  // box - which then covers the very thing the step asks the user to click. So
   // re-check on any scroll (captured, since scroll doesn't bubble) and on resize.
   // The rAF here only throttles measurement; it drives no animation.
   $effect(() => {
@@ -64,7 +70,10 @@
         clampToViewport(box);
       });
     };
-    document.addEventListener('scroll', recheck, { capture: true, passive: true });
+    document.addEventListener('scroll', recheck, {
+      capture: true,
+      passive: true,
+    });
     window.addEventListener('resize', recheck);
     return () => {
       if (frame) cancelAnimationFrame(frame);
@@ -78,7 +87,7 @@
   let dragOffsetX = 0;
   let dragOffsetY = 0;
 
-  // Pointer Events (not mouse) so the box is draggable by touch and pen too —
+  // Pointer Events (not mouse) so the box is draggable by touch and pen too -
   // it can obstruct the very element the tutorial is highlighting. Pointer
   // capture keeps move/up coming to the header even once the pointer leaves it,
   // so no document-level listeners (and no teardown bookkeeping) are needed.
@@ -101,8 +110,17 @@
 
   function onDragMove(e: PointerEvent): void {
     if (!dragging || !boxEl) return;
-    const x = Math.max(0, Math.min(window.innerWidth - boxEl.offsetWidth, e.clientX - dragOffsetX));
-    const y = Math.max(0, Math.min(window.innerHeight - boxEl.offsetHeight, e.clientY - dragOffsetY));
+    const x = Math.max(
+      0,
+      Math.min(window.innerWidth - boxEl.offsetWidth, e.clientX - dragOffsetX),
+    );
+    const y = Math.max(
+      0,
+      Math.min(
+        window.innerHeight - boxEl.offsetHeight,
+        e.clientY - dragOffsetY,
+      ),
+    );
     boxEl.style.left = `${x}px`;
     boxEl.style.top = `${y}px`;
   }
@@ -117,7 +135,7 @@
     }
   }
 
-  // "Find element" dot animation — flies a dot to the current step's target.
+  // "Find element" dot animation - flies a dot to the current step's target.
   function onFindElement(): void {
     if (step) animateFindDot(step.selector);
   }
@@ -140,50 +158,65 @@
 </script>
 
 {#if visible}
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div bind:this={boxEl} class={styles['container']} transition:scaleFade={{ duration: 200 }}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class={styles['header']}
-    onpointerdown={onDragStart}
-    onpointermove={onDragMove}
-    onpointerup={onDragEnd}
-    onpointercancel={onDragEnd}
+    bind:this={boxEl}
+    class={styles['container']}
+    transition:scaleFade={{ duration: 200 }}
   >
-    <span class={styles['title']}>Tutorial</span>
-    <button class={styles['findBtn']} data-tutorial-find onpointerdown={stopPointerdown} onclick={onFindElement}>
-      Find Element
-    </button>
-    <button class={styles['skipBtn']} onpointerdown={stopPointerdown} onclick={() => tutorialService.skip()}>
-      Skip tutorial
-    </button>
-  </div>
-  <div class={styles['body']}>
-    <div class={styles['stepTitle']}>{step?.title ?? ''}</div>
-    <!-- eslint-disable-next-line svelte/no-at-html-tags — tutorial copy is author-controlled -->
-    <div class={styles['stepDescription']}>{@html step?.description ?? ''}</div>
-  </div>
-  <div class={styles['footer']}>
-    <span class={styles['stepCounter']}>Step {index + 1} of {total}</span>
-    <button
-      class={styles['backBtn']}
-      data-tutorial-back
-      style:display={showBack ? '' : 'none'}
-      disabled={backDisabled}
-      onpointerdown={stopPointerdown}
-      onclick={onBack}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class={styles['header']}
+      onpointerdown={onDragStart}
+      onpointermove={onDragMove}
+      onpointerup={onDragEnd}
+      onpointercancel={onDragEnd}
     >
-      <span>Back</span>
-    </button>
-    <button
-      class={styles['nextBtn']}
-      data-tutorial-next
-      style:margin-left={showBack ? '' : 'auto'}
-      onpointerdown={stopPointerdown}
-      onclick={onNext}
-    >
-      <span>{nextLabel}</span>
-    </button>
+      <span class={styles['title']}>Tutorial</span>
+      <button
+        class={styles['findBtn']}
+        data-tutorial-find
+        onpointerdown={stopPointerdown}
+        onclick={onFindElement}
+      >
+        Find Element
+      </button>
+      <button
+        class={styles['skipBtn']}
+        onpointerdown={stopPointerdown}
+        onclick={() => tutorialService.skip()}
+      >
+        Skip tutorial
+      </button>
+    </div>
+    <div class={styles['body']}>
+      <div class={styles['stepTitle']}>{step?.title ?? ''}</div>
+      <!-- eslint-disable-next-line svelte/no-at-html-tags - tutorial copy is author-controlled -->
+      <div class={styles['stepDescription']}>
+        {@html step?.description ?? ''}
+      </div>
+    </div>
+    <div class={styles['footer']}>
+      <span class={styles['stepCounter']}>Step {index + 1} of {total}</span>
+      <button
+        class={styles['backBtn']}
+        data-tutorial-back
+        style:display={showBack ? '' : 'none'}
+        disabled={backDisabled}
+        onpointerdown={stopPointerdown}
+        onclick={onBack}
+      >
+        <span>Back</span>
+      </button>
+      <button
+        class={styles['nextBtn']}
+        data-tutorial-next
+        style:margin-left={showBack ? '' : 'auto'}
+        onpointerdown={stopPointerdown}
+        onclick={onNext}
+      >
+        <span>{nextLabel}</span>
+      </button>
+    </div>
   </div>
-</div>
 {/if}

@@ -8,18 +8,19 @@
   let { filterService }: { filterService: FilterService } = $props();
 
   // Track *collapsed* categories (not expanded) so categories that appear after
-  // data loads default to expanded — matching the old DepartmentController.
+  // data loads default to expanded - matching the old DepartmentController.
   const collapsed = new SvelteSet<string>();
 
   // Source data + active filter state are reactive: `appState.loadedDepartments`
   // is a rune, and `filterService.getActiveFilters()` reads a SvelteMap. So the
-  // list, active highlighting, and counts all recompute on their own — this
+  // list, active highlighting, and counts all recompute on their own - this
   // replaces DepartmentController's manual displayDepartments/syncVisualState.
   const departments = $derived(appState.loadedDepartments);
   const categories = $derived(groupDepartmentsByCategory(departments));
 
   const activeDepts = $derived(
-    filterService.getCriteria<DepartmentFilterCriteria>('department')?.departments ?? []
+    filterService.getCriteria<DepartmentFilterCriteria>('department')
+      ?.departments ?? [],
   );
   const activeSet = $derived(new Set(activeDepts));
 
@@ -30,10 +31,16 @@
     let total = 0;
     if (departments.length === 0) return { map, total };
 
-    const hasNonDeptFilters = filterService.getActiveFilters().some(f => f.id !== 'department');
+    const hasNonDeptFilters = filterService
+      .getActiveFilters()
+      .some(f => f.id !== 'department');
     const allCourses = departments.flatMap(d => d.courses);
     const passing = hasNonDeptFilters
-      ? new Set(filterService.filterCoursesExcluding(allCourses, ['department']).map(c => c.id))
+      ? new Set(
+          filterService
+            .filterCoursesExcluding(allCourses, ['department'])
+            .map(c => c.id),
+        )
       : null;
 
     for (const dept of departments) {
@@ -69,10 +76,11 @@
         ? current.filter(id => id !== deptId)
         : [...current, deptId];
     } else {
-      next = (current.length === 1 && current[0] === deptId) ? [] : [deptId];
+      next = current.length === 1 && current[0] === deptId ? [] : [deptId];
     }
 
-    if (next.length > 0) filterService.addFilter('department', { departments: next });
+    if (next.length > 0)
+      filterService.addFilter('department', { departments: next });
     else filterService.removeFilter('department');
   }
 </script>
@@ -87,7 +95,7 @@
         class="department-item all-departments"
         class:active={activeSet.size === 0}
         data-dept-id="all"
-        onclick={(e) => selectDepartment('all', e)}
+        onclick={e => selectDepartment('all', e)}
       >
         All Departments ({counts.total})
       </button>
@@ -113,9 +121,10 @@
               class="department-item"
               class:active={activeSet.has(dept.abbreviation)}
               data-dept-id={dept.abbreviation}
-              onclick={(e) => selectDepartment(dept.abbreviation, e)}
+              onclick={e => selectDepartment(dept.abbreviation, e)}
             >
-              {dept.name} ({counts.map.get(dept.abbreviation) ?? dept.courses.length})
+              {dept.name} ({counts.map.get(dept.abbreviation) ??
+                dept.courses.length})
             </button>
           {/each}
         </div>

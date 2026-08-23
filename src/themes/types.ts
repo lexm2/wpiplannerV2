@@ -1,25 +1,25 @@
 export interface ThemeColors {
-    primary: string;
-    primaryHover: string;
-    primaryLight: string;
-    /** Comma-separated channels for rgba() composition, e.g. "212, 66, 79". */
-    primaryRgb: string;
-    secondary: string;
-    secondaryHover: string;
-    background: string;
-    backgroundAlt: string;
-    surface: string;
-    surfaceHover: string;
-    surfaceElevated: string;
-    text: string;
-    textSecondary: string;
-    textInverse: string;
-    border: string;
-    borderHover: string;
-    success: string;
-    warning: string;
-    error: string;
-    info: string;
+  primary: string;
+  primaryHover: string;
+  primaryLight: string;
+  /** Comma-separated channels for rgba() composition, e.g. "212, 66, 79". */
+  primaryRgb: string;
+  secondary: string;
+  secondaryHover: string;
+  background: string;
+  backgroundAlt: string;
+  surface: string;
+  surfaceHover: string;
+  surfaceElevated: string;
+  text: string;
+  textSecondary: string;
+  textInverse: string;
+  border: string;
+  borderHover: string;
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
 }
 
 /**
@@ -34,31 +34,31 @@ export interface ThemeColors {
  * silently overriding base.css.
  */
 export interface ThemeSpacing {
-    baseUnit: string;
-    headerHeight: string;
+  baseUnit: string;
+  headerHeight: string;
 }
 
 export interface ThemeEffects {
-    borderRadius: string;
-    borderRadiusLarge: string;
-    shadow: string;
-    shadowHover: string;
-    transition: string;
+  borderRadius: string;
+  borderRadiusLarge: string;
+  shadow: string;
+  shadowHover: string;
+  transition: string;
 }
 
 export interface ThemeDefinition {
-    name: string;
-    id: string;
-    description: string;
-    colors: ThemeColors;
-    spacing: ThemeSpacing;
-    effects: ThemeEffects;
+  name: string;
+  id: string;
+  description: string;
+  colors: ThemeColors;
+  spacing: ThemeSpacing;
+  effects: ThemeEffects;
 }
 
 export interface ThemeManagerConfig {
-    defaultThemeId: string;
-    storageKey: string;
-    themes: ThemeDefinition[];
+  defaultThemeId: string;
+  storageKey: string;
+  themes: ThemeDefinition[];
 }
 
 export type ThemeId = string;

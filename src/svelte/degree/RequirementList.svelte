@@ -1,5 +1,9 @@
 <script lang="ts">
-  import type { StudentRecord, RequirementStatus, RequirementCategory } from '../../types/degree';
+  import type {
+    StudentRecord,
+    RequirementStatus,
+    RequirementCategory,
+  } from '../../types/degree';
   import RequirementCard from './RequirementCard.svelte';
   import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
@@ -17,7 +21,9 @@
   const allActive = $derived(selected.length === 0);
 
   function toggleStatus(s: RequirementStatus): void {
-    let next = selected.includes(s) ? selected.filter(x => x !== s) : [...selected, s];
+    let next = selected.includes(s)
+      ? selected.filter(x => x !== s)
+      : [...selected, s];
     if (next.length === STATUSES.length) next = []; // all selected → collapse to All
     selected = next;
   }
@@ -27,22 +33,33 @@
   // they're hidden by default behind a toggle.
   const UMBRELLA = new Set<RequirementCategory>(['total_credits', 'residency']);
   let showUmbrella = $state(false);
-  const umbrellaCount = $derived(record.requirements.filter(r => UMBRELLA.has(r.category)).length);
+  const umbrellaCount = $derived(
+    record.requirements.filter(r => UMBRELLA.has(r.category)).length,
+  );
 
-  // Hide the synthetic "Unused Courses" bucket — it's always Not Satisfied and
-  // isn't a real requirement — plus umbrella requirements unless toggled on.
+  // Hide the synthetic "Unused Courses" bucket - it's always Not Satisfied and
+  // isn't a real requirement - plus umbrella requirements unless toggled on.
   const visible = $derived(
-    record.requirements.filter(r => r.category !== 'unused' && (showUmbrella || !UMBRELLA.has(r.category)))
+    record.requirements.filter(
+      r =>
+        r.category !== 'unused' && (showUmbrella || !UMBRELLA.has(r.category)),
+    ),
   );
 
   // Filter/count by the *live* status (reflects schedule overlay + drag moves),
   // so a requirement that becomes satisfied moves between filters in real time.
   const withStatus = $derived(
-    visible.map(r => ({ r, status: effectiveProgress(r, degreeState.placements.get(r.rawName) ?? []).status }))
+    visible.map(r => ({
+      r,
+      status: effectiveProgress(r, degreeState.placements.get(r.rawName) ?? [])
+        .status,
+    })),
   );
 
   const filtered = $derived(
-    allActive ? withStatus.map(x => x.r) : withStatus.filter(x => selected.includes(x.status)).map(x => x.r)
+    allActive
+      ? withStatus.map(x => x.r)
+      : withStatus.filter(x => selected.includes(x.status)).map(x => x.r),
   );
 
   const counts = $derived({
@@ -54,14 +71,19 @@
 </script>
 
 <div class="degree-requirements">
-  <div class="degree-filter-row" role="group" aria-label="Filter requirements by status">
+  <div
+    class="degree-filter-row"
+    role="group"
+    aria-label="Filter requirements by status"
+  >
     <button
       type="button"
       class="degree-filter-chip"
       class:active={allActive}
       aria-pressed={allActive}
       onclick={() => (selected = [])}
-    >All <span class="degree-filter-count">{counts.all}</span></button>
+      >All <span class="degree-filter-count">{counts.all}</span></button
+    >
     {#each STATUSES as s}
       <button
         type="button"
@@ -69,7 +91,9 @@
         class:active={selected.includes(s.key)}
         aria-pressed={selected.includes(s.key)}
         onclick={() => toggleStatus(s.key)}
-      >{s.label} <span class="degree-filter-count">{counts[s.key]}</span></button>
+        >{s.label}
+        <span class="degree-filter-count">{counts[s.key]}</span></button
+      >
     {/each}
     {#if umbrellaCount > 0}
       <button
@@ -78,14 +102,22 @@
         class:active={showUmbrella}
         aria-pressed={showUmbrella}
         onclick={() => (showUmbrella = !showUmbrella)}
-      >{showUmbrella ? 'Hide' : 'Show'} degree-wide <span class="degree-filter-count">{umbrellaCount}</span></button>
+        >{showUmbrella ? 'Hide' : 'Show'} degree-wide
+        <span class="degree-filter-count">{umbrellaCount}</span></button
+      >
     {/if}
   </div>
 
   <div class="degree-progress-legend" aria-hidden="true">
-    <span class="degree-legend-item"><span class="degree-legend-swatch seg-earned"></span> Completed</span>
-    <span class="degree-legend-item"><span class="degree-legend-swatch seg-planned"></span> Planned</span>
-    <span class="degree-legend-item"><span class="degree-legend-swatch seg-schedule"></span> Schedule</span>
+    <span class="degree-legend-item"
+      ><span class="degree-legend-swatch seg-earned"></span> Completed</span
+    >
+    <span class="degree-legend-item"
+      ><span class="degree-legend-swatch seg-planned"></span> Planned</span
+    >
+    <span class="degree-legend-item"
+      ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
+    >
   </div>
 
   {#if filtered.length === 0}

@@ -7,10 +7,10 @@ on:
   # C term: Early February
   # D term: Late March
   schedule:
-    - cron: '0 6 1 9 *'   # September 1st at 6:00 AM UTC (A term)
-    - cron: '0 6 1 11 *'  # November 1st at 6:00 AM UTC (B term)
-    - cron: '0 6 1 2 *'   # February 1st at 6:00 AM UTC (C term)
-    - cron: '0 6 25 3 *'  # March 25th at 6:00 AM UTC (D term)
+    - cron: '0 6 1 9 *' # September 1st at 6:00 AM UTC (A term)
+    - cron: '0 6 1 11 *' # November 1st at 6:00 AM UTC (B term)
+    - cron: '0 6 1 2 *' # February 1st at 6:00 AM UTC (C term)
+    - cron: '0 6 25 3 *' # March 25th at 6:00 AM UTC (D term)
 
   # Allow manual trigger
   workflow_dispatch:

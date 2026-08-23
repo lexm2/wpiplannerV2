@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Typecheck, svelte-check, unit tests, build
+    name: Typecheck, svelte-check, format, unit tests, build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +35,12 @@ jobs:
 
       - name: svelte-check
         run: bun run check
+
+      - name: Prettier format check
+        run: bun run format:check
+
+      - name: Check for unwanted characters
+        run: bun run check:unwanted-chars
 
       - name: Unit tests
         run: bun run test

@@ -6,7 +6,9 @@
   import { showAppError } from '../services/ui/uiState.svelte';
   import { sectionsOf } from '../utils/courseUtils';
 
-  let { courseSelectionService }: { courseSelectionService: CourseSelectionService } = $props();
+  let {
+    courseSelectionService,
+  }: { courseSelectionService: CourseSelectionService } = $props();
 
   // Replaces ScheduleController.setupClearAllSectionsButton + handleClearAllSections.
   // The reactive sidebar/grid re-render off appState.selectedCourses on their own.
@@ -18,7 +20,9 @@
       return;
     }
 
-    const hasAnySections = selectedCourses.some(sc => sectionsOf(sc.selected).length > 0);
+    const hasAnySections = selectedCourses.some(
+      sc => sectionsOf(sc.selected).length > 0,
+    );
 
     if (!hasAnySections) {
       showAppError('No sections selected to clear.');

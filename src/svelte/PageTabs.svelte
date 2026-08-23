@@ -2,7 +2,9 @@
   import { uiState } from '../services/ui/uiState.svelte';
   import type { PageId } from '../types/uiState';
 
-  let { onSwitch }: {
+  let {
+    onSwitch,
+  }: {
     onSwitch: (page: PageId) => void;
   } = $props();
 
@@ -17,19 +19,19 @@
   class="nav-tab"
   class:active={page === 'planner'}
   aria-label="Classes view"
-  onclick={() => onSwitch('planner')}
->Classes</button>
+  onclick={() => onSwitch('planner')}>Classes</button
+>
 <button
   id="schedule-tab"
   class="nav-tab"
   class:active={page === 'schedule'}
   aria-label="Schedule view"
-  onclick={() => onSwitch('schedule')}
->Schedule</button>
+  onclick={() => onSwitch('schedule')}>Schedule</button
+>
 <button
   id="degree-tab"
   class="nav-tab"
   class:active={page === 'degree'}
   aria-label="Degree view"
-  onclick={() => onSwitch('degree')}
->Degree</button>
+  onclick={() => onSwitch('degree')}>Degree</button
+>

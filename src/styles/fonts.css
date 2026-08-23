@@ -1,13 +1,13 @@
 /*
  * Self-hosted webfonts. Both families ship as variable fonts so a single file
- * per style covers every weight the themes ask for — see --font-weight-* in
+ * per style covers every weight the themes ask for - see --font-weight-* in
  * src/themes/styles/base.css.
  *
  * Both are SIL Open Font License 1.1; the license texts are served verbatim
  * from public/licenses/ as OFL section 2 requires.
  */
 
-/* Source Sans 3 — Copyright 2010-2024 Adobe, RFN "Source". */
+/* Source Sans 3 - Copyright 2010-2024 Adobe, RFN "Source". */
 @font-face {
   font-family: 'Source Sans 3';
   src: url('./fonts/SourceSans3VF-Upright.otf.woff2') format('woff2');
@@ -16,7 +16,7 @@
   font-display: swap;
 }
 
-/* Real italic face — the display font previously had none, so every
+/* Real italic face - the display font previously had none, so every
    `font-style: italic` rule rendered a browser-synthesised oblique. */
 @font-face {
   font-family: 'Source Sans 3';
@@ -26,7 +26,7 @@
   font-display: swap;
 }
 
-/* JetBrains Mono — Copyright 2020 The JetBrains Mono Project Authors. */
+/* JetBrains Mono - Copyright 2020 The JetBrains Mono Project Authors. */
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('./fonts/JetBrainsMonoVF.woff2') format('woff2');

@@ -12,18 +12,21 @@ import { timeRangesOverlap } from './timeParser.js';
  * 1. Cluster constraints satisfied (GPS courses, cluster matching)
  * 2. No time conflicts between meeting periods
  */
-export function areCompatible(section1: PlannerSection, section2: PlannerSection): boolean {
-    // Check cluster compatibility first
-    if (!checkClusterCompatibility(section1, section2)) {
-        return false;
-    }
+export function areCompatible(
+  section1: PlannerSection,
+  section2: PlannerSection,
+): boolean {
+  // Check cluster compatibility first
+  if (!checkClusterCompatibility(section1, section2)) {
+    return false;
+  }
 
-    // Check for time conflicts
-    if (hasTimeConflict(section1, section2)) {
-        return false;
-    }
+  // Check for time conflicts
+  if (hasTimeConflict(section1, section2)) {
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
 /**
@@ -37,41 +40,47 @@ export function areCompatible(section1: PlannerSection, section2: PlannerSection
  * - If either section has no cluster → compatible
  * - If both have clusters → they must match
  */
-function checkClusterCompatibility(section1: PlannerSection, section2: PlannerSection): boolean {
-    const cluster1 = section1.note;
-    const cluster2 = section2.note;
+function checkClusterCompatibility(
+  section1: PlannerSection,
+  section2: PlannerSection,
+): boolean {
+  const cluster1 = section1.note;
+  const cluster2 = section2.note;
 
-    // GPS courses: both MUST have same cluster
-    if (section1.isGps || section2.isGps) {
-        if (!cluster1 || !cluster2) {
-            return false; // GPS requires both to have clusters
-        }
-        return cluster1 === cluster2;
-    }
-
-    // Non-GPS: if either has no cluster, they're compatible
+  // GPS courses: both MUST have same cluster
+  if (section1.isGps || section2.isGps) {
     if (!cluster1 || !cluster2) {
-        return true;
+      return false; // GPS requires both to have clusters
     }
-
-    // Both have clusters: must match
     return cluster1 === cluster2;
+  }
+
+  // Non-GPS: if either has no cluster, they're compatible
+  if (!cluster1 || !cluster2) {
+    return true;
+  }
+
+  // Both have clusters: must match
+  return cluster1 === cluster2;
 }
 
 /**
  * Checks if two sections have time conflicts
  * Compares all period pairs between the two sections
  */
-function hasTimeConflict(section1: PlannerSection, section2: PlannerSection): boolean {
-    for (const period1 of section1.periods) {
-        for (const period2 of section2.periods) {
-            if (periodsConflict(period1, period2)) {
-                return true; // Found a conflict
-            }
-        }
+function hasTimeConflict(
+  section1: PlannerSection,
+  section2: PlannerSection,
+): boolean {
+  for (const period1 of section1.periods) {
+    for (const period2 of section2.periods) {
+      if (periodsConflict(period1, period2)) {
+        return true; // Found a conflict
+      }
     }
+  }
 
-    return false; // No conflicts found
+  return false; // No conflicts found
 }
 
 /**
@@ -80,30 +89,33 @@ function hasTimeConflict(section1: PlannerSection, section2: PlannerSection): bo
  * 1. Time ranges overlap
  * 2. They share at least one day
  */
-function periodsConflict(period1: PlannerPeriod, period2: PlannerPeriod): boolean {
-    // Check if times overlap
-    const timeOverlap = timeRangesOverlap(
-        period1.startTime,
-        period1.endTime,
-        period2.startTime,
-        period2.endTime
-    );
+function periodsConflict(
+  period1: PlannerPeriod,
+  period2: PlannerPeriod,
+): boolean {
+  // Check if times overlap
+  const timeOverlap = timeRangesOverlap(
+    period1.startTime,
+    period1.endTime,
+    period2.startTime,
+    period2.endTime,
+  );
 
-    if (!timeOverlap) {
-        return false; // No time overlap, no conflict
+  if (!timeOverlap) {
+    return false; // No time overlap, no conflict
+  }
+
+  // Times overlap - check if they share any days
+  const days1 = new Set(period1.days);
+  const days2 = new Set(period2.days);
+
+  for (const day of days1) {
+    if (days2.has(day)) {
+      return true; // Conflict: same day + overlapping time
     }
+  }
 
-    // Times overlap - check if they share any days
-    const days1 = new Set(period1.days);
-    const days2 = new Set(period2.days);
-
-    for (const day of days1) {
-        if (days2.has(day)) {
-            return true; // Conflict: same day + overlapping time
-        }
-    }
-
-    return false; // Times overlap but different days
+  return false; // Times overlap but different days
 }
 
 /**
@@ -111,8 +123,10 @@ function periodsConflict(period1: PlannerPeriod, period2: PlannerPeriod): boolea
  * Used to build compatibleDiscussions and compatibleLabs arrays
  */
 export function filterCompatibleSections(
-    referenceSection: PlannerSection,
-    candidateSections: PlannerSection[]
+  referenceSection: PlannerSection,
+  candidateSections: PlannerSection[],
 ): PlannerSection[] {
-    return candidateSections.filter(candidate => areCompatible(referenceSection, candidate));
+  return candidateSections.filter(candidate =>
+    areCompatible(referenceSection, candidate),
+  );
 }

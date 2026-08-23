@@ -11,29 +11,29 @@
  * is a plain class: directive now; this only owns the scroll behaviour.
  */
 export function wizardScrollLock(node: HTMLElement, isOpen: boolean) {
-    let prevScrollTop = 0;
+  let prevScrollTop = 0;
 
-    function apply(open: boolean): void {
-        if (open) {
-            prevScrollTop = node.scrollTop;
-            node.scrollTop = 0;
-        } else {
-            node.scrollTop = prevScrollTop;
-        }
+  function apply(open: boolean): void {
+    if (open) {
+      prevScrollTop = node.scrollTop;
+      node.scrollTop = 0;
+    } else {
+      node.scrollTop = prevScrollTop;
     }
+  }
 
-    let current = isOpen;
-    if (current) apply(true);
+  let current = isOpen;
+  if (current) apply(true);
 
-    return {
-        update(next: boolean) {
-            if (next !== current) {
-                current = next;
-                apply(next);
-            }
-        },
-        destroy() {
-            if (current) apply(false);
-        },
-    };
+  return {
+    update(next: boolean) {
+      if (next !== current) {
+        current = next;
+        apply(next);
+      }
+    },
+    destroy() {
+      if (current) apply(false);
+    },
+  };
 }

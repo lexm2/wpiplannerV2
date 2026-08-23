@@ -9,21 +9,21 @@ import type { Course, SectionsByKind } from '../../types/types';
  * `wizardPreviewSelections` / `hoverPreviewSelections` fields on
  * `ScheduleController` (which re-rendered the grid imperatively).
  *
- * - `previewCourse` + `selections`: the wizard's CURRENT committed selection —
+ * - `previewCourse` + `selections`: the wizard's CURRENT committed selection -
  *   overlaid onto the selected list so it renders as solid blocks.
- * - `previewCourse` + `hover`: a hovered (not-yet-committed) option — rendered
+ * - `previewCourse` + `hover`: a hovered (not-yet-committed) option - rendered
  *   as a dashed, border-only preview block.
  */
 class SchedulePreviewState {
-    previewCourse = $state.raw<Course | null>(null);
-    selections = $state.raw<SectionsByKind | null>(null);
-    hover = $state.raw<SectionsByKind | null>(null);
+  previewCourse = $state.raw<Course | null>(null);
+  selections = $state.raw<SectionsByKind | null>(null);
+  hover = $state.raw<SectionsByKind | null>(null);
 
-    clear(): void {
-        this.previewCourse = null;
-        this.selections = null;
-        this.hover = null;
-    }
+  clear(): void {
+    this.previewCourse = null;
+    this.selections = null;
+    this.hover = null;
+  }
 }
 
 export const schedulePreviewState = new SchedulePreviewState();

@@ -5,11 +5,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type {
-  Professor,
-  RateMyProfessorData,
-  School,
-} from './types';
+import type { Professor, RateMyProfessorData, School } from './types';
 
 // WPI School Information (obtained from https://www.ratemyprofessors.com/school/1220)
 const WPI_LEGACY_ID = 1220;
@@ -47,7 +43,7 @@ async function graphqlRequest(query: string, variables: any): Promise<any> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${AUTH_TOKEN}`,
+      Authorization: `Basic ${AUTH_TOKEN}`,
     },
     body: JSON.stringify({
       query,
@@ -71,7 +67,10 @@ async function graphqlRequest(query: string, variables: any): Promise<any> {
 /**
  * Search for teachers at a school with pagination
  */
-async function searchTeachers(schoolID: string, query: string = '*'): Promise<any[]> {
+async function searchTeachers(
+  schoolID: string,
+  query: string = '*',
+): Promise<any[]> {
   const graphqlQuery = `
     query NewSearchTeachersQuery($query: TeacherSearchQuery!) {
       newSearch {
@@ -160,13 +159,17 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
           }
         }
 
-        process.stdout.write(`\rProgress: ${letter.toUpperCase()} (${allTeachers.size} unique professors found)`);
+        process.stdout.write(
+          `\rProgress: ${letter.toUpperCase()} (${allTeachers.size} unique professors found)`,
+        );
       } catch (error) {
         console.error(`\nFailed to search for letter ${letter}:`, error);
       }
     }
 
-    console.log(`\n\nFound ${allTeachers.size} unique professors. Fetching detailed information...`);
+    console.log(
+      `\n\nFound ${allTeachers.size} unique professors. Fetching detailed information...`,
+    );
 
     const teachers = Array.from(allTeachers.values());
 
@@ -214,16 +217,23 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
 
         // Log progress every 10 professors
         if ((i + 1) % 10 === 0) {
-          console.log(`Progress: ${i + 1}/${teachers.length} professors processed`);
+          console.log(
+            `Progress: ${i + 1}/${teachers.length} professors processed`,
+          );
         }
       } catch (error) {
         failureCount++;
-        console.error(`Failed to fetch details for ${teacher.firstName} ${teacher.lastName}:`, error);
+        console.error(
+          `Failed to fetch details for ${teacher.firstName} ${teacher.lastName}:`,
+          error,
+        );
         // Continue with the next professor
       }
     }
 
-    console.log(`\nCompleted: ${successCount} successful, ${failureCount} failed`);
+    console.log(
+      `\nCompleted: ${successCount} successful, ${failureCount} failed`,
+    );
 
     return professors;
   } catch (error) {
@@ -242,11 +252,7 @@ async function saveToFile(data: RateMyProfessorData): Promise<void> {
     await fs.mkdir(dataDir, { recursive: true });
 
     // Write JSON file with pretty formatting
-    await fs.writeFile(
-      OUTPUT_PATH,
-      JSON.stringify(data, null, 2),
-      'utf-8'
-    );
+    await fs.writeFile(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf-8');
 
     console.log(`\nData successfully saved to ${OUTPUT_PATH}`);
     console.log(`Total professors: ${data.totalProfessors}`);
@@ -301,12 +307,19 @@ async function main() {
 
     // Print some statistics
     if (professors.length > 0) {
-      const avgRating = professors.reduce((sum, p) => sum + p.avgRating, 0) / professors.length;
-      const avgDifficulty = professors.reduce((sum, p) => sum + p.avgDifficulty, 0) / professors.length;
-      const professorsWithRatings = professors.filter(p => p.numRatings > 0).length;
+      const avgRating =
+        professors.reduce((sum, p) => sum + p.avgRating, 0) / professors.length;
+      const avgDifficulty =
+        professors.reduce((sum, p) => sum + p.avgDifficulty, 0) /
+        professors.length;
+      const professorsWithRatings = professors.filter(
+        p => p.numRatings > 0,
+      ).length;
 
       console.log('\n=== Statistics ===');
-      console.log(`Professors with ratings: ${professorsWithRatings}/${professors.length}`);
+      console.log(
+        `Professors with ratings: ${professorsWithRatings}/${professors.length}`,
+      );
       console.log(`Average rating: ${avgRating.toFixed(2)}/5.0`);
       console.log(`Average difficulty: ${avgDifficulty.toFixed(2)}/5.0`);
     }

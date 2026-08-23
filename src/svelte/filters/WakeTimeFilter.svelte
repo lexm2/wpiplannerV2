@@ -7,20 +7,23 @@
   let { filterService }: { filterService: FilterService } = $props();
 
   const wakeUpTime = $derived(
-    filterService.getCriteria<WakeUpTimeFilterCriteria>('wakeUpTime')?.wakeUpTime ?? null
+    filterService.getCriteria<WakeUpTimeFilterCriteria>('wakeUpTime')
+      ?.wakeUpTime ?? null,
   );
 
   const timeValue = $derived(
     wakeUpTime
       ? `${String(wakeUpTime.hours).padStart(2, '0')}:${String(wakeUpTime.minutes).padStart(2, '0')}`
-      : ''
+      : '',
   );
 
   function onChange(value: string): void {
     if (value && value.trim()) {
       const [hours, minutes] = value.split(':').map(Number);
       if (!isNaN(hours) && !isNaN(minutes)) {
-        filterService.addFilter('wakeUpTime', { wakeUpTime: { hours, minutes } });
+        filterService.addFilter('wakeUpTime', {
+          wakeUpTime: { hours, minutes },
+        });
       }
     } else {
       filterService.removeFilter('wakeUpTime');
@@ -40,7 +43,7 @@
     panel
     hint="Excludes sections that start before this time"
     value={timeValue}
-    onchange={(e) => onChange((e.currentTarget as HTMLInputElement).value)}
+    onchange={e => onChange((e.currentTarget as HTMLInputElement).value)}
   />
   {#if timeValue}
     <button class="filter-clear-btn" onclick={clear}>Clear</button>
