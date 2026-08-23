@@ -51,10 +51,16 @@ export class TutorialService {
     if (tutorial.onStart) {
       const result = tutorial.onStart();
       if (result instanceof Promise) {
-        result.then(() =>
-          requestAnimationFrame(() => {
-            void this.applyStep();
-          }),
+        // onStart is supplied by the tutorial definition, so this is external
+        // code and a rejection is not ours to assume away.
+        result.then(
+          () =>
+            requestAnimationFrame(() => {
+              void this.applyStep();
+            }),
+          (error: unknown) => {
+            logger.error('Tutorial onStart failed:', error);
+          },
         );
         return;
       }

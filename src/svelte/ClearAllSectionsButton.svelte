@@ -34,13 +34,15 @@
       message: 'Clear all selected sections for all courses?',
       confirmLabel: 'Clear sections',
       variant: 'danger',
-      onConfirm: async () => {
-        try {
-          await courseSelectionService.clearAllComponents();
-        } catch (error) {
-          logger.error('Failed to clear all components:', error);
-          showAppError('Failed to clear sections. Please try again.');
-        }
+      onConfirm: () => {
+        void (async () => {
+          try {
+            await courseSelectionService.clearAllComponents();
+          } catch (error) {
+            logger.error('Failed to clear all components:', error);
+            showAppError('Failed to clear sections. Please try again.');
+          }
+        })();
       },
     });
   }

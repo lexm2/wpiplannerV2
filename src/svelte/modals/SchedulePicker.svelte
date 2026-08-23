@@ -62,9 +62,16 @@
   }
 
   onMount(() => {
-    scheduleManagementService.initialize().then(() => {
-      refreshTick++;
-    });
+    scheduleManagementService.initialize().then(
+      () => {
+        refreshTick++;
+      },
+      (error: unknown) => {
+        // Without this the modal just renders an empty list and never says why.
+        logger.error('Failed to initialize schedules:', error);
+        showAppError('Failed to load schedules. Please try again.');
+      },
+    );
   });
 
   // Tab navigation (horizontal page slide)
@@ -202,17 +209,40 @@
     refreshTick++;
   }
 
+  // showConfirm returns immediately and fires onConfirm later, from the modal.
+  // handleAction's try/catch is off the stack by then, so each confirm handler
+  // has to surface its own failure or the action fails silently.
+  async function confirmDelete(schedule: Schedule): Promise<void> {
+    try {
+      await scheduleManagementService.deleteSchedule(schedule.id);
+      refreshTick++;
+    } catch (error) {
+      logger.error('Failed to delete schedule:', error);
+      showAppError('Failed to delete schedule. Please try again.');
+    }
+  }
+
   function deleteSchedule(schedule: Schedule): void {
     showConfirm({
       title: 'Delete schedule',
       message: `Are you sure you want to delete "${schedule.name}"?`,
       confirmLabel: 'Delete',
       variant: 'danger',
-      onConfirm: async () => {
-        await scheduleManagementService.deleteSchedule(schedule.id);
-        refreshTick++;
+      onConfirm: () => {
+        void confirmDelete(schedule);
       },
     });
+  }
+
+  async function confirmCreate(name?: string): Promise<void> {
+    if (!name) return;
+    try {
+      await scheduleManagementService.createNewSchedule(name);
+      refreshTick++;
+    } catch (error) {
+      logger.error('Failed to create schedule:', error);
+      showAppError('Failed to create schedule. Please try again.');
+    }
   }
 
   function createNewSchedule(): void {
@@ -222,10 +252,8 @@
       confirmLabel: 'Create',
       input: true,
       placeholder: 'Schedule name',
-      onConfirm: async name => {
-        if (!name) return;
-        await scheduleManagementService.createNewSchedule(name);
-        refreshTick++;
+      onConfirm: name => {
+        void confirmCreate(name);
       },
     });
   }
@@ -327,7 +355,13 @@
 
   function exportActiveICS(): void {
     const activeId = scheduleManagementService.getActiveScheduleId();
-    if (activeId) exportScheduleICS(activeId);
+    // Not reached through handleAction, so this path has no catch above it.
+    if (activeId) {
+      exportScheduleICS(activeId).catch((error: unknown) => {
+        logger.error('Failed to export calendar:', error);
+        showAppError('Failed to export calendar. Please try again.');
+      });
+    }
   }
 
   async function exportAllSchedules(): Promise<void> {
@@ -344,6 +378,16 @@
     }
   }
 
+  async function confirmClearAllData(): Promise<void> {
+    try {
+      await scheduleManagementService.clearAllSchedules();
+      refreshTick++;
+    } catch (error) {
+      logger.error('Failed to clear all data:', error);
+      showAppError('Failed to clear all data. Please try again.');
+    }
+  }
+
   function clearAllData(): void {
     showConfirm({
       title: 'Clear all data',
@@ -353,9 +397,8 @@
         'This action CANNOT be undone.',
       confirmLabel: 'Clear everything',
       variant: 'danger',
-      onConfirm: async () => {
-        await scheduleManagementService.clearAllSchedules();
-        refreshTick++;
+      onConfirm: () => {
+        void confirmClearAllData();
       },
     });
   }

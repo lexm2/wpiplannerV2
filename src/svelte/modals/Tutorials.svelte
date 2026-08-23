@@ -1,6 +1,8 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { logger } from '../../utils/logger';
+  import { showAppError } from '../../services/ui/uiState.svelte';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
 
   let {
@@ -21,7 +23,12 @@
           data-tutorial-id={t.id}
           onclick={() => {
             close();
-            tutorial.start(t.id);
+            // The modal is already closed by the time start() can reject, so
+            // without this a failure leaves the user looking at nothing.
+            tutorial.start(t.id).catch((error: unknown) => {
+              logger.error('Failed to start tutorial:', error);
+              showAppError('Failed to start tutorial. Please try again.');
+            });
           }}
         >
           {@html getInlineSVG('CALENDAR_REPEAT', 'modal-footer-icon')}

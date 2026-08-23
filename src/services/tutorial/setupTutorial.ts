@@ -14,6 +14,7 @@ import {
 } from '../ui/uiState.svelte';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
+import { logger } from '../../utils/logger';
 
 export interface TutorialEntry {
   id: string;
@@ -128,9 +129,16 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     if (appState.activeScheduleId !== tutorialScheduleId) {
       tutorialService.cancel();
       cleaningUp = true;
-      cleanupTutorial(true).finally(() => {
-        cleaningUp = false;
-      });
+      // cleanupTutorial has no internal try/catch and awaits both
+      // setActiveSchedule and deleteSchedule, and .finally rethrows -- so
+      // without a catch a teardown failure escapes as an unhandled rejection.
+      cleanupTutorial(true)
+        .catch((error: unknown) => {
+          logger.error('Tutorial cleanup failed:', error);
+        })
+        .finally(() => {
+          cleaningUp = false;
+        });
     }
   }
 
@@ -841,7 +849,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       schedulesStarted = true;
       tutorialService.start('schedules');
     } else {
-      cleanupTutorial(true);
+      cleanupTutorial(true).catch((error: unknown) => {
+        logger.error('Tutorial cleanup failed:', error);
+      });
     }
   });
 
