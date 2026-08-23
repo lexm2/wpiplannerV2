@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 23, 2026, 1:27 PM",
+  "generated": "Aug 23, 2026, 1:54 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -34016,7 +34016,7 @@
                 "crn": 356075,
                 "number": "B01",
                 "seats": 35,
-                "seatsAvailable": 16,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -34033,7 +34033,7 @@
                     "building": "",
                     "room": "Fuller Labs 311",
                     "seats": 35,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
@@ -35999,7 +35999,7 @@
                 "crn": 350277,
                 "number": "F01",
                 "seats": 25,
-                "seatsAvailable": 9,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -36016,7 +36016,7 @@
                     "building": "",
                     "room": "Kaven Hall 203 CARS Computer Lab",
                     "seats": 25,
-                    "seatsAvailable": 9,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
