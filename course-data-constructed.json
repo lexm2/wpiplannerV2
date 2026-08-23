@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 23, 2026, 7:24 PM",
+  "generated": "Aug 23, 2026, 7:43 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -157264,7 +157264,7 @@
                 "crn": 350414,
                 "number": "F01",
                 "seats": 35,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -157281,7 +157281,7 @@
                     "building": "",
                     "room": "Stratton Hall 201",
                     "seats": 35,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -227021,7 +227021,7 @@
                 "crn": 348966,
                 "number": "A01",
                 "seats": 50,
-                "seatsAvailable": 16,
+                "seatsAvailable": 17,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -227038,7 +227038,7 @@
                     "building": "",
                     "room": "Unknown",
                     "seats": 50,
-                    "seatsAvailable": 16,
+                    "seatsAvailable": 17,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
