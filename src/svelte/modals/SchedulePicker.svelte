@@ -160,9 +160,19 @@
   }
 
   // Schedule actions
-  function switchToSchedule(scheduleId: string): void {
+  //
+  // setActiveSchedule is async and reports failure by returning
+  // {success:false, error}, not by throwing. The previous sync try/catch could
+  // catch neither, so a switch that failed validation or hit a missing
+  // schedule did nothing visible at all.
+  async function switchToSchedule(scheduleId: string): Promise<void> {
     try {
-      scheduleManagementService.setActiveSchedule(scheduleId);
+      const result =
+        await scheduleManagementService.setActiveSchedule(scheduleId);
+      if (!result.success) {
+        logger.error('Failed to switch schedule:', result.error);
+        showAppError(result.error ?? 'Failed to switch schedule.');
+      }
     } catch (error) {
       logger.error('Failed to switch schedule:', error);
       showAppError('Failed to switch schedule. Please try again.');
@@ -460,7 +470,7 @@
                   data-schedule-id={schedule.id}
                   onclick={() => {
                     if (editingId !== schedule.id)
-                      switchToSchedule(schedule.id);
+                      void switchToSchedule(schedule.id);
                   }}
                 >
                   <div class="schedule-item-info">

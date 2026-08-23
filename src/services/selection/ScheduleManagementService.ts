@@ -351,7 +351,22 @@ export class ScheduleManagementService {
         };
       }
 
-      this.profileStateManager.deleteSchedule(scheduleId, 'api');
+      // Must be awaited: deleteSchedule awaits storage and only then
+      // reassigns activeScheduleId, so an unawaited call let save() below
+      // persist pre-delete state and returned success before the delete had
+      // landed. Its false result (e.g. refusing to remove the only remaining
+      // schedule) was being discarded too.
+      const deleted = await this.profileStateManager.deleteSchedule(
+        scheduleId,
+        'api',
+      );
+
+      if (!deleted) {
+        return {
+          success: false,
+          error: `Failed to delete schedule "${scheduleId}"`,
+        };
+      }
 
       this.profileStateManager.save();
 
