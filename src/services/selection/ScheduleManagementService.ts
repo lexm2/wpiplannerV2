@@ -9,6 +9,7 @@ import {
 } from '../../utils/icsGenerator';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
+import { MinimalSyncDataSchema } from '../../types/export';
 
 export interface ScheduleOperationResult {
   success: boolean;
@@ -470,7 +471,7 @@ export class ScheduleManagementService {
         };
       }
 
-      const parsed = JSON.parse(data);
+      const parsed = MinimalSyncDataSchema.parse(JSON.parse(data));
       const scheduleIndex = this.profileStateManager
         .getAllSchedules()
         .findIndex(s => s.id === scheduleId);
@@ -566,8 +567,10 @@ export class ScheduleManagementService {
     try {
       await this.ensureInitialized();
 
-      const data = JSON.parse(jsonData);
-      if (!data.v?.startsWith('4')) {
+      // safeParse, not parse: a malformed or older file should get the same
+      // friendly "re-export" message as a version mismatch, not a schema throw.
+      const parsed = MinimalSyncDataSchema.safeParse(JSON.parse(jsonData));
+      if (!parsed.success || !parsed.data.v.startsWith('4')) {
         return {
           success: false,
           error:

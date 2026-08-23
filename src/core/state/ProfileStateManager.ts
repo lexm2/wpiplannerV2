@@ -15,6 +15,7 @@ import { TransactionalStorageManager } from '../storage';
 import { getAllSections, logger } from '../../utils';
 import { deepClone } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
+import { MinimalSyncDataSchema } from '../../types/export';
 import { UndoRedoManager } from './UndoRedoManager';
 import { appState } from './appState.svelte';
 import { TermBoundsService } from '../../utils/termBounds';
@@ -847,7 +848,7 @@ export class ProfileStateManager {
   }
 
   parseImportCourses(data: string): SelectedCourse[] {
-    const parsed = JSON.parse(data);
+    const parsed = MinimalSyncDataSchema.parse(JSON.parse(data));
     const applicationState = ApplicationState.fromMinimalFormat(
       parsed,
       this.allDepartments,
@@ -857,7 +858,7 @@ export class ProfileStateManager {
 
   async importData(data: string): Promise<TransactionResult> {
     try {
-      const parsed = JSON.parse(data);
+      const parsed = MinimalSyncDataSchema.parse(JSON.parse(data));
       const applicationState = ApplicationState.fromMinimalFormat(
         parsed,
         this.allDepartments,

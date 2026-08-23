@@ -364,7 +364,9 @@ export class TransactionalStorageManager {
         return { data: defaultValue, valid: true };
       }
 
-      const parsed = JSON.parse(stored, this.reviver);
+      // JSON.parse returns any; T is the caller's declared expectation for
+      // this key, and a mismatch surfaces as a validation failure downstream.
+      const parsed = JSON.parse(stored, this.reviver) as T;
       return { data: parsed, valid: true };
     } catch (error) {
       logger.warn(`Failed to load ${dataType}:`, error);

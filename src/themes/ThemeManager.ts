@@ -46,7 +46,9 @@ class DefaultThemeStorage implements ThemeStorage {
   saveThemePreference(themeId: string): void {
     try {
       const raw = localStorage.getItem(this.preferencesKey);
-      const existing = raw ? JSON.parse(raw) : {};
+      const existing: Record<string, unknown> = raw
+        ? (JSON.parse(raw) as Record<string, unknown>)
+        : {};
       localStorage.setItem(
         this.preferencesKey,
         JSON.stringify({ ...existing, theme: themeId }),
@@ -55,6 +57,17 @@ class DefaultThemeStorage implements ThemeStorage {
       logger.warn('Failed to save theme preference:', error);
     }
   }
+}
+
+/**
+ * Object.entries() has no overload matching an interface without an index
+ * signature -- and interfaces, unlike type aliases, never get an implicit one --
+ * so it falls back to [string, any][] and the CSS values below arrive untyped.
+ * This recovers the value type; the assertion is exactly what Object.entries
+ * already guarantees.
+ */
+function cssEntries<T extends object>(obj: T): [string, T[keyof T]][] {
+  return Object.entries(obj) as [string, T[keyof T]][];
 }
 
 export class ThemeManager {
@@ -161,15 +174,15 @@ export class ThemeManager {
 
     const root = document.documentElement;
 
-    Object.entries(theme.colors).forEach(([key, value]) => {
+    cssEntries(theme.colors).forEach(([key, value]) => {
       root.style.setProperty(`--color-${this.kebabCase(key)}`, value);
     });
 
-    Object.entries(theme.spacing).forEach(([key, value]) => {
+    cssEntries(theme.spacing).forEach(([key, value]) => {
       root.style.setProperty(`--spacing-${this.kebabCase(key)}`, value);
     });
 
-    Object.entries(theme.effects).forEach(([key, value]) => {
+    cssEntries(theme.effects).forEach(([key, value]) => {
       root.style.setProperty(`--effect-${this.kebabCase(key)}`, value);
     });
 
@@ -233,7 +246,7 @@ export class ThemeManager {
 
   importTheme(themeJson: string): boolean {
     try {
-      const theme = JSON.parse(themeJson);
+      const theme: unknown = JSON.parse(themeJson);
       if (this.isValidTheme(theme)) {
         this.registerTheme(theme);
         return true;

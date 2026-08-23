@@ -70,7 +70,7 @@ export class TermBoundsService {
         return;
       }
 
-      const data = await response.json();
+      const data: unknown = await response.json();
       this.termBoundsCache = TermBoundsDataSchema.parse(data);
     } catch (error) {
       logger.warn(
