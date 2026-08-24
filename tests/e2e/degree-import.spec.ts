@@ -91,26 +91,6 @@ test('status filters are multi-select and collapse to All when all chosen', asyn
   await expect(cards).toHaveCount(3);
 });
 
-test('builds a schedule from the planned courses and swaps to it', async ({
-  page,
-}) => {
-  await page.goto('/');
-  await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
-
-  // The fixture has one planned (in-progress) course → the build button appears.
-  const buildBtn = page.locator('.degree-build-btn');
-  await expect(buildBtn).toContainText('planned');
-  await buildBtn.click();
-
-  // Swaps to a new active "Enrolled" schedule and lands on the schedule page.
-  await expect(page.locator('#schedule-picker-label')).toHaveText('Enrolled');
-  await expect(page.locator('#schedule-page')).toBeVisible();
-  // The planned course was added to the schedule (shown in the schedule sidebar).
-  await expect(page.locator('#schedule-sidebar-content')).toContainText('2022');
-});
-
 /**
  * Import the fixture and put a catalog course into the active schedule, chosen
  * to be absent from the transcript - courses Workday applied stay out of the rail.

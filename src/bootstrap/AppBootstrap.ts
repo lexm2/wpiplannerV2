@@ -106,7 +106,6 @@ export class AppBootstrap {
       profileStateManager,
       colorService,
       autoScheduleOrchestrator,
-      scheduleManagementService,
     } = services;
 
     componentWizardService.init(
@@ -122,11 +121,7 @@ export class AppBootstrap {
       colorService,
       autoScheduleOrchestrator,
     );
-    degreePlanService.init(
-      scheduleManagementService,
-      profileStateManager,
-      filterService,
-    );
+    degreePlanService.init(profileStateManager, filterService);
   }
 
   static initializeFilters(services: ServiceContainer): void {

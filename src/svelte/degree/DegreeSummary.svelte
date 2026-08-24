@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { StudentRecord } from '../../types/degree';
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
-  import { degreePlanService } from '../../services/degree/degreePlanService';
   import { openModal } from '../../services/ui/uiState.svelte';
   import { showConfirm } from '../modals/modalState.svelte';
 
@@ -14,33 +13,6 @@
   } = $props();
 
   let fileInput = $state<HTMLInputElement | null>(null);
-
-  const plannedCount = $derived(
-    record.courses.filter(c => c.isInProgress).length,
-  );
-
-  let building = $state(false);
-  let buildResult = $state<string | null>(null);
-  let buildUnmatched = $state<string[]>([]);
-
-  async function buildSchedule(): Promise<void> {
-    if (building || plannedCount === 0) return;
-    building = true;
-    buildResult = null;
-    buildUnmatched = [];
-    try {
-      const stats = await degreePlanService.buildFromPlan(record);
-      buildResult =
-        `Created “Enrolled” - ${stats.matched} added` +
-        ` (${stats.autoSectioned} with sections, ${stats.pinnedOnly} pinned to term).`;
-      buildUnmatched = stats.unmatched;
-    } catch (err) {
-      buildResult =
-        err instanceof Error ? err.message : 'Failed to build schedule.';
-    } finally {
-      building = false;
-    }
-  }
 
   const required = $derived(record.credits.required);
   // Overall progress = completed (earned, incl. transfer) toward the degree total.
@@ -147,27 +119,4 @@
       >
     </div>
   </div>
-
-  {#if plannedCount > 0}
-    <div class="degree-build">
-      <button
-        type="button"
-        class="btn btn-primary degree-build-btn"
-        disabled={building}
-        onclick={buildSchedule}
-      >
-        {building
-          ? 'Building…'
-          : `Build schedule from plan (${plannedCount} planned)`}
-      </button>
-      {#if buildResult}
-        <p class="degree-build-result">{buildResult}</p>
-      {/if}
-      {#if buildUnmatched.length}
-        <p class="degree-build-unmatched">
-          Not found in catalog: {buildUnmatched.join(', ')}
-        </p>
-      {/if}
-    </div>
-  {/if}
 </section>

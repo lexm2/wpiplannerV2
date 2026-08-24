@@ -250,39 +250,6 @@
   letter-spacing: 0.5px;
 }
 
-/* ---- Build schedule from plan ---- */
-.degree-build {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.degree-build-btn:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-/* result lines span the full row under the buttons */
-.degree-build-result,
-.degree-build-unmatched {
-  flex-basis: 100%;
-}
-
-.degree-build-result {
-  margin: 0.5rem 0 0;
-  font-size: 0.85rem;
-  color: var(--color-success);
-}
-
-.degree-build-unmatched {
-  margin: 0.25rem 0 0;
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-}
-
 /* ---- Progress bars ---- */
 .degree-progress {
   display: flex;

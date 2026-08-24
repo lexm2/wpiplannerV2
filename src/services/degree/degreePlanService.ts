@@ -1,10 +1,7 @@
 import { appState } from '../../core/state/appState.svelte';
 import { setPage, showAppError } from '../ui/uiState.svelte';
-import type { ScheduleManagementService } from '../selection/ScheduleManagementService';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { FilterService } from '../filtering/FilterService';
-import type { StudentRecord } from '../../types/degree';
-import { matchPlannedCourses, type PlanMatchResult } from './planMatcher';
 import { inferBucketDepartments, type DegreeBucket } from './degreeBuckets';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { findCatalogCourse } from './catalogLookup';
@@ -12,74 +9,20 @@ import { degreeState } from '../../svelte/degree/degreeState.svelte';
 import { courseListState } from '../../svelte/courseListState.svelte';
 
 /**
- * Builds a planner schedule from the planned (in-progress) courses of an
- * imported academic-progress record, then swaps to it.
- *
- * Matching is delegated to the pure matchPlannedCourses(); this service handles
- * the schedule lifecycle (create → populate → activate) via the existing
- * ScheduleManagementService. Dependencies are injected once via init(), matching
- * the other standalone scheduling services.
+ * Navigation out of the Degree page and into the planner: browsing for a bucket
+ * and opening a degree course's catalog entry. Dependencies are injected once
+ * via init(), matching the other standalone scheduling services.
  */
 class DegreePlanService {
-  private scheduleManagementService: ScheduleManagementService | null = null;
   private profileStateManager: ProfileStateManager | null = null;
   private filterService: FilterService | null = null;
 
   init(
-    scheduleManagementService: ScheduleManagementService,
     profileStateManager: ProfileStateManager,
     filterService: FilterService,
   ): void {
-    this.scheduleManagementService = scheduleManagementService;
     this.profileStateManager = profileStateManager;
     this.filterService = filterService;
-  }
-
-  /**
-   * Match the record's planned courses against the catalog, create a new
-   * "Enrolled" schedule containing them, activate it, and switch to the
-   * schedule page. Returns match stats for the UI to surface.
-   */
-  async buildFromPlan(
-    record: StudentRecord,
-  ): Promise<PlanMatchResult['stats']> {
-    if (!this.scheduleManagementService || !this.profileStateManager) {
-      throw new Error('DegreePlanService not initialized');
-    }
-
-    const { selections, year, stats } = matchPlannedCourses(
-      record,
-      appState.loadedDepartments,
-    );
-
-    const created = await this.scheduleManagementService.createNewSchedule(
-      'Enrolled',
-      {
-        autoActivate: false,
-        autoSave: false,
-      },
-    );
-    if (!created.success || !created.schedule) {
-      throw new Error(created.error ?? 'Failed to create schedule');
-    }
-    const scheduleId = created.schedule.id;
-
-    if (selections.length > 0) {
-      const update = await this.scheduleManagementService.updateSchedule(
-        scheduleId,
-        { selectedCourses: selections, year },
-        { autoSave: false },
-      );
-      if (!update.success) {
-        throw new Error(update.error ?? 'Failed to add courses to schedule');
-      }
-    }
-
-    await this.scheduleManagementService.setActiveSchedule(scheduleId);
-    this.profileStateManager.save();
-    setPage('schedule');
-
-    return stats;
   }
 
   /**
