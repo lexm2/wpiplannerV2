@@ -1544,46 +1544,60 @@ html.is-mobile .changelog-modal-body {
 .course-finder-body {
   flex-direction: column;
   align-items: stretch;
-  gap: 1.25rem;
+  /* No gap and no top padding: a sticky heading pins to the padding box and its
+     background only covers its own box, so any space owned by the container
+     rather than by the heading is a strip a row shows through while it scrolls
+     underneath. All of the group spacing therefore lives in the heading's
+     padding-top and the row grid's padding-top. */
+  gap: 0;
   overflow-y: auto;
   min-height: 0;
-  /* No top padding: a sticky heading pins to the padding box, so rows scrolling
-     through the padding would show above it. The headings carry the spacing
-     instead (see the padding/margin pair below). */
   padding-top: 0;
 }
 
-/* padding-top + equal negative margin-top: the heading keeps its visual spacing
-   while its background covers the sliver a row would otherwise show through as
-   it scrolls underneath. */
+/* Sticky group headings, on the same idiom as .degree-rail-head: the band
+   paints the dialog's own surface, so a pinned heading occludes the rows
+   sliding under it rather than reading as a stripe of some other colour.
+   --color-surface-elevated cannot: it is lighter than the surface in wpi-dark
+   and darker than it in wpi-classic, so a band drawn in it is a bright slab in
+   one theme and a near-black one (under dark secondary text) in another.
+   Spacing is padding, never margin, for the reason given above. */
 .course-finder-group-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin: -1rem 0 0.5rem;
-  padding-top: 1rem;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1rem 0 0.5rem;
   font-size: 0.7rem;
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-secondary);
-  position: sticky;
-  top: 0;
-  background: var(--color-surface-elevated);
-  padding-bottom: 0.25rem;
-  z-index: 1;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
+/* Same count-pill as .degree-rail-count, and for the same reason: a bare
+   dimmed number beside uppercase tracked text reads as part of the label. */
 .course-finder-group-count {
   font-variant-numeric: tabular-nums;
-  opacity: 0.7;
+  letter-spacing: normal;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
 }
 
 /* The width the modal exists for: short rows tiled, not stacked. */
+/* padding, not margin, so the gap under a pinned heading belongs to the grid
+   and rows slide through it instead of surfacing above the heading's rule. */
 .course-finder-rows {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
   gap: 0.5rem;
+  padding-top: 0.6rem;
 }
 
 .course-finder-row {
