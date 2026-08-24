@@ -82,15 +82,43 @@ export interface StudentRecord {
 export const DEGREE_SCHEMA_VERSION = 1 as const;
 
 /**
- * The user's course placements.
+ * A bucket the user created by hand. `coursesRemaining` mirrors the field name
+ * on Requirement so effectiveProgress() covers both kinds without a shim.
+ */
+export interface CustomBucket {
+  id: string; // `custom:<n>`
+  name: string;
+  creditsRequired: number | null;
+  coursesRemaining: number | null;
+  /** Departments whose courses fill this bucket; [] = no restriction. */
+  departments: string[];
+}
+
+/** User edits layered over an imported (Workday) bucket. */
+export interface BucketOverride {
+  name?: string;
+  creditsRequired?: number | null;
+  coursesRemaining?: number | null;
+}
+
+/**
+ * The user's bucket layout and course placements.
  *
  * Persisted separately from StudentRecord so a re-import replaces the
- * transcript without discarding the courses you placed. `assignments` keys on
- * the catalog course id, which is stable across reloads and independent of
- * which bucket a course sits in.
+ * transcript without discarding the buckets you built or the courses you
+ * placed; deleting an imported bucket is recorded in `hidden` rather than by
+ * mutating the record. `assignments` keys on the catalog course id, which is
+ * stable across reloads and independent of which bucket a course sits in.
  */
 export interface DegreeBucketConfig {
   schemaVersion: 1;
+  custom: CustomBucket[];
+  /** Bucket id -> edits. */
+  overrides: Record<string, BucketOverride>;
+  /** Ids of imported buckets the user deleted. */
+  hidden: string[];
+  /** Display order of bucket ids; ids absent from it render last. */
+  order: string[];
   /** Catalog course id -> bucket id. */
   assignments: Record<string, string>;
 }
@@ -102,5 +130,9 @@ export const importedBucketId = (rawName: string): string => `req:${rawName}`;
 
 export const EMPTY_BUCKET_CONFIG: DegreeBucketConfig = {
   schemaVersion: DEGREE_BUCKET_CONFIG_VERSION,
+  custom: [],
+  overrides: {},
+  hidden: [],
+  order: [],
   assignments: {},
 };

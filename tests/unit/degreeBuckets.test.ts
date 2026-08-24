@@ -137,8 +137,81 @@ describe('buildBuckets', () => {
     expect(buckets[0].source).toBe('import');
   });
 
-  it('returns nothing when there is no record', () => {
-    expect(buildBuckets(null, config())).toEqual([]);
+  it('returns only custom buckets when there is no record', () => {
+    const buckets = buildBuckets(
+      null,
+      config({
+        custom: [
+          {
+            id: 'custom:1',
+            name: 'Robotics minor',
+            creditsRequired: 9,
+            coursesRemaining: null,
+            departments: ['RBE'],
+          },
+        ],
+      }),
+    );
+    expect(bucketNames(buckets)).toEqual(['Robotics minor']);
+    expect(buckets[0].source).toBe('custom');
+  });
+
+  it('merges custom buckets after the imported ones', () => {
+    const buckets = buildBuckets(
+      rec,
+      config({
+        custom: [
+          {
+            id: 'custom:1',
+            name: 'Robotics minor',
+            creditsRequired: 9,
+            coursesRemaining: null,
+            departments: [],
+          },
+        ],
+      }),
+    );
+    expect(bucketNames(buckets)).toEqual([
+      'CS Core',
+      'Humanities & Arts',
+      'Robotics minor',
+    ]);
+  });
+
+  it('hides a deleted imported bucket without touching the record', () => {
+    const buckets = buildBuckets(rec, config({ hidden: ['req:CS Core'] }));
+    expect(bucketNames(buckets)).toEqual(['Humanities & Arts']);
+    expect(rec.requirements).toHaveLength(3);
+  });
+
+  it('applies name and target overrides', () => {
+    const buckets = buildBuckets(
+      rec,
+      config({
+        overrides: {
+          'req:CS Core': { name: 'Major core', creditsRequired: 18 },
+        },
+      }),
+    );
+    expect(buckets[0].name).toBe('Major core');
+    expect(buckets[0].creditsRequired).toBe(18);
+  });
+
+  it('respects the configured order', () => {
+    const buckets = buildBuckets(
+      rec,
+      config({ order: ['req:Humanities & Arts', 'req:CS Core'] }),
+    );
+    expect(bucketNames(buckets)).toEqual(['Humanities & Arts', 'CS Core']);
+  });
+
+  it('appends buckets missing from the order rather than dropping them', () => {
+    // A re-import that introduced a requirement the saved order predates.
+    const buckets = buildBuckets(
+      rec,
+      config({ order: ['req:Humanities & Arts'] }),
+    );
+    expect(bucketNames(buckets)).toEqual(['Humanities & Arts', 'CS Core']);
   });
 });
 
@@ -296,6 +369,24 @@ describe('inferBucketDepartments', () => {
         departments,
       ),
     ).toEqual([]);
+  });
+
+  it('uses a custom bucket’s own departments verbatim', () => {
+    const [b] = buildBuckets(
+      null,
+      config({
+        custom: [
+          {
+            id: 'custom:1',
+            name: 'Robotics minor',
+            creditsRequired: 9,
+            coursesRemaining: null,
+            departments: ['RBE', 'ME'],
+          },
+        ],
+      }),
+    );
+    expect(inferBucketDepartments(b, departments)).toEqual(['RBE', 'ME']);
   });
 });
 

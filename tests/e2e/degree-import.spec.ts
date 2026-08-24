@@ -250,6 +250,139 @@ test('drags a course from the rail onto a bucket and back again', async ({
   await expect(railCount(page)).toHaveText('1');
 });
 
+test('reorders config rows vertically, clamped to the list', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+  await page.locator('#degree-configure-buckets-btn').click();
+
+  const names = () => page.locator('.bucket-config-name').allTextContents();
+  const before = await names();
+
+  const last = page.locator('.bucket-config-row').last();
+  const handle = (await last.locator('.bucket-config-handle').boundingBox())!;
+  const list = (await page.locator('.bucket-config-list').boundingBox())!;
+
+  await page.mouse.move(
+    handle.x + handle.width / 2,
+    handle.y + handle.height / 2,
+  );
+  await page.mouse.down();
+  await page.mouse.move(handle.x + handle.width / 2, handle.y - 40, {
+    steps: 5,
+  });
+
+  // Shove the pointer far off to the side and above the list: the row must
+  // neither move horizontally nor escape its container.
+  await page.mouse.move(handle.x + 600, list.y - 400, { steps: 10 });
+  const clamped = await page.evaluate(() => {
+    const row = document.querySelector<HTMLElement>(
+      '.bucket-config-row.is-dragging',
+    )!;
+    const listEl = document.querySelector<HTMLElement>('.bucket-config-list')!;
+    const r = row.getBoundingClientRect();
+    const l = listEl.getBoundingClientRect();
+    return {
+      translateX: new DOMMatrix(getComputedStyle(row).transform).m41,
+      insideList: r.top >= Math.floor(l.top) && r.bottom <= Math.ceil(l.bottom),
+    };
+  });
+  expect(clamped.translateX).toBe(0);
+  expect(clamped.insideList).toBe(true);
+  // The rows it displaces slide aside to open the gap it drops into.
+  const shifted = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>('.bucket-config-row')]
+      .filter(r => !r.classList.contains('is-dragging'))
+      .map(r => Math.round(new DOMMatrix(getComputedStyle(r).transform).m42)),
+  );
+  expect(shifted.filter(y => y !== 0).length).toBeGreaterThan(0);
+
+  // Release inside the window - Playwright cannot deliver a pointerup outside
+  // the viewport, and it is the realistic gesture anyway.
+  await page.mouse.move(list.x + list.width / 2, list.y + 4, { steps: 6 });
+  await page.mouse.up();
+
+  // The last bucket is now first, and the order is persisted.
+  await expect
+    .poll(async () => (await names())[0])
+    .toBe(before[before.length - 1]);
+  const stored = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('wpi-planner-degree-buckets')!).order,
+  );
+  expect(stored).toHaveLength(before.length);
+});
+
+test('adds and deletes buckets from the config modal', async ({ page }) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+
+  await page.locator('#degree-configure-buckets-btn').click();
+  const rows = page.locator('.bucket-config-row');
+  await expect(rows).toHaveCount(5);
+
+  // Add a custom bucket.
+  await page.locator('#bucket-config-add-btn').click();
+  await page.locator('#new-bucket-name').fill('Robotics minor');
+  await page.locator('#bucket-config-save-btn').click();
+  await expect(rows).toHaveCount(6);
+  await expect(
+    page.locator('.bucket-config-row[data-bucket-id="custom:1"]'),
+  ).toBeVisible();
+
+  // Delete an imported bucket through the shared confirm dialog.
+  const systems = rows.filter({ hasText: 'Systems Requirement' });
+  await systems.locator('.bucket-config-action.is-danger').click();
+  await page.locator('#confirm-primary-btn').click();
+  await expect(rows).toHaveCount(5);
+  await expect(rows.filter({ hasText: 'Systems Requirement' })).toHaveCount(0);
+
+  // Both edits survive a reload, and the deleted bucket stays off the page.
+  await page.reload();
+  await page.click('#degree-tab');
+  await page.locator('.degree-summary-title').waitFor();
+  await expect(
+    page.locator('.requirement-card-name', { hasText: 'Robotics minor' }),
+  ).toBeVisible();
+  await expect(
+    page.locator('.requirement-card-name', { hasText: 'Systems Requirement' }),
+  ).toHaveCount(0);
+});
+
+test('renames an imported bucket without touching the record', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+
+  await page.locator('#degree-configure-buckets-btn').click();
+  // Anchor on the bucket id: in edit mode the row swaps its name for inputs, so
+  // a hasText filter would stop matching mid-test.
+  const core = page.locator(
+    '.bucket-config-row[data-bucket-id*="Core Requirement"]',
+  );
+  await core.locator('.bucket-config-action', { hasText: 'Edit' }).click();
+  await core.locator('input[type="text"]').fill('Major core');
+  await core.locator('.modal-btn.btn-primary').click();
+
+  await expect(
+    page.locator('.bucket-config-row').filter({ hasText: 'Major core' }),
+  ).toBeVisible();
+
+  // The rename is an override layer - the imported record keeps Workday's name.
+  const recordName = await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem('wpi-planner-degree-record')!);
+    return raw.requirements.some((r: any) => r.name === 'Core Requirement');
+  });
+  expect(recordName).toBe(true);
+});
+
 test('browses the catalog from an empty bucket slot', async ({ page }) => {
   await page.goto('/');
   await page.click('#degree-tab');

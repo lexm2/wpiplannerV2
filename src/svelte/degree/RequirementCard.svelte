@@ -60,6 +60,9 @@
       {#if bucket.scope}<span class="requirement-card-scope"
           >{bucket.scope}</span
         >{/if}
+      {#if bucket.source === 'custom'}
+        <span class="requirement-card-scope">Custom</span>
+      {/if}
     </div>
     <span class="req-status req-status-{progress.status}">{statusLabel}</span>
   </header>

@@ -24,7 +24,8 @@
 .theme-high-contrast .section-badge,
 .theme-high-contrast .requirement-card,
 .theme-high-contrast .requirement-course,
-.theme-high-contrast .degree-filter-chip {
+.theme-high-contrast .degree-filter-chip,
+.theme-high-contrast .bucket-config-row {
   border-width: 2px;
 }
 

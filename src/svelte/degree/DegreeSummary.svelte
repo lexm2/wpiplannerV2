@@ -2,6 +2,7 @@
   import type { StudentRecord } from '../../types/degree';
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
+  import { openModal } from '../../services/ui/uiState.svelte';
   import { showConfirm } from '../modals/modalState.svelte';
 
   let {
@@ -91,6 +92,12 @@
       <button
         type="button"
         class="btn btn-primary"
+        id="degree-configure-buckets-btn"
+        onclick={() => openModal('bucket-config')}>Configure buckets</button
+      >
+      <button
+        type="button"
+        class="btn btn-secondary"
         onclick={() => fileInput?.click()}>Re-import</button
       >
       <button type="button" class="btn btn-secondary" onclick={clearRecord}

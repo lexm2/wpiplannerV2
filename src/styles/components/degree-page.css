@@ -792,6 +792,146 @@
   color: var(--color-text-secondary);
 }
 
+/* ---- Bucket config modal ---- */
+
+/* The shared .modal-body is a row flexbox for the confirm dialog's icon + text;
+   this modal stacks instead, and needs more width for full requirement names. */
+.bucket-config-dialog {
+  max-width: 640px;
+}
+
+.bucket-config-dialog .modal-body {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.bucket-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bucket-config-list {
+  position: relative;
+}
+
+.bucket-config-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-background-alt);
+  /* Displaced rows slide aside to open the gap the dragged row drops into. */
+  transition: transform 0.16s ease;
+}
+
+/* The dragged row tracks the pointer exactly, or it lags behind. */
+.bucket-config-row.is-dragging {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bucket-config-row {
+    transition: none;
+  }
+}
+
+/* The row being dragged: lifted, and moving only on Y (the action clamps it to
+   the list, so it can never leave the box). */
+.bucket-config-row.is-dragging {
+  position: relative;
+  z-index: 5;
+  cursor: grabbing;
+  border-color: var(--color-primary);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--effect-shadow-large);
+}
+
+.bucket-config-handle {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  cursor: grab;
+  user-select: none;
+  /* the handle owns the gesture, so the browser must not scroll from it */
+  touch-action: none;
+  padding: 0 0.25rem;
+}
+
+.bucket-config-handle:active {
+  cursor: grabbing;
+}
+
+.bucket-config-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bucket-config-target {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bucket-config-action {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  transition: var(--effect-transition);
+}
+
+.bucket-config-action:hover,
+.bucket-config-action:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+}
+
+.bucket-config-action.is-danger:hover,
+.bucket-config-action.is-danger:focus-visible {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.bucket-config-edit {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.bucket-config-add {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-background-alt);
+}
+
+.bucket-config-add-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bucket-config-add-btn {
+  width: 100%;
+}
+
 /* ---- Responsive ---- */
 
 /* Below the sidebar breakpoint the rail can't hold a column: stack it on top,
