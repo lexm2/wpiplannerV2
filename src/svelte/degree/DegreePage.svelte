@@ -5,11 +5,8 @@
   import DegreeSummary from './DegreeSummary.svelte';
   import RequirementList from './RequirementList.svelte';
   import UnassignedRail from './UnassignedRail.svelte';
-  import CourseFinder from './CourseFinder.svelte';
   import SidePanel from '../SidePanel.svelte';
   import { PANEL_WIDTHS } from '../panelWidths';
-  import { degreeViewState } from './degreeViewState.svelte';
-  import { slideX } from '../transitions';
 
   let { degreeImportService }: { degreeImportService: DegreeImportService } =
     $props();
@@ -19,10 +16,9 @@
 </script>
 
 {#if ready && record}
-  <!-- Independently-scrolling panes so the rail and the finder stay reachable
-       while the bucket list scrolls. Each leads in the DOM where it leads
-       visually; keeping the two orders together is what makes tab order match
-       the page. -->
+  <!-- Two independently-scrolling panes so the rail stays reachable while the
+       bucket list scrolls. The rail leads in the DOM because it leads visually;
+       keeping the two orders together is what makes tab order match the page. -->
   <div class="degree-shell">
     <!-- .degree-rail stays on the panel, not the scroller: courseDrag resolves
          the unassign target with closest('.degree-rail'), so a drop on the
@@ -45,21 +41,6 @@
         <RequirementList />
       </div>
     </div>
-    {#if degreeViewState.finderOpen}
-      <div class="degree-finder-slot" transition:slideX={{ duration: 200 }}>
-        <SidePanel
-          class="degree-finder"
-          label="Find a course"
-          config={PANEL_WIDTHS.degreeFinder}
-          edge="left"
-          resizeLabel="Resize the course finder"
-        >
-          <div class="degree-pane degree-side-scroll">
-            <CourseFinder />
-          </div>
-        </SidePanel>
-      </div>
-    {/if}
   </div>
 {:else}
   <div class="degree-pane degree-main">

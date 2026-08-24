@@ -54,25 +54,12 @@
   max-width: 880px;
 }
 
-/* ---- Side panels ----
-   Both are SidePanel shells: position/overflow/background/border come from
-   .side-panel, so only width and the inner scroller live here. The panel itself
-   must not scroll, or its resize handle would scroll away with the content. */
+/* ---- Unassigned rail ----
+   A SidePanel shell: position/overflow/background/border come from .side-panel,
+   so only width and the inner scroller live here. The panel itself must not
+   scroll, or its resize handle would scroll away with the content. */
 .degree-rail {
   width: var(--panel-degree-rail-width, 15.5rem);
-  flex-shrink: 0;
-}
-
-.degree-finder {
-  width: var(--panel-degree-finder-width, 19rem);
-  flex-shrink: 0;
-}
-
-/* Wrapper the slide transition can own, since SidePanel renders its own
-   <aside>. Its transform is harmless: a drag holds pointer capture on the
-   document, so the finder cannot be toggled mid-drag. */
-.degree-finder-slot {
-  display: flex;
   flex-shrink: 0;
 }
 
@@ -134,187 +121,6 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0 1rem;
-}
-
-/* ---- Course finder ---- */
-.degree-finder-inner {
-  padding: 0 0 2rem;
-  min-height: 100%;
-}
-
-.degree-finder-head {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.degree-finder-close {
-  margin-left: auto;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: var(--effect-border-radius);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 1.1rem;
-  line-height: 1;
-  padding: 0 0.35rem;
-}
-
-.degree-finder-close:hover,
-.degree-finder-close:focus-visible {
-  color: var(--color-danger);
-  border-color: var(--color-danger);
-  outline: none;
-}
-
-.degree-finder-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-}
-
-.degree-finder-search {
-  width: 100%;
-  padding: 0.4rem 0.6rem;
-  font-family: inherit;
-  font-size: 0.85rem;
-  color: var(--color-text);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-}
-
-.degree-finder-search:focus-visible {
-  border-color: var(--color-primary);
-  outline: none;
-}
-
-/* One button cycling the modes: the panel is narrow, and only the current mode
-   is worth the space. */
-.degree-finder-sort {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.6rem;
-  font-family: inherit;
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.degree-finder-sort:hover,
-.degree-finder-sort:focus-visible {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  outline: none;
-}
-
-.degree-finder-sort-icon {
-  margin-left: auto;
-}
-
-.degree-finder-groups {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0 1rem;
-}
-
-.degree-finder-group-head {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0 0 0.4rem;
-  font-size: 0.7rem;
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--color-text-secondary);
-  position: sticky;
-  top: 3.25rem;
-  background: var(--color-background-alt);
-  padding: 0.25rem 0;
-}
-
-.degree-finder-group-count {
-  font-variant-numeric: tabular-nums;
-  opacity: 0.7;
-}
-
-.degree-finder-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.4rem 0.5rem;
-  margin-bottom: 0.35rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--color-border);
-  border-left-width: 3px;
-  border-radius: var(--effect-border-radius);
-  background: var(--color-surface);
-}
-
-/* Same colour language as the bucket cards' left edge. */
-.degree-finder-row-completed {
-  border-left-color: var(--color-success);
-}
-.degree-finder-row-transfer {
-  border-left-color: var(--color-text-secondary);
-}
-.degree-finder-row-planned {
-  border-left-color: var(--color-warning);
-}
-.degree-finder-row-schedule {
-  border-left-color: var(--color-primary);
-}
-
-.degree-finder-row-top {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.degree-finder-row-title {
-  color: var(--color-text-secondary);
-  line-height: 1.25;
-  font-size: 0.75rem;
-}
-
-.degree-finder-row-buckets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.15rem;
-}
-
-.degree-finder-bucket {
-  font-size: 0.7rem;
-  padding: 0.1rem 0.35rem;
-  border-radius: calc(var(--effect-border-radius) / 2);
-  background: var(--color-background-alt);
-  color: var(--color-text-secondary);
-}
-
-.degree-finder-bucket.is-unplaced {
-  color: var(--color-warning);
-  background: var(--color-warning-background);
-}
-
-.degree-finder-row-actions {
-  margin-top: 0.25rem;
 }
 
 /* ---- Import / empty state ---- */
@@ -605,6 +411,17 @@
 .degree-view-group {
   display: flex;
   gap: 0.25rem;
+}
+
+.degree-search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.degree-search-icon {
+  font-size: 0.9rem;
+  line-height: 1;
 }
 
 /* Divides the card-edge statuses from the progress-bar segments in the one
@@ -1390,21 +1207,8 @@
     --req-card-min-w: 17rem;
   }
 
-  /* The finder cannot hold a column here either - stack it under the rail. */
-  .degree-finder-slot {
-    width: 100%;
-  }
-
-  .degree-finder {
-    width: 100%;
-    max-height: 45vh;
-    border-left: none;
-    border-top: 1px solid var(--color-border);
-  }
-
-  /* Stacked, the panels are full-width: there is no width left to drag. */
-  .degree-rail .resize-handle,
-  .degree-finder .resize-handle {
+  /* Stacked, the rail is full-width: there is no width left to drag. */
+  .degree-rail .resize-handle {
     display: none;
   }
 

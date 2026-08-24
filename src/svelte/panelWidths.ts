@@ -50,13 +50,6 @@ export const PANEL_WIDTHS = {
     min: 200,
     max: 420,
   },
-  degreeFinder: {
-    cssVar: '--panel-degree-finder-width',
-    storageKey: 'wpi-planner-width-degree-finder',
-    defaultWidth: 304,
-    min: 240,
-    max: 520,
-  },
 } satisfies Record<string, PanelWidthConfig>;
 
 export function clampWidth(config: PanelWidthConfig, width: number): number {

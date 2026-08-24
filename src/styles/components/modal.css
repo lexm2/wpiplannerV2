@@ -1467,3 +1467,187 @@ html.is-mobile .changelog-modal-body {
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
 }
+
+/* ---- Course finder modal ----
+   Replaces what used to be a right-hand pane on the Degree page. That pane cost
+   the bucket grid a column permanently to answer a question asked occasionally;
+   as a modal it can be far wider, and the grid keeps its width.
+
+   Wide on purpose: the rows are short, so a grid of them reads much better than
+   one long narrow list. */
+.course-finder-modal .modal-dialog {
+  max-width: 1100px;
+  width: 100%;
+}
+
+.course-finder-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 82vh;
+}
+
+/* Search and grouping live in the header, so the body is all results. */
+.course-finder-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.course-finder-header .modal-title {
+  flex-shrink: 0;
+}
+
+.course-finder-search {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.4rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+}
+
+.course-finder-search:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.course-finder-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.4rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.course-finder-sort:hover,
+.course-finder-sort:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+}
+
+.course-finder-body {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
+  overflow-y: auto;
+  min-height: 0;
+  /* No top padding: a sticky heading pins to the padding box, so rows scrolling
+     through the padding would show above it. The headings carry the spacing
+     instead (see the padding/margin pair below). */
+  padding-top: 0;
+}
+
+/* padding-top + equal negative margin-top: the heading keeps its visual spacing
+   while its background covers the sliver a row would otherwise show through as
+   it scrolls underneath. */
+.course-finder-group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -1rem 0 0.5rem;
+  padding-top: 1rem;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-elevated);
+  padding-bottom: 0.25rem;
+  z-index: 1;
+}
+
+.course-finder-group-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+/* The width the modal exists for: short rows tiled, not stacked. */
+.course-finder-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.5rem;
+}
+
+.course-finder-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-left-width: 3px;
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+}
+
+/* Same colour language as the bucket cards' left edge. */
+.course-finder-row-completed {
+  border-left-color: var(--color-success);
+}
+.course-finder-row-transfer {
+  border-left-color: var(--color-text-secondary);
+}
+.course-finder-row-planned {
+  border-left-color: var(--color-warning);
+}
+.course-finder-row-schedule {
+  border-left-color: var(--color-primary);
+}
+
+.course-finder-row-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.course-finder-row-title {
+  color: var(--color-text-secondary);
+  line-height: 1.25;
+  font-size: 0.8rem;
+}
+
+.course-finder-row-buckets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+
+.course-finder-bucket {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: calc(var(--effect-border-radius) / 2);
+  background: var(--color-background-alt);
+  color: var(--color-text-secondary);
+}
+
+.course-finder-bucket.is-unplaced {
+  color: var(--color-warning);
+  background: var(--color-warning-background);
+}
+
+.course-finder-row-actions {
+  margin-top: 0.3rem;
+}
+
+html.is-mobile .course-finder-modal .modal-dialog {
+  max-width: 100%;
+}

@@ -1,6 +1,6 @@
 /**
- * Degree page view preferences: which bucket layout is showing, whether the
- * course finder is open, and how the finder groups its list.
+ * Degree page view preferences: which bucket layout is showing, and how the
+ * course finder modal groups its list.
  *
  * These are presentation choices, not data, so they live apart from
  * degreeState's record/config and persist under their own key. Kept out of
@@ -18,13 +18,11 @@ type BucketView = 'grid' | 'full';
 
 interface DegreeViewPrefs {
   bucketView: BucketView;
-  finderOpen: boolean;
   courseSort: CourseSort;
 }
 
 const DEFAULTS: DegreeViewPrefs = {
   bucketView: 'grid',
-  finderOpen: false,
   courseSort: 'source',
 };
 
@@ -35,7 +33,6 @@ function load(): DegreeViewPrefs {
     const parsed = JSON.parse(raw) as Partial<DegreeViewPrefs>;
     return {
       bucketView: parsed.bucketView === 'full' ? 'full' : 'grid',
-      finderOpen: parsed.finderOpen === true,
       courseSort: COURSE_SORTS.some(s => s.key === parsed.courseSort)
         ? (parsed.courseSort as CourseSort)
         : DEFAULTS.courseSort,
@@ -50,7 +47,6 @@ class DegreeViewState {
   #initial = load();
 
   bucketView = $state<BucketView>(this.#initial.bucketView);
-  finderOpen = $state(this.#initial.finderOpen);
   courseSort = $state<CourseSort>(this.#initial.courseSort);
 
   #persist(): void {
@@ -59,7 +55,6 @@ class DegreeViewState {
         STORAGE_KEYS.DEGREE_VIEW,
         JSON.stringify({
           bucketView: this.bucketView,
-          finderOpen: this.finderOpen,
           courseSort: this.courseSort,
         }),
       );
@@ -70,11 +65,6 @@ class DegreeViewState {
 
   setBucketView(view: BucketView): void {
     this.bucketView = view;
-    this.#persist();
-  }
-
-  toggleFinder(): void {
-    this.finderOpen = !this.finderOpen;
     this.#persist();
   }
 

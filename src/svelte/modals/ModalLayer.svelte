@@ -11,6 +11,7 @@
   import SchedulePicker from './SchedulePicker.svelte';
   import FilterModal from './FilterModal.svelte';
   import BucketConfig from './BucketConfig.svelte';
+  import CourseFinderModal from './CourseFinderModal.svelte';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { FilterService } from '../../services/filtering/FilterService';
@@ -84,6 +85,8 @@
     />
   {:else if id === 'bucket-config'}
     <BucketConfig onRequestClose={() => closeModal('bucket-config')} />
+  {:else if id === 'course-finder'}
+    <CourseFinderModal onRequestClose={() => closeModal('course-finder')} />
   {:else if id === 'filter-modal'}
     <FilterModal
       typeId="filter-modal"

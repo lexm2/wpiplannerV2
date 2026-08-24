@@ -387,13 +387,13 @@ test('keeps a placed course visible in an already-satisfied bucket', async ({
 test('finds a course and names the bucket it is in', async ({ page }) => {
   await setupWithScheduleCourse(page);
 
-  await page.locator('#degree-finder-toggle').click();
-  const finder = page.locator('.degree-finder');
+  await page.locator('#degree-course-search').click();
+  const finder = page.locator('.course-finder-modal');
   await expect(finder).toBeVisible();
 
   // Unplaced to begin with, and the finder says so.
-  const row = finder.locator('.degree-finder-row', { hasText: 'CS 1004' });
-  await expect(row.locator('.degree-finder-bucket')).toHaveText(
+  const row = finder.locator('.course-finder-row', { hasText: 'CS 1004' });
+  await expect(row.locator('.course-finder-bucket')).toHaveText(
     'Not in a bucket',
   );
 
@@ -401,32 +401,36 @@ test('finds a course and names the bucket it is in', async ({ page }) => {
   await page
     .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
     .click();
-  await expect(row.locator('.degree-finder-bucket')).toHaveText(
+  await expect(row.locator('.course-finder-bucket')).toHaveText(
     'Core Requirement',
   );
 
   // Search narrows to the one course, by code.
-  await page.locator('#degree-finder-search').fill('CS 1004');
-  await expect(finder.locator('.degree-finder-row')).toHaveCount(1);
+  await page.locator('#course-finder-search').fill('CS 1004');
+  await expect(finder.locator('.course-finder-row')).toHaveCount(1);
 
   // ...and by the name of the bucket holding it.
-  await page.locator('#degree-finder-search').fill('core requirement');
+  await page.locator('#course-finder-search').fill('core requirement');
   await expect(
-    finder.locator('.degree-finder-row', { hasText: 'CS 1004' }),
+    finder.locator('.course-finder-row', { hasText: 'CS 1004' }),
   ).toBeVisible();
 
-  await page.locator('#degree-finder-search').fill('nothing matches this');
-  await expect(finder.locator('.degree-finder-row')).toHaveCount(0);
+  await page.locator('#course-finder-search').fill('nothing matches this');
+  await expect(finder.locator('.course-finder-row')).toHaveCount(0);
   await expect(finder.locator('.empty-state')).toBeVisible();
+
+  // Escape closes it, handing the width back to the bucket grid.
+  await page.keyboard.press('Escape');
+  await expect(finder).toHaveCount(0);
 });
 
 test('cycles the finder through its grouping modes', async ({ page }) => {
   await setupWithScheduleCourse(page);
-  await page.locator('#degree-finder-toggle').click();
+  await page.locator('#degree-course-search').click();
 
-  const label = page.locator('.degree-finder-sort-label');
-  const sortButton = page.locator('#degree-finder-sort');
-  const headings = page.locator('.degree-finder-group-head');
+  const label = page.locator('.course-finder-sort-label');
+  const sortButton = page.locator('#course-finder-sort');
+  const headings = page.locator('.course-finder-group-head');
 
   await expect(label).toHaveText('By source');
   await expect(headings.first()).toContainText('In your schedule');
@@ -480,19 +484,18 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
 });
 
 /**
- * The rail and the finder are SidePanels, like the sidebars on the other pages.
- * The shell must not be the scrolling element: ResizeHandle is positioned
- * against it and measures it, so a scrolling panel would carry its own handle
- * out of view and report the wrong width.
+ * The rail is a SidePanel, like the sidebars on the other pages. The shell must
+ * not be the scrolling element: ResizeHandle is positioned against it and
+ * measures it, so a scrolling panel would carry its own handle out of view and
+ * report the wrong width.
  */
-test('resizes the degree side panels and remembers the widths', async ({
+test('resizes the unassigned rail and remembers the width', async ({
   page,
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
   await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
-  await page.locator('#degree-finder-toggle').click();
 
   const shape = await page.evaluate(() => {
     const rail = document.querySelector('.degree-rail')!;
