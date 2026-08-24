@@ -4,6 +4,7 @@
   import { modalState, showConfirm } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { triggerFileDownload } from '../../utils/download';
   import { logger } from '../../utils/logger';
   import { ThemeManager } from '../../themes/ThemeManager';
   import { openModal, showAppError } from '../../services/ui/uiState.svelte';
@@ -264,21 +265,6 @@
         void confirmCreate(name);
       },
     });
-  }
-
-  let downloadLink = $state<HTMLAnchorElement | null>(null);
-
-  function triggerFileDownload(
-    data: string,
-    filename: string,
-    mimeType: string,
-  ): void {
-    if (!downloadLink) return;
-    const url = URL.createObjectURL(new Blob([data], { type: mimeType }));
-    downloadLink.href = url;
-    downloadLink.download = filename;
-    downloadLink.click();
-    URL.revokeObjectURL(url);
   }
 
   async function exportSchedule(scheduleId: string): Promise<void> {
@@ -747,7 +733,7 @@
       </div>
     </div>
 
-    <!-- Hidden but real file IO elements, following DegreeImport's pattern. -->
+    <!-- Hidden but real file input, following DegreeImport's pattern. -->
     <input
       bind:this={fileInput}
       type="file"
@@ -755,7 +741,5 @@
       hidden
       onchange={onFileChosen}
     />
-    <!-- svelte-ignore a11y_missing_attribute (programmatic download target, never focused) -->
-    <a bind:this={downloadLink} hidden aria-hidden="true"></a>
   {/snippet}
 </Modal>

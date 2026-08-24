@@ -19,6 +19,17 @@ export interface AppError {
   message: string;
   /** When set, the banner offers "Clear Data & Reload", which awaits this then reloads. */
   onClearData?: () => Promise<void>;
+  /**
+   * When set, the banner offers "Export Data" so a backup can be downloaded
+   * before the clear destroys it. Shaped as
+   * ScheduleManagementService.exportAllSchedules' result so the one caller can
+   * pass that method straight through.
+   */
+  onExportData?: () => Promise<{
+    success: boolean;
+    data?: string;
+    error?: string;
+  }>;
 }
 
 class UiState {
@@ -62,8 +73,9 @@ export function closeAllModals(): void {
 export function showAppError(
   message: string,
   onClearData?: () => Promise<void>,
+  onExportData?: AppError['onExportData'],
 ): void {
-  uiState.appError = { message, onClearData };
+  uiState.appError = { message, onClearData, onExportData };
 }
 
 /** Snapshot for the tutorial (fresh objects/arrays - safe to store as-is). */
