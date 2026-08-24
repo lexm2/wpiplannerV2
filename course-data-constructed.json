@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 24, 2026, 7:53 AM",
+  "generated": "Aug 24, 2026, 8:41 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -157065,7 +157065,7 @@
                 "crn": 350201,
                 "number": "F01",
                 "seats": 30,
-                "seatsAvailable": 22,
+                "seatsAvailable": 23,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -157082,7 +157082,7 @@
                     "building": "",
                     "room": "Stratton Hall 313",
                     "seats": 30,
-                    "seatsAvailable": 22,
+                    "seatsAvailable": 23,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "F01",
@@ -174827,7 +174827,7 @@
                 "crn": 357458,
                 "number": "A01",
                 "seats": 25,
-                "seatsAvailable": 3,
+                "seatsAvailable": 2,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -174844,7 +174844,7 @@
                     "building": "",
                     "room": "Alden Hall B30 Music Technology Lab",
                     "seats": 25,
-                    "seatsAvailable": 3,
+                    "seatsAvailable": 2,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
