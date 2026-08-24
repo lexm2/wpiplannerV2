@@ -6292,7 +6292,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "A Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "6/20",
+      "Waitlist_Waitlist_Capacity": "5/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-348574"
     },
     {
@@ -15446,7 +15446,7 @@
       "Course_Title": "CE 501 - Professional Practice",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "6/24",
+      "Enrolled_Capacity": "7/24",
       "Instructional_Format": "Lecture",
       "Instructors": "Jessica Rosewitz",
       "Locations": "Kaven Hall 116",
@@ -44286,7 +44286,7 @@
       "Course_Title": "FIN 500 - Financial Management",
       "Credits": "3",
       "Delivery_Mode": "Online",
-      "Enrolled_Capacity": "39/60",
+      "Enrolled_Capacity": "40/60",
       "Instructional_Format": "Lecture",
       "Instructors": "David Dwumah",
       "Locations": "Online-asynchronous",
