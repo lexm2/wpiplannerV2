@@ -41,7 +41,7 @@
   import AutoScheduleControls from './AutoScheduleControls.svelte';
   import ScheduleGrids from './schedule/ScheduleGrids.svelte';
   import DegreePage from './degree/DegreePage.svelte';
-  import ResizeHandle from './ResizeHandle.svelte';
+  import SidePanel from './SidePanel.svelte';
   import ErrorBanner from './ErrorBanner.svelte';
   import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
   import { logger } from '../utils/logger';
@@ -190,16 +190,17 @@
   id="planner-page"
   style:display={currentPage === 'planner' ? 'grid' : 'none'}
 >
-  <aside class="sidebar" aria-label="Department navigation">
+  <SidePanel
+    class="sidebar"
+    label="Department navigation"
+    config={PANEL_WIDTHS.sidebar}
+    edge="right"
+    resizeLabel="Resize department sidebar"
+  >
     <div class="department-categories" id="department-list">
       <DepartmentSidebar filterService={services.filterService} />
     </div>
-    <ResizeHandle
-      config={PANEL_WIDTHS.sidebar}
-      edge="right"
-      label="Resize department sidebar"
-    />
-  </aside>
+  </SidePanel>
 
   <main class="main-content">
     <div class="content-header">
@@ -227,12 +228,13 @@
     </div>
   </main>
 
-  <aside class="right-panel" aria-label="Course details and selection">
-    <ResizeHandle
-      config={PANEL_WIDTHS.rightPanel}
-      edge="left"
-      label="Resize course details panel"
-    />
+  <SidePanel
+    class="right-panel"
+    label="Course details and selection"
+    config={PANEL_WIDTHS.rightPanel}
+    edge="left"
+    resizeLabel="Resize course details panel"
+  >
     <section class="selected-courses-section">
       <SelectedCoursesPanel
         courseSelectionService={services.courseSelectionService}
@@ -243,7 +245,7 @@
         <CourseDescription courseDataService={services.courseDataService} />
       </div>
     </section>
-  </aside>
+  </SidePanel>
 </div>
 
 <div
@@ -252,7 +254,13 @@
   style:display={currentPage === 'schedule' ? 'flex' : 'none'}
 >
   <div class="schedule-page-layout">
-    <aside class="schedule-sidebar">
+    <SidePanel
+      class="schedule-sidebar"
+      label="Schedule courses"
+      config={PANEL_WIDTHS.scheduleSidebar}
+      edge="right"
+      resizeLabel="Resize schedule sidebar"
+    >
       <div class="schedule-sidebar-header">
         <div class="schedule-filter-controls">
           <div
@@ -295,12 +303,7 @@
           onOpenAutoSchedule={() => autoScheduleService.openAutoSchedule()}
         />
       </div>
-      <ResizeHandle
-        config={PANEL_WIDTHS.scheduleSidebar}
-        edge="right"
-        label="Resize schedule sidebar"
-      />
-    </aside>
+    </SidePanel>
 
     <main class="schedule-main">
       <ScheduleGrids

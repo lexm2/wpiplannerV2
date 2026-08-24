@@ -457,8 +457,13 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
 
   const list = page.locator('.degree-card-list');
   await expect(list).not.toHaveClass(/is-full/);
-  // Grid bounds each card, so an overflowing bucket hides courses behind a toggle.
-  await expect(page.locator('.requirement-card-toggle').first()).toBeVisible();
+  // Grid bounds each card, so the satisfied bucket keeps its course behind a
+  // toggle. Anchored on that bucket rather than "some card somewhere": an
+  // unanchored .first() would burn the whole timeout to say nothing useful.
+  const systems = page.locator('[data-bucket-id*="Systems Requirement"]');
+  await expect(systems.locator('.requirement-card-toggle')).toHaveText(
+    /complete$/,
+  );
 
   await page.locator('#degree-view-full').click();
   await expect(list).toHaveClass(/is-full/);
@@ -472,6 +477,61 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
 
   await page.locator('#degree-view-grid').click();
   await expect(page.locator('.degree-card-list')).not.toHaveClass(/is-full/);
+});
+
+/**
+ * The rail and the finder are SidePanels, like the sidebars on the other pages.
+ * The shell must not be the scrolling element: ResizeHandle is positioned
+ * against it and measures it, so a scrolling panel would carry its own handle
+ * out of view and report the wrong width.
+ */
+test('resizes the degree side panels and remembers the widths', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+  await page.locator('#degree-finder-toggle').click();
+
+  const shape = await page.evaluate(() => {
+    const rail = document.querySelector('.degree-rail')!;
+    return {
+      isPanel: rail.classList.contains('side-panel'),
+      overflowY: getComputedStyle(rail).overflowY,
+      position: getComputedStyle(rail).position,
+      handles: rail.querySelectorAll('.resize-handle').length,
+      // the scroller is a child, and is the element dragAutoScroll looks for
+      innerScrollers: rail.querySelectorAll('.degree-pane').length,
+    };
+  });
+  expect(shape).toEqual({
+    isPanel: true,
+    overflowY: 'hidden',
+    position: 'relative',
+    handles: 1,
+    innerScrollers: 1,
+  });
+
+  // Drag the seam right; the handle straddles the border, so aim just inside it.
+  const widthOf = (selector: string) =>
+    page.evaluate(
+      sel =>
+        Math.round(document.querySelector(sel)!.getBoundingClientRect().width),
+      selector,
+    );
+  const before = await widthOf('.degree-rail');
+  await page.mouse.move(before - 3, 300);
+  await page.mouse.down();
+  await page.mouse.move(before + 77, 300, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(() => widthOf('.degree-rail')).toBe(before + 80);
+
+  // Restored before first paint on the next load.
+  await page.reload();
+  await page.click('#degree-tab');
+  await page.locator('.degree-summary-title').waitFor();
+  expect(await widthOf('.degree-rail')).toBe(before + 80);
 });
 
 test('reorders config rows vertically, clamped to the list', async ({

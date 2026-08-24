@@ -1,10 +1,6 @@
-/* Sidebar */
-.sidebar {
-  position: relative;
-  background: var(--color-background-alt);
-  border-right: 1px solid var(--color-border);
-  overflow: hidden;
-}
+/* Department sidebar. The shell (position/overflow/background/border) comes
+   from .side-panel, and the width from .app-body's grid template, so the panel
+   element itself needs no rule of its own - only its contents do. */
 
 .department-categories {
   height: 100%;

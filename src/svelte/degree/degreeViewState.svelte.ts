@@ -14,7 +14,7 @@ import type { CourseSort } from '../../services/degree/courseIndex';
 import { COURSE_SORTS, nextSort } from '../../services/degree/courseIndex';
 
 /** `grid` = bounded cards, many per row. `full` = one bucket per row, all of it. */
-export type BucketView = 'grid' | 'full';
+type BucketView = 'grid' | 'full';
 
 interface DegreeViewPrefs {
   bucketView: BucketView;

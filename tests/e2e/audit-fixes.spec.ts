@@ -89,6 +89,39 @@ test('a stored drag width still wins over the default', async ({ page }) => {
   expect(w).toBe(500);
 });
 
+/**
+ * The one rule SidePanel exists to hold, checked on every panel the app renders:
+ * a resizable panel is positioned, does not scroll itself, and carries exactly
+ * one handle. A panel that scrolls drags its own handle out of view.
+ */
+test('every side panel keeps its handle out of the scrolling element', async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem('wpi_visited', '1'));
+  await page.goto('/');
+  await page.locator('.side-panel').first().waitFor();
+
+  for (const pageId of ['planner', 'schedule']) {
+    await page.click(`#${pageId}-tab`);
+    const panels = await page.evaluate(pid => {
+      const host = document.getElementById(`${pid}-page`)!;
+      return [...host.querySelectorAll('.side-panel')].map(el => ({
+        cls: el.className,
+        overflowY: getComputedStyle(el).overflowY,
+        position: getComputedStyle(el).position,
+        handles: el.querySelectorAll('.resize-handle').length,
+      }));
+    }, pageId);
+
+    expect(panels.length).toBeGreaterThan(0);
+    for (const panel of panels) {
+      expect(panel.position, panel.cls).toBe('relative');
+      expect(panel.overflowY, panel.cls).toBe('hidden');
+      expect(panel.handles, panel.cls).toBe(1);
+    }
+  }
+});
+
 test('saved theme is applied at first paint, with no dark flash', async ({
   page,
 }) => {

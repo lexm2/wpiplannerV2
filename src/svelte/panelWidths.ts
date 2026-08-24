@@ -1,10 +1,13 @@
 /**
  * Resizable side-panel configuration.
  *
- * Each panel's width is driven by a CSS custom property read by the grid
- * layouts (see layout.css / schedule-page.css). A ResizeHandle drags the
+ * Each panel's width is driven by a CSS custom property, read either by a grid
+ * template (layout.css / schedule-page.css) or by the panel's own `width` rule
+ * (degree-page.css). SidePanel.svelte mounts the ResizeHandle that drags the
  * variable live and persists the result; applyStoredPanelWidths() restores
  * saved widths on startup (before first paint) to avoid a layout flash.
+ *
+ * Adding an entry here is all a new panel needs for its width to be restored.
  */
 export interface PanelWidthConfig {
   /** CSS custom property the grid template reads (set on :root). */
@@ -39,6 +42,20 @@ export const PANEL_WIDTHS = {
     defaultWidth: 400,
     min: 280,
     max: 680,
+  },
+  degreeRail: {
+    cssVar: '--panel-degree-rail-width',
+    storageKey: 'wpi-planner-width-degree-rail',
+    defaultWidth: 248,
+    min: 200,
+    max: 420,
+  },
+  degreeFinder: {
+    cssVar: '--panel-degree-finder-width',
+    storageKey: 'wpi-planner-width-degree-finder',
+    defaultWidth: 304,
+    min: 240,
+    max: 520,
   },
 } satisfies Record<string, PanelWidthConfig>;
 

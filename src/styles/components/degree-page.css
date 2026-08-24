@@ -54,14 +54,32 @@
   max-width: 880px;
 }
 
-/* ---- Unassigned rail ---- */
-/* Degree-local, not the shared --spacing-schedule-sidebar-width: the schedule
-   page uses that token too, and the rail holds one narrow column of tiles. */
+/* ---- Side panels ----
+   Both are SidePanel shells: position/overflow/background/border come from
+   .side-panel, so only width and the inner scroller live here. The panel itself
+   must not scroll, or its resize handle would scroll away with the content. */
 .degree-rail {
-  width: var(--degree-rail-width, 15.5rem);
+  width: var(--panel-degree-rail-width, 15.5rem);
   flex-shrink: 0;
-  border-right: 1px solid var(--color-border);
-  background: var(--color-background-alt);
+}
+
+.degree-finder {
+  width: var(--panel-degree-finder-width, 19rem);
+  flex-shrink: 0;
+}
+
+/* Wrapper the slide transition can own, since SidePanel renders its own
+   <aside>. Its transform is harmless: a drag holds pointer capture on the
+   document, so the finder cannot be toggled mid-drag. */
+.degree-finder-slot {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* The scrolling child of a degree side panel. .degree-pane alongside it is what
+   dragAutoScroll edge-scrolls. */
+.degree-side-scroll {
+  height: 100%;
 }
 
 .degree-rail-inner {
@@ -118,14 +136,7 @@
   padding: 0 1rem;
 }
 
-/* ---- Course finder (right pane) ---- */
-.degree-finder {
-  width: var(--degree-finder-width, 19rem);
-  flex-shrink: 0;
-  border-left: 1px solid var(--color-border);
-  background: var(--color-background-alt);
-}
-
+/* ---- Course finder ---- */
 .degree-finder-inner {
   padding: 0 0 2rem;
   min-height: 100%;
@@ -1380,11 +1391,21 @@
   }
 
   /* The finder cannot hold a column here either - stack it under the rail. */
+  .degree-finder-slot {
+    width: 100%;
+  }
+
   .degree-finder {
     width: 100%;
     max-height: 45vh;
     border-left: none;
     border-top: 1px solid var(--color-border);
+  }
+
+  /* Stacked, the panels are full-width: there is no width left to drag. */
+  .degree-rail .resize-handle,
+  .degree-finder .resize-handle {
+    display: none;
   }
 
   .degree-rail {

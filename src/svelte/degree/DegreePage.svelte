@@ -6,6 +6,8 @@
   import RequirementList from './RequirementList.svelte';
   import UnassignedRail from './UnassignedRail.svelte';
   import CourseFinder from './CourseFinder.svelte';
+  import SidePanel from '../SidePanel.svelte';
+  import { PANEL_WIDTHS } from '../panelWidths';
   import { degreeViewState } from './degreeViewState.svelte';
   import { slideX } from '../transitions';
 
@@ -17,13 +19,26 @@
 </script>
 
 {#if ready && record}
-  <!-- Two independently-scrolling panes so the rail stays reachable while the
-       bucket list scrolls. The rail leads in the DOM because it leads visually;
-       keeping the two orders together is what makes tab order match the page. -->
+  <!-- Independently-scrolling panes so the rail and the finder stay reachable
+       while the bucket list scrolls. Each leads in the DOM where it leads
+       visually; keeping the two orders together is what makes tab order match
+       the page. -->
   <div class="degree-shell">
-    <aside class="degree-pane degree-rail" aria-label="Unassigned courses">
-      <UnassignedRail />
-    </aside>
+    <!-- .degree-rail stays on the panel, not the scroller: courseDrag resolves
+         the unassign target with closest('.degree-rail'), so a drop on the
+         resize seam still counts as a drop on the rail. .degree-pane goes on
+         the scroller inside, which is what dragAutoScroll edge-scrolls. -->
+    <SidePanel
+      class="degree-rail"
+      label="Unassigned courses"
+      config={PANEL_WIDTHS.degreeRail}
+      edge="right"
+      resizeLabel="Resize the unassigned rail"
+    >
+      <div class="degree-pane degree-side-scroll">
+        <UnassignedRail />
+      </div>
+    </SidePanel>
     <div class="degree-pane degree-main">
       <div class="degree-content">
         <DegreeSummary {record} {degreeImportService} />
@@ -31,15 +46,19 @@
       </div>
     </div>
     {#if degreeViewState.finderOpen}
-      <!-- A third .degree-pane, which is what dragAutoScroll keys off - so a
-           drag that wanders over the finder scrolls it like the other two. -->
-      <aside
-        class="degree-pane degree-finder"
-        aria-label="Find a course"
-        transition:slideX={{ duration: 200 }}
-      >
-        <CourseFinder />
-      </aside>
+      <div class="degree-finder-slot" transition:slideX={{ duration: 200 }}>
+        <SidePanel
+          class="degree-finder"
+          label="Find a course"
+          config={PANEL_WIDTHS.degreeFinder}
+          edge="left"
+          resizeLabel="Resize the course finder"
+        >
+          <div class="degree-pane degree-side-scroll">
+            <CourseFinder />
+          </div>
+        </SidePanel>
+      </div>
     {/if}
   </div>
 {:else}

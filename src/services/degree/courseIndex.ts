@@ -17,9 +17,9 @@ import { UMBRELLA_CATEGORIES } from './degreeBuckets';
 import { academicYearForPeriod } from './catalogLookup';
 
 /** Where the page learned about a course. */
-export type CourseSource = 'completed' | 'transfer' | 'planned' | 'schedule';
+type CourseSource = 'completed' | 'transfer' | 'planned' | 'schedule';
 
-export interface CourseBucketRef {
+interface CourseBucketRef {
   id: string;
   name: string;
 }

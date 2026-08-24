@@ -1,9 +1,5 @@
-/* Right panel */
+/* Right panel - shell from .side-panel; this is its content layout. */
 .right-panel {
-  position: relative;
-  background: var(--color-background-alt);
-  border-left: 1px solid var(--color-border);
-  overflow: hidden;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 0;

@@ -1,0 +1,22 @@
+/* Resizable side panels - see SidePanel.svelte for why the shell exists.
+   Deliberately minimal: the shell and its border only. Contents layout and the
+   panel's width belong to the page, since some read their width from a grid
+   template and others set it directly. */
+.side-panel {
+  /* the handle is absolutely positioned against this */
+  position: relative;
+  /* MUST NOT scroll: the handle would scroll out of view with the content, and
+     would measure the wrong width. Content scrolls in a child. */
+  overflow: hidden;
+  background: var(--color-background-alt);
+}
+
+/* The border sits on the same edge as the handle, so the seam the user grabs is
+   the line they see. */
+.side-panel-right {
+  border-right: 1px solid var(--color-border);
+}
+
+.side-panel-left {
+  border-left: 1px solid var(--color-border);
+}
