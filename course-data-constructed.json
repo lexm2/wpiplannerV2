@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 24, 2026, 10:11 AM",
+  "generated": "Aug 24, 2026, 10:52 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8639,7 +8639,7 @@
                 "number": "A01",
                 "seats": 120,
                 "seatsAvailable": 0,
-                "actualWaitlist": 3,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "A",
@@ -8656,7 +8656,7 @@
                     "room": "Olin Hall 107",
                     "seats": 120,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 3,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
                     "days": [
@@ -43812,7 +43812,7 @@
                 "crn": 348950,
                 "number": "A01",
                 "seats": 75,
-                "seatsAvailable": 14,
+                "seatsAvailable": 13,
                 "actualWaitlist": 0,
                 "maxWaitlist": 40,
                 "note": null,
@@ -43829,7 +43829,7 @@
                     "building": "",
                     "room": "Washburn 229",
                     "seats": 75,
-                    "seatsAvailable": 14,
+                    "seatsAvailable": 13,
                     "actualWaitlist": 0,
                     "maxWaitlist": 40,
                     "specificSection": "A01",

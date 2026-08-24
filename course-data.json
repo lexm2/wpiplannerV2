@@ -6376,7 +6376,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "A Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "3/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349232"
     },
     {
@@ -27630,7 +27630,7 @@
       "Course_Title": "CS 3431 - Database Systems I",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "61/75",
+      "Enrolled_Capacity": "62/75",
       "Instructional_Format": "Lecture",
       "Instructors": "Wilson Wong",
       "Locations": "Washburn 229",
