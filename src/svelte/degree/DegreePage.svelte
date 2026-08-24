@@ -18,9 +18,6 @@
        bucket list scrolls. -->
   <div class="degree-shell">
     <div class="degree-pane degree-main">
-      <header class="content-header degree-page-header">
-        <h1 class="degree-page-title">Degree</h1>
-      </header>
       <div class="degree-content">
         <DegreeSummary {record} {degreeImportService} />
         <RequirementList />
@@ -32,9 +29,6 @@
   </div>
 {:else}
   <div class="degree-pane degree-main">
-    <header class="content-header degree-page-header">
-      <h1 class="degree-page-title">Degree</h1>
-    </header>
     <div class="degree-content">
       <DegreeImport {degreeImportService} />
     </div>

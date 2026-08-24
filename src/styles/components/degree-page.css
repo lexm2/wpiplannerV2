@@ -30,21 +30,6 @@
   background: var(--color-background-alt);
 }
 
-/* Reuses .content-header so the page opens like the others; sticky because the
-   pane owns the scroll. */
-.degree-page-header {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: var(--color-background-alt);
-}
-
-.degree-page-title {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: var(--font-weight-bold);
-}
-
 .degree-content {
   max-width: 880px;
   margin: 0 auto;
