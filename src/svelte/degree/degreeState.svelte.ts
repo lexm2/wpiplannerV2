@@ -8,6 +8,10 @@ import {
   type DegreeBucket,
   type DegreeTile,
 } from '../../services/degree/degreeBuckets';
+import {
+  buildCourseIndex,
+  type CourseIndexEntry,
+} from '../../services/degree/courseIndex';
 import { appState } from '../../core/state/appState.svelte';
 
 /**
@@ -49,6 +53,11 @@ class DegreeState {
 
   /** Bucket ids whose card is expanded to show every course. Not persisted. */
   expanded = new SvelteSet<string>();
+
+  /** Every course the page knows about, and which buckets hold it. */
+  courseIndex = $derived.by<CourseIndexEntry[]>(() =>
+    buildCourseIndex(this.buckets, this.placements, this.unassigned),
+  );
 
   /** Schedule courses still waiting to be placed. */
   unassigned = $derived.by<DegreeTile[]>(() =>

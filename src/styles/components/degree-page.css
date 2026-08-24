@@ -1,10 +1,16 @@
 /* Degree page - imports the student's Workday Academic Progress export and
    displays bucket completion.
 
-   Two independently-scrolling panes: the rail of schedule courses waiting to be
-   placed on the left, and the bucket list on the right. The page itself never
-   scrolls, so the rail stays reachable while the list does. Below 991px the
-   split turns vertical and the rail sits on top.
+   Independently-scrolling panes: the rail of schedule courses waiting to be
+   placed on the left, the bucket list in the middle, and the optional course
+   finder on the right. The page itself never scrolls, so the rail stays
+   reachable while the list does. Below 991px the split turns vertical and the
+   side panes sit on top. Every pane carries .degree-pane, which is what
+   dragAutoScroll edge-scrolls during a drag.
+
+   Two bucket layouts, swapped by the Grid/Full toggle: `grid` is the default
+   deck of bounded cards; `.degree-card-list.is-full` is one bucket per row with
+   everything it holds on show.
 
    The buckets are a grid of fixed-height cards, not a column of tall ones: a
    grid row is as tall as its tallest card, so a card that grows with its
@@ -110,6 +116,194 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0 1rem;
+}
+
+/* ---- Course finder (right pane) ---- */
+.degree-finder {
+  width: var(--degree-finder-width, 19rem);
+  flex-shrink: 0;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-background-alt);
+}
+
+.degree-finder-inner {
+  padding: 0 0 2rem;
+  min-height: 100%;
+}
+
+.degree-finder-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.degree-finder-close {
+  margin-left: auto;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.35rem;
+}
+
+.degree-finder-close:hover,
+.degree-finder-close:focus-visible {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+  outline: none;
+}
+
+.degree-finder-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.degree-finder-search {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+}
+
+.degree-finder-search:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* One button cycling the modes: the panel is narrow, and only the current mode
+   is worth the space. */
+.degree-finder-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.degree-finder-sort:hover,
+.degree-finder-sort:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+}
+
+.degree-finder-sort-icon {
+  margin-left: auto;
+}
+
+.degree-finder-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.degree-finder-group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  position: sticky;
+  top: 3.25rem;
+  background: var(--color-background-alt);
+  padding: 0.25rem 0;
+}
+
+.degree-finder-group-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+.degree-finder-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.4rem 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-left-width: 3px;
+  border-radius: var(--effect-border-radius);
+  background: var(--color-surface);
+}
+
+/* Same colour language as the bucket cards' left edge. */
+.degree-finder-row-completed {
+  border-left-color: var(--color-success);
+}
+.degree-finder-row-transfer {
+  border-left-color: var(--color-text-secondary);
+}
+.degree-finder-row-planned {
+  border-left-color: var(--color-warning);
+}
+.degree-finder-row-schedule {
+  border-left-color: var(--color-primary);
+}
+
+.degree-finder-row-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.degree-finder-row-title {
+  color: var(--color-text-secondary);
+  line-height: 1.25;
+  font-size: 0.75rem;
+}
+
+.degree-finder-row-buckets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+
+.degree-finder-bucket {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: calc(var(--effect-border-radius) / 2);
+  background: var(--color-background-alt);
+  color: var(--color-text-secondary);
+}
+
+.degree-finder-bucket.is-unplaced {
+  color: var(--color-warning);
+  background: var(--color-warning-background);
+}
+
+.degree-finder-row-actions {
+  margin-top: 0.25rem;
 }
 
 /* ---- Import / empty state ---- */
@@ -381,6 +575,54 @@
   --req-card-min-h: 14.25rem;
 }
 
+/* Legend on the left, layout controls on the right. */
+.degree-view-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.degree-view-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.degree-view-group {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* Divides the card-edge statuses from the progress-bar segments in the one
+   merged legend. */
+.degree-legend-sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-border);
+  margin: 0 0.25rem;
+}
+
+.degree-legend-edge {
+  width: 0.25rem;
+  height: 0.75rem;
+  border-radius: 1px;
+  flex-shrink: 0;
+  background: var(--color-border);
+}
+
+.degree-legend-edge.req-not_satisfied {
+  background: var(--color-danger);
+}
+.degree-legend-edge.req-in_progress {
+  background: var(--color-warning);
+}
+.degree-legend-edge.req-satisfied {
+  background: var(--color-success);
+}
+
 .degree-card-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--req-card-min-w), 1fr));
@@ -389,6 +631,24 @@
      rows still line up. */
   align-items: start;
   gap: 0.75rem;
+}
+
+/* ---- Full layout: one bucket per row, everything it holds on show.
+   No height bound and no row-mates, so nothing is hidden and nothing is
+   wasted - the trade is vertical space, which is the point of the mode. ---- */
+.degree-card-list.is-full {
+  /* Wide cards, but still more than one where there is room: a single 1600px
+     column leaves a bucket holding three courses mostly empty. */
+  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+}
+
+.degree-card-list.is-full .requirement-card {
+  min-height: 0;
+}
+
+/* Wide again, so a full-width card is not one tall stack of single rows. */
+.degree-card-list.is-full .requirement-courses {
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 }
 
 /* Exists only so animate:flip has an element to attach to - a component cannot
@@ -1117,6 +1377,14 @@
 
   .degree-requirements {
     --req-card-min-w: 17rem;
+  }
+
+  /* The finder cannot hold a column here either - stack it under the rail. */
+  .degree-finder {
+    width: 100%;
+    max-height: 45vh;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
   }
 
   .degree-rail {

@@ -10,6 +10,7 @@
     isExpanded,
     toggleExpanded,
   } from './degreeState.svelte';
+  import { degreeViewState } from './degreeViewState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
   import { academicYearForPeriod } from '../../services/degree/catalogLookup';
@@ -30,7 +31,16 @@
    */
   const COLLAPSED_ROWS = 3;
 
-  const expanded = $derived(isExpanded(bucket.id));
+  /**
+   * The full-bucket layout is "every card expanded" - it reuses this same
+   * machinery rather than adding a second rendering path, so one place decides
+   * what a card shows.
+   */
+  const expanded = $derived(
+    degreeViewState.bucketView === 'full' || isExpanded(bucket.id),
+  );
+  /** In the full layout there is nothing to collapse to, so no toggle. */
+  const collapsible = $derived(degreeViewState.bucketView === 'grid');
 
   // Completed/transfer courses stay fixed; the rest render as tiles.
   const fixedCourses = $derived(
@@ -128,7 +138,9 @@
         ? `${entries.length} course${entries.length === 1 ? '' : 's'} · complete`
         : `+${hiddenCount} more`,
   );
-  const canToggle = $derived(expanded ? entries.length > 0 : hiddenCount > 0);
+  const canToggle = $derived(
+    collapsible && (expanded ? entries.length > 0 : hiddenCount > 0),
+  );
 
   // Highlighted while a dragged course hovers this card.
   const dragOver = $derived(

@@ -1,14 +1,13 @@
 <script lang="ts">
-  import type {
-    RequirementStatus,
-    RequirementCategory,
-  } from '../../types/degree';
+  import type { RequirementStatus } from '../../types/degree';
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
   import RequirementCard from './RequirementCard.svelte';
   import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
   import { courseDrag } from './courseDrag.svelte';
+  import { degreeViewState } from './degreeViewState.svelte';
+  import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
   import { dur } from '../transitions';
 
   /**
@@ -42,17 +41,15 @@
     selected = next;
   }
 
-  // "Umbrella" buckets are degree-wide aggregates (total credits, residency)
-  // that accumulate every course rather than naming something to fill, so
-  // they're hidden behind a toggle.
-  const UMBRELLA = new Set<RequirementCategory>(['total_credits', 'residency']);
   let showUmbrella = $state(false);
   const umbrellaCount = $derived(
-    degreeState.buckets.filter(b => UMBRELLA.has(b.category)).length,
+    degreeState.buckets.filter(b => UMBRELLA_CATEGORIES.has(b.category)).length,
   );
 
   const visible = $derived(
-    degreeState.buckets.filter(b => showUmbrella || !UMBRELLA.has(b.category)),
+    degreeState.buckets.filter(
+      b => showUmbrella || !UMBRELLA_CATEGORIES.has(b.category),
+    ),
   );
 
   // Filter/count by the live status, so a bucket that becomes satisfied moves
@@ -117,22 +114,68 @@
     {/if}
   </div>
 
-  <div class="degree-progress-legend" aria-hidden="true">
-    <span class="degree-legend-item"
-      ><span class="degree-legend-swatch seg-earned"></span> Completed</span
-    >
-    <span class="degree-legend-item"
-      ><span class="degree-legend-swatch seg-planned"></span> Planned</span
-    >
-    <span class="degree-legend-item"
-      ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
-    >
+  <div class="degree-view-row">
+    <!-- The left edge is the card's status signal now, so the legend names it
+         alongside the progress-bar segments. -->
+    <div class="degree-progress-legend" aria-hidden="true">
+      <span class="degree-legend-item"
+        ><span class="degree-legend-edge req-not_satisfied"></span> Not satisfied</span
+      >
+      <span class="degree-legend-item"
+        ><span class="degree-legend-edge req-in_progress"></span> In progress</span
+      >
+      <span class="degree-legend-item"
+        ><span class="degree-legend-edge req-satisfied"></span> Satisfied</span
+      >
+      <span class="degree-legend-sep" aria-hidden="true"></span>
+      <span class="degree-legend-item"
+        ><span class="degree-legend-swatch seg-earned"></span> Completed</span
+      >
+      <span class="degree-legend-item"
+        ><span class="degree-legend-swatch seg-planned"></span> Planned</span
+      >
+      <span class="degree-legend-item"
+        ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
+      >
+    </div>
+
+    <div class="degree-view-toggle">
+      <div role="group" aria-label="Bucket layout" class="degree-view-group">
+        <button
+          type="button"
+          id="degree-view-grid"
+          class="degree-filter-chip"
+          class:active={degreeViewState.bucketView === 'grid'}
+          aria-pressed={degreeViewState.bucketView === 'grid'}
+          onclick={() => degreeViewState.setBucketView('grid')}>Grid</button
+        >
+        <button
+          type="button"
+          id="degree-view-full"
+          class="degree-filter-chip"
+          class:active={degreeViewState.bucketView === 'full'}
+          aria-pressed={degreeViewState.bucketView === 'full'}
+          onclick={() => degreeViewState.setBucketView('full')}>Full</button
+        >
+      </div>
+      <button
+        type="button"
+        id="degree-finder-toggle"
+        class="degree-filter-chip"
+        class:active={degreeViewState.finderOpen}
+        aria-pressed={degreeViewState.finderOpen}
+        onclick={() => degreeViewState.toggleFinder()}>Find a course</button
+      >
+    </div>
   </div>
 
   {#if filtered.length === 0}
     <p class="empty-state">No requirements match this filter.</p>
   {:else}
-    <div class="degree-card-list">
+    <div
+      class="degree-card-list"
+      class:is-full={degreeViewState.bucketView === 'full'}
+    >
       {#each filtered as bucket (bucket.id)}
         <!-- animate: needs an element that is an immediate child of the keyed
              {#each}, and a component is not one - hence the cell wrapper.

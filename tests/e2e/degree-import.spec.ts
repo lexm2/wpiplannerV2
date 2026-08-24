@@ -379,6 +379,101 @@ test('keeps a placed course visible in an already-satisfied bucket', async ({
   ).toHaveText(['CS 1004']);
 });
 
+/**
+ * The course finder answers "where did this course end up?" - the one question
+ * the bucket list itself cannot, since a course can count toward more than one
+ * requirement and an unplaced one appears in no card at all.
+ */
+test('finds a course and names the bucket it is in', async ({ page }) => {
+  await setupWithScheduleCourse(page);
+
+  await page.locator('#degree-finder-toggle').click();
+  const finder = page.locator('.degree-finder');
+  await expect(finder).toBeVisible();
+
+  // Unplaced to begin with, and the finder says so.
+  const row = finder.locator('.degree-finder-row', { hasText: 'CS 1004' });
+  await expect(row.locator('.degree-finder-bucket')).toHaveText(
+    'Not in a bucket',
+  );
+
+  await row.locator('.assign-menu-trigger').click();
+  await page
+    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .click();
+  await expect(row.locator('.degree-finder-bucket')).toHaveText(
+    'Core Requirement',
+  );
+
+  // Search narrows to the one course, by code.
+  await page.locator('#degree-finder-search').fill('CS 1004');
+  await expect(finder.locator('.degree-finder-row')).toHaveCount(1);
+
+  // ...and by the name of the bucket holding it.
+  await page.locator('#degree-finder-search').fill('core requirement');
+  await expect(
+    finder.locator('.degree-finder-row', { hasText: 'CS 1004' }),
+  ).toBeVisible();
+
+  await page.locator('#degree-finder-search').fill('nothing matches this');
+  await expect(finder.locator('.degree-finder-row')).toHaveCount(0);
+  await expect(finder.locator('.empty-state')).toBeVisible();
+});
+
+test('cycles the finder through its grouping modes', async ({ page }) => {
+  await setupWithScheduleCourse(page);
+  await page.locator('#degree-finder-toggle').click();
+
+  const label = page.locator('.degree-finder-sort-label');
+  const sortButton = page.locator('#degree-finder-sort');
+  const headings = page.locator('.degree-finder-group-head');
+
+  await expect(label).toHaveText('By source');
+  await expect(headings.first()).toContainText('In your schedule');
+
+  await sortButton.click();
+  await expect(label).toHaveText('By bucket');
+  // Degree-wide aggregates sort after the named requirements.
+  await expect(headings.first()).not.toContainText('Total Credits');
+
+  await sortButton.click();
+  await expect(label).toHaveText('By code');
+  await expect(headings).toHaveCount(1);
+
+  await sortButton.click();
+  await expect(label).toHaveText('By term');
+
+  await sortButton.click(); // wraps
+  await expect(label).toHaveText('By source');
+});
+
+test('swaps between the grid and full bucket layouts, and remembers', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+
+  const list = page.locator('.degree-card-list');
+  await expect(list).not.toHaveClass(/is-full/);
+  // Grid bounds each card, so an overflowing bucket hides courses behind a toggle.
+  await expect(page.locator('.requirement-card-toggle').first()).toBeVisible();
+
+  await page.locator('#degree-view-full').click();
+  await expect(list).toHaveClass(/is-full/);
+  // Full shows everything, so there is nothing left to expand.
+  await expect(page.locator('.requirement-card-toggle')).toHaveCount(0);
+
+  await page.reload();
+  await page.click('#degree-tab');
+  await page.locator('.degree-summary-title').waitFor();
+  await expect(page.locator('.degree-card-list')).toHaveClass(/is-full/);
+
+  await page.locator('#degree-view-grid').click();
+  await expect(page.locator('.degree-card-list')).not.toHaveClass(/is-full/);
+});
+
 test('reorders config rows vertically, clamped to the list', async ({
   page,
 }) => {

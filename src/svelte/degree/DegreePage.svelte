@@ -5,6 +5,9 @@
   import DegreeSummary from './DegreeSummary.svelte';
   import RequirementList from './RequirementList.svelte';
   import UnassignedRail from './UnassignedRail.svelte';
+  import CourseFinder from './CourseFinder.svelte';
+  import { degreeViewState } from './degreeViewState.svelte';
+  import { slideX } from '../transitions';
 
   let { degreeImportService }: { degreeImportService: DegreeImportService } =
     $props();
@@ -27,6 +30,17 @@
         <RequirementList />
       </div>
     </div>
+    {#if degreeViewState.finderOpen}
+      <!-- A third .degree-pane, which is what dragAutoScroll keys off - so a
+           drag that wanders over the finder scrolls it like the other two. -->
+      <aside
+        class="degree-pane degree-finder"
+        aria-label="Find a course"
+        transition:slideX={{ duration: 200 }}
+      >
+        <CourseFinder />
+      </aside>
+    {/if}
   </div>
 {:else}
   <div class="degree-pane degree-main">

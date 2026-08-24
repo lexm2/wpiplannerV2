@@ -17,6 +17,8 @@ export const STORAGE_KEYS = {
   DEGREE_RECORD: 'wpi-planner-degree-record',
   /** Manual degree-bucket layout + course placements (survives a re-import). */
   DEGREE_BUCKET_CONFIG: 'wpi-planner-degree-buckets',
+  /** Degree page view preferences: bucket layout, finder panel, course sort. */
+  DEGREE_VIEW: 'wpi-planner-degree-view',
   /** Set on first visit; gates the welcome tutorial auto-start. */
   VISITED: 'wpi_visited',
   /** Expanded/collapsed state of the selected-courses panel. */

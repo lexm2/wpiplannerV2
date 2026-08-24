@@ -22,6 +22,17 @@ import type { Course, Department } from '../../types/types';
 import type { SelectedCourse } from '../../types/schedule';
 import { academicYearForPeriod } from './catalogLookup';
 
+/**
+ * Degree-wide aggregates: they accumulate every course rather than naming
+ * something to go and fill. The bucket list hides them behind a toggle, and the
+ * finder sorts them last - a course "being in" Total Credits says nothing about
+ * where it counts.
+ */
+export const UMBRELLA_CATEGORIES: ReadonlySet<RequirementCategory> = new Set([
+  'total_credits',
+  'residency',
+]);
+
 /** A bucket as the UI renders it, whether Workday emitted it or the user made it. */
 export interface DegreeBucket {
   id: string;
