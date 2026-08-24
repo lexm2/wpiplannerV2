@@ -6,8 +6,11 @@
    scrolls, so the rail stays reachable while the list does. Below 991px the
    split turns vertical and the rail sits on top.
 
-   .degree-content keeps a reading-column max-width; the rail already occupies
-   the space a full-bleed column would use. */
+   The buckets are a grid of fixed-height cards, not a column of tall ones: a
+   grid row is as tall as its tallest card, so a card that grows with its
+   contents wastes a whole row's height beside its neighbours. Every collapsed
+   card is exactly --req-card-min-h; anything over the row budget hides behind
+   "+N more". The import empty state keeps the old reading column. */
 
 #degree-page.degree-page {
   overflow: hidden;
@@ -32,7 +35,7 @@
 }
 
 .degree-content {
-  max-width: 880px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 1.5rem 2rem 4rem;
   width: 100%;
@@ -40,9 +43,16 @@
   color: var(--color-text);
 }
 
+/* The import dropzone and its Workday how-to read as prose. */
+.degree-content-narrow {
+  max-width: 880px;
+}
+
 /* ---- Unassigned rail ---- */
+/* Degree-local, not the shared --spacing-schedule-sidebar-width: the schedule
+   page uses that token too, and the rail holds one narrow column of tiles. */
 .degree-rail {
-  width: var(--spacing-schedule-sidebar-width);
+  width: var(--degree-rail-width, 15.5rem);
   flex-shrink: 0;
   border-right: 1px solid var(--color-border);
   background: var(--color-background-alt);
@@ -63,7 +73,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
   position: sticky;
@@ -88,16 +98,18 @@
 }
 
 .degree-rail-hint {
-  margin: 1rem 1.5rem 0.75rem;
+  margin: 0.75rem 1rem 0.5rem;
   font-size: 0.8rem;
   color: var(--color-text-secondary);
 }
 
+/* Stays flex-column: courseDrag.begin() reads that to decide whether the slot a
+   lifted tile leaves behind animates closed. */
 .degree-rail-list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
 }
 
 /* ---- Import / empty state ---- */
@@ -361,18 +373,48 @@
   font-variant-numeric: tabular-nums;
 }
 
+.degree-requirements {
+  /* 19rem pins 4 columns at 1680px and 3 at 1366px. Smaller lets a 5th column
+     in, which squeezes the course title to nothing. */
+  --req-card-min-w: 19rem;
+  /* Must match COLLAPSED_ROWS in RequirementCard.svelte. */
+  --req-card-min-h: 14.25rem;
+}
+
 .degree-card-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--req-card-min-w), 1fr));
+  /* start, not stretch: expanding one card must not inflate its row-mates into
+     tall empty boxes. Collapsed cards are all exactly --req-card-min-h, so the
+     rows still line up. */
+  align-items: start;
   gap: 0.75rem;
 }
 
+/* Exists only so animate:flip has an element to attach to - a component cannot
+   take an animate: directive. Deliberately plain: no transform, filter,
+   contain, will-change or z-index, any of which would become a containing block
+   for the position:fixed tile being dragged, or a stacking context that traps
+   the Assign popup. */
+.requirement-card-cell {
+  display: flex;
+  min-width: 0;
+}
+
 /* ---- Requirement card - the shared .course-item shell ---- */
+/* No overflow/contain/transform/will-change here: the Assign popup escapes the
+   card upwards, and the dragged tile is position:fixed. */
 .requirement-card {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--req-card-min-h);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left-width: 3px;
   border-radius: var(--effect-border-radius-large);
-  padding: 1rem 1.25rem;
+  padding: 0.875rem 1rem;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -384,8 +426,27 @@
   box-shadow: var(--effect-shadow);
 }
 
-.requirement-card.is-satisfied {
-  border-left: 3px solid var(--color-success);
+/* The left edge is the at-a-glance signal - every status carries one, not just
+   satisfied. */
+.requirement-card.req-not_satisfied {
+  border-left-color: var(--color-danger);
+}
+
+.requirement-card.req-in_progress {
+  border-left-color: var(--color-warning);
+}
+
+.requirement-card.req-satisfied {
+  border-left-color: var(--color-success);
+  background: var(--color-background-alt);
+}
+
+.requirement-card.req-satisfied .requirement-card-name {
+  color: var(--color-text-secondary);
+}
+
+.requirement-card.is-custom {
+  border-left-style: dashed;
 }
 
 .requirement-card-head {
@@ -395,16 +456,18 @@
   gap: 0.75rem;
 }
 
-.requirement-card-titles {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
+/* Always two lines tall, wrapped or not: the single biggest lever on keeping
+   every collapsed card the same height. */
 .requirement-card-name {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  min-height: 2.4375rem;
   font-weight: var(--font-weight-bold);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .requirement-card-scope {
@@ -423,7 +486,7 @@
 /* status pills */
 .req-status {
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: var(--font-weight-medium);
   padding: 0.25rem 0.5rem;
   border-radius: var(--effect-border-radius);
@@ -445,13 +508,16 @@
   color: var(--color-danger);
 }
 
-/* applied courses - outlined grid tiles */
+/* applied courses - one row per course.
+   MUST stay display:grid: courseDrag treats a flex-column parent as a list
+   whose slots collapse, and flipping that would change drag behaviour in every
+   bucket. One column also makes the row budget deterministic at every width. */
 .requirement-courses {
-  margin: 0.75rem 0 0;
+  margin: 0.625rem 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.4rem;
 }
 
 .requirement-course {
@@ -562,7 +628,144 @@
   outline: none;
 }
 
-/* drop-target highlight while dragging a course over a card */
+/* ---- Card tiles: one dense row each.
+   Scoped to .degree-card-list so the rail keeps the taller two-line tile it
+   measures drop slots from. ---- */
+.degree-card-list .requirement-course {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.degree-card-list .requirement-course-code {
+  flex: none;
+}
+
+.degree-card-list .requirement-course-title {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  -webkit-line-clamp: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.degree-card-list .requirement-course-actions {
+  margin-top: 0;
+  flex: none;
+}
+
+.degree-card-list .course-badge,
+.degree-card-list .assign-menu-trigger {
+  padding: 0.1rem 0.35rem;
+  font-size: 0.6875rem;
+}
+
+/* ---- Card actions row: "+N more" and the Browse affordance share one row, so
+   the collapsed body always costs exactly COLLAPSED_ROWS. ---- */
+/* margin-top:auto pins it to the foot of the card, so a bucket with little to
+   show reads as header / progress / action rather than as a half-empty box. */
+.requirement-card-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  margin-top: auto;
+  padding-top: 0.4rem;
+}
+
+.requirement-card-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--effect-border-radius);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.requirement-card-toggle:hover,
+.requirement-card-toggle:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+}
+
+/* The collapsed stand-in for up to twelve "Course needed" tiles. Keeps
+   .requirement-course-empty: that class and its browseForBucket click are the
+   catalog entry point, and an e2e test clicks the first one on the page. */
+.degree-card-list .requirement-card-browse {
+  /* display:flex, not just a direction: a <button> is inline-block by default,
+     and the two labels then wrapped onto a second line in a narrow column,
+     making the card taller than its row-mates. */
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 0;
+}
+
+.degree-card-list .requirement-card-browse .requirement-course-empty-label {
+  flex: none;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* The strip is the only thing standing in for the ghost slots, so its call to
+   action is always readable - not revealed on hover like the expanded tiles. */
+.degree-card-list
+  .requirement-card-browse
+  .requirement-course-empty-hint::before {
+  content: '·';
+  margin-right: 0.35rem;
+}
+
+.degree-card-list .requirement-card-browse .requirement-course-empty-hint {
+  opacity: 1;
+  max-height: none;
+  margin-top: 0;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The expanded card's collapse control, below the body rather than in it. */
+.requirement-card-less {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+/* No numeric target to fill - hatch the track rather than leave it blank, so
+   every card still has the same anatomy. */
+.degree-progress-bar.is-indeterminate {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-border) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+/* drop-target highlight while dragging a course over a card.
+   Must stay after the .req-* rules above: equal specificity, so source order
+   decides which colour the left edge gets. */
 .requirement-card.drag-over {
   border-color: var(--color-primary);
   background: var(--color-primary-background);
@@ -625,7 +828,11 @@
   text-align: center;
   font-family: inherit;
   color: inherit;
-  transition: var(--effect-transition);
+  /* Named, not var(--effect-transition): that expands to `all 0.5s ease`, which
+     would tween the card's own growth on expand. */
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .requirement-course-empty:hover,
@@ -638,6 +845,10 @@
 .requirement-course-empty-label {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
+}
+
+.degree-card-list .requirement-course-empty-label {
+  color: var(--color-primary);
 }
 
 .requirement-course-empty-hint {
@@ -904,6 +1115,10 @@
     flex-direction: column;
   }
 
+  .degree-requirements {
+    --req-card-min-w: 17rem;
+  }
+
   .degree-rail {
     width: 100%;
     max-height: 35vh;
@@ -921,11 +1136,17 @@
   }
 }
 
+@media (max-width: 700px) {
+  .degree-card-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 560px) {
   .degree-credit-stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  .requirement-courses,
+  /* .requirement-courses is deliberately absent: it is one column by design. */
   .degree-rail-list {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }

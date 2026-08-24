@@ -3,9 +3,26 @@
     RequirementStatus,
     RequirementCategory,
   } from '../../types/degree';
+  import { flip } from 'svelte/animate';
+  import { cubicOut } from 'svelte/easing';
   import RequirementCard from './RequirementCard.svelte';
   import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
+  import { courseDrag } from './courseDrag.svelte';
+  import { dur } from '../transitions';
+
+  /**
+   * Cards glide when the grid reflows - a filter change, or a card expanding.
+   *
+   * Never mid-drag, though: flip animates `transform`, and a transformed
+   * ancestor becomes the containing block for the position:fixed tile
+   * courseDrag is flying across the page. Returning a bare config (no `css`)
+   * writes no styles at all, which `flip(..., {duration: 0})` would not.
+   */
+  function cardFlip(node: Element, rects: { from: DOMRect; to: DOMRect }) {
+    if (courseDrag.courseId !== null) return { duration: 0 };
+    return flip(node, rects, { duration: dur(220), easing: cubicOut });
+  }
 
   // Status filter is multi-select: pick any combination of statuses. An empty
   // selection means "All"; selecting every status collapses back to All.
@@ -117,7 +134,13 @@
   {:else}
     <div class="degree-card-list">
       {#each filtered as bucket (bucket.id)}
-        <RequirementCard {bucket} />
+        <!-- animate: needs an element that is an immediate child of the keyed
+             {#each}, and a component is not one - hence the cell wrapper.
+             data-bucket-id stays on the card itself: that is what the drag
+             hit-test and the e2e drag-over assertion both look for. -->
+        <div class="requirement-card-cell" animate:cardFlip>
+          <RequirementCard {bucket} />
+        </div>
       {/each}
     </div>
   {/if}

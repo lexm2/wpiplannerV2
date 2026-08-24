@@ -30,7 +30,9 @@
   </div>
 {:else}
   <div class="degree-pane degree-main">
-    <div class="degree-content">
+    <!-- The import state is a reading column, not a dashboard: it keeps the
+         narrow width the bucket grid gave up. -->
+    <div class="degree-content degree-content-narrow">
       <DegreeImport {degreeImportService} />
     </div>
   </div>

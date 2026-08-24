@@ -309,6 +309,76 @@ test('opens a rail slot for an incoming course and settles without a bounce', as
   await expect(slot).toHaveCount(0);
 });
 
+/**
+ * The grid's whole payoff rests on cards being bounded and uniform: a CSS grid
+ * row is as tall as its tallest card, so one card that grows with its contents
+ * wastes a full row's height beside its neighbours. Guard both halves of that -
+ * the uniform height, and the overflow control that makes it possible.
+ */
+test('keeps every collapsed bucket card the same height', async ({ page }) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+  // Show every bucket, umbrella ones included - they carry the most courses and
+  // are the likeliest to outgrow the budget.
+  await page.locator('.degree-umbrella-toggle').click();
+
+  const heights = await page.evaluate(() => [
+    ...new Set(
+      [...document.querySelectorAll('.requirement-card')].map(el =>
+        Math.round(el.getBoundingClientRect().height),
+      ),
+    ),
+  ]);
+  expect(heights).toHaveLength(1);
+});
+
+test('hides overflow behind "+N more" and expands the card in place', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+
+  // Total Credits carries the whole transcript, so it always overflows.
+  await page.locator('.degree-umbrella-toggle').click();
+  const card = page.locator('[data-bucket-id*="Total Credits"]');
+  const toggle = card.locator('.requirement-card-toggle');
+  await expect(toggle).toHaveText(/^\+\d+ more$/);
+
+  const collapsed = card.locator('.requirement-course');
+  const collapsedCount = await collapsed.count();
+
+  await toggle.click();
+  await expect(card.locator('.requirement-card-less')).toBeVisible();
+  expect(await collapsed.count()).toBeGreaterThan(collapsedCount);
+
+  await card.locator('.requirement-card-less').click();
+  await expect(collapsed).toHaveCount(collapsedCount);
+});
+
+/**
+ * A satisfied bucket collapses its transcript history to a "N courses ·
+ * complete" toggle - but never the user's own placement. An early cut of that
+ * rule swallowed the tile the moment it was dropped, so the drop looked like it
+ * had failed.
+ */
+test('keeps a placed course visible in an already-satisfied bucket', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+
+  await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
+  await page
+    .locator('.assign-menu-item', { hasText: /^Systems Requirement$/ })
+    .click();
+
+  const card = page.locator('[data-bucket-id*="Systems Requirement"]');
+  await expect(card).toHaveClass(/req-satisfied/);
+  await expect(
+    card.locator('.requirement-course.is-schedule .requirement-course-code'),
+  ).toHaveText(['CS 1004']);
+});
+
 test('reorders config rows vertically, clamped to the list', async ({
   page,
 }) => {
