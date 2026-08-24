@@ -1,9 +1,10 @@
 /* Degree page - imports the student's Workday Academic Progress export and
    displays bucket completion.
 
-   Two independently-scrolling panes: the bucket list, and the rail of schedule
-   courses waiting to be placed. The page itself never scrolls, so the rail stays
-   reachable while the list does. Below 991px the split turns vertical.
+   Two independently-scrolling panes: the rail of schedule courses waiting to be
+   placed on the left, and the bucket list on the right. The page itself never
+   scrolls, so the rail stays reachable while the list does. Below 991px the
+   split turns vertical and the rail sits on top.
 
    .degree-content keeps a reading-column max-width; the rail already occupies
    the space a full-bleed column would use. */
@@ -43,7 +44,7 @@
 .degree-rail {
   width: var(--spacing-schedule-sidebar-width);
   flex-shrink: 0;
-  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
   background: var(--color-background-alt);
 }
 
@@ -498,11 +499,21 @@
   opacity: 0.95;
 }
 
-.course-drag-placeholder {
+/* The slot a dragged tile left behind, and the one a list opens ahead of an
+   incoming tile. Both are sized in JS and animate their own box, so they must
+   not be stretched or squeezed by the list they sit in. */
+.course-drag-placeholder,
+.degree-rail-slot {
+  box-sizing: border-box;
+  flex: none;
   border: 1px dashed var(--color-border);
   border-radius: var(--effect-border-radius);
   background: var(--color-background-alt);
   opacity: 0.5;
+}
+
+.degree-rail-slot {
+  border-color: var(--color-primary);
 }
 
 .requirement-course-draggable:hover {
@@ -896,7 +907,7 @@
   .degree-rail {
     width: 100%;
     max-height: 35vh;
-    border-left: none;
+    border-right: none;
     border-bottom: 1px solid var(--color-border);
   }
 

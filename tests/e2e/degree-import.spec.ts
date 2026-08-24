@@ -230,6 +230,85 @@ test('drags a course from the rail onto a bucket and back again', async ({
   await expect(railCount(page)).toHaveText('1');
 });
 
+test('opens a rail slot for an incoming course and settles without a bounce', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+  // A second course stays behind in the rail, so the gap opens above a real
+  // neighbour - which is also where the rail measures the gap's height from.
+  await page.evaluate(async () => {
+    const services = (window as any).services;
+    const cs = services.courseDataService
+      .getAllDepartments()
+      .find((d: any) => d.abbreviation === 'CS');
+    await services.courseSelectionService.selectCourse(
+      cs.courses.find((c: any) => c.number === '2102'),
+    );
+  });
+  await expect(railCount(page)).toHaveText('2');
+
+  await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
+  await page
+    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .click();
+  await expect(railCount(page)).toHaveText('1');
+
+  const placed = page
+    .locator(
+      '.degree-card-list .requirement-course.is-schedule .requirement-course-title',
+    )
+    .first();
+  await placed.scrollIntoViewIfNeeded();
+  const box = (await placed.boundingBox())!;
+  const rail = (await page.locator('.degree-rail').boundingBox())!;
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 60, box.y + 30, { steps: 5 });
+
+  // Hovering the rail opens a full-height gap for the tile before it lands.
+  await page.mouse.move(rail.x + rail.width / 2, rail.y + 300, { steps: 12 });
+  const slot = page.locator('.degree-rail-slot');
+  await expect(slot).toHaveCount(1);
+  // Let the gap finish opening, or the "nothing moved" sample below starts
+  // mid-animation and catches the tail of the intro instead.
+  await page.waitForFunction(() => {
+    const el = document.querySelector('.degree-rail-slot');
+    return !!el && el.getAnimations().length === 0;
+  });
+  await expect
+    .poll(async () => (await slot.boundingBox())!.height)
+    .toBeGreaterThan(40);
+
+  // Releasing swaps the real tile in where the gap already was. The old
+  // slide/fade on the tiles replayed here, after the drop had moved on; nothing
+  // in the rail may shift now.
+  const moved = page.evaluate(() => {
+    const boxes = () =>
+      [...document.querySelectorAll('.degree-rail-list > *')].map(e => {
+        const r = e.getBoundingClientRect();
+        return `${Math.round(r.top)}/${Math.round(r.height)}`;
+      });
+    const first = boxes();
+    const start = performance.now();
+    return new Promise<boolean>(resolve => {
+      const tick = () => {
+        const now = boxes();
+        if (now.length !== first.length || now.some((b, i) => b !== first[i]))
+          return resolve(true);
+        if (performance.now() - start < 400) requestAnimationFrame(tick);
+        else resolve(false);
+      };
+      requestAnimationFrame(tick);
+    });
+  });
+  await page.mouse.up();
+  expect(await moved).toBe(false);
+
+  await expect(railCount(page)).toHaveText('2');
+  await expect(slot).toHaveCount(0);
+});
+
 test('reorders config rows vertically, clamped to the list', async ({
   page,
 }) => {

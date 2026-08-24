@@ -15,17 +15,18 @@
 
 {#if ready && record}
   <!-- Two independently-scrolling panes so the rail stays reachable while the
-       bucket list scrolls. -->
+       bucket list scrolls. The rail leads in the DOM because it leads visually;
+       keeping the two orders together is what makes tab order match the page. -->
   <div class="degree-shell">
+    <aside class="degree-pane degree-rail" aria-label="Unassigned courses">
+      <UnassignedRail />
+    </aside>
     <div class="degree-pane degree-main">
       <div class="degree-content">
         <DegreeSummary {record} {degreeImportService} />
         <RequirementList />
       </div>
     </div>
-    <aside class="degree-pane degree-rail" aria-label="Unassigned courses">
-      <UnassignedRail />
-    </aside>
   </div>
 {:else}
   <div class="degree-pane degree-main">
