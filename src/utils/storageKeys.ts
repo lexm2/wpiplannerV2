@@ -24,5 +24,3 @@ export const STORAGE_KEYS = {
   /** Legacy: schedules live in IndexedDB, but clearAllData still purges this. */
   LEGACY_SCHEDULES: 'wpi-planner-schedules',
 } as const;
-
-export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

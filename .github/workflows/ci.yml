@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Typecheck, svelte-check, format, unit tests, build
+    name: Typecheck, svelte-check, format, dead code, unit tests, build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,6 +45,12 @@ jobs:
       - name: Check for unwanted characters
         run: bun run check:unwanted-chars
 
+      # Knip has graduated into this blocking job, the same way ESLint did:
+      # the barrel-file layer it used to report is deleted and its backlog is
+      # zero, so any new finding is a genuine regression.
+      - name: Knip (unused files, exports, dependencies)
+        run: bun run lint:dead
+
       - name: Unit tests
         run: bun run test
 
@@ -52,34 +58,6 @@ jobs:
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: bun run build
-
-  code-health:
-    # ESLint has graduated into the blocking `checks` job above, now that its
-    # backlog is zero and `lint` runs with --max-warnings 0.
-    #
-    # Knip stays here and stays report-only: it still reports ~150 unused
-    # files, exports and types, mostly a dead barrel-file layer. Move it up
-    # once that is cleared, the same way.
-    name: Code health (dead code) -- report only
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      # No `|| true` here: the step is allowed to fail so the job summary shows
-      # a red X when findings exist, while continue-on-error keeps the workflow
-      # itself green.
-      - name: Knip (unused files, exports, dependencies)
-        run: bun run lint:dead
 
   e2e:
     name: Playwright e2e (Firefox)

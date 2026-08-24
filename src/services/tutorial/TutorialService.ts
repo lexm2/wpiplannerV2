@@ -3,7 +3,7 @@ import type {
   TutorialStep,
   TutorialAppState,
 } from '../../types/tutorial';
-import { getInlineSVG } from '../../utils';
+import { getInlineSVG } from '../../utils/iconPaths';
 import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState.svelte';
 
 import type { UIState } from '../../types/uiState';

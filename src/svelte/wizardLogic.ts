@@ -70,7 +70,7 @@ export function determineAvailableSteps(
 }
 
 /** Steps relevant to one specific lecture section. */
-export function computeStepsForLecture(
+function computeStepsForLecture(
   course: Course,
   courseDataService: CourseDataService,
   lecture: Section,

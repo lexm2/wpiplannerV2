@@ -111,7 +111,7 @@ export function getBucketRule(
 }
 
 /** Convert a bucket rule into `degreeBucket` filter criteria. */
-export function bucketRuleToCriteria(
+function bucketRuleToCriteria(
   rule: DegreeBucketRule,
 ): DegreeBucketFilterCriteria {
   return {

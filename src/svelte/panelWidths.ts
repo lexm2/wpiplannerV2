@@ -47,7 +47,7 @@ export function clampWidth(config: PanelWidthConfig, width: number): number {
 }
 
 /** Apply a persisted width (if any) for a single panel to :root. */
-export function applyStoredPanelWidth(config: PanelWidthConfig): void {
+function applyStoredPanelWidth(config: PanelWidthConfig): void {
   const raw = localStorage.getItem(config.storageKey);
   if (raw === null) return;
   const value = Number(raw);

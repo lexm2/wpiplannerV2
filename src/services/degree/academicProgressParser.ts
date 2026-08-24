@@ -25,7 +25,7 @@ const COL = {
   grade: 6,
 } as const;
 
-export function parseStatus(raw: string): RequirementStatus {
+function parseStatus(raw: string): RequirementStatus {
   const v = raw.trim().toLowerCase();
   if (v === 'satisfied') return 'satisfied';
   if (v === 'in progress') return 'in_progress';

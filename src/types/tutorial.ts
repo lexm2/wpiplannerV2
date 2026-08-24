@@ -2,16 +2,16 @@ import type { Schedule, SchedulePreferences } from './schedule';
 import type { ActiveFilter } from './filters';
 import type { UIState } from './uiState';
 
-export type TutorialWaitFor = 'click' | 'input' | 'manual' | 'appear';
+type TutorialWaitFor = 'click' | 'input' | 'manual' | 'appear';
 
-export interface TutorialCourseState {
+interface TutorialCourseState {
   courseId: string;
   lecture?: string; // section number (e.g., 'TAL01')
   discussion?: string;
   lab?: string;
 }
 
-export interface TutorialFilterState {
+interface TutorialFilterState {
   id: string;
   criteria: unknown;
 }

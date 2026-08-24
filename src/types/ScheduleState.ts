@@ -1,11 +1,10 @@
-import type { Course, Section, Department } from './types';
+import type { Course, Department } from './types';
 import type {
   SelectedCourse,
   ScheduleCombination,
   Schedule,
   LocalCalendarEvent,
 } from './schedule';
-import { getAllSections } from '../utils/courseUtils';
 
 /**
  * Single source of truth for one schedule's data, holding full
@@ -75,10 +74,4 @@ export function findCourseById(
     if (course) return course;
   }
   return null;
-}
-
-/** Find a section by CRN within a course. */
-export function findSectionByCRN(course: Course, crn: string): Section | null {
-  const allSections = getAllSections(course);
-  return allSections.find(s => s.crn.toString() === crn) || null;
 }

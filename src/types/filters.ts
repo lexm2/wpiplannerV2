@@ -1,17 +1,5 @@
-import { DayOfWeek, SimpleTime, TimeSlot } from './types';
+import { SimpleTime } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
-
-export interface FilterMetadata {
-  readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  readonly priority?: number;
-}
-
-export interface BaseFilter<TCriteria = unknown> extends FilterMetadata {
-  isValidCriteria(criteria: unknown): criteria is TCriteria;
-  getDisplayValue(criteria: TCriteria): string;
-}
 
 export interface FilterCriteria {
   [filterId: string]: unknown;
@@ -39,14 +27,6 @@ export interface CreditRangeFilterCriteria {
   max: number;
 }
 
-export interface ProfessorFilterCriteria {
-  professors: string[];
-}
-
-export interface TimeSlotFilterCriteria {
-  timeSlots: TimeSlot[];
-}
-
 export interface TermFilterCriteria {
   terms: AcademicTerm[];
 }
@@ -54,14 +34,6 @@ export interface TermFilterCriteria {
 export interface SearchTextFilterCriteria {
   query: string;
   professorOnly?: boolean;
-}
-
-export interface SectionStatusFilterCriteria {
-  status: 'selected' | 'unselected' | 'all';
-}
-
-export interface RequiredStatusFilterCriteria {
-  status: 'required' | 'optional' | 'all';
 }
 
 export interface GraduateLevelFilterCriteria {
@@ -72,26 +44,13 @@ export interface AcademicYearFilterCriteria {
   year: number | 'all';
 }
 
-// Period-based filter criteria
-export interface CourseSelectionFilterCriteria {
-  selectedCourseIds: string[];
-}
-
-export interface PeriodDaysFilterCriteria {
-  days: DayOfWeek[];
-}
-
-export interface ConflictFilterCriteria {
+interface ConflictFilterCriteria {
   avoidConflicts: boolean;
   blockedSlots: WeeklyTimeSlot[];
 }
 
 export interface ConflictCriteria extends ConflictFilterCriteria {
   selectedCourses?: SelectedCourse[];
-}
-
-export interface SectionCodeFilterCriteria {
-  codes: string[];
 }
 
 /**
@@ -120,10 +79,6 @@ export interface RMPRatingFilterCriteria {
 
 export interface BookmarkFilterCriteria {
   showBookmarkedOnly: boolean;
-}
-
-export interface BlockedTimesFilterCriteria {
-  blockedTimes: WeeklyTimeSlot[];
 }
 
 export interface WakeUpTimeFilterCriteria {

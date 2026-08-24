@@ -39,12 +39,6 @@ export interface SchedulePreferences {
   bookmarkedCourseIds?: string[];
 }
 
-export interface UserScheduleState {
-  activeSchedule: Schedule | null;
-  savedSchedules: Schedule[];
-  preferences: SchedulePreferences;
-}
-
 /**
  * Academic term for blocked time periods.
  * Maps to WPI's 7-week term system.
@@ -106,18 +100,6 @@ export interface WeeklyTimeSlot {
   startTime: SimpleTime;
   endTime: SimpleTime;
   term: AcademicTerm;
-}
-
-/**
- * Extended type with display metadata for UI rendering.
- * Used for calendar events, grid display, visual components.
- */
-export interface DisplayableTimeSlot extends WeeklyTimeSlot {
-  title: string;
-  subtitle?: string;
-  color?: string;
-  sourceType: 'calendar' | 'blocked' | 'course';
-  sourceId?: string;
 }
 
 /**

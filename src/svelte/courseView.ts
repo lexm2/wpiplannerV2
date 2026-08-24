@@ -14,7 +14,7 @@ const MAX_BADGES = 100;
 
 type ProfLink = { text: string; url: string | null };
 
-export interface SectionBadge {
+interface SectionBadge {
   key: string;
   number: string;
   isFull: boolean;
@@ -22,7 +22,7 @@ export interface SectionBadge {
   profs: ProfLink[];
 }
 
-export interface TermInfo {
+interface TermInfo {
   term: string;
   available: boolean;
   allFull: boolean;

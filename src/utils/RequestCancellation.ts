@@ -22,7 +22,7 @@ export class CancellationToken {
   }
 }
 
-export class CancellationError extends Error {
+class CancellationError extends Error {
   constructor(message: string = 'Operation was cancelled') {
     super(message);
     this.name = 'CancellationError';

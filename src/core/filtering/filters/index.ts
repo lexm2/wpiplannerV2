@@ -1,13 +1,4 @@
-export { DepartmentFilter } from './DepartmentFilter';
-export { AvailabilityFilter } from './AvailabilityFilter';
-export { CreditRangeFilter } from './CreditRangeFilter';
-export { TermFilter } from './TermFilter';
 export { SearchTextFilter } from './SearchTextFilter';
-export { RMPRatingFilter } from './RMPRatingFilter';
-export { ConflictFilter } from './ConflictFilter';
-export { WakeUpTimeFilter } from './WakeUpTimeFilter';
-export { AcademicYearFilter } from './AcademicYearFilter';
-export { GraduateLevelFilter } from './GraduateLevelFilter';
 export { DegreeBucketFilter } from './DegreeBucketFilter';
 
 import { SectionBasedFilter } from '../SectionFilterPipeline';
@@ -19,7 +10,7 @@ import { RMPRatingFilter } from './RMPRatingFilter';
 import { WakeUpTimeFilter } from './WakeUpTimeFilter';
 import { AcademicYearFilter } from './AcademicYearFilter';
 import { GraduateLevelFilter } from './GraduateLevelFilter';
-import { RateMyProfessorService } from '../../../services/external';
+import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 
 // All default filters (excludes SearchTextFilter and ConflictFilter which are registered separately)
 export const createDefaultFilters = (

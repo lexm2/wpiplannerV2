@@ -1,6 +1,6 @@
 import { Department } from '../types/types';
 
-export const DEPARTMENT_CATEGORIES: { [key: string]: string } = {
+const DEPARTMENT_CATEGORIES: { [key: string]: string } = {
   // Science
   BB: 'Science',
   BCB: 'Science',
@@ -91,12 +91,4 @@ export function groupDepartmentsByCategory(
   });
 
   return categories;
-}
-
-export function getAllDepartmentAbbreviations(): string[] {
-  return Object.keys(DEPARTMENT_CATEGORIES);
-}
-
-export function getCategoryList(): string[] {
-  return [...CATEGORY_ORDER];
 }

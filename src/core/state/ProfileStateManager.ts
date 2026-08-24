@@ -2,17 +2,21 @@ import type {
   Schedule,
   SchedulePreferences,
   SelectedCourse,
+} from '../../types/schedule';
+import type {
   ComponentKind,
   Course,
   Section,
   SectionsByKind,
   Department,
-} from '../../types';
-import { ApplicationState, COMPONENT_KINDS } from '../../types';
+} from '../../types/types';
+import { COMPONENT_KINDS } from '../../types/types';
+import { ApplicationState } from '../../types/ApplicationState';
 import { ScheduleState } from '../../types/ScheduleState';
-import type { TransactionResult } from '../storage';
-import { TransactionalStorageManager } from '../storage';
-import { getAllSections, logger } from '../../utils';
+import type { TransactionResult } from '../storage/TransactionalStorageManager';
+import { TransactionalStorageManager } from '../storage/TransactionalStorageManager';
+import { getAllSections } from '../../utils/courseUtils';
+import { logger } from '../../utils/logger';
 import { deepClone } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
 import { MinimalSyncDataSchema } from '../../types/export';

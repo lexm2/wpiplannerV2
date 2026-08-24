@@ -2,6 +2,50 @@ import type { KnipConfig } from 'knip';
 import { compile } from 'svelte/compiler';
 
 /**
+ * The Svelte compiler erases every TypeScript annotation, and that includes
+ * whole `import type { X } from './x'` statements and inline `{ type X }`
+ * specifiers -- they simply do not appear in the emitted JS. Knip then never
+ * sees that a component uses X and reports X as an unused export. So collect
+ * the type specifiers off the original source and re-emit them alongside the
+ * compiled output, where Knip can still find them.
+ */
+const IMPORT_RE = /\bimport\s+([\s\S]*?)\s+from\s*['"]([^'"]+)['"]/g;
+
+const typeImportsOf = (source: string): string[] => {
+  const statements: string[] = [];
+
+  for (const [, clause, specifier] of source.matchAll(IMPORT_RE)) {
+    // `import type { A, B } from '...'` / `import type A from '...'`
+    if (/^type\b/.test(clause)) {
+      statements.push(`import ${clause} from '${specifier}';`);
+      continue;
+    }
+
+    // `import { value, type A } from '...'` -- the value half already
+    // survived compilation, so re-emit only the `type` specifiers.
+    const named = clause.match(/\{([\s\S]*)\}/);
+    if (!named) continue;
+
+    const types = named[1]
+      .split(',')
+      .map(entry => entry.trim())
+      .filter(entry => /^type\s/.test(entry))
+      .map(entry => entry.replace(/^type\s+/, ''));
+
+    if (types.length > 0) {
+      statements.push(
+        `import type { ${types.join(', ')} } from '${specifier}';`,
+      );
+    }
+  }
+
+  return statements;
+};
+
+const svelteCompiler = (source: string): string =>
+  [compile(source, {}).js.code, ...typeImportsOf(source)].join('\n');
+
+/**
  * Finds cross-file dead code: unused files, unused exports, unused types, and
  * unused dependencies. This is the gap tsconfig's noUnusedLocals cannot see --
  * it catches unused *locals*, never an export nobody imports.
@@ -32,6 +76,6 @@ export default {
     'src/utils/iconPaths.ts',
   ],
   compilers: {
-    svelte: (source: string) => compile(source, {}).js.code,
+    svelte: svelteCompiler,
   },
 } satisfies KnipConfig;

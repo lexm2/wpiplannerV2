@@ -1,4 +1,4 @@
-export interface ThemeColors {
+interface ThemeColors {
   primary: string;
   primaryHover: string;
   primaryLight: string;
@@ -41,12 +41,12 @@ export interface ThemeColors {
  * applyTheme() wrote them as inline custom properties on documentElement,
  * silently overriding base.css.
  */
-export interface ThemeSpacing {
+interface ThemeSpacing {
   baseUnit: string;
   headerHeight: string;
 }
 
-export interface ThemeEffects {
+interface ThemeEffects {
   borderRadius: string;
   borderRadiusLarge: string;
   shadow: string;
@@ -62,12 +62,6 @@ export interface ThemeDefinition {
   colors: ThemeColors;
   spacing: ThemeSpacing;
   effects: ThemeEffects;
-}
-
-export interface ThemeManagerConfig {
-  defaultThemeId: string;
-  storageKey: string;
-  themes: ThemeDefinition[];
 }
 
 export type ThemeId = string;

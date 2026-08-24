@@ -446,5 +446,3 @@ export class IndexedDBStorageManager {
     return this.db;
   }
 }
-
-export const indexedDBStorage = new IndexedDBStorageManager();

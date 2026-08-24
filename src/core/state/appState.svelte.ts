@@ -2,8 +2,8 @@ import type {
   Schedule,
   SelectedCourse,
   SchedulePreferences,
-  Department,
-} from '../../types';
+} from '../../types/schedule';
+import type { Department } from '../../types/types';
 
 /**
  * Reactive application state (Svelte 5 runes) - the single source of truth that

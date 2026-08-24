@@ -16,7 +16,7 @@ export interface StorageTransaction {
   backupData: Map<string, string | null>;
 }
 
-export interface StorageOperation {
+interface StorageOperation {
   type: 'save' | 'delete';
   key: string;
   value?: string | null;

@@ -32,7 +32,7 @@ export interface RateMyProfessorData {
   totalProfessors: number;
 }
 
-export const ProfessorSchema = z.object({
+const ProfessorSchema = z.object({
   id: z.string(),
   legacyId: z.number(),
   firstName: z.string(),
@@ -45,7 +45,7 @@ export const ProfessorSchema = z.object({
   profileUrl: z.string(),
 }) satisfies z.ZodType<Professor>;
 
-export const SchoolSchema = z.object({
+const SchoolSchema = z.object({
   id: z.string(),
   name: z.string(),
   city: z.string().optional(),

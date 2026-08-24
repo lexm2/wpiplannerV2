@@ -16,7 +16,7 @@ import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
 import { logger } from '../../utils/logger';
 
-export interface TutorialEntry {
+interface TutorialEntry {
   id: string;
   label: string;
 }

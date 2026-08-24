@@ -18,12 +18,12 @@ export interface ConfirmPayload {
   onConfirm: (value?: string) => void;
 }
 
-export interface DeleteLocalEventPayload {
+interface DeleteLocalEventPayload {
   title: string;
   onConfirm: () => void;
 }
 
-export interface LocalEventPayload {
+interface LocalEventPayload {
   /** Callback when the event is saved */
   onSave: (
     event: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>,
@@ -32,7 +32,7 @@ export interface LocalEventPayload {
   existingEvent?: LocalCalendarEvent;
 }
 
-export interface FilterModalPayload {
+interface FilterModalPayload {
   /** 'filter' = planner/schedule filter; 'auto-schedule' = generate settings. */
   mode: 'filter' | 'auto-schedule';
   /** auto-schedule only: invoked (after close) when "Generate Schedule" clicked. */
@@ -41,7 +41,7 @@ export interface FilterModalPayload {
   coursesToSchedule?: SelectedCourse[];
 }
 
-export interface AutoScheduleIntroPayload {
+interface AutoScheduleIntroPayload {
   selectedCourses: SelectedCourse[];
   getColor: (courseId: string) => string;
   /** Invoked with the term-filtered courses when the user clicks Next */

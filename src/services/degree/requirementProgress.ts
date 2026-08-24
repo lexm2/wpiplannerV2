@@ -31,7 +31,7 @@ export interface ProgressTile {
 }
 
 /** Progress-bar segment widths (each 0..1), cumulatively clamped to sum ≤ 1. */
-export interface ProgressSegments {
+interface ProgressSegments {
   earned: number;
   planned: number;
   schedule: number;

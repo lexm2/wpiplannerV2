@@ -38,7 +38,7 @@ export const WEEKDAYS: DayOfWeek[] = [
   DayOfWeek.FRIDAY,
 ];
 
-export type BlockKind = 'section' | 'preview' | 'conflict' | 'event';
+type BlockKind = 'section' | 'preview' | 'conflict' | 'event';
 
 export interface GridBlock {
   key: string;

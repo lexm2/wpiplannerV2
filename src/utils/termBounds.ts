@@ -2,14 +2,14 @@ import { z } from 'zod';
 import type { DateRange } from '../types/common';
 import { logger } from './logger';
 
-export interface TermBoundInfo {
+interface TermBoundInfo {
   startDate: string;
   endDate: string;
   offeringPeriod: string;
   sampleSize: number;
 }
 
-export interface YearTermBounds {
+interface YearTermBounds {
   A: TermBoundInfo;
   B: TermBoundInfo;
   C: TermBoundInfo;

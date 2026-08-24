@@ -6,8 +6,8 @@ import type {
   Period,
   Time,
   LectureGroup,
-} from '../../types';
-import { DayOfWeek, PeriodType } from '../../types';
+} from '../../types/types';
+import { DayOfWeek, PeriodType } from '../../types/types';
 import { AcademicTerm } from '../../types/schedule';
 import type {
   RawDepartment,

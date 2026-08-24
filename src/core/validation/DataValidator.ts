@@ -11,14 +11,14 @@ export interface ValidationResult {
   warnings: ValidationWarning[];
 }
 
-export interface ValidationError {
+interface ValidationError {
   field: string;
   message: string;
   severity: 'error' | 'critical';
   code: string;
 }
 
-export interface ValidationWarning {
+interface ValidationWarning {
   field: string;
   message: string;
   suggestion?: string;

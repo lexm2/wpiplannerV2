@@ -106,12 +106,6 @@ export interface Time {
 
 export type SimpleTime = Omit<Time, 'displayTime'>;
 
-export interface TimeSlot {
-  startTime: SimpleTime;
-  endTime: SimpleTime;
-  days: DayOfWeek[];
-}
-
 export enum DayOfWeek {
   MONDAY = 'M',
   TUESDAY = 'T',
@@ -125,24 +119,4 @@ export enum DayOfWeek {
 export interface ScheduleDB {
   departments: Department[];
   generated: string;
-}
-
-export interface PlannerState {
-  courses: Course[];
-  selectedYear: number;
-  searchTerm: string;
-  activeFilters: string[];
-  plan: {
-    [year: number]: {
-      fall: Course[];
-      spring: Course[];
-      summer: Course[];
-    };
-  };
-}
-
-export enum Semester {
-  FALL = 'fall',
-  SPRING = 'spring',
-  SUMMER = 'summer',
 }

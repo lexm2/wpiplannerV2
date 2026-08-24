@@ -24,7 +24,7 @@ import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
 import { determineAvailableSteps } from './wizardLogic';
 
-export interface WizardConfig {
+interface WizardConfig {
   course: Course;
   courseDataService: CourseDataService;
   filterService: FilterService | null;

@@ -1,9 +1,7 @@
-import type {
-  RMPRatingFilterCriteria,
-  FilterableSection,
-} from '../../../types';
+import type { RMPRatingFilterCriteria } from '../../../types/filters';
+import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
-import { RateMyProfessorService } from '../../../services/external';
+import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 
 export class RMPRatingFilter implements SectionBasedFilter {
   readonly id = 'rmpRating';
