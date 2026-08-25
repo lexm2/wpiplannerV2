@@ -463,6 +463,50 @@ test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
 });
 
 /**
+ * Every course counts toward Total Credits and Residency, so lighting those up
+ * next to the requirement actually asked for says nothing - and it would drag
+ * the umbrella toggle on to say it. CS 1102 is in all three, and only the one
+ * that names a requirement should flash.
+ */
+test('leaves the degree-wide aggregates out of a bucket highlight', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+
+  await page.locator('#degree-course-search').click();
+  const row = page.locator('.course-finder-row', { hasText: 'CS 1102' });
+  await expect(row.locator('.course-finder-bucket-name')).toHaveText([
+    'Total Credits Required',
+    'Residency Requirement',
+    'Core Requirement',
+  ]);
+  await row
+    .locator('button.course-finder-bucket', { hasText: 'Core Requirement' })
+    .click();
+
+  await expect
+    .poll(() =>
+      page
+        .locator('[data-bucket-id]')
+        .evaluateAll(els =>
+          els
+            .filter(el => el.getAnimations().some(a => a.id === 'bucket-focus'))
+            .map(el => el.getAttribute('data-bucket-id')),
+        ),
+    )
+    .toEqual([expect.stringContaining('Core Requirement')]);
+
+  // The aggregates are hidden, and nothing reached for the toggle to flash one.
+  await expect(page.locator('.degree-umbrella-toggle')).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+});
+
+/**
  * The jump has to be able to LAND. Degree-wide aggregates are hidden behind the
  * umbrella toggle, so jumping to one has to drop what is hiding it first -
  * otherwise the modal closes onto a page that never scrolls anywhere.

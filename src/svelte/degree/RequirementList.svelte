@@ -97,8 +97,14 @@
     const request = bucketFocus.request;
     if (!request) return;
     untrack(() => {
-      const targets = degreeState.buckets.filter(b =>
-        request.ids.includes(b.id),
+      // Every course counts toward the degree-wide aggregates, so flashing
+      // Total Credits alongside the requirement actually asked for says
+      // nothing - and revealing it to do so is worse. One is a target only
+      // when it is what was clicked, which its own row is the only way to say.
+      const targets = degreeState.buckets.filter(
+        b =>
+          request.ids.includes(b.id) &&
+          (b.id === request.target || !UMBRELLA_CATEGORIES.has(b.category)),
       );
       if (targets.some(b => UMBRELLA_CATEGORIES.has(b.category)))
         showUmbrella = true;
@@ -115,7 +121,7 @@
         )
       )
         selected = [];
-      runBucketFocus(request);
+      runBucketFocus({ ...request, ids: targets.map(b => b.id) });
       clearBucketFocus();
     });
   });
