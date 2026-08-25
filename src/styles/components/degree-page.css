@@ -385,9 +385,10 @@
 }
 
 .degree-requirements {
-  /* 19rem pins 4 columns at 1680px and 3 at 1366px. Smaller lets a 5th column
-     in, which squeezes the course title to nothing. */
-  --req-card-min-w: 19rem;
+  /* The content column caps at 1536px, so 24rem pins 3 columns everywhere from
+     a 1512px window up to the widest screen, and 2 below that. Narrower let a
+     4th column in, which squeezed every course title to an ellipsis. */
+  --req-card-min-w: 24rem;
   /* Must match COLLAPSED_ROWS in RequirementCard.svelte. */
   --req-card-min-h: 14.25rem;
 }
@@ -804,9 +805,10 @@
   min-width: 0;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0.4rem;
-  padding: 0.25rem 0.5rem;
+  /* Matches .requirement-card-toggle, its row-mate. */
+  padding: 0.25rem 0.6rem;
   min-height: 0;
 }
 
@@ -827,8 +829,8 @@
 
 .degree-card-list .requirement-card-browse .requirement-course-empty-hint {
   opacity: 1;
-  max-height: none;
-  margin-top: 0;
+  max-width: none;
+  margin-left: 0;
   font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
@@ -909,8 +911,11 @@
 .requirement-course-empty {
   align-items: center;
   justify-content: center;
-  gap: 0;
-  border-style: dashed;
+  /* Spelled out rather than inherited from .requirement-course: the collapsed
+     browse strip does not carry that class, and a bare <button> would fall back
+     to the UA's 2px square border. */
+  border: 1px dashed var(--color-border);
+  border-radius: var(--effect-border-radius);
   background: transparent;
   cursor: pointer;
   text-align: center;
@@ -943,17 +948,34 @@
   font-size: 0.75rem;
   color: var(--color-primary);
   opacity: 0;
-  max-height: 0;
-  margin-top: 0;
+  /* Collapses sideways, not vertically: the tiles that carry a hint are all
+     flex rows, so a height collapse left the hidden hint at full width and
+     pushed the label off-centre, while the reveal's margin-top dropped the
+     hint below the label's centre line. */
+  max-width: 0;
+  white-space: nowrap;
   overflow: hidden;
   transition: var(--effect-transition);
 }
 
-.requirement-course-empty:hover .requirement-course-empty-hint,
-.requirement-course-empty:focus-visible .requirement-course-empty-hint {
+/* Ghost tile: with the hint collapsed it must occupy no width whatever, or the
+   label lands off-centre by half a gap. The reveal's own margin-left separates
+   the two once the hint is on show. */
+.requirement-course.requirement-course-empty {
+  gap: 0;
+}
+
+/* Ghost tiles only (.requirement-course), never the collapsed browse strip:
+   that strip keeps its hint on show, and revealing it again on hover added a
+   margin that grew the strip - and so the whole card - under the cursor. */
+.requirement-course.requirement-course-empty:hover
+  .requirement-course-empty-hint,
+.requirement-course.requirement-course-empty:focus-visible
+  .requirement-course-empty-hint {
   opacity: 1;
-  max-height: 1.25rem;
-  margin-top: 0.25rem;
+  /* Comfortably past the hint's ~5.5rem, so no theme's metrics can clip it. */
+  max-width: 10rem;
+  margin-left: 0.4rem;
 }
 
 .course-badge {
@@ -1204,7 +1226,7 @@
   }
 
   .degree-requirements {
-    --req-card-min-w: 17rem;
+    --req-card-min-w: 20rem;
   }
 
   /* Stacked, the rail is full-width: there is no width left to drag. */
@@ -1254,8 +1276,12 @@ html.is-mobile .requirement-course-remove {
   padding: 0.5rem 0.75rem;
 }
 
-html.is-mobile .requirement-course-empty-hint {
+/* Same scope as the hover reveal above: touch has no hover, so the ghost tiles
+   show their hint outright. The browse strip already shows its own. */
+html.is-mobile
+  .requirement-course.requirement-course-empty
+  .requirement-course-empty-hint {
   opacity: 1;
-  max-height: 1.25rem;
-  margin-top: 0.25rem;
+  max-width: 10rem;
+  margin-left: 0.4rem;
 }
