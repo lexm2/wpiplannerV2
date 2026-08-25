@@ -4,14 +4,15 @@ import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { FilterService } from '../filtering/FilterService';
 import { inferBucketDepartments, type DegreeBucket } from './degreeBuckets';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
-import { findCatalogCourse } from './catalogLookup';
+import { candidateCodes, findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
 import { courseListState } from '../../svelte/courseListState.svelte';
 
 /**
- * Navigation out of the Degree page and into the planner: browsing for a bucket
- * and opening a degree course's catalog entry. Dependencies are injected once
- * via init(), matching the other standalone scheduling services.
+ * Navigation out of the Degree page and into the planner: browsing for a bucket,
+ * opening a degree course's catalog entry, and searching the catalog for one.
+ * Dependencies are injected once via init(), matching the other standalone
+ * scheduling services.
  */
 class DegreePlanService {
   private profileStateManager: ProfileStateManager | null = null;
@@ -109,6 +110,43 @@ class DegreePlanService {
     courseListState.selectedCourse = course;
     setPage('planner');
     scrollCourseIntoView(course.id);
+  }
+
+  /**
+   * Look a degree course up in the catalog, from the course finder.
+   *
+   * Where openCourse aims at one known catalog entry, this aims at the search:
+   * every filter dropped and the year set to All, then one query for the code.
+   * The finder's question is "what does the catalog have for this course?", and
+   * a leftover department or year filter is exactly what answers it wrongly -
+   * a course taken three years ago is not in the active schedule's year.
+   *
+   * Unlike openCourse it does not give up when the catalog has no match: the
+   * empty result list is the answer, and it is a truer one than an error toast.
+   */
+  searchCatalog(code: string, year: number | null = null): void {
+    // Codes are spaced ("CS 1004") and sometimes cross-listed ("CS 2022/ MA
+    // 2201"); SearchTextFilter matches the unspaced form the catalog stores.
+    const [first] = candidateCodes(code);
+    const query = first
+      ? `${first.dept}${first.number}`
+      : code.replace(/\s+/g, '');
+
+    if (this.filterService) {
+      this.filterService.resetFilters();
+      // Explicit rather than "no year filter": both show every year, but this
+      // one lights the All chip up, so the page says why it is showing them.
+      this.filterService.addFilter('academicYear', { year: 'all' });
+      this.filterService.addFilter('searchText', { query });
+    }
+
+    // Best effort - open the detail panel on the entry the finder was pointing
+    // at, so the search lands on a course rather than just a filtered list.
+    const course = findCatalogCourse(code, year, appState.loadedDepartments);
+    if (course) courseListState.selectedCourse = course;
+
+    setPage('planner');
+    if (course) scrollCourseIntoView(course.id);
   }
 }
 

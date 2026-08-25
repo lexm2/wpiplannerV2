@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { RequirementStatus } from '../../types/degree';
+  import { untrack } from 'svelte';
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
   import RequirementCard from './RequirementCard.svelte';
@@ -7,6 +8,11 @@
   import { degreeState } from './degreeState.svelte';
   import { courseDrag } from './courseDrag.svelte';
   import { degreeViewState } from './degreeViewState.svelte';
+  import {
+    bucketFocus,
+    clearBucketFocus,
+    runBucketFocus,
+  } from './bucketFocus.svelte';
   import { openModal } from '../../services/ui/uiState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
@@ -75,6 +81,43 @@
     not_satisfied: withStatus.filter(x => x.status === 'not_satisfied').length,
     in_progress: withStatus.filter(x => x.status === 'in_progress').length,
     satisfied: withStatus.filter(x => x.status === 'satisfied').length,
+  });
+
+  /**
+   * A jump from the course finder ("this course counts toward Core") has to be
+   * able to LAND: the card it names may be filtered out by the status chips, or
+   * be a degree-wide aggregate the umbrella toggle is hiding. Both of those
+   * knobs live here, so this is the only place that can clear the way - hence
+   * the request being state rather than the modal scrolling the page itself.
+   *
+   * Tracks the request and nothing else; the body writes the two filters it may
+   * have to relax, and would otherwise re-fire on its own writes.
+   */
+  $effect(() => {
+    const request = bucketFocus.request;
+    if (!request) return;
+    untrack(() => {
+      const targets = degreeState.buckets.filter(b =>
+        request.ids.includes(b.id),
+      );
+      if (targets.some(b => UMBRELLA_CATEGORIES.has(b.category)))
+        showUmbrella = true;
+      // Widen to All rather than adding the missing status: the user asked for
+      // one bucket, not for a filter set they never chose.
+      if (
+        selected.length &&
+        targets.some(
+          b =>
+            !selected.includes(
+              effectiveProgress(b, degreeState.placements.get(b.id) ?? [])
+                .status,
+            ),
+        )
+      )
+        selected = [];
+      runBucketFocus(request);
+      clearBucketFocus();
+    });
   });
 </script>
 

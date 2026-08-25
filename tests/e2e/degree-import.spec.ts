@@ -393,7 +393,7 @@ test('finds a course and names the bucket it is in', async ({ page }) => {
 
   // Unplaced to begin with, and the finder says so.
   const row = finder.locator('.course-finder-row', { hasText: 'CS 1004' });
-  await expect(row.locator('.course-finder-bucket')).toHaveText(
+  await expect(row.locator('.course-finder-bucket-name')).toHaveText(
     'Not in a bucket',
   );
 
@@ -401,7 +401,7 @@ test('finds a course and names the bucket it is in', async ({ page }) => {
   await page
     .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
     .click();
-  await expect(row.locator('.course-finder-bucket')).toHaveText(
+  await expect(row.locator('.course-finder-bucket-name')).toHaveText(
     'Core Requirement',
   );
 
@@ -422,6 +422,120 @@ test('finds a course and names the bucket it is in', async ({ page }) => {
   // Escape closes it, handing the width back to the bucket grid.
   await page.keyboard.press('Escape');
   await expect(finder).toHaveCount(0);
+});
+
+/**
+ * A bucket chip that only NAMES the requirement leaves the reader to go and find
+ * the card themselves. Clicking one closes the finder, scrolls the bucket into
+ * view and flashes it - and flashes every other bucket the course counts toward,
+ * since "it is in two places" is the finder's whole reason to exist.
+ */
+test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
+  await setupWithScheduleCourse(page);
+
+  await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
+  await page
+    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .click();
+
+  await page.locator('#degree-course-search').click();
+  const row = page.locator('.course-finder-row', { hasText: 'CS 1004' });
+  const bucketRow = row.locator('button.course-finder-bucket');
+  await expect(bucketRow.locator('.course-finder-bucket-name')).toHaveText(
+    'Core Requirement',
+  );
+
+  await bucketRow.click();
+
+  // The flash is a WAAPI animation tagged with its own id, so the assertion can
+  // name the thing under test rather than sampling a colour mid-fade.
+  const card = page.locator('[data-bucket-id*="Core Requirement"]');
+  await expect
+    .poll(() =>
+      card.evaluate(el =>
+        el.getAnimations().some(a => a.id === 'bucket-focus'),
+      ),
+    )
+    .toBe(true);
+
+  await expect(page.locator('.course-finder-modal')).toHaveCount(0);
+  await expect(card).toBeInViewport();
+});
+
+/**
+ * The jump has to be able to LAND. Degree-wide aggregates are hidden behind the
+ * umbrella toggle, so jumping to one has to drop what is hiding it first -
+ * otherwise the modal closes onto a page that never scrolls anywhere.
+ */
+test('reveals a hidden degree-wide bucket when jumping to it', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+
+  const totalCredits = page.locator('.requirement-card-name', {
+    hasText: 'Total Credits',
+  });
+  await expect(totalCredits).toHaveCount(0);
+
+  await page.locator('#degree-course-search').click();
+  // By-bucket mode: the heading is the bucket, so it carries the jump.
+  await page.locator('#course-finder-sort').click();
+  await expect(page.locator('.course-finder-sort-label')).toHaveText(
+    'By bucket',
+  );
+  await page
+    .locator('.course-finder-group', { hasText: 'Total Credits' })
+    .first()
+    .locator('.course-finder-group-jump')
+    .click();
+
+  await expect(page.locator('.course-finder-modal')).toHaveCount(0);
+  await expect(page.locator('.degree-umbrella-toggle')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(totalCredits).toBeVisible();
+});
+
+/**
+ * The other half of a finder card is the catalog. A degree course can be years
+ * older than the active schedule, so the search leaves from a clean slate -
+ * every filter dropped and the year set to All - rather than inheriting the
+ * planner's current view, which is exactly what would find nothing.
+ */
+test('sends a finder course to the classes page on a cleared search', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+
+  // A department filter to prove the reset: it would hide CS 1004 outright.
+  await page.evaluate(() => {
+    (window as any).services.filterService.addFilter('department', {
+      departments: ['MA'],
+    });
+  });
+
+  await page.locator('#degree-course-search').click();
+  await page
+    .locator('.course-finder-row', { hasText: 'CS 1004' })
+    .locator('.course-finder-open')
+    .click();
+
+  await expect(page.locator('#planner-page')).toBeVisible();
+  await expect(page.locator('#search-input')).toHaveValue('CS1004');
+
+  const filters = await page.evaluate(() =>
+    (window as any).services.filterService
+      .getActiveFilters()
+      .map((f: any) => [f.id, f.criteria]),
+  );
+  expect(Object.fromEntries(filters)).toEqual({
+    academicYear: { year: 'all' },
+    searchText: { query: 'CS1004' },
+  });
 });
 
 test('cycles the finder through its grouping modes', async ({ page }) => {

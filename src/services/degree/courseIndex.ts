@@ -11,17 +11,27 @@
  * applies CS 3013 to both Core and Systems, say), so entries carry a LIST of
  * buckets rather than one. Grouping by bucket then shows it under each.
  */
-import type { AppliedCourse } from '../../types/degree';
+import type { AppliedCourse, RequirementStatus } from '../../types/degree';
 import type { DegreeBucket, DegreeTile } from './degreeBuckets';
 import { UMBRELLA_CATEGORIES } from './degreeBuckets';
 import { academicYearForPeriod } from './catalogLookup';
+import { effectiveProgress } from './requirementProgress';
 
 /** Where the page learned about a course. */
-type CourseSource = 'completed' | 'transfer' | 'planned' | 'schedule';
+export type CourseSource = 'completed' | 'transfer' | 'planned' | 'schedule';
 
+/**
+ * A bucket as the finder shows it: enough to name it, colour it, and draw the
+ * same three-segment bar its card draws. Carrying the live progress here rather
+ * than re-deriving it in the modal keeps one answer to "how is this bucket
+ * doing?" - buildCourseIndex already walks every bucket, so it costs nothing.
+ */
 interface CourseBucketRef {
   id: string;
   name: string;
+  status: RequirementStatus;
+  /** Segment widths (each 0..1), exactly as RequirementCard renders them. */
+  segments: { earned: number; planned: number; schedule: number };
 }
 
 export interface CourseIndexEntry {
@@ -59,7 +69,7 @@ export function nextSort(current: CourseSort): CourseSort {
   return COURSE_SORTS[(i + 1) % COURSE_SORTS.length].key;
 }
 
-const SOURCE_LABELS: Record<CourseSource, string> = {
+export const SOURCE_LABELS: Record<CourseSource, string> = {
   completed: 'Completed',
   transfer: 'Transfer',
   planned: 'Planned',
@@ -117,7 +127,14 @@ export function buildCourseIndex(
   };
 
   for (const bucket of buckets) {
-    const ref: CourseBucketRef = { id: bucket.id, name: bucket.name };
+    const tiles = placements.get(bucket.id) ?? [];
+    const progress = effectiveProgress(bucket, tiles);
+    const ref: CourseBucketRef = {
+      id: bucket.id,
+      name: bucket.name,
+      status: progress.status,
+      segments: progress.segments,
+    };
 
     // Workday's fixed transcript courses.
     for (const c of bucket.appliedCourses) {
@@ -138,7 +155,7 @@ export function buildCourseIndex(
     }
 
     // Planned (in-progress) and user-placed schedule courses.
-    for (const tile of placements.get(bucket.id) ?? []) {
+    for (const tile of tiles) {
       add(
         {
           code: tile.code,
