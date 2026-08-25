@@ -8,15 +8,17 @@
    side panes sit on top. Every pane carries .degree-pane, which is what
    dragAutoScroll edge-scrolls during a drag.
 
-   Two bucket layouts, swapped by the Grid/Full toggle: `grid` is the default
-   deck of bounded cards; `.degree-card-list.is-full` is one bucket per row with
-   everything it holds on show.
+   Two bucket layouts, swapped by the Grid/Full toggle. `grid` is the default
+   deck of bounded cards: a real CSS grid, because every collapsed card is
+   exactly --req-card-min-h, so the rows line up and a row costs no more than
+   the card in it. Anything over the row budget hides behind "+N more".
 
-   The buckets are a grid of fixed-height cards, not a column of tall ones: a
-   grid row is as tall as its tallest card, so a card that grows with its
-   contents wastes a whole row's height beside its neighbours. Every collapsed
-   card is exactly --req-card-min-h; anything over the row budget hides behind
-   "+N more". The import empty state keeps the old reading column. */
+   `.degree-card-list.is-full` shows everything each bucket holds, so its card
+   heights vary - and a grid row is as tall as its tallest card, which left a
+   hole beside every short bucket. That layout is multicol instead, packing each
+   card under the one above it; it reads down a column rather than across a row.
+
+   The import empty state keeps the old reading column. */
 
 #degree-page.degree-page {
   overflow: hidden;
@@ -462,13 +464,27 @@
   gap: 0.75rem;
 }
 
-/* ---- Full layout: one bucket per row, everything it holds on show.
-   No height bound and no row-mates, so nothing is hidden and nothing is
-   wasted - the trade is vertical space, which is the point of the mode. ---- */
+/* ---- Full layout: every bucket with everything it holds on show.
+   No height bound, so nothing is hidden - the trade is vertical space, which is
+   the point of the mode. ---- */
+/* Columns, not a grid: heights vary with the contents here, and a grid row is
+   as tall as its tallest card, so every short bucket left a hole beside its
+   row-mate - a quarter of the layout was dead space. Multicol is the one CSS
+   layout that packs each card directly under the one above it; flex cannot,
+   since a flex line is also as tall as its tallest item, and column-wrapping
+   needs a fixed container height the scrolling pane can't give it.
+   The column count stays what the grid produced: one per 30rem of width. */
 .degree-card-list.is-full {
-  /* Wide cards, but still more than one where there is room: a single 1600px
-     column leaves a bucket holding three courses mostly empty. */
-  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+  display: block;
+  columns: 30rem;
+  /* `gap` from the base rule still applies - multicol takes its column half.
+     Row spacing is the cells' own margin, below. */
+}
+
+/* Never let a card be split down the middle by a column break. */
+.degree-card-list.is-full .requirement-card-cell {
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
 }
 
 .degree-card-list.is-full .requirement-card {
