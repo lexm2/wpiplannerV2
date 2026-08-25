@@ -166,7 +166,7 @@ export function riseFade(
 /** Small scale+fade pop for cards (replaces the old cardReveal keyframes). */
 export function scaleFade(
   _node: Element,
-  { duration = 300, delay = 0, from = 0.97 } = {},
+  { duration = 300, delay = 0, from = 0.9 } = {},
 ): TransitionConfig {
   return {
     duration: dur(duration),
