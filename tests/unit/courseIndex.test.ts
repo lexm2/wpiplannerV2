@@ -113,6 +113,48 @@ describe('buildCourseIndex', () => {
     ]);
   });
 
+  it('leaves a degree-wide aggregate off a course that merely counts toward it', () => {
+    const shared = applied('CS 1101');
+    const buckets = [
+      bucket('total', 'Total Credits', {
+        category: 'total_credits',
+        applied: [shared],
+      }),
+      bucket('core', 'Core', { applied: [shared] }),
+    ];
+    const entries = buildCourseIndex(buckets, new Map(), []);
+
+    expect(find(entries, 'CS 1101').buckets.map(b => b.name)).toEqual(['Core']);
+  });
+
+  it('still indexes a course an aggregate is the only home for', () => {
+    const buckets = [
+      bucket('total', 'Total Credits', {
+        category: 'total_credits',
+        applied: [applied('CS 1101')],
+      }),
+    ];
+    const entries = buildCourseIndex(buckets, new Map(), []);
+
+    expect(find(entries, 'CS 1101').buckets).toEqual([]);
+  });
+
+  it('keeps an aggregate a schedule course was deliberately placed in', () => {
+    const buckets = [
+      bucket('total', 'Total Credits', { category: 'total_credits' }),
+    ];
+    const placements = new Map<string, DegreeTile[]>([
+      ['total', [tile('CS 2223', 'planned'), tile('CS 4241', 'schedule')]],
+    ]);
+    const entries = buildCourseIndex(buckets, placements, []);
+
+    // The planned tile is Workday applying it, the same as an applied course.
+    expect(find(entries, 'CS 2223').buckets).toEqual([]);
+    expect(find(entries, 'CS 4241').buckets.map(b => b.name)).toEqual([
+      'Total Credits',
+    ]);
+  });
+
   it('takes planned and schedule courses from the placements map', () => {
     const buckets = [bucket('b1', 'Core')];
     const placements = new Map<string, DegreeTile[]>([
@@ -171,7 +213,16 @@ describe('groupCourses', () => {
   });
 
   it('puts degree-wide aggregates after real requirements, unplaced last', () => {
-    const groups = groupCourses(entries, 'bucket', buckets);
+    // An aggregate is only a bucket here when a course was placed in one, so
+    // the applied course it shares with Core is not enough to give it a group.
+    const placed = new Map(placements).set('total', [
+      tile('CS 3733', 'schedule'),
+    ]);
+    const groups = groupCourses(
+      buildCourseIndex(buckets, placed, [tile('CS 1004', 'schedule')]),
+      'bucket',
+      buckets,
+    );
     expect(groups.map(g => g.label)).toEqual([
       'Core',
       'Total Credits',
@@ -180,11 +231,20 @@ describe('groupCourses', () => {
   });
 
   it('repeats a course under each bucket it counts toward', () => {
-    const groups = groupCourses(entries, 'bucket', buckets);
+    const shared = applied('CS 1101');
+    const named = [
+      bucket('core', 'Core', { applied: [shared] }),
+      bucket('systems', 'Systems', { applied: [shared] }),
+    ];
+    const groups = groupCourses(
+      buildCourseIndex(named, new Map(), []),
+      'bucket',
+      named,
+    );
     const inCore = groups.find(g => g.label === 'Core')!;
-    const inTotal = groups.find(g => g.label === 'Total Credits')!;
+    const inSystems = groups.find(g => g.label === 'Systems')!;
     expect(inCore.entries.some(e => e.code === 'CS 1101')).toBe(true);
-    expect(inTotal.entries.some(e => e.code === 'CS 1101')).toBe(true);
+    expect(inSystems.entries.some(e => e.code === 'CS 1101')).toBe(true);
   });
 
   it('groups by term with undated courses last', () => {

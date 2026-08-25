@@ -97,15 +97,11 @@
     const request = bucketFocus.request;
     if (!request) return;
     untrack(() => {
-      // Every course counts toward the degree-wide aggregates, so flashing
-      // Total Credits alongside the requirement actually asked for says
-      // nothing - and revealing it to do so is worse. One is a target only
-      // when it is what was clicked, which its own row is the only way to say.
-      const targets = degreeState.buckets.filter(
-        b =>
-          request.ids.includes(b.id) &&
-          (b.id === request.target || !UMBRELLA_CATEGORIES.has(b.category)),
+      const targets = degreeState.buckets.filter(b =>
+        request.ids.includes(b.id),
       );
+      // The finder only names an aggregate the user placed a course in, so one
+      // reaching here is a real destination and worth unhiding.
       if (targets.some(b => UMBRELLA_CATEGORIES.has(b.category)))
         showUmbrella = true;
       // Widen to All rather than adding the missing status: the user asked for
@@ -121,7 +117,7 @@
         )
       )
         selected = [];
-      runBucketFocus({ ...request, ids: targets.map(b => b.id) });
+      runBucketFocus(request);
       clearBucketFocus();
     });
   });

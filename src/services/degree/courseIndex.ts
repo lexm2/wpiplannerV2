@@ -135,6 +135,14 @@ export function buildCourseIndex(
       status: progress.status,
       segments: progress.segments,
     };
+    /**
+     * A degree-wide aggregate holds every course by definition, so naming one
+     * as a course's bucket tells the reader what they already knew - and buries
+     * the requirement they were actually looking for under two rows of it. The
+     * courses still have to be indexed, since walking the buckets is how the
+     * finder finds them at all, so what gets dropped is the ref, not the course.
+     */
+    const aggregate = UMBRELLA_CATEGORIES.has(bucket.category);
 
     // Workday's fixed transcript courses.
     for (const c of bucket.appliedCourses) {
@@ -150,7 +158,7 @@ export function buildCourseIndex(
           term: c.period?.raw ?? null,
           year: academicYearForPeriod(c.period),
         },
-        ref,
+        aggregate ? null : ref,
       );
     }
 
@@ -167,7 +175,9 @@ export function buildCourseIndex(
           term: tile.term,
           year: tile.year,
         },
-        ref,
+        // Except a schedule course sitting in one: nothing put it there but the
+        // user, so that placement is theirs to see and to jump to.
+        aggregate && tile.kind !== 'schedule' ? null : ref,
       );
     }
   }

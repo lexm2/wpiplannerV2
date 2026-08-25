@@ -463,12 +463,13 @@ test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
 });
 
 /**
- * Every course counts toward Total Credits and Residency, so lighting those up
- * next to the requirement actually asked for says nothing - and it would drag
- * the umbrella toggle on to say it. CS 1102 is in all three, and only the one
- * that names a requirement should flash.
+ * Every course counts toward Total Credits and Residency, so naming them on a
+ * card says nothing and buries the requirement the reader came for under two
+ * rows of it. Workday applies CS 1102 to all three; the finder shows the one
+ * that names a requirement, and a jump lights that one alone rather than
+ * dragging the umbrella toggle on to flash a card nobody asked for.
  */
-test('leaves the degree-wide aggregates out of a bucket highlight', async ({
+test('leaves the degree-wide aggregates off a finder card', async ({
   page,
 }) => {
   await page.goto('/');
@@ -479,8 +480,6 @@ test('leaves the degree-wide aggregates out of a bucket highlight', async ({
   await page.locator('#degree-course-search').click();
   const row = page.locator('.course-finder-row', { hasText: 'CS 1102' });
   await expect(row.locator('.course-finder-bucket-name')).toHaveText([
-    'Total Credits Required',
-    'Residency Requirement',
     'Core Requirement',
   ]);
   await row
@@ -507,17 +506,15 @@ test('leaves the degree-wide aggregates out of a bucket highlight', async ({
 });
 
 /**
- * The jump has to be able to LAND. Degree-wide aggregates are hidden behind the
- * umbrella toggle, so jumping to one has to drop what is hiding it first -
- * otherwise the modal closes onto a page that never scrolls anywhere.
+ * The one aggregate a card does name is one the user put a course in, and that
+ * jump still has to LAND: degree-wide cards are hidden behind the umbrella
+ * toggle, so jumping to one has to drop what is hiding it first - otherwise the
+ * modal closes onto a page that never scrolls anywhere.
  */
-test('reveals a hidden degree-wide bucket when jumping to it', async ({
+test('reveals a hidden degree-wide bucket the user placed a course in', async ({
   page,
 }) => {
-  await page.goto('/');
-  await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await setupWithScheduleCourse(page);
 
   const totalCredits = page.locator('.requirement-card-name', {
     hasText: 'Total Credits',
@@ -525,15 +522,18 @@ test('reveals a hidden degree-wide bucket when jumping to it', async ({
   await expect(totalCredits).toHaveCount(0);
 
   await page.locator('#degree-course-search').click();
-  // By-bucket mode: the heading is the bucket, so it carries the jump.
-  await page.locator('#course-finder-sort').click();
-  await expect(page.locator('.course-finder-sort-label')).toHaveText(
-    'By bucket',
-  );
+  const row = page.locator('.course-finder-row', { hasText: 'CS 1004' });
+  await row.locator('.assign-menu-trigger').click();
+  // Keyboard, not a click: .assign-menu-popup is a hard drop-up with no
+  // viewport clamp, so its first two items open underneath whatever sticky
+  // header is above the trigger and swallow the pointer. Placing the course is
+  // this test's setup, not its subject - but the menu needs fixing.
   await page
-    .locator('.course-finder-group', { hasText: 'Total Credits' })
-    .first()
-    .locator('.course-finder-group-jump')
+    .locator('.assign-menu-item', { hasText: /^Total Credits Required$/ })
+    .press('Enter');
+
+  await row
+    .locator('button.course-finder-bucket', { hasText: 'Total Credits' })
     .click();
 
   await expect(page.locator('.course-finder-modal')).toHaveCount(0);
