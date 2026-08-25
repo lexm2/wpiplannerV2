@@ -137,8 +137,7 @@ export function scrim(node: Element): Deferred {
 }
 
 /**
- * Modal dialog enter/exit: fades while rising into place, with a slight scale
- * so it reads as arriving rather than sliding.
+ * Modal dialog enter/exit: fades in while rising and growing into place
  *
  * `transform: false` drops the rise and scale, leaving the fade alone, for
  * dialogs that must never carry a transform - a transformed element becomes
@@ -147,7 +146,7 @@ export function scrim(node: Element): Deferred {
  */
 export function riseFade(
   _node: Element,
-  { y = 20, from = 0.97, transform = true } = {},
+  { y = 200, from = 0.7, transform = true } = {},
 ): Deferred {
   return opts => {
     const inbound = opts?.direction !== 'out';
