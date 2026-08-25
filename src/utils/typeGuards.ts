@@ -15,9 +15,9 @@ export function getComputedTerm(sc: SelectedCourse): string | null {
 
 /**
  * Maps a computed term to display terms
- * F (Fall graduate) → ['A', 'B']
- * S (Spring graduate) → ['C', 'D']
- * A/B/C/D → [term]
+ * F (Fall graduate) -> ['A', 'B']
+ * S (Spring graduate) -> ['C', 'D']
+ * A/B/C/D -> [term]
  */
 export function getDisplayTerms(computedTerm: string): string[] {
   if (computedTerm === 'F') {

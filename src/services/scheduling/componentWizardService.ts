@@ -116,7 +116,7 @@ class ComponentWizardService {
     course: Course,
     selections: SectionsByKind,
   ): void {
-    // Committed wizard selection → solid preview blocks (the grid reacts).
+    // Committed wizard selection -> solid preview blocks (the grid reacts).
     schedulePreviewState.previewCourse = course;
     schedulePreviewState.selections = selections;
     schedulePreviewState.hover = null;
@@ -126,7 +126,7 @@ class ComponentWizardService {
     course: Course,
     selections: SectionsByKind,
   ): void {
-    // Hovered (not-yet-committed) option → dashed preview blocks.
+    // Hovered (not-yet-committed) option -> dashed preview blocks.
     schedulePreviewState.previewCourse = course;
     schedulePreviewState.hover = selections;
   }

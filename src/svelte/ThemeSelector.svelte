@@ -26,7 +26,7 @@
   }
 
   function selectTheme(id: string): void {
-    tm.setTheme(id); // bumps the rune → display updates reactively
+    tm.setTheme(id); // bumps the rune -> display updates reactively
     open = false;
   }
 </script>

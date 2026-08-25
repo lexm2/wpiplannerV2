@@ -70,7 +70,7 @@
     return getDepartmentCategory(dept).toLowerCase().includes(lq);
   }
 
-  // Expand the chosen values (categories → their departments) and write.
+  // Expand the chosen values (categories -> their departments) and write.
   function applyFromSelection(values: string[]): void {
     let departments: string[] = [];
     if (isCategoryMode) {

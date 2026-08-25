@@ -37,8 +37,8 @@ export function areCompatible(
  * - If either lacks a cluster, they're incompatible
  *
  * Non-GPS Course Rules:
- * - If either section has no cluster → compatible
- * - If both have clusters → they must match
+ * - If either section has no cluster -> compatible
+ * - If both have clusters -> they must match
  */
 function checkClusterCompatibility(
   section1: PlannerSection,

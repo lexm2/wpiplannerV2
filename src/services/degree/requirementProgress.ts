@@ -19,7 +19,7 @@ export type ProgressTarget = Pick<
  * pulling the parser (and fflate) into the main bundle.
  *
  * The status is anchored to Workday's imported status - it can only improve
- * (e.g. not_satisfied → in_progress → satisfied), never regress, since our
+ * (e.g. not_satisfied -> in_progress -> satisfied), never regress, since our
  * credit accounting doesn't model every Workday combination rule.
  */
 

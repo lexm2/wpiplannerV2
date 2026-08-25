@@ -166,7 +166,7 @@ function getAllLabsForCourse(
   return Array.from(all.values());
 }
 
-/** Group sections by academic term, ordered A→E. */
+/** Group sections by academic term, ordered A->E. */
 export function groupSectionsByTerm(
   sections: Section[],
 ): Array<{ term: string; sections: Section[] }> {

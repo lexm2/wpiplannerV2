@@ -86,7 +86,7 @@ test('status filters are multi-select and collapse to All when all chosen', asyn
   await chip('In progress').click(); // multi-select: both statuses shown
   await expect(cards).toHaveCount(2);
 
-  await chip('Satisfied').click(); // all three → collapse to All
+  await chip('Satisfied').click(); // all three -> collapse to All
   await expect(chip('All')).toHaveAttribute('aria-pressed', 'true');
   await expect(cards).toHaveCount(3);
 });

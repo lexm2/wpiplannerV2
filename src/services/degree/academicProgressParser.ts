@@ -32,7 +32,7 @@ function parseStatus(raw: string): RequirementStatus {
   return 'not_satisfied';
 }
 
-/** "2025 Fall A Term" / "2025 Fall Semester" / "" → AcademicPeriod | null. */
+/** "2025 Fall A Term" / "2025 Fall Semester" / "" -> AcademicPeriod | null. */
 export function parseAcademicPeriod(raw: string): AcademicPeriod | null {
   const s = raw?.trim();
   if (!s || s.toLowerCase() === 'none') return null;

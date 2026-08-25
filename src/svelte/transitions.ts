@@ -31,7 +31,7 @@ export function slideFade(
   const style = getComputedStyle(node);
   const height = parseFloat(style.height);
   // In a hidden subtree (a page kept mounted but display:none) computed
-  // sizes come back "auto" → NaN; nothing is visible, so skip rather than
+  // sizes come back "auto" -> NaN; nothing is visible, so skip rather than
   // emit NaNpx keyframes.
   if (!Number.isFinite(height)) return { duration: 0 };
   const px = (v: string) => parseFloat(v) || 0;

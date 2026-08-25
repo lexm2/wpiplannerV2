@@ -23,7 +23,7 @@ const OUTPUT_PATH = join(projectRoot, 'public', 'course-data-constructed.json');
 async function main() {
   console.log('='.repeat(60));
   console.log('WPI Course Data Converter');
-  console.log('Workday → Planner Hierarchical Format');
+  console.log('Workday -> Planner Hierarchical Format');
   console.log('='.repeat(60));
   console.log();
 

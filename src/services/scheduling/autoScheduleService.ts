@@ -12,7 +12,7 @@ import { logger } from '../../utils/logger';
 /**
  * Standalone auto-schedule modal orchestration for the schedule page.
  *
- * Drives the intro → filter modal sequence (modalState + continuation callbacks)
+ * Drives the intro -> filter modal sequence (modalState + continuation callbacks)
  * and generation via AutoScheduleOrchestrator. Reads the selection through
  * CourseSelectionService and surfaces the generating overlay through the
  * `appState.scheduleGenerating` rune.
@@ -52,7 +52,7 @@ class AutoScheduleService {
       return;
     }
 
-    // Intro modal → its onNext opens the filter modal with the term-filtered courses.
+    // Intro modal -> its onNext opens the filter modal with the term-filtered courses.
     modalState.autoScheduleIntro = {
       selectedCourses,
       getColor: id => this.colorService?.getCourseColor(id) ?? '',

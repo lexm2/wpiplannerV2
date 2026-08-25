@@ -67,9 +67,9 @@ function upgradeSelectedSection(stored: StoredCourse): StoredCourse {
 }
 
 /**
- * v2 → v3: three parallel nullable fields become one keyed map. A kind that was
- * null becomes an absent key, so `Object.keys(selected).length` is meaningful
- * and the serialized form carries no empty slots.
+ * v2 -> v3: three parallel nullable fields become one keyed map. A kind that
+ * was null becomes an absent key, so `Object.keys(selected).length` is
+ * meaningful and the serialized form carries no empty slots.
  */
 function collapseToSelectedMap(stored: StoredCourse): StoredCourse {
   if (stored.selected) return stored;

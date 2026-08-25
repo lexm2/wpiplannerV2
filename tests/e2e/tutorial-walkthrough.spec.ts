@@ -196,7 +196,7 @@ test('every tutorial step can be completed by clicking its own target', async ({
 
   // No explicit start(): a first visit (no `wpi_visited` key in a fresh
   // context) auto-starts 'welcome' from AppBootstrap.startApp, and onComplete
-  // chains filtering → autoSchedule → schedules. Waiting on it guards that
+  // chains filtering -> autoSchedule -> schedules. Waiting on it guards that
   // first-visit path too.
   await page.waitForFunction(
     () =>
@@ -265,7 +265,7 @@ test('every tutorial step can be completed by clicking its own target', async ({
         why.push(
           `clicking it did not advance the tutorial${r.clickError ? ` (${r.clickError})` : ''}`,
         );
-      return `  ✗ ${r.tutorial}#${r.index} "${r.title}" → ${r.selector}\n      ${why.join('\n      ')}`;
+      return `  ✗ ${r.tutorial}#${r.index} "${r.title}" -> ${r.selector}\n      ${why.join('\n      ')}`;
     })
     .join('\n');
 

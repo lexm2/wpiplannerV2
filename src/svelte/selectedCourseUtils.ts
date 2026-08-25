@@ -5,7 +5,7 @@ import type { Course } from '../types/types';
 /**
  * Shared helpers for the selected-course lists (SelectedCoursesPanel on the
  * planner page + ScheduleSidebar/SelectedCourseItem on the schedule page), which
- * previously each re-declared the credit formatter, the dept→number comparator,
+ * previously each re-declared the credit formatter, the dept->number comparator,
  * and the term ordering.
  */
 

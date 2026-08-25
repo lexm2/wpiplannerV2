@@ -13,7 +13,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-echo "=== Merging Development → master ==="
+echo "=== Merging Development -> master ==="
 
 if [ "$START_BRANCH" != "Development" ]; then
   echo "[ERROR] Must be on Development branch. Currently on: $START_BRANCH"

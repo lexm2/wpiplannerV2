@@ -16,7 +16,7 @@ import { updateClientTimestamp } from './timestampState.svelte';
  * layout root leaves App.svelte as pure composition.
  */
 export function installAppEffects(services: ServiceContainer): void {
-  // Active-schedule (re)activation → sync the academicYear filter to the newly
+  // Active-schedule (re)activation -> sync the academicYear filter to the newly
   // activated schedule's year. The first run is skipped (the initial year filter
   // is set by the loadedDepartments effect on data load), exclusion-only changes
   // are ignored, and the body runs untracked so its filter writes don't re-fire.
@@ -50,7 +50,7 @@ export function installAppEffects(services: ServiceContainer): void {
     });
   });
 
-  // Page navigation → reset search + department filters on entering the schedule
+  // Page navigation -> reset search + department filters on entering the schedule
   // page (the initial run is a no-op since the start page is 'planner'). Both
   // SearchBar and DepartmentSidebar react to these removals on their own.
   let prevPage: PageId = uiState.currentPage;
@@ -65,7 +65,7 @@ export function installAppEffects(services: ServiceContainer): void {
     });
   });
 
-  // Selection change → release colors for deselected courses + invalidate any
+  // Selection change -> release colors for deselected courses + invalidate any
   // generated auto-schedules. The initial run (mount, empty selection) is skipped.
   let selectionInit = false;
   $effect(() => {
@@ -80,7 +80,7 @@ export function installAppEffects(services: ServiceContainer): void {
     });
   });
 
-  // Course-data load/refresh → sync the non-reactive services off
+  // Course-data load/refresh -> sync the non-reactive services off
   // appState.loadedDepartments. CourseDataService reassigns loadedDepartments
   // (a $state.raw freshly-built array) on the initial fetch and every post-sync
   // refresh; one effect covers both. The mount run sees the empty array and is
@@ -132,7 +132,7 @@ export function installAppEffects(services: ServiceContainer): void {
     });
   });
 
-  // Active-schedule change → let the tutorial auto-cancel if the user navigated
+  // Active-schedule change -> let the tutorial auto-cancel if the user navigated
   // away from its schedule. services.tutorial is assigned in main.ts after mount,
   // so it may be undefined on the initial run (guarded by ?.).
   $effect(() => {

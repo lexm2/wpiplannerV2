@@ -266,7 +266,7 @@ describe('computePlacements', () => {
     expect(out.size).toBe(0);
   });
 
-  it('tags planned tiles with their catalog academic year (Spring → previous fall)', () => {
+  it('tags planned tiles with their catalog academic year (Spring -> previous fall)', () => {
     const rec = record([req('CS Core', 'major_specific')]);
     rec.requirements[0].appliedCourses.push({
       ...planned('CS 3733'),

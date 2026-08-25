@@ -22,7 +22,7 @@ export interface CourseSelectionResult {
 
 /**
  * Course selection API with synchronous persistence and validation.
- * Mutations flow through ProfileStateManager → appState runes; consumers react
+ * Mutations flow through ProfileStateManager -> appState runes; consumers react
  * to those runes directly (no event system here).
  */
 export class CourseSelectionService {

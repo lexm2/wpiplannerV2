@@ -49,7 +49,7 @@ const tile = (
 ) => ({ code, credits, kind });
 
 describe('effectiveProgress (credit-based)', () => {
-  it('counts completed credits as earned and flips not_satisfied → in_progress', () => {
+  it('counts completed credits as earned and flips not_satisfied -> in_progress', () => {
     const p = effectiveProgress(
       req({ creditsRequired: 9, appliedCourses: [completed('CS 1101', 3)] }),
       [],

@@ -10,8 +10,8 @@
 {#if wizardState.isOpen}
   <!-- Key on the course so reopening for a DIFFERENT course remounts a fresh
        wizard (ComponentSelectionWizard snapshots its config at mount). Without
-       this, a rapid close→open - which Svelte batches so the {#if} never cycles
-       to false - would leave the previous course's wizard on screen. -->
+       this, a rapid close->open - which Svelte batches so the {#if} never
+       cycles to false - would leave the previous course's wizard on screen. -->
   {#key wizardState.config?.course.id}
     <ComponentSelectionWizard />
   {/key}

@@ -38,7 +38,7 @@
     requestClose: () => void;
   } = $props();
 
-  // Flatten departments → courses (the section components read filter options
+  // Flatten departments -> courses (the section components read filter options
   // off this). Reactive so it picks up a late course-data load.
   const allCourses = $derived(getDepartments().flatMap(d => d.courses));
 

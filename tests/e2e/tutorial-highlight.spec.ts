@@ -42,7 +42,7 @@ async function walkTutorials(page: Page): Promise<StepResult[]> {
 
     const results: StepResult[] = [];
     // The wrapper start() runs sharedSetup (adds the TUT department + a tutorial
-    // schedule). onComplete chains welcome → filtering → autoSchedule → schedules,
+    // schedule). onComplete chains welcome -> filtering -> autoSchedule -> schedules,
     // so this single start walks all four tutorials.
     await tutorial.start('welcome');
 
@@ -103,7 +103,7 @@ test('every tutorial step highlights a real, visible element', async ({
   const report = broken
     .map(
       r =>
-        `  ✗ ${r.tutorial}#${r.index} "${r.title}" → ${r.selector}` +
+        `  ✗ ${r.tutorial}#${r.index} "${r.title}" -> ${r.selector}` +
         ` (found=${r.found}, highlighted=${r.highlighted})`,
     )
     .join('\n');

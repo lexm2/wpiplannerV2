@@ -164,8 +164,8 @@ function parseTime(timeString: string): { startTime: string; endTime: string } {
 
 /**
  * Converts 12-hour time to 24-hour format
- * "9:00 AM" → "09:00"
- * "2:30 PM" → "14:30"
+ * "9:00 AM" -> "09:00"
+ * "2:30 PM" -> "14:30"
  */
 function convertTo24Hour(time12: string): string {
   const match = time12.match(/(\d+):(\d+)\s*([AP]M)/i);
@@ -189,8 +189,8 @@ function convertTo24Hour(time12: string): string {
 
 /**
  * Converts time string to minutes since midnight for comparison
- * "09:00" → 540
- * "14:30" → 870
+ * "09:00" -> 540
+ * "14:30" -> 870
  */
 export function timeToMinutes(timeStr: string): number {
   const [hours, minutes] = timeStr.split(':').map(Number);

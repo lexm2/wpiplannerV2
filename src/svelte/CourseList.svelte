@@ -27,7 +27,7 @@
   // Pagination cursor (the old CourseController INITIAL_PAGE_SIZE / load-more).
   let displayCount = $state(INITIAL_PAGE_SIZE);
 
-  // `uiState.currentView` is a rune → list/grid toggle recomputes on its own.
+  // `uiState.currentView` is a rune -> list/grid toggle recomputes on its own.
   const view = $derived(uiState.currentView);
 
   // Base courses replicate MainController.refreshCurrentView: a SINGLE active

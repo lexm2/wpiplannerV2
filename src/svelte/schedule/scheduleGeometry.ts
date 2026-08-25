@@ -128,7 +128,7 @@ function packColumns(
 
   for (const idx of order) {
     const it = items[idx];
-    if (cluster.length && it.startMin >= clusterMaxEnd) flush(); // disjoint → new cluster
+    if (cluster.length && it.startMin >= clusterMaxEnd) flush(); // disjoint -> new cluster
     let col = colEnds.findIndex(end => end <= it.startMin);
     if (col === -1) {
       col = colEnds.length;
@@ -147,7 +147,7 @@ export function collectSelectedSections(courses: SelectedCourse[]): Section[] {
   return courses.flatMap(sc => getSelectedSections(sc));
 }
 
-/** Which display columns (A/B/C/D) a course renders in. F→A,B and S→C,D. */
+/** Which display columns (A/B/C/D) a course renders in. F->A,B and S->C,D. */
 export function courseShowsInTerm(sc: SelectedCourse, term: string): boolean {
   const computedTerm = getComputedTerm(sc);
   if (!computedTerm) return false;
@@ -209,7 +209,7 @@ export function buildHoverCourse(
 }
 
 /**
- * Per-day collapsed time ranges for a section (earliest start → latest end of
+ * Per-day collapsed time ranges for a section (earliest start -> latest end of
  * all periods that day), matching the old occupancy map. Skips days with no
  * periods and zero-duration (async) ranges.
  */

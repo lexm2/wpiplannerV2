@@ -83,7 +83,7 @@ export function transformSection(
     professor = isInterestList ? 'N/A' : 'Not Assigned';
   }
 
-  // Normalize type (Laboratory → Lab)
+  // Normalize type (Laboratory -> Lab)
   const type =
     instructionalFormat === 'Laboratory' ? 'Lab' : instructionalFormat;
 
@@ -141,7 +141,7 @@ function extractSectionNumber(
   );
 
   if (hasAppendix) {
-    // Extract: "CS 1101-A01-Quiz" → "A01"
+    // Extract: "CS 1101-A01-Quiz" -> "A01"
     const dashIndex = courseSectionFull.indexOf('-');
     const secondDashIndex = courseSectionFull.indexOf('-', dashIndex + 6);
     return courseSectionFull.substring(dashIndex + 1, secondDashIndex - 1);
@@ -164,7 +164,7 @@ function extractSectionNumber(
     return courseSectionFull.substring(dashIndex + 1).trim();
   }
 
-  // Standard section: "CS 1101-A01 - Intro" → "A01"
+  // Standard section: "CS 1101-A01 - Intro" -> "A01"
   const dashIndex = courseSectionFull.indexOf('-');
   const secondDashIndex = courseSectionFull.indexOf('-', dashIndex + 1);
 
@@ -177,7 +177,7 @@ function extractSectionNumber(
     .substring(dashIndex + 1, secondDashIndex - 1)
     .trim();
 
-  // Remove parenthetical suffixes: "A01 (Honors)" → "A01"
+  // Remove parenthetical suffixes: "A01 (Honors)" -> "A01"
   const parenIndex = sectionNumber.indexOf('(');
   if (parenIndex !== -1) {
     sectionNumber = sectionNumber.substring(0, parenIndex - 1).trim();
@@ -209,8 +209,8 @@ function isSpecialSection(
 
 /**
  * Extracts academic term letter from section number
- * For undergraduate: "A01" → "A", "DL08" → "D"
- * For graduate: "F01" → "F" (Fall), "S01" → "S" (Spring)
+ * For undergraduate: "A01" -> "A", "DL08" -> "D"
+ * For graduate: "F01" -> "F" (Fall), "S01" -> "S" (Spring)
  */
 function extractTermLetter(sectionNumber: string, isGraduate: boolean): string {
   const match = sectionNumber.match(/^([ABCDFS])/i);
