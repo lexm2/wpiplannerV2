@@ -422,9 +422,15 @@
   gap: 0.35rem;
 }
 
+/* Sized like the other inline SVGs (see .filter-icon): the glyph this replaced
+   took its size from font-size, an SVG does not. */
 .degree-search-icon {
-  font-size: 0.9rem;
-  line-height: 1;
+  width: 16px;
+  height: 16px;
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+  color: inherit;
 }
 
 /* Divides the card-edge statuses from the progress-bar segments in the one

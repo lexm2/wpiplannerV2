@@ -8,6 +8,7 @@
   import { courseDrag } from './courseDrag.svelte';
   import { degreeViewState } from './degreeViewState.svelte';
   import { openModal } from '../../services/ui/uiState.svelte';
+  import { getInlineSVG } from '../../utils/iconPaths';
   import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
   import { dur } from '../transitions';
 
@@ -165,7 +166,7 @@
         class="degree-filter-chip degree-search-chip"
         onclick={() => openModal('course-finder')}
       >
-        <span class="degree-search-icon" aria-hidden="true">&#9906;</span>
+        {@html getInlineSVG('SEARCH', 'degree-search-icon')}
         Search courses
       </button>
     </div>
