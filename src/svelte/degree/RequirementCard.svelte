@@ -165,13 +165,10 @@
   </header>
 
   <!-- Always rendered, even with no numeric target (the segments are then all
-       zero and the track is hatched): in a grid every card needs the same
-       anatomy, or the rows read as accidental. -->
+       zero and only the hatched track shows): in a grid every card needs the
+       same anatomy, or the rows read as accidental. -->
   <div class="degree-progress degree-progress-sm">
-    <div
-      class="degree-progress-bar"
-      class:is-indeterminate={progress.fraction === null}
-    >
+    <div class="degree-progress-bar">
       <div
         class="degree-progress-seg seg-earned"
         style:width="{progress.segments.earned * 100}%"

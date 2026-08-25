@@ -277,7 +277,19 @@
   flex: 1;
   display: flex;
   height: 8px;
-  background: var(--color-background-alt);
+  /* Hatched, never flat. A flat track is --color-background-alt, which no theme
+     guarantees to differ from the card under it: in WPI Dark that token and
+     --color-surface are the same #2c2c2e, so the unfilled part of every bar
+     was invisible, and --color-background-alt is a satisfied card's background
+     in every theme. The hatch is drawn in --color-border, so it reads as
+     unfilled track whatever the card is painted in - and gives every bar the
+     same anatomy whether or not the bucket has a numeric target to fill. */
+  background-color: var(--color-background-alt);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-border) 0 4px,
+    transparent 4px 8px
+  );
   border-radius: var(--effect-border-radius);
   overflow: hidden;
 }
@@ -863,16 +875,6 @@
 .requirement-card-less {
   align-self: flex-start;
   margin-top: 0.5rem;
-}
-
-/* No numeric target to fill - hatch the track rather than leave it blank, so
-   every card still has the same anatomy. */
-.degree-progress-bar.is-indeterminate {
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--color-border) 0 4px,
-    transparent 4px 8px
-  );
 }
 
 /* drop-target highlight while dragging a course over a card.
