@@ -49,7 +49,7 @@
   //
   // Closing goes through closeModal(id) so uiState.openModals
   // stays the single source of truth (keeping tutorial snapshots correct);
-  // that removal unmounts the component, after its 200ms hide animation has
+  // that removal unmounts the component, after its ~225ms hide animation has
   // already played. Payload modals (section-info, delete-local-event) read
   // their data from modalState (set by the trigger sites before modalOpened).
 </script>

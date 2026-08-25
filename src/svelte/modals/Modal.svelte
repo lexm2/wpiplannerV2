@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   import type { Snippet } from 'svelte';
   import { trapFocus } from './trapFocus';
-  import { zoom, dur } from '../transitions';
+  import { scrim, riseFade } from '../transitions';
 
   let {
     typeId,
@@ -38,9 +37,15 @@
     children: Snippet<[() => void]>;
   } = $props();
 
-  // Backdrop fades, dialog zooms. `|global` because ModalLayer's {#each}
-  // unmounts us, so a local outro wouldn't play. `no-transform` dialogs
-  // (position:fixed descendants) skip the zoom; the backdrop fade still covers them.
+  // Enter: the backdrop darkens, then the dialog fades and rises into it a
+  // beat later. Exit reverses the order and runs faster. Both halves live in
+  // `scrim`/`riseFade`, which read the direction themselves - see the note
+  // there on why this is one `transition:` and not split in:/out:.
+  //
+  // `|global` because ModalLayer's {#each} unmounts us, so a local outro
+  // would never play. `no-transform` dialogs (position:fixed descendants)
+  // keep the fade but drop the rise, so they never become a containing block
+  // for those children.
   const noTransform = $derived((dialogClass ?? '').includes('no-transform'));
 
   function close(): void {
@@ -70,13 +75,13 @@
 <div
   class="modal-backdrop modal-container {extraClass ?? ''}"
   data-modal-type={typeId}
-  transition:fade|global={{ duration: dur(200) }}
+  transition:scrim|global
   onclick={backdropClick}
 >
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus (dialog onclick only stops backdrop propagation) -->
   <div
     class="modal-dialog {dialogClass ?? ''}"
-    transition:zoom|global={{ enabled: !noTransform }}
+    transition:riseFade|global={{ transform: !noTransform }}
     role="dialog"
     aria-modal="true"
     aria-label={title}

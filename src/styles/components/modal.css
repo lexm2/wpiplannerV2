@@ -24,8 +24,8 @@
   pointer-events: auto;
 }
 
-/* Modal Dialog - enter/exit lives in Modal.svelte (backdrop fade + dialog
-   zoom; a `no-transform` dialog class opts out of the zoom). */
+/* Modal Dialog - enter/exit lives in Modal.svelte (backdrop darken + dialog
+   fade/rise; a `no-transform` dialog class keeps the fade, drops the rise). */
 .modal-dialog {
   background: var(--color-surface);
   border-radius: var(--effect-border-radius-large);
