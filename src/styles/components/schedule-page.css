@@ -247,6 +247,10 @@
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   background: var(--color-background);
+  /* Breathing room for the hover reveal (revealSidebarCourse): scrollIntoView
+     stops the moment the item fits, which without this parks it flush against
+     the panel edge, reading as "there is nothing above/below". */
+  scroll-margin-block: 0.75rem;
 }
 
 .schedule-course-item.sidebar-course-highlighted {

@@ -1,6 +1,9 @@
 <script lang="ts">
   import { getInlineSVG } from '../utils/iconPaths';
-  import { scheduleSidebarState } from './scheduleSidebarState.svelte';
+  import {
+    scheduleSidebarState,
+    revealSidebarCourse,
+  } from './scheduleSidebarState.svelte';
   import { formatCredits } from './selectedCourseUtils';
   import { sectionsOf } from '../utils/courseUtils';
   import { COMPONENT_KINDS, type ComponentKind } from '../types/types';
@@ -39,6 +42,15 @@
     scheduleSidebarState.hoveredCourseId === course.id,
   );
 
+  let itemEl = $state<HTMLElement | null>(null);
+
+  // The list is taller than the panel as soon as a few courses are selected, so
+  // the item the grid just named is as often as not scrolled out of it. Scroll
+  // it back rather than highlighting something nobody can see.
+  $effect(() => {
+    if (highlighted && itemEl) revealSidebarCourse(itemEl);
+  });
+
   // The whole header opens the wizard; the control buttons stopPropagation so a
   // click on them doesn't also open the wizard.
   function handleHeaderKeydown(e: KeyboardEvent): void {
@@ -61,6 +73,7 @@
   class="sidebar-content-item schedule-course-item collapsed"
   class:sidebar-course-highlighted={highlighted}
   data-course-id={course.id}
+  bind:this={itemEl}
 >
   <div
     class="schedule-course-header"
