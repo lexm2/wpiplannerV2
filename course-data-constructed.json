@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 26, 2026, 11:05 AM",
+  "generated": "Aug 26, 2026, 11:43 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8642,7 +8642,7 @@
                 "crn": 349339,
                 "number": "B01",
                 "seats": 80,
-                "seatsAvailable": 17,
+                "seatsAvailable": 16,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -8659,7 +8659,7 @@
                     "building": "",
                     "room": "Unity Hall 400",
                     "seats": 80,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 16,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "B01",
@@ -55137,7 +55137,7 @@
                 "crn": 349566,
                 "number": "B01",
                 "seats": 30,
-                "seatsAvailable": 27,
+                "seatsAvailable": 26,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -55154,7 +55154,7 @@
                     "building": "",
                     "room": "Atwater Kent 219",
                     "seats": 30,
-                    "seatsAvailable": 27,
+                    "seatsAvailable": 26,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "B01",
