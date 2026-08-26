@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 26, 2026, 8:22 AM",
+  "generated": "Aug 26, 2026, 9:09 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -45117,7 +45117,7 @@
                 "number": "A01",
                 "seats": 70,
                 "seatsAvailable": 0,
-                "actualWaitlist": 7,
+                "actualWaitlist": 6,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "A",
@@ -45134,7 +45134,7 @@
                     "room": "Unity Hall 520",
                     "seats": 70,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 7,
+                    "actualWaitlist": 6,
                     "maxWaitlist": 20,
                     "specificSection": "A01",
                     "days": [
@@ -211246,8 +211246,8 @@
                 "crn": 348712,
                 "number": "A01",
                 "seats": 50,
-                "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "seatsAvailable": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "A",
@@ -211263,8 +211263,8 @@
                     "building": "",
                     "room": "Salisbury Labs 105",
                     "seats": 50,
-                    "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "A01",
                     "days": [
@@ -224452,8 +224452,8 @@
                 "crn": 348885,
                 "number": "A01",
                 "seats": 30,
-                "seatsAvailable": -1,
-                "actualWaitlist": 1,
+                "seatsAvailable": 0,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "A",
@@ -224469,8 +224469,8 @@
                     "building": "",
                     "room": "Recreation Center All Courts 1-2",
                     "seats": 30,
-                    "seatsAvailable": -1,
-                    "actualWaitlist": 1,
+                    "seatsAvailable": 0,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "A01",
                     "days": [
