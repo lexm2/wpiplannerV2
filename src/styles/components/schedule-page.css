@@ -418,13 +418,6 @@
   min-width: 0;
 }
 
-.section-number {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-primary);
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
-}
-
 /* Enhanced period display styles */
 .section-periods {
   display: flex;

@@ -1,0 +1,33 @@
+/* Shared inline-SVG icon utilities.
+ *
+ * These classes are injected as RAW STRINGS by getInlineSVG() (utils/iconPaths.ts)
+ * and are used by components that own different stylesheets - .x-icon by
+ * SearchBar, .trash-icon by both SelectedCoursesPanel and SelectedCourseItem.
+ * They are therefore deliberately global: a CSS module would hash them and the
+ * {@html} markup has no way to reach the hashed name. Component-specific icon
+ * styling belongs in that component's module, not here. */
+
+.x-icon,
+.trash-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
+  stroke: currentColor;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.chevron-icon {
+  transition: transform 0.3s ease;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chevron-icon svg {
+  transform-origin: center;
+  display: block;
+}

@@ -13,8 +13,10 @@
 @import url('./styles/components/side-panel.css');
 @import url('./styles/components/sidebar.css');
 @import url('./styles/components/main-content.css');
+@import url('./styles/components/icons.css'); /* shared getInlineSVG icon classes - must stay global */
 @import url('./styles/components/course-list.css');
-@import url('./styles/components/right-panel.css');
+/* right-panel.module.css - imported directly in App.svelte, CourseDescription.svelte,
+   SelectedCoursesPanel.svelte and SelectedCourseItem.svelte */
 @import url('./styles/components/schedule-page.css');
 @import url('./styles/components/degree-page.css');
 @import url('./styles/components/schedule-picker-modal.css');

@@ -55,7 +55,7 @@ test('right panel default width is 700px, not the old 320px', async ({
 
   const result = await page.evaluate(() => {
     const cs = getComputedStyle(document.documentElement);
-    const panel = document.querySelector('.right-panel');
+    const panel = document.querySelector('[data-right-panel]');
     return {
       spacingVar: cs.getPropertyValue('--spacing-right-panel-width').trim(),
       inlineOverride: document.documentElement.style.getPropertyValue(
@@ -83,7 +83,7 @@ test('a stored drag width still wins over the default', async ({ page }) => {
   await page.waitForTimeout(500);
 
   const w = await page.evaluate(() => {
-    const panel = document.querySelector('.right-panel');
+    const panel = document.querySelector('[data-right-panel]');
     return panel ? Math.round(panel.getBoundingClientRect().width) : null;
   });
   expect(w).toBe(500);

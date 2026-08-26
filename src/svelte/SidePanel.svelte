@@ -31,6 +31,10 @@
     /** The page's own class, for its layout and width rules. */
     class?: string;
     children: Snippet;
+    /** Anything else lands on the <aside> - notably the stable `data-*` hooks
+     * that tests and tutorial steps address the panel by, since `class` is a
+     * hashed CSS-module name and cannot be selected on. */
+    [key: string]: unknown;
   }
 
   let {
@@ -40,10 +44,15 @@
     label,
     class: className = '',
     children,
+    ...rest
   }: Props = $props();
 </script>
 
-<aside class="side-panel side-panel-{edge} {className}" aria-label={label}>
+<aside
+  class="side-panel side-panel-{edge} {className}"
+  aria-label={label}
+  {...rest}
+>
   {@render children()}
   <ResizeHandle {config} {edge} label={resizeLabel} />
 </aside>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import styles from '../styles/components/right-panel.module.css';
   import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../utils/iconPaths';
   import { courseListState } from './courseListState.svelte';
@@ -188,55 +189,63 @@
 {#if !course}
   <div class="empty-state">Select a course to view description</div>
 {:else}
-  <div class="course-info">
-    <div class="course-desc-title">{course.name}</div>
-    <div class="course-code">
+  <div class={styles['course-info']}>
+    <div class={styles['course-desc-title']}>{course.name}</div>
+    <div class={styles['course-code']}>
       {course.departmentAbbr}{course.number} ({credits})
     </div>
-    <div class="course-meta">
-      {#if yearLabel}<div class="course-year">{yearLabel}</div>{/if}
+    <div class={styles['course-meta']}>
+      {#if yearLabel}<div class={styles['course-year']}>{yearLabel}</div>{/if}
       {#if course.category != null}
-        <div class="course-category">
+        <div class={styles['course-category']}>
           Cat {course.category}
-          <div class="course-category-tooltip">
+          <div class={styles['course-category-tooltip']}>
             {CATEGORY_DESCRIPTIONS[course.category]}
           </div>
         </div>
       {/if}
     </div>
   </div>
-  <div class="course-description-text">{course.description}</div>
+  <div class={styles['course-description-text']}>{course.description}</div>
 
   {#if showTabs}
-    <div class="course-components-section">
-      <div class="component-tabs">
+    <div class={styles['course-components-section']}>
+      <div class={styles['component-tabs']}>
         {#each tabs as tab (tab.id)}
           <button
-            class="component-tab"
-            class:active={activeTab === tab.id}
+            class={[
+              styles['component-tab'],
+              { [styles['active']]: activeTab === tab.id },
+            ]}
             data-tab={tab.id}
             onclick={() => (activeTab = tab.id)}>{tab.label}</button
           >
         {/each}
       </div>
-      <div class="component-tab-content">
+      <div class={styles['component-tab-content']}>
         {#if activeGroup}
-          <div class="tab-panel active" data-panel={activeTab}>
+          <div
+            class={[styles['tab-panel'], styles['active']]}
+            data-panel={activeTab}
+          >
             <h3>{activeGroup.heading}</h3>
-            <div class="sections-list">
+            <div class={styles['sections-list']}>
               {#each activeGroup.sections as section (section.crn)}
                 {@const interest = section.isInterestList}
                 {@const async = isAsyncSection(section)}
                 {@const rmpUrl = professorRmpUrl(section)}
-                <div class="section-list-item">
-                  <div class="section-header">
-                    <span class="section-number">{section.number}</span>
-                    {#if !interest}<span class="section-type"
+                <div class={styles['section-list-item']}>
+                  <div class={styles['section-header']}>
+                    <span class={styles['section-number']}
+                      >{section.number}</span
+                    >
+                    {#if !interest}<span class={styles['section-type']}
                         >{activeGroup.type}</span
                       >{/if}
-                    <span class="section-crn">CRN: {section.crn}</span>
+                    <span class={styles['section-crn']}>CRN: {section.crn}</span
+                    >
                   </div>
-                  <div class="section-details">
+                  <div class={styles['section-details']}>
                     {#if interest}
                       <!-- interest lists have no time/location -->
                     {:else if async}
@@ -245,16 +254,16 @@
                         Asynchronous
                       </div>
                     {:else}
-                      <div class="section-time">
+                      <div class={styles['section-time']}>
                         <strong>{sectionDays(section)}</strong>
                         {sectionTime(section)}
                       </div>
-                      <div class="section-location">
+                      <div class={styles['section-location']}>
                         {sectionLocation(section)}
                       </div>
                     {/if}
                     {#if !interest}
-                      <div class="section-professor">
+                      <div class={styles['section-professor']}>
                         {#if rmpUrl}
                           <a
                             href={rmpUrl}
@@ -268,7 +277,7 @@
                         {/if}
                       </div>
                     {/if}
-                    <div class="section-seats">
+                    <div class={styles['section-seats']}>
                       Seats: {section.seatsAvailable}/{section.seats} available
                       {#if section.actualWaitlist > 0}(Waitlist: {section.actualWaitlist}/{section.maxWaitlist}){/if}
                     </div>

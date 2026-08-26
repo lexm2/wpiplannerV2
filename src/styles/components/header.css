@@ -164,9 +164,7 @@
   white-space: nowrap;
 }
 
-.course-item-controls .course-clear-sections-btn:hover .eraser-icon,
-.course-item-controls .course-remove-btn:hover .x-icon,
-.course-item-controls .course-remove-btn:hover .trash-icon {
+.course-item-controls .course-clear-sections-btn:hover .eraser-icon {
   color: var(--color-text) !important;
   opacity: 1;
 }

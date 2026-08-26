@@ -1,4 +1,5 @@
 <script lang="ts">
+  import styles from '../styles/components/right-panel.module.css';
   import { slide } from 'svelte/transition';
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
@@ -66,7 +67,7 @@
 </script>
 
 <div
-  class="selected-courses-header"
+  class={styles['selected-courses-header']}
   id="selected-courses-header"
   role="button"
   tabindex="0"
@@ -75,8 +76,8 @@
   onclick={toggleExpander}
   onkeydown={onHeaderKeydown}
 >
-  <h3 class="selected-courses-title">
-    Selected Courses <span id="selected-count" class="course-count"
+  <h3 class={styles['selected-courses-title']}>
+    Selected Courses <span id="selected-count" class={styles['course-count']}
       >({count})</span
     >
   </h3>
@@ -87,7 +88,7 @@
 
 {#if isExpanded}
   <div
-    class="selected-courses-content"
+    class={styles['selected-courses-content']}
     id="selected-courses-list"
     transition:slide={{ duration: dur(280), easing: cubicOut }}
   >
@@ -99,7 +100,7 @@
     {#each courses as sc (sc.course.id)}
       {@const course = sc.course}
       <div
-        class="selected-course-item"
+        class={styles['selected-course-item']}
         data-course-id={course.id}
         role="button"
         tabindex="0"
@@ -108,15 +109,17 @@
         onclick={() => handleSelect(course)}
         onkeydown={e => onItemKeydown(e, course)}
       >
-        <div class="selected-course-info">
-          <div class="selected-course-code">
+        <div class={styles['selected-course-info']}>
+          <div class={styles['selected-course-code']}>
             {course.departmentAbbr}{course.number}
           </div>
-          <div class="selected-course-name">{course.name}</div>
-          <div class="selected-course-credits">{formatCredits(course)}</div>
+          <div class={styles['selected-course-name']}>{course.name}</div>
+          <div class={styles['selected-course-credits']}>
+            {formatCredits(course)}
+          </div>
         </div>
         <button
-          class="course-remove-btn"
+          class={styles['course-remove-btn']}
           data-course-id={course.id}
           title="Remove from selection"
           onclick={e => handleRemove(e, course)}

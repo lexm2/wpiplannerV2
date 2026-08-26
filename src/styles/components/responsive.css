@@ -24,8 +24,9 @@
     grid-template-columns: 1fr;
   }
 
-  .sidebar,
-  .right-panel {
+  /* `.right-panel` used to be listed here too; it is hashed by
+     right-panel.module.css now, so its copy of this rule lives there. */
+  .sidebar {
     display: none;
   }
 }

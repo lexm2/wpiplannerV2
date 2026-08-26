@@ -1,4 +1,5 @@
 <script lang="ts">
+  import styles from '../styles/components/right-panel.module.css';
   import { untrack } from 'svelte';
   import { wizardState } from './wizardState.svelte';
   import { wizardScrollLock } from './wizardScrollLock';
@@ -229,19 +230,20 @@
   </main>
 
   <SidePanel
-    class="right-panel"
+    class={styles['right-panel']}
+    data-right-panel
     label="Course details and selection"
     config={PANEL_WIDTHS.rightPanel}
     edge="left"
     resizeLabel="Resize course details panel"
   >
-    <section class="selected-courses-section">
+    <section class={styles['selected-courses-section']}>
       <SelectedCoursesPanel
         courseSelectionService={services.courseSelectionService}
       />
     </section>
-    <section class="course-description-section">
-      <div class="course-description-content" id="course-description">
+    <section class={styles['course-description-section']}>
+      <div class={styles['course-description-content']} id="course-description">
         <CourseDescription courseDataService={services.courseDataService} />
       </div>
     </section>

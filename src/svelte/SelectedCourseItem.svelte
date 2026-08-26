@@ -1,4 +1,5 @@
 <script lang="ts">
+  import styles from '../styles/components/right-panel.module.css';
   import { getInlineSVG } from '../utils/iconPaths';
   import {
     scheduleSidebarState,
@@ -125,7 +126,7 @@
         >{@html getInlineSVG('ERASER', 'eraser-icon')}</button
       >
       <button
-        class="course-remove-btn"
+        class={styles['course-remove-btn']}
         data-course-id={course.id}
         title="Remove from selection"
         onclick={handleRemove}
