@@ -3,13 +3,9 @@ import { test, expect, type Page } from '@playwright/test';
 /**
  * Guards the course list's scroll-driven paging.
  *
- * The list renders 100 courses at a time and extends itself when its sentinel
- * comes within a screenful of the bottom of #course-container. That sentinel is
- * watched by an IntersectionObserver whose `root` must be the scrolling
- * ancestor: left on the default viewport root it would still be clipped by the
- * container, the rootMargin would buy nothing, and the second page would simply
- * never arrive. Nothing about that is a compile error and nothing throws - the
- * list just quietly stops at 100 - which is what this test is for.
+ * The sentinel's IntersectionObserver must take the scrolling ancestor as its
+ * `root`; against the viewport it stays clipped and the next page never
+ * arrives. That fails silently - the list just stops at 100.
  */
 
 const rows = (page: Page) => page.locator('[data-course-item]');
@@ -31,8 +27,8 @@ test('the course list pages itself as it is scrolled', async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
   await page.waitForSelector('#course-container');
-  // "All Departments" is the first entry, and the only one holding enough
-  // courses to page more than once.
+  // "All Departments" is the first entry, and the only one with enough courses
+  // to page more than once.
   await page.locator('.department-item').first().click();
 
   const footer = page.locator('[data-list-footer]');
@@ -47,15 +43,13 @@ test('the course list pages itself as it is scrolled', async ({ page }) => {
   await expect(rows(page)).toHaveCount(200);
   await expect(footer).toHaveText(/^Showing 200 of [\d,]+ courses$/);
 
-  // Run to the end. Each pass adds a page, so this needs at most total/100
-  // rounds; the cap is a runaway guard, not a real bound.
+  // Run to the end; the cap is a runaway guard, not a real bound.
   for (let i = 0; i < 40 && (await sentinel(page).count()) > 0; i++) {
     await scrollToBottom(page);
     await page.waitForTimeout(250);
   }
 
-  // Exhausted: the sentinel is gone, every course is rendered, and the footer
-  // drops the "Showing N of" now that there is nothing left to show.
+  // Exhausted: sentinel gone, every course rendered, footer drops "Showing N of".
   await expect(sentinel(page)).toHaveCount(0);
   await expect(rows(page)).toHaveCount(total);
   await expect(footer).toHaveText(/^[\d,]+ courses$/);
@@ -69,8 +63,7 @@ test('a new result set restarts at the first page', async ({ page }) => {
   await page.locator('.department-item').first().click();
   await expect(rows(page)).toHaveCount(100);
 
-  // Await each page before scrolling again - scrolling to a bottom that hasn't
-  // moved yet is a no-op, not a second trigger.
+  // Await each page - scrolling to a bottom that hasn't moved is a no-op.
   await scrollToBottom(page);
   await expect(rows(page)).toHaveCount(200);
   await scrollToBottom(page);
@@ -88,7 +81,6 @@ test('a new result set restarts at the first page', async ({ page }) => {
   const footer = page.locator('[data-list-footer]');
   await expect(footer).toHaveText(/^Showing 100 of [\d,]+ courses$/);
   await expect(rows(page)).toHaveCount(100);
-  // Non-vacuous only if the search still matches more than a page: without the
-  // reset those extra matches would all have rendered against the old cursor.
+  // Non-vacuous only if the search matches more than a page.
   expect(lastNumber((await footer.textContent())!)).toBeGreaterThan(300);
 });

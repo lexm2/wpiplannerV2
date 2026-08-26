@@ -469,9 +469,7 @@
   }
 }
 
-/* The list's footer count. Replaces the "Load next 100 courses" button: the
-   list pages itself on scroll now, so the only thing left to say at the bottom
-   is how much of the result set is on screen. */
+/* Footer count under the list. */
 .list-footer {
   padding: 1.5rem 0 0.5rem;
   text-align: center;

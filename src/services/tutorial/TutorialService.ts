@@ -175,7 +175,7 @@ export class TutorialService {
     }
 
     // Target isn't in the DOM yet - observe for it to mount while actively
-    // revealing it (course-list rows past the rendered window, off-screen rows).
+    // revealing it (rows past the rendered window, off-screen rows).
     this.highlightObserver = new MutationObserver(() => {
       const found = document.querySelector(selector);
       if (!found) return;
@@ -219,11 +219,10 @@ export class TutorialService {
   }
 
   // While a step's target is missing, page the course list forward until it
-  // mounts (the list renders 100 at a time). Stops as soon as the target appears
-  // (the highlight MutationObserver then attaches and revealInView scrolls to
-  // it) or the step changes. The list grows itself on scroll, but this reaches
-  // for its cursor directly rather than scrolling the container - scrolling
-  // arbitrary containers races with wizard/modal render.
+  // mounts. Stops as soon as the target appears (the highlight MutationObserver
+  // attaches and revealInView scrolls to it) or the step changes. Grows the
+  // cursor directly rather than scrolling the container - scrolling arbitrary
+  // containers races with wizard/modal render.
   private startReveal(selector: string): void {
     let attempts = 0;
     const tick = () => {

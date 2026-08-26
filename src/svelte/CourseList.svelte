@@ -74,17 +74,14 @@
       : `${sorted.length.toLocaleString()} course${sorted.length === 1 ? '' : 's'}`,
   );
 
-  // A new result set starts at the top. Without this, clearing a filter after
-  // scrolling deep would render every match at once - the list only ever grew
-  // before, because growing it took a deliberate click.
+  // A new result set starts at the top; without this, clearing a filter after
+  // scrolling deep renders every match at once.
   $effect(() => {
     sorted;
     courseListState.resetPaging();
   });
 
-  // Wrapped rather than handed to the action as `courseListState.showMore`,
-  // which would arrive unbound; named rather than an inline arrow so the action
-  // isn't given a fresh identity on every render.
+  // Wrapped to bind `this`, named so the action keeps one identity across renders.
   function showMore(): void {
     courseListState.showMore();
   }
@@ -361,8 +358,7 @@
 {/if}
 
 {#if sorted.length > 0}
-  <!-- The count is what tells the reader the list is finite now that there is no
-       button saying so, and the live region is how that reaches a screen reader. -->
+  <!-- How much of the result set is on screen; live so it reaches a screen reader. -->
   <div
     class={listStyles['list-footer']}
     data-list-footer
@@ -372,8 +368,7 @@
     {footerText}
   </div>
   {#if hasMore}
-    <!-- Mounted only while there is more to show, so the list dropping it is the
-         whole of the disarm story - see infiniteScroll. -->
+    <!-- Mounted only while more remains; unmounting disarms the observer. -->
     <div
       data-load-sentinel
       aria-hidden="true"
