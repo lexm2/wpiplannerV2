@@ -119,6 +119,16 @@ async function setupWithScheduleCourse(page: Page): Promise<void> {
   await expect(railCount(page)).toHaveText('1');
 }
 
+/**
+ * Modals scale in over 280ms. Clicking or measuring inside one before that
+ * settles works off stale coordinates and lands on nothing.
+ */
+const settleModal = (page: Page) =>
+  page.waitForFunction(() => {
+    const el = document.querySelector('.modal-dialog');
+    return !!el && el.getAnimations().length === 0;
+  });
+
 const railCount = (page: Page) => page.locator('.degree-rail-count');
 /** Scoped to the bucket list - rail tiles carry the same classes. */
 const placedCodes = (page: Page) =>
@@ -388,6 +398,7 @@ test('finds a course and names the bucket it is in', async ({ page }) => {
   await setupWithScheduleCourse(page);
 
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
   const finder = page.locator('.course-finder-modal');
   await expect(finder).toBeVisible();
 
@@ -439,6 +450,7 @@ test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
     .click();
 
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
   const row = page.locator('.course-finder-row', { hasText: 'CS 1004' });
   const bucketRow = row.locator('button.course-finder-bucket');
   await expect(bucketRow.locator('.course-finder-bucket-name')).toHaveText(
@@ -485,6 +497,7 @@ test('keeps the jump scrolled once the finder closes', async ({ page }) => {
   await expect(card).not.toBeInViewport();
 
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
   await page
     .locator('.course-finder-row', { hasText: 'CS 3013' })
     .locator('button.course-finder-bucket', { hasText: 'Systems Requirement' })
@@ -513,6 +526,7 @@ test('leaves the degree-wide aggregates off a finder card', async ({
   await page.locator('.degree-summary-title').waitFor();
 
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
   const row = page.locator('.course-finder-row', { hasText: 'CS 1102' });
   await expect(row.locator('.course-finder-bucket-name')).toHaveText([
     'Core Requirement',
@@ -557,6 +571,7 @@ test('reveals a hidden degree-wide bucket the user placed a course in', async ({
   await expect(totalCredits).toHaveCount(0);
 
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
   const row = page.locator('.course-finder-row', { hasText: 'CS 1004' });
   await row.locator('.assign-menu-trigger').click();
   // Keyboard, not a click: .assign-menu-popup is a hard drop-up with no
@@ -598,6 +613,7 @@ test('sends a finder course to the classes page on a cleared search', async ({
   });
 
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
   await page
     .locator('.course-finder-row', { hasText: 'CS 1004' })
     .locator('.course-finder-open')
@@ -620,6 +636,7 @@ test('sends a finder course to the classes page on a cleared search', async ({
 test('cycles the finder through its grouping modes', async ({ page }) => {
   await setupWithScheduleCourse(page);
   await page.locator('#degree-course-search').click();
+  await settleModal(page);
 
   const label = page.locator('.course-finder-sort-label');
   const sortButton = page.locator('#course-finder-sort');
@@ -738,6 +755,7 @@ test('reorders config rows vertically, clamped to the list', async ({
   await page.setInputFiles('#degree-import-file', fixture);
   await page.locator('.degree-summary-title').waitFor();
   await page.locator('#degree-configure-buckets-btn').click();
+  await settleModal(page);
 
   const names = () => page.locator('.bucket-config-name').allTextContents();
   const before = await names();
@@ -772,13 +790,19 @@ test('reorders config rows vertically, clamped to the list', async ({
   });
   expect(clamped.translateX).toBe(0);
   expect(clamped.insideList).toBe(true);
-  // The rows it displaces slide aside to open the gap it drops into.
-  const shifted = await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLElement>('.bucket-config-row')]
-      .filter(r => !r.classList.contains('is-dragging'))
-      .map(r => Math.round(new DOMMatrix(getComputedStyle(r).transform).m42)),
-  );
-  expect(shifted.filter(y => y !== 0).length).toBeGreaterThan(0);
+  // The rows it displaces slide aside to open the gap it drops into - a 160ms
+  // transition, so poll rather than read once.
+  const shiftedRows = async () =>
+    (
+      await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>('.bucket-config-row')]
+          .filter(r => !r.classList.contains('is-dragging'))
+          .map(r =>
+            Math.round(new DOMMatrix(getComputedStyle(r).transform).m42),
+          ),
+      )
+    ).filter(y => y !== 0).length;
+  await expect.poll(shiftedRows).toBeGreaterThan(0);
 
   // Release inside the window - Playwright cannot deliver a pointerup outside
   // the viewport, and it is the realistic gesture anyway.
@@ -802,6 +826,7 @@ test('adds and deletes buckets from the config modal', async ({ page }) => {
   await page.locator('.degree-summary-title').waitFor();
 
   await page.locator('#degree-configure-buckets-btn').click();
+  await settleModal(page);
   const rows = page.locator('.bucket-config-row');
   await expect(rows).toHaveCount(5);
 
@@ -842,6 +867,7 @@ test('renames an imported bucket without touching the record', async ({
   await page.locator('.degree-summary-title').waitFor();
 
   await page.locator('#degree-configure-buckets-btn').click();
+  await settleModal(page);
   // Anchor on the bucket id: in edit mode the row swaps its name for inputs, so
   // a hasText filter would stop matching mid-test.
   const core = page.locator(
