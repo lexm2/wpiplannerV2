@@ -107,7 +107,7 @@
 {#if appState.loadedDepartments.length === 0}
   <div class="empty-state">Loading courses...</div>
 {:else if displayed.length === 0}
-  <div class="empty-state">No courses found in this department.</div>
+  <div class="empty-state">No courses found.</div>
 {:else if view === 'grid'}
   <div class={listStyles['course-grid']}>
     {#each courseViews as cv (cv.course.id)}
@@ -134,7 +134,7 @@
           <div class={listStyles['course-card-info']}>
             <div class={listStyles['course-title-main']}>{course.name}</div>
             <div class={listStyles['course-code-row']}>
-              <div class={listStyles['course-code-badge']}>
+              <div class={listStyles['course-code']}>
                 {course.departmentAbbr}{course.number}
               </div>
               {#if cv.hasWarning}<span class={listStyles['capacity-badge']}
