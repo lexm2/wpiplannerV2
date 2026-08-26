@@ -1462,11 +1462,8 @@ html.is-mobile .changelog-modal-body {
   justify-content: flex-end;
 }
 
-.as-card-terms .term-badge.selected {
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  border-color: var(--color-primary);
-}
+/* `.as-card-terms .term-badge.selected` lived here; `.term-badge` is hashed by
+   course-list.module.css now, so that rule moved there. */
 
 /* ---- Course finder modal ----
    Replaces what used to be a right-hand pane on the Degree page. That pane cost

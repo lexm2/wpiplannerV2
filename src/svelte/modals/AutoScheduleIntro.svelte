@@ -1,4 +1,5 @@
 <script lang="ts">
+  import listStyles from '../../styles/components/course-list.module.css';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
   import Modal from './Modal.svelte';
   import { modalState } from './modalState.svelte';
@@ -134,13 +135,17 @@
                   {sc.course.academicYear ?? '-'}
                 </div>
               </div>
-              <div class="as-card-terms term-badges-container">
+              <div
+                class={['as-card-terms', listStyles['term-badges-container']]}
+              >
                 {#each TERMS as term (term)}
                   {#if isAvailable(sc, term)}
                     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (term badge toggles one term; stops card toggle) -->
                     <span
-                      class="term-badge"
-                      class:selected={isSelected(sc, term)}
+                      class={[
+                        listStyles['term-badge'],
+                        { [listStyles['selected']]: isSelected(sc, term) },
+                      ]}
                       data-term={term}
                       data-term-badge
                       data-course-id={sc.course.id}
@@ -149,16 +154,19 @@
                         toggleTerm(sc, term);
                       }}
                     >
-                      <span class="term-letter">{term}</span>
+                      <span class={listStyles['term-letter']}>{term}</span>
                     </span>
                   {:else}
                     <span
-                      class="term-badge unavailable"
+                      class={[
+                        listStyles['term-badge'],
+                        listStyles['unavailable'],
+                      ]}
                       data-term={term}
                       data-term-badge
                       data-course-id={sc.course.id}
                     >
-                      <span class="term-letter">{term}</span>
+                      <span class={listStyles['term-letter']}>{term}</span>
                     </span>
                   {/if}
                 {/each}

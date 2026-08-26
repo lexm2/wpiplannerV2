@@ -76,26 +76,16 @@
   color: var(--color-text-inverse);
 }
 
-.check-icon,
-.plus-icon {
-  width: 20px;
-  height: 20px;
-  display: block;
-  pointer-events: none;
-  stroke: currentColor;
-  color: inherit;
-}
-
-.course-select-btn.selected .check-icon {
+.course-select-btn.selected :global(.check-icon) {
   stroke: var(--color-text-inverse);
 }
 
-.course-select-btn:not(.selected) .plus-icon {
+.course-select-btn:not(.selected) :global(.plus-icon) {
   stroke: var(--color-text-secondary);
 }
 
-.course-select-btn:not(.selected):hover .plus-icon,
-.course-select-btn:not(.selected):focus .plus-icon {
+.course-select-btn:not(.selected):hover :global(.plus-icon),
+.course-select-btn:not(.selected):focus :global(.plus-icon) {
   stroke: var(--color-primary);
 }
 
@@ -132,23 +122,16 @@
   color: var(--color-text-inverse);
 }
 
-.bookmark-icon {
-  width: 18px;
-  height: 18px;
-  display: block;
-  pointer-events: none;
-}
-
-.course-bookmark-btn:not(.bookmarked) .bookmark-icon {
+.course-bookmark-btn:not(.bookmarked) :global(.bookmark-icon) {
   stroke: var(--color-text-secondary);
 }
 
-.course-bookmark-btn:not(.bookmarked):hover .bookmark-icon,
-.course-bookmark-btn:not(.bookmarked):focus .bookmark-icon {
+.course-bookmark-btn:not(.bookmarked):hover :global(.bookmark-icon),
+.course-bookmark-btn:not(.bookmarked):focus :global(.bookmark-icon) {
   stroke: var(--color-warning);
 }
 
-.course-bookmark-btn.bookmarked .bookmark-icon {
+.course-bookmark-btn.bookmarked :global(.bookmark-icon) {
   fill: var(--color-text-inverse);
 }
 
@@ -281,11 +264,11 @@
   pointer-events: none;
 }
 
-.term-badge .term-icon {
+.term-badge :global(.term-icon) {
   display: none;
 }
 
-.term-badge.active .term-icon {
+.term-badge.active :global(.term-icon) {
   display: block;
   width: 14px;
   height: 14px;
@@ -360,17 +343,8 @@
   padding: 0.25rem 0.5rem;
 }
 
-.term-badge.active .term-icon {
+.term-badge.active :global(.term-icon) {
   transform: rotate(45deg);
-}
-
-.warning-icon {
-  color: var(--color-warning);
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  vertical-align: middle;
-  transform: translateY(-2px);
 }
 
 .capacity-badge {
@@ -481,12 +455,12 @@
 }
 
 /* Responsive grid adjustments */
-html.is-mobile .course-grid {
+:global(html.is-mobile) .course-grid {
   grid-template-columns: 1fr;
   gap: 1rem;
 }
 
-html.is-mobile .course-card {
+:global(html.is-mobile) .course-card {
   padding: 1rem;
 }
 
@@ -534,4 +508,30 @@ html.is-mobile .course-card {
 
 .load-more-button:active:not(:disabled) {
   transform: translateY(0);
+}
+
+/* Moved here from responsive.css, theme-overrides.css and modal.css: these
+   classes are hashed by this module now, so a rule in a global stylesheet can
+   no longer reach them. The outer halves stay global - .theme-high-contrast is
+   set on <body> by the theme manager, .as-card-terms is modal.css's. */
+@media (max-width: 1440px) {
+  .course-sections {
+    display: none;
+  }
+}
+
+:global(.theme-high-contrast) .course-item,
+:global(.theme-high-contrast) .section-badge {
+  border-width: 2px;
+}
+
+:global(.theme-high-contrast) .course-item:hover,
+:global(.theme-high-contrast) .section-badge:hover {
+  border-width: 3px;
+}
+
+:global(.as-card-terms) .term-badge.selected {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
 }

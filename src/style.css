@@ -14,7 +14,8 @@
 @import url('./styles/components/sidebar.css');
 @import url('./styles/components/main-content.css');
 @import url('./styles/components/icons.css'); /* shared getInlineSVG icon classes - must stay global */
-@import url('./styles/components/course-list.css');
+/* course-list.module.css - imported directly in CourseList.svelte and
+   modals/AutoScheduleIntro.svelte */
 /* right-panel.module.css - imported directly in App.svelte, CourseDescription.svelte,
    SelectedCoursesPanel.svelte and SelectedCourseItem.svelte */
 @import url('./styles/components/schedule-page.css');

@@ -13,11 +13,8 @@
  * and a UA-detected phone reached the same result by different paths.
  */
 
-@media (max-width: 1440px) {
-  .course-sections {
-    display: none;
-  }
-}
+/* The 1440px `.course-sections` rule lived here; that class is hashed by
+   course-list.module.css now, so the rule moved there. */
 
 @media (max-width: 1200px) {
   .app-body {

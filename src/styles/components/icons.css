@@ -31,3 +31,24 @@
   transform-origin: center;
   display: block;
 }
+
+.check-icon,
+.plus-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+  stroke: currentColor;
+  color: inherit;
+}
+
+/* Also targeted by schedule-page.css and conflict-modal.css, and rendered as a
+   literal class on an inline <svg> in SelectedCourseItem. */
+.warning-icon {
+  color: var(--color-warning);
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  transform: translateY(-2px);
+}

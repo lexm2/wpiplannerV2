@@ -1,4 +1,5 @@
 <script lang="ts">
+  import listStyles from '../styles/components/course-list.module.css';
   import { appState } from '../core/state/appState.svelte';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
@@ -108,37 +109,45 @@
 {:else if displayed.length === 0}
   <div class="empty-state">No courses found in this department.</div>
 {:else if view === 'grid'}
-  <div class="course-grid">
+  <div class={listStyles['course-grid']}>
     {#each courseViews as cv (cv.course.id)}
       {@const course = cv.course}
       {@const isSelected = appState.selectedById.has(course.id)}
       {@const isBookmarked = appState.bookmarkedIds.has(course.id)}
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
       <div
-        class="course-card"
-        class:selected={isSelected}
-        class:active={courseListState.selectedCourseId === course.id}
+        class={[
+          listStyles['course-card'],
+          {
+            [listStyles['selected']]: isSelected,
+            [listStyles['active']]:
+              courseListState.selectedCourseId === course.id,
+          },
+        ]}
         data-course-id={course.id}
         data-active={courseListState.selectedCourseId === course.id
           ? ''
           : undefined}
         onclick={() => selectCourse(course)}
       >
-        <div class="course-card-header">
-          <div class="course-card-info">
-            <div class="course-title-main">{course.name}</div>
-            <div class="course-code-row">
-              <div class="course-code-badge">
+        <div class={listStyles['course-card-header']}>
+          <div class={listStyles['course-card-info']}>
+            <div class={listStyles['course-title-main']}>{course.name}</div>
+            <div class={listStyles['course-code-row']}>
+              <div class={listStyles['course-code-badge']}>
                 {course.departmentAbbr}{course.number}
               </div>
-              {#if cv.hasWarning}<span class="capacity-badge">At capacity</span
+              {#if cv.hasWarning}<span class={listStyles['capacity-badge']}
+                  >At capacity</span
                 >{/if}
             </div>
           </div>
-          <div class="course-card-buttons">
+          <div class={listStyles['course-card-buttons']}>
             <button
-              class="course-select-btn"
-              class:selected={isSelected}
+              class={[
+                listStyles['course-select-btn'],
+                { [listStyles['selected']]: isSelected },
+              ]}
               data-select-btn
               title={isSelected ? 'Remove from selection' : 'Add to selection'}
               onclick={e => {
@@ -150,8 +159,10 @@
                 : getInlineSVG('PLUS', 'plus-icon')}</button
             >
             <button
-              class="course-bookmark-btn"
-              class:bookmarked={isBookmarked}
+              class={[
+                listStyles['course-bookmark-btn'],
+                { [listStyles['bookmarked']]: isBookmarked },
+              ]}
               title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
               onclick={e => {
                 e.stopPropagation();
@@ -167,7 +178,7 @@
     {/each}
   </div>
 {:else}
-  <div class="course-list">
+  <div class={listStyles['course-list']}>
     {#each courseViews as cv (cv.course.id)}
       {@const course = cv.course}
       {@const isSelected = appState.selectedById.has(course.id)}
@@ -175,9 +186,14 @@
       {@const expanded = expandedTerm.get(course.id)}
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
       <div
-        class="course-item"
-        class:selected={isSelected}
-        class:active={courseListState.selectedCourseId === course.id}
+        class={[
+          listStyles['course-item'],
+          {
+            [listStyles['selected']]: isSelected,
+            [listStyles['active']]:
+              courseListState.selectedCourseId === course.id,
+          },
+        ]}
         data-course-id={course.id}
         data-course-item
         data-active={courseListState.selectedCourseId === course.id
@@ -186,11 +202,13 @@
         onclick={() => selectCourse(course)}
         use:termFlip={expanded}
       >
-        <div class="course-header">
-          <div class="course-header-controls">
+        <div class={listStyles['course-header']}>
+          <div class={listStyles['course-header-controls']}>
             <button
-              class="course-select-btn"
-              class:selected={isSelected}
+              class={[
+                listStyles['course-select-btn'],
+                { [listStyles['selected']]: isSelected },
+              ]}
               data-select-btn
               title={isSelected ? 'Remove from selection' : 'Add to selection'}
               onclick={e => {
@@ -202,8 +220,10 @@
                 : getInlineSVG('PLUS', 'plus-icon')}</button
             >
             <button
-              class="course-bookmark-btn"
-              class:bookmarked={isBookmarked}
+              class={[
+                listStyles['course-bookmark-btn'],
+                { [listStyles['bookmarked']]: isBookmarked },
+              ]}
               title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
               onclick={e => {
                 e.stopPropagation();
@@ -213,29 +233,34 @@
                 ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon')
                 : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button
             >
-            <div class="course-code">
+            <div class={listStyles['course-code']}>
               {course.departmentAbbr}{course.number}
             </div>
-            <div class="course-name">
-              <span class="course-name-text">{course.name}</span>
+            <div class={listStyles['course-name']}>
+              <span class={listStyles['course-name-text']}>{course.name}</span>
             </div>
           </div>
           <div
-            class="course-sections"
-            class:expanded={!!expanded}
+            class={[
+              listStyles['course-sections'],
+              { [listStyles['expanded']]: !!expanded },
+            ]}
             data-course-id={course.id}
           >
             {#if expanded}
               {@const sec = cv.sectionsByTerm.get(expanded)}
               <div
-                class="term-sections-container"
+                class={listStyles['term-sections-container']}
                 data-term={expanded}
                 data-term-sections
               >
                 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
                 <span
-                  class="term-badge active"
-                  class:full={sec?.allFull}
+                  class={[
+                    listStyles['term-badge'],
+                    listStyles['active'],
+                    { [listStyles['full']]: sec?.allFull },
+                  ]}
                   data-term={expanded}
                   data-term-badge
                   title={sec?.allFull ? 'All sections full' : undefined}
@@ -244,13 +269,15 @@
                     toggleTerm(e, course.id, expanded, true);
                   }}
                 >
-                  <span class="term-letter">{expanded}</span>
+                  <span class={listStyles['term-letter']}>{expanded}</span>
                   {@html getInlineSVG('PLUS', 'term-icon')}
                 </span>
                 {#each sec?.badges ?? [] as badge (badge.key)}
                   <span
-                    class="section-badge"
-                    class:full={badge.isFull}
+                    class={[
+                      listStyles['section-badge'],
+                      { [listStyles['full']]: badge.isFull },
+                    ]}
                     data-section={badge.number}
                     data-section-badge
                     title={`${badge.profPlain}: ${badge.number}`}
@@ -266,7 +293,10 @@
                 {/each}
                 {#if sec && sec.overflow > 0}
                   <span
-                    class="section-badge section-badge-overflow"
+                    class={[
+                      listStyles['section-badge'],
+                      listStyles['section-badge-overflow'],
+                    ]}
                     data-section-badge
                     title="View course details for all sections"
                     >+{sec.overflow} more - see course details</span
@@ -274,16 +304,18 @@
                 {/if}
               </div>
             {:else}
-              <div class="term-badges-container">
-                {#if cv.hasWarning}<span class="capacity-badge"
+              <div class={listStyles['term-badges-container']}>
+                {#if cv.hasWarning}<span class={listStyles['capacity-badge']}
                     >At capacity</span
                   >{/if}
                 {#each cv.terms as t (t.term)}
                   {#if t.available}
                     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
                     <span
-                      class="term-badge"
-                      class:full={t.allFull}
+                      class={[
+                        listStyles['term-badge'],
+                        { [listStyles['full']]: t.allFull },
+                      ]}
                       data-term={t.term}
                       data-term-badge
                       title={t.allFull ? 'All sections full' : undefined}
@@ -292,16 +324,19 @@
                         toggleTerm(e, course.id, t.term, true);
                       }}
                     >
-                      <span class="term-letter">{t.term}</span>
+                      <span class={listStyles['term-letter']}>{t.term}</span>
                       {@html getInlineSVG('PLUS', 'term-icon')}
                     </span>
                   {:else}
                     <span
-                      class="term-badge unavailable"
+                      class={[
+                        listStyles['term-badge'],
+                        listStyles['unavailable'],
+                      ]}
                       data-term={t.term}
                       data-term-badge
                     >
-                      <span class="term-letter">{t.term}</span>
+                      <span class={listStyles['term-letter']}>{t.term}</span>
                     </span>
                   {/if}
                 {/each}
@@ -315,9 +350,9 @@
 {/if}
 
 {#if hasMore}
-  <div class="load-more-container">
+  <div class={listStyles['load-more-container']}>
     <button
-      class="load-more-button btn btn-secondary"
+      class={[listStyles['load-more-button'], 'btn', 'btn-secondary']}
       data-load-more
       onclick={() => (displayCount += INITIAL_PAGE_SIZE)}
     >

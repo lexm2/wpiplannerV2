@@ -18,10 +18,10 @@
   --effect-transition: all 0.1s ease;
 }
 
-.theme-high-contrast .course-item,
+/* `.course-item` and `.section-badge` were in this list; both are hashed by
+   course-list.module.css now, so their copy of it lives there. */
 .theme-high-contrast .btn,
 .theme-high-contrast .field-shell,
-.theme-high-contrast .section-badge,
 .theme-high-contrast .requirement-card,
 .theme-high-contrast .requirement-course,
 .theme-high-contrast .degree-filter-chip,
@@ -39,9 +39,7 @@
   box-shadow: none;
 }
 
-.theme-high-contrast .course-item:hover,
 .theme-high-contrast .btn:hover,
-.theme-high-contrast .section-badge:hover,
 .theme-high-contrast .requirement-card:hover,
 .theme-high-contrast .requirement-course-draggable:hover,
 .theme-high-contrast .degree-filter-chip:hover {
