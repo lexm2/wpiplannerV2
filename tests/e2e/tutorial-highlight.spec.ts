@@ -9,7 +9,7 @@ import { test, expect, type Page } from '@playwright/test';
  * finds nothing. This test walks all registered tutorials end to end and asserts
  * that, for every step, the selector resolves to a visible element AND the
  * highlight SVG actually attaches (which also exercises the auto-reveal path for
- * off-screen, paginated targets).
+ * targets past the course list's rendered window).
  *
  * The walk is driven through the live TutorialService on `window.services`
  * rather than by synthetic clicks: each step carries its own ui/app-state, so

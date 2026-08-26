@@ -5,6 +5,8 @@ import type {
 } from '../../types/tutorial';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState.svelte';
+import { courseListState } from '../../svelte/courseListState.svelte';
+import { scrollParent } from '../../utils/scrollParent';
 
 import type { UIState } from '../../types/uiState';
 import { logger } from '../../utils/logger';
@@ -173,7 +175,7 @@ export class TutorialService {
     }
 
     // Target isn't in the DOM yet - observe for it to mount while actively
-    // revealing it (paginated "Load more" lists, off-screen rows).
+    // revealing it (course-list rows past the rendered window, off-screen rows).
     this.highlightObserver = new MutationObserver(() => {
       const found = document.querySelector(selector);
       if (!found) return;
@@ -216,11 +218,12 @@ export class TutorialService {
     if (outOfView) el.scrollIntoView({ block: 'center', inline: 'center' });
   }
 
-  // While a step's target is missing, mount it by clicking a visible "Load
-  // more" (the paginated course list pages in 100 at a time). Stops as soon as
-  // the target appears (the highlight MutationObserver then attaches and
-  // revealInView scrolls to it) or the step changes. Deliberately does NOT
-  // scroll arbitrary containers - that races with wizard/modal render.
+  // While a step's target is missing, page the course list forward until it
+  // mounts (the list renders 100 at a time). Stops as soon as the target appears
+  // (the highlight MutationObserver then attaches and revealInView scrolls to
+  // it) or the step changes. The list grows itself on scroll, but this reaches
+  // for its cursor directly rather than scrolling the container - scrolling
+  // arbitrary containers races with wizard/modal render.
   private startReveal(selector: string): void {
     let attempts = 0;
     const tick = () => {
@@ -228,10 +231,7 @@ export class TutorialService {
       if (this.currentSelector !== selector) return;
       if (document.querySelector(selector)) return;
       if (attempts++ >= 40) return;
-      const loadMore = Array.from(
-        document.querySelectorAll<HTMLElement>('[data-load-more]'),
-      ).find(b => b.offsetParent !== null);
-      if (loadMore) loadMore.click();
+      courseListState.showMore();
       this.revealTimer = setTimeout(tick, 200);
     };
     tick();
@@ -337,7 +337,7 @@ export class TutorialService {
         } else if (arrow) {
           svg.style.visibility = 'hidden';
           const r = entry.boundingClientRect;
-          const cr = this.getScrollParent(el).getBoundingClientRect();
+          const cr = scrollParent(el).getBoundingClientRect();
           const elCY = r.top + r.height / 2;
           arrow.dataset.direction =
             elCY < cr.top + cr.height / 2 ? 'up' : 'down';
@@ -379,16 +379,6 @@ export class TutorialService {
       this.svgContainer = null;
       this.originalPosition = null;
     }
-  }
-
-  private getScrollParent(el: Element): Element {
-    let parent = el.parentElement;
-    while (parent && parent !== document.body) {
-      const { overflow, overflowY } = getComputedStyle(parent);
-      if (/auto|scroll/.test(overflow + overflowY)) return parent;
-      parent = parent.parentElement;
-    }
-    return document.documentElement;
   }
 
   private listenForAction(step: TutorialStep): void {

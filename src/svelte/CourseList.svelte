@@ -6,6 +6,7 @@
   import { courseListState } from './courseListState.svelte';
   import { buildCourseView } from './courseView';
   import { expandedTerm, toggleTerm, termFlip } from './termExpansion.svelte';
+  import { infiniteScroll } from './infiniteScroll';
   import type { Course } from '../types/types';
   import type { DepartmentFilterCriteria } from '../types/filters';
   import type { FilterService } from '../services/filtering/FilterService';
@@ -22,11 +23,6 @@
     courseSelectionService: CourseSelectionService;
     profileStateManager: ProfileStateManager;
   } = $props();
-
-  const INITIAL_PAGE_SIZE = 100;
-
-  // Pagination cursor (the old CourseController INITIAL_PAGE_SIZE / load-more).
-  let displayCount = $state(INITIAL_PAGE_SIZE);
 
   // `uiState.currentView` is a rune -> list/grid toggle recomputes on its own.
   const view = $derived(uiState.currentView);
@@ -69,14 +65,29 @@
         }),
   );
 
-  const displayed = $derived(sorted.slice(0, displayCount));
-  const hasMore = $derived(sorted.length > displayCount);
-  const remaining = $derived(sorted.length - displayCount);
-  const loadMoreText = $derived(
-    remaining < INITIAL_PAGE_SIZE
-      ? `Load ${remaining} more courses`
-      : `Load next ${INITIAL_PAGE_SIZE} courses`,
+  const displayed = $derived(sorted.slice(0, courseListState.shownCount));
+  const hasMore = $derived(sorted.length > courseListState.shownCount);
+
+  const footerText = $derived(
+    hasMore
+      ? `Showing ${displayed.length.toLocaleString()} of ${sorted.length.toLocaleString()} courses`
+      : `${sorted.length.toLocaleString()} course${sorted.length === 1 ? '' : 's'}`,
   );
+
+  // A new result set starts at the top. Without this, clearing a filter after
+  // scrolling deep would render every match at once - the list only ever grew
+  // before, because growing it took a deliberate click.
+  $effect(() => {
+    sorted;
+    courseListState.resetPaging();
+  });
+
+  // Wrapped rather than handed to the action as `courseListState.showMore`,
+  // which would arrive unbound; named rather than an inline arrow so the action
+  // isn't given a fresh identity on every render.
+  function showMore(): void {
+    courseListState.showMore();
+  }
 
   // Per-course view models (term availability + deduped section badges), memoized
   // on Course identity. See courseView.ts.
@@ -349,14 +360,24 @@
   </div>
 {/if}
 
-{#if hasMore}
-  <div class={listStyles['load-more-container']}>
-    <button
-      class={[listStyles['load-more-button'], 'btn', 'btn-secondary']}
-      data-load-more
-      onclick={() => (displayCount += INITIAL_PAGE_SIZE)}
-    >
-      {loadMoreText}
-    </button>
+{#if sorted.length > 0}
+  <!-- The count is what tells the reader the list is finite now that there is no
+       button saying so, and the live region is how that reaches a screen reader. -->
+  <div
+    class={listStyles['list-footer']}
+    data-list-footer
+    role="status"
+    aria-live="polite"
+  >
+    {footerText}
   </div>
+  {#if hasMore}
+    <!-- Mounted only while there is more to show, so the list dropping it is the
+         whole of the disarm story - see infiniteScroll. -->
+    <div
+      data-load-sentinel
+      aria-hidden="true"
+      use:infiniteScroll={showMore}
+    ></div>
+  {/if}
 {/if}

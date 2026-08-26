@@ -47,7 +47,9 @@ function isMeaningfulProf(prof: string): boolean {
 // Identity-keyed memo: a CourseView depends only on the Course object, which is
 // a `$state.raw` value replaced wholesale on data refresh - so a cache hit means
 // the data is unchanged, and refreshed courses are new objects that miss cleanly.
-// Saves rebuilding the already-shown rows every time load-more grows `displayed`.
+// Saves rebuilding the already-shown rows every time the list grows `displayed`,
+// which is now every hundred courses the reader scrolls past rather than every
+// deliberate click.
 const courseViewCache = new WeakMap<Course, CourseView>();
 
 export function buildCourseView(course: Course): CourseView {
