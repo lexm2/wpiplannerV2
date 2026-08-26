@@ -83,7 +83,12 @@ export function trapFocus(node: HTMLElement) {
       if (lockCount === 0) {
         document.body.style.overflow = priorBodyOverflow;
       }
-      previouslyFocused?.focus?.();
+      // preventScroll, because a modal can hand work to the page behind it:
+      // the course finder closes and asks the bucket list to scroll a card into
+      // view. A bare focus() scrolls the restored element back into view too,
+      // and since the restore lands after the outro - a good 200ms into that
+      // smooth scroll - it would yank the pane back where it started.
+      previouslyFocused?.focus?.({ preventScroll: true });
     },
   };
 }

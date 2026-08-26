@@ -463,6 +463,41 @@ test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
 });
 
 /**
+ * The jump has to outlive the modal it came from. Closing the finder restores
+ * focus to the button that opened it, and a bare focus() drags that button back
+ * into view - which landed a good 200ms into the smooth scroll and snapped the
+ * pane straight back to the top, leaving the flash to play off screen.
+ *
+ * Asserted only once the dialog has left the DOM, since unmounting it is what
+ * fires the restore. The window is squat on purpose: the fixture is three
+ * buckets, and a jump can only be undone on a pane with somewhere to scroll.
+ * Still wider than the 991px the layout stacks at, so the middle pane is the
+ * scroller either way.
+ */
+test('keeps the jump scrolled once the finder closes', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 400 });
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+
+  const card = page.locator('[data-bucket-id*="Systems Requirement"]');
+  await expect(card).not.toBeInViewport();
+
+  await page.locator('#degree-course-search').click();
+  await page
+    .locator('.course-finder-row', { hasText: 'CS 3013' })
+    .locator('button.course-finder-bucket', { hasText: 'Systems Requirement' })
+    .click();
+
+  await expect(page.locator('.course-finder-modal')).toHaveCount(0);
+  // ratio 1, not a bare scrollTop: the restore does not put the pane back at 0
+  // in every browser, it puts the trigger back on screen - which is the top of
+  // the list either way, with the card it was asked for nowhere in it.
+  await expect(card).toBeInViewport({ ratio: 1 });
+});
+
+/**
  * Every course counts toward Total Credits and Residency, so naming them on a
  * card says nothing and buries the requirement the reader came for under two
  * rows of it. Workday applies CS 1102 to all three; the finder shows the one
