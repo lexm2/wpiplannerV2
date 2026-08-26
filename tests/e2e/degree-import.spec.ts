@@ -465,8 +465,8 @@ test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
 /**
  * The jump has to outlive the modal it came from. Closing the finder restores
  * focus to the button that opened it, and a bare focus() drags that button back
- * into view - which landed a good 200ms into the smooth scroll and snapped the
- * pane straight back to the top, leaving the flash to play off screen.
+ * into view - which lands a good 200ms into the smooth scroll and snaps the pane
+ * straight back to the top, leaving the flash to play off screen.
  *
  * Asserted only once the dialog has left the DOM, since unmounting it is what
  * fires the restore. The window is squat on purpose: the fixture is three
