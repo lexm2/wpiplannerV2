@@ -157,7 +157,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: { currentPage: 'planner' },
       },
       {
-        selector: '[data-course-id="TUT-2001"] .course-select-btn',
+        selector: '[data-course-id="TUT-2001"] [data-select-btn]',
         title: 'Select a course',
         description:
           'Click the + button on the Tutorial course to add it to your planner.',
@@ -397,7 +397,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           },
         },
         {
-          selector: '[data-course-id="TUT-2005"] .course-select-btn',
+          selector: '[data-course-id="TUT-2005"] [data-select-btn]',
           title: 'Add Blinking LEDs 101',
           description: 'Click the + button on Blinking LEDs 101 to add it.',
           waitFor: 'click',
@@ -591,7 +591,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       },
       {
         selector:
-          '.as-course-card[data-course-id="TUT-2001"] .term-badge[data-term="C"]',
+          '.as-course-card[data-course-id="TUT-2001"] [data-term-badge][data-term="C"]',
         title: 'Change generation parameters',
         description:
           'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
@@ -603,7 +603,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       },
       {
         selector:
-          '.as-course-card[data-course-id="TUT-2006"] .term-badge[data-term="C"]',
+          '.as-course-card[data-course-id="TUT-2006"] [data-term-badge][data-term="C"]',
         title: 'Change generation parameters',
         description: 'Same change for TUT2006.',
         waitFor: 'click',

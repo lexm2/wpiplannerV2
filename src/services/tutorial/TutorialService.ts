@@ -229,9 +229,7 @@ export class TutorialService {
       if (document.querySelector(selector)) return;
       if (attempts++ >= 40) return;
       const loadMore = Array.from(
-        document.querySelectorAll<HTMLElement>(
-          '.load-more-button, [data-load-more]',
-        ),
+        document.querySelectorAll<HTMLElement>('[data-load-more]'),
       ).find(b => b.offsetParent !== null);
       if (loadMore) loadMore.click();
       this.revealTimer = setTimeout(tick, 200);

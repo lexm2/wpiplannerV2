@@ -119,6 +119,9 @@
         class:selected={isSelected}
         class:active={courseListState.selectedCourseId === course.id}
         data-course-id={course.id}
+        data-active={courseListState.selectedCourseId === course.id
+          ? ''
+          : undefined}
         onclick={() => selectCourse(course)}
       >
         <div class="course-card-header">
@@ -136,6 +139,7 @@
             <button
               class="course-select-btn"
               class:selected={isSelected}
+              data-select-btn
               title={isSelected ? 'Remove from selection' : 'Add to selection'}
               onclick={e => {
                 e.stopPropagation();
@@ -175,6 +179,10 @@
         class:selected={isSelected}
         class:active={courseListState.selectedCourseId === course.id}
         data-course-id={course.id}
+        data-course-item
+        data-active={courseListState.selectedCourseId === course.id
+          ? ''
+          : undefined}
         onclick={() => selectCourse(course)}
         use:termFlip={expanded}
       >
@@ -183,6 +191,7 @@
             <button
               class="course-select-btn"
               class:selected={isSelected}
+              data-select-btn
               title={isSelected ? 'Remove from selection' : 'Add to selection'}
               onclick={e => {
                 e.stopPropagation();
@@ -218,12 +227,17 @@
           >
             {#if expanded}
               {@const sec = cv.sectionsByTerm.get(expanded)}
-              <div class="term-sections-container" data-term={expanded}>
+              <div
+                class="term-sections-container"
+                data-term={expanded}
+                data-term-sections
+              >
                 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
                 <span
                   class="term-badge active"
                   class:full={sec?.allFull}
                   data-term={expanded}
+                  data-term-badge
                   title={sec?.allFull ? 'All sections full' : undefined}
                   onclick={e => {
                     e.stopPropagation();
@@ -238,6 +252,7 @@
                     class="section-badge"
                     class:full={badge.isFull}
                     data-section={badge.number}
+                    data-section-badge
                     title={`${badge.profPlain}: ${badge.number}`}
                     >{#each badge.profs as p, i (i)}{#if p.url}<a
                           href={p.url}
@@ -252,6 +267,7 @@
                 {#if sec && sec.overflow > 0}
                   <span
                     class="section-badge section-badge-overflow"
+                    data-section-badge
                     title="View course details for all sections"
                     >+{sec.overflow} more - see course details</span
                   >
@@ -269,6 +285,7 @@
                       class="term-badge"
                       class:full={t.allFull}
                       data-term={t.term}
+                      data-term-badge
                       title={t.allFull ? 'All sections full' : undefined}
                       onclick={e => {
                         e.stopPropagation();
@@ -279,7 +296,11 @@
                       {@html getInlineSVG('PLUS', 'term-icon')}
                     </span>
                   {:else}
-                    <span class="term-badge unavailable" data-term={t.term}>
+                    <span
+                      class="term-badge unavailable"
+                      data-term={t.term}
+                      data-term-badge
+                    >
                       <span class="term-letter">{t.term}</span>
                     </span>
                   {/if}
@@ -297,6 +318,7 @@
   <div class="load-more-container">
     <button
       class="load-more-button btn btn-secondary"
+      data-load-more
       onclick={() => (displayCount += INITIAL_PAGE_SIZE)}
     >
       {loadMoreText}

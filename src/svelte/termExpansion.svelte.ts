@@ -66,10 +66,10 @@ export function toggleTerm(
 ): void {
   if (!available) return;
   const item = (e.currentTarget as HTMLElement | null)?.closest(
-    '.course-item',
+    '[data-course-item]',
   ) as HTMLElement | null;
   const container = item?.querySelector(
-    '.term-sections-container',
+    '[data-term-sections]',
   ) as HTMLElement | null;
   const collapsing = expandedTerm.get(courseId) === term;
 
@@ -79,7 +79,7 @@ export function toggleTerm(
   // instant the rune flips, so the fade must run here, before that mutation.
   if (collapsing && item && container && !reduceMotion) {
     const rows = groupBadgeRows(
-      Array.from(container.querySelectorAll('.section-badge')),
+      Array.from(container.querySelectorAll('[data-section-badge]')),
     );
     let maxStep = 0;
     rows.forEach((row, ri) =>
@@ -146,7 +146,7 @@ export function termFlip(item: HTMLElement, term: string | undefined) {
     // 0,1,2,…; many rows cascade as a wavefront without taking years.
     const rows = groupBadgeRows(
       Array.from(
-        item.querySelectorAll('.term-sections-container .section-badge'),
+        item.querySelectorAll('[data-term-sections] [data-section-badge]'),
       ),
     );
 

@@ -914,7 +914,7 @@ test('clicking a course name opens its catalog entry on the classes page', async
     .click();
   await expect(page.locator('#planner-page')).toBeVisible();
   await expect(
-    page.locator('#course-container [data-course-id].active'),
+    page.locator('#course-container [data-course-id][data-active]'),
   ).toBeVisible();
 });
 

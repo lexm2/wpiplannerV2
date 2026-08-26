@@ -142,6 +142,7 @@
                       class="term-badge"
                       class:selected={isSelected(sc, term)}
                       data-term={term}
+                      data-term-badge
                       data-course-id={sc.course.id}
                       onclick={e => {
                         e.stopPropagation();
@@ -154,6 +155,7 @@
                     <span
                       class="term-badge unavailable"
                       data-term={term}
+                      data-term-badge
                       data-course-id={sc.course.id}
                     >
                       <span class="term-letter">{term}</span>

@@ -164,14 +164,14 @@ test('professor links carry an underline affordance on every background', async 
   // is selected and a course expanded.
   await page.locator('.department-item').first().click();
   await page.waitForTimeout(800);
-  await page.locator('.course-item').first().click();
+  await page.locator('[data-course-item]').first().click();
   await page.waitForTimeout(800);
 
   const info = await page.evaluate(() => {
     const links = Array.from(document.querySelectorAll('a.professor-link'));
     return links.slice(0, 5).map(el => {
       const cs = getComputedStyle(el);
-      const badge = el.closest('.section-badge');
+      const badge = el.closest('[data-section-badge]');
       return {
         decoration: cs.textDecorationLine,
         color: cs.color,
