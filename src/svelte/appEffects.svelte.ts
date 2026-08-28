@@ -99,7 +99,7 @@ export function installAppEffects(services: ServiceContainer): void {
 
       if (!initialLoadDone) {
         initialLoadDone = true;
-        services.courseSelectionService.reconstructSectionObjects();
+        services.profileStateManager.seedUndoBaseline();
         updateClientTimestamp();
 
         // Backfill year for existing schedules that lack one.

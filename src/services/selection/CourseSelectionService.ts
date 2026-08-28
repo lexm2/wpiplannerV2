@@ -507,38 +507,6 @@ export class CourseSelectionService {
     return this.profileStateManager.hasUnsavedChanges();
   }
 
-  findCourseById(_courseId: string): Course | undefined {
-    logger.warn(
-      'findCourseById: Course data access not implemented in this service',
-    );
-    return undefined;
-  }
-
-  unselectCourseById(_courseId: string): void {
-    logger.warn(
-      'unselectCourseById: Use unselectCourse with course object instead',
-    );
-  }
-
-  isCourseSelectedById(_courseId: string): boolean {
-    logger.warn(
-      'isCourseSelectedById: Use isCourseSelected with course object instead',
-    );
-    return false;
-  }
-
-  reconstructSectionObjects(): void {
-    try {
-      const selectedCourses = this.getSelectedCourses();
-
-      if (selectedCourses.length > 0) {
-        this.profileStateManager.save();
-      }
-    } catch (error) {
-      logger.error('Failed to reconstruct section objects:', error);
-    }
-  }
-
   private async ensureInitialized(): Promise<void> {
     if (!this.isInitialized) {
       await this.initialize();

@@ -678,6 +678,20 @@ export class ProfileStateManager {
     }
   }
 
+  /**
+   * Records the as-loaded state as history[0] so the user's first change is
+   * undoable. `canUndo()` needs `currentIndex > 0`, so without this the first
+   * captured snapshot becomes the baseline and cannot be stepped back past.
+   * Call after the catalog is attached and before any user edit.
+   */
+  seedUndoBaseline(): void {
+    this.undoRedoManager.captureBaseline(
+      this.state.activeScheduleId,
+      new Map(this.state.schedules.map(s => [s.id, s])),
+      this.state.preferences,
+    );
+  }
+
   canUndo(): boolean {
     return this.undoRedoManager.canUndo();
   }

@@ -41,6 +41,20 @@ export class UndoRedoManager {
     this.notifyListeners();
   }
 
+  /**
+   * Seeds history[0] with the as-loaded state so the first user change is
+   * undoable. No-op once any snapshot exists, so callers need not know whether
+   * boot already captured one.
+   */
+  captureBaseline(
+    activeScheduleId: string | null,
+    schedules: Map<string, Schedule>,
+    preferences: SchedulePreferences,
+  ): void {
+    if (this.history.length > 0) return;
+    this.captureSnapshot(activeScheduleId, schedules, preferences);
+  }
+
   undo(): StateSnapshot | null {
     if (!this.canUndo()) {
       return null;
