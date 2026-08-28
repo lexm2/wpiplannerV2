@@ -9,7 +9,8 @@
     blocks,
     hasConflict,
     focused,
-    onFocus,
+    hidden,
+    onToggleFocus,
     onOpenSectionInfo,
     onOpenDeleteEvent,
   }: {
@@ -17,7 +18,8 @@
     blocks: GridBlock[];
     hasConflict: boolean;
     focused: boolean;
-    onFocus: () => void;
+    hidden: boolean;
+    onToggleFocus: () => void;
     onOpenSectionInfo: (courseId: string, sectionNumber: string) => void;
     onOpenDeleteEvent: (eventId: string) => void;
   } = $props();
@@ -37,7 +39,7 @@
   }
 
   function sectionClick(e: MouseEvent, b: GridBlock): void {
-    e.stopPropagation(); // don't bubble to the term-graph focus handler
+    e.stopPropagation(); // don't bubble to the term-graph focus toggle
     if (b.courseId && b.sectionNumber)
       onOpenSectionInfo(b.courseId, b.sectionNumber);
   }
@@ -60,12 +62,15 @@
   }
 </script>
 
+<!-- A hidden card is only transparent, not display:none, so the zoom has
+     something to fade; `inert` is what keeps it out of the tab order. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
   class="term-graph"
   data-term={term}
   class:focused-term={focused}
-  onclick={onFocus}
+  inert={hidden}
+  onclick={onToggleFocus}
 >
   {#if hasConflict}
     <div

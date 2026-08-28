@@ -546,37 +546,61 @@
   flex-direction: column;
   background: var(--color-background);
   overflow: hidden;
+  padding: 1rem;
 }
 
+/* The pane's inset lives on .schedule-main, so this box carries no padding of
+   its own. That is deliberate: an absolutely-positioned grid child resolves
+   against its *grid area* while a rect measured off the container is relative to
+   the border box, and with no padding the two coordinate systems coincide.
+   termFocus.svelte.ts measures in exactly those terms. */
 .terms-grid {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 1rem;
-  padding: 1rem;
   overflow: hidden;
   position: relative;
   border-radius: var(--effect-border-radius);
 }
 
-.terms-grid.focused {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  gap: 0.5rem;
-  border-radius: 0;
+/* Each card is pinned to its own cell. Without this, the focused card leaving
+   the flow would let the other three auto-place into the wrong cells and jump
+   around behind the zoom. */
+.term-graph[data-term='A'] {
+  grid-area: 1 / 1;
+}
+.term-graph[data-term='B'] {
+  grid-area: 1 / 2;
+}
+.term-graph[data-term='C'] {
+  grid-area: 2 / 1;
+}
+.term-graph[data-term='D'] {
+  grid-area: 2 / 2;
 }
 
+/* Focus keeps the same 2x2 grid, so the container never reflows and the three
+   background cards hold still while one zooms out over them.
+   The zoom itself is a WAAPI box tween in termFocus.svelte.ts; these are only
+   the settled states it starts from and lands on. */
 .terms-grid.focused .term-graph {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .terms-grid.focused .term-graph.focused-term {
-  display: flex;
-  flex: 1;
+  opacity: 1;
+  pointer-events: auto;
+  position: absolute;
+  /* Spanning every track is what makes the whole grid the containing block;
+     left on its own cell it would only ever fill that quarter. */
+  grid-area: 1 / 1 / -1 / -1;
+  inset: 0;
   min-height: 0;
-  transition: none;
+  /* Above its siblings, below .schedule-generating-overlay. */
+  z-index: 5;
 }
 
 .term-graph {
@@ -588,22 +612,17 @@
   overflow: hidden;
   min-height: 200px;
   cursor: pointer;
-  transition: var(--effect-transition);
+  /* Deliberately not --effect-transition (`all 0.5s ease`): that would tween
+     the box on every focus change and fight the WAAPI zoom. */
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   position: relative;
 }
 
 .term-graph:hover {
   border-color: var(--color-primary);
   box-shadow: var(--effect-shadow-hover);
-}
-
-.term-graph.focused-term {
-  cursor: default;
-}
-
-.term-graph.focused-term:hover {
-  border-color: var(--color-border);
-  box-shadow: none;
 }
 
 .term-conflict-warning {
@@ -637,58 +656,6 @@
     opacity: 0.7;
     transform: scale(1.1);
   }
-}
-
-.focused-term-header {
-  display: none;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--color-background-alt);
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0 0 var(--effect-border-radius) var(--effect-border-radius);
-  flex-shrink: 0;
-  position: relative;
-}
-
-.terms-grid.focused .focused-term-header {
-  display: flex;
-}
-
-.focused-term-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.9rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
-}
-
-.term-back-btn {
-  background: none;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  padding: 0;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: var(--effect-transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  flex-shrink: 0;
-}
-
-.term-back-btn svg {
-  width: 1.1rem;
-  height: 1.1rem;
-}
-
-.term-back-btn:hover {
-  background: var(--color-background);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
 }
 
 /* Schedule grid for each term */
@@ -957,22 +924,6 @@
   .schedule-page-layout {
     grid-template-columns: 20rem 1fr;
   }
-
-  .terms-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    padding: 0;
-    gap: 0;
-  }
-
-  .term-graph {
-    scroll-snap-align: start;
-    height: calc(100vh - var(--spacing-header-height));
-    min-height: unset;
-    border-radius: 0;
-  }
 }
 
 html.is-mobile .schedule-page-layout {
@@ -981,4 +932,22 @@ html.is-mobile .schedule-page-layout {
 
 html.is-mobile .schedule-sidebar {
   display: none;
+}
+
+/* A phone is permanently focused on one term (termFocus.focusLocked), so the
+   card runs full bleed and vertical swipes page between terms instead of
+   scrolling - the old scroll-snap column this replaces lived at max-width 1024. */
+html.is-mobile .schedule-main {
+  padding: 0;
+}
+
+html.is-mobile .terms-grid {
+  gap: 0;
+  border-radius: 0;
+  touch-action: none;
+}
+
+html.is-mobile .term-graph {
+  min-height: 0;
+  border-radius: 0;
 }

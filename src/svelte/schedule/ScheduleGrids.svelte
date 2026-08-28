@@ -1,6 +1,5 @@
 <script lang="ts">
   import { appState } from '../../core/state/appState.svelte';
-  import { getInlineSVG } from '../../utils/iconPaths';
   import {
     buildConflictMatrix,
     type BitMaskEngine,
@@ -16,6 +15,12 @@
     type TermBlocks,
   } from './scheduleGeometry';
   import TermGrid from './TermGrid.svelte';
+  import {
+    TERMS,
+    termFocus,
+    termMotion,
+    toggleFocus,
+  } from './termFocus.svelte';
 
   let {
     colorService,
@@ -28,10 +33,6 @@
     onOpenSectionInfo: (courseId: string, sectionNumber: string) => void;
     onOpenDeleteEvent: (eventId: string) => void;
   } = $props();
-
-  const TERMS = ['A', 'B', 'C', 'D'];
-
-  let focusedTerm = $state<string | null>(null);
 
   // Selected courses with the committed wizard preview overlaid. Shape repair
   // belongs to the storage boundary (scheduleMigration), not to a render pass.
@@ -91,50 +92,25 @@
     }
     return result;
   });
-
-  // Desktop-only term focus (mobile uses scroll-snap). Ignored when a term is
-  // already focused - matches the old document-level guard.
-  function focusTerm(term: string): void {
-    if (focusedTerm !== null) return;
-    if (document.documentElement.classList.contains('is-mobile')) return;
-    focusedTerm = term;
-  }
-  function unfocus(): void {
-    focusedTerm = null;
-  }
-
-  // Escape exits term focus (declarative window listener; no-op when nothing is
-  // focused).
-  function onKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape' && focusedTerm !== null) {
-      e.preventDefault();
-      unfocus();
-    }
-  }
 </script>
 
-<svelte:window onkeydown={onKeydown} />
-
-<div class="terms-grid" class:focused={focusedTerm !== null}>
-  <div class="focused-term-header">
-    <button
-      class="term-back-btn"
-      title="Back to all terms"
-      aria-label="Back to all terms"
-      onclick={unfocus}
-      >{@html getInlineSVG('ARROW_BACK_UP', 'term-back-icon')}</button
-    >
-    <span class="focused-term-title"
-      >{focusedTerm ? `${focusedTerm} Term` : ''}</span
-    >
-  </div>
+<!-- Focus state, its zoom/page animation and the wheel/touch/key input that
+     drives it all live in termFocus; this stays render-only. -->
+<div
+  class="terms-grid"
+  data-terms-grid
+  data-focused-term={termFocus.term}
+  class:focused={termFocus.term !== null}
+  use:termMotion={termFocus.term}
+>
   {#each TERMS as term (term)}
     <TermGrid
       {term}
       blocks={blocksByTerm[term].blocks}
       hasConflict={blocksByTerm[term].hasConflict}
-      focused={focusedTerm === term}
-      onFocus={() => focusTerm(term)}
+      focused={termFocus.term === term}
+      hidden={termFocus.term !== null && termFocus.term !== term}
+      onToggleFocus={() => toggleFocus(term)}
       {onOpenSectionInfo}
       {onOpenDeleteEvent}
     />
