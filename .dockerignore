@@ -1,0 +1,17 @@
+.git
+.github
+node_modules
+dist
+tests
+playwright-report
+test-results
+docs
+WorkdayToPlannerConverter-master
+*.md
+!package.json
+.vscode
+.idea
+.env
+.env.*
+coverage
+.DS_Store

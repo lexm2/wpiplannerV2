@@ -1,0 +1,28 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wpiplannerv2-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - course-data:/data:ro
+    depends_on:
+      - fetcher
+
+  fetcher:
+    build:
+      context: .
+      dockerfile: Dockerfile.fetcher
+    image: wpiplannerv2-fetcher
+    restart: unless-stopped
+    environment:
+      REFRESH_INTERVAL_SECONDS: "900"
+      DATA_DIR: /data
+    volumes:
+      - course-data:/data
+
+volumes:
+  course-data:
