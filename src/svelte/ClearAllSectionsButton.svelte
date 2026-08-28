@@ -10,7 +10,6 @@
     courseSelectionService,
   }: { courseSelectionService: CourseSelectionService } = $props();
 
-  // Replaces ScheduleController.setupClearAllSectionsButton + handleClearAllSections.
   // The reactive sidebar/grid re-render off appState.selectedCourses on their own.
   function handleClick(): void {
     const selectedCourses = courseSelectionService.getSelectedCourses();

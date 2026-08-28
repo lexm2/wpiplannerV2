@@ -46,8 +46,8 @@
   const title = $derived(isAuto ? 'Auto-Schedule Settings' : 'Filter Courses');
   const primaryLabel = $derived(isAuto ? 'Generate Schedule' : 'Apply');
 
-  // Filter-count badge: only shown when filters differ from the schedule-year
-  // default (mirrors the controller's hasNonDefaultFilters gate).
+  // Filter-count badge: only shown when filters differ from the
+  // schedule-year default.
   const activeYear = $derived(appState.activeSchedule?.year);
   const filterCount = $derived(
     filterService.hasNonDefaultFilters(activeYear)
@@ -81,7 +81,7 @@
 
   // The service-derived sections reset reactively, but RmpRatingFilter seeds its
   // slider positions once at mount - bump this to remount it so the thumbs snap
-  // back to defaults (the old controller rebuilt the whole panel on Clear All).
+  // back to defaults.
   let resetNonce = $state(0);
 
   function onClearAll(): void {

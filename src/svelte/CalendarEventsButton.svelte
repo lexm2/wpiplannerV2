@@ -4,8 +4,7 @@
   let { onClick }: { onClick: () => void } = $props();
 
   // Always shown (users can add local calendar events even with no courses
-  // selected). Replaces ScheduleController.buildCalendarEventsButtonHTML +
-  // renderCalendarEventsHeader.
+  // selected).
   function handleClick(e: MouseEvent): void {
     e.stopPropagation();
     onClick();

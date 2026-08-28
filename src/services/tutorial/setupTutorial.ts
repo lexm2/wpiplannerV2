@@ -771,9 +771,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         appState.autoScheduleTermPrefs,
       );
     }
-    // appState.refreshFilterUI used to imperatively re-sync the open filter
-    // modal; the filter sections are reactive now, so applying filters to
-    // filterService (in onAppStateTransition) updates the modal directly.
+    // appState.refreshFilterUI needs no handler: the filter sections are
+    // reactive, so applying filters to filterService (in
+    // onAppStateTransition) updates the open filter modal directly.
     if (appState?.runAutoSchedule) {
       autoScheduleService.runAutoSchedule();
     }

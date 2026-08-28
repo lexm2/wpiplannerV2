@@ -3,10 +3,9 @@ import { rateMyProfessorService } from '../services/external/RateMyProfessorServ
 import type { Course, Section } from '../types/types';
 
 /**
- * Pure per-course view-model construction for the course list - extracted from
- * CourseList.svelte so the component stays render-only. Mirrors the old
- * ProgressiveRenderer.createCourseListItem: term availability + the (deduped)
- * section badges per term.
+ * Pure per-course view-model construction for the course list, kept out of
+ * CourseList.svelte so the component stays render-only: term availability +
+ * the (deduped) section badges per term.
  */
 
 const TERMS = ['A', 'B', 'C', 'D'] as const;

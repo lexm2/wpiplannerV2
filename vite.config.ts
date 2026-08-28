@@ -16,7 +16,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Other vendor libraries
           'vendor-utils': ['lz-string', 'rrule', 'zod'],
           'worker-storage': ['src/workers/storage.worker.ts'],
         },

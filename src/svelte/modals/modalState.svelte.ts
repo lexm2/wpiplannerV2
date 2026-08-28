@@ -54,15 +54,13 @@ class ModalState {
   deleteLocalEvent = $state.raw<DeleteLocalEventPayload | null>(null);
   localEvent = $state.raw<LocalEventPayload | null>(null);
   autoScheduleIntro = $state.raw<AutoScheduleIntroPayload | null>(null);
-  // Tutorial-driven term-preference overrides (replaces the imperative
-  // AutoScheduleIntroModal.setTermPreferences call). The component merges
-  // these into its per-course term selection whenever this changes.
+  // Tutorial-driven term-preference overrides. The component merges these
+  // into its per-course term selection whenever this changes.
   autoScheduleIntroTermPrefs = $state.raw<Record<string, string[]> | null>(
     null,
   );
-  // Tutorial-driven schedule-picker tab navigation (replaces the imperative
-  // SchedulePickerModal.navigateToTab call). The component applies it to its
-  // local active-tab then nulls this channel.
+  // Tutorial-driven schedule-picker tab navigation. The component applies it
+  // to its local active-tab then nulls this channel.
   schedulePickerTab = $state.raw<'schedules' | 'settings' | null>(null);
   // Filter modal payload (mode + auto-schedule continuation). Set by the
   // trigger site before modalOpened('filter-modal' | 'auto-schedule-filter').

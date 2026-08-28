@@ -151,10 +151,9 @@ export class FilterService {
   }
 
   /**
-   * Reactive, typed accessor for a single filter's criteria - replaces the
-   * `getActiveFilters().find(f => f.id === '...')?.criteria as T` pattern in
-   * the filter components. Reads the SvelteMap-backed FilterState, so it stays
-   * reactive inside `$derived`/templates.
+   * Reactive, typed accessor for a single filter's criteria. Reads the
+   * SvelteMap-backed FilterState, so it stays reactive inside
+   * `$derived`/templates.
    */
   getCriteria<T>(filterId: string): T | undefined {
     return this.filterState.getFilter(filterId)?.criteria as T | undefined;
@@ -203,7 +202,6 @@ export class FilterService {
     return this.sectionPipeline.reconstructCourses(sections);
   }
 
-  // Convenience: apply + resolveToCourses + bookmark + search ranking
   filterCourses(courses: Course[]): Course[] {
     if (this.isEmpty()) {
       return courses;
@@ -212,7 +210,6 @@ export class FilterService {
     const filteredSections = this.apply(courses);
     let filteredCourses = this.resolveToCourses(filteredSections);
 
-    // Bookmark filter is applied at course level
     const criteriaMap = this.getCriteriaMap();
     const bookmarkCriteria = criteriaMap.get('bookmark') as
       BookmarkFilterCriteria | undefined;
@@ -227,7 +224,6 @@ export class FilterService {
       );
     }
 
-    // Reorder remaining courses by search relevance
     const searchCriteria = criteriaMap.get('searchText') as
       SearchTextFilterCriteria | undefined;
     if (searchCriteria && searchCriteria.query) {

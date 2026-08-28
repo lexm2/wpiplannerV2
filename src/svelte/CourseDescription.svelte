@@ -47,7 +47,6 @@
     course ? courseDataService.getLecturesForCourse(course) : [],
   );
 
-  // Tab visibility - mirrors CourseController.renderComponentTabs lines 465-468.
   const showLectures = $derived(isHierarchical);
   const showDiscussions = $derived(
     isHierarchical && lectures.some(lg => lg.compatibleDiscussions.length > 0),
@@ -150,7 +149,6 @@
     course ? sectionsForTab(course, activeTab) : null,
   );
 
-  // Section-card derived data - mirrors CourseController.renderSectionCard.
   function isAsyncSection(section: Section): boolean {
     const period = section.periods[0];
     return !!(

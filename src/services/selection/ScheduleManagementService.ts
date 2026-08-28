@@ -398,7 +398,6 @@ export class ScheduleManagementService {
     return schedules.find(s => s.id === scheduleId) || null;
   }
 
-  // Legacy compatibility methods
   loadSchedule(scheduleId: string): Schedule | null {
     return this.getScheduleById(scheduleId);
   }
@@ -630,7 +629,6 @@ export class ScheduleManagementService {
         );
       }
 
-      // Check active schedule consistency
       const activeScheduleId = this.getActiveScheduleId();
       if (activeScheduleId && !schedules.some(s => s.id === activeScheduleId)) {
         issues.push('Active schedule ID references non-existent schedule');

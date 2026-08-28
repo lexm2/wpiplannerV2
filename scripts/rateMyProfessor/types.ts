@@ -41,5 +41,5 @@ export interface RMPTeacherDetails {
   school: RMPSchoolResult;
   legacyId: number;
   wouldTakeAgainPercent?: number | null;
-  [key: string]: unknown; // Allow for additional fields
+  [key: string]: unknown;
 }

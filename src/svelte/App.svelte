@@ -50,9 +50,6 @@
   // Restore any saved sidebar widths before first paint to avoid a layout flash.
   applyStoredPanelWidths();
 
-  // The whole app shell is now declarative. main.ts mounts this once into #app
-  // (and ModalLayer separately into #modal-root) instead of MainController's ~16
-  // imperative mount() calls. `services` is the same container AppBootstrap built.
   let { services }: { services: ServiceContainer } = $props();
 
   // `services` is a stable singleton container (built once in main.ts), so this
@@ -62,13 +59,10 @@
   );
 
   // Page region display: keep BOTH pages mounted and toggle display off
-  // uiState.currentPage (a rune) - replaces UIStateManager.applyPageEffects'
-  // imperative #planner-page/#schedule-page style writes. {#if} is avoided so a
-  // page's reactive child components are never torn down on a page switch.
+  // uiState.currentPage. {#if} is avoided so a page's reactive child components
+  // are never torn down on a page switch.
   const currentPage = $derived(uiState.currentPage);
 
-  // The schedule-picker button label is declarative now (the old imperative
-  // updateSchedulePickerButton is gone).
   const scheduleName = $derived(appState.activeSchedule?.name ?? 'Schedule');
 
   function handleUndo(): void {

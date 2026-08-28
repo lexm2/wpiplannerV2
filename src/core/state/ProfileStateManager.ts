@@ -45,7 +45,7 @@ export class ProfileStateManager {
   private isRestoringState = false;
   private pendingSavePromises = new Set<Promise<void>>();
   private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
-  public isBatchUpdate = false; // Flag to suppress individual event emissions during batch updates
+  public isBatchUpdate = false;
 
   private constructor(storageManager?: TransactionalStorageManager) {
     this.storageManager = storageManager || new TransactionalStorageManager();
@@ -82,8 +82,7 @@ export class ProfileStateManager {
 
     this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
       if (this.pendingSavePromises.size > 0) {
-        // Calling preventDefault() triggers the browser's "leave site?" prompt;
-        // the legacy returnValue mechanism is deprecated and no longer needed.
+        // Calling preventDefault() triggers the browser's "leave site?" prompt.
         e.preventDefault();
       }
     };
@@ -421,7 +420,7 @@ export class ProfileStateManager {
     if (!available.size) return undefined;
     const current = TermBoundsService.getInstance().getCurrentAcademicYear();
     if (current !== null && available.has(current)) return current;
-    return Math.max(...available); // fallback: newest year with data
+    return Math.max(...available);
   }
 
   createSchedule(
@@ -500,7 +499,6 @@ export class ProfileStateManager {
       );
       if (scheduleIndex < 0) return false;
 
-      // Don't allow deleting if it's the only schedule
       if (this.state.schedules.length <= 1) {
         logger.warn('Cannot delete the only remaining schedule');
         return false;
@@ -518,7 +516,6 @@ export class ProfileStateManager {
         );
       }
 
-      // If we deleted the active schedule, switch to another one
       if (this.state.activeScheduleId === scheduleId) {
         const nextSchedule = this.state.schedules[0];
         this.state.activeScheduleId = nextSchedule.id;
@@ -724,9 +721,9 @@ export class ProfileStateManager {
 
       this.storageManager.savePreferences(this.state.preferences);
 
-      // A rejected write comes back as a result, not a throw, so this used to
-      // fall through and mark the state clean - the schedule was silently gone
-      // on the next reload. Stay dirty and say so instead.
+      // A rejected write comes back as a result, not a throw: falling through
+      // here would mark the state clean while the schedule is silently gone on
+      // the next reload. Stay dirty and say so instead.
       const failed = results.filter(r => !r.success);
       if (failed.length > 0) {
         logger.error(
@@ -747,12 +744,10 @@ export class ProfileStateManager {
   }
 
   async loadFromStorage(): Promise<boolean> {
-    // Prevent concurrent calls - if already loading, skip this call
     if (this.isLoadingFlag) {
       return false;
     }
 
-    // Skip if already loaded with schedules (redundant call prevention)
     if (this.state.schedules.length > 0 && !this.state.isLoading) {
       return true;
     }
@@ -823,14 +818,12 @@ export class ProfileStateManager {
       logger.log(JSON.stringify(loadedData, null, 2));
       logger.log('---');
 
-      // If no schedules exist, create a default one
       if (this.state.schedules.length === 0) {
         logger.log('No schedules found, creating default schedule');
         const defaultSchedule = this.createSchedule('My Schedule', 'system');
         this.state.activeScheduleId = defaultSchedule.id;
       }
 
-      // If no active schedule but schedules exist, set the last one as active
       if (!this.state.activeScheduleId && this.state.schedules.length > 0) {
         logger.log('No active schedule, setting last schedule as active');
         this.state.activeScheduleId =
@@ -1001,9 +994,9 @@ export class ProfileStateManager {
                 : [],
             );
 
-      // Spread the stored course rather than naming each field: this used to
-      // be an allowlist rebuild, which silently dropped every field it didn't
-      // mention (allowedTerms) and would drop the next one anyone adds.
+      // Spread the stored course rather than naming each field: an allowlist
+      // rebuild silently drops every field it doesn't mention (allowedTerms)
+      // and would drop the next one anyone adds.
       // A section that no longer exists in the catalog loses its key
       // rather than becoming an explicit null.
       const selected: SectionsByKind = {};
@@ -1035,9 +1028,9 @@ export class ProfileStateManager {
   }
 
   /**
-   * Signal that the active schedule was (re)activated or its metadata changed
-   * (the old `active_schedule_changed` event). Publishes a fresh activation
-   * event object; consumers `watch` it and read `.source` to branch on origin.
+   * Signal that the active schedule was (re)activated or its metadata changed.
+   * Publishes a fresh activation event object; consumers `watch` it and read
+   * `.source` to branch on origin.
    */
   private signalActivation(source: string): void {
     appState.activation = { source };

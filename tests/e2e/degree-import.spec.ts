@@ -29,7 +29,6 @@ test('imports an Academic Progress file and persists it across reload', async ({
 
   await page.setInputFiles('#degree-import-file', fixture);
 
-  // Summary + requirement cards render from the parsed record.
   await expect(page.locator('.degree-summary-title')).toContainText(
     'Computer Science',
   );
@@ -830,7 +829,6 @@ test('adds and deletes buckets from the config modal', async ({ page }) => {
   const rows = page.locator('.bucket-config-row');
   await expect(rows).toHaveCount(5);
 
-  // Add a custom bucket.
   await page.locator('#bucket-config-add-btn').click();
   await page.locator('#new-bucket-name').fill('Robotics minor');
   await page.locator('#bucket-config-save-btn').click();

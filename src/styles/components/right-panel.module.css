@@ -6,7 +6,6 @@
   height: 100%;
 }
 
-/* Course description section - top half */
 .course-description-section {
   display: flex;
   flex-direction: column;
@@ -112,7 +111,6 @@
   color: var(--color-text);
 }
 
-/* Selected courses section - bottom half */
 .selected-courses-section {
   display: flex;
   flex-direction: column;

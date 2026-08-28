@@ -503,7 +503,6 @@ export class TransactionalStorageManager {
       issues.push(`Data integrity issue: ${integrityCheck.error}`);
     }
 
-    // Flag transactions that may be stuck
     if (this.activeTransactions.size > 0) {
       const stuckTransactions = Array.from(
         this.activeTransactions.values(),

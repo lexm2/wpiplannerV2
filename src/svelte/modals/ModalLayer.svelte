@@ -42,10 +42,9 @@
     getDepartments: () => Department[];
   } = $props();
 
-  // Single declarative modal layer - the ONLY modal renderer in the app now
-  // that BaseModal/ModalService are gone. Renders a Svelte component for each
-  // open modal type-id in the registry below; uiState.openModals is the sole
-  // modal source of truth.
+  // Single declarative modal layer - the only modal renderer in the app.
+  // Renders a Svelte component for each open modal type-id in the registry
+  // below; uiState.openModals is the sole modal source of truth.
   //
   // Closing goes through closeModal(id) so uiState.openModals
   // stays the single source of truth (keeping tutorial snapshots correct);

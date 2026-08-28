@@ -29,9 +29,7 @@
     ) => void;
   } = $props();
 
-  // Group selected courses by computed term, sorted dept->number within each
-  // group; unscheduled (and unknown terms) sort last. The list is reactive on
-  // appState.selectedCourses, so add/remove/section changes re-render on their own.
+  // Unscheduled (and unknown terms) sort last.
   const groups = $derived.by(() => {
     const sorted = [...appState.selectedCourses].sort(compareSelectedCourses);
 

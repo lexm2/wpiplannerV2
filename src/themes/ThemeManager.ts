@@ -265,7 +265,6 @@ export class ThemeManager {
   }
 
   removeTheme(themeId: ThemeId): boolean {
-    // Don't allow removal of built-in themes
     const builtInThemes = [
       'wpi-classic',
       'wpi-dark',
@@ -278,7 +277,7 @@ export class ThemeManager {
     }
 
     if (this.currentTheme === themeId) {
-      this.setTheme('wpi-dark'); // Fallback to default
+      this.setTheme('wpi-dark');
     }
 
     return this.themes.delete(themeId);

@@ -12,7 +12,6 @@ export interface ActiveFilter<TCriteria = unknown> {
   displayValue: string;
 }
 
-// Standard filter criteria types
 export interface DepartmentFilterCriteria {
   departments: string[];
 }

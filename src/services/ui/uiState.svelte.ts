@@ -3,8 +3,7 @@ import { wizardState } from '../../svelte/wizardState.svelte';
 
 /**
  * Reactive UI state (Svelte 5 runes) - page/view/modal tracking - plus the
- * module-level mutator functions every caller uses directly (the old
- * UIStateManager class wrapper is gone).
+ * module-level mutator functions every caller uses directly.
  *
  * `openModals` uses `$state.raw` because mutators replace it wholesale with
  * immutable updates (and it gets copied into tutorial snapshots).

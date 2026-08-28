@@ -27,16 +27,15 @@
     onRequestClose: () => void;
   } = $props();
 
-  // Menu (⋮) popup geometry - mirrors the old SchedulePickerModal constants.
+  // Menu (⋮) popup geometry.
   const MENU_WIDTH = 120;
   const MENU_HEIGHT = 160;
   const MENU_OFFSET = 4;
   const VIEWPORT_PADDING = 8;
 
   // Bumped after any list-mutating action (rename/duplicate/delete/import/
-  // create/clear) to re-derive the list - replaces the old imperative
-  // updateScheduleList() calls. Schedule (re)activation + selection changes are
-  // already covered by reading the appState runes below.
+  // create/clear) to re-derive the list. Schedule (re)activation + selection
+  // changes are already covered by reading the appState runes below.
   let refreshTick = $state(0);
 
   const schedules = $derived.by<Schedule[]>(() => {
@@ -79,8 +78,8 @@
   let pagesContainer = $state<HTMLElement>();
   let activeTab = $state<'schedules' | 'settings'>('schedules');
 
-  // Tutorial-driven tab navigation channel (replaces navigateToTab). Apply then
-  // clear so a later tutorial run can push the same value again.
+  // Tutorial-driven tab navigation channel. Apply then clear so a later
+  // tutorial run can push the same value again.
   $effect(() => {
     const tab = modalState.schedulePickerTab;
     if (!tab) return;
@@ -471,7 +470,6 @@
                         onkeydown={onEditKeydown}
                       />
                     {:else}
-                      <!-- Double-click to rename. -->
                       <div
                         class="schedule-item-name"
                         ondblclick={e => {

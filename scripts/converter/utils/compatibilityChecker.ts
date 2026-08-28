@@ -16,12 +16,10 @@ export function areCompatible(
   section1: PlannerSection,
   section2: PlannerSection,
 ): boolean {
-  // Check cluster compatibility first
   if (!checkClusterCompatibility(section1, section2)) {
     return false;
   }
 
-  // Check for time conflicts
   if (hasTimeConflict(section1, section2)) {
     return false;
   }
@@ -50,7 +48,7 @@ function checkClusterCompatibility(
   // GPS courses: both MUST have same cluster
   if (section1.isGps || section2.isGps) {
     if (!cluster1 || !cluster2) {
-      return false; // GPS requires both to have clusters
+      return false;
     }
     return cluster1 === cluster2;
   }
@@ -75,12 +73,12 @@ function hasTimeConflict(
   for (const period1 of section1.periods) {
     for (const period2 of section2.periods) {
       if (periodsConflict(period1, period2)) {
-        return true; // Found a conflict
+        return true;
       }
     }
   }
 
-  return false; // No conflicts found
+  return false;
 }
 
 /**
@@ -93,7 +91,6 @@ function periodsConflict(
   period1: PlannerPeriod,
   period2: PlannerPeriod,
 ): boolean {
-  // Check if times overlap
   const timeOverlap = timeRangesOverlap(
     period1.startTime,
     period1.endTime,
@@ -102,20 +99,19 @@ function periodsConflict(
   );
 
   if (!timeOverlap) {
-    return false; // No time overlap, no conflict
+    return false;
   }
 
-  // Times overlap - check if they share any days
   const days1 = new Set(period1.days);
   const days2 = new Set(period2.days);
 
   for (const day of days1) {
     if (days2.has(day)) {
-      return true; // Conflict: same day + overlapping time
+      return true;
     }
   }
 
-  return false; // Times overlap but different days
+  return false;
 }
 
 /**

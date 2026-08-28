@@ -1,4 +1,3 @@
-/* Modal Container */
 .modal-container {
   position: fixed;
   top: 0;
@@ -9,7 +8,6 @@
   z-index: 90;
 }
 
-/* Modal Backdrop */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -36,7 +34,6 @@
   overflow: hidden;
 }
 
-/* Modal Content */
 .modal-content {
   display: flex;
   flex-direction: column;
@@ -44,7 +41,6 @@
   max-height: 90vh;
 }
 
-/* Modal Header */
 .modal-header {
   padding: 1.5rem 1.5rem 1rem 1.5rem;
   display: flex;
@@ -81,7 +77,6 @@
   color: var(--color-text);
 }
 
-/* Modal Body */
 .modal-body {
   padding: 1rem 1.5rem;
   flex: 1;
@@ -102,7 +97,6 @@
   margin-top: 0.85rem;
 }
 
-/* Modal Header Type Variants */
 .modal-header.info {
   background: linear-gradient(
     135deg,
@@ -157,7 +151,6 @@
   color: var(--color-text-inverse);
 }
 
-/* Modal Footer */
 .modal-footer {
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   display: flex;
@@ -168,7 +161,6 @@
   background: var(--color-surface-elevated);
 }
 
-/* Modal Buttons */
 .modal-btn {
   padding: 0.5rem 1rem;
   border-radius: var(--effect-border-radius);
@@ -216,7 +208,6 @@
   transform: translateY(-1px);
 }
 
-/* Responsive Design */
 html.is-mobile .modal-backdrop {
   padding: 0.5rem;
 }
@@ -244,7 +235,6 @@ html.is-mobile .modal-btn {
   margin: 0;
 }
 
-/* High Contrast Mode Support */
 @media (prefers-contrast: high) {
   .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.8);
@@ -270,7 +260,6 @@ html.is-mobile .modal-btn {
    SECTION INFO MODAL - Card-Based Redesign
    ============================================ */
 
-/* Modal Container */
 .section-info-modal .modal-dialog {
   max-width: 580px;
 }
@@ -315,7 +304,6 @@ html.is-mobile .modal-btn {
   border-top: 1px solid var(--color-border);
 }
 
-/* ===== Modal Content Layout ===== */
 .section-modal-content {
   display: flex;
   flex-direction: column;
@@ -323,7 +311,6 @@ html.is-mobile .modal-btn {
   width: 100%;
 }
 
-/* ===== Change Sections button ===== */
 .section-change-btn {
   display: flex;
   align-items: center;
@@ -360,7 +347,6 @@ html.is-mobile .modal-btn {
   flex-shrink: 0;
 }
 
-/* ===== Card Base Styles ===== */
 .section-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -401,17 +387,14 @@ html.is-mobile .modal-btn {
   color: var(--color-text-secondary);
 }
 
-/* Card Content */
 .section-card-content {
   padding: 1rem;
 }
 
-/* ===== Primary Card - Section Overview ===== */
 .section-card--primary {
   border-left: 3px solid var(--color-primary);
 }
 
-/* Info Grid - 3 columns */
 .section-info-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -444,7 +427,6 @@ html.is-mobile .modal-btn {
   line-height: 1.3;
 }
 
-/* Professor Link */
 .section-info-value .professor-link {
   color: var(--color-primary);
   text-decoration: none;
@@ -457,7 +439,6 @@ html.is-mobile .modal-btn {
   border-bottom-color: var(--color-primary);
 }
 
-/* Color Picker - Compact inline */
 .section-color-inline {
   display: flex;
   align-items: center;
@@ -489,7 +470,6 @@ html.is-mobile .modal-btn {
   border: none;
 }
 
-/* Enrollment Status Badge */
 .section-enrollment-badge {
   display: flex;
   align-items: center;
@@ -541,7 +521,6 @@ html.is-mobile .modal-btn {
   font-weight: 500;
 }
 
-/* ===== Schedule Card - Meeting Times ===== */
 .section-card--schedule {
   border-left: 3px solid var(--color-info);
 }
@@ -552,7 +531,6 @@ html.is-mobile .modal-btn {
   gap: 0.5rem;
 }
 
-/* Individual Period Row */
 .section-period {
   display: flex;
   align-items: flex-start;
@@ -569,7 +547,6 @@ html.is-mobile .modal-btn {
   background: var(--color-surface);
 }
 
-/* Period Type Badge */
 .section-period-type {
   display: flex;
   align-items: center;
@@ -586,7 +563,6 @@ html.is-mobile .modal-btn {
   flex-shrink: 0;
 }
 
-/* Type-specific colors using theme variables */
 .section-period-type--lab {
   background: var(--color-success);
 }
@@ -621,7 +597,6 @@ html.is-mobile .modal-btn {
   background: var(--color-success);
 }
 
-/* Period Details */
 .section-period-details {
   flex: 1;
   display: flex;
@@ -643,7 +618,6 @@ html.is-mobile .modal-btn {
   font-weight: 400;
 }
 
-/* Async Period */
 .section-period--async {
   border: 1px dashed var(--color-border);
   background: transparent;
@@ -664,7 +638,6 @@ html.is-mobile .modal-btn {
   opacity: 0.7;
 }
 
-/* ===== Note Card ===== */
 .section-card--note {
   border-left: 3px solid var(--color-warning);
   background: rgba(255, 149, 0, 0.06);
@@ -685,7 +658,6 @@ html.is-mobile .modal-btn {
   margin: 0;
 }
 
-/* ===== Responsive Design ===== */
 html.is-mobile .section-info-modal .modal-dialog {
   max-width: 100%;
   margin: 0;
@@ -725,7 +697,6 @@ html.is-mobile .section-enrollment-waitlist {
   border-top: 1px solid var(--color-border);
 }
 
-/* ===== Accessibility ===== */
 @media (prefers-reduced-motion: reduce) {
   .section-card {
     transition: none;
@@ -754,7 +725,6 @@ html.is-mobile .section-enrollment-waitlist {
   }
 }
 
-/* Filter Modal Specific Styling */
 .filter-modal .modal-dialog {
   max-width: 800px;
   width: 90%;
@@ -828,8 +798,7 @@ html.is-mobile .section-enrollment-waitlist {
   border-radius: 0 0 var(--effect-border-radius) var(--effect-border-radius);
 }
 
-/* Second (and later) visually distinct group inside a filter section. Replaces a
-   `style="margin-top: 0.75rem"` that two filter components had each hand-added. */
+/* Second (and later) visually distinct group inside a filter section. */
 .filter-subsection {
   margin-top: 0.75rem;
 }
@@ -848,7 +817,6 @@ html.is-mobile .section-enrollment-waitlist {
   overflow-y: auto;
 }
 
-/* Custom Department Checkbox Styling */
 .department-checkbox {
   appearance: none;
   -webkit-appearance: none;
@@ -1004,7 +972,6 @@ html.is-mobile .section-enrollment-waitlist {
   gap: 1rem;
 }
 
-/* The min/max pair shares the row evenly. */
 .filter-range-inputs > .field {
   flex: 1;
 }
@@ -1032,7 +999,6 @@ html.is-mobile .section-enrollment-waitlist {
   border-color: var(--color-primary);
 }
 
-/* Professor Filter */
 .professor-dropdown {
   position: absolute;
   top: 100%;
@@ -1073,7 +1039,6 @@ html.is-mobile .section-enrollment-waitlist {
   border-bottom: none;
 }
 
-/* Filter Modal Footer */
 .filter-modal .modal-footer {
   display: flex;
   justify-content: space-between;
@@ -1101,7 +1066,6 @@ html.is-mobile .section-enrollment-waitlist {
   font-size: 0.9rem;
 }
 
-/* Responsive adjustments for filter modal */
 html.is-mobile .filter-modal .modal-dialog {
   max-width: 100%;
   width: 100%;
@@ -1362,7 +1326,6 @@ html.is-mobile .changelog-modal-body {
   gap: 0.5rem;
 }
 
-/* Wake-Up Time Filter Styles */
 .filter-clear-btn {
   margin-top: 0.5rem;
   padding: 0.4rem 0.8rem;

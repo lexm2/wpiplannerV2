@@ -1,9 +1,5 @@
-// Pure, DOM-free helpers for the component-selection wizard.
-//
-// Lifted near-verbatim from the old vanilla `ComponentSelectionWizard` class so the
-// Svelte component can derive everything reactively. Nothing here touches the DOM -
-// it's all course-structure / filtering math, which keeps it easy to reason about
-// and unit-test.
+// Pure, DOM-free helpers for the component-selection wizard: course-structure
+// and filtering math the component derives from.
 
 import type {
   ComponentKind,

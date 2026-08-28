@@ -110,7 +110,6 @@ export function getDepartment(
     return dept;
   }
 
-  // Default to "Other" department for unknown abbreviations
   const otherDept = departments.get('OT');
   if (!otherDept) {
     throw new Error('Other department not found');

@@ -8,9 +8,8 @@
     onSwitch: (page: PageId) => void;
   } = $props();
 
-  // `uiState.currentPage` is a rune, so the reactive `class:active` bindings
-  // below replace the old imperative tab class toggling. onSwitch runs the
-  // page-switch side-effects (close wizard / switch page) in App.svelte.
+  // onSwitch runs the page-switch side-effects (close wizard / switch page) in
+  // App.svelte.
   const page = $derived(uiState.currentPage);
 </script>
 

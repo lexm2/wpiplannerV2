@@ -45,7 +45,7 @@
     let next = selected.includes(s)
       ? selected.filter(x => x !== s)
       : [...selected, s];
-    if (next.length === STATUSES.length) next = []; // all selected -> collapse to All
+    if (next.length === STATUSES.length) next = [];
     selected = next;
   }
 

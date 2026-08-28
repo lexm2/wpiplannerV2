@@ -3,9 +3,8 @@ import { SvelteMap } from 'svelte/reactivity';
 import { reduceMotion } from './transitions';
 
 /**
- * Course-list term-expansion FLIP animation - extracted from CourseList.svelte so
- * the component stays render-only. This is the runes-native port of the old
- * MainController FLIP height animation + diagonal badge cascade.
+ * Course-list term-expansion FLIP animation, kept out of CourseList.svelte so
+ * the component stays render-only.
  *
  * The FLIP needs a pre-swap height measurement, so it can't be a declarative
  * Svelte transition; all motion here runs on WAAPI element.animate().
@@ -26,8 +25,8 @@ const pendingStartHeight = new Map<string, number>();
 const BADGE_STEP_MS = 40; // per-step delay of the diagonal crumb cascade (the app-wide stagger step)
 const BADGE_FADE_MS = 150;
 
-// ~2ms per pixel of height delta, clamped to [200, 500]ms - ports the old
-// MainController.getHeightAnimDuration so longer expansions take a bit longer.
+// ~2ms per pixel of height delta, clamped to [200, 500]ms, so longer
+// expansions take a bit longer.
 function heightAnimDuration(from: number, to: number): number {
   return Math.min(500, Math.max(200, Math.abs(to - from) * 2));
 }
@@ -116,13 +115,12 @@ export function toggleTerm(
   else expandedTerm.set(courseId, term);
 }
 
-// Port of the old MainController FLIP height animation. Driven by the
-// `expandedTerm` rune: when a course's expanded term changes, Svelte swaps the
-// {#if expanded} content, then this action animates the .course-item height
-// from its old value to its new one (overflow clipped during the tween) and
-// fades the section badges ("crumbs") in one-by-one. Badges start at opacity:0
-// in CSS so they can never flash their finished state before the animation
-// (the reduced-motion media query flips them straight to 1).
+// Driven by the `expandedTerm` rune: when a course's expanded term changes,
+// Svelte swaps the {#if expanded} content, then this action animates the
+// .course-item height from its old value to its new one (overflow clipped
+// during the tween) and fades the section badges ("crumbs") in one-by-one.
+// Badges start at opacity:0 in CSS so they can never flash their finished state
+// before the animation (the reduced-motion media query flips them straight to 1).
 export function termFlip(item: HTMLElement, term: string | undefined) {
   let current = term;
   let cancel: (() => void) | null = null;

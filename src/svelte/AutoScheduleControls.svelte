@@ -13,9 +13,7 @@
 
   // The orchestrator publishes its result count + applied index to these runes
   // on every transition (generate / navigate / reset / selection-invalidation),
-  // so the footer's nav + progress bar stay in sync on their own - replacing
-  // ScheduleController's imperative updateAutoScheduleButtonUI() DOM updates and
-  // the orchestrator's onStateChange callback.
+  // so the footer's nav + progress bar stay in sync on their own.
   const generatedCount = $derived(appState.autoScheduleCount);
   const currentIndex = $derived(appState.autoScheduleIndex);
   const hasSchedules = $derived(generatedCount > 0);

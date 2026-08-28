@@ -20,8 +20,7 @@
   } = $props();
 
   // Step state is driven by the tutorialOverlayState rune store (written by
-  // TutorialService) - the runes-native replacement for the old onStepChange
-  // callback slot.
+  // TutorialService).
   const step = $derived(tutorialOverlayState.step);
   const index = $derived(tutorialOverlayState.index);
   const total = $derived(tutorialOverlayState.total);
@@ -82,7 +81,6 @@
     };
   });
 
-  // Dragging (header grab)
   let dragging = false;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
@@ -135,7 +133,6 @@
     }
   }
 
-  // "Find element" dot animation - flies a dot to the current step's target.
   function onFindElement(): void {
     if (step) animateFindDot(step.selector);
   }

@@ -29,7 +29,6 @@
   const minPct = $derived(((minValue - min) / range) * 100);
   const maxPct = $derived(((maxValue - min) / range) * 100);
 
-  // Tooltip shows on hover or while dragging (matches the old imperative logic).
   const showLeftTip = $derived(hoverLeft || draggingLeft);
   const showRightTip = $derived(hoverRight || draggingRight);
 
@@ -55,7 +54,8 @@
   }
 
   // Pointer capture routes move/up back to the thumb even when the pointer
-  // leaves it, so no document listeners are needed. Matches ResizeHandle.
+  // leaves it, so no document listeners are needed. Same pattern as
+  // ResizeHandle.
   function onThumbDown(side: 'left' | 'right', e: PointerEvent): void {
     e.preventDefault();
     if (side === 'left') draggingLeft = true;

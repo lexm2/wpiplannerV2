@@ -1,4 +1,3 @@
-/* Main content */
 .main-content {
   background: var(--color-background-alt);
   overflow-y: auto;
@@ -99,7 +98,6 @@
   overflow-y: auto;
 }
 
-/* Search input */
 .search-input-wrapper {
   position: relative;
   display: flex;

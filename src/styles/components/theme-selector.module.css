@@ -1,12 +1,7 @@
-/* Theme Selector - Dynamic State Classes (CSS Module) */
-/* These classes are added dynamically by JavaScript in ThemeSelector.ts */
-
-/* Dropdown open state - rotates the arrow */
 .open :global(.dropdown-arrow) {
   transform: rotate(180deg);
 }
 
-/* Individual theme option */
 /* Real <button>s now, so reset the default inline-block chrome. */
 .theme-option {
   display: block;
@@ -30,25 +25,21 @@
   background: var(--color-surface-hover);
 }
 
-/* Active/selected theme option */
 .theme-option.active {
   background: var(--color-primary);
   color: var(--color-text-inverse);
 }
 
-/* Theme option title */
 .theme-option-name {
   font-weight: var(--font-weight-medium);
   margin-bottom: 0.25rem;
 }
 
-/* Theme option description */
 .theme-option-description {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
 }
 
-/* Description color when option is active */
 .theme-option.active .theme-option-description {
   color: var(--color-text-inverse);
   opacity: 0.8;

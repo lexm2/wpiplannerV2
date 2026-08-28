@@ -1,8 +1,6 @@
 /**
- * DOM positioning helpers for the tutorial floating box - extracted from
- * FloatingTextBox.svelte so the component keeps only its reactive glue. All
- * operate on a passed `box` element and read live layout; none touch component
- * state.
+ * DOM positioning helpers for the tutorial floating box. All operate on a passed
+ * `box` element and read live layout; none touch component state.
  */
 
 /** Nudge the box back inside the viewport (8px inset) if it overflows any edge. */

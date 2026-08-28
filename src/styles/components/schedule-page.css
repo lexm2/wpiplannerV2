@@ -1,10 +1,9 @@
-/* Schedule page */
 .schedule-page {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  grid-column: 1 / -1; /* Take up all grid columns when displayed */
+  grid-column: 1 / -1;
 }
 
 .schedule-page-layout {
@@ -46,7 +45,6 @@
   border-color: var(--color-primary);
 }
 
-/* Filtered period highlighting */
 .filtered-section {
   border-left: 3px solid var(--color-primary);
   background: rgba(var(--color-primary-rgb), 0.05);
@@ -76,7 +74,6 @@
   position: relative; /* Allow wizard to position absolutely inside */
 }
 
-/* Common sidebar content item wrapper - provides consistent spacing */
 .sidebar-content-item {
   margin-bottom: 0.75rem;
 }
@@ -100,7 +97,6 @@
   margin-top: 2rem;
 }
 
-/* Term separators in the schedule sidebar */
 .term-separator {
   display: flex;
   align-items: center;
@@ -128,7 +124,6 @@
   background: var(--color-border);
 }
 
-/* Auto-schedule footer */
 .schedule-sidebar-content-footer {
   border-top: 1px solid var(--color-border);
   background: var(--color-background-alt);
@@ -158,7 +153,6 @@
   cursor: not-allowed;
 }
 
-/* Clear all sections button in header */
 .schedule-filter-controls .clear-all-sections-btn {
   padding: 0.5rem 0.75rem;
   flex-shrink: 0;
@@ -226,7 +220,6 @@
   stroke: currentColor;
 }
 
-/* Schedule progress bar */
 .schedule-progress-track {
   height: 0.2rem;
   background: var(--color-border);
@@ -241,7 +234,6 @@
   transition: width 0.25s ease;
 }
 
-/* Schedule course items with sections */
 .schedule-course-item {
   margin-bottom: 1rem;
   border: 1px solid var(--color-border);
@@ -418,7 +410,6 @@
   min-width: 0;
 }
 
-/* Enhanced period display styles */
 .section-periods {
   display: flex;
   flex-direction: column;
@@ -540,7 +531,6 @@
   color: var(--color-text-inverse);
 }
 
-/* Main content area for term graphs */
 .schedule-main {
   display: flex;
   flex-direction: column;
@@ -658,7 +648,6 @@
   }
 }
 
-/* Schedule grid for each term */
 .schedule-grid {
   flex: 1;
   display: grid;
@@ -681,7 +670,6 @@
   min-height: 0;
 }
 
-/* Time labels column */
 .time-label {
   background: var(--color-background-alt);
   display: flex;
@@ -694,7 +682,6 @@
   border-right: 2px solid var(--color-border);
 }
 
-/* Day headers */
 .day-header {
   background: var(--color-background-alt);
   display: flex;
@@ -715,7 +702,6 @@
   min-height: 2rem;
 }
 
-/* Time slot cells */
 .time-slot,
 .schedule-cell {
   background: var(--color-surface);
@@ -734,7 +720,7 @@
 
 /* Absolute overlay layer for the declarative grid (ScheduleGrids/TermGrid):
    spans the 5 day columns × 12 time rows; blocks are positioned inside it by
-   percentage over the full 8 AM-8 PM body. Replaces per-cell block placement. */
+   percentage over the full 8 AM-8 PM body. */
 .block-layer {
   grid-column: 2 / -1;
   grid-row: 2 / -1;
@@ -754,7 +740,6 @@
   pointer-events: auto;
 }
 
-/* Section blocks */
 .section-block {
   background: var(--color-primary);
   color: white;
@@ -784,7 +769,6 @@
   box-shadow: var(--effect-shadow-hover);
 }
 
-/* Preview blocks for hover interaction */
 .section-preview {
   background: transparent;
   border: 2px dashed var(--color-primary);
@@ -814,7 +798,6 @@
   background: rgba(255, 152, 0, 0.1);
 }
 
-/* Conflict overlay - displayed on top of conflicting sections */
 .conflict-overlay {
   position: absolute;
   border: 3px solid #ffeb3b;
@@ -841,7 +824,6 @@
   );
 }
 
-/* External calendar events - distinct styling from course sections */
 .external-event-block {
   background: rgba(107, 114, 128, 0.15);
   border: 2px dashed #6b7280;
@@ -870,7 +852,6 @@
   color: var(--color-text);
 }
 
-/* Calendar Events Button in Header */
 .calendar-events-header-slot {
   flex: 1;
   min-width: 0;
@@ -919,7 +900,6 @@
   text-overflow: ellipsis;
 }
 
-/* Responsive breakpoints */
 @media (max-width: 1024px) {
   .schedule-page-layout {
     grid-template-columns: 20rem 1fr;

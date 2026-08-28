@@ -11,7 +11,6 @@ interface FetchOptions extends RequestInit {
   timeout?: number;
 }
 
-// Fetch with timeout and retry logic
 async function fetchWithRetry(
   url: string,
   options: FetchOptions = {},
@@ -45,7 +44,6 @@ async function fetchWithRetry(
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      // Log response details
       const contentLength = response.headers.get('content-length');
       if (contentLength) {
         console.log(
@@ -88,7 +86,6 @@ async function fetchCourseData(): Promise<void> {
     const data = await response.json();
     console.log('Data parsed successfully');
 
-    // Log data statistics
     const dataKeys = Object.keys(data);
     console.log(
       `Data contains ${dataKeys.length} top-level properties:`,
@@ -109,7 +106,6 @@ async function fetchCourseData(): Promise<void> {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('Failed to fetch course data:', errorMessage);
 
-    // Provide helpful debugging information
     if (
       errorMessage.includes('terminated') ||
       errorMessage.includes('ECONNRESET')

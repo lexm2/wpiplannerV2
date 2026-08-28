@@ -14,7 +14,6 @@
     sections: ChangelogSection[];
   }
 
-  // Ported verbatim from ChangelogModal.parseMarkdown.
   function parseMarkdown(markdown: string): ChangelogEntry[] {
     const entries: ChangelogEntry[] = [];
     const lines = markdown.split('\n');

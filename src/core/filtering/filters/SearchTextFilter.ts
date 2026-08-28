@@ -41,7 +41,6 @@ export class SearchTextFilter implements SectionBasedFilter {
         return true;
       }
 
-      // Search in section-level fields
       const section = fs.section;
       if (section.number.toLowerCase().includes(query)) {
         return true;

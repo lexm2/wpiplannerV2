@@ -4,7 +4,6 @@
    *
    * One parameterized component rather than one per case: the call sites differ
    * only in wording, button colour and whether a text input is needed.
-   * DeleteLocalEvent.svelte predates this and is left as-is.
    */
 
   import Modal from './Modal.svelte';
@@ -29,7 +28,7 @@
   function submit(close: () => void): void {
     const p = payload;
     if (!p) return;
-    if (p.input && !inputValue.trim()) return; // nothing to submit
+    if (p.input && !inputValue.trim()) return;
     p.onConfirm(p.input ? inputValue.trim() : undefined);
     close();
   }

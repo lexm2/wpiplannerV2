@@ -11,8 +11,7 @@
   } = $props();
 
   // UndoRedoManager publishes availability to these runes on every history
-  // change, so the buttons' disabled state stays in sync automatically -
-  // replacing the old imperative updateUndoRedoButtons() + watch() wiring.
+  // change, so the buttons' disabled state stays in sync automatically.
   const canUndo = $derived(appState.canUndo);
   const canRedo = $derived(appState.canRedo);
 </script>

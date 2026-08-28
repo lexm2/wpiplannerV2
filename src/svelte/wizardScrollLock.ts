@@ -5,10 +5,6 @@
  * The panel is absolutely positioned at top:0 inside this scroll container, so
  * if the sidebar was scrolled down the panel renders out of view and the
  * overflow lock leaves no way to reach it.
- *
- * An action on the owning element rather than an $effect in the wizard, which
- * used to reach across components via getElementById. The wizard-active class
- * is a plain class: directive now; this only owns the scroll behaviour.
  */
 export function wizardScrollLock(node: HTMLElement, isOpen: boolean) {
   let prevScrollTop = 0;

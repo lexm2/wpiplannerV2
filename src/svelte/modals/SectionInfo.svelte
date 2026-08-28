@@ -16,7 +16,6 @@
 
   const data = $derived(modalState.sectionInfo);
 
-  // Professor list with RMP links - mirrors generateModalBody.
   interface ProfessorLink {
     name: string;
     rmpUrl: string | null;

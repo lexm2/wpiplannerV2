@@ -97,8 +97,6 @@ export class CourseDataService {
       generated: jsonData.generated || new Date().toISOString(),
     };
 
-    //this.logMA1024Sections(scheduleDB); << Lots of sections for reference
-
     return scheduleDB;
   }
 
@@ -217,9 +215,6 @@ export class CourseDataService {
     });
   }
 
-  /**
-   * Each lecture group is a lecture section with its compatible discussions and labs.
-   */
   private parseLectureGroups(lectureGroups: RawLectureGroup[]): LectureGroup[] {
     return lectureGroups.map(groupData => {
       const lectureSection = this.parseConstructedSections([
@@ -300,7 +295,6 @@ export class CourseDataService {
       return { hours: 0, minutes: 0, displayTime: 'TBD' };
     }
 
-    // Parse "HH:MM" format from constructed data
     const match = timeStr.match(/(\d{1,2}):(\d{2})/);
     if (!match) {
       return { hours: 0, minutes: 0, displayTime: timeStr };
@@ -493,9 +487,6 @@ export class CourseDataService {
     this.notifyDataRefreshed();
   }
 
-  /**
-   * Signal that data should be refreshed
-   */
   notifyDataRefreshed(): void {
     if (!this.scheduleDB) {
       logger.warn('[CourseDataService] Cannot notify refresh - no data loaded');

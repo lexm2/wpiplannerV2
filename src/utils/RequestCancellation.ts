@@ -147,6 +147,6 @@ export class DebouncedOperation {
   }
 
   setDelay(delay: number): void {
-    this.delay = Math.max(0, Math.min(5000, delay)); // Clamp between 0-5000ms
+    this.delay = Math.max(0, Math.min(5000, delay));
   }
 }

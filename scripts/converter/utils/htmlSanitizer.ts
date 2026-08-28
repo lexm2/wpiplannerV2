@@ -41,10 +41,8 @@ export function sanitizeHTML(html: string | null): string {
 
   let cleaned = html;
 
-  // Remove all HTML tags
   cleaned = cleaned.replace(/<[^>]*>/g, ' ');
 
-  // Decode HTML entities
   cleaned = cleaned.replace(/&amp;/g, '&');
   cleaned = cleaned.replace(/&#39;/g, "'");
   cleaned = cleaned.replace(/&#43;/g, '+');
@@ -54,10 +52,8 @@ export function sanitizeHTML(html: string | null): string {
   cleaned = cleaned.replace(/&quot;/g, '"');
   cleaned = cleaned.replace(/&nbsp;/g, ' ');
 
-  // Collapse multiple spaces
   cleaned = cleaned.replace(/\s+/g, ' ');
 
-  // Trim whitespace
   cleaned = cleaned.trim();
 
   // Strip leading punctuation artifacts left after category marker removal (e.g. ", " or "- ")

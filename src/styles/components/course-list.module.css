@@ -1,4 +1,3 @@
-/* Course listings */
 .course-list {
   display: flex;
   flex-direction: column;
@@ -89,7 +88,6 @@
   stroke: var(--color-primary);
 }
 
-/* Bookmark button */
 .course-bookmark-btn {
   width: 32px;
   height: 32px;
@@ -370,7 +368,6 @@
   flex-shrink: 0;
 }
 
-/* Grid view styles */
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -452,7 +449,6 @@
   -webkit-box-orient: vertical;
 }
 
-/* Responsive grid adjustments */
 :global(html.is-mobile) .course-grid {
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -469,7 +465,6 @@
   }
 }
 
-/* Footer count under the list. */
 .list-footer {
   padding: 1.5rem 0 0.5rem;
   text-align: center;

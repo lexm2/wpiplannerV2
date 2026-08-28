@@ -2,9 +2,9 @@ import { reduceMotion } from '../transitions';
 
 /**
  * "Find element" dot animation - a self-contained WAAPI flourish that flies a dot
- * from screen center to the tutorial step's target and fades out. Extracted from
- * FloatingTextBox.svelte: it appends to document.body and self-cleans, with no
- * component state beyond the target selector.
+ * from screen center to the tutorial step's target and fades out. It appends to
+ * document.body and self-cleans, with no component state beyond the target
+ * selector.
  *
  * Under `prefers-reduced-motion` every duration collapses to 0 but the two 500ms
  * holds are kept: the point of this flourish is to show the user WHERE the target

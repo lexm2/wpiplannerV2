@@ -1,6 +1,5 @@
 /**
  * Configuration for the Workday to Planner converter
- * Corresponds to planner.properties in the Java version
  */
 
 export interface ConverterConfig {

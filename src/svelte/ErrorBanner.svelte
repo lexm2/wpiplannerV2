@@ -3,9 +3,8 @@
   import { triggerFileDownload } from '../utils/download';
   import { STORAGE_KEYS } from '../utils/storageKeys';
 
-  // Declarative replacement for UIStateManager.showErrorMessage's innerHTML
-  // injection into #department-list/#course-container. showAppError() sets the
-  // uiState.appError rune; this banner renders it above whatever page is active.
+  // showAppError() sets the uiState.appError rune; this banner renders it above
+  // whatever page is active.
   const error = $derived(uiState.appError);
 
   let clearing = $state(false);

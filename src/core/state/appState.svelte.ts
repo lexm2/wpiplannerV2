@@ -31,22 +31,21 @@ class AppState {
   hasUnsavedChanges = $state(false);
 
   /**
-   * The most recent active-schedule (re)activation event - i.e. the old
-   * `active_schedule_changed` trigger. {@link ProfileStateManager} reassigns
-   * this (a fresh object) whenever the active schedule is switched, deleted, or
-   * has its metadata updated; consumers `watch` it to refresh and read `.source`
-   * to branch on origin (e.g. 'calendar-event-exclusion'). A reassigned object
-   * - rather than a counter - fires on exactly these events without the spurious
-   * fires that watching `activeSchedule` identity would bring (it changes on
-   * every course add).
+   * The most recent active-schedule (re)activation event.
+   * {@link ProfileStateManager} reassigns this (a fresh object) whenever the
+   * active schedule is switched, deleted, or has its metadata updated;
+   * consumers `watch` it to refresh and read `.source` to branch on origin
+   * (e.g. 'calendar-event-exclusion'). A reassigned object - rather than a
+   * counter - fires on exactly these events without the spurious fires that
+   * watching `activeSchedule` identity would bring (it changes on every course
+   * add).
    */
   activation = $state.raw<{ source: string }>({ source: 'user' });
 
   /**
    * Whether undo/redo are currently available. {@link UndoRedoManager} writes
    * these after every history change (capture, undo, redo, clear); the
-   * UndoRedoButtons component reads them directly for its disabled state -
-   * replacing the old generation counter + `canUndo()`/`canRedo()` re-read.
+   * UndoRedoButtons component reads them directly for its disabled state.
    */
   canUndo = $state(false);
   canRedo = $state(false);
@@ -63,17 +62,14 @@ class AppState {
    * Generated auto-schedule result count + the currently-applied index.
    * {@link AutoScheduleOrchestrator} writes these on every transition
    * (generated, navigated, reset, or invalidated by a selection change); the
-   * AutoScheduleControls footer reads them directly for its nav + progress bar
-   * - replacing the old generation counter and `getGeneratedSchedules()`/
-   * `getCurrentScheduleIndex()` re-reads.
+   * AutoScheduleControls footer reads them directly for its nav + progress bar.
    */
   autoScheduleCount = $state(0);
   autoScheduleIndex = $state(0);
 
   /**
    * True while the auto-scheduler is generating. Drives the declarative
-   * schedule grid's generating overlay (replaces ScheduleController's imperative
-   * `.schedule-generating-overlay` create/append in `doGenerateSchedules`).
+   * schedule grid's generating overlay.
    */
   scheduleGenerating = $state(false);
 

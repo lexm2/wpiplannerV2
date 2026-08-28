@@ -6,8 +6,7 @@ import { wizardState } from './wizardState.svelte';
  *
  * The Svelte schedule grid (TermGrid) sets `hoveredCourseId` on section-block
  * mouseenter/leave; ScheduleSidebar's SelectedCourseItem reads it to toggle the
- * `.sidebar-course-highlighted` class. Replaces the old imperative
- * `ScheduleController.sidebarCourseItems` map + classList add/remove.
+ * `.sidebar-course-highlighted` class.
  */
 class ScheduleSidebarState {
   hoveredCourseId = $state.raw<string | null>(null);

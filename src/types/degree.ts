@@ -53,7 +53,7 @@ export interface Requirement {
   rawName: string;
   category: RequirementCategory;
   scope: string; // "WPI" or the major name
-  name: string; // short name
+  name: string;
   status: RequirementStatus;
   creditsRequired: number | null;
   creditsRemaining: number | null;

@@ -23,8 +23,7 @@ import { reduceMotion } from '../transitions';
 export const TERMS = ['A', 'B', 'C', 'D'];
 
 // A phone has no room for four grids at once, so it is permanently focused and
-// can never zoom out - paging between terms is the only navigation there. This
-// replaces the old scroll-snap column.
+// can never zoom out - paging between terms is the only navigation there.
 export const focusLocked = DeviceDetection.isMobilePhone();
 
 class TermFocus {

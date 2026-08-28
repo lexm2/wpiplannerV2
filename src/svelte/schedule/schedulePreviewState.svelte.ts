@@ -5,9 +5,7 @@ import type { Course, SectionsByKind } from '../../types/types';
  *
  * The still-vanilla {@link ComponentSelectionWizard} writes these as the user
  * navigates/hovers; the declarative `ScheduleGrids` reads them to overlay a
- * preview onto the grid. Replaces the old private `wizardPreviewCourse` /
- * `wizardPreviewSelections` / `hoverPreviewSelections` fields on
- * `ScheduleController` (which re-rendered the grid imperatively).
+ * preview onto the grid.
  *
  * - `previewCourse` + `selections`: the wizard's CURRENT committed selection -
  *   overlaid onto the selected list so it renders as solid blocks.

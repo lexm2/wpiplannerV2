@@ -44,9 +44,9 @@
     termsByCourse = next;
   });
 
-  // Tutorial-driven term-preference overrides (replaces setTermPreferences).
-  // Merge whenever the override channel changes, then clear it so the same
-  // prefs can be pushed again on a later tutorial run.
+  // Tutorial-driven term-preference overrides. Merge whenever the override
+  // channel changes, then clear it so the same prefs can be pushed again on a
+  // later tutorial run.
   $effect(() => {
     const prefs = modalState.autoScheduleIntroTermPrefs;
     if (!prefs) return;

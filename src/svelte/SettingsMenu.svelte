@@ -4,11 +4,9 @@
   import { getInlineSVG } from '../utils/iconPaths';
   import { dur } from './transitions';
 
-  // Declarative replacement for MainController.setupSettingsMenu (the vanilla DOM
-  // build that appended a dropdown to document.body). The dropdown is
-  // position:fixed (anchored to the viewport), so rendering it inside the header
-  // - rather than the body - places it identically. Actions are passed in so the
-  // undo/redo error handling + modal opening stay in App.svelte.
+  // The dropdown is position:fixed (anchored to the viewport), so rendering it
+  // inside the header rather than in the body places it identically. Actions are
+  // passed in so the undo/redo error handling + modal opening stay in App.svelte.
   let {
     onSchedules,
     onToggleTheme,
@@ -24,8 +22,8 @@
   let open = $state(false);
 
   // appState.canUndo/canRedo are runes published by UndoRedoManager - the same
-  // source the header UndoRedoButtons use - so the items' disabled state stays in
-  // sync without the imperative re-check the old toggle handler ran on open.
+  // source the header UndoRedoButtons use - so the items' disabled state stays
+  // in sync.
   const canUndo = $derived(appState.canUndo);
   const canRedo = $derived(appState.canRedo);
 

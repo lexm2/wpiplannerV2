@@ -17,7 +17,6 @@
 
   const buckets = $derived(degreeState.buckets);
 
-  // --- inline rename / retarget -------------------------------------------
   let editingId = $state<string | null>(null);
   let draftName = $state('');
   let draftCredits = $state('');
@@ -47,7 +46,6 @@
     return raw.trim() && Number.isFinite(n) && n > 0 ? n : null;
   }
 
-  // --- add ------------------------------------------------------------------
   let adding = $state(false);
   let newName = $state('');
   let newCredits = $state('');
@@ -71,7 +69,6 @@
     adding = false;
   }
 
-  // --- delete ---------------------------------------------------------------
   function remove(bucket: DegreeBucket): void {
     const held = degreeBucketService.assignedCount(bucket.id);
     const consequence = held
@@ -93,7 +90,6 @@
     });
   }
 
-  // --- reorder ---------------------------------------------------------------
   // The row itself moves under the pointer, vertically only and clamped to the
   // list, while the rows it displaces slide aside to open the gap it lands in.
   let dragId = $state<string | null>(null);

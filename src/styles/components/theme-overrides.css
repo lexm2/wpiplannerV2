@@ -1,4 +1,3 @@
-/* Theme-specific overrides */
 .theme-wpi-dark {
   color-scheme: dark;
 }
@@ -14,7 +13,6 @@
 }
 
 .theme-high-contrast {
-  /* Additional high contrast specific styles */
   --effect-transition: all 0.1s ease;
 }
 

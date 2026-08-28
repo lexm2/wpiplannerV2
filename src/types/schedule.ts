@@ -53,9 +53,6 @@ export enum AcademicTerm {
   ALL = 'ALL', // Applies to all terms
 }
 
-/**
- * Calendar event type.
- */
 export enum EventType {
   ONE_TIME = 'one-time',
   RECURRING = 'recurring',

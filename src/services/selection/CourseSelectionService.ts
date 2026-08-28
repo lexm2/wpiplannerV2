@@ -50,8 +50,8 @@ export class CourseSelectionService {
 
   private async performInitialization(): Promise<boolean> {
     try {
-      // NOTE: ProfileStateManager is already loaded by AppBootstrap before this service
-      // Redundant loadFromStorage() call removed to prevent duplicate schedule creation race condition
+      // NOTE: ProfileStateManager is already loaded by AppBootstrap before this
+      // service; loading from storage again here races and creates duplicate schedules.
 
       this.isInitialized = true;
 
@@ -508,7 +508,6 @@ export class CourseSelectionService {
   }
 
   findCourseById(_courseId: string): Course | undefined {
-    // This would need to be implemented with access to course data
     logger.warn(
       'findCourseById: Course data access not implemented in this service',
     );
@@ -530,7 +529,6 @@ export class CourseSelectionService {
 
   reconstructSectionObjects(): void {
     try {
-      // No longer needed - component-based selection doesn't require reconstruction
       const selectedCourses = this.getSelectedCourses();
 
       if (selectedCourses.length > 0) {

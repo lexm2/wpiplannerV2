@@ -85,7 +85,6 @@ export class DataValidator {
       result.valid = false;
     }
 
-    // Auto-repair missing fields if requested
     if (options.repairInPlace && result.valid) {
       this.repairSchedule(scheduleObj as unknown as Schedule);
     }
@@ -245,7 +244,6 @@ export class DataValidator {
     this.validateRequiredField(departmentObj, 'abbreviation', 'string', result);
     this.validateRequiredField(departmentObj, 'name', 'string', result);
 
-    // Validate abbreviation format (should be uppercase letters)
     if (
       departmentObj.abbreviation &&
       typeof departmentObj.abbreviation === 'string' &&
@@ -351,7 +349,6 @@ export class DataValidator {
       return result; // Can't check integrity without both pieces
     }
 
-    // Check if active schedule ID references a valid schedule
     if (data.activeScheduleId) {
       const activeScheduleExists = data.schedules.some(
         s => s.id === data.activeScheduleId,

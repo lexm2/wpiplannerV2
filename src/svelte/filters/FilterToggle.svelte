@@ -1,7 +1,5 @@
 <script lang="ts">
-  // Shared checkbox toggle row used across the filter sections - the
-  // `filter-toggle-label` / checkbox / slider / text markup that was copy-pasted
-  // in Bookmarks and Availability (×3).
+  // Shared checkbox toggle row used across the filter sections.
   let {
     label,
     checked,

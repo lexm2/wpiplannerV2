@@ -105,7 +105,6 @@ test('scrolling pages through the terms and wraps D back to A', async ({
     await page.waitForTimeout(SETTLE_MS);
   }
 
-  // And back the other way.
   await page.mouse.wheel(0, -120);
   await expect(page.locator('[data-terms-grid]')).toHaveAttribute(
     'data-focused-term',

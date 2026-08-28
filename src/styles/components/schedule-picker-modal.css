@@ -1,6 +1,3 @@
-/* Schedule Picker Modal - Complete Redesign */
-
-/* Modal Dialog Sizing - Large Base Size */
 .schedule-picker-modal-dialog {
   max-width: 1000px;
   width: 50vw;
@@ -13,7 +10,6 @@
   height: 100%;
 }
 
-/* Modal Header - Standard Styling */
 .schedule-picker-modal-dialog .modal-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--color-border);
@@ -51,7 +47,6 @@
   color: var(--color-text);
 }
 
-/* Modal Body - Flexbox Container */
 .schedule-picker-modal-dialog .modal-body {
   padding: 0 !important;
   display: flex !important;
@@ -64,7 +59,6 @@
   min-height: 0;
 }
 
-/* Schedule List - Scrollable Area */
 .schedule-picker-modal-dialog .schedule-list {
   flex: 1;
   min-height: 0;
@@ -88,7 +82,6 @@
   font-size: 1rem;
 }
 
-/* Schedule Item */
 .schedule-picker-modal-dialog .schedule-item {
   display: flex;
   align-items: center;
@@ -128,7 +121,6 @@
   background: var(--color-surface-elevated);
 }
 
-/* Schedule Item Info */
 .schedule-picker-modal-dialog .schedule-item-info {
   flex: 1;
   min-width: 0;
@@ -162,7 +154,6 @@
   line-height: 1.3;
 }
 
-/* Schedule Item Actions */
 .schedule-picker-modal-dialog .schedule-item-actions {
   display: flex;
   align-items: center;
@@ -215,7 +206,6 @@
   font-weight: 500;
 }
 
-/* Modal Footer - Pill Tab Nav */
 .schedule-picker-modal-dialog .modal-footer {
   padding: 0.75rem 1.5rem;
   display: flex;
@@ -224,7 +214,6 @@
   background: var(--color-background);
 }
 
-/* Pages Container - Horizontal Slider */
 .schedule-picker-modal-dialog .modal-pages-container {
   display: flex;
   flex-direction: row;
@@ -267,9 +256,6 @@
   outline-offset: 2px;
 }
 
-/* Responsive Breakpoints - Progressive Scaling */
-
-/* Ultra Wide Screens (1200px+) - Expanded Layout with Inline Actions */
 @media (min-width: 1200px) {
   .schedule-picker-modal-dialog {
     max-width: 1400px !important;
@@ -277,7 +263,6 @@
     height: 90vh;
   }
 
-  /* Hide menu button and dropdown on wide screens */
   .schedule-picker-modal-dialog .menu-btn {
     display: none;
   }
@@ -286,26 +271,22 @@
     display: none !important;
   }
 
-  /* Show inline action buttons */
   .schedule-picker-modal-dialog .inline-action-btn {
     display: inline-block;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
   }
 
-  /* Expand schedule item actions area */
   .schedule-picker-modal-dialog .schedule-item-actions {
     gap: 0.5rem;
     flex-wrap: wrap;
   }
 
-  /* Increase schedule item padding for spacious layout */
   .schedule-picker-modal-dialog .schedule-item {
     padding: 1.25rem 1.75rem;
   }
 }
 
-/* Medium Screens (992px - 1199px) - Reduced Size */
 @media (max-width: 1199px) and (min-width: 992px) {
   .schedule-picker-modal-dialog {
     max-width: 800px;
@@ -314,7 +295,6 @@
   }
 }
 
-/* Tablet Screens (768px - 991px) - Compact */
 @media (max-width: 991px) and (min-width: 768px) {
   .schedule-picker-modal-dialog {
     max-width: none;
@@ -333,7 +313,6 @@
   }
 }
 
-/* Mobile Screens - Maximum Compact */
 html.is-mobile .schedule-picker-modal-dialog {
   width: 95vw;
   max-width: none;
@@ -352,9 +331,6 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
   font-size: 1.25rem;
 }
 
-/* Height-Based Breakpoints */
-
-/* Further compress on very short screens */
 @media (max-height: 599px) {
   .schedule-picker-modal-dialog {
     height: 85vh;
@@ -371,7 +347,6 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
   }
 }
 
-/* Extreme height constraint - minimal UI */
 @media (max-height: 499px) {
   .schedule-picker-modal-dialog {
     height: 90vh;
@@ -392,7 +367,6 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
   }
 }
 
-/* Mobile footer */
 html.is-mobile .schedule-picker-modal-dialog .modal-footer {
   display: none;
 }

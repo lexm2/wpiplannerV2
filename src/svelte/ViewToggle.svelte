@@ -1,9 +1,6 @@
 <script lang="ts">
   import { uiState, setView } from '../services/ui/uiState.svelte';
 
-  // `uiState.currentView` is a rune, so the reactive `class:` bindings below
-  // keep both buttons in sync; setView writes the rune and CourseList derives
-  // its list/grid layout from it, so the course list re-renders on its own.
   const view = $derived(uiState.currentView);
 </script>
 

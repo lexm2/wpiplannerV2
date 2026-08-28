@@ -8,8 +8,7 @@
   let { filterService }: { filterService: FilterService } = $props();
 
   // Read the active criteria ONCE at mount; the sliders own their values after
-  // that and write back to the service (debounced). Matches the controller,
-  // which seeded the sliders from criteria and never re-synced them while open.
+  // that and write back to the service (debounced).
   // Intentional one-time seed read; the directive below is load-bearing.
   // svelte-ignore state_referenced_locally
   const initial: RMPRatingFilterCriteria =
@@ -48,9 +47,9 @@
     }
   }
 
-  // 300ms debounce: any slider drag / checkbox flip resets the timer (the old
-  // SharedFilterSetup used the same 300ms window). The effect depends only on
-  // local state, so writing to the service can't re-trigger it.
+  // 300ms debounce: any slider drag / checkbox flip resets the timer. The
+  // effect depends only on local state, so writing to the service can't
+  // re-trigger it.
   $effect(() => {
     ratingMin;
     ratingMax;

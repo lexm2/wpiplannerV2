@@ -23,7 +23,6 @@ export function transformCourse(
 
   const firstSection = workdaySections[0];
 
-  // Extract course information from first section
   const courseSection = firstSection.Course_Section;
   const dashIndex = courseSection.indexOf('-');
   const subjectAndNumber = courseSection.substring(0, dashIndex);
@@ -31,7 +30,6 @@ export function transformCourse(
     subjectAndNumber.indexOf(' ') + 1,
   );
 
-  // Extract course name
   const courseTitle = firstSection.Course_Title;
   const titleDashIndex = courseTitle.indexOf('-');
   const courseName =
@@ -39,7 +37,6 @@ export function transformCourse(
       ? courseTitle.substring(titleDashIndex + 2).trim()
       : courseSection.substring(courseSection.lastIndexOf('-') + 1).trim();
 
-  // Get description
   const isSpecialCourse =
     config.specialCourses.some(sc => subjectAndNumber.includes(sc)) ||
     config.specialSections.some(ss => courseSection.includes(ss));
@@ -51,10 +48,8 @@ export function transformCourse(
   const { category, cleanedHtml } = extractCategory(descriptionRaw);
   const description = sanitizeHTML(cleanedHtml);
 
-  // Parse credits
   const credits = parseFloat(firstSection.Credits);
 
-  // Determine if graduate course
   const isGraduate = firstSection.Academic_Level === 'Graduate';
 
   // Parse fall year from "2025 - 2026 Academic Year"
@@ -65,7 +60,6 @@ export function transformCourse(
     transformSection(ws, config),
   );
 
-  // Categorize sections by type
   const categorized = categorizeSections(plannerSections);
 
   const lectures = buildLectureGroups(categorized);
@@ -78,7 +72,6 @@ export function transformCourse(
     })),
   );
 
-  // Handle lab-only courses
   const standaloneLabs =
     lectures.length === 0 && categorized.labs.length > 0
       ? categorized.labs

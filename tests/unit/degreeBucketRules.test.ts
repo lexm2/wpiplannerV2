@@ -33,7 +33,6 @@ describe('degreeBucketRules lookup', () => {
     // WPI-wide social_science/hua come through (CS does not override them)
     expect(rules.some(r => r.category === 'social_science')).toBe(true);
     expect(rules.some(r => r.category === 'hua')).toBe(true);
-    // CS major-specific buckets are present
     expect(
       rules.some(
         r =>

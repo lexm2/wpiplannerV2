@@ -17,11 +17,9 @@ import { TimeUtils } from '../../utils/timeUtils';
 /**
  * Pure geometry/data helpers for the declarative schedule grid (no Svelte/DOM).
  *
- * Replaces ScheduleController's imperative cell-occupancy renderer
- * (`buildCellOccupancyMap` / `getCellFromMap`). The grid uses an absolute-overlay
- * model: each section/event/preview/conflict is one block positioned over the
- * full 12-hour (8 AM-8 PM) term body by percentage, so there is no per-cell
- * occupancy map and no `isFirstSlot` gating.
+ * The grid uses an absolute-overlay model: each section/event/preview/conflict
+ * is one block positioned over the full 12-hour (8 AM-8 PM) term body by
+ * percentage.
  */
 
 // Single source of truth for the grid's time bounds - shared with TermGrid's
@@ -156,7 +154,7 @@ export function courseShowsInTerm(sc: SelectedCourse, term: string): boolean {
 
 /**
  * Overlay the wizard's CURRENT committed selection onto the selected list so it
- * renders as solid blocks (ported from ScheduleController.applyPreviewOverlay).
+ * renders as solid blocks.
  */
 export function applyPreviewOverlay(
   courses: SelectedCourse[],
@@ -190,8 +188,8 @@ export function applyPreviewOverlay(
 
 /**
  * Build the dashed hover-preview course from the hovered (not-yet-committed)
- * option (ported from ScheduleController.buildHoverCourse). `selected` is the
- * post-overlay list, so the base course already carries the committed selection.
+ * option. `selected` is the post-overlay list, so the base course already
+ * carries the committed selection.
  */
 export function buildHoverCourse(
   selected: SelectedCourse[],
@@ -210,8 +208,8 @@ export function buildHoverCourse(
 
 /**
  * Per-day collapsed time ranges for a section (earliest start -> latest end of
- * all periods that day), matching the old occupancy map. Skips days with no
- * periods and zero-duration (async) ranges.
+ * all periods that day). Skips days with no periods and zero-duration (async)
+ * ranges.
  */
 function sectionDayRanges(
   section: Section,
@@ -236,7 +234,7 @@ function sectionDayRanges(
   return ranges;
 }
 
-/** Recurring, visible events that render in `term` (matches the shipped filter). */
+/** Recurring, visible events that render in `term`. */
 function visibleTermEvents(
   events: LocalCalendarEvent[],
   term: string,
@@ -253,7 +251,7 @@ function visibleTermEvents(
  * Build every block for one term: solid section blocks, dashed hover preview,
  * yellow conflict overlays, and gray calendar-event blocks. Conflicts are
  * detected among the solid (committed) sections only - preview/hover blocks
- * never register conflicts, matching the old renderer.
+ * never register conflicts.
  */
 export function buildTermBlocks(
   termCourses: SelectedCourse[],

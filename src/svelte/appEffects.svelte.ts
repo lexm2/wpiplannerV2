@@ -6,14 +6,12 @@ import { appState } from '../core/state/appState.svelte';
 import { updateClientTimestamp } from './timestampState.svelte';
 
 /**
- * Installs the app's global side-effect bridges - the runes-native replacement
- * for MainController/AppBootstrap's old listener wiring. Call once during
- * App.svelte initialization (so the `$effect`s register in its component scope).
+ * Installs the app's global side-effect bridges. Call once during App.svelte
+ * initialization (so the `$effect`s register in its component scope).
  *
  * Each effect tracks exactly one rune, then runs its body `untrack`ed so the
- * services it writes can't re-trigger it, and skips its initial (mount) fire to
- * match the old bridge-watch skip-initial semantics. Keeping these out of the
- * layout root leaves App.svelte as pure composition.
+ * services it writes can't re-trigger it, and skips its initial (mount) fire.
+ * Keeping these out of the layout root leaves App.svelte as pure composition.
  */
 export function installAppEffects(services: ServiceContainer): void {
   // Active-schedule (re)activation -> sync the academicYear filter to the newly

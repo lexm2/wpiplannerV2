@@ -38,7 +38,6 @@
   const hasComponents = $derived(
     sectionsOf(selectedCourse.selected).length > 0,
   );
-  // The grid sets the hovered course id; this item highlights when it matches.
   const highlighted = $derived(
     scheduleSidebarState.hoveredCourseId === course.id,
   );

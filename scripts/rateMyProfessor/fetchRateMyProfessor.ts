@@ -22,22 +22,15 @@ const GRAPHQL_URL = 'https://www.ratemyprofessors.com/graphql';
 // Authorization token (from @mtucourses/rate-my-professors library)
 const AUTH_TOKEN = 'dGVzdDp0ZXN0';
 
-// Output file path
 const OUTPUT_PATH = path.join(process.cwd(), 'public', 'rateMyProfessor.json');
 
 // Rate limiting configuration
-const DELAY_BETWEEN_REQUESTS_MS = 100; // 100ms delay between requests
+const DELAY_BETWEEN_REQUESTS_MS = 100;
 
-/**
- * Sleep for a specified number of milliseconds
- */
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Make a GraphQL request to Rate My Professors API
- */
 async function graphqlRequest(query: string, variables: any): Promise<any> {
   const response = await fetch(GRAPHQL_URL, {
     method: 'POST',
@@ -107,9 +100,6 @@ async function searchTeachers(
   return data.newSearch.teachers.edges.map((edge: any) => edge.node);
 }
 
-/**
- * Get detailed information about a teacher
- */
 async function getTeacher(id: string): Promise<any> {
   const graphqlQuery = `
     query TeacherQuery($id: ID!) {
@@ -198,7 +188,6 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
           throw new Error('No details returned');
         }
 
-        // Create professor object with cleaned data
         const professor: Professor = {
           id: details.id,
           legacyId: details.legacyId,
@@ -215,7 +204,6 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
         professors.push(professor);
         successCount++;
 
-        // Log progress every 10 professors
         if ((i + 1) % 10 === 0) {
           console.log(
             `Progress: ${i + 1}/${teachers.length} professors processed`,
@@ -227,7 +215,6 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
           `Failed to fetch details for ${teacher.firstName} ${teacher.lastName}:`,
           error,
         );
-        // Continue with the next professor
       }
     }
 
@@ -242,16 +229,11 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
   }
 }
 
-/**
- * Save data to JSON file
- */
 async function saveToFile(data: RateMyProfessorData): Promise<void> {
   try {
-    // Ensure the data directory exists
     const dataDir = path.dirname(OUTPUT_PATH);
     await fs.mkdir(dataDir, { recursive: true });
 
-    // Write JSON file with pretty formatting
     await fs.writeFile(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf-8');
 
     console.log(`\nData successfully saved to ${OUTPUT_PATH}`);
@@ -262,16 +244,12 @@ async function saveToFile(data: RateMyProfessorData): Promise<void> {
   }
 }
 
-/**
- * Main execution function
- */
 async function main() {
   console.log('=== WPI Rate My Professor Data Fetcher ===\n');
 
   const startTime = Date.now();
 
   try {
-    // WPI school information
     const school: School = {
       id: WPI_LEGACY_ID.toString(),
       name: WPI_SCHOOL_NAME,
@@ -279,17 +257,14 @@ async function main() {
       state: WPI_SCHOOL_STATE,
     };
 
-    // Fetch professor data
     const professors = await fetchWPIProfessors();
 
-    // Sort professors alphabetically by last name, then first name
     professors.sort((a, b) => {
       const lastNameCompare = a.lastName.localeCompare(b.lastName);
       if (lastNameCompare !== 0) return lastNameCompare;
       return a.firstName.localeCompare(b.firstName);
     });
 
-    // Create output data structure
     const data: RateMyProfessorData = {
       lastUpdated: new Date().toISOString(),
       school,
@@ -297,7 +272,6 @@ async function main() {
       totalProfessors: professors.length,
     };
 
-    // Save to file
     await saveToFile(data);
 
     const endTime = Date.now();
@@ -305,7 +279,6 @@ async function main() {
 
     console.log(`\n✓ Complete! Execution time: ${durationSeconds}s`);
 
-    // Print some statistics
     if (professors.length > 0) {
       const avgRating =
         professors.reduce((sum, p) => sum + p.avgRating, 0) / professors.length;
@@ -329,7 +302,6 @@ async function main() {
   }
 }
 
-// Run the script
 main().catch(err => {
   console.error(err);
   process.exit(1);

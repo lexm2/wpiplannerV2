@@ -10,13 +10,10 @@ import { converterConfig } from './converter.config.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Get script directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// Go up 1 level from scripts/ to get project root
 const projectRoot = join(__dirname, '..');
 
-// File paths
 const INPUT_PATH = join(projectRoot, 'public', 'course-data.json');
 const OUTPUT_PATH = join(projectRoot, 'public', 'course-data-constructed.json');
 

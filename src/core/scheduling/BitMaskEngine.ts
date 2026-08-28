@@ -53,7 +53,6 @@ export function sectionToMask(section: Section): bigint {
     );
     const endSlot = timeToSlot(period.endTime.hours, period.endTime.minutes);
 
-    // Skip invalid time ranges
     if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY)
       continue;
 

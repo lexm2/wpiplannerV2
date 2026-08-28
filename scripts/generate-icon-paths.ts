@@ -50,9 +50,9 @@ function generateIconPaths(): void {
     const variableName = kebabToCamel(filename);
     const svgContent = readFileSync(join(ICONS_DIR, filename), 'utf-8')
       .trim()
-      .replace(/\s+class="[^"]*"/g, '') // Remove class attributes from source SVG
-      .replace(/stroke="#000000"/g, 'stroke="currentColor"') // Replace black stroke with currentColor
-      .replace(/fill="#000000"/g, 'fill="currentColor"'); // Replace black fill with currentColor
+      .replace(/\s+class="[^"]*"/g, '')
+      .replace(/stroke="#000000"/g, 'stroke="currentColor"')
+      .replace(/fill="#000000"/g, 'fill="currentColor"');
 
     return {
       filename,

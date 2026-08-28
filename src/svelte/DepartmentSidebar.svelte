@@ -8,13 +8,12 @@
   let { filterService }: { filterService: FilterService } = $props();
 
   // Track *collapsed* categories (not expanded) so categories that appear after
-  // data loads default to expanded - matching the old DepartmentController.
+  // data loads default to expanded.
   const collapsed = new SvelteSet<string>();
 
   // Source data + active filter state are reactive: `appState.loadedDepartments`
   // is a rune, and `filterService.getActiveFilters()` reads a SvelteMap. So the
-  // list, active highlighting, and counts all recompute on their own - this
-  // replaces DepartmentController's manual displayDepartments/syncVisualState.
+  // list, active highlighting, and counts all recompute on their own.
   const departments = $derived(appState.loadedDepartments);
   const categories = $derived(groupDepartmentsByCategory(departments));
 
@@ -25,7 +24,7 @@
   const activeSet = $derived(new Set(activeDepts));
 
   // Per-department counts reflect what the OTHER active filters allow (the
-  // department filter itself is excluded), mirroring updateCourseCounts().
+  // department filter itself is excluded).
   const counts = $derived.by(() => {
     const map = new Map<string, number>();
     let total = 0;

@@ -20,7 +20,6 @@
   const filterCount = $derived(filterService.getFilterCount());
   const bookmarkOn = $derived(filterService.hasFilter('bookmark'));
 
-  // Mirrors the old #bookmark-filter-btn click handler.
   function toggleBookmark(): void {
     if (filterService.hasFilter('bookmark')) {
       filterService.removeFilter('bookmark');
@@ -29,9 +28,8 @@
     }
   }
 
-  // Mirrors the old #clear-filters-btn click handler. The filter change flows
-  // through the SvelteMap, so MainController's filter `watch` refreshes the
-  // course list - no manual refresh here.
+  // The filter change flows through the SvelteMap, so the filter `watch`
+  // refreshes the course list - no manual refresh here.
   function clearFilters(): void {
     filterService.resetFilters(year);
   }

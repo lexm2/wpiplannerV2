@@ -24,13 +24,12 @@
     profileStateManager: ProfileStateManager;
   } = $props();
 
-  // `uiState.currentView` is a rune -> list/grid toggle recomputes on its own.
   const view = $derived(uiState.currentView);
 
-  // Base courses replicate MainController.refreshCurrentView: a SINGLE active
-  // department filter narrows to that department's courses; otherwise all
-  // loaded departments' courses. `appState.loadedDepartments` +
-  // `filterService.getActiveFilters()` (a SvelteMap) are reactive.
+  // Base courses: a SINGLE active department filter narrows to that department's
+  // courses; otherwise all loaded departments' courses.
+  // `appState.loadedDepartments` + `filterService.getActiveFilters()` (a
+  // SvelteMap) are reactive.
   const baseCourses = $derived.by(() => {
     const departments = appState.loadedDepartments;
     const deptIds =

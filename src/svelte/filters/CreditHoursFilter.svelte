@@ -14,7 +14,7 @@
   // reachable from the max input.
   const maxCredits = $derived(criteria?.max ?? 4);
 
-  // Off when at the full default range (1-4), matching the controller.
+  // Off when at the full default range (1-4).
   function update(min: number, max: number): void {
     if (min && max && (min !== 1 || max !== 4)) {
       filterService.addFilter('creditRange', { min, max });

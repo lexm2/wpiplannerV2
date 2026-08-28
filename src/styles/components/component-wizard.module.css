@@ -1,12 +1,9 @@
-/* Component Selection Wizard - Inline Sidebar Version */
 /* Now extends BaseSidebarPanel, inherits base .sidebar-panel styles */
 
-/* Wizard-specific panel overrides */
 .sidebar-panel--component-wizard {
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Header */
 .wizard-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--color-border);
@@ -54,7 +51,6 @@
   margin-top: 0.25rem;
 }
 
-/* Breadcrumbs */
 .wizard-breadcrumbs {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--color-border);
@@ -128,7 +124,6 @@
   color: inherit;
 }
 
-/* Content */
 .wizard-content {
   flex: 1;
   overflow-y: auto;
@@ -150,7 +145,6 @@
   font-weight: 600;
 }
 
-/* Term Separator */
 .wizard-term-separator {
   font-size: 0.95rem;
   font-weight: 600;
@@ -167,7 +161,6 @@
   margin-top: 0;
 }
 
-/* Sections Grid */
 .wizard-sections-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -239,7 +232,6 @@
   margin-bottom: 0.15rem;
 }
 
-/* Async Badge */
 .section-card-async-badge {
   display: inline-flex;
   align-items: center;
@@ -282,8 +274,6 @@
   font-weight: 600;
 }
 
-/* Empty State */
-/* Footer */
 .wizard-footer {
   position: absolute;
   bottom: 0;
@@ -370,15 +360,15 @@
 }
 
 .rmp-rating.excellent {
-  color: #4caf50; /* Green */
+  color: #4caf50;
 }
 
 .rmp-rating.good {
-  color: #ff9800; /* Orange */
+  color: #ff9800;
 }
 
 .rmp-rating.poor {
-  color: #f44336; /* Red */
+  color: #f44336;
 }
 
 .rmp-details {
@@ -387,7 +377,6 @@
   line-height: 1.3;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .wizard-breadcrumbs {
     overflow-x: auto;
@@ -416,7 +405,6 @@
   gap: 0.75rem;
 }
 
-/* Filter Status Indicator */
 .wizard-filter-status {
   padding: 0.75rem 1.5rem;
   background-color: var(--color-primary-background);
@@ -449,7 +437,6 @@
   vertical-align: middle;
 }
 
-/* Height breakpoint */
 @media (max-height: 1100px) {
   .wizard-content {
     padding-bottom: 0;
@@ -461,7 +448,6 @@
   }
 }
 
-/* Filtered out notice */
 .wizard-filtered-notice {
   display: flex;
   align-items: center;

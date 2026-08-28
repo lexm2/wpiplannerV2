@@ -23,31 +23,25 @@ export class WorkdayConverter {
     console.log(`Input: ${inputPath}`);
     console.log(`Output: ${outputPath}`);
 
-    // Read and parse input
     const workdayData = await this.readWorkdayData(inputPath);
     console.log(
       `Read ${workdayData.Report_Entry.length} sections from Workday`,
     );
 
-    // Pre-filter: Remove canceled sections
     const validSections = this.preFilterSections(workdayData.Report_Entry);
     console.log(
       `${validSections.length} sections after filtering canceled courses`,
     );
 
-    // Calculate and write term bounds
     const termBounds = this.calculateTermBounds(validSections);
     const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
     await this.writeTermBounds(termBounds, projectRoot);
 
-    // Group sections by course (all terms combined)
     const courseGroups = this.groupSectionsByCourse(validSections);
     console.log(`Grouped into ${courseGroups.length} unique courses`);
 
-    // Initialize departments
     const departments = initializeDepartments();
 
-    // Transform each course group
     let coursesProcessed = 0;
     for (const group of courseGroups) {
       const firstSection = group[0];
@@ -59,10 +53,8 @@ export class WorkdayConverter {
         subjectAndNumber.indexOf(' '),
       );
 
-      // Transform course
       const course = transformCourse(group, departmentAbbrev, this.config);
 
-      // Add to appropriate department
       const department = getDepartment(departments, departmentAbbrev);
       department.courses.push(course);
 
@@ -76,7 +68,6 @@ export class WorkdayConverter {
 
     console.log(`Transformed ${coursesProcessed} courses`);
 
-    // Build output
     const output: PlannerOutput = {
       generated: new Date().toLocaleString('en-US', {
         hour: 'numeric',
@@ -89,33 +80,23 @@ export class WorkdayConverter {
       departments: Array.from(departments.values()),
     };
 
-    // Write output
     await this.writePlannerData(output, outputPath);
     console.log('Conversion complete!');
 
-    // Print statistics
     this.printStatistics(output);
   }
 
-  /**
-   * Reads and parses Workday JSON file
-   */
   private async readWorkdayData(inputPath: string): Promise<WorkdayFeed> {
     const content = await readFile(inputPath, 'utf-8');
     return JSON.parse(content) as WorkdayFeed;
   }
 
-  /**
-   * Pre-filters sections to remove invalid ones
-   */
   private preFilterSections(sections: WorkdaySection[]): WorkdaySection[] {
     return sections.filter(section => {
-      // Remove canceled sections
       if (section.Section_Status === 'Canceled: Preliminary') {
         return false;
       }
 
-      // Remove sections from invalid academic periods
       if (
         !isValidAcademicPeriod(
           section.Offering_Period,
@@ -158,9 +139,6 @@ export class WorkdayConverter {
     return Array.from(groupMap.values());
   }
 
-  /**
-   * Writes planner data to JSON file
-   */
   private async writePlannerData(
     data: PlannerOutput,
     outputPath: string,
@@ -169,15 +147,11 @@ export class WorkdayConverter {
     await writeFile(outputPath, json, 'utf-8');
     console.log(`Wrote output to ${outputPath}`);
 
-    // Calculate file size
     const stats = await stat(outputPath);
     const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
     console.log(`Output file size: ${sizeInMB} MB`);
   }
 
-  /**
-   * Prints conversion statistics
-   */
   private printStatistics(output: PlannerOutput): void {
     let totalCourses = 0;
     let totalLectures = 0;

@@ -110,7 +110,6 @@ export class AutoScheduler {
 
       const lectureMask = sectionToMask(lecture);
 
-      // Get valid discussion candidates - must be same term as lecture
       const discussionCandidates: SectionCandidate[] = [];
       if (typeInfo.hasDiscussions) {
         const discussions = lectureGroup.compatibleDiscussions || [];
@@ -127,7 +126,6 @@ export class AutoScheduler {
         discussionCandidates.push({ section: null, mask: 0n });
       }
 
-      // Get valid lab candidates - must be same term as lecture
       const labCandidates: SectionCandidate[] = [];
       if (typeInfo.hasLabs) {
         const labs = lectureGroup.compatibleLabs || [];
@@ -171,9 +169,6 @@ export class AutoScheduler {
     return candidates;
   }
 
-  /**
-   * Check if a section is valid (has time slots, passes filters, doesn't conflict with blocked times)
-   */
   private isValidSection(
     section: Section,
     blockedMasksByTerm: Map<string, bigint>,
@@ -220,9 +215,6 @@ export class AutoScheduler {
     return { hasLectures, hasDiscussions, hasLabs, isStandaloneLab };
   }
 
-  /**
-   * Check if a section has at least one valid time slot (or is async).
-   */
   private hasValidTimeSlot(section: Section): boolean {
     if (!section.periods?.length) return false;
 

@@ -5,10 +5,10 @@
  * Selection is the bridge between the Svelte CourseList / SelectedCoursesPanel
  * and CourseDescription.svelte. CourseList and SelectedCoursesPanel set
  * `selectedCourse` (the full Course object) on item click. CourseDescription
- * reads it directly to render the description panel. The old vanilla bridge
- * (CourseController) is gone. `selectedCourseId` is kept as a getter so existing
- * id reads (e.g. CourseList's `active` highlight) keep working - reading a
- * `$state.raw` field through a getter is still reactive inside `$derived`/templates.
+ * reads it directly to render the description panel. `selectedCourseId` is a
+ * getter so id-only reads (e.g. CourseList's `active` highlight) stay cheap -
+ * reading a `$state.raw` field through a getter is still reactive inside
+ * `$derived`/templates.
  *
  * Paging lives here rather than in CourseList so the tutorial can grow the
  * window to bring a step's target into the DOM.

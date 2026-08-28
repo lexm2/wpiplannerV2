@@ -1,10 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  // Shared shell for a filter panel section - the `filter-section` / header /
-  // title / content markup that every section filter repeated verbatim. The
-  // optional `actions` snippet renders in the header (e.g. a Clear button); the
-  // body goes in `children`.
+  // Shared shell for a filter panel section. The optional `actions` snippet
+  // renders in the header (e.g. a Clear button); the body goes in `children`.
   let {
     title,
     actions,

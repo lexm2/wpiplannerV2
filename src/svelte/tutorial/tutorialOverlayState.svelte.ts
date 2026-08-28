@@ -1,8 +1,7 @@
 import type { TutorialStep } from '../../types/tutorial';
 
 /**
- * Reactive home for the tutorial overlay's current step - the runes-native
- * replacement for TutorialService's single-slot `onStepChange` callback.
+ * Reactive home for the tutorial overlay's current step.
  *
  * TutorialService (a plain service) writes these as it applies/advances/ends a
  * step, exactly as ProfileStateManager writes appState. FloatingTextBox reads

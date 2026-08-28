@@ -94,7 +94,7 @@ function parseDays(dayString: string): string[] {
 
   for (const part of dayParts) {
     const trimmed = part.trim();
-    if (!trimmed) continue; // Skip empty parts
+    if (!trimmed) continue;
 
     // Match single letter codes (most common in Workday data)
     if (trimmed === 'M') {
@@ -199,7 +199,6 @@ export function timeToMinutes(timeStr: string): number {
 
 /**
  * Checks if two time ranges overlap
- * Returns true if times overlap, false otherwise
  */
 export function timeRangesOverlap(
   start1: string,
@@ -212,6 +211,5 @@ export function timeRangesOverlap(
   const start2Min = timeToMinutes(start2);
   const end2Min = timeToMinutes(end2);
 
-  // Check if ranges overlap: start2 < end1 AND end2 > start1
   return start2Min < end1Min && end2Min > start1Min;
 }

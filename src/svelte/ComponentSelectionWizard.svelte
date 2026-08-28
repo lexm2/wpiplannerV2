@@ -1,11 +1,8 @@
 <script lang="ts">
-  // Svelte rewrite of the old vanilla ComponentSelectionWizard. Same features:
-  // dynamic steps, breadcrumb jumps, directional slide-in with staggered cards,
+  // Dynamic steps, breadcrumb jumps, directional slide-in with staggered cards,
   // term grouping, async/RMP/seat badges, toggle-select, Skip/Next/Finish footer,
-  // filter status + hidden/year notices, live + hover grid preview, escape-to-cancel.
-  //
-  // All the imperative DOM-swapping the class did by hand is now plain $derived
-  // reactivity over wizardState.{currentStep,selections} + the active filters.
+  // filter status + hidden/year notices, live + hover grid preview, escape-to-cancel
+  // - all derived from wizardState.{currentStep,selections} + the active filters.
   import { fade } from 'svelte/transition';
   import { slideX, dur } from './transitions';
   import { wizardState } from './wizardState.svelte';
@@ -58,7 +55,7 @@
   );
 
   // Reads filterService.getActiveFilters() transitively, so it re-runs live when
-  // filters change - this replaces the old watch()/onFilterChange()/rerender().
+  // filters change.
   const optionInfo = $derived(
     getOptionsWithFilterInfo(
       course,

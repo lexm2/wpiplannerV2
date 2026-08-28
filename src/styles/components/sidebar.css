@@ -83,7 +83,6 @@
   background: var(--color-primary-hover) !important;
 }
 
-/* All Departments special styling */
 .department-item.all-departments {
   font-weight: var(--font-weight-medium);
   background: linear-gradient(
@@ -104,7 +103,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Multi-selection indicators */
 .department-list.multi-select-active .department-item.active {
   position: relative;
   background: var(--color-primary) !important;
@@ -123,20 +121,17 @@
   z-index: 1;
 }
 
-/* Ensure active state is visible in all scenarios */
 .department-item[data-dept-id].active {
   background: var(--color-primary) !important;
   color: var(--color-text-inverse) !important;
   font-weight: var(--font-weight-medium);
 }
 
-/* Enhanced visual feedback for multiple selections */
 .department-list.multi-select-active .department-item.active {
   border-left: 3px solid var(--color-text-inverse);
   padding-left: calc(0.75rem - 3px);
 }
 
-/* Debugging class for visual verification */
 .department-item.debug-selected {
   outline: 2px solid red !important;
   outline-offset: 1px;
@@ -148,7 +143,6 @@
   color: var(--color-text);
 }
 
-/* Visual indicator when multiple departments are selected */
 .department-list.multi-select-active {
   border-left: 3px solid var(--color-primary);
   padding-left: calc(1rem - 3px);

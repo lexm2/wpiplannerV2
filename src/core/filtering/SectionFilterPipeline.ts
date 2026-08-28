@@ -95,7 +95,6 @@ export class SectionFilterPipeline {
   }
 
   reconstructCourses(filteredSections: FilterableSection[]): Course[] {
-    // Track which lecture CRNs actually survived filtering
     const survivingLectureCrns = new Set<string>();
     const courseMap = new Map<string, ReconstructedCourse>();
 
@@ -168,7 +167,6 @@ export class SectionFilterPipeline {
       const prunedKeys: string[] = [];
 
       for (const [lectureCrn, lg] of courseData.lectureGroups) {
-        // If the lecture section itself was filtered out, remove this group
         if (!survivingLectureCrns.has(lectureCrn)) {
           prunedKeys.push(lectureCrn);
           continue;
@@ -179,12 +177,10 @@ export class SectionFilterPipeline {
         );
         if (!originalLg) continue;
 
-        // If original had labs but filtered result has none, remove this lecture group
         if (originalLg.compatibleLabs.length > 0 && lg.labs.length === 0) {
           prunedKeys.push(lectureCrn);
           continue;
         }
-        // If original had discussions but filtered result has none, remove this lecture group
         if (
           originalLg.compatibleDiscussions.length > 0 &&
           lg.discussions.length === 0

@@ -2,9 +2,7 @@ import { z } from 'zod';
 import { logger } from '../utils/logger';
 /**
  * Reactive home for the header's "client loaded" / "server updated" labels,
- * plus the functions that set them (formerly the TimestampManager class).
- * App.svelte renders the runes, so no vanilla code reaches into the component
- * tree.
+ * plus the functions that set them. App.svelte renders the runes.
  */
 class TimestampState {
   clientLabel = $state('Loading client data...');

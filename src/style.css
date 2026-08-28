@@ -1,10 +1,7 @@
-/* Import fonts */
 @import url('./styles/fonts.css');
 
-/* Import theme base styles */
 @import url('./themes/styles/base.css');
 
-/* Import component styles */
 @import url('./styles/components/reset.css');
 @import url('./styles/components/header.css');
 @import url('./styles/components/theme-selector-base.css'); /* Base styles for index.html */
@@ -24,11 +21,11 @@
 @import url('./styles/components/modal.css'); /* BaseModal framework - LocalEventModal migrated to local-event-modal.module.css */
 /* dual-range-slider.module.css - imported directly in svelte/filters/DualRangeSlider.svelte */
 /* component-wizard.module.css - imported directly in ComponentSelectionWizard.svelte */
-@import url('./styles/components/sidebar-panel.css'); /* Base sidebar panel styles */
+@import url('./styles/components/sidebar-panel.css');
 @import url('./styles/components/buttons.css');
 @import url('./styles/components/input.css'); /* TextField primitive - svelte/ui/TextField.svelte */
 @import url('./styles/components/states.css');
-@import url('./styles/components/conflict-modal.css'); /* Schedule conflict resolution modal */
+@import url('./styles/components/conflict-modal.css');
 @import url('./styles/components/responsive.css');
 @import url('./styles/components/theme-overrides.css');
 @import url('./styles/components/tutorial-highlight.css');

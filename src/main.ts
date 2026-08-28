@@ -15,15 +15,14 @@ const services = AppBootstrap.createServices();
 
 // Non-UI bootstrap (sync): inject the standalone scheduling services and
 // register the default filters before the component shell mounts. The
-// course-data sync is now an App.svelte $effect on appState.loadedDepartments,
+// course-data sync is an App.svelte $effect on appState.loadedDepartments,
 // established at mount - before the async data load in startApp() fires it.
 AppBootstrap.initStandaloneServices(services);
 AppBootstrap.initializeFilters(services);
 
-// Mount the declarative root shell (App.svelte) into #app - replaces
-// MainController's ~16 imperative mount() calls. The modal layer is mounted
-// separately into #modal-root (outside #app) to keep modal stacking/z-index
-// independent of the app layout's containing block. getTutorial is a thunk:
+// Mount the declarative root shell (App.svelte) into #app. The modal layer is
+// mounted separately into #modal-root (outside #app) to keep modal
+// stacking/z-index independent of the app layout's containing block. getTutorial is a thunk:
 // services.tutorial is assigned below, after this mount.
 const appEl = document.getElementById('app');
 if (appEl) {
@@ -47,15 +46,12 @@ if (modalRootEl) {
 }
 
 if (DeviceDetection.isMobilePhone()) {
-  // Open the mobile-notice modal declaratively: push its id into
-  // uiState.openModals. ModalLayer renders it reactively.
   openModal('mobile-notice');
 }
 
 services.tutorial = setupTutorial(services);
 
-// Expose the service container globally for development/testing (replaces the
-// old window.mainController handle - MainController no longer exists).
+// Expose the service container globally for development/testing.
 declare global {
   interface Window {
     services: ServiceContainer;

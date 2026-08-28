@@ -1,4 +1,3 @@
-/* Dual Range Slider Component */
 .dual-range-slider {
   position: relative;
   height: 40px;
@@ -9,7 +8,6 @@
   box-sizing: border-box;
 }
 
-/* Track - background bar */
 .dual-range-track {
   position: absolute;
   left: 10px;
@@ -20,7 +18,6 @@
   z-index: 0;
 }
 
-/* Range bar - colored area between thumbs */
 .dual-range-bar {
   position: absolute;
   height: 8px;
@@ -35,7 +32,6 @@
   opacity: 0.9;
 }
 
-/* Thumbs - draggable handles */
 .dual-range-thumb {
   /* Required by the pointer-event drag: without it the browser claims touch
      gestures on the thumb for panning and the drag never starts. */
@@ -54,19 +50,16 @@
     box-shadow 0.1s ease;
 }
 
-/* Both thumbs - solid primary color */
 .dual-range-thumb-left,
 .dual-range-thumb-right {
   background: var(--color-primary);
 }
 
-/* Hover effects */
 .dual-range-thumb:hover {
   transform: translateX(-50%) scale(1.1);
   box-shadow: var(--effect-shadow);
 }
 
-/* Active/dragging state */
 .dual-range-thumb:active {
   transform: translateX(-50%) scale(1.15);
   box-shadow: var(--effect-shadow-hover);
@@ -78,7 +71,6 @@
   box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
 }
 
-/* Tooltips - show values on hover/drag */
 .dual-range-tooltip {
   position: absolute;
   top: -30px;
@@ -110,13 +102,11 @@
   border-top: 5px solid var(--color-surface-elevated);
 }
 
-/* Tooltip color coding */
 .dual-range-tooltip-left,
 .dual-range-tooltip-right {
   border-left: 3px solid var(--color-primary);
 }
 
-/* Responsive adjustments */
 html.is-mobile .dual-range-slider {
   padding: 0 15px;
 }

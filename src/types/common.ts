@@ -2,9 +2,6 @@
  * Common utility types used across the application.
  */
 
-/**
- * A date range with start and end dates.
- */
 export interface DateRange {
   start: Date;
   end: Date;

@@ -23,8 +23,7 @@
   const courses = $derived(appState.selectedCourses);
   const count = $derived(courses.length);
 
-  // Expander state persists in localStorage (default collapsed), matching the
-  // old CourseController.initializeSelectedCoursesExpander.
+  // Expander state persists in localStorage (default collapsed).
   let isExpanded = $state(
     localStorage.getItem(STORAGE_KEYS.SELECTED_COURSES_EXPANDED) === 'true',
   );

@@ -44,7 +44,6 @@ html.is-mobile .content-header {
   gap: 1rem;
 }
 
-/* Schedule page responsive breakpoints */
 @media (max-width: 1024px) {
   .schedule-sidebar {
     display: none;

@@ -22,7 +22,6 @@ export function transformSection(
   workdaySection: WorkdaySection,
   config: ConverterConfig,
 ): PlannerSection[] {
-  // Extract basic section information
   const courseSectionFull = workdaySection.Course_Section;
   const instructionalFormat = workdaySection.Instructional_Format;
 
@@ -31,11 +30,9 @@ export function transformSection(
     return [];
   }
 
-  // Extract department and course number
   const dashIndex = courseSectionFull.indexOf('-');
   const subjectAndNumber = courseSectionFull.substring(0, dashIndex);
 
-  // Extract section number
   const sectionNumber = extractSectionNumber(
     courseSectionFull,
     subjectAndNumber,
@@ -50,7 +47,6 @@ export function transformSection(
   const referenceID = workdaySection.cour_sec_def_referenceID;
   const crn = parseInt(referenceID.substring(28, 34));
 
-  // Parse enrollment data
   const enrolledCapacity = workdaySection.Enrolled_Capacity;
   const [enrolled, capacity] = enrolledCapacity
     .split('/')
@@ -62,22 +58,17 @@ export function transformSection(
     .split('/')
     .map(s => parseInt(s.trim()));
 
-  // Get cluster ID (if any)
   const clusterId = workdaySection.CF_LRV_Cluster_Ref_ID || null;
   const note = isInterestList ? 'IntList' : clusterId || null;
 
-  // Determine if graduate course
   const isGraduate = workdaySection.Academic_Level === 'Graduate';
 
-  // Compute term from section number
   // Graduate courses keep F/S, undergraduate use A/B/C/D
   const computedTerm = extractTermLetter(sectionNumber, isGraduate);
 
-  // Parse meeting patterns
   const sectionDetails = workdaySection.Section_Details || '';
   const meetingPatterns = parseSectionDetails(sectionDetails);
 
-  // Get professor info
   let professor = workdaySection.Instructors || 'Not Assigned';
   if (!professor || professor.trim() === '') {
     professor = isInterestList ? 'N/A' : 'Not Assigned';
@@ -87,7 +78,6 @@ export function transformSection(
   const type =
     instructionalFormat === 'Laboratory' ? 'Lab' : instructionalFormat;
 
-  // Create periods from meeting patterns
   const periods: PlannerPeriod[] = meetingPatterns.map(pattern => {
     const isAsync =
       pattern.startTime === '12:00' && pattern.endTime === '12:00';
@@ -194,12 +184,10 @@ function isSpecialSection(
   subjectAndNumber: string,
   config: ConverterConfig,
 ): boolean {
-  // Check if course is in special courses list
   if (config.specialCourses.some(sc => subjectAndNumber.includes(sc))) {
     return true;
   }
 
-  // Check if section name contains special section substrings
   if (config.specialSections.some(ss => courseSectionFull.includes(ss))) {
     return true;
   }
@@ -239,7 +227,6 @@ export function categorizeSections(
   };
 
   for (const section of sections) {
-    // Determine category based on period type
     const type = section.periods[0]?.type || 'Other';
 
     if (type === 'Lecture') {
