@@ -5,16 +5,11 @@ import globals from 'globals';
 import svelteConfig from './svelte.config.js';
 
 /**
- * Flat config. Three layers:
- *   1. baseline correctness (eslint:recommended + typescript-eslint type-aware)
- *   2. Svelte 5 idiom (eslint-plugin-svelte, parsed with the real svelte.config.js)
- *   3. this repo's own conventions
+ * Flat config: eslint:recommended + typescript-eslint (type-aware) +
+ * eslint-plugin-svelte, then this repo's own rules.
  *
- * Severity policy: `error` is reserved for findings that are actionable now and
- * few enough to fix. The type-safety debt inherited from the pre-lint era
- * (the `no-unsafe-*` family, ~195 findings) is `warn` so CI can gate on errors
- * immediately instead of waiting for a mass cleanup. Run `bunx eslint .` to see
- * the backlog; it is meant to shrink, not to stay.
+ * Severity policy: `error` for anything worth blocking CI on; `warn` for the
+ * large `no-unsafe-*` backlog, which is meant to shrink over time.
  */
 export default [
   {
@@ -67,8 +62,7 @@ export default [
 
   {
     rules: {
-      // tsconfig already runs noUnusedLocals/noUnusedParameters, and
-      // svelte-check reports the same finding a third time.
+      // Already reported by tsconfig's noUnusedLocals and by svelte-check.
       '@typescript-eslint/no-unused-vars': 'off',
 
       // --- errors: actionable, low volume -------------------------------
@@ -96,23 +90,20 @@ export default [
       'no-useless-assignment': 'warn',
       'preserve-caught-error': 'warn',
 
-      // All 10 findings were $derived.by locals, copy-on-write state, or
-      // internal bookkeeping -- none read reactively, and SvelteSet would make
-      // the copy-on-write ones mutation-based. Collections that really are
-      // reactive already use SvelteMap (termExpansion.svelte.ts).
+      // The flagged collections are never read reactively; the ones that are
+      // already use SvelteMap.
       'svelte/prefer-svelte-reactivity': 'off',
 
-      // termsByCourse in AutoScheduleIntro.svelte is reassigned, so dropping
-      // the $state() wrapper around its SvelteMap would break reactivity.
+      // termsByCourse in AutoScheduleIntro.svelte is reassigned, so it needs
+      // the $state() wrapper around its SvelteMap.
       'svelte/no-unnecessary-state-wrap': ['error', { allowReassign: true }],
 
-      // Every {@html} in this repo is either getInlineSVG() over the generated
-      // icon path table or an authored tutorial step description -- no user
-      // input reaches either. 57 findings, all deliberate.
+      // Every {@html} here renders a generated icon path or authored tutorial
+      // text -- no user input reaches one.
       'svelte/no-at-html-tags': 'off',
 
-      // `let { x } = $props()` cannot be const: the compiler reassigns props.
-      // svelte/prefer-const knows that; the core rule does not.
+      // `let { x } = $props()` cannot be const -- the compiler reassigns
+      // props. Only the svelte version of the rule knows that.
       'prefer-const': 'off',
       'svelte/prefer-const': [
         'error',
@@ -140,14 +131,12 @@ export default [
   {
     files: ['**/*.svelte', '**/*.svelte.ts'],
     rules: {
-      // A bare `someState;` inside $effect is the idiomatic way to register a
-      // dependency without using the value. The base rule reads it as dead code.
+      // A bare `someState;` in $effect registers a dependency, not dead code.
       '@typescript-eslint/no-unused-expressions': 'off',
 
-      // Types are lost crossing svelte-eslint-parser's intermediate
-      // representation, so snippet parameters and component callback props
-      // read as `any` however well they are declared. tsc and svelte-check
-      // accept all of them; there is nothing to annotate.
+      // svelte-eslint-parser loses types, so snippet params and callback props
+      // read as `any` however they are declared. tsc and svelte-check do see
+      // them, so there is nothing to fix.
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
@@ -156,8 +145,7 @@ export default [
     },
   },
 
-  // Tests assert on shapes TypeScript cannot always see, and Playwright specs
-  // legitimately log.
+  // Tests assert on shapes TypeScript cannot see, and specs legitimately log.
   {
     files: ['tests/**/*.ts', 'src/**/*.test.ts', 'src/**/*.svelte.test.ts'],
     rules: {
@@ -178,11 +166,8 @@ export default [
     rules: { 'no-console': 'off' },
   },
 
-  // One-off CLI tools parsing external JSON and scraped GraphQL, imported by
-  // nothing under src/. Same argument as the tests/ block above.
-  //
-  // types.ts is excluded: it is the schema for public/rateMyProfessor.json,
-  // not a munging script, and the app reads that file.
+  // One-off CLI tools parsing external JSON and scraped GraphQL; same argument
+  // as the tests/ block. types.ts is excluded -- the app reads what it types.
   {
     files: ['scripts/**/*.ts', 'scripts/**/*.mjs'],
     ignores: ['scripts/**/types.ts'],
@@ -203,9 +188,8 @@ export default [
     rules: { 'no-console': 'off' },
   },
 
-  // Plain-JS files are not in the TS program (tsconfig has no allowJs), so
-  // type-aware rules cannot run on them. Must come last -- later blocks win,
-  // and the rules block above would otherwise switch them back on.
+  // Plain-JS files are not in the TS program (no allowJs), so type-aware rules
+  // cannot run on them. Must come last: later blocks win.
   {
     files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
     ...ts.configs.disableTypeChecked,

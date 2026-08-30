@@ -2,12 +2,9 @@ import type { KnipConfig } from 'knip';
 import { compile } from 'svelte/compiler';
 
 /**
- * The Svelte compiler erases every TypeScript annotation, and that includes
- * whole `import type { X } from './x'` statements and inline `{ type X }`
- * specifiers -- they simply do not appear in the emitted JS. Knip then never
- * sees that a component uses X and reports X as an unused export. So collect
- * the type specifiers off the original source and re-emit them alongside the
- * compiled output, where Knip can still find them.
+ * The Svelte compiler erases type-only imports, so Knip never sees a component
+ * use a type and calls it an unused export. Recover them from the source and
+ * re-emit them alongside the compiled output.
  */
 const IMPORT_RE = /\bimport\s+([\s\S]*?)\s+from\s*['"]([^'"]+)['"]/g;
 
@@ -21,8 +18,8 @@ const typeImportsOf = (source: string): string[] => {
       continue;
     }
 
-    // `import { value, type A } from '...'` -- the value half already
-    // survived compilation, so re-emit only the `type` specifiers.
+    // `import { value, type A }` -- the value half survived compilation, so
+    // re-emit only the `type` specifiers.
     const named = clause.match(/\{([\s\S]*)\}/);
     if (!named) continue;
 
@@ -46,24 +43,19 @@ const svelteCompiler = (source: string): string =>
   [compile(source, {}).js.code, ...typeImportsOf(source)].join('\n');
 
 /**
- * Finds cross-file dead code: unused files, unused exports, unused types, and
- * unused dependencies. This is the gap tsconfig's noUnusedLocals cannot see --
- * it catches unused *locals*, never an export nobody imports.
+ * Finds cross-file dead code -- unused files, exports, types, and dependencies
+ * -- which tsconfig's noUnusedLocals cannot see.
  *
- * The svelte compiler override is required, not optional: Knip's built-in
- * .svelte handling is a regex extractor that only finds import statements, so
- * exports declared in components get reported as unused. Running the real
- * compiler makes them visible.
+ * The svelte compiler override is required: Knip's built-in .svelte handling
+ * only extracts imports, so every component export would read as unused.
  */
 export default {
   entry: [
-    // index.html already pulls in src/main.ts, so main is not listed here.
-    //
-    // There is no --production script: that mode does not resolve this HTML
-    // entry, so it walks an empty graph and calls every dependency unused.
+    // index.html pulls in src/main.ts, so main is not listed separately.
+    // Do not run knip --production: that mode skips HTML entries, walks an
+    // empty graph, and calls every dependency unused.
     'index.html',
-    // Workers are instantiated by URL, not imported, so nothing in the module
-    // graph points at them.
+    // Instantiated by URL, so nothing in the module graph points at them.
     'src/workers/*.worker.ts',
     // Standalone CLI tools invoked via package.json scripts or by hand.
     'scripts/**/*.{ts,mjs}',

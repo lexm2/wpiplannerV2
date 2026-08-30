@@ -1,21 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// E2E config. Firefox is the only Playwright browser cached locally, so we pin
-// to it to avoid a Chromium download. The dev server is reused if already up.
+// Firefox only: it is the one Playwright browser cached locally, so this
+// avoids a Chromium download.
 export default defineConfig({
   testDir: './tests/e2e',
-  // Underscore-prefixed specs are local scratch files (gitignored, personal
-  // absolute paths). Without this they'd still be globbed on a local run.
+  // Underscore-prefixed specs are gitignored local scratch files.
   testIgnore: '**/_*.spec.ts',
   timeout: 120_000,
   fullyParallel: false,
-  // One worker: fullyParallel:false only serialises tests WITHIN a file, so
-  // separate spec files would still run concurrently against the single shared
-  // dev server. tutorial-highlight walks 39 timed steps and fails under that
-  // contention. Also keeps CI (variable core count) deterministic.
+  // fullyParallel:false only serialises within a file, so one worker is what
+  // stops spec files racing each other on the shared dev server. The timed
+  // tutorial-highlight steps fail under that contention.
   workers: 1,
-  // CI only: tutorial-highlight walks 39 timed steps and occasionally loses
-  // that race late in a full run. Locally the failure should surface.
+  // tutorial-highlight is timing-sensitive and occasionally flakes on CI.
+  // Locally, let the failure surface.
   retries: process.env.CI ? 1 : 0,
   reporter: 'list',
   use: {

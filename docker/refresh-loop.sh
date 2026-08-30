@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fetch + convert loop; outputs feed nginx via $DATA_DIR.
+# Refetches course data on an interval and publishes it to $DATA_DIR for nginx.
 
 set -euo pipefail
 
@@ -8,7 +8,7 @@ INTERVAL="${REFRESH_INTERVAL_SECONDS:-900}"
 
 mkdir -p "$DATA_DIR"
 
-# Seed the volume so nginx has something to serve before the first refresh.
+# Seed from the build's bundled data so nginx can serve before the first fetch.
 for f in course-data.json course-data-constructed.json term-bounds.json last-updated.json; do
     if [ ! -f "$DATA_DIR/$f" ] && [ -f "/app/public/$f" ]; then
         cp "/app/public/$f" "$DATA_DIR/$f"
@@ -18,7 +18,7 @@ done
 refresh_once() {
     echo "[refresh] $(date -u +%FT%TZ) starting"
 
-    # Scripts write into /app/public/.
+    # The fetch/convert scripts write into /app/public/.
     cd /app
 
     bun run fetch-data
@@ -29,6 +29,7 @@ refresh_once() {
         "$(date -u '+%Y-%m-%d %H:%M UTC')" \
         > public/last-updated.json
 
+    # Publish via tmp+mv so nginx never reads a half-written file.
     for f in course-data.json course-data-constructed.json term-bounds.json last-updated.json; do
         if [ -f "public/$f" ]; then
             cp "public/$f" "$DATA_DIR/$f.tmp"
