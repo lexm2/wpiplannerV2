@@ -1103,9 +1103,13 @@
 /* ---- Bucket config modal ---- */
 
 /* The shared .modal-body is a row flexbox for the confirm dialog's icon + text;
-   this modal stacks instead, and needs more width for full requirement names. */
-.bucket-config-dialog {
-  max-width: 640px;
+   this modal stacks instead, and needs more width for full requirement names.
+
+   Qualified with .modal-dialog on purpose: degree-page.css is imported before
+   modal.css, so a bare .bucket-config-dialog ties with .modal-dialog's 500px
+   default and loses on source order. */
+.modal-dialog.bucket-config-dialog {
+  max-width: 1000px;
 }
 
 .bucket-config-dialog .modal-body {

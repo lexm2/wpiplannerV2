@@ -159,6 +159,7 @@
     typeId="local-event"
     title={isEditMode ? 'Edit Event' : 'Add Event'}
     showHeader
+    dialogClass="local-event-dialog"
     {onRequestClose}
   >
     {#snippet children(close)}

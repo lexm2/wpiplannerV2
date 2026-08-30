@@ -31,7 +31,7 @@
     showConfirm({
       title: 'Clear degree record',
       message:
-        'This removes the imported academic progress record. Your buckets and course placements are kept.',
+        'Are you sure you want to do this?',
       confirmLabel: 'Clear',
       variant: 'danger',
       onConfirm: () => degreeImportService.clear(),

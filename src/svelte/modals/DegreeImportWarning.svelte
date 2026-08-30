@@ -18,9 +18,8 @@
     <div class="modal-body">
       <p>
         Degree planning is an <strong>experimental feature</strong>. The
-        importer reads your Workday academic progress export and sorts courses
-        into requirement buckets automatically, so it can misread, miscount, or
-        misplace things.
+        importer reads your Workday academic progress export creates buckets
+        automatically. Mistakes are possible.
       </p>
       <p>
         Always confirm what you see here against WPI's official

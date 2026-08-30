@@ -741,6 +741,12 @@ html.is-mobile .section-enrollment-waitlist {
   width: 90%;
 }
 
+/* Add/Edit Event: the form's day pills, term toggles and start/end time row all
+   crowd at the 500px default, so this one runs about twice as wide. */
+.modal-dialog.local-event-dialog {
+  max-width: 1000px;
+}
+
 .filter-modal-body {
   padding: 1rem 0;
   flex-direction: column;
