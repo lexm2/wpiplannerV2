@@ -120,6 +120,25 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     services.courseDataService.filterDepartments(d => d.abbreviation !== 'TUT');
   }
 
+  // Tear down the tutorial for good and leave the user on a real schedule:
+  // cleanupTutorial deletes the tutorial's own schedule, so a first-time user
+  // who had none of their own would otherwise be left with no active schedule.
+  // The cleaningUp guard keeps the schedule swap from re-entering teardown via
+  // onActiveScheduleChange.
+  function endTutorials(): void {
+    cleaningUp = true;
+    cleanupTutorial(true)
+      .then(() =>
+        services.scheduleManagementService.initializeDefaultScheduleIfNeeded(),
+      )
+      .catch((error: unknown) => {
+        logger.error('Tutorial cleanup failed:', error);
+      })
+      .finally(() => {
+        cleaningUp = false;
+      });
+  }
+
   // Auto-cancel the running tutorial when the active schedule changes away from
   // the tutorial's own schedule. Called by an App.svelte $effect keyed on
   // appState.activeScheduleId. The tutorialScheduleId guard makes this a no-op
@@ -252,7 +271,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '[data-tutorial-next]',
         title: 'Next Tutorial: Filtering',
         description:
-          'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to skip over a tutorial for any reason just hit skip tutorial and it will move onto the next one. If you want to restart a tutorial, go to the schedules button at the top right then settings then click on tutorials.',
+          'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to move past a tutorial for any reason just hit next tutorial and it will move onto the next one, or hit skip tutorial to leave the tutorials entirely. If you want to restart a tutorial, go to the schedules button at the top right then settings then click on tutorials.',
         waitFor: 'manual',
         uiState: {
           currentPage: 'schedule',
@@ -848,10 +867,15 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       schedulesStarted = true;
       tutorialService.start('schedules');
     } else {
-      cleanupTutorial(true).catch((error: unknown) => {
-        logger.error('Tutorial cleanup failed:', error);
-      });
+      endTutorials();
     }
+  });
+
+  // Skip tutorial: leave the tutorial system entirely, without chaining into
+  // whichever tutorial would have come next.
+  tutorialService.onExit(() => {
+    stateMachine.clear();
+    endTutorials();
   });
 
   mount(FloatingTextBox, {

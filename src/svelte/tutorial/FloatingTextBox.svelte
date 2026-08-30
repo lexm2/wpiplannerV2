@@ -179,9 +179,18 @@
         Find Element
       </button>
       <button
-        class={styles['skipBtn']}
+        class={styles['nextTutorialBtn']}
+        data-tutorial-next-tutorial
         onpointerdown={stopPointerdown}
-        onclick={() => tutorialService.skip()}
+        onclick={() => tutorialService.skipToNextTutorial()}
+      >
+        Next Tutorial
+      </button>
+      <button
+        class={styles['skipBtn']}
+        data-tutorial-skip
+        onpointerdown={stopPointerdown}
+        onclick={() => tutorialService.exit()}
       >
         Skip tutorial
       </button>

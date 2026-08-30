@@ -32,8 +32,26 @@
   align-items: center;
 }
 
+.nextTutorialBtn {
+  margin-left: 6px;
+  background: none;
+  border: 1px solid var(--color-border-hover);
+  color: var(--color-text);
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: var(--effect-border-radius);
+  white-space: nowrap;
+}
+
+.nextTutorialBtn:hover {
+  background: rgba(var(--color-primary-rgb, 100, 100, 255), 0.15);
+  border-color: var(--color-primary);
+}
+
 .skipBtn {
   margin-left: 6px;
+  white-space: nowrap;
   background: none;
   border: 1px solid var(--color-border-hover);
   color: var(--color-text);

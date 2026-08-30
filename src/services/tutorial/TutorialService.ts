@@ -22,6 +22,7 @@ export class TutorialService {
   private currentStepIndex = 0;
   private stepApplyCallback: StepApplyCallback | null = null;
   private completionCallback: (() => void) | null = null;
+  private exitCallback: (() => void) | null = null;
   private currentSelector: string | null = null;
   private svgOverlay: SVGSVGElement | null = null;
   private arrowOverlay: HTMLElement | null = null;
@@ -69,11 +70,21 @@ export class TutorialService {
     void this.applyStep();
   }
 
-  skip(): void {
+  // Abandon the current tutorial and move on to the next one in the chain, as
+  // if it had been completed.
+  skipToNextTutorial(): void {
     this.cleanup();
     this.activeTutorial = null;
     tutorialOverlayState.set(null, 0, 0);
     this.completionCallback?.();
+  }
+
+  // Leave the tutorial system entirely - no further tutorial is started.
+  exit(): void {
+    this.cleanup();
+    this.activeTutorial = null;
+    tutorialOverlayState.set(null, 0, 0);
+    this.exitCallback?.();
   }
 
   cancel(): void {
@@ -121,6 +132,10 @@ export class TutorialService {
 
   onComplete(cb: () => void): void {
     this.completionCallback = cb;
+  }
+
+  onExit(cb: () => void): void {
+    this.exitCallback = cb;
   }
 
   onUIStateTransition(cb: UIStateTransitionCallback): void {
