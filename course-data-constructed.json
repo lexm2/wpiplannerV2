@@ -1,5 +1,5 @@
 {
-  "generated": "Aug 30, 2026, 5:37 AM",
+  "generated": "Aug 30, 2026, 10:41 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -217374,7 +217374,7 @@
                 "crn": 356408,
                 "number": "F07 - ST: Optimal Control and Reinforcement Learning",
                 "seats": 20,
-                "seatsAvailable": 7,
+                "seatsAvailable": 8,
                 "actualWaitlist": 0,
                 "maxWaitlist": 5,
                 "note": null,
@@ -217391,7 +217391,7 @@
                     "building": "",
                     "room": "Olin Hall 126",
                     "seats": 20,
-                    "seatsAvailable": 7,
+                    "seatsAvailable": 8,
                     "actualWaitlist": 0,
                     "maxWaitlist": 5,
                     "specificSection": "F07 - ST: Optimal Control and Reinforcement Learning",
