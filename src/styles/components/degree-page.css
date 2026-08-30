@@ -1309,3 +1309,30 @@ html.is-mobile
   max-width: 10rem;
   margin-left: 0.4rem;
 }
+
+/* ---- Post-import experimental-feature warning ---- */
+
+/* .modal-body is a row flexbox (confirm dialog's icon + text); this one is
+   stacked prose. */
+.degree-warning-dialog .modal-body {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.degree-warning-dialog .modal-body p {
+  margin: 0;
+}
+
+.degree-warning-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* The footer's tracking-sheets link is an <a> styled as a .modal-btn, so it
+   needs the text decoration and sizing a button would have had. */
+.degree-warning-dialog .modal-footer a.modal-btn {
+  text-decoration: none;
+}

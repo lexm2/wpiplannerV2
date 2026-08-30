@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
   import { degreeState } from './degreeState.svelte';
+  import { openModal } from '../../services/ui/uiState.svelte';
 
   let { degreeImportService }: { degreeImportService: DegreeImportService } =
     $props();
@@ -15,6 +16,9 @@
     if (!file) return;
     try {
       await degreeImportService.importFromFile(file);
+      // Import succeeded: the bucketing is best-effort, so make the caveat
+      // unmissable before the student reads anything into the result.
+      openModal('degree-import-warning');
     } catch {
       // Error surfaced via degreeState.errorMessage.
     }

@@ -22,7 +22,7 @@ interface DegreeViewPrefs {
 }
 
 const DEFAULTS: DegreeViewPrefs = {
-  bucketView: 'grid',
+  bucketView: 'full',
   courseSort: 'source',
 };
 
@@ -32,7 +32,7 @@ function load(): DegreeViewPrefs {
     if (!raw) return { ...DEFAULTS };
     const parsed = JSON.parse(raw) as Partial<DegreeViewPrefs>;
     return {
-      bucketView: parsed.bucketView === 'full' ? 'full' : 'grid',
+      bucketView: parsed.bucketView === 'grid' ? 'grid' : 'full',
       courseSort: COURSE_SORTS.some(s => s.key === parsed.courseSort)
         ? (parsed.courseSort as CourseSort)
         : DEFAULTS.courseSort,
