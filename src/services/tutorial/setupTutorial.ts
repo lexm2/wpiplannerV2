@@ -729,7 +729,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '[data-tutorial-next]',
         title: 'Almost there!',
         description:
-          'Make sure to give the new schedule a name and then hit OK on the prompt.',
+          'Make sure to give the new schedule a name and then hit Create.',
         waitFor: 'manual',
         uiState: {
           currentPage: 'planner',
