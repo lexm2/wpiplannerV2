@@ -149,3 +149,8 @@ tests/e2e/_*.spec.ts
 
 # Local audit reports (not tracked)
 audits/
+
+# Dont pollute git with planning files, whitelist only
+*.md
+!README.md
+!CHANGELOG.md
