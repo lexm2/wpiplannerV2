@@ -19,6 +19,24 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('wpi_visited', '1'));
 });
 
+/**
+ * DegreeImport opens the `degree-import-warning` advisory after *every*
+ * successful import, and its backdrop swallows pointer events - so anything
+ * that clicks the page afterwards has to clear it first.
+ */
+async function dismissImportWarning(page: Page): Promise<void> {
+  const warning = page.locator('[data-modal-type="degree-import-warning"]');
+  await warning.getByRole('button', { name: 'Got it' }).click();
+  await warning.waitFor({ state: 'detached' });
+}
+
+/** Import the fixture, wait for it to render, and clear the advisory. */
+async function importFixture(page: Page): Promise<void> {
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+  await dismissImportWarning(page);
+}
+
 test('imports an Academic Progress file and persists it across reload', async ({
   page,
 }) => {
@@ -32,6 +50,8 @@ test('imports an Academic Progress file and persists it across reload', async ({
   await expect(page.locator('.degree-summary-title')).toContainText(
     'Computer Science',
   );
+  // Every import raises the "please verify" advisory over the result.
+  await dismissImportWarning(page);
   await expect(page.locator('.requirement-card').first()).toBeVisible();
 
   // Persisted: after a reload the record rehydrates without re-importing.
@@ -48,8 +68,7 @@ test('hides umbrella (degree-wide) requirements until toggled', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   // "Total Credits" / "Residency" are hidden by default.
   await expect(
@@ -68,8 +87,7 @@ test('status filters are multi-select and collapse to All when all chosen', asyn
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   const cards = page.locator('.requirement-card');
   // Anchor the match: plain-string hasText is case-insensitive, so "Satisfied"
@@ -97,8 +115,7 @@ test('status filters are multi-select and collapse to All when all chosen', asyn
 async function setupWithScheduleCourse(page: Page): Promise<void> {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   await page.waitForFunction(
     () =>
@@ -327,8 +344,10 @@ test('opens a rail slot for an incoming course and settles without a bounce', as
 test('keeps every collapsed bucket card the same height', async ({ page }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
+  // Card-height budgeting and "+N more" are grid-layout rules; the page
+  // defaults to the full layout (degreeViewState bucketView: 'full').
+  await page.locator('#degree-view-grid').click();
   // Show every bucket, umbrella ones included - they carry the most courses and
   // are the likeliest to outgrow the budget.
   await page.locator('.degree-umbrella-toggle').click();
@@ -347,6 +366,9 @@ test('hides overflow behind "+N more" and expands the card in place', async ({
   page,
 }) => {
   await setupWithScheduleCourse(page);
+  // Card-height budgeting and "+N more" are grid-layout rules; the page
+  // defaults to the full layout (degreeViewState bucketView: 'full').
+  await page.locator('#degree-view-grid').click();
 
   // Total Credits carries the whole transcript, so it always overflows.
   await page.locator('.degree-umbrella-toggle').click();
@@ -489,8 +511,7 @@ test('keeps the jump scrolled once the finder closes', async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 400 });
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   const card = page.locator('[data-bucket-id*="Systems Requirement"]');
   await expect(card).not.toBeInViewport();
@@ -521,8 +542,7 @@ test('leaves the degree-wide aggregates off a finder card', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   await page.locator('#degree-course-search').click();
   await settleModal(page);
@@ -665,10 +685,14 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   const list = page.locator('.degree-card-list');
+  // Full is the default, and it shows everything - nothing left to expand.
+  await expect(list).toHaveClass(/is-full/);
+  await expect(page.locator('.requirement-card-toggle')).toHaveCount(0);
+
+  await page.locator('#degree-view-grid').click();
   await expect(list).not.toHaveClass(/is-full/);
   // Grid bounds each card, so the satisfied bucket keeps its course behind a
   // toggle. Anchored on that bucket rather than "some card somewhere": an
@@ -678,18 +702,15 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
     /complete$/,
   );
 
-  await page.locator('#degree-view-full').click();
-  await expect(list).toHaveClass(/is-full/);
-  // Full shows everything, so there is nothing left to expand.
-  await expect(page.locator('.requirement-card-toggle')).toHaveCount(0);
-
+  // The choice persists - and grid, being the non-default, is the one worth
+  // checking survives a reload.
   await page.reload();
   await page.click('#degree-tab');
   await page.locator('.degree-summary-title').waitFor();
-  await expect(page.locator('.degree-card-list')).toHaveClass(/is-full/);
-
-  await page.locator('#degree-view-grid').click();
   await expect(page.locator('.degree-card-list')).not.toHaveClass(/is-full/);
+
+  await page.locator('#degree-view-full').click();
+  await expect(page.locator('.degree-card-list')).toHaveClass(/is-full/);
 });
 
 /**
@@ -703,8 +724,7 @@ test('resizes the unassigned rail and remembers the width', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   const shape = await page.evaluate(() => {
     const rail = document.querySelector('.degree-rail')!;
@@ -751,8 +771,7 @@ test('reorders config rows vertically, clamped to the list', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
   await page.locator('#degree-configure-buckets-btn').click();
   await settleModal(page);
 
@@ -821,8 +840,7 @@ test('reorders config rows vertically, clamped to the list', async ({
 test('adds and deletes buckets from the config modal', async ({ page }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   await page.locator('#degree-configure-buckets-btn').click();
   await settleModal(page);
@@ -861,8 +879,7 @@ test('renames an imported bucket without touching the record', async ({
 }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   await page.locator('#degree-configure-buckets-btn').click();
   await settleModal(page);
@@ -890,8 +907,7 @@ test('renames an imported bucket without touching the record', async ({
 test('browses the catalog from an empty bucket slot', async ({ page }) => {
   await page.goto('/');
   await page.click('#degree-tab');
-  await page.setInputFiles('#degree-import-file', fixture);
-  await page.locator('.degree-summary-title').waitFor();
+  await importFixture(page);
 
   // Clicking an empty slot filters the courses page and navigates there.
   await page.locator('.requirement-course-empty').first().click();

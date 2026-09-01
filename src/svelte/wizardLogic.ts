@@ -218,7 +218,7 @@ export function describeActiveFilters(
 
   const descriptions: string[] = [];
   for (const filter of filterService.getActiveFilters()) {
-    if (filter.id === 'periodRmpRating' && filter.criteria) {
+    if (filter.id === 'rmpRating' && filter.criteria) {
       const c = filter.criteria as {
         minRating?: number;
         maxRating?: number;

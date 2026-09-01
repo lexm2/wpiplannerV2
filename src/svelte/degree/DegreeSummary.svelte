@@ -30,8 +30,7 @@
   function clearRecord(): void {
     showConfirm({
       title: 'Clear degree record',
-      message:
-        'Are you sure you want to do this?',
+      message: 'Are you sure you want to do this?',
       confirmLabel: 'Clear',
       variant: 'danger',
       onConfirm: () => degreeImportService.clear(),

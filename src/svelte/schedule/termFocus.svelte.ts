@@ -24,7 +24,7 @@ export const TERMS = ['A', 'B', 'C', 'D'];
 
 // A phone has no room for four grids at once, so it is permanently focused and
 // can never zoom out - paging between terms is the only navigation there.
-export const focusLocked = DeviceDetection.isMobilePhone();
+const focusLocked = DeviceDetection.isMobilePhone();
 
 class TermFocus {
   term = $state.raw<string | null>(focusLocked ? TERMS[0] : null);
@@ -140,14 +140,14 @@ export function toggleFocus(term: string): void {
   if (termFocus.term === term) unfocus();
 }
 
-export function unfocus(): void {
+function unfocus(): void {
   if (busy || focusLocked || termFocus.term === null || !gridEl) return;
   capture(termFocus.term);
   busy = true;
   termFocus.term = null;
 }
 
-export function stepTerm(dir: 1 | -1): void {
+function stepTerm(dir: 1 | -1): void {
   if (busy || termFocus.term === null || !gridEl) return;
   const i = TERMS.indexOf(termFocus.term);
   pendingDir = dir;
