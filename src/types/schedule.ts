@@ -98,12 +98,3 @@ export interface WeeklyTimeSlot {
   endTime: SimpleTime;
   term: AcademicTerm;
 }
-
-/**
- * UI-level settings for auto-schedule modal.
- */
-export interface AutoScheduleSettings {
-  blockedTimes: WeeklyTimeSlot[];
-  wakeUpTime?: SimpleTime | null;
-  avoidCalendarEvents?: boolean;
-}

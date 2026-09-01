@@ -1,6 +1,4 @@
 import type { ScheduleResult } from './AutoScheduler';
-import type { AutoScheduleSettings } from '../../types/schedule';
-import { SectionScorer } from './SectionScorer';
 import { sectionsOf } from '../../utils/courseUtils';
 import { AcademicTerm } from '../../types/schedule';
 
@@ -16,13 +14,9 @@ const TERM_EXPANSION: Partial<Record<AcademicTerm, AcademicTerm[]>> = {
 };
 
 export class ScheduleScorer {
-  private sectionScorer = new SectionScorer();
-
-  score(schedule: ScheduleResult[], settings: AutoScheduleSettings): number {
+  score(schedule: ScheduleResult[]): number {
     return (
-      this.termScore(schedule) * 1_000_000 -
-      this.gapMinutes(schedule) * 1_000 +
-      this.wakeScore(schedule, settings)
+      this.termScore(schedule) * 1_000_000 - this.gapMinutes(schedule) * 1_000
     );
   }
 
@@ -69,22 +63,5 @@ export class ScheduleScorer {
       }
     }
     return total;
-  }
-
-  private wakeScore(
-    schedule: ScheduleResult[],
-    settings: AutoScheduleSettings,
-  ): number {
-    if (!settings.wakeUpTime) return 500;
-    let total = 0,
-      count = 0;
-    for (const result of schedule) {
-      total += this.sectionScorer.scoreCombination(
-        result.combination,
-        settings.wakeUpTime,
-      );
-      count++;
-    }
-    return count > 0 ? Math.round(total / count) : 500;
   }
 }

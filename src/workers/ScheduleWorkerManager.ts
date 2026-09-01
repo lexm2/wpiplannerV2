@@ -6,7 +6,6 @@ import {
 } from '../services/scheduling/SmartScheduler';
 import { ScheduleScorer } from '../services/scheduling/ScheduleScorer';
 import type { ScheduleResult } from '../services/scheduling/AutoScheduler';
-import type { AutoScheduleSettings } from '../types/schedule';
 import { logger } from '../utils/logger';
 import { errorMessage } from '../utils/errorMessage';
 
@@ -67,18 +66,17 @@ export class ScheduleWorkerManager {
 
   async generate(
     input: SchedulerInput,
-    settings: AutoScheduleSettings,
     maxResults: number,
   ): Promise<ScheduleResult[][]> {
     if (this.fallbackMode || !this.worker) {
-      return this.executeFallback(input, settings, maxResults);
+      return this.executeFallback(input, maxResults);
     }
 
     const taskId = `sched-${++this.taskCounter}`;
     const request: WorkerRequest = {
       id: taskId,
       type: WorkerTaskType.GENERATE_SCHEDULES,
-      payload: { input, settings, maxResults },
+      payload: { input, maxResults },
       timestamp: Date.now(),
     };
 
@@ -119,16 +117,11 @@ export class ScheduleWorkerManager {
 
   private executeFallback(
     input: SchedulerInput,
-    settings: AutoScheduleSettings,
     maxResults: number,
   ): ScheduleResult[][] {
     const schedules = SmartScheduler.findSchedules(input, maxResults);
     const scorer = new ScheduleScorer();
-    const effectiveSettings = settings ?? { blockedTimes: [] };
-    schedules.sort(
-      (a, b) =>
-        scorer.score(b, effectiveSettings) - scorer.score(a, effectiveSettings),
-    );
+    schedules.sort((a, b) => scorer.score(b) - scorer.score(a));
     return schedules;
   }
 

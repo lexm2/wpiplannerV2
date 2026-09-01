@@ -1,5 +1,5 @@
 import type { Course, Section, SectionsByKind } from '../../types/types';
-import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
+import type { SelectedCourse } from '../../types/schedule';
 import { AcademicTerm } from '../../types/schedule';
 import type { SectionCandidate } from '../../types/scheduling';
 import {
@@ -49,18 +49,6 @@ export class AutoScheduler {
           criteria as ConflictCriteria,
         );
       }
-    }
-
-    const blockedTimesCriteria = activeFilters.find(
-      f => f.id === 'blockedTimes',
-    )?.criteria as { blockedTimes?: WeeklyTimeSlot[] } | undefined;
-    const blockedTimes = blockedTimesCriteria?.blockedTimes;
-    if (blockedTimes && blockedTimes.length > 0) {
-      const tempFilter = new ConflictFilter();
-      return tempFilter.getBlockedMasksByTerm({
-        avoidConflicts: true,
-        blockedSlots: blockedTimes,
-      });
     }
 
     return new Map();

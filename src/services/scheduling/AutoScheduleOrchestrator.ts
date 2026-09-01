@@ -1,8 +1,5 @@
 import { SelectedCourse } from '../../types/schedule';
-import type {
-  AutoScheduleSettings,
-  WeeklyTimeSlot,
-} from '../../types/schedule';
+import type { WeeklyTimeSlot } from '../../types/schedule';
 import type { CourseComponentSelections } from '../../types/scheduling';
 import { CourseSelectionService } from '../selection/CourseSelectionService';
 import { FilterService } from '../filtering/FilterService';
@@ -86,37 +83,10 @@ export class AutoScheduleOrchestrator {
     this.notifyStateChange();
   }
 
-  async generateSchedules(
-    selectedCourses: SelectedCourse[],
-    settings?: AutoScheduleSettings,
-  ): Promise<boolean> {
+  async generateSchedules(selectedCourses: SelectedCourse[]): Promise<boolean> {
     try {
-      if (settings) {
-        let blockedTimes = [...settings.blockedTimes];
-        if (settings.avoidCalendarEvents && this.calendarEventProvider) {
-          const calendarBlockedTimes =
-            this.calendarEventProvider.getAllLocalEventBlockedTimes();
-          blockedTimes = [...blockedTimes, ...calendarBlockedTimes];
-        }
-
-        if (blockedTimes.length > 0) {
-          this.filterService.addFilter('blockedTimes', { blockedTimes });
-        }
-
-        if (settings.wakeUpTime) {
-          this.filterService.addFilter('wakeUpTime', {
-            wakeUpTime: settings.wakeUpTime,
-          });
-        }
-      }
-
       const scheduler = new SmartScheduler(this.filterService);
       const input = scheduler.buildCandidateData(selectedCourses);
-
-      if (settings) {
-        this.filterService.removeFilter('blockedTimes');
-        this.filterService.removeFilter('wakeUpTime');
-      }
 
       if (!input) {
         this.generatedSchedules = [];
@@ -125,10 +95,8 @@ export class AutoScheduleOrchestrator {
         return false;
       }
 
-      const effectiveSettings = settings ?? { blockedTimes: [] };
       const allSchedules = await ScheduleWorkerManager.getInstance().generate(
         input,
-        effectiveSettings,
         500,
       );
 

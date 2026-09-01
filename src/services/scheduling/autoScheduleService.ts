@@ -2,7 +2,6 @@ import { appState } from '../../core/state/appState.svelte';
 import { modalState } from '../../svelte/modals/modalState.svelte';
 import { openModal, showAppError } from '../ui/uiState.svelte';
 import type { SelectedCourse } from '../../types/schedule';
-import type { WeeklyTimeSlot } from '../../types/schedule';
 import type { CourseSelectionService } from '../selection/CourseSelectionService';
 import type { FilterService } from '../filtering/FilterService';
 import type { CourseColorService } from './CourseColorService';
@@ -107,7 +106,6 @@ class AutoScheduleService {
 
   private async doGenerateSchedules(
     selectedCourses: SelectedCourse[],
-    settings?: { blockedTimes: WeeklyTimeSlot[] },
   ): Promise<void> {
     if (!this.orchestrator) return;
 
@@ -115,10 +113,8 @@ class AutoScheduleService {
     appState.scheduleGenerating = true;
 
     try {
-      const success = await this.orchestrator.generateSchedules(
-        selectedCourses,
-        settings,
-      );
+      const success =
+        await this.orchestrator.generateSchedules(selectedCourses);
 
       if (!success) {
         logger.warn('[Auto-Schedule] No valid schedules found');

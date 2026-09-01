@@ -4,24 +4,18 @@ import {
   type SchedulerInput,
 } from '../services/scheduling/SmartScheduler';
 import { ScheduleScorer } from '../services/scheduling/ScheduleScorer';
-import type { AutoScheduleSettings } from '../types/schedule';
 
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const { id, type, payload } = event.data;
-  const { input, settings, maxResults } = payload as {
+  const { input, maxResults } = payload as {
     input: SchedulerInput;
-    settings: AutoScheduleSettings;
     maxResults: number;
   };
 
   try {
     const schedules = SmartScheduler.findSchedules(input, maxResults);
     const scorer = new ScheduleScorer();
-    const effectiveSettings = settings ?? { blockedTimes: [] };
-    schedules.sort(
-      (a, b) =>
-        scorer.score(b, effectiveSettings) - scorer.score(a, effectiveSettings),
-    );
+    schedules.sort((a, b) => scorer.score(b) - scorer.score(a));
 
     const response: WorkerResponse = {
       id,
