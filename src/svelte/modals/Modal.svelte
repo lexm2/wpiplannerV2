@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { trapFocus } from './trapFocus';
+  import { uiState } from '../../services/ui/uiState.svelte';
   import { scrim, riseFade } from '../transitions';
 
   let {
@@ -62,8 +63,12 @@
     event.stopPropagation();
   }
 
+  // Escape is bound on the window, so with modals stacked every open dialog
+  // would see the same event and close together. Only the topmost reacts.
+  const isTop = $derived(uiState.openModals.at(-1) === typeId);
+
   function onKeydown(event: KeyboardEvent): void {
-    if (closeOnEscape && event.key === 'Escape') {
+    if (closeOnEscape && isTop && event.key === 'Escape') {
       close();
     }
   }

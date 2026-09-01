@@ -12,7 +12,7 @@
   import BookmarksFilter from './BookmarksFilter.svelte';
   import AvailabilityFilter from './AvailabilityFilter.svelte';
   import DepartmentFilter from './DepartmentFilter.svelte';
-  import WakeTimeFilter from './WakeTimeFilter.svelte';
+  import TimesFilter from './TimesFilter.svelte';
   import CreditHoursFilter from './CreditHoursFilter.svelte';
   import RmpRatingFilter from './RmpRatingFilter.svelte';
 
@@ -112,7 +112,7 @@
       {autoScheduleOrchestrator}
     />
     <DepartmentFilter {filterService} {allCourses} />
-    <WakeTimeFilter {filterService} />
+    <TimesFilter {filterService} />
     <CreditHoursFilter {filterService} />
     {#key resetNonce}
       <RmpRatingFilter {filterService} />

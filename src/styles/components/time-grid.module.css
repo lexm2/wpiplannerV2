@@ -1,0 +1,169 @@
+/* Times filter picker. Reuses the schedule page's global .time-label and
+   .day-header (self-contained text styling), but owns its own grid container:
+   .schedule-grid's `gap: 1px` gridlines would put 23px of non-cell space inside
+   the drag body's measured rect, drifting the pointer->row math by nearly a
+   full row at the bottom. This grid is gapless and paints its own lattice. */
+
+.grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 60px repeat(5, 1fr);
+  grid-template-rows: auto repeat(12, 1fr);
+  gap: 0;
+  container-type: inline-size;
+  font-size: 0.7rem;
+  height: var(--time-grid-height, 480px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.corner {
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* Header/label cells double as "select this whole column/row" buttons. They sit
+   outside the drag body, so pressing one can never start a drag. */
+.headerBtn,
+.labelBtn {
+  border-width: 0;
+  border-right: 2px solid var(--color-border);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--effect-transition);
+}
+
+.headerBtn {
+  border-right-width: 0;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.headerBtn:hover,
+.labelBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+.body {
+  grid-column: 2 / -1;
+  grid-row: 2 / -1;
+  position: relative;
+  /* Pointer capture owns the gesture; without this, touch would scroll. */
+  touch-action: none;
+  user-select: none;
+  cursor: crosshair;
+  /* The lattice, drawn rather than built from 120 nodes: solid line per hour,
+     fainter per half hour, plus day separators. Keeps the rect contiguous so
+     `cellAt` is exact. */
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      var(--color-border) 0 1px,
+      transparent 1px calc(100% / 12)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-border) 45%, transparent) 0 1px,
+      transparent 1px calc(100% / 24)
+    ),
+    repeating-linear-gradient(
+      to right,
+      var(--color-border) 0 1px,
+      transparent 1px 20%
+    );
+}
+
+.body:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.painted,
+.preview,
+.focusRing {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.paintedOnly {
+  background: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border-left: 2px solid var(--color-primary);
+}
+
+.paintedAvoid {
+  background: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  border-left: 2px solid var(--color-danger);
+}
+
+.preview {
+  border: 2px dashed var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.focusRing {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.summary {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  min-height: 1.5rem;
+}
+
+.summaryText {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+html.is-mobile .grid {
+  height: var(--time-grid-height, 60vh);
+  min-height: 320px;
+}
+
+/* Compact panel section: a summary line plus the button that opens the grid.
+   Kept short deliberately - the filter modal body is a 60vh scroll container. */
+.panelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.panelSummary {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* The shared .modal-body is a row flex container, so the picker supplies its
+   own column context - without it the sections sit side by side and the grid's
+   1fr day columns collapse to their content width. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}

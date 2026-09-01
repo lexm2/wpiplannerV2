@@ -7,7 +7,8 @@ import { AvailabilityFilter } from './AvailabilityFilter';
 import { CreditRangeFilter } from './CreditRangeFilter';
 import { TermFilter } from './TermFilter';
 import { RMPRatingFilter } from './RMPRatingFilter';
-import { WakeUpTimeFilter } from './WakeUpTimeFilter';
+import { TimesFilter } from './TimesFilter';
+import { AsyncFilter } from './AsyncFilter';
 import { AcademicYearFilter } from './AcademicYearFilter';
 import { GraduateLevelFilter } from './GraduateLevelFilter';
 import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
@@ -21,7 +22,8 @@ export const createDefaultFilters = (
   new CreditRangeFilter(),
   new TermFilter(),
   new RMPRatingFilter(rmpService),
-  new WakeUpTimeFilter(),
+  new TimesFilter(),
+  new AsyncFilter(),
   new AcademicYearFilter(),
   new GraduateLevelFilter(),
 ];

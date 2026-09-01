@@ -1,4 +1,4 @@
-import { SimpleTime } from './types';
+import { DayOfWeek } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface FilterCriteria {
@@ -80,6 +80,36 @@ export interface BookmarkFilterCriteria {
   showBookmarkedOnly: boolean;
 }
 
-export interface WakeUpTimeFilterCriteria {
-  wakeUpTime: SimpleTime;
+export type TimeGridMode = 'only' | 'avoid';
+
+/** One painted band on one weekday. Minutes from midnight; half-open [start, end). */
+export interface TimeWindow {
+  day: DayOfWeek;
+  startMin: number;
+  endMin: number;
+}
+
+/**
+ * Criteria for the Times filter's weekly grid.
+ *
+ * `windows` is canonical: sorted by weekday then start, non-overlapping, and
+ * non-adjacent (touching bands merged). Only `windowsFromCells` in
+ * `src/utils/timeWindows.ts` produces it - the containment test in TimesFilter
+ * depends on that merge having already happened. An empty array is a valid
+ * no-op state, not an error.
+ */
+export interface TimesFilterCriteria {
+  mode: TimeGridMode;
+  windows: TimeWindow[];
+}
+
+/**
+ * Criteria for the async-sections toggle in the Times modal.
+ *
+ * Only the restrictive state is ever stored: including async sections is the
+ * default, so that state is represented by the filter being absent rather than
+ * by `include: true`, which would otherwise count toward the filter badge.
+ */
+export interface AsyncFilterCriteria {
+  include: boolean;
 }

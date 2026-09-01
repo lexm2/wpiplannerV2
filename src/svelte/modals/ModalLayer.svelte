@@ -13,6 +13,7 @@
   import BucketConfig from './BucketConfig.svelte';
   import CourseFinderModal from './CourseFinderModal.svelte';
   import DegreeImportWarning from './DegreeImportWarning.svelte';
+  import TimeGridModal from './TimeGridModal.svelte';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { FilterService } from '../../services/filtering/FilterService';
@@ -100,6 +101,11 @@
       {profileStateManager}
       {getDepartments}
       onRequestClose={() => closeModal('filter-modal')}
+    />
+  {:else if id === 'time-grid'}
+    <TimeGridModal
+      {filterService}
+      onRequestClose={() => closeModal('time-grid')}
     />
   {:else if id === 'auto-schedule-filter'}
     <FilterModal
