@@ -1,5 +1,152 @@
 # Changelog
 
+## [2026-09-01]
+
+### Added
+- Times filter. Drag across a weekly grid to pick times, then choose to show only courses in those times, or to avoid them
+- Toggle to hide async courses
+
+### Changed
+- The wake up time filter was replaced by the Times filter
+
+## [2026-08-29]
+
+### Changed
+- The Degree page opens in the full layout by default, with a notice explaining the view
+- Clearer wording and sizing in modals and tutorial text
+
+### Fixed
+- The tutorial Skip button now skips the tutorial instead of moving to the next step
+- The Add Event button in the Add Event modal now works
+
+## [2026-08-27]
+
+### Changed
+- Reworked the term grid view in the schedule
+
+### Fixed
+- Undo and redo fixes
+
+## [2026-08-26]
+
+### Added
+- The course list loads more courses as you scroll, so you no longer click Load next 100 courses
+
+### Changed
+- The schedule sidebar scrolls to the course you point at
+
+### Fixed
+- Auto scrolling on the Degree page
+
+## [2026-08-25]
+
+### Changed
+- Course finder results are clickable. Clicking one takes you to that requirement
+
+### Fixed
+- Degree wide totals are no longer highlighted as if they were a course's own requirement
+
+## [2026-08-24]
+
+### Added
+- Course finder on the Degree page, for finding courses that fill a requirement
+- Degree side panels can be resized by dragging
+
+### Changed
+- Degree requirements are laid out as a grid of cards
+- Modals open with a darken and rise animation
+
+### Fixed
+- Progress bar tracks are visible in every theme. In WPI Dark the unfilled part was invisible
+- Sticky group headings in the course finder
+- Empty slot markers in the degree buckets
+
+## [2026-08-23]
+
+### Added
+- Degree buckets are editable. You can add your own, such as a minor, and rename, retarget or remove any bucket
+- The app offers you a backup before the error banner clears your data
+
+### Changed
+- Degree courses are placed by hand instead of guessed for you
+- Removed the Build Schedule button and the header from the Degree page
+
+### Fixed
+- The wizard selection no longer breaks every save
+- Loading a schedule no longer hangs on a bad read
+- Errors show a readable message instead of [object Object]
+- Failed schedule deletes and switches are reported instead of failing silently
+
+## [2026-08-22]
+
+### Fixed
+- Tutorial fixes
+- Font loading
+
+## [2026-08-20]
+
+### Added
+- The tutorial box can be dragged by touch
+- The find element dot respects your reduced motion setting
+
+### Changed
+- Browser alert, confirm and prompt dialogs were replaced with the app's own
+- Professor links have a visible underline
+
+### Fixed
+- Flash of the wrong theme on page load
+- Themes no longer override your panel widths
+- The wizard plays its close animation instead of skipping it
+
+## [2026-06-24]
+
+### Added
+- The Degree page is connected to the planner schedule
+- Sidebar panels can be resized by dragging
+
+### Changed
+- Degree progress updates live from the courses you have placed
+- Umbrella requirements are hidden, and status filters allow more than one choice
+- Course needed tiles are larger and show details on hover
+
+## [2026-06-23]
+
+### Added
+- Degree page. Import your Workday Academic Progress file to see your requirements and what is left
+- Build a schedule from your planned degree courses
+
+## [2026-06-22]
+
+### Added
+- Change Sections button in the schedule course info modal
+
+### Changed
+- The selected courses panel expands with a slide and a staggered fly in
+- Myriad Pro loads correctly and is used across the app
+- Modals keep keyboard focus inside them and lock background scrolling
+
+### Fixed
+- Tutorial highlighting
+- Section info modal header alignment
+
+## [2026-06-16]
+
+### Changed
+- Refined the term badge animation in the classes list
+
+### Fixed
+- The wizard modal no longer opens above the viewport when the sidebar is scrolled
+
+## [2026-06-15]
+
+### Changed
+- The interface was rebuilt in Svelte. What the app does is the same, but the UI updates more smoothly
+
+## [2026-06-13]
+
+### Changed
+- The year filter defaults to the current academic year
+
 ## [2026-04-08]
 
 ### Added
@@ -14,7 +161,7 @@
 
 ### Added
 - X button on the right side of the course search bar to quickly clear the search
-- Professor search mode toggle in the search bar — click the school icon to search by professor name only, with a live suggestions dropdown as you type
+- Professor search mode toggle in the search bar. Click the school icon to search by professor name only, with a live suggestions dropdown as you type
 - Removed course and professor search bars from the filter modal (search is now handled from the main search bar)
 
 ### Fixed
@@ -23,7 +170,7 @@
 ## [2026-03-28]
 
 ### Added
-- "Find Element" button in the tutorial floating text box — animates a dot from the center of the screen to the highlighted element with a dark overlay, helping you locate the target
+- "Find Element" button in the tutorial floating text box. It animates a dot from the center of the screen to the highlighted element with a dark overlay, helping you locate the target
 - First tutorial step now introduces the Find Element button by asking you to click it
 
 ### Changed
@@ -33,7 +180,7 @@
 ## [2026-03-25]
 
 ### Fixed
-- Tutorials now load significantly faster — course selections during setup are batched into a single storage write instead of one per course
+- Tutorials now load significantly faster. Course selections during setup are batched into a single storage write instead of one per course
 - Fixed a race condition where the first tutorial highlight would sometimes not appear on the auto-schedule tutorial
 - Fixed tutorial highlight disappearing from the Auto Schedule button after the wizard closes
 
@@ -41,8 +188,8 @@
 
 ### Fixed
 - Section selection wizard now shows a warning instead of hiding the Finish button when you haven't selected all required sections, letting you finish with an incomplete course if needed
-- Fixed the Import button in the Schedules settings tab — it now opens a file picker immediately and names the new schedule after the imported file
-- Auto-scheduler now respects locked sections when distributing courses across terms — a locked course in a term counts toward that term's course limit
+- Fixed the Import button in the Schedules settings tab. It now opens a file picker immediately and names the new schedule after the imported file
+- Auto-scheduler now respects locked sections when distributing courses across terms. A locked course in a term counts toward that term's course limit
 
 ### Removed
 - Removed the "Clear Filters" button from the schedule sidebar header
@@ -107,8 +254,8 @@
 - Deleting a local calendar event now correctly updates the event count on the calendar button
 
 ### Improved
-- Removed the course listing header label — the content header now only shows the search and filter controls
-- Term graphs no longer show a separate header — the term letter (A/B/C/D) is now embedded in the schedule grid's first cell, giving more space to the actual schedule
+- Removed the course listing header label. The content header now only shows the search and filter controls
+- Term graphs no longer show a separate header. The term letter (A/B/C/D) is now embedded in the schedule grid's first cell, giving more space to the actual schedule
 - Course and bookmark buttons now respond instantly with no delay
 - Added a "New Schedule" button at the bottom of the schedule list for quicker access
 - Import button on each schedule now imports courses directly into that schedule
@@ -159,9 +306,9 @@
 ## [2026-03-06]
 
 ### Fixed
-- Creating a new schedule no longer inherits courses from the previously active schedule — new schedules start empty
+- Creating a new schedule no longer inherits courses from the previously active schedule. New schedules start empty
 - Creating a new schedule now automatically switches to it
-- Clicking the bookmark or select button on a course card no longer feels sluggish — buttons now respond instantly without triggering unintended side effects
+- Clicking the bookmark or select button on a course card no longer feels sluggish. Buttons now respond instantly without triggering unintended side effects
 - Course list now renders all at once instead of in small batches, eliminating a race condition where button clicks during loading would revert
 
 ### Changed
@@ -172,7 +319,7 @@
 ## [2026-03-03]
 
 ### Improved
-- The course component wizard now shows only the steps relevant to the selected lecture — lectures with no labs or discussions skip those steps entirely and go straight to Finish
+- The course component wizard now shows only the steps relevant to the selected lecture. Lectures with no labs or discussions skip those steps entirely and go straight to Finish
 
 ### Fixed
 - ICS export now uses each course's own academic year for event dates instead of defaulting to the most recent year
@@ -181,14 +328,14 @@
 
 
 ### Fixed
-- Hovering a section in the wizard after clicking it no longer shows it as a dashed preview — it stays solid
+- Hovering a section in the wizard after clicking it no longer shows it as a dashed preview. It stays solid
 - Re-opening the wizard in editing mode no longer shows already-confirmed sections (like discussions) as ghost previews when hovering a lecture card
 
 ## [2026-02-28]
 
 ### Improved
 - Schedule grid no longer re-renders when navigating away from the schedule page, reducing unnecessary work on startup and schedule switches
-- Schedule grid rendering is now faster — course data is scanned once per render instead of once per grid cell
+- Schedule grid rendering is now faster. Course data is scanned once per render instead of once per grid cell
 
 ## [2026-02-25]
 
@@ -203,7 +350,7 @@
 ### Improved
 - Moved separator bar in sidebar calendar events section to appear below the button instead of above
 - Schedules modal footer redesigned with a pill-style tab nav; body now slides between Schedules and Settings pages
-- Academic Year filter in course and schedule filter modals — filter courses by 2025-2026 or 2026-2027
+- Academic Year filter in course and schedule filter modals. Filter courses by 2025-2026 or 2026-2027
 - Reduced course data file size by removing redundant fields from sections (legacy term code and duplicate description)
 
 ## [2026-02-07]
@@ -224,7 +371,7 @@
 - Refactored auto-schedule constraints into unified filter system
 - Simplified auto-schedule API by removing config parameter
 - Wake-up time now works as a hard filter (excludes sections before set time)
-- Unified conflict detection system - calendar events and section conflicts now use the same filtering mechanism
+- Unified conflict detection system. Calendar events and section conflicts now use the same filtering mechanism
 - Simplified filter architecture by merging BlockedTimesFilter into ConflictFilter
 - Calendar event conflict toggle now appears within Schedule Conflicts section for better discoverability
 - Eliminated circular references between Course and Department by flattening department data
@@ -304,7 +451,7 @@
 - Removed all cloud sync functionality and infrastructure
 - Removed all calendar integration features
 - Removed Export ICS button from schedules modal footer
-- Removed cloud calendar integration - local events continue to work
+- Removed cloud calendar integration. Local events continue to work
 
 ## [2026-01-21]
 
@@ -361,6 +508,6 @@
 - Added changelog modal that displays on startup (parses this CHANGELOG.md file directly)
 
 ### Fixed
-- Fixed availability filter "hide conflicting periods" toggle - now properly persists and filters out courses that conflict with selected sections
+- Fixed availability filter "hide conflicting periods" toggle. It now properly persists and filters out courses that conflict with selected sections
 - Fixed term-badges-container not reappearing after filtering/unfiltering
 - Fixed cloud status button inconsistently displaying "Sync with cloud" when cloud sync is unavailable
