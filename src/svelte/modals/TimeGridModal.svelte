@@ -19,30 +19,25 @@
     onRequestClose: () => void;
   } = $props();
 
-  // Snapshot for seeding only - the picker owns the cell set while open, and
-  // nothing behind this modal can edit the criteria in the meantime.
+  // Seed only; the picker owns the selection while it is open.
   const seed = untrack(() =>
     filterService.getCriteria<TimesFilterCriteria>('times'),
   );
   const initialWindows: TimeWindow[] = seed?.windows ?? [];
   const initialMode: TimeGridMode = seed?.mode ?? 'only';
 
-  // The async toggle reads live rather than being seeded: it is a plain
-  // boolean with no drag state to protect.
   const includeAsync = $derived(
     filterService.getCriteria<AsyncFilterCriteria>('async')?.include !== false,
   );
 
   function onchange(mode: TimeGridMode, windows: TimeWindow[]): void {
-    // Clearing the grid removes the filter outright, so the panel's
-    // filter-count badge doesn't keep counting an empty selection.
+    // An empty grid drops the filter so it stops counting toward the badge.
     if (windows.length > 0) filterService.addFilter('times', { mode, windows });
     else filterService.removeFilter('times');
   }
 
   function onAsyncChange(checked: boolean): void {
-    // Including async sections is the default, so it is stored as no filter at
-    // all rather than as a no-op criteria that would count toward the badge.
+    // Including async is the default state, stored as no filter at all.
     if (checked) filterService.removeFilter('async');
     else filterService.addFilter('async', { include: false });
   }

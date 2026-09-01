@@ -7,23 +7,17 @@ import { TimeUtils } from './timeUtils';
  *
  * Two representations, bridged by `windowsFromCells` / `cellsFromWindows`:
  *
- * - **Cells** - a flat `Set<number>` of `dayIndex * ROWS_PER_DAY + row` indices.
- *   Cheap to mutate, so this is what the picker holds while dragging.
- * - **Windows** - merged `{day, startMin, endMin}` bands. This is what the
- *   filter criteria store, because matching is then one comparison per band
- *   instead of decomposing every period into cell indices.
+ * - **Cells** - a flat `Set<number>` of `dayIndex * ROWS_PER_DAY + row` indices,
+ *   what the picker holds while dragging.
+ * - **Windows** - merged `{day, startMin, endMin}` bands, what the filter
+ *   criteria store.
  *
- * `windowsFromCells` is the *only* producer of windows, and it guarantees the
- * canonical form the filter relies on: sorted, non-overlapping, and
- * non-adjacent. That last property is load-bearing - a period spanning two
- * bands that were left unmerged would wrongly fail the containment test.
+ * `windowsFromCells` guarantees the canonical form the filter relies on:
+ * sorted, non-overlapping, and non-adjacent. A period spanning two bands left
+ * unmerged would wrongly fail the containment test.
  */
 
-/**
- * Monday-Friday in grid-column order. Deliberately duplicated from
- * `WEEKDAYS` in `src/svelte/schedule/scheduleGeometry.ts` so this module
- * (used by the filter core and its tests) never imports the UI layer.
- */
+/** Monday-Friday in grid-column order. */
 export const GRID_DAYS: readonly DayOfWeek[] = [
   DayOfWeek.MONDAY,
   DayOfWeek.TUESDAY,
@@ -32,7 +26,6 @@ export const GRID_DAYS: readonly DayOfWeek[] = [
   DayOfWeek.FRIDAY,
 ];
 
-/** Grid bounds, shared with the schedule view so the two never drift. */
 export const GRID_START_MIN = TimeUtils.START_HOUR * 60; // 8:00 AM
 export const GRID_END_MIN = TimeUtils.END_HOUR * 60; // 8:00 PM
 export const CELL_MINUTES = 30;
@@ -79,9 +72,8 @@ export function windowsFromCells(cells: ReadonlySet<number>): TimeWindow[] {
 }
 
 /**
- * Cells covered by a set of windows. Defensive about alignment (windows from
- * `windowsFromCells` always land on the lattice, but criteria can arrive from
- * a tutorial snapshot) - floor the start, ceil the end, clamp to the grid.
+ * Cells covered by a set of windows: floor the start, ceil the end, clamp to
+ * the grid, so an unaligned window still lands on whole cells.
  */
 export function cellsFromWindows(windows: readonly TimeWindow[]): Set<number> {
   const cells = new Set<number>();
@@ -132,9 +124,8 @@ function periodMinutes(period: Period): {
 }
 
 /**
- * Periods that actually occupy a slot on the weekly grid. Async sections, rows
- * with a degenerate time span, and periods with no meeting day all impose no
- * schedule constraint and are invisible to this filter.
+ * Periods that occupy a slot on the weekly grid. Async periods, degenerate
+ * spans and periods with no meeting day impose no schedule constraint.
  */
 export function timedPeriods(section: Section): Period[] {
   return (section.periods ?? []).filter(period => {
@@ -147,13 +138,11 @@ export function timedPeriods(section: Section): Period[] {
 
 /**
  * True when the period sits inside the painted region on **every** day it
- * meets. A Mon/Wed 10-11 gap should not surface an MWF 10-11 class: it would
- * collide on the Friday the user never painted.
+ * meets: a Mon/Wed 10-11 gap should not surface an MWF 10-11 class, which
+ * would collide on the unpainted Friday.
  *
- * Note that period minutes are never clamped to the grid. A 7:00 AM class is
- * simply not containable in a grid that starts at 8:00, which is the right
- * answer for a gap search - clamping it up to 8:00 would make it falsely match
- * a painted 8:00-9:00 window.
+ * Period minutes are never clamped to the grid, so a 7:00 AM class is not
+ * containable in a grid that starts at 8:00.
  */
 export function periodInsideWindows(
   period: Period,
@@ -199,11 +188,7 @@ function asTime(minutes: number): {
   };
 }
 
-/**
- * Human summary of a painted grid, e.g. "Only Tue, Thu 10:00-12:00 PM".
- * Rendered visibly under the grid and read out via aria-live, so it is the
- * summary users actually see - not just the filter chip's display value.
- */
+/** Human summary of a painted grid, e.g. "Only Tue, Thu 10:00-12:00 PM". */
 export function describeWindows(
   windows: readonly TimeWindow[],
   mode: TimeGridMode,
@@ -243,15 +228,8 @@ export function describeWindows(
 }
 
 /**
- * True when a section has nothing on the weekly grid at all - an explicitly
- * async period, the 12:00-12:00 placeholder the course data uses for
- * asynchronous meetings (caught by the zero-duration test in `timedPeriods`),
- * or no periods whatsoever.
- *
- * This is exactly the set of sections the Times filter refuses to judge, which
- * is why the "include async classes" toggle lives beside it: painting a window
- * narrows the timed sections, and this decides whether the untimed ones ride
- * along.
+ * True when a section has nothing on the weekly grid: async periods, the
+ * 12:00-12:00 placeholder the course data uses for them, or no periods at all.
  */
 export function isAsyncSection(section: Section): boolean {
   return timedPeriods(section).length === 0;

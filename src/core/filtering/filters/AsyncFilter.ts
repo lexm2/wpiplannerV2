@@ -4,15 +4,8 @@ import type { FilterableSection } from '../../../types/filterableUnit';
 import { isAsyncSection } from '../../../utils/timeWindows';
 
 /**
- * Hides asynchronous sections - the ones with no scheduled meeting time.
- *
- * The counterpart to TimesFilter, which deliberately keeps untimed sections in
- * both of its modes because they impose no schedule constraint. That is the
- * right default, but it means painting a 10-12 window still surfaces every
- * async course; this filter is the switch for that.
- *
- * Only the restrictive state is ever stored (`include: false`) - see
- * AsyncFilterCriteria.
+ * Hides sections with no scheduled meeting time. Only the hiding state is
+ * stored: including async sections is the absence of the filter.
  */
 export class AsyncFilter implements SectionBasedFilter {
   readonly id = 'async';

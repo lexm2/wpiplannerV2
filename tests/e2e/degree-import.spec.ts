@@ -345,8 +345,7 @@ test('keeps every collapsed bucket card the same height', async ({ page }) => {
   await page.goto('/');
   await page.click('#degree-tab');
   await importFixture(page);
-  // Card-height budgeting and "+N more" are grid-layout rules; the page
-  // defaults to the full layout (degreeViewState bucketView: 'full').
+  // Card-height budgeting and "+N more" are grid-layout rules.
   await page.locator('#degree-view-grid').click();
   // Show every bucket, umbrella ones included - they carry the most courses and
   // are the likeliest to outgrow the budget.
@@ -366,8 +365,7 @@ test('hides overflow behind "+N more" and expands the card in place', async ({
   page,
 }) => {
   await setupWithScheduleCourse(page);
-  // Card-height budgeting and "+N more" are grid-layout rules; the page
-  // defaults to the full layout (degreeViewState bucketView: 'full').
+  // Card-height budgeting and "+N more" are grid-layout rules.
   await page.locator('#degree-view-grid').click();
 
   // Total Credits carries the whole transcript, so it always overflows.
@@ -688,7 +686,7 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
   await importFixture(page);
 
   const list = page.locator('.degree-card-list');
-  // Full is the default, and it shows everything - nothing left to expand.
+  // The full layout shows everything, so there is nothing left to expand.
   await expect(list).toHaveClass(/is-full/);
   await expect(page.locator('.requirement-card-toggle')).toHaveCount(0);
 
@@ -702,8 +700,7 @@ test('swaps between the grid and full bucket layouts, and remembers', async ({
     /complete$/,
   );
 
-  // The choice persists - and grid, being the non-default, is the one worth
-  // checking survives a reload.
+  // Grid is the non-default, so it is the layout worth checking survives.
   await page.reload();
   await page.click('#degree-tab');
   await page.locator('.degree-summary-title').waitFor();

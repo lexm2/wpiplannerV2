@@ -1,11 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * The Times filter's drag-to-select grid.
- *
- * Driven with real pointer events rather than a unit test: the whole point of
- * the component is `setPointerCapture` plus rect arithmetic against a laid-out
- * element, neither of which jsdom provides.
+ * The Times filter's drag-to-select grid, driven with real pointer events:
+ * the component is `setPointerCapture` plus rect arithmetic against a
+ * laid-out element, neither of which jsdom provides.
  */
 
 const GRID = '[data-modal-type="time-grid"]';
@@ -30,8 +28,8 @@ async function openPicker(page: Page): Promise<void> {
   await page.click('#filter-btn');
   await page.click('#edit-times-btn');
   await expect(page.locator(BODY)).toBeVisible();
-  // The dialog is still mid-riseFade when it first becomes visible; measuring
-  // the grid now would read a box that has moved by the time the pointer lands.
+  // The dialog is still mid-riseFade when it first becomes visible, so its box
+  // would have moved by the time the pointer lands.
   await page.waitForTimeout(SETTLE_MS);
 }
 

@@ -15,7 +15,6 @@
     filterService.getCriteria<TimesFilterCriteria>('times'),
   );
 
-  // Set by the toggle inside the same modal, so it belongs in the same summary.
   const hideAsync = $derived(
     filterService.getCriteria<AsyncFilterCriteria>('async')?.include === false,
   );

@@ -63,8 +63,8 @@
     event.stopPropagation();
   }
 
-  // Escape is bound on the window, so with modals stacked every open dialog
-  // would see the same event and close together. Only the topmost reacts.
+  // Escape is bound on the window, so every stacked dialog sees the same
+  // event. Only the topmost closes.
   const isTop = $derived(uiState.openModals.at(-1) === typeId);
 
   function onKeydown(event: KeyboardEvent): void {

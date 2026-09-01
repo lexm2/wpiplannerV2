@@ -24,7 +24,7 @@
     windows: TimeWindow[];
     mode?: TimeGridMode;
     onchange: (mode: TimeGridMode, windows: TimeWindow[]) => void;
-    /** Rendered at the right of the toolbar, where it stays above the fold. */
+    /** Rendered at the right of the toolbar. */
     toolbarExtra?: Snippet;
   } = $props();
 
@@ -32,13 +32,11 @@
   type Rect = { d0: number; d1: number; r0: number; r1: number };
   type Brush = 'paint' | 'erase';
 
-  // Seeded once: the modal mounts fresh on every open, and nothing else can
-  // edit the criteria while it is on top.
+  // Seeded once; the picker owns the selection while it is open.
   let cells = $state.raw<Set<number>>(untrack(() => cellsFromWindows(windows)));
   let gridMode = $state<TimeGridMode>(untrack(() => initialMode));
 
-  // Drag is a rectangle from an anchor cell, so a fast flick can never skip
-  // cells the way sampled free-painting would.
+  // A rectangle from an anchor cell, so a fast flick cannot skip cells.
   let dragRect = $state.raw<Rect | null>(null);
   let anchor: Cell | null = null;
   let brush: Brush = 'paint';
@@ -94,9 +92,8 @@
   }
 
   /**
-   * The pixel->time inverse. Measured against the gapless body, so the row is
-   * exact rather than drifting with interior gridline gaps. Clamping (rather
-   * than bailing) means dragging past an edge extends to that edge.
+   * Pixel -> cell, measured against the gapless body. Clamping means dragging
+   * past an edge extends the selection to that edge.
    */
   function cellAt(clientX: number, clientY: number): Cell {
     const r = bodyEl!.getBoundingClientRect();
@@ -114,7 +111,7 @@
     };
   }
 
-  /** Single write path. Never called from pointermove - only on commit. */
+  /** Single write path; runs on commit, never per pointermove. */
   function commit(next: Set<number>): void {
     cells = next;
     onchange(gridMode, windowsFromCells(cells));
@@ -126,14 +123,15 @@
     const cell = cellAt(e.clientX, e.clientY);
     anchor = cell;
     focusCell = cell;
-    // Starting on a painted cell erases; starting on an empty one paints. A
-    // zero-distance drag is then click-to-toggle, with no separate handler.
+    // Starting on a painted cell erases, on an empty one paints, which makes a
+    // zero-distance drag a click-to-toggle.
     brush = cells.has(cellIndex(cell.dayIndex, cell.row)) ? 'erase' : 'paint';
     dragRect = rectOf(cell, cell);
     try {
       bodyEl.setPointerCapture(e.pointerId);
     } catch {
-      // Capture is a convenience; the window-level up handler still commits.
+      // Throws on an unrecognised pointer id; the drag still tracks while the
+      // pointer stays over the grid.
     }
   }
 

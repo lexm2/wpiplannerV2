@@ -1,8 +1,6 @@
-/* Times filter picker. Reuses the schedule page's global .time-label and
-   .day-header (self-contained text styling), but owns its own grid container:
-   .schedule-grid's `gap: 1px` gridlines would put 23px of non-cell space inside
-   the drag body's measured rect, drifting the pointer->row math by nearly a
-   full row at the bottom. This grid is gapless and paints its own lattice. */
+/* Times filter picker. The grid is gapless and paints its own lattice: gaps
+   between cells would sit inside the drag body's measured rect and drift the
+   pointer->row math by nearly a full row at the bottom. */
 
 .grid {
   display: grid;
@@ -23,8 +21,7 @@
   border-bottom: 2px solid var(--color-border);
 }
 
-/* Header/label cells double as "select this whole column/row" buttons. They sit
-   outside the drag body, so pressing one can never start a drag. */
+/* Header/label cells double as "select this whole column/row" buttons. */
 .headerBtn,
 .labelBtn {
   border-width: 0;
@@ -53,9 +50,8 @@
   touch-action: none;
   user-select: none;
   cursor: crosshair;
-  /* The lattice, drawn rather than built from 120 nodes: solid line per hour,
-     fainter per half hour, plus day separators. Keeps the rect contiguous so
-     `cellAt` is exact. */
+  /* Solid line per hour, fainter per half hour, day separators every 20%.
+     Drawn rather than built from cells so the rect stays contiguous. */
   background-image:
     repeating-linear-gradient(
       to bottom,
@@ -143,8 +139,7 @@ html.is-mobile .grid {
   min-height: 320px;
 }
 
-/* Compact panel section: a summary line plus the button that opens the grid.
-   Kept short deliberately - the filter modal body is a 60vh scroll container. */
+/* Compact panel section: a summary line plus the button that opens the grid. */
 .panelRow {
   display: flex;
   align-items: center;
@@ -158,9 +153,8 @@ html.is-mobile .grid {
   color: var(--color-text-secondary);
 }
 
-/* The shared .modal-body is a row flex container, so the picker supplies its
-   own column context - without it the sections sit side by side and the grid's
-   1fr day columns collapse to their content width. */
+/* .modal-body is a row flex container, so the picker supplies its own column
+   context; without it the day columns collapse to their content width. */
 .wrap {
   display: flex;
   flex-direction: column;

@@ -740,8 +740,7 @@ html.is-mobile .section-enrollment-waitlist {
   max-width: 800px;
   width: 90%;
 }
-/* The Times picker opens over the filter modal, so it doesn't inherit the
-   .filter-modal width; the weekly grid needs more room than the 500px default. */
+/* The weekly grid needs more room than the 500px default. */
 .time-grid-modal .modal-dialog {
   max-width: 860px;
   width: 90%;

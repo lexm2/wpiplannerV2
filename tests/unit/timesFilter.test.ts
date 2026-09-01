@@ -114,8 +114,7 @@ describe('TimesFilter', () => {
     });
 
     it('keeps a section when one of its periods fits and another does not', () => {
-      // The "any period inside" rule: a lab outside the gap does not disqualify
-      // a lecture that fits it.
+      // A lab outside the gap does not disqualify a lecture that fits it.
       const sample = [
         fs('mixed', [period([T], 10, 0, 10, 50), period([W], 14, 0, 15, 50)]),
       ];
@@ -125,8 +124,8 @@ describe('TimesFilter', () => {
     });
 
     it('drops an MWF period when only Wednesday is painted', () => {
-      // Containment is required on *every* day the period meets - an MWF class
-      // would collide on the Monday and Friday the user never painted.
+      // Containment is required on every day the period meets: an MWF class
+      // collides on the unpainted Monday and Friday.
       const sample = [fs('mwf', [period([M, W, F], 10, 0, 10, 50)])];
       const wedOnly: TimeWindow[] = [{ day: W, startMin: 600, endMin: 720 }];
       expect(filter.apply(sample, only(wedOnly))).toEqual([]);
