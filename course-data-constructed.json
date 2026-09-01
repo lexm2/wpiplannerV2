@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 1, 2026, 6:13 AM",
+  "generated": "Sep 1, 2026, 11:41 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -8334,7 +8334,7 @@
                 "number": "B01",
                 "seats": 140,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 2,
                 "maxWaitlist": 20,
                 "note": null,
                 "computedTerm": "B",
@@ -8351,7 +8351,7 @@
                     "room": "Olin Hall 107",
                     "seats": 140,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 2,
                     "maxWaitlist": 20,
                     "specificSection": "B01",
                     "days": [
@@ -79896,8 +79896,8 @@
                 "crn": 355053,
                 "number": "B01",
                 "seats": 40,
-                "seatsAvailable": 6,
-                "actualWaitlist": 6,
+                "seatsAvailable": 12,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -79913,8 +79913,8 @@
                     "building": "",
                     "room": "Unity Hall 405",
                     "seats": 40,
-                    "seatsAvailable": 6,
-                    "actualWaitlist": 6,
+                    "seatsAvailable": 12,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [

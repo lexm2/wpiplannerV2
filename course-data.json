@@ -6210,7 +6210,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "4/20",
+      "Waitlist_Waitlist_Capacity": "2/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349669"
     },
     {
@@ -55365,7 +55365,7 @@
       "Course_Title": "IMGD 3100 - Novel Interfaces For Interactive Environments",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/40",
+      "Enrolled_Capacity": "28/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Gillian Smith",
       "Locations": "Unity Hall 405",
@@ -55376,7 +55376,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development",
-      "Waitlist_Waitlist_Capacity": "6/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-355053"
     },
     {
