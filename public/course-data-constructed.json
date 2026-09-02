@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 2, 2026, 6:08 AM",
+  "generated": "Sep 2, 2026, 11:15 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -78258,7 +78258,7 @@
                 "number": "B01",
                 "seats": 24,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 25,
                 "note": null,
                 "computedTerm": "B",
@@ -78275,7 +78275,7 @@
                     "room": "Innovation Studio 203 Active Learning Classroom South",
                     "seats": 24,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 25,
                     "specificSection": "B01",
                     "days": [
