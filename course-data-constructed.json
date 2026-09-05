@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 5, 2026, 8:28 AM",
+  "generated": "Sep 5, 2026, 11:56 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -211525,7 +211525,7 @@
                 "crn": 354441,
                 "number": "C01",
                 "seats": 45,
-                "seatsAvailable": 25,
+                "seatsAvailable": 24,
                 "actualWaitlist": 0,
                 "maxWaitlist": 20,
                 "note": null,
@@ -211542,7 +211542,7 @@
                     "building": "",
                     "room": "Salisbury Labs 402",
                     "seats": 45,
-                    "seatsAvailable": 25,
+                    "seatsAvailable": 24,
                     "actualWaitlist": 0,
                     "maxWaitlist": 20,
                     "specificSection": "C01",
@@ -231420,7 +231420,7 @@
                 "crn": 351466,
                 "number": "C02",
                 "seats": 15,
-                "seatsAvailable": 0,
+                "seatsAvailable": 1,
                 "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
@@ -231437,7 +231437,7 @@
                     "building": "",
                     "room": "Daniels Hall 102E",
                     "seats": 15,
-                    "seatsAvailable": 0,
+                    "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "C02",
