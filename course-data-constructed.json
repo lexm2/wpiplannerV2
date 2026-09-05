@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 5, 2026, 4:56 PM",
+  "generated": "Sep 5, 2026, 6:48 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -6989,7 +6989,7 @@
                 "crn": 349630,
                 "number": "BL01",
                 "seats": 30,
-                "seatsAvailable": 17,
+                "seatsAvailable": 18,
                 "actualWaitlist": 0,
                 "maxWaitlist": 0,
                 "note": null,
@@ -7006,7 +7006,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 30,
-                    "seatsAvailable": 17,
+                    "seatsAvailable": 18,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
                     "specificSection": "BL01",
@@ -7023,7 +7023,7 @@
                   "crn": 349304,
                   "number": "BX01",
                   "seats": 60,
-                  "seatsAvailable": 47,
+                  "seatsAvailable": 48,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": null,
@@ -7040,7 +7040,7 @@
                       "building": "",
                       "room": "Fuller Labs PHU Perreault Hall - Upper Section",
                       "seats": 60,
-                      "seatsAvailable": 47,
+                      "seatsAvailable": 48,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX01",
