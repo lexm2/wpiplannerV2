@@ -3313,7 +3313,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "4/5",
+      "Waitlist_Waitlist_Capacity": "3/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349953"
     },
     {
@@ -3745,7 +3745,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-356636"
     },
     {
@@ -40743,7 +40743,7 @@
       "Course_Title": "ES 1310 - Introduction To Computer Aided Design",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "69/70",
+      "Enrolled_Capacity": "68/70",
       "Instructional_Format": "Lecture",
       "Instructors": "Reza Ebadi",
       "Locations": "Salisbury Labs 104",
@@ -40755,7 +40755,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2026 Fall B Term: ES 1310 - Introduction To Computer Aided Design (a)",
       "Subject": "Engineering Science",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349529"
     },
     {
@@ -54498,7 +54498,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Interactive Media and Game Development; Art",
-      "Waitlist_Waitlist_Capacity": "8/10",
+      "Waitlist_Waitlist_Capacity": "7/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-356636"
     },
     {
