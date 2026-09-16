@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 16, 2026, 5:59 AM",
+  "generated": "Sep 16, 2026, 11:19 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -10660,8 +10660,8 @@
               "crn": 355636,
               "number": "BX02",
               "seats": 5,
-              "seatsAvailable": 0,
-              "actualWaitlist": 1,
+              "seatsAvailable": 1,
+              "actualWaitlist": 0,
               "maxWaitlist": 2,
               "note": null,
               "computedTerm": "B",
@@ -10677,8 +10677,8 @@
                   "building": "",
                   "room": "Goddard Hall 212 BB Lab",
                   "seats": 5,
-                  "seatsAvailable": 0,
-                  "actualWaitlist": 1,
+                  "seatsAvailable": 1,
+                  "actualWaitlist": 0,
                   "maxWaitlist": 2,
                   "specificSection": "BX02",
                   "days": [
