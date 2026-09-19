@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 19, 2026, 11:32 AM",
+  "generated": "Sep 19, 2026, 2:47 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -41402,7 +41402,7 @@
                   "crn": 350071,
                   "number": "BX04",
                   "seats": 25,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5219",
@@ -41419,7 +41419,7 @@
                       "building": "",
                       "room": "Fuller Labs A21 Zoo Lab Restricted",
                       "seats": 25,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX04",
@@ -41434,7 +41434,7 @@
                   "crn": 350067,
                   "number": "BX06",
                   "seats": 25,
-                  "seatsAvailable": 1,
+                  "seatsAvailable": 2,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5219",
@@ -41451,7 +41451,7 @@
                       "building": "",
                       "room": "Salisbury Labs 123 Computer Lab",
                       "seats": 25,
-                      "seatsAvailable": 1,
+                      "seatsAvailable": 2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BX06",
