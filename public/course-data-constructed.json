@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 19, 2026, 5:43 PM",
+  "generated": "Sep 19, 2026, 7:36 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -111089,7 +111089,7 @@
                   "crn": 349933,
                   "number": "BD09",
                   "seats": 35,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 3,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5197",
@@ -111106,7 +111106,7 @@
                       "building": "",
                       "room": "Stratton Hall 313",
                       "seats": 35,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 3,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD09",
@@ -111121,7 +111121,7 @@
                   "crn": 349451,
                   "number": "BD10",
                   "seats": 35,
-                  "seatsAvailable": 2,
+                  "seatsAvailable": 1,
                   "actualWaitlist": 0,
                   "maxWaitlist": 0,
                   "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5197",
@@ -111138,7 +111138,7 @@
                       "building": "",
                       "room": "Stratton Hall 205",
                       "seats": 35,
-                      "seatsAvailable": 2,
+                      "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
                       "specificSection": "BD10",
