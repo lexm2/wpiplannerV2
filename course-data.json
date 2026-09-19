@@ -7603,7 +7603,7 @@
       "Course_Title": "BB 3080 - Neurobiology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "28/54",
+      "Enrolled_Capacity": "27/54",
       "Instructional_Format": "Lecture",
       "Instructors": "Inna Nechipurenko",
       "Locations": "Goddard Hall 227 Classroom",
@@ -8422,7 +8422,7 @@
       "Course_Title": "BB 4050 - Cancer Biology",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "19/40",
+      "Enrolled_Capacity": "20/40",
       "Instructional_Format": "Lecture",
       "Instructors": "Amity Manning",
       "Locations": "Unity Hall 405",
@@ -20326,7 +20326,7 @@
       "Course_Title": "CH 4120 - Lipids And Biomembrane Functions",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "44/50",
+      "Enrolled_Capacity": "45/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Aya Narunsky",
       "Locations": "Goddard Hall 227 Classroom",
@@ -20354,7 +20354,7 @@
       "Course_Title": "CH 4130 - Nucleic Acids And Bioinformation",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "37/50",
+      "Enrolled_Capacity": "36/50",
       "Instructional_Format": "Lecture",
       "Instructors": "Robert Dempski",
       "Locations": "Atwater Kent 219",
@@ -78762,7 +78762,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-352036"
     },
     {
@@ -114270,7 +114270,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-350135"
     },
     {
@@ -114326,7 +114326,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "0/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349587"
     },
     {
