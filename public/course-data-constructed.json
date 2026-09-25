@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 25, 2026, 5:00 AM",
+  "generated": "Sep 25, 2026, 10:10 AM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -13234,7 +13234,7 @@
                 "number": "BL01",
                 "seats": 50,
                 "seatsAvailable": 0,
-                "actualWaitlist": 8,
+                "actualWaitlist": 7,
                 "maxWaitlist": 20,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5222",
                 "computedTerm": "B",
@@ -13251,7 +13251,7 @@
                     "room": "Kaven Hall 116",
                     "seats": 50,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 8,
+                    "actualWaitlist": 7,
                     "maxWaitlist": 20,
                     "specificSection": "BL01",
                     "days": [
@@ -53987,7 +53987,7 @@
                 "number": "DL01",
                 "seats": 66,
                 "seatsAvailable": 0,
-                "actualWaitlist": 11,
+                "actualWaitlist": 10,
                 "maxWaitlist": 15,
                 "note": "STUDENT_COURSE_SECTION_CLUSTER-3-5443",
                 "computedTerm": "D",
@@ -54004,7 +54004,7 @@
                     "room": "Atwater Kent 233",
                     "seats": 66,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 11,
+                    "actualWaitlist": 10,
                     "maxWaitlist": 15,
                     "specificSection": "DL01",
                     "days": [
