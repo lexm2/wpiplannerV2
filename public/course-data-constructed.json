@@ -1,5 +1,5 @@
 {
-  "generated": "Sep 26, 2026, 10:43 AM",
+  "generated": "Sep 26, 2026, 2:44 PM",
   "departments": [
     {
       "abbreviation": "AB",
@@ -54902,7 +54902,7 @@
                 "number": "D01",
                 "seats": 40,
                 "seatsAvailable": 0,
-                "actualWaitlist": 10,
+                "actualWaitlist": 9,
                 "maxWaitlist": 15,
                 "note": null,
                 "computedTerm": "D",
@@ -54919,7 +54919,7 @@
                     "room": "Washburn 229",
                     "seats": 40,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 10,
+                    "actualWaitlist": 9,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
                     "days": [
@@ -58494,7 +58494,7 @@
                 "crn": 354463,
                 "number": "D01",
                 "seats": 60,
-                "seatsAvailable": 11,
+                "seatsAvailable": 12,
                 "actualWaitlist": 0,
                 "maxWaitlist": 15,
                 "note": null,
@@ -58511,7 +58511,7 @@
                     "building": "",
                     "room": "Fuller Labs 320",
                     "seats": 60,
-                    "seatsAvailable": 11,
+                    "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 15,
                     "specificSection": "D01",
@@ -70664,7 +70664,7 @@
                 "number": "B01",
                 "seats": 35,
                 "seatsAvailable": 0,
-                "actualWaitlist": 1,
+                "actualWaitlist": 0,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "B",
@@ -70681,7 +70681,7 @@
                     "room": "Salisbury Labs 411",
                     "seats": 35,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 1,
+                    "actualWaitlist": 0,
                     "maxWaitlist": 10,
                     "specificSection": "B01",
                     "days": [
