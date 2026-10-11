@@ -810,10 +810,16 @@ export class ProfileStateManager {
           }));
       }
 
+      // The saved id can name a schedule that was not loaded back: tutorial
+      // schedules are filtered out above, so reloading mid-tutorial leaves
+      // one behind. Fall back to the first real schedule.
       const activeIdResult = this.storageManager.loadActiveScheduleId();
-      if (activeIdResult.valid && activeIdResult.data) {
-        this.state.activeScheduleId = activeIdResult.data;
-      }
+      const savedId = activeIdResult.valid ? activeIdResult.data : null;
+      this.state.activeScheduleId = this.state.schedules.some(
+        s => s.id === savedId,
+      )
+        ? savedId
+        : (this.state.schedules[0]?.id ?? null);
 
       // Selected courses come from the active schedule only (no fallback)
       let loadedCourses: SelectedCourse[] = [];
