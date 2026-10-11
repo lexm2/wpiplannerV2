@@ -38,10 +38,10 @@ if ! git merge Development --no-commit --no-ff; then
   CONFLICTS=$(git diff --name-only --diff-filter=U)
 
   if [ -n "$CONFLICTS" ]; then
-    OTHER_CONFLICTS=$(echo "$CONFLICTS" | grep -v "^public/" || true)
+    OTHER_CONFLICTS=$(echo "$CONFLICTS" | grep -vE "^(public|data)/" || true)
 
     if [ -n "$OTHER_CONFLICTS" ]; then
-      echo "[ERROR] Conflicts outside public/ directory:"
+      echo "[ERROR] Conflicts outside the public/ and data/ directories:"
       echo "$OTHER_CONFLICTS" | sed 's/^/  - /'
       echo ""
       echo "Manual resolution required."
@@ -51,10 +51,18 @@ if ! git merge Development --no-commit --no-ff; then
   fi
 fi
 
-# Use Development's public/ directory, but keep master's JSON data files
+# Use Development's public/ directory, but keep master's copy of each data
+# file Development still has, since CI keeps master's current. Only files
+# Development has: one it moved or deleted must not come back. data/ is left
+# as merged otherwise, so a file Development moved there keeps master's data.
 git checkout MERGE_HEAD -- public/
-git checkout HEAD -- $(git ls-tree -r --name-only HEAD -- 'public/*.json' | tr '\n' ' ')
-git add public/
+# (ls-tree takes no globs, so the JSON is picked out with grep.)
+for f in $(git ls-tree -r --name-only MERGE_HEAD -- public/ data/ | grep -E '^data/|\.json$'); do
+  if git cat-file -e "HEAD:$f" 2>/dev/null; then
+    git checkout HEAD -- "$f"
+  fi
+done
+git add public/ data/
 
 git commit -m "Merge Development into master"
 
