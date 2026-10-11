@@ -1,22 +1,21 @@
 <script lang="ts">
   import { uiState, setView } from '../services/ui/uiState.svelte';
+  import { getInlineSVG } from '../utils/iconPaths';
 
-  const view = $derived(uiState.currentView);
+  // One button that flips the Classes page between list and grid, showing the
+  // view it switches to - the settings menu's item does the same.
+  const other = $derived(uiState.currentView === 'list' ? 'grid' : 'list');
+  const label = $derived(other === 'grid' ? 'Grid view' : 'List view');
 </script>
 
 <button
-  id="view-list"
-  class="filter-btn filter-btn-wide"
-  class:btn-primary={view === 'list'}
-  class:active={view === 'list'}
-  class:btn-secondary={view !== 'list'}
-  onclick={() => setView('list')}>List</button
->
-<button
-  id="view-grid"
-  class="filter-btn filter-btn-wide"
-  class:btn-primary={view === 'grid'}
-  class:active={view === 'grid'}
-  class:btn-secondary={view !== 'grid'}
-  onclick={() => setView('grid')}>Grid</button
+  id="view-toggle-btn"
+  class="filter-btn"
+  title={label}
+  aria-label={label}
+  onclick={() => setView(other)}
+  >{@html getInlineSVG(
+    other === 'grid' ? 'LAYOUT_GRID' : 'LAYOUT_LIST',
+    'view-toggle-icon',
+  )}</button
 >

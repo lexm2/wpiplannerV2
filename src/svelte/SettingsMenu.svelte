@@ -1,6 +1,7 @@
 <script lang="ts">
   import { scale } from 'svelte/transition';
   import { appState } from '../core/state/appState.svelte';
+  import { uiState, setView } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
   import { dur } from './transitions';
   import { clickOutside } from './clickOutside';
@@ -51,6 +52,12 @@
   // in sync.
   const canUndo = $derived(appState.canUndo);
   const canRedo = $derived(appState.canRedo);
+
+  // The Classes page's List/Grid switch. Its buttons give way to the search
+  // field wherever that page's panels are drawers (main-content.css), so the
+  // menu carries it too, offering whichever view is not showing.
+  const onClasses = $derived(uiState.currentPage === 'planner');
+  const otherView = $derived(uiState.currentView === 'list' ? 'grid' : 'list');
 
   // Each item closes the menu as it runs; clicks anywhere else close it via
   // clickOutside.
@@ -108,6 +115,18 @@
         >Toggle Theme</span
       >
     </button>
+    {#if onClasses}
+      <button
+        class="settings-menu-item"
+        id="settings-view-btn"
+        onclick={choose(() => setView(otherView))}
+      >
+        {@html getInlineSVG(
+          otherView === 'grid' ? 'LAYOUT_GRID' : 'LAYOUT_LIST',
+          'menu-item-icon',
+        )}<span>{otherView === 'grid' ? 'Grid View' : 'List View'}</span>
+      </button>
+    {/if}
     <button
       class="settings-menu-item"
       id="settings-undo-btn"

@@ -420,6 +420,65 @@ for (const { name, ...options } of WIZARD_CASES) {
 }
 
 /**
+ * Where the Classes page's panels are drawers, List/Grid would crowd the
+ * search field out, so they move to the settings menu and the field takes the
+ * middle of the row.
+ */
+test.describe('Classes toolbar at 755x755', () => {
+  test.use({ viewport: { width: 755, height: 755 } });
+
+  test('List/Grid move to the settings menu', async ({ page }) => {
+    await boot(page);
+    await expect(page.locator('#view-toggle-btn')).toBeHidden();
+
+    await page.locator('#settings-menu-btn').click();
+    await expect(page.locator('#settings-view-btn')).toHaveText('Grid View');
+    await page.locator('#settings-view-btn').click();
+    await expect(page.locator('[class*="course-grid"]')).toBeVisible();
+
+    await page.locator('#settings-menu-btn').click();
+    await expect(page.locator('#settings-view-btn')).toHaveText('List View');
+  });
+
+  test('the search field is centered, the filters to its left', async ({
+    page,
+  }) => {
+    await boot(page);
+    const offset = await page.evaluate(() => {
+      const r = document
+        .querySelector('.search-field')!
+        .getBoundingClientRect();
+      return Math.abs(r.left + r.width / 2 - window.innerWidth / 2);
+    });
+    expect(offset).toBeLessThan(4);
+    const left = await page.evaluate(
+      () =>
+        document.querySelector('#filter-btn')!.getBoundingClientRect().right <
+        document.querySelector('.search-field')!.getBoundingClientRect().left,
+    );
+    expect(left).toBe(true);
+  });
+
+  test('the settings menu hangs from the gear', async ({ page }) => {
+    await boot(page);
+    await page.locator('#settings-menu-btn').click();
+    const { btn, menu } = await page.evaluate(() => ({
+      btn: document
+        .querySelector('#settings-menu-btn')!
+        .getBoundingClientRect()
+        .toJSON(),
+      menu: document
+        .querySelector('#settings-dropdown-menu')!
+        .getBoundingClientRect()
+        .toJSON(),
+    }));
+    expect(Math.abs(menu.right - btn.right)).toBeLessThan(1);
+    expect(menu.top - btn.bottom).toBeGreaterThanOrEqual(0);
+    expect(menu.top - btn.bottom).toBeLessThan(8);
+  });
+});
+
+/**
  * The right panel defaults to 700px, which on a 1280px laptop left the course
  * list ~270px wide: names cut to "El…" and no List/Grid toggle. The default
  * has to give way to the list there, while a dragged width still wins.
@@ -441,7 +500,7 @@ test.describe('Classes page at 1280x720', () => {
       500,
     );
     expect(panel).toBeGreaterThanOrEqual(360);
-    await expect(page.locator('#view-grid')).toBeVisible();
+    await expect(page.locator('#view-toggle-btn')).toBeVisible();
 
     // The course name is not cut down to a couple of letters.
     const name = page.locator('[data-course-item]').first().getByText(/\w{6}/);

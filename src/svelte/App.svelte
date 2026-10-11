@@ -235,9 +235,7 @@
             onFilter={openFilterModal}
           />
         </div>
-        <div id="view-toggle" class="view-toggle">
-          <ViewToggle />
-        </div>
+        <ViewToggle />
         <DrawerToggle drawer="details" label="Details" side="right" />
       </div>
     </div>
