@@ -215,11 +215,7 @@
           <!-- Only schedule tiles are movable; Workday's planned courses stay put. -->
           {@const movable =
             tile.kind === 'schedule' && tile.courseId
-              ? {
-                  role: 'button',
-                  tabindex: 0,
-                  title: 'Drag to another bucket, or use the Assign menu',
-                }
+              ? { title: 'Drag to another bucket, or use the Assign menu' }
               : {}}
           <div
             class="requirement-course"

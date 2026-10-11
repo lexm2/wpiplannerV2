@@ -24,13 +24,23 @@
       degreeBucketService.assign(courseId, bucketId);
     }
   }
-</script>
 
-<svelte:window
-  onkeydown={e => {
-    if (e.key === 'Escape') open = false;
-  }}
-/>
+  function closeAndRefocus(): void {
+    open = false;
+    trigger?.focus();
+  }
+
+  // Escape from anywhere closes it, but only an open menu listens - every tile
+  // carries one of these.
+  $effect(() => {
+    if (!open) return;
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') open = false;
+    };
+    window.addEventListener('keydown', onKeydown);
+    return () => window.removeEventListener('keydown', onKeydown);
+  });
+</script>
 
 <div class="assign-menu">
   <button
@@ -40,7 +50,13 @@
     aria-expanded={open}
     title={label}
     bind:this={trigger}
-    onclick={() => (open = !open)}>Assign&hellip;</button
+    onclick={() => (open = !open)}
+    onkeydown={e => {
+      if (e.key === 'Escape' && open) {
+        e.stopPropagation();
+        closeAndRefocus();
+      }
+    }}>Assign&hellip;</button
   >
 
   {#if open}
@@ -50,7 +66,11 @@
       tabindex="-1"
       transition:scaleFade={{ duration: 150 }}
       use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
-      onkeydown={e => e.stopPropagation()}
+      onkeydown={e => {
+        // Keys stay inside the menu, so Escape has to be handled here.
+        e.stopPropagation();
+        if (e.key === 'Escape') closeAndRefocus();
+      }}
     >
       {#each degreeState.buckets as bucket (bucket.id)}
         <button

@@ -11,11 +11,12 @@
   let { degreeImportService }: { degreeImportService: DegreeImportService } =
     $props();
 
+  // A re-import that is still parsing, or that failed, keeps the old record on
+  // screen - DegreeSummary reports its progress instead.
   const record = $derived(degreeState.record);
-  const ready = $derived(degreeState.status === 'ready' && record !== null);
 </script>
 
-{#if ready && record}
+{#if record}
   <!-- Two independently-scrolling panes so the rail stays reachable while the
        bucket list scrolls. The rail leads in the DOM because it leads visually;
        keeping the two orders together is what makes tab order match the page. -->

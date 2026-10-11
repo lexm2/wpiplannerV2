@@ -3,6 +3,7 @@
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
   import { openModal } from '../../services/ui/uiState.svelte';
   import { showConfirm } from '../modals/modalState.svelte';
+  import { degreeState } from './degreeState.svelte';
 
   let {
     record,
@@ -13,6 +14,13 @@
   } = $props();
 
   let fileInput = $state<HTMLInputElement | null>(null);
+
+  // A re-import runs over the record already on screen, so its progress and
+  // failure show here rather than swapping the page for the import view.
+  const parsing = $derived(degreeState.status === 'parsing');
+  const error = $derived(
+    degreeState.status === 'error' ? degreeState.errorMessage : null,
+  );
 
   const required = $derived(record.credits.required);
   // Overall progress = completed (earned, incl. transfer) toward the degree total.
@@ -69,6 +77,7 @@
       <button
         type="button"
         class="btn btn-secondary"
+        disabled={parsing}
         onclick={() => fileInput?.click()}>Re-import</button
       >
       <button type="button" class="btn btn-secondary" onclick={clearRecord}
@@ -84,6 +93,14 @@
       />
     </div>
   </div>
+
+  {#if parsing}
+    <p class="degree-dropzone-status" role="status">Reading file…</p>
+  {:else if error}
+    <p class="degree-dropzone-error" role="alert">
+      Re-import failed: {error}
+    </p>
+  {/if}
 
   {#if overallPct !== null}
     <div class="degree-progress">

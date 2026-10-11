@@ -134,7 +134,11 @@ class DegreeBucketService {
     }
   }
 
-  /** Monotonic so ids stay unique after deletions. */
+  /**
+   * One past the highest id still in use. Not monotonic: deleting the newest
+   * custom bucket frees its id for reuse. That is safe because deleteBucket
+   * clears every assignment and order entry pointing at it.
+   */
   private nextCustomIndex(): number {
     const used = degreeState.config.custom
       .map(b => Number(b.id.slice('custom:'.length)))

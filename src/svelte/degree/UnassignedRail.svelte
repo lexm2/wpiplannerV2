@@ -125,8 +125,6 @@
             class="requirement-course requirement-course-draggable is-schedule"
             data-course-id={courseId}
             use:draggableCourse={{ courseId, from: null }}
-            role="button"
-            tabindex="0"
             title="Drag onto a bucket to place it"
           >
             <div class="requirement-course-top">
@@ -142,9 +140,8 @@
             </div>
             <span class="requirement-course-title">{tile.title}</span>
             {#if courseId}
-              <!-- The tile is draggable, so a press that lands on these controls
-                   would start a drag instead of clicking them. Cancel dragstart
-                   that originates in here. -->
+              <!-- The keyboard and touch path for placing the course; the
+                   drag ignores presses that start on these controls. -->
               <div class="requirement-course-actions">
                 <AssignMenu {courseId} label="Assign {tile.code} to a bucket" />
               </div>

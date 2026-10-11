@@ -62,6 +62,10 @@ class DegreePlanService {
       }
     }
 
+    // A search left behind by openCourse would narrow the bucket's courses down
+    // to that one code, or to nothing.
+    this.filterService.removeFilter('searchText');
+
     const year =
       appState.activeSchedule?.year ??
       this.profileStateManager?.getDefaultAcademicYear();
@@ -91,8 +95,7 @@ class DegreePlanService {
     );
 
     if (!course) {
-      if (typeof alert === 'function')
-        showAppError(`${code} could not be found in the course catalog.`);
+      showAppError(`${code} could not be found in the course catalog.`);
       return;
     }
 

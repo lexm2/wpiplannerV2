@@ -13,7 +13,7 @@
   const error = $derived(degreeState.errorMessage);
 
   async function handleFile(file: File | undefined): Promise<void> {
-    if (!file) return;
+    if (!file || parsing) return;
     try {
       await degreeImportService.importFromFile(file);
       // Import succeeded: the bucketing is best-effort, so make the caveat
@@ -30,6 +30,19 @@
     input.value = '';
   }
 
+  function browse(): void {
+    if (!parsing) fileInput?.click();
+  }
+
+  function onKeydown(e: KeyboardEvent): void {
+    // Keys on the inner button already click it - and bubbling up here would
+    // open the picker a second time.
+    if (e.target !== e.currentTarget) return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault(); // Space would scroll the page
+    browse();
+  }
+
   function onDrop(e: DragEvent): void {
     e.preventDefault();
     dragOver = false;
@@ -43,8 +56,9 @@
     class:drag-over={dragOver}
     role="button"
     tabindex="0"
-    onclick={() => fileInput?.click()}
-    onkeydown={e => (e.key === 'Enter' || e.key === ' ') && fileInput?.click()}
+    aria-disabled={parsing}
+    onclick={browse}
+    onkeydown={onKeydown}
     ondragover={e => {
       e.preventDefault();
       dragOver = true;

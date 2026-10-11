@@ -111,8 +111,10 @@ export class TutorialService {
   ): Promise<void> {
     if (!this.activeTutorial || this.currentStepIndex <= 0) return;
     this.cleanup();
+    const tutorial = this.activeTutorial;
     const targetIndex = this.currentStepIndex - 1;
     await restoreFn(targetIndex);
+    if (this.activeTutorial !== tutorial) return;
     this.currentStepIndex = targetIndex;
     this.suppressAutoAdvance = true;
     await this.applyStep();
@@ -158,21 +160,27 @@ export class TutorialService {
   }
 
   private async applyStep(): Promise<void> {
-    if (!this.activeTutorial) return;
-    this.stepApplyCallback?.(this.currentStepIndex);
-    const step = this.activeTutorial.steps[this.currentStepIndex];
+    const tutorial = this.activeTutorial;
+    if (!tutorial) return;
+    const index = this.currentStepIndex;
+    // Only the step goBack applies skips its auto-advance; consume the flag here
+    // so a manual or click step can't leave it set for a later one.
+    const suppress = this.suppressAutoAdvance;
+    this.suppressAutoAdvance = false;
+    this.stepApplyCallback?.(index);
+    const step = tutorial.steps[index];
     if (step.appState && this.appStateTransitionCallback) {
       await this.appStateTransitionCallback(step.appState);
+      // Exited, skipped, or moved on while the app caught up - this step is
+      // stale, and drawing it would leak its overlay into whatever came next.
+      if (this.activeTutorial !== tutorial || this.currentStepIndex !== index)
+        return;
     }
     if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
     this.postTransitionCallback?.(step.appState);
     this.highlightElement(step.selector, step.scrollArrow ?? false);
-    tutorialOverlayState.set(
-      step,
-      this.currentStepIndex,
-      this.activeTutorial.steps.length,
-    );
-    if (step.waitFor !== 'manual') this.listenForAction(step);
+    tutorialOverlayState.set(step, index, tutorial.steps.length);
+    if (step.waitFor !== 'manual') this.listenForAction(step, suppress);
   }
 
   private highlightElement(selector: string, scrollArrow: boolean): void {
@@ -395,18 +403,13 @@ export class TutorialService {
     }
   }
 
-  private listenForAction(step: TutorialStep): void {
+  private listenForAction(step: TutorialStep, suppress: boolean): void {
     if (step.waitFor === 'appear') {
       const selector = step.waitForSelector ?? step.selector;
       if (document.querySelector(selector)) {
-        if (this.suppressAutoAdvance) {
-          this.suppressAutoAdvance = false;
-          return;
-        }
-        this.nextStep();
+        if (!suppress) this.nextStep();
         return;
       }
-      this.suppressAutoAdvance = false;
       this.actionObserver = new MutationObserver(() => {
         if (!document.querySelector(selector)) return;
         this.actionObserver!.disconnect();

@@ -212,6 +212,32 @@ export function matchesQuery(entry: CourseIndexEntry, query: string): boolean {
   );
 }
 
+/**
+ * Chronological sort key for a Workday period label ("2025 Fall A Term",
+ * "2026 Spring Semester"), or null for a shape we don't recognise. Spring of a
+ * calendar year comes before its Fall; a semester sorts ahead of that season's
+ * lettered terms. Mirrors parseAcademicPeriod, which stays out of the UI bundle.
+ */
+function termSortKey(label: string): [number, number, string] | null {
+  const m = /^(\d{4})\s+(Fall|Spring)\s+(?:([A-E])\s+Term|Semester)$/.exec(
+    label.trim(),
+  );
+  if (!m) return null;
+  return [parseInt(m[1], 10), m[2] === 'Spring' ? 0 : 1, m[3] ?? ''];
+}
+
+/** Oldest term first; labels that don't parse go last, alphabetically. */
+export function compareTerms(a: string, b: string): number {
+  const ka = termSortKey(a);
+  const kb = termSortKey(b);
+  if (!ka || !kb) {
+    if (ka) return -1;
+    if (kb) return 1;
+    return a.localeCompare(b);
+  }
+  return ka[0] - kb[0] || ka[1] - kb[1] || ka[2].localeCompare(kb[2]);
+}
+
 export interface CourseGroup {
   key: string;
   label: string;
@@ -247,7 +273,7 @@ export function groupCourses(
   if (mode === 'term') {
     const terms = [
       ...new Set(entries.map(e => e.term).filter((t): t is string => !!t)),
-    ].sort();
+    ].sort(compareTerms);
     const groups: CourseGroup[] = terms.map(term => ({
       key: term,
       label: term,

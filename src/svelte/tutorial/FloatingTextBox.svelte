@@ -54,9 +54,12 @@
     if (!step || !boxEl) return;
     const box = boxEl;
     const selector = step.selector;
+    let disposed = false;
+    let stopWatching = () => {};
     void tick().then(() => {
+      if (disposed) return;
       decorateInlineHighlights(box);
-      repositionIfObstructed(box, selector);
+      stopWatching = repositionIfObstructed(box, selector);
       clampToViewport(box);
     });
 
@@ -75,6 +78,8 @@
     });
     window.addEventListener('resize', recheck);
     return () => {
+      disposed = true;
+      stopWatching();
       if (frame) cancelAnimationFrame(frame);
       document.removeEventListener('scroll', recheck, { capture: true });
       window.removeEventListener('resize', recheck);
