@@ -6,6 +6,8 @@
 - Copy Into button in the Schedules list. Pick a schedule, then click another to add its courses to that one
 - Auto-Schedule shows F and S term badges for semester courses
 - Conflict filter option to count semester courses (F, S) as conflicting with their quarters (A and B, C and D). On by default
+- On narrow screens, the department list, course details and the schedule's course panel open as drawers from buttons in the header and toolbar
+- The course list shows F and S term badges for semester courses, so their sections can be opened
 
 ### Changed
 - Auto-Schedule is much faster with many courses
@@ -13,6 +15,9 @@
 - The Times picker fits on laptop and phone screens, and Avoid times are striped so they look different from Only times
 - The course list stays wider on laptop screens
 - Over-enrolled sections show as Full instead of a negative seat count
+- "Only these times" now requires every meeting of a section to fit, not just one
+- The Times picker covers every hour classes meet (6 AM to 9 PM), and its grid lines draw in every browser
+- The schedule grid grows to fit classes before 8 AM or after 8 PM instead of cutting them off
 
 ### Fixed
 - Auto-Schedule no longer overlaps semester (F/S) courses with quarter courses, or ignores courses you kept locked
@@ -24,6 +29,10 @@
 - The settings button can be tapped on phones
 - Selected days now show as selected in Add Event
 - A failed import no longer leaves an empty schedule behind
+- Classes before 7 AM are now checked for time conflicts
+- Menus close when you click anywhere else, including inside a window
+- Selected courses show current seat counts right after the page loads
+- Reloading during the tutorial no longer leaves you on a missing schedule
 
 ## [2026-09-01]
 
