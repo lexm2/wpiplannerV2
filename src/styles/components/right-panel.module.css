@@ -387,14 +387,6 @@
   margin-top: 0.25rem;
 }
 
-/* Moved here from responsive.css: `.right-panel` is hashed by this module, so a
-   rule in a global stylesheet can no longer reach it. `.sidebar` stays there. */
-@media (max-width: 1200px) {
-  .right-panel {
-    display: none;
-  }
-}
-
 /* Moved here from header.css for the same reason - `.course-remove-btn` is
    hashed, while `.course-item-controls` (schedule-page.css) and the icon
    classes (icons.css) stay global. The sibling

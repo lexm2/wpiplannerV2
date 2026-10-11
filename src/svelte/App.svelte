@@ -43,6 +43,7 @@
   import ScheduleGrids from './schedule/ScheduleGrids.svelte';
   import DegreePage from './degree/DegreePage.svelte';
   import SidePanel from './SidePanel.svelte';
+  import DrawerToggle from './DrawerToggle.svelte';
   import ErrorBanner from './ErrorBanner.svelte';
   import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
   import { logger } from '../utils/logger';
@@ -137,6 +138,14 @@
         </div>
       </div>
     </div>
+    <!-- The page's left panel, where it is a drawer. -->
+    <div class="header-drawer-toggle">
+      {#if currentPage === 'planner'}
+        <DrawerToggle drawer="departments" label="Departments" side="left" />
+      {:else if currentPage === 'schedule'}
+        <DrawerToggle drawer="schedule" label="Courses" side="left" />
+      {/if}
+    </div>
     <nav class="header-navigation" aria-label="Main navigation">
       <div class="nav-tabs-pill">
         <PageTabs onSwitch={switchToPageView} />
@@ -188,6 +197,7 @@
   <SidePanel
     class="sidebar"
     label="Department navigation"
+    drawer={{ id: 'departments', title: 'Departments' }}
     config={PANEL_WIDTHS.sidebar}
     edge="right"
     resizeLabel="Resize department sidebar"
@@ -212,6 +222,7 @@
         <div id="view-toggle" class="view-toggle">
           <ViewToggle />
         </div>
+        <DrawerToggle drawer="details" label="Details" side="right" />
       </div>
     </div>
     <div class="course-container" id="course-container">
@@ -227,6 +238,7 @@
     class={styles['right-panel']}
     data-right-panel
     label="Course details and selection"
+    drawer={{ id: 'details', title: 'Details' }}
     config={PANEL_WIDTHS.rightPanel}
     edge="left"
     resizeLabel="Resize course details panel"
@@ -250,11 +262,15 @@
   style:display={currentPage === 'schedule' ? 'flex' : 'none'}
 >
   <div class="schedule-page-layout">
-    <!-- `wizard-open` lets a narrow layout, which hides this sidebar, show it
-         as a drawer while the wizard (mounted inside it) is in use. -->
+    <!-- The wizard mounts in this sidebar, so dismissing the drawer while it
+         is in use cancels it rather than leaving it open out of sight. -->
     <SidePanel
-      class="schedule-sidebar {wizardState.isOpen ? 'wizard-open' : ''}"
+      class="schedule-sidebar"
       label="Schedule courses"
+      drawer={{ id: 'schedule', title: 'Courses' }}
+      onDrawerClose={() => {
+        if (wizardState.isOpen) componentWizardService.closeComponentWizard();
+      }}
       config={PANEL_WIDTHS.scheduleSidebar}
       edge="right"
       resizeLabel="Resize schedule sidebar"

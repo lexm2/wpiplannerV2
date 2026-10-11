@@ -5,6 +5,13 @@ import type { ServiceContainer } from '../bootstrap/ServiceContainer';
 import { uiState } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
 import { updateClientTimestamp } from './timestampState.svelte';
+import { wizardState } from './wizardState.svelte';
+import {
+  drawerMode,
+  isDrawerOpen,
+  openDrawer,
+  closeDrawer,
+} from './drawerState.svelte';
 
 /**
  * Installs the app's global side-effect bridges. Call once during App.svelte
@@ -60,7 +67,28 @@ export function installAppEffects(services: ServiceContainer): void {
         services.filterService.removeFilter('searchText');
         services.filterService.removeFilter('department');
       }
+      // A drawer belongs to the page it was opened on, which is now hidden.
+      if (page !== prevPage) closeDrawer();
       prevPage = page;
+    });
+  });
+
+  // Wizard -> schedule drawer. The wizard mounts inside the schedule sidebar,
+  // so where that sidebar is a drawer, opening the wizard slides it in (also on
+  // narrowing the window mid-wizard), and the wizard closing slides it back out
+  // - but only if the wizard was what opened it. Dismissing the drawer cancels
+  // the wizard (App.svelte's onDrawerClose), so the two never part.
+  let drawerForWizard = false;
+  $effect(() => {
+    const wizardOpen = wizardState.isOpen;
+    const asDrawer = drawerMode.schedule.current;
+    untrack(() => {
+      if (wizardOpen && asDrawer && !isDrawerOpen('schedule')) {
+        drawerForWizard = openDrawer('schedule');
+      } else if (!wizardOpen && drawerForWizard) {
+        drawerForWizard = false;
+        closeDrawer('schedule');
+      }
     });
   });
 

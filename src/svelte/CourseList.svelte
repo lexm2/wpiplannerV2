@@ -14,6 +14,7 @@
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
   import { logger } from '../utils/logger';
+  import { openDrawer } from './drawerState.svelte';
 
   let {
     filterService,
@@ -92,6 +93,8 @@
 
   function selectCourse(course: Course): void {
     courseListState.selectedCourse = course;
+    // Where the details panel is hidden, bring it in to show the course.
+    openDrawer('details');
   }
 
   function toggleSelect(course: Course): void {

@@ -127,6 +127,15 @@
   #view-grid {
     display: none;
   }
+
+  /* Phone widths also carry the Details drawer button, which the field's
+     minimum would push off the row; the field takes what is left instead. */
+  .content-controls,
+  .content-controls .search-input-wrapper,
+  .search-field,
+  .search-field .field-shell {
+    min-width: 0;
+  }
 }
 
 html.is-mobile .filter-buttons {

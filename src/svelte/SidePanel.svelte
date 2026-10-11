@@ -2,6 +2,16 @@
   import type { Snippet } from 'svelte';
   import ResizeHandle from './ResizeHandle.svelte';
   import type { PanelWidthConfig } from './panelWidths';
+  import { trapFocus } from './modals/trapFocus';
+  import { fade } from 'svelte/transition';
+  import { dur } from './transitions';
+  import {
+    drawerMode,
+    isDrawerOpen,
+    isTopmostDrawer,
+    closeDrawer,
+    type DrawerId,
+  } from './drawerState.svelte';
 
   /**
    * A resizable side panel: the shell every one of them needs, plus its handle.
@@ -18,6 +28,12 @@
    * shell and the handle are shared. The panel's WIDTH also stays with the
    * caller, because it comes from a grid template on some pages and from the
    * panel's own `width` on others - both read the same `config.cssVar`.
+   *
+   * With `drawer`, the panel becomes an off-canvas drawer wherever its page
+   * hides it (see drawerState): parked off screen until opened, then slid in
+   * over a backdrop with focus trapped inside, and closed by the backdrop,
+   * Escape or its close button. It slides from the side it docks on - the
+   * opposite of `edge`.
    */
   interface Props {
     /** Drives the handle: which custom property to write, bounds, persistence. */
@@ -28,6 +44,10 @@
     resizeLabel: string;
     /** Accessible label for the panel region itself. */
     label?: string;
+    /** Makes the panel a drawer on narrow screens; `title` heads it there. */
+    drawer?: { id: DrawerId; title: string };
+    /** Called when the user dismisses the drawer. */
+    onDrawerClose?: () => void;
     /** The page's own class, for its layout and width rules. */
     class?: string;
     children: Snippet;
@@ -42,17 +62,85 @@
     edge,
     resizeLabel,
     label,
+    drawer,
+    onDrawerClose,
     class: className = '',
     children,
     ...rest
   }: Props = $props();
+
+  const asDrawer = $derived(!!drawer && drawerMode[drawer.id].current);
+  const open = $derived(!!drawer && asDrawer && isDrawerOpen(drawer.id));
+
+  // Widening past the breakpoint puts the panel back inline, so the drawer
+  // must leave the modal stack too - or it would keep silencing page keys.
+  $effect(() => {
+    if (drawer && !asDrawer && isDrawerOpen(drawer.id)) closeDrawer(drawer.id);
+  });
+
+  function close(): void {
+    if (!drawer) return;
+    closeDrawer(drawer.id);
+    onDrawerClose?.();
+  }
+
+  // Same rule as Modal.svelte: only the topmost entry takes Escape, and not
+  // once something else has claimed the key.
+  function onKeydown(event: KeyboardEvent): void {
+    if (
+      drawer &&
+      event.key === 'Escape' &&
+      !event.defaultPrevented &&
+      isTopmostDrawer(drawer.id)
+    ) {
+      event.preventDefault();
+      close();
+    }
+  }
+
+  // trapFocus moves focus in, keeps Tab inside, locks page scroll and hands
+  // focus back to the opener - attached only while the drawer is open.
+  function focusTrap(node: HTMLElement): () => void {
+    const trap = trapFocus(node);
+    return () => trap.destroy();
+  }
 </script>
+
+<svelte:window onkeydown={onKeydown} />
+
+{#if open}
+  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (click-to-close; Escape is handled on svelte:window) -->
+  <div
+    class="side-panel-backdrop"
+    transition:fade={{ duration: dur(200) }}
+    onclick={close}
+  ></div>
+{/if}
 
 <aside
   class="side-panel side-panel-{edge} {className}"
+  class:side-panel-drawer={asDrawer}
+  class:side-panel-open={open}
   aria-label={label}
+  aria-modal={open ? 'true' : undefined}
+  role={open ? 'dialog' : undefined}
+  style:--side-panel-drawer-width="var({config.cssVar}, {config.defaultWidth}px)"
+  {@attach open ? focusTrap : undefined}
   {...rest}
 >
+  {#if asDrawer && drawer}
+    <div class="side-panel-drawer-bar">
+      <h2 class="side-panel-drawer-title">{drawer.title}</h2>
+      <button
+        type="button"
+        class="side-panel-drawer-close"
+        aria-label="Close {drawer.title}"
+        onclick={close}>&times;</button
+      >
+    </div>
+  {/if}
   {@render children()}
-  <ResizeHandle {config} {edge} label={resizeLabel} />
+  {#if !asDrawer}
+    <ResizeHandle {config} {edge} label={resizeLabel} />
+  {/if}
 </aside>

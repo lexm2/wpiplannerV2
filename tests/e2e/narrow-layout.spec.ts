@@ -177,6 +177,28 @@ for (const { name, ...options } of WIZARD_CASES) {
       const grid = await hitTargetAtCentre(page, '.schedule-main');
       expect(grid.ok, `grid covered by ${grid.hit}`).toBe(true);
     });
+
+    // The wizard's drawer is the schedule sidebar's drawer, so dismissing it
+    // must take the wizard with it rather than leave it open out of sight.
+    test('Escape closes the wizard and its drawer together', async ({
+      page,
+    }) => {
+      await boot(page);
+      const { id } = await scheduleOneCourse(page);
+      await openChangeSections(page, id);
+      await expect(page.locator('.sidebar-panel')).toBeVisible();
+
+      await page.keyboard.press('Escape');
+
+      await expect(page.locator('.schedule-sidebar')).toBeHidden();
+      expect(
+        await page.evaluate(
+          () => document.querySelector('.sidebar-panel') === null,
+        ),
+      ).toBe(true);
+      const grid = await hitTargetAtCentre(page, '.schedule-main');
+      expect(grid.ok, `grid covered by ${grid.hit}`).toBe(true);
+    });
   });
 }
 

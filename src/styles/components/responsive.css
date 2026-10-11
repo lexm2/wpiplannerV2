@@ -16,15 +16,13 @@
 /* The 1440px `.course-sections` rule lived here; that class is hashed by
    course-list.module.css now, so the rule moved there. */
 
+/* The side panels are not hidden here. At these widths SidePanel turns them
+   into drawers (drawerState.svelte.ts) and side-panel.css parks a closed drawer
+   off screen, so the grids only give up the panels' columns. The breakpoints
+   are mirrored in drawerState's queries. */
 @media (max-width: 1200px) {
   .app-body {
     grid-template-columns: 1fr;
-  }
-
-  /* `.right-panel` used to be listed here too; it is hashed by
-     right-panel.module.css now, so its copy of this rule lives there. */
-  .sidebar {
-    display: none;
   }
 }
 
@@ -44,34 +42,9 @@ html.is-mobile .content-header {
   gap: 1rem;
 }
 
+/* Schedule sidebar - same arrangement as the 1200px block above. */
 @media (max-width: 1024px) {
-  .schedule-sidebar {
-    display: none;
-  }
-
   .schedule-page-layout {
     grid-template-columns: 1fr;
-  }
-
-  /* The component wizard mounts inside the schedule sidebar, so hiding the
-     sidebar hid the wizard too and "Change Sections" did nothing. While it is
-     open the sidebar comes back as a drawer over the grid, leaving the rest of
-     the grid visible for the wizard's previews. The wizard's own Close/Cancel
-     dismiss it, which drops `.wizard-open` and the drawer with it. */
-  .schedule-sidebar.wizard-open {
-    display: flex;
-    position: fixed;
-    top: var(--spacing-header-height);
-    bottom: 0;
-    left: 0;
-    z-index: 40;
-    width: min(
-      var(
-        --panel-schedule-sidebar-width,
-        var(--spacing-schedule-sidebar-width)
-      ),
-      100vw
-    );
-    box-shadow: var(--effect-shadow-large);
   }
 }
