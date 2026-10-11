@@ -43,3 +43,16 @@
 .theme-high-contrast .degree-filter-chip:hover {
   border-width: 3px;
 }
+
+/* The segmented control's track is --color-border and its active pill is
+   --color-primary, both black here, so the inactive label was dim grey on black
+   and the active pill vanished into the track. A white track with black labels
+   leaves the active pill as the one solid black block. */
+.theme-high-contrast .filter-segmented-control {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+}
+
+.theme-high-contrast .segmented-btn:not(.active) {
+  color: var(--color-text);
+}

@@ -327,3 +327,44 @@ test('space then shift and arrow keys keeps painting', async ({ page }) => {
   await page.keyboard.press('Shift+ArrowRight');
   await expect(summary(page)).toHaveText('Any time');
 });
+
+/** WCAG contrast ratio between two computed `rgb(...)` colours. */
+function contrast(a: string, b: string): number {
+  const lum = (c: string) => {
+    const [r, g, bl] = (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(v => {
+      const s = Number(v) / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  };
+  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+test('the active mode is clear in high contrast', async ({ page }) => {
+  await useTheme(page, 'high-contrast');
+  await openPicker(page);
+  // Let the theme class and the toggle's own transition land.
+  await page.waitForTimeout(SETTLE_MS);
+
+  /** Text colour, and the first opaque background at or above the button. */
+  const look = (mode: 'Only' | 'Avoid') =>
+    modeButton(page, mode).evaluate(el => {
+      let bg = 'rgb(255, 255, 255)';
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const c = getComputedStyle(n).backgroundColor;
+        if (c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) {
+          bg = c;
+          break;
+        }
+      }
+      return { color: getComputedStyle(el).color, bg };
+    });
+
+  const active = await look('Only');
+  const inactive = await look('Avoid');
+  expect(contrast(inactive.color, inactive.bg)).toBeGreaterThanOrEqual(4.5);
+  expect(contrast(active.color, active.bg)).toBeGreaterThanOrEqual(4.5);
+  // The two states must read as different fills, not just different text.
+  expect(contrast(active.bg, inactive.bg)).toBeGreaterThanOrEqual(3);
+});
