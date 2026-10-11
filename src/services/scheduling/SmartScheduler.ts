@@ -9,6 +9,7 @@ import {
 import { masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
 import { logger } from '../../utils/logger';
+import { getDisplayTerms } from '../../utils/typeGuards';
 
 export interface SchedulerInput {
   candidatesPerCourse: MaskedCandidate[][];
@@ -90,11 +91,11 @@ export class SmartScheduler {
         [];
       let valid = true;
 
-      for (const [term, indices] of termGroups) {
+      for (const indices of SmartScheduler.overlappingGroups(termGroups)) {
         const groupCandidates = indices.map(i =>
-          candidatesPerCourse[i].filter(c => c.term === term),
+          candidatesPerCourse[i].filter(c => c.term === assignment[i]),
         );
-        const combos = SmartScheduler.bestForTermGroup(groupCandidates, 0n);
+        const combos = SmartScheduler.bestForTermGroup(groupCandidates);
         if (!combos) {
           valid = false;
           break;
@@ -144,9 +145,34 @@ export class SmartScheduler {
     return results;
   }
 
+  /**
+   * Splits term groups into sets that must be checked against each other: an
+   * F section meets in A and B, an S section in C and D, so F joins any A/B
+   * group and S any C/D group. Groups sharing no quarter stay apart, keeping
+   * each search's cartesian product small.
+   */
+  private static overlappingGroups(
+    termGroups: Map<string, number[]>,
+  ): number[][] {
+    const merged: Array<{ quarters: Set<string>; indices: number[] }> = [];
+    for (const [term, indices] of termGroups) {
+      const group = {
+        quarters: new Set(getDisplayTerms(term)),
+        indices: [...indices],
+      };
+      for (let i = merged.length - 1; i >= 0; i--) {
+        if (![...merged[i].quarters].some(q => group.quarters.has(q))) continue;
+        merged[i].quarters.forEach(q => group.quarters.add(q));
+        group.indices.push(...merged[i].indices);
+        merged.splice(i, 1);
+      }
+      merged.push(group);
+    }
+    return merged.map(g => g.indices.sort((a, b) => a - b));
+  }
+
   private static bestForTermGroup(
     candidatesPerCourse: MaskedCandidate[][],
-    lockedMask: bigint,
   ): SectionsByKind[] | null {
     const n = candidatesPerCourse.length;
     if (n === 0) return [];
@@ -158,25 +184,33 @@ export class SmartScheduler {
     let bestCombo: SectionsByKind[] | null = null;
 
     while (true) {
-      let combinedMask = lockedMask;
+      // Occupied time per quarter: a semester section fills both of its own.
+      const occupied = new Map<string, bigint>();
       let conflict = false;
-      const selections: SectionsByKind[] = [];
+      const selections: MaskedCandidate[] = [];
 
       for (let i = 0; i < n; i++) {
         const candidate = candidatesPerCourse[i][indices[i]];
-        if (masksConflict(candidate.mask, combinedMask)) {
+        const quarters = getDisplayTerms(candidate.term);
+        if (
+          quarters.some(q =>
+            masksConflict(candidate.mask, occupied.get(q) ?? 0n),
+          )
+        ) {
           conflict = true;
           break;
         }
-        combinedMask |= candidate.mask;
-        selections.push(candidate.combination);
+        for (const q of quarters) {
+          occupied.set(q, (occupied.get(q) ?? 0n) | candidate.mask);
+        }
+        selections.push(candidate);
       }
 
       if (!conflict) {
         const gap = SmartScheduler.gapForSelections(selections);
         if (gap < bestGap) {
           bestGap = gap;
-          bestCombo = selections.slice();
+          bestCombo = selections.map(s => s.combination);
         }
       }
 
@@ -193,26 +227,30 @@ export class SmartScheduler {
     return bestCombo;
   }
 
-  private static gapForSelections(selections: SectionsByKind[]): number {
-    const byDay = new Map<string, { start: number; end: number }[]>();
+  /** Idle minutes between classes, summed per quarter and day. */
+  private static gapForSelections(selections: MaskedCandidate[]): number {
+    const byQuarterDay = new Map<string, { start: number; end: number }[]>();
 
-    for (const combo of selections) {
-      for (const section of sectionsOf(combo)) {
+    for (const { combination, term } of selections) {
+      for (const section of sectionsOf(combination)) {
         for (const period of section.periods) {
           if (period.isAsync) continue;
-          for (const day of period.days) {
-            if (!byDay.has(day)) byDay.set(day, []);
-            byDay.get(day)!.push({
-              start: period.startTime.hours * 60 + period.startTime.minutes,
-              end: period.endTime.hours * 60 + period.endTime.minutes,
-            });
+          for (const quarter of getDisplayTerms(term)) {
+            for (const day of period.days) {
+              const key = `${quarter}-${day}`;
+              if (!byQuarterDay.has(key)) byQuarterDay.set(key, []);
+              byQuarterDay.get(key)!.push({
+                start: period.startTime.hours * 60 + period.startTime.minutes,
+                end: period.endTime.hours * 60 + period.endTime.minutes,
+              });
+            }
           }
         }
       }
     }
 
     let total = 0;
-    for (const slots of byDay.values()) {
+    for (const slots of byQuarterDay.values()) {
       if (slots.length < 2) continue;
       slots.sort((a, b) => a.start - b.start);
       for (let i = 1; i < slots.length; i++) {
