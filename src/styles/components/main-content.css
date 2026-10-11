@@ -164,6 +164,11 @@ html.is-mobile .filter-buttons {
     min-height: 44px;
   }
 
+  /* Same height as the buttons beside it (it was 38px against their 44). */
+  .content-controls .search-field .field-shell {
+    min-height: 44px;
+  }
+
   #search-clear-btn.search-clear-empty {
     display: none;
   }
