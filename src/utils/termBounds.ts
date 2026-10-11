@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import type { DateRange } from '../types/common';
 import { logger } from './logger';
 

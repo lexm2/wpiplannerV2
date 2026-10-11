@@ -18,7 +18,7 @@ import type {
 } from '../../types/rawData';
 import { appState } from '../../core/state/appState.svelte';
 import { logger } from '../../utils/logger';
-import { z } from 'zod';
+import * as z from 'zod';
 
 // Departments stay loosely typed on purpose -- see fetchFreshData.
 const CourseDataEnvelopeSchema = z.object({

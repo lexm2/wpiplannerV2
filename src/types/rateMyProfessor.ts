@@ -3,7 +3,7 @@
  * drift: scripts/rateMyProfessor/fetchRateMyProfessor.ts writes the file and
  * services/external/RateMyProfessorService.ts reads it.
  */
-import { z } from 'zod';
+import * as z from 'zod';
 
 export interface Professor {
   id: string;

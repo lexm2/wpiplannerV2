@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { logger } from '../utils/logger';
 /**
  * Reactive home for the header's "client loaded" / "server updated" labels,
