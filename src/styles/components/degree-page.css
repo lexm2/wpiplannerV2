@@ -1261,9 +1261,19 @@
   }
 }
 
+/* One column: nothing to line a card up with, so the fixed height that keeps
+   grid rows even only leaves empty space under short buckets. */
 @media (max-width: 700px) {
   .degree-card-list {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .degree-requirements {
+    --req-card-min-h: auto;
+  }
+
+  .requirement-card-name {
+    min-height: 0;
   }
 }
 
@@ -1498,6 +1508,75 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+/* ---- Phone: search bar and filter panel (RequirementList.svelte) ---- */
+/* Sticks once scrolled to, on the page's own background so cards pass under
+   it cleanly. */
+.degree-phone-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 0.5rem;
+  margin: -0.5rem 0 0.25rem;
+  padding: 0.5rem 0;
+  background: var(--color-background-alt);
+}
+
+.degree-search-bar {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.degree-phone-toolbar .filter-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.degree-filter-panel {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius-large);
+}
+
+.degree-filter-panel .degree-filter-row {
+  margin-bottom: 0;
+}
+
+.degree-filter-panel .degree-umbrella-toggle {
+  margin-left: 0;
+}
+
+.degree-filter-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.degree-filter-layout-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 
 /* ---- Phone: a course row is one button (RequirementCard.svelte) ---- */

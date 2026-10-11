@@ -26,10 +26,21 @@ const DEFAULTS: DegreeViewPrefs = {
   courseSort: 'source',
 };
 
+/**
+ * A phone opens on Grid until told otherwise: Full draws every empty slot as
+ * its own row, which on one narrow column runs a single bucket past a screen.
+ */
+function defaults(): DegreeViewPrefs {
+  const phone =
+    typeof matchMedia === 'function' &&
+    matchMedia('(max-width: 560px)').matches;
+  return { ...DEFAULTS, bucketView: phone ? 'grid' : DEFAULTS.bucketView };
+}
+
 function load(): DegreeViewPrefs {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.DEGREE_VIEW);
-    if (!raw) return { ...DEFAULTS };
+    if (!raw) return defaults();
     const parsed = JSON.parse(raw) as Partial<DegreeViewPrefs>;
     return {
       bucketView: parsed.bucketView === 'grid' ? 'grid' : 'full',
@@ -39,7 +50,7 @@ function load(): DegreeViewPrefs {
     };
   } catch (error) {
     logger.warn('Could not read degree view preferences', error);
-    return { ...DEFAULTS };
+    return defaults();
   }
 }
 

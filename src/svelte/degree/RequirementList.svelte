@@ -15,7 +15,8 @@
   import { openModal } from '../../services/ui/uiState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
-  import { dur } from '../transitions';
+  import { dur, slideFade } from '../transitions';
+  import { phoneLayout } from '../phoneLayout.svelte';
 
   /**
    * Cards glide when the grid reflows - a filter change, or a card expanding.
@@ -75,6 +76,11 @@
       : withStatus.filter(x => selected.includes(x.status)).map(x => x.b),
   );
 
+  // Phone only: the chips, the degree-wide switch and the layout toggle fold
+  // into a panel behind one Filter button beside the search bar.
+  let filtersOpen = $state(false);
+  const filtering = $derived(!allActive || showUmbrella);
+
   const counts = $derived({
     all: visible.length,
     not_satisfied: withStatus.filter(x => x.status === 'not_satisfied').length,
@@ -121,7 +127,8 @@
   });
 </script>
 
-<div class="degree-requirements">
+<!-- Shared by the wide layout's rows and the phone's filter panel. -->
+{#snippet statusChips()}
   <div
     class="degree-filter-row"
     role="group"
@@ -158,62 +165,106 @@
       >
     {/if}
   </div>
+{/snippet}
 
-  <div class="degree-view-row">
-    <!-- The left edge is the card's status signal now, so the legend names it
-         alongside the progress-bar segments. -->
-    <div class="degree-progress-legend" aria-hidden="true">
-      <span class="degree-legend-item"
-        ><span class="degree-legend-edge req-not_satisfied"></span> Not satisfied</span
-      >
-      <span class="degree-legend-item"
-        ><span class="degree-legend-edge req-in_progress"></span> In progress</span
-      >
-      <span class="degree-legend-item"
-        ><span class="degree-legend-edge req-satisfied"></span> Satisfied</span
-      >
-      <span class="degree-legend-sep" aria-hidden="true"></span>
-      <span class="degree-legend-item"
-        ><span class="degree-legend-swatch seg-earned"></span> Completed</span
-      >
-      <span class="degree-legend-item"
-        ><span class="degree-legend-swatch seg-planned"></span> Planned</span
-      >
-      <span class="degree-legend-item"
-        ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
-      >
-    </div>
+{#snippet layoutToggle()}
+  <div role="group" aria-label="Bucket layout" class="degree-view-group">
+    <button
+      type="button"
+      id="degree-view-grid"
+      class="degree-filter-chip"
+      class:active={degreeViewState.bucketView === 'grid'}
+      aria-pressed={degreeViewState.bucketView === 'grid'}
+      onclick={() => degreeViewState.setBucketView('grid')}>Grid</button
+    >
+    <button
+      type="button"
+      id="degree-view-full"
+      class="degree-filter-chip"
+      class:active={degreeViewState.bucketView === 'full'}
+      aria-pressed={degreeViewState.bucketView === 'full'}
+      onclick={() => degreeViewState.setBucketView('full')}>Full</button
+    >
+  </div>
+{/snippet}
 
-    <div class="degree-view-toggle">
-      <div role="group" aria-label="Bucket layout" class="degree-view-group">
-        <button
-          type="button"
-          id="degree-view-grid"
-          class="degree-filter-chip"
-          class:active={degreeViewState.bucketView === 'grid'}
-          aria-pressed={degreeViewState.bucketView === 'grid'}
-          onclick={() => degreeViewState.setBucketView('grid')}>Grid</button
-        >
-        <button
-          type="button"
-          id="degree-view-full"
-          class="degree-filter-chip"
-          class:active={degreeViewState.bucketView === 'full'}
-          aria-pressed={degreeViewState.bucketView === 'full'}
-          onclick={() => degreeViewState.setBucketView('full')}>Full</button
-        >
-      </div>
+<div class="degree-requirements">
+  {#if phoneLayout.current}
+    <!-- Sticks to the top of the page once scrolled to, like the Classes
+         page's toolbar: search the courses, or narrow the buckets. The legend
+         stays wide-only - each card's pill already names its status. -->
+    <div class="degree-phone-toolbar">
       <button
         type="button"
         id="degree-course-search"
-        class="degree-filter-chip degree-search-chip"
+        class="degree-search-bar"
         onclick={() => openModal('course-finder')}
       >
         {@html getInlineSVG('SEARCH', 'degree-search-icon')}
-        Search courses
+        <span>Search courses or buckets</span>
       </button>
+      <button
+        type="button"
+        id="degree-filter-btn"
+        class="filter-btn"
+        class:active={filtering}
+        aria-label="Filter requirements"
+        aria-expanded={filtersOpen}
+        onclick={() => (filtersOpen = !filtersOpen)}
+        >{@html getInlineSVG('FILTER_FILLED', 'filter-icon')}</button
+      >
     </div>
-  </div>
+    {#if filtersOpen}
+      <div class="degree-filter-panel" transition:slideFade={{ duration: 180 }}>
+        {@render statusChips()}
+        <div class="degree-filter-layout">
+          <span class="degree-filter-layout-label">Layout</span>
+          {@render layoutToggle()}
+        </div>
+      </div>
+    {/if}
+  {:else}
+    {@render statusChips()}
+
+    <div class="degree-view-row">
+      <!-- The left edge is the card's status signal now, so the legend names it
+           alongside the progress-bar segments. -->
+      <div class="degree-progress-legend" aria-hidden="true">
+        <span class="degree-legend-item"
+          ><span class="degree-legend-edge req-not_satisfied"></span> Not satisfied</span
+        >
+        <span class="degree-legend-item"
+          ><span class="degree-legend-edge req-in_progress"></span> In progress</span
+        >
+        <span class="degree-legend-item"
+          ><span class="degree-legend-edge req-satisfied"></span> Satisfied</span
+        >
+        <span class="degree-legend-sep" aria-hidden="true"></span>
+        <span class="degree-legend-item"
+          ><span class="degree-legend-swatch seg-earned"></span> Completed</span
+        >
+        <span class="degree-legend-item"
+          ><span class="degree-legend-swatch seg-planned"></span> Planned</span
+        >
+        <span class="degree-legend-item"
+          ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
+        >
+      </div>
+
+      <div class="degree-view-toggle">
+        {@render layoutToggle()}
+        <button
+          type="button"
+          id="degree-course-search"
+          class="degree-filter-chip degree-search-chip"
+          onclick={() => openModal('course-finder')}
+        >
+          {@html getInlineSVG('SEARCH', 'degree-search-icon')}
+          Search courses
+        </button>
+      </div>
+    </div>
+  {/if}
 
   {#if filtered.length === 0}
     <p class="empty-state">No requirements match this filter.</p>
