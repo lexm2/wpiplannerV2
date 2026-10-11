@@ -41,6 +41,23 @@ html {
   }
 }
 
+/* Keyboard focus in the theme's colour rather than the browser's blue. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Touch screens show no focus outline at all: a tap, or a drawer's focus trap
+   moving focus to its close button, would otherwise ring a tab or button that
+   nobody reached by keyboard. !important outranks the components' own
+   :focus-visible rings. */
+@media (hover: none) and (pointer: coarse) {
+  :focus,
+  :focus-visible {
+    outline: none !important;
+  }
+}
+
 /* A tap or a script (a drawer's focus trap) focusing a button should not ring
    it; keyboard focus still does, via :focus-visible. */
 button:focus:not(:focus-visible),
