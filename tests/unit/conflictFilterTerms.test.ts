@@ -63,12 +63,12 @@ describe('ConflictFilter term expansion', () => {
     expect(masks.get('B')).not.toBe(undefined);
   });
 
-  it('skips slots that produce an empty mask (outside the 07:00-22:00 grid)', () => {
+  it('skips slots that produce an empty mask (weekends are not modelled)', () => {
     const outside: WeeklyTimeSlot = {
-      id: '1-A-M',
-      day: DayOfWeek.MONDAY,
-      startTime: { hours: 5, minutes: 0 },
-      endTime: { hours: 6, minutes: 0 },
+      id: '1-A-S',
+      day: DayOfWeek.SATURDAY,
+      startTime: { hours: 9, minutes: 0 },
+      endTime: { hours: 10, minutes: 0 },
       term: AcademicTerm.A,
     };
     expect(masksFor(outside).size).toBe(0);

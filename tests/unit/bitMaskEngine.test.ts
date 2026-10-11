@@ -1,6 +1,6 @@
 /**
  * Characterization tests for the bitmask conflict engine. Assert current
- * behaviour, quirks included (see the 07:00 boundary cases below).
+ * behaviour.
  */
 import { describe, it, expect } from 'vitest';
 import {
@@ -86,15 +86,33 @@ describe('sectionToMask', () => {
     ).toBe(0n);
   });
 
-  it('ignores times outside the 07:00-22:00 window the grid models', () => {
-    // Before the window: slot index goes negative and the period is skipped.
+  it('covers the whole day, so early and late classes still conflict', () => {
+    // The catalog runs from 6:00 AM to 8:50 PM; a mask that drops either end
+    // would let two clashing sections through as compatible.
+    const early = (crn: number, startM: number) =>
+      sectionToMask(
+        section(crn, [period([DayOfWeek.MONDAY], 6, startM, 6, startM + 50)]),
+      );
+    expect(early(9, 0)).not.toBe(0n);
+    expect(masksConflict(early(9, 0), early(10, 5))).toBe(true);
+
+    const late = sectionToMask(
+      section(11, [period([DayOfWeek.MONDAY], 20, 0, 23, 55)]),
+    );
+    const lateOverlap = sectionToMask(
+      section(12, [period([DayOfWeek.MONDAY], 21, 0, 22, 0)]),
+    );
+    expect(masksConflict(late, lateOverlap)).toBe(true);
     expect(
-      sectionToMask(section(9, [period([DayOfWeek.MONDAY], 6, 0, 6, 30)])),
-    ).toBe(0n);
-    // Past the window end: end slot exceeds SLOTS_PER_DAY and is skipped.
-    expect(
-      sectionToMask(section(9, [period([DayOfWeek.MONDAY], 21, 0, 23, 0)])),
-    ).toBe(0n);
+      masksConflict(
+        weeklySlotToMask({
+          day: DayOfWeek.MONDAY,
+          startTime: { hours: 0, minutes: 0 },
+          endTime: { hours: 24, minutes: 0 },
+        } as never),
+        early(9, 0),
+      ),
+    ).toBe(true);
   });
 
   it('sets distinct bits per weekday, so same time on different days cannot collide', () => {

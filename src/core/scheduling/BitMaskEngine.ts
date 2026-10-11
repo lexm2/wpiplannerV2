@@ -2,17 +2,17 @@
  * Bitmask-based conflict detection. Each section = BigInt of 5-min time slots.
  * Conflict check: (mask1 & mask2) !== 0n - O(1)
  *
- * 900 bits per term: 180 slots/day * 5 weekdays
- * Bits 0-179: Mon, 180-359: Tue, 360-539: Wed, 540-719: Thu, 720-899: Fri
+ * 1440 bits per term: 288 slots/day * 5 weekdays, Mon first. Each day spans
+ * midnight to midnight, so any class the catalog holds (6 AM starts included)
+ * lands in the mask; a narrower window silently dropped out-of-range periods,
+ * which then never conflicted with anything.
  */
 
 import type { Section } from '../../types/types';
 import type { WeeklyTimeSlot } from '../../types/schedule';
 
-const START_HOUR = 7; // 7:00 AM
-const END_HOUR = 22; // 10:00 PM
 const SLOT_MINUTES = 5;
-const SLOTS_PER_DAY = ((END_HOUR - START_HOUR) * 60) / SLOT_MINUTES; // 180
+const SLOTS_PER_DAY = (24 * 60) / SLOT_MINUTES; // 288
 const DAYS_PER_WEEK = 5; // M, T, W, R, F
 
 const DAY_INDEX: Record<string, number> = {
@@ -32,9 +32,7 @@ export interface SectionMask {
 }
 
 function timeToSlot(hours: number, minutes: number): number {
-  const totalMinutes = hours * 60 + minutes;
-  const startMinutes = START_HOUR * 60;
-  return Math.floor((totalMinutes - startMinutes) / SLOT_MINUTES);
+  return Math.floor((hours * 60 + minutes) / SLOT_MINUTES);
 }
 
 export function sectionToMask(section: Section): bigint {
