@@ -95,11 +95,15 @@ export function weeklySlotToMask(slot: WeeklyTimeSlot): bigint {
 export function masksConflict(mask1: bigint, mask2: bigint): boolean {
   return (mask1 & mask2) !== 0n;
 }
+
 export class BitMaskEngine {
-  private sectionMasks = new Map<number, SectionMask>();
+  // Keyed by the Section object, not its CRN: CRNs can repeat across
+  // academic years, and a catalog refresh builds new Section objects, which
+  // must not pick up the old masks. Stale entries are collected with them.
+  private sectionMasks = new WeakMap<Section, SectionMask>();
 
   addSection(section: Section): SectionMask {
-    const existing = this.sectionMasks.get(section.crn);
+    const existing = this.sectionMasks.get(section);
     if (existing) return existing;
 
     const mask = sectionToMask(section);
@@ -109,12 +113,12 @@ export class BitMaskEngine {
       term: section.computedTerm,
     };
 
-    this.sectionMasks.set(section.crn, sectionMask);
+    this.sectionMasks.set(section, sectionMask);
     return sectionMask;
   }
 
   getMask(section: Section): SectionMask {
-    const existing = this.sectionMasks.get(section.crn);
+    const existing = this.sectionMasks.get(section);
     if (existing) return existing;
     return this.addSection(section);
   }

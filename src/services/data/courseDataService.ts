@@ -26,6 +26,25 @@ const CourseDataEnvelopeSchema = z.object({
   generated: z.string().optional(),
 });
 
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&',
+  nbsp: ' ',
+  quot: '"',
+  apos: "'",
+  lt: '<',
+  gt: '>',
+};
+
+/** Decodes one HTML entity; unknown named ones become a space. */
+function decodeEntity(body: string): string {
+  if (body.startsWith('#')) {
+    const hex = body[1] === 'x' || body[1] === 'X';
+    const code = parseInt(body.slice(hex ? 2 : 1), hex ? 16 : 10);
+    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : ' ';
+  }
+  return NAMED_ENTITIES[body.toLowerCase()] ?? ' ';
+}
+
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
  * Publishes the catalog by reassigning `appState.loadedDepartments`; consumers react to that.
@@ -135,6 +154,7 @@ export class CourseDataService {
             );
           } else {
             // Production fallback: derive a synthetic unique ID
+            const originalId = courseId;
             const fallbackId = `${department.abbreviation}-${courseData.number}`;
             logger.error(
               `DUPLICATE ID: "${courseId}" for ${department.abbreviation}${courseData.number}`,
@@ -152,7 +172,7 @@ export class CourseDataService {
 
             logger.error('[Data Quality Issue]', {
               type: 'duplicate_course_id',
-              originalId: courseId,
+              originalId,
               fallbackId: courseId,
               timestamp: Date.now(),
             });
@@ -343,9 +363,13 @@ export class CourseDataService {
   }
 
   private stripHtml(html: string): string {
+    // Only real entities: a bare "&" in prose ("reading & listening") must
+    // not swallow the text up to the next semicolon.
     return html
       .replace(/<[^>]*>/g, '')
-      .replace(/&[^;]+;/g, ' ')
+      .replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, (_entity, body: string) =>
+        decodeEntity(body),
+      )
       .trim();
   }
 
@@ -448,6 +472,11 @@ export class CourseDataService {
     const response = await fetch('./tutorial-courses.json', {
       cache: 'no-cache',
     });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch tutorial courses: ${response.status} ${response.statusText}`,
+      );
+    }
     const json = (await response.json()) as { courses: RawCourse[] };
     const parsedCourses = json.courses.map(raw => {
       const lectures = this.parseLectureGroups(raw.lectures ?? []);

@@ -18,6 +18,9 @@ import type { ConflictCriteria } from '../../src/types/filters';
 import { FilterService } from '../../src/services/filtering/FilterService';
 import { sectionsOf } from '../../src/utils/courseUtils';
 import { getDisplayTerms } from '../../src/utils/typeGuards';
+import { AcademicYearFilter } from '../../src/core/filtering/filters/AcademicYearFilter';
+import { AvailabilityFilter } from '../../src/core/filtering/filters/AvailabilityFilter';
+import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
 
 const { MONDAY: M, TUESDAY: T, WEDNESDAY: W } = DayOfWeek;
 
@@ -446,5 +449,38 @@ describe('SmartScheduler group search', () => {
     const started = performance.now();
     expect(internals.bestForTermGroup(group)).toBeNull();
     expect(performance.now() - started).toBeLessThan(100);
+  });
+});
+
+describe('SmartScheduler.buildCandidateData with course-list filters', () => {
+  function filterServiceWithListFilters(): FilterService {
+    const fs = filterServiceWith();
+    fs.registerFilter(new SearchTextFilter());
+    fs.registerFilter(new AcademicYearFilter());
+    fs.registerFilter(new AvailabilityFilter());
+    return fs;
+  }
+
+  it('ignores a search and year that exclude the chosen courses', () => {
+    // As left behind by the Degree page's "open course".
+    const fs = filterServiceWithListFilters();
+    fs.addFilter('searchText', { query: 'zzz-no-match' });
+    fs.addFilter('academicYear', { year: 2023 });
+    const ma1022 = course('MA1022', [
+      section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01'),
+    ]);
+
+    expect(candidateNumbers(fs, [picked(ma1022, null)])).toEqual([['AL01']]);
+  });
+
+  it('still applies section filters such as availability', () => {
+    const fs = filterServiceWithListFilters();
+    fs.addFilter('availability', { availableOnly: true });
+    const full = section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01');
+    full.seatsAvailable = 0;
+    const open = section(AcademicTerm.A, [M], '13:00', '13:50', 'AL02');
+    const ma1022 = course('MA1022', [full, open]);
+
+    expect(candidateNumbers(fs, [picked(ma1022, null)])).toEqual([['AL02']]);
   });
 });

@@ -17,7 +17,6 @@ const DEFAULT_COLORS = [
 
 export class CourseColorService {
   private courseColorMap: Map<string, string> = new Map();
-  private usedColors: Set<string> = new Set();
   private courseSelectionService: CourseSelectionService;
 
   constructor(courseSelectionService: CourseSelectionService) {
@@ -43,9 +42,12 @@ export class CourseColorService {
 
       if (sc.customColor) {
         this.courseColorMap.set(courseId, sc.customColor);
-        this.usedColors.add(sc.customColor);
       } else if (!this.courseColorMap.has(courseId)) {
-        let assignedColor = DEFAULT_COLORS.find(c => !this.usedColors.has(c));
+        // Derived from the map rather than tracked separately: colors can be
+        // shared (custom picks, the hash fallback), so a released color is
+        // only free once no other course still uses it.
+        const usedColors = new Set(this.courseColorMap.values());
+        let assignedColor = DEFAULT_COLORS.find(c => !usedColors.has(c));
         if (!assignedColor) {
           let hash = 0;
           for (let i = 0; i < courseId.length; i++) {
@@ -56,7 +58,6 @@ export class CourseColorService {
         }
 
         this.courseColorMap.set(courseId, assignedColor);
-        this.usedColors.add(assignedColor);
       }
     }
   }
@@ -66,16 +67,11 @@ export class CourseColorService {
   }
 
   releaseCourseColor(courseId: string): void {
-    const color = this.courseColorMap.get(courseId);
-    if (color) {
-      this.usedColors.delete(color);
-      this.courseColorMap.delete(courseId);
-    }
+    this.courseColorMap.delete(courseId);
   }
 
   setCourseColor(courseId: string, color: string): void {
     this.courseColorMap.set(courseId, color);
-    this.usedColors.add(color);
     // Persists customColor onto the SelectedCourse, which reassigns
     // appState.selectedCourses - the declarative grid derives off that and
     // re-colors on its own (no separate signal needed).
