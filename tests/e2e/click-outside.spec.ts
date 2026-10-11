@@ -261,7 +261,9 @@ test.describe('assign menu', () => {
     await row.locator('.assign-menu-trigger').click();
     // Keyboard: the drop-up's top items can sit under the sticky header.
     await page
-      .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+      .locator(
+        '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+      )
       .press('Enter');
     await expect(popup(page)).toHaveCount(0);
     await expect(row.locator('.course-finder-bucket-name')).toHaveText(

@@ -5,6 +5,7 @@ import {
   buildBuckets,
   computePlacements,
   computeUnassigned,
+  UMBRELLA_CATEGORIES,
   type DegreeBucket,
   type DegreeTile,
 } from '../../services/degree/degreeBuckets';
@@ -119,4 +120,18 @@ export function toggleExpanded(bucketId: string): void {
 export function openMoveSheet(courseId: string): void {
   degreeState.moving = courseId;
   openModal('move-course');
+}
+
+/**
+ * The buckets a course can be placed in from the Move sheet or the Assign
+ * menu: the ones the page is showing, so never a degree-wide bucket it hides -
+ * unless the course already sits in it.
+ */
+export function placeableBuckets(current: string | null): DegreeBucket[] {
+  return degreeState.buckets.filter(
+    b =>
+      degreeState.showUmbrella ||
+      !UMBRELLA_CATEGORIES.has(b.category) ||
+      b.id === current,
+  );
 }

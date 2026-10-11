@@ -172,7 +172,9 @@ test('assigns a course to a bucket and keeps it across a reload', async ({
 
   await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
   await page
-    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
     .click();
 
   await expect(placedCodes(page)).toHaveText(['CS 1004']);
@@ -190,7 +192,9 @@ test('sends an assigned course back to the rail', async ({ page }) => {
 
   await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
   await page
-    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
     .click();
   await expect(placedCodes(page)).toHaveCount(1);
 
@@ -275,7 +279,9 @@ test('opens a rail slot for an incoming course and settles without a bounce', as
 
   await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
   await page
-    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
     .click();
   await expect(railCount(page)).toHaveText('1');
 
@@ -398,7 +404,9 @@ test('keeps a placed course visible in an already-satisfied bucket', async ({
 
   await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
   await page
-    .locator('.assign-menu-item', { hasText: /^Systems Requirement$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Systems Requirement"))',
+    )
     .click();
 
   const card = page.locator('[data-bucket-id*="Systems Requirement"]');
@@ -429,7 +437,9 @@ test('finds a course and names the bucket it is in', async ({ page }) => {
 
   await row.locator('.assign-menu-trigger').click();
   await page
-    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
     .click();
   await expect(row.locator('.course-finder-bucket-name')).toHaveText(
     'Core Requirement',
@@ -465,7 +475,9 @@ test('jumps from a finder bucket row to the bucket card', async ({ page }) => {
 
   await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
   await page
-    .locator('.assign-menu-item', { hasText: /^Core Requirement$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
     .click();
 
   await page.locator('#degree-course-search').click();
@@ -587,18 +599,29 @@ test('reveals a hidden degree-wide bucket the user placed a course in', async ({
   });
   await expect(totalCredits).toHaveCount(0);
 
+  // The Assign menu only offers degree-wide buckets while the page shows
+  // them, so show them to place the course, then hide them again.
+  const umbrella = page.locator('.degree-umbrella-toggle');
+  await umbrella.click();
   await page.locator('#degree-course-search').click();
   await settleModal(page);
   const row = page.locator('.course-finder-row', { hasText: 'CS 1004' });
   await row.locator('.assign-menu-trigger').click();
-  // Keyboard, not a click: .assign-menu-popup is a hard drop-up with no
-  // viewport clamp, so its first two items open underneath whatever sticky
-  // header is above the trigger and swallow the pointer. Placing the course is
-  // this test's setup, not its subject - but the menu needs fixing.
   await page
-    .locator('.assign-menu-item', { hasText: /^Total Credits Required$/ })
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Total Credits Required"))',
+    )
     .press('Enter');
+  await page
+    .locator('.course-finder-modal')
+    .getByRole('button', { name: 'Close' })
+    .click();
+  await expect(page.locator('.course-finder-modal')).toHaveCount(0);
+  await umbrella.click();
+  await expect(totalCredits).toHaveCount(0);
 
+  await page.locator('#degree-course-search').click();
+  await settleModal(page);
   await row
     .locator('button.course-finder-bucket', { hasText: 'Total Credits' })
     .click();

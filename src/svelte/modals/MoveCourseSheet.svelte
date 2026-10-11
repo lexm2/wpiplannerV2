@@ -1,9 +1,8 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
-  import { degreeState } from '../degree/degreeState.svelte';
+  import { degreeState, placeableBuckets } from '../degree/degreeState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
-  import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
   import { remainingLabel, statusLabel } from '../degree/progressLabels';
 
   /**
@@ -24,16 +23,7 @@
     courseId ? (degreeState.config.assignments[courseId] ?? null) : null,
   );
 
-  // The page's own choice of buckets, so the sheet never offers a degree-wide
-  // one the page is hiding - unless the course already sits in it.
-  const buckets = $derived(
-    degreeState.buckets.filter(
-      b =>
-        degreeState.showUmbrella ||
-        !UMBRELLA_CATEGORIES.has(b.category) ||
-        b.id === current,
-    ),
-  );
+  const buckets = $derived(placeableBuckets(current));
 
   function place(bucketId: string): void {
     onRequestClose();

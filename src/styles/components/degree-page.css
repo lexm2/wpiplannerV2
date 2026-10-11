@@ -1075,6 +1075,72 @@
   font-style: italic;
 }
 
+/* The rail clips anything wider than itself, so there the popup spans the
+   course it belongs to instead of hanging off its small button. */
+.degree-rail .requirement-course {
+  position: relative;
+}
+
+.degree-rail .assign-menu {
+  position: static;
+}
+
+.degree-rail .assign-menu-popup {
+  left: 0;
+  right: 0;
+  min-width: 0;
+}
+
+/* Too narrow there for a name and its label side by side. */
+.degree-rail .assign-menu-bucket {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* No room above the trigger (a course at the top of the rail, say): drop
+   down instead of running off the top of the screen. */
+.assign-menu-popup.opens-down {
+  bottom: auto;
+  top: calc(100% + 0.25rem);
+  transform-origin: top left;
+}
+
+/* A bucket choice: its name, what it still needs, and its bar, edged in its
+   status colour like the card it stands for. */
+.assign-menu-bucket {
+  --assign-edge: var(--color-text-secondary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
+  border-left: 3px solid var(--assign-edge);
+}
+
+.assign-menu-bucket.req-not_satisfied {
+  --assign-edge: var(--color-danger);
+}
+.assign-menu-bucket.req-in_progress {
+  --assign-edge: var(--color-warning);
+}
+.assign-menu-bucket.req-satisfied {
+  --assign-edge: var(--color-success);
+}
+
+.assign-menu-bucket-name {
+  line-height: 1.3;
+}
+
+.assign-menu-bucket-meta {
+  font-size: 0.7rem;
+  font-style: normal;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.assign-menu-bucket .degree-progress-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+}
+
 .assign-menu-empty {
   margin: 0;
   padding: 0.5rem 0.75rem;
