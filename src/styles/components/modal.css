@@ -746,6 +746,13 @@ html.is-mobile .section-enrollment-waitlist {
   width: 90%;
 }
 
+/* A column, so the picker can be squeezed to the dialog's 90vh cap: the grid
+   gives up height before anything has to scroll (see time-grid.module.css). */
+.time-grid-modal .modal-body {
+  flex-direction: column;
+  align-items: stretch;
+}
+
 /* Add/Edit Event: the form's day pills, term toggles and start/end time row all
    crowd at the 500px default, so this one runs about twice as wide. */
 .modal-dialog.local-event-dialog {

@@ -10,7 +10,12 @@
   gap: 0;
   container-type: inline-size;
   font-size: 0.7rem;
-  height: var(--time-grid-height, 480px);
+  /* 480px where there is room, shrinking with the viewport so the whole picker
+     fits without the modal body scrolling: a scrolled body slides the top rows
+     under the header mid-drag, and on touch the grid blocks the scroll. The
+     drag math measures the body's rect, so any height keeps it exact. */
+  flex: 0 1 480px;
+  min-height: 200px;
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
   overflow: hidden;
@@ -134,11 +139,6 @@
   color: var(--color-text-secondary);
 }
 
-html.is-mobile .grid {
-  height: var(--time-grid-height, 60vh);
-  min-height: 320px;
-}
-
 /* Compact panel section: a summary line plus the button that opens the grid. */
 .panelRow {
   display: flex;
@@ -153,11 +153,13 @@ html.is-mobile .grid {
   color: var(--color-text-secondary);
 }
 
-/* .modal-body is a row flex container, so the picker supplies its own column
-   context; without it the day columns collapse to their content width. */
+/* Its own column context, so the day columns fill the width; min-height: 0
+   lets the modal body shrink it and, through it, the grid. */
 .wrap {
   display: flex;
   flex-direction: column;
   width: 100%;
   min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
 }

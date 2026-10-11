@@ -168,3 +168,77 @@ test('the async toggle hides sections with no meeting time', async ({
     ),
   ).toBe(false);
 });
+
+/**
+ * Everything the picker shows must be on screen at once: a scrolling body
+ * slides the top rows under the header mid-drag, and on touch the grid itself
+ * blocks the scroll gesture.
+ */
+async function expectPickerFits(page: Page): Promise<void> {
+  // Something painted, so the summary's Clear button is showing too.
+  await drag(page, { day: 0, row: 0 }, { day: 0, row: 0 });
+  await expect(
+    page.locator(GRID).getByRole('button', { name: 'Clear' }),
+  ).toBeVisible();
+
+  const body = page.locator(`${GRID} .modal-body`);
+  const { scrollHeight, clientHeight } = await body.evaluate(el => ({
+    scrollHeight: el.scrollHeight,
+    clientHeight: el.clientHeight,
+  }));
+  expect(scrollHeight).toBeLessThanOrEqual(clientHeight + 1);
+
+  for (const control of [
+    page.locator(BODY),
+    page.locator(GRID).getByRole('button', { name: 'Clear' }),
+    page.locator(GRID).getByRole('button', { name: 'Done' }),
+    page.locator(`${GRID} p`),
+    summary(page),
+  ]) {
+    // Not quite 1: a fractional box can lose a sliver to rounding.
+    await expect(control).toBeInViewport({ ratio: 0.99 });
+  }
+
+  // The pixel->row math still lands on the last row: 7:30 PM is row 23.
+  await page.locator(GRID).getByRole('button', { name: 'Clear' }).click();
+  await drag(page, { day: 4, row: 23 }, { day: 4, row: 23 });
+  await expect(summary(page)).toHaveText('Only Fri 7:30-8:00 PM');
+}
+
+for (const size of [
+  { width: 1280, height: 720 },
+  { width: 1366, height: 768 },
+]) {
+  test(`the whole picker fits at ${size.width}x${size.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(size);
+    await openPicker(page);
+    await expectPickerFits(page);
+  });
+}
+
+test.describe('on a phone', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  });
+
+  test('the whole picker fits at 390x844', async ({ page }) => {
+    // The phone notice opens over everything on load.
+    await page.addInitScript(() => {
+      const dismiss = () =>
+        [...document.querySelectorAll('button')]
+          .find(b => b.textContent?.trim() === 'Got it')
+          ?.click();
+      new MutationObserver(dismiss).observe(document, {
+        childList: true,
+        subtree: true,
+      });
+    });
+    await openPicker(page);
+    await expect(page.locator('html.is-mobile')).toHaveCount(1);
+    await expectPickerFits(page);
+  });
+});
