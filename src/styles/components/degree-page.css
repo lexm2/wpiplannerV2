@@ -1277,17 +1277,38 @@
   }
 }
 
+/* Phones. One 0.75rem gutter, the header's and the Classes page's, and
+   everything inside a card a further 0.75rem in: the page, the To place list,
+   the summary and every card share those two edges. Tap targets are 40px or
+   more. The rail, the legend and the drag affordances are gone - see
+   DegreePage, RequirementList and RequirementCard for what replaces them. */
 @media (max-width: 560px) {
-  .degree-credit-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  /* .requirement-courses is deliberately absent: it is one column by design. */
-  .degree-rail-list {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-  /* The same 0.75rem side gutter as the header and the Classes page. */
   .degree-content {
-    padding: 1rem 0.75rem 3rem;
+    padding: 0.75rem 0.75rem 3rem;
+  }
+
+  .degree-summary,
+  .degree-card-list .requirement-card {
+    padding: 0.75rem;
+  }
+
+  .degree-card-list {
+    gap: 0.75rem;
+  }
+
+  .degree-filter-chip,
+  .requirement-card-toggle,
+  .degree-card-list .requirement-card-browse,
+  .degree-card-list .requirement-course-empty {
+    min-height: 40px;
+  }
+
+  .requirement-card-actions {
+    min-height: 40px;
+  }
+
+  .degree-dropzone {
+    padding: 1.5rem 1rem;
   }
 }
 

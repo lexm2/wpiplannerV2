@@ -1931,3 +1931,78 @@ button.course-finder-bucket:focus-visible .course-finder-bucket-go {
 html.is-mobile .course-finder-modal .modal-dialog {
   max-width: 100%;
 }
+
+/* Phones: the title and close button on the first line, search and grouping
+   on the second; and a course's Assign beside its buckets rather than on a
+   row of its own under a rule. */
+@media (max-width: 560px) {
+  .course-finder-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem 0.75rem 1rem;
+  }
+
+  .course-finder-header .modal-close {
+    grid-column: 2;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+  }
+
+  .course-finder-search {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  .course-finder-sort {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 44px;
+    margin-right: 0.5rem;
+  }
+
+  .course-finder-sort-label {
+    display: none;
+  }
+
+  .course-finder-body {
+    padding: 0 1rem 1rem;
+  }
+
+  .course-finder-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+  }
+
+  .course-finder-open {
+    grid-column: 1 / -1;
+  }
+
+  .course-finder-row-buckets {
+    grid-column: 1;
+    margin-bottom: 0;
+  }
+
+  .course-finder-row-foot {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: column;
+    align-items: flex-end;
+    align-self: start;
+    gap: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  /* Both are finger targets, and the same height keeps them on one line. */
+  .course-finder-bucket,
+  .course-finder-row-foot .assign-menu-trigger {
+    min-height: 40px;
+  }
+}

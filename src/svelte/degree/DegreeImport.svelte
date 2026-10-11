@@ -2,6 +2,7 @@
   import type { DegreeImportService } from '../../services/degree/degreeImportService';
   import { degreeState } from './degreeState.svelte';
   import { openModal } from '../../services/ui/uiState.svelte';
+  import { phoneLayout } from '../phoneLayout.svelte';
 
   let { degreeImportService }: { degreeImportService: DegreeImportService } =
     $props();
@@ -11,6 +12,12 @@
 
   const parsing = $derived(degreeState.status === 'parsing');
   const error = $derived(degreeState.errorMessage);
+
+  // A phone has no file to drop and nothing to click, so the hint asks for a tap.
+  const touch = $derived(
+    phoneLayout.current ||
+      document.documentElement.classList.contains('is-mobile'),
+  );
 
   async function handleFile(file: File | undefined): Promise<void> {
     if (!file || parsing) return;
@@ -68,7 +75,11 @@
   >
     <h2 class="degree-dropzone-title">Import your Academic Progress</h2>
     <p class="degree-dropzone-hint">
-      Drop your <strong>.xlsx</strong> here, or click to browse.
+      {#if touch}
+        Tap to choose your <strong>.xlsx</strong>.
+      {:else}
+        Drop your <strong>.xlsx</strong> here, or click to browse.
+      {/if}
     </p>
     {#if parsing}
       <p class="degree-dropzone-status">Reading file…</p>
