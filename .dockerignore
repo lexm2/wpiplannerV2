@@ -8,6 +8,7 @@ test-results
 docs
 WorkdayToPlannerConverter-master
 *.md
+!CHANGELOG.md
 !package.json
 .vscode
 .idea
