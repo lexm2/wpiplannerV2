@@ -342,10 +342,12 @@ html.is-mobile .header-navigation {
   max-width: none;
 }
 
-/* Phone widths: the page tabs become a bottom tab bar, within thumb reach and
-   in the same place on every page. The top bar keeps only the page's drawer
-   button (left) and the gear (right), the only way to Schedules/theme/undo
-   here. #app gives up the bar's height so no page runs underneath it. */
+/* Phone widths: the whole header becomes one bar along the bottom, within
+   thumb reach - the page's drawer button, the page tabs, then the gear (the
+   only way to Schedules/theme/undo here) - and the top of the screen goes to
+   the page. The drawer slot holds its column even where a page has no drawer
+   (Degree), so the tabs sit in the same place on every page. #app gives up
+   the bar's height so no page runs underneath it. */
 @media (max-width: 560px) {
   /* Not --spacing-*: ThemeManager sets those inline on <html>, which would
      outrank anything set here. */
@@ -357,48 +359,62 @@ html.is-mobile .header-navigation {
     padding-bottom: var(--tab-bar-height);
   }
 
+  /* Below the drawers (z-index 79/80) and modals, which cover it when open. */
   .app-header {
-    height: 52px;
-    padding: 0 0.75rem;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    height: var(--tab-bar-height);
+    padding: 0 0.25rem env(safe-area-inset-bottom, 0px);
+    border-bottom: none;
+    border-top: 1px solid var(--color-border);
+    box-shadow: none;
   }
 
   .header-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    align-items: center;
   }
 
-  .header-drawer-toggle {
-    justify-self: start;
-  }
-
+  .header-drawer-toggle,
   .app-header .header-controls {
-    justify-self: end;
+    justify-self: center;
     margin-left: 0;
   }
 
-  /* 44px touch targets. */
+  .header-navigation {
+    position: static;
+    transform: none;
+    margin: 0;
+    max-width: none;
+    align-self: stretch;
+  }
+
+  /* 44px touch targets, and one style for both: borderless icons in the text
+     colour, so the drawer button and the gear read as a pair. */
   .app-header .settings-menu-btn,
   .header-drawer-toggle .drawer-toggle {
     width: 44px;
     height: 44px;
     padding: 0;
     justify-content: center;
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-text);
   }
 
-  /* Below the drawers (z-index 79/80) and modals, which cover it when open. */
-  .header-navigation {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    transform: none;
-    margin: 0;
-    max-width: none;
-    height: var(--tab-bar-height);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    z-index: 70;
-    background: var(--color-background-alt);
-    border-top: 1px solid var(--color-border);
+  .app-header .settings-menu-btn svg {
+    stroke: var(--color-text) !important;
+    fill: none;
+  }
+
+  .app-header .settings-menu-btn svg,
+  .header-drawer-toggle .drawer-toggle-icon {
+    width: 22px;
+    height: 22px;
   }
 
   .nav-tabs-pill {
@@ -409,29 +425,43 @@ html.is-mobile .header-navigation {
     background: none;
     border: none;
     border-radius: 0;
+    box-shadow: none;
   }
 
   /* An active tab is marked by colour and a bar along its top edge, the usual
-     tab-bar treatment, rather than the desktop pill fill. */
+     tab-bar treatment, rather than the desktop pill fill. The weight stays the
+     same, so selecting a tab does not reflow its label. */
   .nav-tab {
+    position: relative;
     flex: 1;
     border-radius: 0;
     padding: 0;
     font-size: 0.85rem;
     color: var(--color-text-secondary);
-    box-shadow: inset 0 3px 0 transparent;
   }
 
   .nav-tab.active {
     background: transparent;
     color: var(--color-primary);
-    font-weight: var(--font-weight-heavy);
-    box-shadow: inset 0 3px 0 var(--color-primary);
+    box-shadow: none;
   }
 
-  /* Keep the menu under the gear at the shorter header and tighter padding. */
+  /* Its own box, not an inset shadow: the tabs are fractional pixels wide, and
+     a shadow there bled a hairline down both sides of the active tab. */
+  .nav-tab.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-primary);
+  }
+
+  /* The menu opens upward from the gear, now at the bottom right. */
   .settings-dropdown-menu {
-    top: calc(52px + 0.5rem);
-    right: 0.75rem;
+    top: auto;
+    bottom: calc(var(--tab-bar-height) + 0.5rem);
+    right: 0.5rem;
   }
 }

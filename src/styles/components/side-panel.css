@@ -129,8 +129,8 @@ button.drawer-toggle {
 
 .drawer-toggle-count {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: 2px;
+  right: 2px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;

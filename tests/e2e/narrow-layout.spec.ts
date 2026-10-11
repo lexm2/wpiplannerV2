@@ -76,17 +76,20 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
       }
     });
 
-    // The page tabs are a bottom tab bar here, in the same place on every
-    // page, and no page content runs underneath it.
-    test('the page tabs sit in a bottom bar on every page', async ({
-      page,
-    }) => {
+    // The header is one bar along the bottom here: nothing above the page,
+    // the tabs in the same place on every page, and no page content running
+    // underneath it.
+    test('the header is a bottom bar on every page', async ({ page }) => {
       await boot(page);
+      let tabsAt: string | null = null;
       for (const tab of ['#planner-tab', '#schedule-tab', '#degree-tab']) {
         await page.click(tab);
         const box = await page.evaluate(() => {
           const r = document
-            .querySelector('.header-navigation')!
+            .querySelector('.app-header')!
+            .getBoundingClientRect();
+          const tabs = document
+            .querySelector('.nav-tabs-pill')!
             .getBoundingClientRect();
           const body = [...document.querySelectorAll<HTMLElement>('.app-body')]
             .find(el => el.offsetParent !== null)!
@@ -95,14 +98,19 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
             left: r.left,
             width: r.width,
             bottomGap: window.innerHeight - r.bottom,
+            bodyTop: body.top,
             overlap: body.bottom - r.top,
             vw: window.innerWidth,
+            tabs: `${tabs.left},${tabs.width}`,
           };
         });
         expect(box.left, `${tab} page`).toBe(0);
         expect(box.width, `${tab} page`).toBe(box.vw);
         expect(box.bottomGap, `${tab} page`).toBe(0);
+        expect(box.bodyTop, `${tab} page`).toBe(0);
         expect(box.overlap, `${tab} page`).toBeLessThanOrEqual(0);
+        tabsAt ??= box.tabs;
+        expect(box.tabs, `${tab} page`).toBe(tabsAt);
       }
     });
 

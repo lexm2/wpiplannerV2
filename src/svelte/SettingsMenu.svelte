@@ -23,6 +23,10 @@
   let open = $state(false);
   let trigger = $state<HTMLButtonElement | null>(null);
 
+  // At phone widths the gear sits in the bottom bar (header.css), so the menu
+  // opens upward and rises into place instead of dropping down.
+  const bottomBar = window.matchMedia('(max-width: 560px)');
+
   // appState.canUndo/canRedo are runes published by UndoRedoManager - the same
   // source the header UndoRedoButtons use - so the items' disabled state stays
   // in sync.
@@ -53,7 +57,7 @@
   <div
     class="settings-dropdown-menu"
     id="settings-dropdown-menu"
-    transition:fly={{ y: -10, duration: dur(200) }}
+    transition:fly={{ y: bottomBar.matches ? 10 : -10, duration: dur(200) }}
     use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
   >
     <button class="settings-menu-item" onclick={choose(onSchedules)}>
