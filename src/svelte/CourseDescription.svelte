@@ -2,6 +2,7 @@
   import styles from '../styles/components/right-panel.module.css';
   import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../utils/iconPaths';
+  import { seatsLabel } from '../utils/courseUtils';
   import { courseListState } from './courseListState.svelte';
   import { untrack } from 'svelte';
   import type { CourseDataService } from '../services/data/courseDataService';
@@ -276,7 +277,7 @@
                       </div>
                     {/if}
                     <div class={styles['section-seats']}>
-                      Seats: {section.seatsAvailable}/{section.seats} available
+                      Seats: {seatsLabel(section)}
                       {#if section.actualWaitlist > 0}(Waitlist: {section.actualWaitlist}/{section.maxWaitlist}){/if}
                     </div>
                   </div>

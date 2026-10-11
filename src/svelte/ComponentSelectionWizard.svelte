@@ -377,7 +377,7 @@
                     <span
                       class={[
                         styles['section-card-seats'],
-                        { [styles['full']]: section.seatsAvailable === 0 },
+                        { [styles['full']]: section.seatsAvailable <= 0 },
                       ]}
                     >
                       {getSeatsInfo(section)}

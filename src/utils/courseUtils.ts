@@ -26,6 +26,21 @@ export function getAllSections(course: Course): Section[] {
 }
 
 /**
+ * Seat availability for display. The feed reports an over-enrolled section as
+ * a negative seatsAvailable, so anything at or below zero reads as full with
+ * its real enrollment instead of a negative count.
+ */
+export function seatsLabel(
+  section: Pick<Section, 'seats' | 'seatsAvailable'>,
+): string {
+  if (section.seatsAvailable > 0) {
+    return `${section.seatsAvailable}/${section.seats} available`;
+  }
+  const enrolled = section.seats - section.seatsAvailable;
+  return `Full (${enrolled}/${section.seats} enrolled)`;
+}
+
+/**
  * The sections a selection holds, in canonical kind order.
  *
  * Always reach for this rather than Object.values(): a plain object iterates in
