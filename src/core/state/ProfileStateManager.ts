@@ -16,6 +16,7 @@ import { ScheduleState } from '../../types/ScheduleState';
 import type { TransactionResult } from '../storage/TransactionalStorageManager';
 import { TransactionalStorageManager } from '../storage/TransactionalStorageManager';
 import { getAllSections } from '../../utils/courseUtils';
+import { TERM_ORDER } from '../../utils/typeGuards';
 import { logger } from '../../utils/logger';
 import { deepClone } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
@@ -44,7 +45,9 @@ export class ProfileStateManager {
   private undoRedoManager: UndoRedoManager;
   private isRestoringState = false;
   private pendingSavePromises = new Set<Promise<void>>();
-  private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
+  // The schedule object each id last saved successfully. Schedules in state
+  // are replaced, never mutated, so an unchanged object needs no re-save.
+  private savedSchedules = new Map<string, Schedule>();
   public isBatchUpdate = false;
 
   private constructor(storageManager?: TransactionalStorageManager) {
@@ -70,36 +73,36 @@ export class ProfileStateManager {
     return ProfileStateManager.instance;
   }
 
-  public static resetInstance(): void {
-    if (ProfileStateManager.instance) {
-      ProfileStateManager.instance.destroy();
-      ProfileStateManager.instance = null;
-    }
-  }
-
   private setupBeforeUnloadHandler(): void {
     if (typeof window === 'undefined') return;
 
-    this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+    window.addEventListener('beforeunload', (e: BeforeUnloadEvent) => {
       if (this.pendingSavePromises.size > 0) {
         // Calling preventDefault() triggers the browser's "leave site?" prompt.
         e.preventDefault();
       }
-    };
-
-    window.addEventListener('beforeunload', this.beforeUnloadHandler);
+    });
   }
 
-  destroy(): void {
-    if (this.beforeUnloadHandler && typeof window !== 'undefined') {
-      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
-    }
-  }
-
+  /**
+   * Attach (or refresh) the catalog, and point every saved selection at its
+   * live course and section objects. Storage loads before the catalog does,
+   * so until this runs selections hold the stored copies, with stale seat
+   * counts. Not an edit: nothing is saved and no undo step is recorded.
+   */
   setCourseData(departments: Department[]): void {
     this.allDepartments = departments;
     logger.log(
       `[CATALOG] Course catalog set with ${departments.length} departments`,
+    );
+    if (departments.length === 0) return;
+
+    this.state.schedules = this.state.schedules.map(s => ({
+      ...s,
+      selectedCourses: this.resolveCourseReferences(s.selectedCourses),
+    }));
+    this.state.selectedCourses = this.resolveCourseReferences(
+      this.state.selectedCourses,
     );
   }
 
@@ -141,16 +144,8 @@ export class ProfileStateManager {
     return { ...this.state.preferences };
   }
 
-  hasUnsavedChanges(): boolean {
-    return this.state.hasUnsavedChanges;
-  }
-
   hasPendingSaves(): boolean {
     return this.pendingSavePromises.size > 0;
-  }
-
-  isLoading(): boolean {
-    return this.state.isLoading || this.isLoadingFlag;
   }
 
   /**
@@ -322,52 +317,6 @@ export class ProfileStateManager {
     });
   }
 
-  clearAllSelections(_source: string = 'user'): void {
-    this.withStateUpdate(() => {
-      this.state.selectedCourses = [];
-      this.updateActiveScheduleWithCurrentCourses();
-    });
-  }
-
-  lockSection(
-    course: Course,
-    sectionCrn: string,
-    _source: string = 'user',
-  ): void {
-    this.withStateUpdate(() => {
-      const found = this.patchSelectedCourse(course.id, sc => {
-        const lockedSections = new Set(sc.lockedSections ?? []);
-        lockedSections.add(sectionCrn);
-        return { ...sc, lockedSections };
-      });
-      if (found) {
-        this.updateActiveScheduleWithCurrentCourses();
-      }
-    });
-  }
-
-  unlockSection(
-    course: Course,
-    sectionCrn: string,
-    _source: string = 'user',
-  ): void {
-    this.withStateUpdate(() => {
-      let changed = false;
-      this.patchSelectedCourse(course.id, sc => {
-        if (sc.lockedSections?.has(sectionCrn)) {
-          const lockedSections = new Set(sc.lockedSections);
-          lockedSections.delete(sectionCrn);
-          changed = true;
-          return { ...sc, lockedSections };
-        }
-        return sc;
-      });
-      if (changed) {
-        this.updateActiveScheduleWithCurrentCourses();
-      }
-    });
-  }
-
   setCourseColor(
     courseId: string,
     color: string,
@@ -382,28 +331,6 @@ export class ProfileStateManager {
         this.updateActiveScheduleWithCurrentCourses();
       }
     });
-  }
-
-  isSectionLocked(course: Course, sectionCrn: string): boolean {
-    const selectedCourse = this.state.selectedCourses.find(
-      sc => sc.course.id === course.id,
-    );
-    return selectedCourse?.lockedSections?.has(sectionCrn) || false;
-  }
-
-  getLockedSections(course: Course): Set<string> {
-    const selectedCourse = this.state.selectedCourses.find(
-      sc => sc.course.id === course.id,
-    );
-    return selectedCourse?.lockedSections || new Set();
-  }
-
-  getNewestAcademicYear(): number | undefined {
-    const years = this.allDepartments
-      .flatMap(d => d.courses)
-      .map(c => c.academicYear)
-      .filter(Boolean) as number[];
-    return years.length ? Math.max(...years) : undefined;
   }
 
   /**
@@ -480,6 +407,14 @@ export class ProfileStateManager {
       );
 
       if (scheduleId === this.state.activeScheduleId) {
+        // The live selection mirrors the active schedule, so a course-list
+        // change has to reach it too. Doing it here, rather than through
+        // setActiveSchedule, keeps the undo history.
+        if (updates.selectedCourses) {
+          this.state.selectedCourses = this.resolveCourseReferences([
+            ...updates.selectedCourses,
+          ]);
+        }
         this.signalActivation(source);
       }
       return true;
@@ -508,6 +443,7 @@ export class ProfileStateManager {
         s => s.id !== scheduleId,
       );
 
+      this.savedSchedules.delete(scheduleId);
       const deleteResult = await this.storageManager.deleteSchedule(scheduleId);
       if (!deleteResult.success) {
         logger.warn(
@@ -639,8 +575,14 @@ export class ProfileStateManager {
   }): void {
     this.state.activeScheduleId = snapshot.activeScheduleId;
 
+    // The clone detaches every Course from the catalog, so point all
+    // schedules back at it (as loadFromStorage and setCourseData do), not
+    // just the active one: switching to another schedule reads these.
     const schedulesArray = Array.from(snapshot.schedules.values());
-    this.state.schedules = deepClone(schedulesArray);
+    this.state.schedules = deepClone(schedulesArray).map(s => ({
+      ...s,
+      selectedCourses: this.resolveCourseReferences(s.selectedCourses),
+    }));
     this.state.preferences = deepClone(snapshot.preferences);
 
     if (this.state.activeScheduleId) {
@@ -700,6 +642,15 @@ export class ProfileStateManager {
     return this.undoRedoManager.canRedo();
   }
 
+  /**
+   * Make the next save write every schedule. save() skips a schedule whose
+   * object is unchanged, so a caller that edited one in place calls this
+   * first.
+   */
+  forgetSavedSchedules(): void {
+    this.savedSchedules.clear();
+  }
+
   save(skipSnapshot = false): void {
     const savePromise = this.executeSave(skipSnapshot);
     this.pendingSavePromises.add(savePromise);
@@ -720,9 +671,14 @@ export class ProfileStateManager {
         );
       }
 
-      this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
+      const activeIdResult = this.storageManager.saveActiveScheduleId(
+        this.state.activeScheduleId,
+      );
 
-      const savePromises = this.state.schedules.map(schedule => {
+      const toSave = this.state.schedules.filter(
+        schedule => this.savedSchedules.get(schedule.id) !== schedule,
+      );
+      const savePromises = toSave.map(schedule => {
         const scheduleToSave = {
           ...schedule,
           selectedCourses: schedule.selectedCourses.filter(
@@ -732,16 +688,29 @@ export class ProfileStateManager {
         return this.storageManager.saveSchedule(scheduleToSave);
       });
       const results = await Promise.all(savePromises);
+      results.forEach((result, i) => {
+        if (result.success) this.savedSchedules.set(toSave[i].id, toSave[i]);
+      });
+      // Drop deleted schedules, so one restored later is written again.
+      const liveIds = new Set(this.state.schedules.map(s => s.id));
+      for (const id of this.savedSchedules.keys()) {
+        if (!liveIds.has(id)) this.savedSchedules.delete(id);
+      }
 
-      this.storageManager.savePreferences(this.state.preferences);
+      const preferencesResult = this.storageManager.savePreferences(
+        this.state.preferences,
+      );
 
       // A rejected write comes back as a result, not a throw: falling through
       // here would mark the state clean while the schedule is silently gone on
-      // the next reload. Stay dirty and say so instead.
-      const failed = results.filter(r => !r.success);
+      // the next reload. Stay dirty and say so instead. The localStorage
+      // writes (active id, preferences) fail the same way on a full quota.
+      const failed = [...results, activeIdResult, preferencesResult].filter(
+        r => !r.success,
+      );
       if (failed.length > 0) {
         logger.error(
-          `Save failed for ${failed.length} schedule(s):`,
+          `Save failed for ${failed.length} write(s):`,
           failed.map(f => f.error),
         );
         showAppError(
@@ -769,6 +738,7 @@ export class ProfileStateManager {
     try {
       this.state.isLoading = true;
       this.isLoadingFlag = true;
+      this.savedSchedules.clear();
 
       const preferencesResult = this.storageManager.loadPreferences();
       if (preferencesResult.valid && preferencesResult.data) {
@@ -786,10 +756,16 @@ export class ProfileStateManager {
           }));
       }
 
+      // The saved id can name a schedule that was not loaded back: tutorial
+      // schedules are filtered out above, so reloading mid-tutorial leaves
+      // one behind. Fall back to the first real schedule.
       const activeIdResult = this.storageManager.loadActiveScheduleId();
-      if (activeIdResult.valid && activeIdResult.data) {
-        this.state.activeScheduleId = activeIdResult.data;
-      }
+      const savedId = activeIdResult.valid ? activeIdResult.data : null;
+      this.state.activeScheduleId = this.state.schedules.some(
+        s => s.id === savedId,
+      )
+        ? savedId
+        : (this.state.schedules[0]?.id ?? null);
 
       // Selected courses come from the active schedule only (no fallback)
       let loadedCourses: SelectedCourse[] = [];
@@ -899,6 +875,7 @@ export class ProfileStateManager {
       );
 
       if (result.success) {
+        this.savedSchedules.clear();
         this.state.schedules = [];
         this.state.selectedCourses = [];
         this.state.activeScheduleId = null;
@@ -938,12 +915,9 @@ export class ProfileStateManager {
   private resolveCourseReferences(
     selectedCourses: SelectedCourse[],
   ): SelectedCourse[] {
-    if (this.allDepartments.length === 0) {
-      logger.warn(
-        'Course catalog not available, skipping section reference resolution',
-      );
-      return selectedCourses;
-    }
+    // Before the catalog loads there is nothing to resolve against;
+    // setCourseData resolves everything once it arrives.
+    if (this.allDepartments.length === 0) return selectedCourses;
 
     logger.log(
       `Resolving course references for ${selectedCourses.length} courses`,
@@ -989,7 +963,7 @@ export class ProfileStateManager {
 
         if (
           typeof liveSection.computedTerm !== 'string' ||
-          !['A', 'B', 'C', 'D'].includes(liveSection.computedTerm)
+          !TERM_ORDER.includes(liveSection.computedTerm)
         ) {
           logger.error(
             `Resolved section CRN ${liveSection.crn} has invalid computedTerm: ${liveSection.computedTerm}`,
@@ -1121,24 +1095,6 @@ export class ProfileStateManager {
     }
   }
 
-  /** Synchronous version of withBatch for non-async batch operations. */
-  withBatchSync<T>(fn: () => T): T {
-    const wasBatch = this.isBatchUpdate;
-    if (!wasBatch) {
-      this.isBatchUpdate = true;
-    }
-
-    try {
-      const result = fn();
-      return result;
-    } finally {
-      if (!wasBatch) {
-        this.isBatchUpdate = false;
-        this.save();
-      }
-    }
-  }
-
   private updateActiveScheduleWithCurrentCourses(): void {
     const activeId = this.state.activeScheduleId;
     if (!activeId) return;
@@ -1153,13 +1109,11 @@ export class ProfileStateManager {
     return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
-  async getStorageStats() {
-    return this.storageManager.getStorageStats();
-  }
-
   async clearAllData(): Promise<{ success: boolean; error?: string }> {
     try {
       const result = await this.storageManager.clearAllDataComplete();
+      // Cleared even on failure: storage may be partly wiped.
+      this.savedSchedules.clear();
       if (!result.success) {
         return {
           success: false,

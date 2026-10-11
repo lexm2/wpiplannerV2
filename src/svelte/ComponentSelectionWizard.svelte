@@ -7,6 +7,7 @@
   import { slideX, dur } from './transitions';
   import { wizardState } from './wizardState.svelte';
   import { showConfirm } from './modals/modalState.svelte';
+  import { uiState } from '../services/ui/uiState.svelte';
   import {
     determineAvailableSteps,
     getOptionsWithFilterInfo,
@@ -29,15 +30,14 @@
   // fade-out (when the store nulls config).
   const cfg = wizardState.config!;
   const { course, courseDataService, filterService } = cfg;
-  const isLabOnly = courseDataService.isLabOnlyCourse(course);
 
   const STEP_LABELS: Record<ComponentKind, string> = {
-    lecture: isLabOnly ? 'Lab Section' : 'Lecture',
+    lecture: 'Lecture',
     discussion: 'Discussion',
     lab: 'Lab',
   };
   const STEP_TITLES: Record<ComponentKind, string> = {
-    lecture: isLabOnly ? 'Select Lab Section' : 'Select Lecture',
+    lecture: 'Select Lecture',
     discussion: 'Select Discussion',
     lab: 'Select Lab',
   };
@@ -172,7 +172,15 @@
   }
 
   function onKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') cancel();
+    // A modal opened over the wizard (filters, section info) takes Escape for
+    // itself. Which window listener runs first depends on mount order, so check
+    // both that none is open and that none has just closed on this key.
+    if (
+      e.key === 'Escape' &&
+      !e.defaultPrevented &&
+      uiState.openModals.length === 0
+    )
+      cancel();
   }
 </script>
 
@@ -339,7 +347,9 @@
                         href={rmpUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="professor-link">{professor}</a
+                        class="professor-link"
+                        onclick={e => e.stopPropagation()}
+                        onkeydown={e => e.stopPropagation()}>{professor}</a
                       >
                     {:else}
                       {professor}
@@ -368,7 +378,7 @@
                     <span
                       class={[
                         styles['section-card-seats'],
-                        { [styles['full']]: section.seatsAvailable === 0 },
+                        { [styles['full']]: section.seatsAvailable <= 0 },
                       ]}
                     >
                       {getSeatsInfo(section)}

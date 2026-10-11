@@ -21,6 +21,7 @@
   import { autoScheduleService } from '../services/scheduling/autoScheduleService';
   import { timestampState } from './timestampState.svelte';
   import { installAppEffects } from './appEffects.svelte';
+  import { installPageSwipe } from './pageSwipe.svelte';
   import { DebouncedOperation } from '../utils/RequestCancellation';
 
   import DepartmentSidebar from './DepartmentSidebar.svelte';
@@ -43,6 +44,9 @@
   import ScheduleGrids from './schedule/ScheduleGrids.svelte';
   import DegreePage from './degree/DegreePage.svelte';
   import SidePanel from './SidePanel.svelte';
+  import DrawerToggle from './DrawerToggle.svelte';
+  import ToPlaceButton from './degree/ToPlaceButton.svelte';
+  import { degreeState } from './degree/degreeState.svelte';
   import ErrorBanner from './ErrorBanner.svelte';
   import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
   import { logger } from '../utils/logger';
@@ -105,10 +109,15 @@
   }
 
   function handleKeydown(e: KeyboardEvent): void {
-    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    // Leave text fields their own native undo.
+    const target = e.target as Element | null;
+    if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
+    const key = e.key.toLowerCase();
+    if (key === 'z' && !e.shiftKey) {
       e.preventDefault();
       handleUndo();
-    } else if (e.ctrlKey && e.key === 'y') {
+    } else if (key === 'y' || (key === 'z' && e.shiftKey)) {
       e.preventDefault();
       handleRedo();
     }
@@ -120,6 +129,10 @@
   // the effects register in this component's scope. Untracked for the same reason
   // as debouncedSearch above: one-time wiring off the stable singleton container.
   untrack(() => installAppEffects(services));
+
+  // Swiping sideways between pages on a phone. Its callbacks read the page
+  // when a swipe happens, so the effect itself tracks nothing and runs once.
+  $effect(() => installPageSwipe(() => uiState.currentPage, switchToPageView));
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -136,6 +149,22 @@
           <span id="server-timestamp">{timestampState.serverLabel}</span>
         </div>
       </div>
+    </div>
+    <!-- The page's left panel, where it is a drawer. -->
+    <div class="header-drawer-toggle">
+      {#if currentPage === 'planner'}
+        <DrawerToggle drawer="departments" label="Departments" side="left" />
+      {:else if currentPage === 'schedule'}
+        <DrawerToggle
+          drawer="schedule"
+          label="Courses"
+          side="left"
+          icon="list"
+          count={appState.selectedCourses.length}
+        />
+      {:else if currentPage === 'degree' && degreeState.record}
+        <ToPlaceButton />
+      {/if}
     </div>
     <nav class="header-navigation" aria-label="Main navigation">
       <div class="nav-tabs-pill">
@@ -188,6 +217,7 @@
   <SidePanel
     class="sidebar"
     label="Department navigation"
+    drawer={{ id: 'departments', title: 'Departments' }}
     config={PANEL_WIDTHS.sidebar}
     edge="right"
     resizeLabel="Resize department sidebar"
@@ -209,9 +239,8 @@
             onFilter={openFilterModal}
           />
         </div>
-        <div id="view-toggle" class="view-toggle">
-          <ViewToggle />
-        </div>
+        <ViewToggle />
+        <DrawerToggle drawer="details" label="Details" side="right" />
       </div>
     </div>
     <div class="course-container" id="course-container">
@@ -227,6 +256,7 @@
     class={styles['right-panel']}
     data-right-panel
     label="Course details and selection"
+    drawer={{ id: 'details', title: 'Details' }}
     config={PANEL_WIDTHS.rightPanel}
     edge="left"
     resizeLabel="Resize course details panel"
@@ -250,9 +280,15 @@
   style:display={currentPage === 'schedule' ? 'flex' : 'none'}
 >
   <div class="schedule-page-layout">
+    <!-- The wizard mounts in this sidebar, so dismissing the drawer while it
+         is in use cancels it rather than leaving it open out of sight. -->
     <SidePanel
       class="schedule-sidebar"
       label="Schedule courses"
+      drawer={{ id: 'schedule', title: 'Courses' }}
+      onDrawerClose={() => {
+        if (wizardState.isOpen) componentWizardService.closeComponentWizard();
+      }}
       config={PANEL_WIDTHS.scheduleSidebar}
       edge="right"
       resizeLabel="Resize schedule sidebar"

@@ -9,12 +9,16 @@ export function extractCategory(html: string | null): {
 } {
   if (!html) return { category: null, cleanedHtml: '' };
 
-  // No word-boundary lookahead: handles "Cat. IAn intensive..." where text immediately follows the numeral
-  // \.? makes the period after "Cat" optional to also match "Cat II." format
-  const match = html.match(/Cat\.?\s*(III|II|I|[123])\.?/i);
+  // Matches "Cat. I", "Cat I", "Cat.II", "CAT II", "Category I". Case-sensitive with a leading \b
+  // so words like "application" / "communication" don't match. (?![a-z0-9]) still allows
+  // "Cat. IAn intensive..." where text immediately follows the numeral; \.? makes the period
+  // after "Cat" optional to also match "Cat II." format
+  const match = html.match(
+    /\b(?:Cat|CAT)(?:egory)?\.?\s*(III|II|I|[123])(?![a-z0-9])\.?/,
+  );
   if (!match) return { category: null, cleanedHtml: html };
 
-  const catStr = match[1].toUpperCase();
+  const catStr = match[1];
   let category: 1 | 2 | 3;
   if (catStr === 'I' || catStr === '1') category = 1;
   else if (catStr === 'II' || catStr === '2') category = 2;
@@ -22,10 +26,14 @@ export function extractCategory(html: string | null): {
   else return { category: null, cleanedHtml: html };
 
   const cleanedHtml = html
-    .replace(/<p>(?:<i>)?Cat\.?\s*(?:III|II|I|[123])\.?(?:<\/i>)?<\/p>/gi, '')
-    .replace(/Cat\.?\s*(?:III|II|I|[123])\.?(?:<br\s*\/?>\s*)*/gi, '')
-    .replace(/;\s*Cat\.?\s*(?:III|II|I|[123])\.?/gi, '')
-    .replace(/Cat\.?\s*(?:III|II|I|[123])\.?/gi, '')
+    .replace(
+      /<p>(?:<i>)?(?:Cat|CAT)(?:egory)?\.?\s*(?:III|II|I|[123])(?![a-z0-9])\.?(?:<\/i>)?<\/p>/g,
+      '',
+    )
+    .replace(
+      /\b(?:Category:\s*)?(?:Cat|CAT)(?:egory)?\.?\s*(?:III|II|I|[123])(?![a-z0-9])\.?(?:<br\s*\/?>\s*)*/g,
+      '',
+    )
     .replace(/;\s*\)/g, ')');
 
   return { category, cleanedHtml };

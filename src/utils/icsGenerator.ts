@@ -8,6 +8,84 @@ import { Section, Period, DayOfWeek } from '../types/types';
 import type { DateRange } from '../types/common';
 import { TermBoundsService } from './termBounds';
 import { getSelectedSections } from './courseUtils';
+import { parseLocalDate } from './localDate';
+
+type Quarter = 'A' | 'B' | 'C' | 'D';
+
+/**
+ * The quarters a term runs across, first to last. Semester sections (F/S) and
+ * local events marked for the whole year span several, so their dates run
+ * from the first quarter's start to the last one's end.
+ */
+const TERM_SPANS: Record<string, [Quarter, Quarter]> = {
+  A: ['A', 'A'],
+  B: ['B', 'B'],
+  C: ['C', 'C'],
+  D: ['D', 'D'],
+  F: ['A', 'B'],
+  S: ['C', 'D'],
+  ALL: ['A', 'D'],
+};
+
+/** Milliseconds `timezone`'s wall clock runs ahead of UTC at `utcMs`. */
+function timezoneOffsetMs(utcMs: number, timezone: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date(utcMs));
+  const get = (type: Intl.DateTimeFormatPartTypes): number =>
+    Number(parts.find(p => p.type === type)?.value);
+  const wallAsUtc = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour'),
+    get('minute'),
+    get('second'),
+  );
+  return wallAsUtc - utcMs;
+}
+
+/**
+ * The last second of `day` in `timezone`, formatted as an RRULE UNTIL in UTC.
+ * RFC 5545 requires UNTIL in UTC when DTSTART carries a TZID; ical-generator
+ * writes it as a floating local time instead, which some clients misread.
+ */
+function untilEndOfDay(day: Date, timezone: string): string {
+  const wall = Date.UTC(
+    day.getFullYear(),
+    day.getMonth(),
+    day.getDate(),
+    23,
+    59,
+    59,
+  );
+  let utcMs: number;
+  try {
+    const offset = timezoneOffsetMs(wall, timezone);
+    utcMs = wall - offset;
+    // Re-check at the corrected instant in case a DST change lies between.
+    const corrected = timezoneOffsetMs(utcMs, timezone);
+    if (corrected !== offset) utcMs = wall - corrected;
+  } catch {
+    // Unknown timezone: fall back to the browser's own.
+    utcMs = new Date(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+      23,
+      59,
+      59,
+    ).getTime();
+  }
+  return new Date(utcMs).toISOString().replace(/[-:]|\.\d{3}/g, '');
+}
 
 export interface ICSExportOptions {
   includeDescription?: boolean;
@@ -46,21 +124,32 @@ export class ICSGenerator {
     [DayOfWeek.SATURDAY]: 6,
   };
 
-  private static getTermDates(term: string, year: number): DateRange | null {
-    if (!term || term === 'TBA') {
+  static getTermDates(term: string, year: number): DateRange | null {
+    const span = term ? TERM_SPANS[term.toUpperCase()] : undefined;
+    if (!span) {
       return null;
     }
 
-    const termLetter = term.charAt(0).toUpperCase() as 'A' | 'B' | 'C' | 'D';
+    const first = this.getQuarterDates(span[0], year);
+    const last = this.getQuarterDates(span[1], year);
+    if (!first || !last) {
+      return null;
+    }
+    return { start: first.start, end: last.end };
+  }
 
+  private static getQuarterDates(
+    quarter: Quarter,
+    year: number,
+  ): DateRange | null {
     const termBoundsService = TermBoundsService.getInstance();
-    const boundsFromService = termBoundsService.getTermDates(termLetter, year);
+    const boundsFromService = termBoundsService.getTermDates(quarter, year);
 
     if (boundsFromService) {
       return boundsFromService;
     }
 
-    switch (termLetter) {
+    switch (quarter) {
       case 'A':
         return {
           start: new Date(year, 7, 21),
@@ -96,27 +185,46 @@ export class ICSGenerator {
     return dt;
   }
 
-  private static findNextDayOfWeek(
-    startDate: Date,
-    targetDay: DayOfWeek,
-  ): Date {
-    const targetDayNum = this.DAY_TO_NUMBER[targetDay];
-    const currentDayNum = startDate.getDay();
-    let daysToAdd = targetDayNum - currentDayNum;
-
-    if (daysToAdd < 0) {
-      daysToAdd += 7;
+  /**
+   * The earliest of `days` on or after `termStart`. An RRULE never produces
+   * dates before DTSTART, so starting from any later meeting day would drop
+   * the first week's earlier meetings.
+   */
+  static findFirstMeetingDate(
+    termStart: Date,
+    days: Iterable<DayOfWeek>,
+  ): Date | null {
+    let offset = Infinity;
+    for (const day of days) {
+      offset = Math.min(
+        offset,
+        (this.DAY_TO_NUMBER[day] - termStart.getDay() + 7) % 7,
+      );
+    }
+    if (offset === Infinity) {
+      return null;
     }
 
-    const result = new Date(startDate);
-    result.setDate(result.getDate() + daysToAdd);
+    const result = new Date(termStart);
+    result.setDate(result.getDate() + offset);
     return result;
+  }
+
+  /** A weekly RRULE on `days` that runs through the whole of `termEnd`. */
+  private static weeklyRule(
+    days: Iterable<DayOfWeek>,
+    termEnd: Date,
+    timezone: string,
+  ): string {
+    const byDay = Array.from(days, day => this.DAY_TO_ICAL[day]).join(',');
+    return `RRULE:FREQ=${ICalEventRepeatingFreq.WEEKLY};UNTIL=${untilEndOfDay(termEnd, timezone)};BYDAY=${byDay}`;
   }
 
   private static generateUID(
     course: SelectedCourse,
     section: Section,
     period: Period,
+    periodIndex: number,
     startDate: Date,
   ): string {
     const courseId = `${course.course.departmentAbbr}${course.course.number}`;
@@ -125,7 +233,8 @@ export class ICSGenerator {
     const day = String(startDate.getDate()).padStart(2, '0');
     const dateStr = `${year}${month}${day}`;
     const periodType = period.type.toLowerCase().replace(/\s+/g, '-');
-    return `wpi-${courseId}-${section.number}-${periodType}-${dateStr}@wpiplannerv2`;
+    // The index keeps two same-type periods starting the same day distinct.
+    return `wpi-${courseId}-${section.number}-${periodType}-${periodIndex}-${dateStr}@wpiplannerv2`;
   }
 
   static generateICS(
@@ -135,7 +244,9 @@ export class ICSGenerator {
     const timezone = options.timezone || this.DEFAULT_TIMEZONE;
     const service = TermBoundsService.getInstance();
     const academicYear =
-      service.getCurrentAcademicYear() ?? new Date().getFullYear();
+      schedule.year ??
+      service.getCurrentAcademicYear() ??
+      new Date().getFullYear();
 
     const calendar = ical({
       name: schedule.name,
@@ -162,16 +273,14 @@ export class ICSGenerator {
           continue;
         }
 
-        for (const period of section.periods) {
-          if (period.days.size === 0) {
+        for (const [periodIndex, period] of section.periods.entries()) {
+          const firstMeetingDate = this.findFirstMeetingDate(
+            termDates.start,
+            period.days,
+          );
+          if (!firstMeetingDate) {
             continue;
           }
-
-          const firstMeetingDay = Array.from(period.days)[0];
-          const firstMeetingDate = this.findNextDayOfWeek(
-            termDates.start,
-            firstMeetingDay,
-          );
 
           const startDateTime = this.createDateTime(
             firstMeetingDate,
@@ -188,6 +297,7 @@ export class ICSGenerator {
             selectedCourse,
             section,
             period,
+            periodIndex,
             startDateTime,
           );
 
@@ -195,13 +305,6 @@ export class ICSGenerator {
           const periodTypePrefix =
             period.type.charAt(0).toUpperCase() + period.type.slice(1);
           const summary = `${periodTypePrefix}: ${courseId} ${selectedCourse.course.name}`;
-
-          const untilDate = new Date(termDates.end);
-          untilDate.setHours(23, 59, 59, 0);
-
-          const byDay = Array.from(period.days).map(
-            day => this.DAY_TO_ICAL[day],
-          );
 
           let description: string | undefined;
           if (options.includeDescription !== false) {
@@ -236,11 +339,7 @@ export class ICSGenerator {
             description: description,
             location: location,
             timezone: timezone,
-            repeating: {
-              freq: ICalEventRepeatingFreq.WEEKLY,
-              byDay: byDay,
-              until: untilDate,
-            },
+            repeating: this.weeklyRule(period.days, termDates.end, timezone),
           });
         }
       }
@@ -253,7 +352,7 @@ export class ICSGenerator {
         if (localEvent.eventType === EventType.ONE_TIME) {
           if (!localEvent.date) continue;
 
-          const eventDate = new Date(localEvent.date);
+          const eventDate = parseLocalDate(localEvent.date);
           const startDateTime = new Date(eventDate);
           startDateTime.setHours(
             localEvent.startTime.hours,
@@ -287,24 +386,11 @@ export class ICSGenerator {
             if (!termDates) continue;
 
             const days = localEvent.days || [];
-            if (days.length === 0) continue;
-
-            const firstDay: DayOfWeek = days.reduce(
-              (earliest: DayOfWeek, day: DayOfWeek) => {
-                const dayNum = this.DAY_TO_NUMBER[day];
-                const earliestNum = this.DAY_TO_NUMBER[earliest];
-                return dayNum < earliestNum ? day : earliest;
-              },
+            const firstOccurrence = this.findFirstMeetingDate(
+              termDates.start,
+              days,
             );
-
-            const dayNumber = this.DAY_TO_NUMBER[firstDay];
-            const firstOccurrence = new Date(termDates.start);
-
-            const daysUntilTarget =
-              (dayNumber - termDates.start.getDay() + 7) % 7;
-            firstOccurrence.setDate(
-              firstOccurrence.getDate() + daysUntilTarget,
-            );
+            if (!firstOccurrence) continue;
 
             firstOccurrence.setHours(
               localEvent.startTime.hours,
@@ -321,12 +407,7 @@ export class ICSGenerator {
               0,
             );
 
-            const untilDate = new Date(termDates.end);
-            untilDate.setHours(23, 59, 59, 0);
-
             const uid = `local-${localEvent.id}-${term}@wpiplannerv2`;
-
-            const byDay = days.map((day: DayOfWeek) => this.DAY_TO_ICAL[day]);
 
             calendar.createEvent({
               id: uid,
@@ -335,11 +416,7 @@ export class ICSGenerator {
               summary: localEvent.title,
               description: localEvent.description || undefined,
               timezone: timezone,
-              repeating: {
-                freq: ICalEventRepeatingFreq.WEEKLY,
-                byDay: byDay,
-                until: untilDate,
-              },
+              repeating: this.weeklyRule(days, termDates.end, timezone),
             });
           }
         }

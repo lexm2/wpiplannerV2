@@ -24,13 +24,6 @@ export interface ScheduleCreationOptions {
   includeCurrentCourses?: boolean;
   copyFromSchedule?: string;
   autoActivate?: boolean;
-  autoSave?: boolean;
-}
-
-export interface ScheduleUpdateOptions {
-  updateName?: string;
-  updateCourses?: boolean;
-  autoSave?: boolean;
 }
 
 /**
@@ -66,8 +59,9 @@ export class ScheduleManagementService {
 
   private async performInitialization(): Promise<boolean> {
     try {
+      // ProfileStateManager is already loaded by AppBootstrap before this
+      // service (see the note in CourseSelectionService).
       await this.courseSelectionService.initialize();
-      await this.profileStateManager.loadFromStorage();
       await this.initializeDefaultScheduleIfNeeded();
 
       this.isInitialized = true;
@@ -92,7 +86,6 @@ export class ScheduleManagementService {
       includeCurrentCourses = false,
       copyFromSchedule,
       autoActivate = true,
-      autoSave = true,
     } = options;
 
     try {
@@ -105,8 +98,7 @@ export class ScheduleManagementService {
 
       // Auto-generate a unique name instead of rejecting duplicates
       const existingSchedules = this.profileStateManager.getAllSchedules();
-      const uniqueName = this.generateUniqueScheduleName(name);
-      name = uniqueName;
+      name = this.generateUniqueScheduleName(name);
 
       let selectedCourses: SelectedCourse[] = [];
 
@@ -125,39 +117,42 @@ export class ScheduleManagementService {
         selectedCourses = this.profileStateManager.getSelectedCourses();
       }
 
-      const schedule = this.profileStateManager.createSchedule(name, 'api', id);
-
-      if (selectedCourses.length > 0) {
-        const updateResult = await this.updateScheduleCourses(
-          schedule.id,
-          selectedCourses,
+      // Each step below saves on its own; batched, they save once.
+      return await this.profileStateManager.withBatch(async () => {
+        const schedule = this.profileStateManager.createSchedule(
+          name,
+          'api',
+          id,
         );
-        if (!updateResult.success) {
-          return {
-            success: false,
-            error: `Schedule created but failed to add courses: ${updateResult.error}`,
-          };
-        }
-      }
 
-      if (autoActivate) {
-        const activateResult = await this.setActiveSchedule(schedule.id);
-        if (!activateResult.success) {
-          logger.warn(
-            'Schedule created but failed to activate:',
-            activateResult.error,
+        if (selectedCourses.length > 0) {
+          const updateResult = await this.updateScheduleCourses(
+            schedule.id,
+            selectedCourses,
           );
+          if (!updateResult.success) {
+            return {
+              success: false,
+              error: `Schedule created but failed to add courses: ${updateResult.error}`,
+            };
+          }
         }
-      }
 
-      if (autoSave) {
-        this.profileStateManager.save();
-      }
+        if (autoActivate) {
+          const activateResult = await this.setActiveSchedule(schedule.id);
+          if (!activateResult.success) {
+            logger.warn(
+              'Schedule created but failed to activate:',
+              activateResult.error,
+            );
+          }
+        }
 
-      return {
-        success: true,
-        schedule,
-      };
+        return {
+          success: true,
+          schedule,
+        };
+      });
     } catch (error) {
       logger.error('Error creating schedule:', error);
       return {
@@ -210,10 +205,8 @@ export class ScheduleManagementService {
   async updateSchedule(
     scheduleId: string,
     updates: Partial<Schedule>,
-    options: ScheduleUpdateOptions = {},
   ): Promise<ScheduleOperationResult> {
     await this.ensureInitialized();
-    const { autoSave = true } = options;
 
     try {
       const schedules = this.profileStateManager.getAllSchedules();
@@ -236,11 +229,8 @@ export class ScheduleManagementService {
         };
       }
 
+      // Saves on its own.
       this.profileStateManager.updateSchedule(scheduleId, updates, 'api');
-
-      if (autoSave) {
-        this.profileStateManager.save();
-      }
 
       const finalSchedule = this.profileStateManager
         .getAllSchedules()
@@ -259,11 +249,17 @@ export class ScheduleManagementService {
     }
   }
 
+  /**
+   * Name policy: a rename is typed by the user, so a clash is reported back
+   * rather than silently changed; create and duplicate pick their own names
+   * and uniquify instead. All three trim, and compare case-sensitively.
+   */
   async renameSchedule(
     scheduleId: string,
     newName: string,
   ): Promise<ScheduleOperationResult> {
-    if (!newName || newName.trim().length === 0) {
+    const name = newName?.trim();
+    if (!name) {
       return {
         success: false,
         error: 'Schedule name cannot be empty',
@@ -271,16 +267,21 @@ export class ScheduleManagementService {
     }
 
     const existingSchedules = this.profileStateManager.getAllSchedules();
+    const current = existingSchedules.find(s => s.id === scheduleId);
+    // Renaming to the name it already has is a successful no-op.
+    if (current && current.name.trim() === name) {
+      return { success: true, schedule: current };
+    }
     if (
-      existingSchedules.some(s => s.name === newName && s.id !== scheduleId)
+      existingSchedules.some(s => s.id !== scheduleId && s.name.trim() === name)
     ) {
       return {
         success: false,
-        error: `A schedule with the name "${newName}" already exists`,
+        error: `A schedule with the name "${name}" already exists`,
       };
     }
 
-    return this.updateSchedule(scheduleId, { name: newName });
+    return this.updateSchedule(scheduleId, { name });
   }
 
   async duplicateSchedule(
@@ -299,7 +300,7 @@ export class ScheduleManagementService {
 
       const duplicatedSchedule = this.profileStateManager.duplicateSchedule(
         scheduleId,
-        newName,
+        this.generateUniqueScheduleName(newName),
         'api',
       );
 
@@ -309,8 +310,6 @@ export class ScheduleManagementService {
           error: `Schedule with ID "${scheduleId}" not found`,
         };
       }
-
-      this.profileStateManager.save();
 
       return {
         success: true,
@@ -352,8 +351,8 @@ export class ScheduleManagementService {
         };
       }
 
-      // Must be awaited: deleteSchedule reassigns activeScheduleId only after
-      // storage resolves, so save() below would persist pre-delete state.
+      // Saves on its own, once activeScheduleId has moved off the deleted
+      // schedule (which happens only after storage resolves).
       const deleted = await this.profileStateManager.deleteSchedule(
         scheduleId,
         'api',
@@ -365,8 +364,6 @@ export class ScheduleManagementService {
           error: `Failed to delete schedule "${scheduleId}"`,
         };
       }
-
-      this.profileStateManager.save();
 
       return { success: true };
     } catch (error) {
@@ -396,10 +393,6 @@ export class ScheduleManagementService {
   getScheduleById(scheduleId: string): Schedule | null {
     const schedules = this.getAllSchedules();
     return schedules.find(s => s.id === scheduleId) || null;
-  }
-
-  loadSchedule(scheduleId: string): Schedule | null {
-    return this.getScheduleById(scheduleId);
   }
 
   private async updateScheduleCourses(
@@ -433,26 +426,6 @@ export class ScheduleManagementService {
         error: `Failed to update schedule courses: ${errorMessage(error)}`,
       };
     }
-  }
-
-  async save(): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureInitialized();
-      this.profileStateManager.save();
-      return {
-        success: true,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: `Save failed: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  hasUnsavedChanges(): boolean {
-    if (!this.isInitialized) return false;
-    return this.profileStateManager.hasUnsavedChanges();
   }
 
   async exportSchedule(
@@ -539,13 +512,7 @@ export class ScheduleManagementService {
         };
       }
 
-      const result = ICSGenerator.generateICS(schedule, options);
-
-      if (!result.success) {
-        return result;
-      }
-
-      return result;
+      return ICSGenerator.generateICS(schedule, options);
     } catch (error) {
       return {
         success: false,
@@ -563,9 +530,15 @@ export class ScheduleManagementService {
     try {
       await this.ensureInitialized();
 
-      // safeParse so a malformed file gets the same friendly message as an
-      // out-of-date one, rather than a schema throw.
-      const parsed = MinimalSyncDataSchema.safeParse(JSON.parse(jsonData));
+      // safeParse, and a guarded JSON.parse, so a malformed file gets the same
+      // friendly message as an out-of-date one rather than a parser error.
+      let json: unknown;
+      try {
+        json = JSON.parse(jsonData);
+      } catch {
+        json = undefined;
+      }
+      const parsed = MinimalSyncDataSchema.safeParse(json);
       if (!parsed.success || !parsed.data.v.startsWith('4')) {
         return {
           success: false,
@@ -576,71 +549,71 @@ export class ScheduleManagementService {
 
       const importedCourses =
         this.profileStateManager.parseImportCourses(jsonData);
-      const existing = this.profileStateManager
-        .getAllSchedules()
-        .find(s => s.id === scheduleId);
-      if (!existing) {
+      return await this.mergeCoursesInto(scheduleId, importedCourses);
+    } catch (error) {
+      return { success: false, error: errorMessage(error) };
+    }
+  }
+
+  /**
+   * Add every course from one schedule to another, the in-app version of
+   * exporting the source and importing it into the target.
+   */
+  async copyScheduleInto(
+    sourceId: string,
+    targetId: string,
+  ): Promise<ScheduleOperationResult> {
+    try {
+      await this.ensureInitialized();
+
+      if (sourceId === targetId) {
+        return {
+          success: false,
+          error: 'Cannot copy a schedule into itself',
+        };
+      }
+      const source = this.getScheduleById(sourceId);
+      if (!source) {
         return { success: false, error: 'Schedule not found' };
       }
 
-      const existingIds = new Set(
-        existing.selectedCourses.map(c => c.course.id),
+      // Transient courses are never saved or exported, so leave them behind
+      // here too.
+      return await this.mergeCoursesInto(
+        targetId,
+        source.selectedCourses.filter(sc => !sc.course.transient),
       );
-      const merged = [
-        ...existing.selectedCourses,
-        ...importedCourses.filter(c => !existingIds.has(c.course.id)),
-      ];
-
-      const result = await this.updateSchedule(scheduleId, {
-        selectedCourses: merged,
-      });
-
-      if (result.success && scheduleId === this.getActiveScheduleId()) {
-        this.profileStateManager.setActiveSchedule(scheduleId, 'api');
-      }
-
-      return result;
     } catch (error) {
-      return { success: false, error: `Import failed: ${errorMessage(error)}` };
+      return { success: false, error: errorMessage(error) };
     }
+  }
+
+  /**
+   * Append the courses the target does not already have. Courses it does have
+   * keep their own section picks.
+   */
+  private async mergeCoursesInto(
+    scheduleId: string,
+    courses: SelectedCourse[],
+  ): Promise<ScheduleOperationResult> {
+    const existing = this.getScheduleById(scheduleId);
+    if (!existing) {
+      return { success: false, error: 'Schedule not found' };
+    }
+
+    const existingIds = new Set(existing.selectedCourses.map(c => c.course.id));
+    const merged = [
+      ...existing.selectedCourses,
+      ...courses.filter(c => !existingIds.has(c.course.id)),
+    ];
+
+    // updateSchedule also refreshes the live selection when the target is
+    // the active schedule.
+    return this.updateSchedule(scheduleId, { selectedCourses: merged });
   }
 
   getCourseSelectionService(): CourseSelectionService {
     return this.courseSelectionService;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await -- awaited; paired with the CourseSelectionService method
-  async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
-    const issues: string[] = [];
-
-    try {
-      if (!this.isInitialized) {
-        issues.push('Service not initialized');
-      }
-
-      const schedules = this.getAllSchedules();
-      const validation = this.dataValidator.validateBatch(schedules, schedule =>
-        this.dataValidator.validateSchedule(schedule),
-      );
-
-      if (!validation.valid) {
-        issues.push(
-          `Schedule validation: ${validation.errors.length} errors found`,
-        );
-      }
-
-      const activeScheduleId = this.getActiveScheduleId();
-      if (activeScheduleId && !schedules.some(s => s.id === activeScheduleId)) {
-        issues.push('Active schedule ID references non-existent schedule');
-      }
-    } catch (error) {
-      issues.push(`Health check error: ${errorMessage(error)}`);
-    }
-
-    return {
-      healthy: issues.length === 0,
-      issues,
-    };
   }
 
   private async ensureInitialized(): Promise<void> {
@@ -660,9 +633,10 @@ export class ScheduleManagementService {
         'system',
       );
       this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
-      this.profileStateManager.save();
-    } else if (!this.getActiveScheduleId()) {
-      // No active schedule recorded: fall back to the most recent one
+    } else if (!this.profileStateManager.getActiveSchedule()) {
+      // No active schedule recorded: fall back to the most recent one. (Asks
+      // ProfileStateManager directly: this.getActiveScheduleId() reads null
+      // until initialization finishes, which is exactly when this runs.)
       this.profileStateManager.setActiveSchedule(
         existingSchedules[existingSchedules.length - 1].id,
         'system',
@@ -670,9 +644,13 @@ export class ScheduleManagementService {
     }
   }
 
-  private generateUniqueScheduleName(baseName: string): string {
-    const existingSchedules = this.getAllSchedules();
-    const existingNames = new Set(existingSchedules.map(s => s.name));
+  private generateUniqueScheduleName(name: string): string {
+    // Straight from ProfileStateManager: getAllSchedules() reads empty until
+    // initialization finishes.
+    const existingNames = new Set(
+      this.profileStateManager.getAllSchedules().map(s => s.name.trim()),
+    );
+    const baseName = name.trim();
 
     if (!existingNames.has(baseName)) {
       return baseName;
@@ -688,10 +666,6 @@ export class ScheduleManagementService {
     } while (existingNames.has(candidateName));
 
     return candidateName;
-  }
-
-  async getStorageStats() {
-    return this.profileStateManager.getStorageStats();
   }
 
   async clearAllSchedules(): Promise<void> {

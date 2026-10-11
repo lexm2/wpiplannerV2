@@ -360,15 +360,15 @@
 }
 
 .rmp-rating.excellent {
-  color: #4caf50;
+  color: var(--color-success);
 }
 
 .rmp-rating.good {
-  color: #ff9800;
+  color: var(--color-warning);
 }
 
 .rmp-rating.poor {
-  color: #f44336;
+  color: var(--color-error);
 }
 
 .rmp-details {
@@ -398,7 +398,8 @@
 }
 
 :global(html.is-mobile) .wizard-content {
-  padding: 1rem;
+  /* Keeps the 80px bottom room for the footer, which sits over the content. */
+  padding: 1rem 1rem 80px;
 }
 
 :global(html.is-mobile) .wizard-sections-grid {
@@ -437,17 +438,6 @@
   vertical-align: middle;
 }
 
-@media (max-height: 1100px) {
-  .wizard-content {
-    padding-bottom: 0;
-  }
-
-  .wizard-footer {
-    background-color: transparent;
-    border-top: none;
-  }
-}
-
 .wizard-filtered-notice {
   display: flex;
   align-items: center;
@@ -482,4 +472,18 @@
   background: var(--color-primary);
   color: #fff;
   border-color: var(--color-primary);
+}
+
+/* Phone widths: the drawer's 1rem gutter, as html.is-mobile already gives the
+   content above; the filter banner and footer follow it too. */
+@media (max-width: 560px) {
+  .wizard-content {
+    padding: 1rem 1rem 80px;
+  }
+
+  .wizard-filter-status,
+  .wizard-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

@@ -97,60 +97,6 @@
   margin-top: 0.85rem;
 }
 
-.modal-header.info {
-  background: linear-gradient(
-    135deg,
-    var(--color-info, #007bff),
-    var(--color-primary)
-  );
-  color: var(--color-text-inverse);
-}
-
-.modal-header.warning {
-  background: linear-gradient(
-    135deg,
-    var(--color-warning),
-    var(--color-warning)
-  );
-  color: var(--color-text-inverse);
-}
-
-.modal-header.error {
-  background: linear-gradient(135deg, var(--color-error), var(--color-error));
-  color: var(--color-text-inverse);
-}
-
-.modal-header.success {
-  background: linear-gradient(
-    135deg,
-    var(--color-success),
-    var(--color-success)
-  );
-  color: var(--color-text-inverse);
-}
-
-.modal-header.info .modal-title,
-.modal-header.warning .modal-title,
-.modal-header.error .modal-title,
-.modal-header.success .modal-title {
-  color: var(--color-text-inverse);
-}
-
-.modal-header.info .modal-close,
-.modal-header.warning .modal-close,
-.modal-header.error .modal-close,
-.modal-header.success .modal-close {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.modal-header.info .modal-close:hover,
-.modal-header.warning .modal-close:hover,
-.modal-header.error .modal-close:hover,
-.modal-header.success .modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-text-inverse);
-}
-
 .modal-footer {
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   display: flex;
@@ -740,6 +686,34 @@ html.is-mobile .section-enrollment-waitlist {
   max-width: 800px;
   width: 90%;
 }
+/* The weekly grid needs more room than the 500px default. */
+.time-grid-modal .modal-dialog {
+  max-width: 860px;
+  width: 90%;
+}
+
+/* A column, so the picker can be squeezed to the dialog's 90vh cap: the grid
+   gives up height before anything has to scroll (see time-grid.module.css). */
+.time-grid-modal .modal-body {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* "Include async classes" sits beside Done, so the two centre on one line. */
+.time-grid-modal .modal-footer {
+  align-items: center;
+}
+
+/* The off track is --color-border, which nearly matches the footer's own
+   background; mix in the secondary text colour so it reads as a switch. */
+.time-grid-modal .modal-footer .filter-toggle:not(:checked) {
+  background: color-mix(in srgb, var(--color-text-secondary) 45%, transparent);
+}
+
+/* Phones stack the footer with Done on top; keep the toggle at the right. */
+html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
+  align-self: flex-end;
+}
 
 /* Add/Edit Event: the form's day pills, term toggles and start/end time row all
    crowd at the 500px default, so this one runs about twice as wide. */
@@ -940,6 +914,8 @@ html.is-mobile .section-enrollment-waitlist {
 
 .filter-toggle {
   position: relative;
+  /* Never squeezed by a long label beside it, so every switch is one size. */
+  flex-shrink: 0;
   width: 50px;
   height: 24px;
   appearance: none;
@@ -963,7 +939,9 @@ html.is-mobile .section-enrollment-waitlist {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: white;
+  background: var(--color-toggle-knob);
+  /* Edges the knob on a light track, where it would otherwise blend in. */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   transition: var(--effect-transition);
 }
 
@@ -1083,22 +1061,36 @@ html.is-mobile .section-enrollment-waitlist {
   font-size: 0.9rem;
 }
 
+/* A phone's Filter modal is a full screen, edge to edge: the backdrop's inset
+   left an 8px strip down each side of a dialog that already ran top to
+   bottom. dvh is the height actually visible; 100vh runs under the browser's
+   toolbar on phones and hid the footer. */
+html.is-mobile .modal-backdrop.filter-modal {
+  padding: 0;
+}
+
 html.is-mobile .filter-modal .modal-dialog {
   max-width: 100%;
   width: 100%;
   margin: 0;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
+  border-radius: 0;
 }
 
 html.is-mobile .filter-modal .modal-content {
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
   border-radius: 0;
 }
 
 html.is-mobile .filter-modal-body {
   max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
 }
 
 html.is-mobile .filter-checkbox-grid {
@@ -1440,6 +1432,17 @@ html.is-mobile .changelog-modal-body {
   padding: 0 1rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+/* The selectable term badges are buttons; undo the UA button styles that
+   .term-badge doesn't already set, so they match the span badges. */
+.as-card-terms button {
+  margin: 0;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 /* `.as-card-terms .term-badge.selected` lived here; `.term-badge` is hashed by
@@ -1927,4 +1930,79 @@ button.course-finder-bucket:focus-visible .course-finder-bucket-go {
 
 html.is-mobile .course-finder-modal .modal-dialog {
   max-width: 100%;
+}
+
+/* Phones: the title and close button on the first line, search and grouping
+   on the second; and a course's Assign beside its buckets rather than on a
+   row of its own under a rule. */
+@media (max-width: 560px) {
+  .course-finder-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem 0.75rem 1rem;
+  }
+
+  .course-finder-header .modal-close {
+    grid-column: 2;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+  }
+
+  .course-finder-search {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  .course-finder-sort {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 44px;
+    margin-right: 0.5rem;
+  }
+
+  .course-finder-sort-label {
+    display: none;
+  }
+
+  .course-finder-body {
+    padding: 0 1rem 1rem;
+  }
+
+  .course-finder-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+  }
+
+  .course-finder-open {
+    grid-column: 1 / -1;
+  }
+
+  .course-finder-row-buckets {
+    grid-column: 1;
+    margin-bottom: 0;
+  }
+
+  .course-finder-row-foot {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: column;
+    align-items: flex-end;
+    align-self: start;
+    gap: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  /* Both are finger targets, and the same height keeps them on one line. */
+  .course-finder-bucket,
+  .course-finder-row-foot .assign-menu-trigger {
+    min-height: 40px;
+  }
 }

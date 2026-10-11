@@ -23,6 +23,12 @@ const FOCUSABLE = [
 let lockCount = 0;
 let priorBodyOverflow = '';
 
+// Each open dialog's restore candidates, nearest first. A modal opened while
+// another was closing (Next in the auto-schedule intro, Tutorials in the
+// picker) captures a button inside the closing one, which is gone by the time
+// it closes; it falls back to what the closing modal would have restored.
+const restoreTargets = new Map<HTMLElement, HTMLElement[]>();
+
 function focusableWithin(node: HTMLElement): HTMLElement[] {
   return [...node.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
     el =>
@@ -34,6 +40,14 @@ function focusableWithin(node: HTMLElement): HTMLElement[] {
 
 export function trapFocus(node: HTMLElement) {
   const previouslyFocused = document.activeElement as HTMLElement | null;
+  const owner = previouslyFocused
+    ? [...restoreTargets.keys()].find(n => n.contains(previouslyFocused))
+    : undefined;
+  const candidates = [
+    ...(previouslyFocused ? [previouslyFocused] : []),
+    ...((owner && restoreTargets.get(owner)) ?? []),
+  ];
+  restoreTargets.set(node, candidates);
 
   if (lockCount === 0) {
     priorBodyOverflow = document.body.style.overflow;
@@ -79,6 +93,7 @@ export function trapFocus(node: HTMLElement) {
   return {
     destroy(): void {
       node.removeEventListener('keydown', onKeydown);
+      restoreTargets.delete(node);
       lockCount = Math.max(0, lockCount - 1);
       if (lockCount === 0) {
         document.body.style.overflow = priorBodyOverflow;
@@ -88,7 +103,13 @@ export function trapFocus(node: HTMLElement) {
       // view. A bare focus() scrolls the restored element back into view too,
       // and since the restore lands after the outro - a good 200ms into that
       // smooth scroll - it would yank the pane back where it started.
-      previouslyFocused?.focus?.({ preventScroll: true });
+      //
+      // Only when focus is still ours to hand back: on <body> (where removing
+      // the focused dialog leaves it) or inside this dialog. Otherwise a modal
+      // that opened as this one closed already has it.
+      const active = document.activeElement;
+      if (active && active !== document.body && !node.contains(active)) return;
+      candidates.find(el => el.isConnected)?.focus?.({ preventScroll: true });
     },
   };
 }

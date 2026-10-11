@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildCourseIndex,
+  compareTerms,
   groupCourses,
   matchesQuery,
   nextSort,
@@ -250,6 +251,27 @@ describe('groupCourses', () => {
   it('groups by term with undated courses last', () => {
     const groups = groupCourses(entries, 'term', buckets);
     expect(groups.map(g => g.label)).toEqual(['2026 Fall A Term', 'No term']);
+  });
+
+  it('orders terms chronologically, unparsed labels last', () => {
+    const labels = [
+      'Summer Session',
+      '2026 Spring C Term',
+      '2025 Fall B Term',
+      '2026 Fall A Term',
+      '2025 Fall A Term',
+      '2026 Spring Semester',
+      '2025 Spring D Term',
+    ];
+    expect([...labels].sort(compareTerms)).toEqual([
+      '2025 Spring D Term',
+      '2025 Fall A Term',
+      '2025 Fall B Term',
+      '2026 Spring Semester',
+      '2026 Spring C Term',
+      '2026 Fall A Term',
+      'Summer Session',
+    ]);
   });
 
   it('returns one flat section when sorting by code', () => {

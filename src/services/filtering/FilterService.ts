@@ -33,23 +33,6 @@ export class FilterService {
     this.sectionPipeline.registerFilter(filter);
   }
 
-  unregisterFilter(filterId: string): boolean {
-    const removed = this.registeredFilters.delete(filterId);
-    if (removed) {
-      this.removeFilter(filterId);
-      this.sectionPipeline.unregisterFilter(filterId);
-    }
-    return removed;
-  }
-
-  getRegisteredFilter(filterId: string): SectionBasedFilter | undefined {
-    return this.registeredFilters.get(filterId);
-  }
-
-  getAvailableFilters(): SectionBasedFilter[] {
-    return Array.from(this.registeredFilters.values());
-  }
-
   setConflictDetector(): void {
     const conflictFilter = new ConflictFilter();
     this.registerFilter(conflictFilter);
@@ -134,14 +117,6 @@ export class FilterService {
     return true;
   }
 
-  toggleFilter(filterId: string, criteria: unknown): boolean {
-    if (this.hasFilter(filterId)) {
-      return this.removeFilter(filterId);
-    } else {
-      return this.addFilter(filterId, criteria);
-    }
-  }
-
   hasFilter(filterId: string): boolean {
     return this.filterState.hasFilter(filterId);
   }
@@ -167,19 +142,6 @@ export class FilterService {
     return this.filterState.isEmpty();
   }
 
-  getFilterSummary(): string {
-    const activeFilters = this.getActiveFilters();
-    if (activeFilters.length === 0) {
-      return 'No filters active';
-    }
-
-    if (activeFilters.length === 1) {
-      return `1 filter: ${activeFilters[0].displayValue}`;
-    }
-
-    return `${activeFilters.length} filters active`;
-  }
-
   apply(courses: Course[]): FilterableSection[] {
     if (this.isEmpty()) {
       return this.sectionPipeline.flattenCoursesToSections(courses);
@@ -190,11 +152,10 @@ export class FilterService {
     // Remove bookmark from criteriaMap - it's handled post-pipeline in filterCourses()
     criteriaMap.delete('bookmark');
 
-    if (criteriaMap.size === 0) {
-      return this.sectionPipeline.flattenCoursesToSections(courses);
-    }
-
     const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+    if (criteriaMap.size === 0) {
+      return sections;
+    }
     return this.sectionPipeline.applyFilters(sections, criteriaMap);
   }
 
@@ -207,12 +168,27 @@ export class FilterService {
       return courses;
     }
 
-    const filteredSections = this.apply(courses);
-    let filteredCourses = this.resolveToCourses(filteredSections);
-
     const criteriaMap = this.getCriteriaMap();
     const bookmarkCriteria = criteriaMap.get('bookmark') as
       BookmarkFilterCriteria | undefined;
+    const searchCriteria = criteriaMap.get('searchText') as
+      SearchTextFilterCriteria | undefined;
+    criteriaMap.delete('bookmark');
+
+    // With no section filters, flattening and rebuilding would only copy each
+    // course and drop those without sections, so do just the latter.
+    let filteredCourses: Course[];
+    if (criteriaMap.size === 0) {
+      filteredCourses = courses.filter(
+        c => !!c.lectures?.length || !!c.standaloneLabs?.length,
+      );
+    } else {
+      const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+      filteredCourses = this.resolveToCourses(
+        this.sectionPipeline.applyFilters(sections, criteriaMap),
+      );
+    }
+
     if (
       bookmarkCriteria &&
       bookmarkCriteria.showBookmarkedOnly &&
@@ -224,8 +200,6 @@ export class FilterService {
       );
     }
 
-    const searchCriteria = criteriaMap.get('searchText') as
-      SearchTextFilterCriteria | undefined;
     if (searchCriteria && searchCriteria.query) {
       filteredCourses = rankCoursesByRelevance(
         filteredCourses,
@@ -250,6 +224,19 @@ export class FilterService {
     const sections = this.sectionPipeline.flattenCoursesToSections(courses);
     const filtered = this.sectionPipeline.applyFilters(sections, criteriaMap);
     return this.sectionPipeline.reconstructCourses(filtered);
+  }
+
+  /** Like apply(), but skipping the given section filters. */
+  applyExcluding(courses: Course[], excludeIds: string[]): FilterableSection[] {
+    const criteriaMap = this.getCriteriaMap();
+    criteriaMap.delete('bookmark');
+    for (const id of excludeIds) {
+      criteriaMap.delete(id);
+    }
+
+    const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+    if (criteriaMap.size === 0) return sections;
+    return this.sectionPipeline.applyFilters(sections, criteriaMap);
   }
 
   getFilterOptions(

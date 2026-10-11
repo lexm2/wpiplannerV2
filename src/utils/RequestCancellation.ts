@@ -66,21 +66,6 @@ export class OperationManager {
     }
   }
 
-  cancelAllOperations(reason?: string): void {
-    for (const [_id, tokenSource] of this.activeOperations) {
-      tokenSource.cancel(reason || 'All operations cancelled');
-    }
-    this.activeOperations.clear();
-  }
-
-  isOperationActive(operationId: string): boolean {
-    return this.activeOperations.has(operationId);
-  }
-
-  getActiveOperationCount(): number {
-    return this.activeOperations.size;
-  }
-
   completeOperation(operationId: string): void {
     this.activeOperations.delete(operationId);
   }
@@ -88,6 +73,7 @@ export class OperationManager {
 
 export class DebouncedOperation {
   private timeoutId: number | null = null;
+  private rejectPending: ((error: Error) => void) | null = null;
   private operationManager: OperationManager;
   private operationId: string;
 
@@ -104,13 +90,14 @@ export class DebouncedOperation {
     operation: (cancellationToken: CancellationToken) => Promise<T>,
   ): Promise<T> {
     return new Promise((resolve, reject) => {
-      if (this.timeoutId !== null) {
-        clearTimeout(this.timeoutId);
-      }
+      this.clearPending('Superseded by a newer operation');
+      this.rejectPending = reject;
 
       // The callback settles on every path; the void-wrapped IIFE keeps
       // setTimeout's void contract.
       this.timeoutId = window.setTimeout(() => {
+        this.timeoutId = null;
+        this.rejectPending = null;
         void (async () => {
           try {
             const token = this.operationManager.startOperation(
@@ -136,17 +123,22 @@ export class DebouncedOperation {
   }
 
   cancel(): void {
-    if (this.timeoutId !== null) {
-      clearTimeout(this.timeoutId);
-      this.timeoutId = null;
-    }
+    this.clearPending('Debounced operation cancelled');
     this.operationManager.cancelOperation(
       this.operationId,
       'Debounced operation cancelled',
     );
   }
 
-  setDelay(delay: number): void {
-    this.delay = Math.max(0, Math.min(5000, delay));
+  // Drops a still-waiting call: clears its timer and rejects its promise with
+  // CancellationError, which would otherwise never settle.
+  private clearPending(reason: string): void {
+    if (this.timeoutId !== null) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
+    const reject = this.rejectPending;
+    this.rejectPending = null;
+    reject?.(new CancellationError(reason));
   }
 }

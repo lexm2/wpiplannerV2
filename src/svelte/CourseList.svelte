@@ -3,6 +3,7 @@
   import { appState } from '../core/state/appState.svelte';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
+  import { semesterTermLabel } from '../utils/typeGuards';
   import { courseListState } from './courseListState.svelte';
   import { buildCourseView } from './courseView';
   import { expandedTerm, toggleTerm, termFlip } from './termExpansion.svelte';
@@ -13,6 +14,7 @@
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
   import { logger } from '../utils/logger';
+  import { openDrawer } from './drawerState.svelte';
 
   let {
     filterService,
@@ -73,10 +75,30 @@
       : `${sorted.length.toLocaleString()} course${sorted.length === 1 ? '' : 's'}`,
   );
 
+  // What the result set is "of": the filter criteria plus which departments
+  // are loaded. Keyed on this rather than on `sorted`, whose identity also
+  // changes on a data refresh and - with avoid-conflicts on - on every
+  // selection (appEffects rewrites periodConflict's selectedCourses), neither
+  // of which should throw the reader back to the first page.
+  const resultKey = $derived(
+    JSON.stringify([
+      filterService
+        .getActiveFilters()
+        .map(f =>
+          f.id === 'periodConflict'
+            ? [f.id, { ...(f.criteria as object), selectedCourses: undefined }]
+            : [f.id, f.criteria],
+        )
+        .sort(([a], [b]) => String(a).localeCompare(String(b))),
+      appState.loadedDepartments.map(d => d.abbreviation),
+    ]),
+  );
+
   // A new result set starts at the top; without this, clearing a filter after
-  // scrolling deep renders every match at once.
-  $effect(() => {
-    sorted;
+  // scrolling deep renders every match at once. Pre, so the first render of
+  // the new results is already paged.
+  $effect.pre(() => {
+    resultKey;
     courseListState.resetPaging();
   });
 
@@ -91,6 +113,23 @@
 
   function selectCourse(course: Course): void {
     courseListState.selectedCourse = course;
+    // Where the details panel is hidden, bring it in to show the course.
+    openDrawer('details');
+  }
+
+  // The card/row is itself a button for keyboard users. The target guard keeps
+  // Enter/Space on the nested select/bookmark/term buttons and professor links
+  // doing their own thing instead of also opening the course.
+  function onCourseKeydown(e: KeyboardEvent, course: Course): void {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      selectCourse(course);
+    }
+  }
+
+  function termSectionsLabel(term: string): string {
+    return `${semesterTermLabel(term) ?? `${term} term`} sections`;
   }
 
   function toggleSelect(course: Course): void {
@@ -121,7 +160,6 @@
       {@const course = cv.course}
       {@const isSelected = appState.selectedById.has(course.id)}
       {@const isBookmarked = appState.bookmarkedIds.has(course.id)}
-      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
       <div
         class={[
           listStyles['course-card'],
@@ -135,11 +173,16 @@
         data-active={courseListState.selectedCourseId === course.id
           ? ''
           : undefined}
+        role="button"
+        tabindex="0"
+        aria-label="{course.departmentAbbr}{course.number} {course.name}"
         onclick={() => selectCourse(course)}
+        onkeydown={e => onCourseKeydown(e, course)}
       >
         <div class={listStyles['course-card-header']}>
+          <!-- Code above name, buttons stacked at the right: the same layout
+               the list rows take at phone widths. -->
           <div class={listStyles['course-card-info']}>
-            <div class={listStyles['course-title-main']}>{course.name}</div>
             <div class={listStyles['course-code-row']}>
               <div class={listStyles['course-code']}>
                 {course.departmentAbbr}{course.number}
@@ -148,6 +191,7 @@
                   >At capacity</span
                 >{/if}
             </div>
+            <div class={listStyles['course-title-main']}>{course.name}</div>
           </div>
           <div class={listStyles['course-card-buttons']}>
             <button
@@ -191,7 +235,6 @@
       {@const isSelected = appState.selectedById.has(course.id)}
       {@const isBookmarked = appState.bookmarkedIds.has(course.id)}
       {@const expanded = expandedTerm.get(course.id)}
-      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
       <div
         class={[
           listStyles['course-item'],
@@ -206,7 +249,11 @@
         data-active={courseListState.selectedCourseId === course.id
           ? ''
           : undefined}
+        role="button"
+        tabindex="0"
+        aria-label="{course.departmentAbbr}{course.number} {course.name}"
         onclick={() => selectCourse(course)}
+        onkeydown={e => onCourseKeydown(e, course)}
         use:termFlip={expanded}
       >
         <div class={listStyles['course-header']}>
@@ -261,8 +308,8 @@
                 data-term={expanded}
                 data-term-sections
               >
-                <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-                <span
+                <button
+                  type="button"
                   class={[
                     listStyles['term-badge'],
                     listStyles['active'],
@@ -270,6 +317,8 @@
                   ]}
                   data-term={expanded}
                   data-term-badge
+                  aria-label={termSectionsLabel(expanded)}
+                  aria-expanded="true"
                   title={sec?.allFull ? 'All sections full' : undefined}
                   onclick={e => {
                     e.stopPropagation();
@@ -278,7 +327,7 @@
                 >
                   <span class={listStyles['term-letter']}>{expanded}</span>
                   {@html getInlineSVG('PLUS', 'term-icon')}
-                </span>
+                </button>
                 {#each sec?.badges ?? [] as badge (badge.key)}
                   <span
                     class={[
@@ -317,15 +366,19 @@
                   >{/if}
                 {#each cv.terms as t (t.term)}
                   {#if t.available}
-                    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-                    <span
+                    <button
+                      type="button"
                       class={[
                         listStyles['term-badge'],
                         { [listStyles['full']]: t.allFull },
                       ]}
                       data-term={t.term}
                       data-term-badge
-                      title={t.allFull ? 'All sections full' : undefined}
+                      aria-label={termSectionsLabel(t.term)}
+                      aria-expanded="false"
+                      title={t.allFull
+                        ? 'All sections full'
+                        : semesterTermLabel(t.term)}
                       onclick={e => {
                         e.stopPropagation();
                         toggleTerm(e, course.id, t.term, true);
@@ -333,7 +386,7 @@
                     >
                       <span class={listStyles['term-letter']}>{t.term}</span>
                       {@html getInlineSVG('PLUS', 'term-icon')}
-                    </span>
+                    </button>
                   {:else}
                     <span
                       class={[
@@ -375,3 +428,16 @@
     ></div>
   {/if}
 {/if}
+
+<style>
+  /* The clickable term badges are buttons; undo the UA button styles that
+     .term-badge doesn't already set, so they match the span badges. */
+  button[data-term-badge] {
+    margin: 0;
+    line-height: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+</style>

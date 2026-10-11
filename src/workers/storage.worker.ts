@@ -4,7 +4,7 @@ import { setReplacer } from '../utils/jsonSerializer';
 
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const { id, type, payload } = event.data;
-  const typedPayload = payload as { data?: unknown; compressed?: string };
+  const typedPayload = payload as { data?: unknown };
 
   try {
     let result: string | null;
@@ -13,11 +13,6 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
       case WorkerTaskType.COMPRESS_DATA: {
         const serialized = JSON.stringify(typedPayload.data, setReplacer);
         result = LZString.compress(serialized);
-        break;
-      }
-
-      case WorkerTaskType.DECOMPRESS_DATA: {
-        result = LZString.decompress(typedPayload.compressed!);
         break;
       }
 

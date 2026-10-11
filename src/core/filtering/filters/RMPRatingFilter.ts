@@ -35,22 +35,20 @@ export class RMPRatingFilter implements SectionBasedFilter {
     }
 
     return sections.filter(fs => {
-      return fs.section.periods.some(period => {
-        if (!period.professor || period.professor === 'Not Assigned') {
-          return false;
-        }
+      const professors = fs.section.periods
+        .map(period => period.professor)
+        .filter(name => name && name !== 'Not Assigned');
+      // No instructor listed at all means no rating to judge by.
+      if (professors.length === 0) return criteria.includeWithoutData ?? true;
 
-        const rmpData = this.rmpService.getRatingDisplay(period.professor);
+      return professors.some(professor => {
+        const ratings = this.rmpService.getRatings(professor);
 
-        if (!rmpData) {
+        if (!ratings) {
           return criteria.includeWithoutData ?? true;
         }
 
-        const rating = parseFloat(rmpData.rating);
-        const difficulty = parseFloat(rmpData.difficulty);
-        const wouldTakeAgain = rmpData.wouldTakeAgain
-          ? parseInt(rmpData.wouldTakeAgain)
-          : null;
+        const { rating, difficulty, wouldTakeAgain } = ratings;
 
         if (
           criteria.minRating !== undefined &&

@@ -1,4 +1,5 @@
 import { getAllSections } from '../utils/courseUtils';
+import { QUARTER_TERMS, TERM_ORDER } from '../utils/typeGuards';
 import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
 import type { Course, Section } from '../types/types';
 
@@ -8,7 +9,6 @@ import type { Course, Section } from '../types/types';
  * the (deduped) section badges per term.
  */
 
-const TERMS = ['A', 'B', 'C', 'D'] as const;
 const MAX_BADGES = 100;
 
 type ProfLink = { text: string; url: string | null };
@@ -64,7 +64,12 @@ export function buildCourseView(course: Course): CourseView {
   const hasWarning =
     allSecs.length > 0 && allSecs.every(s => s.seatsAvailable <= 0);
 
-  const terms: TermInfo[] = TERMS.map(term => {
+  // Quarters always get a badge (greyed when not offered) so rows line up;
+  // semester terms only when the course offers them.
+  const shownTerms = TERM_ORDER.filter(
+    term => QUARTER_TERMS.includes(term) || sectionsByTermRaw.has(term),
+  );
+  const terms: TermInfo[] = shownTerms.map(term => {
     const secs = sectionsByTermRaw.get(term);
     return {
       term,
@@ -77,7 +82,7 @@ export function buildCourseView(course: Course): CourseView {
     string,
     { badges: SectionBadge[]; overflow: number; allFull: boolean }
   >();
-  for (const term of TERMS) {
+  for (const term of TERM_ORDER) {
     const sections = sectionsByTermRaw.get(term);
     if (!sections) continue;
 

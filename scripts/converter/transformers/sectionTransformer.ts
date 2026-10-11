@@ -25,8 +25,8 @@ export function transformSection(
   const courseSectionFull = workdaySection.Course_Section;
   const instructionalFormat = workdaySection.Instructional_Format;
 
-  // Skip cancelled sections (e.g. "X Cancel - 03/17/2026 - ...")
-  if (/\bX\s+(Cancel|Cancelled)\b/i.test(courseSectionFull)) {
+  // Skip cancelled sections (e.g. "X Cancel - 03/17/2026 - ...", "X-Cancel-Draft ...", "X-Canceled-...")
+  if (/\bX[\s-]+Cancel(l?ed)?\b/i.test(courseSectionFull)) {
     return [];
   }
 
@@ -61,10 +61,10 @@ export function transformSection(
   const clusterId = workdaySection.CF_LRV_Cluster_Ref_ID || null;
   const note = isInterestList ? 'IntList' : clusterId || null;
 
-  const isGraduate = workdaySection.Academic_Level === 'Graduate';
-
   // Graduate courses keep F/S, undergraduate use A/B/C/D
-  const computedTerm = extractTermLetter(sectionNumber, isGraduate);
+  const computedTerm = isInterestList
+    ? interestListTerm(courseSectionFull)
+    : extractTermLetter(sectionNumber);
 
   const sectionDetails = workdaySection.Section_Details || '';
   const meetingPatterns = parseSectionDetails(sectionDetails);
@@ -131,20 +131,20 @@ function extractSectionNumber(
   );
 
   if (hasAppendix) {
-    // Extract: "CS 1101-A01-Quiz" -> "A01"
-    const dashIndex = courseSectionFull.indexOf('-');
-    const secondDashIndex = courseSectionFull.indexOf('-', dashIndex + 6);
-    return courseSectionFull.substring(dashIndex + 1, secondDashIndex - 1);
+    // Keep just the code: "CS 1101-A01-Quiz" -> "A01",
+    // "MA 1024-AD03-ACL (group 2)" -> "AD03", like a plain "(group N)" suffix.
+    const code = courseSectionFull
+      .slice(courseSectionFull.indexOf('-') + 1)
+      .match(/^[A-Z0-9]+/);
+    if (code) return code[0];
   }
 
   // Check for Interest List
   if (courseSectionFull.includes('Interest List')) {
-    const term = courseSectionFull.includes('Fall')
-      ? 'Fall'
-      : courseSectionFull.includes('Spring')
-        ? 'Spring'
-        : 'A Term';
-    return `Interest List-${term}`;
+    const term = interestListTerm(courseSectionFull);
+    const label =
+      term === 'F' ? 'Fall' : term === 'S' ? 'Spring' : `${term} Term`;
+    return `Interest List-${label}`;
   }
 
   // Check for special sections (GPS, Special Topics)
@@ -157,29 +157,23 @@ function extractSectionNumber(
   // Standard section: "CS 1101-A01 - Intro" -> "A01"
   const dashIndex = courseSectionFull.indexOf('-');
   const secondDashIndex = courseSectionFull.indexOf('-', dashIndex + 1);
-
-  if (secondDashIndex === -1) {
-    // No second dash, take everything after first dash
-    return courseSectionFull.substring(dashIndex + 1).trim();
-  }
-
-  let sectionNumber = courseSectionFull
-    .substring(dashIndex + 1, secondDashIndex - 1)
-    .trim();
+  let sectionNumber = courseSectionFull.substring(
+    dashIndex + 1,
+    secondDashIndex === -1 ? undefined : secondDashIndex,
+  );
 
   // Remove parenthetical suffixes: "A01 (Honors)" -> "A01"
   const parenIndex = sectionNumber.indexOf('(');
-  if (parenIndex !== -1) {
-    sectionNumber = sectionNumber.substring(0, parenIndex - 1).trim();
-  }
+  if (parenIndex !== -1) sectionNumber = sectionNumber.substring(0, parenIndex);
 
+  sectionNumber = sectionNumber.trim();
   return sectionNumber;
 }
 
 /**
  * Checks if a section is special (GPS, Special Topics, etc.)
  */
-function isSpecialSection(
+export function isSpecialSection(
   courseSectionFull: string,
   subjectAndNumber: string,
   config: ConverterConfig,
@@ -196,21 +190,25 @@ function isSpecialSection(
 }
 
 /**
+ * An interest list's term is the first letter of its code: "CH 1020-DL-Interest
+ * List" is D term, "MA 501-FD - Interest List" fall. Course_Section never
+ * names the season, so the code is the only place it appears.
+ */
+function interestListTerm(courseSectionFull: string): string {
+  const code = courseSectionFull.slice(courseSectionFull.indexOf('-') + 1);
+  const match = code.match(/^\s*([ABCDFS])/i);
+  return match ? match[1].toUpperCase() : 'A';
+}
+
+/**
  * Extracts academic term letter from section number
  * For undergraduate: "A01" -> "A", "DL08" -> "D"
  * For graduate: "F01" -> "F" (Fall), "S01" -> "S" (Spring)
  */
-function extractTermLetter(sectionNumber: string, isGraduate: boolean): string {
+function extractTermLetter(sectionNumber: string): string {
+  // Graduate F/S terms are kept; the UI displays them as A+B or C+D
   const match = sectionNumber.match(/^([ABCDFS])/i);
-  const termLetter = match ? match[1].toUpperCase() : 'A';
-
-  // Graduate courses keep F/S terms, UI handles display as A+B or C+D
-  if (isGraduate && (termLetter === 'F' || termLetter === 'S')) {
-    return termLetter;
-  }
-
-  // Standard undergraduate terms (A/B/C/D)
-  return termLetter;
+  return match ? match[1].toUpperCase() : 'A';
 }
 
 /**

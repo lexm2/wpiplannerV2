@@ -12,7 +12,7 @@
   import BookmarksFilter from './BookmarksFilter.svelte';
   import AvailabilityFilter from './AvailabilityFilter.svelte';
   import DepartmentFilter from './DepartmentFilter.svelte';
-  import WakeTimeFilter from './WakeTimeFilter.svelte';
+  import TimesFilter from './TimesFilter.svelte';
   import CreditHoursFilter from './CreditHoursFilter.svelte';
   import RmpRatingFilter from './RmpRatingFilter.svelte';
 
@@ -57,9 +57,8 @@
 
   const previewText = $derived.by(() => {
     if (isAuto) {
-      if (!autoScheduleOrchestrator) return 'Configure filters then generate';
       const selected =
-        coursesToSchedule ?? courseSelectionService.getSelectedCourses() ?? [];
+        coursesToSchedule ?? courseSelectionService.getSelectedCourses();
       if (selected.length === 0) return 'No courses selected';
       const courses = selected.map(sc => sc.course);
       const sections = filterService.apply(courses);
@@ -70,7 +69,12 @@
     return `${count} courses match current filters`;
   });
 
+  // Rate My Professor debounces its writes; flushed before anything reads the
+  // criteria or resets them.
+  let rmpFilter = $state<ReturnType<typeof RmpRatingFilter>>();
+
   function onPrimary(): void {
+    rmpFilter?.flush();
     if (isAuto && onGenerate) {
       requestClose();
       onGenerate();
@@ -85,6 +89,8 @@
   let resetNonce = $state(0);
 
   function onClearAll(): void {
+    // Otherwise the remount's flush would write the old values over the reset.
+    rmpFilter?.flush();
     filterService.resetFilters(activeYear);
     resetNonce++;
   }
@@ -112,10 +118,10 @@
       {autoScheduleOrchestrator}
     />
     <DepartmentFilter {filterService} {allCourses} />
-    <WakeTimeFilter {filterService} />
+    <TimesFilter {filterService} />
     <CreditHoursFilter {filterService} />
     {#key resetNonce}
-      <RmpRatingFilter {filterService} />
+      <RmpRatingFilter {filterService} bind:this={rmpFilter} />
     {/key}
   </div>
 </div>

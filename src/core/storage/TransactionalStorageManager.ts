@@ -9,18 +9,9 @@ import type { DegreeBucketConfig, StudentRecord } from '../../types/degree';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
 
-export interface StorageTransaction {
+interface StorageTransaction {
   id: string;
-  operations: StorageOperation[];
-  timestamp: number;
   backupData: Map<string, string | null>;
-}
-
-interface StorageOperation {
-  type: 'save' | 'delete';
-  key: string;
-  value?: string | null;
-  previousValue?: string | null;
 }
 
 export interface TransactionResult {
@@ -34,7 +25,6 @@ export class TransactionalStorageManager {
   /** Shared registry; see utils/storageKeys.ts. */
   private static readonly STORAGE_KEYS = STORAGE_KEYS;
 
-  private activeTransactions = new Map<string, StorageTransaction>();
   private transactionCounter = 0;
   private indexedDBStorage: IndexedDBStorageManager;
   private indexedDBInitialized = false;
@@ -63,52 +53,6 @@ export class TransactionalStorageManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- async by contract
-  async executeTransaction(
-    operations: (() => void)[],
-  ): Promise<TransactionResult> {
-    const transactionId = this.generateTransactionId();
-    const transaction: StorageTransaction = {
-      id: transactionId,
-      operations: [],
-      timestamp: Date.now(),
-      backupData: new Map(),
-    };
-
-    this.activeTransactions.set(transactionId, transaction);
-
-    try {
-      const keysToBackup = this.extractKeysFromOperations(operations);
-      this.createBackup(transaction, keysToBackup);
-
-      for (const operation of operations) {
-        operation();
-      }
-
-      const integrityCheck = this.verifyDataIntegrity();
-      if (!integrityCheck.valid) {
-        throw new Error(`Data integrity check failed: ${integrityCheck.error}`);
-      }
-
-      return {
-        success: true,
-        transactionId,
-      };
-    } catch (error) {
-      logger.warn(`Transaction ${transactionId} failed, rolling back:`, error);
-      const rollbackSuccess = this.rollbackTransaction(transaction);
-
-      return {
-        success: false,
-        transactionId,
-        error: error as Error,
-        rolledBack: rollbackSuccess,
-      };
-    } finally {
-      this.activeTransactions.delete(transactionId);
-    }
-  }
-
   async saveSchedule(schedule: Schedule): Promise<TransactionResult> {
     await this.ensureInitialized();
     const result = await this.indexedDBStorage.saveSchedule(schedule);
@@ -116,18 +60,6 @@ export class TransactionalStorageManager {
       success: result.success,
       transactionId: `indexeddb-${Date.now()}`,
       error: result.error ? new Error(result.error) : undefined,
-    };
-  }
-
-  async loadSchedule(
-    scheduleId: string,
-  ): Promise<{ data: Schedule | null; valid: boolean; error?: string }> {
-    await this.ensureInitialized();
-    const result = await this.indexedDBStorage.loadSchedule(scheduleId);
-    return {
-      data: result.data ?? null,
-      valid: result.success,
-      error: result.error,
     };
   }
 
@@ -162,7 +94,7 @@ export class TransactionalStorageManager {
         TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
         serializedPreferences,
       );
-    });
+    }, [TransactionalStorageManager.STORAGE_KEYS.PREFERENCES]);
   }
 
   loadPreferences(): {
@@ -195,7 +127,7 @@ export class TransactionalStorageManager {
           TransactionalStorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID,
         );
       }
-    });
+    }, [TransactionalStorageManager.STORAGE_KEYS.ACTIVE_SCHEDULE_ID]);
   }
 
   loadActiveScheduleId(): {
@@ -233,7 +165,7 @@ export class TransactionalStorageManager {
           TransactionalStorageManager.STORAGE_KEYS.DEGREE_RECORD,
         );
       }
-    });
+    }, [TransactionalStorageManager.STORAGE_KEYS.DEGREE_RECORD]);
   }
 
   /** Load the raw persisted degree record. Caller validates the schema. */
@@ -262,7 +194,7 @@ export class TransactionalStorageManager {
           TransactionalStorageManager.STORAGE_KEYS.DEGREE_BUCKET_CONFIG,
         );
       }
-    });
+    }, [TransactionalStorageManager.STORAGE_KEYS.DEGREE_BUCKET_CONFIG]);
   }
 
   /** Load the raw persisted bucket config. Caller validates the schema. */
@@ -321,12 +253,20 @@ export class TransactionalStorageManager {
       if (schedules.length > 0) {
         await this.ensureInitialized();
         for (const schedule of schedules) {
-          await this.saveSchedule(schedule);
+          const saved = await this.saveSchedule(schedule);
+          if (!saved.success) {
+            throw new Error(
+              `Failed to import schedule "${schedule.name}": ${saved.error?.message}`,
+            );
+          }
         }
       }
 
       if (activeScheduleId !== undefined) {
-        this.saveActiveScheduleId(activeScheduleId);
+        const saved = this.saveActiveScheduleId(activeScheduleId);
+        if (!saved.success) {
+          throw saved.error ?? new Error('Failed to save active schedule ID');
+        }
       }
 
       return {
@@ -343,21 +283,27 @@ export class TransactionalStorageManager {
     }
   }
 
-  private executeSyncTransaction(operation: () => void): TransactionResult {
+  /**
+   * Runs one localStorage write, rolling back `keys` if it throws (a full
+   * quota, say). Only the keys the write touches are backed up and checked,
+   * so a failure never restores or blames data some other write owns.
+   */
+  private executeSyncTransaction(
+    operation: () => void,
+    keys: string[] = Object.values(TransactionalStorageManager.STORAGE_KEYS),
+  ): TransactionResult {
     const transactionId = this.generateTransactionId();
     const transaction: StorageTransaction = {
       id: transactionId,
-      operations: [],
-      timestamp: Date.now(),
       backupData: new Map(),
     };
 
     try {
-      this.createFullBackup(transaction);
+      this.createBackup(transaction, keys);
 
       operation();
 
-      const integrityCheck = this.verifyDataIntegrity();
+      const integrityCheck = this.verifyDataIntegrity(keys);
       if (!integrityCheck.valid) {
         throw new Error(`Data integrity check failed: ${integrityCheck.error}`);
       }
@@ -421,10 +367,6 @@ export class TransactionalStorageManager {
     return `tx_${Date.now()}_${++this.transactionCounter}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
-  private extractKeysFromOperations(_operations: (() => void)[]): string[] {
-    return Object.values(TransactionalStorageManager.STORAGE_KEYS);
-  }
-
   private createBackup(transaction: StorageTransaction, keys: string[]): void {
     for (const key of keys) {
       try {
@@ -434,11 +376,6 @@ export class TransactionalStorageManager {
         logger.warn(`Failed to backup key ${key}:`, error);
       }
     }
-  }
-
-  private createFullBackup(transaction: StorageTransaction): void {
-    const keys = Object.values(TransactionalStorageManager.STORAGE_KEYS);
-    this.createBackup(transaction, keys);
   }
 
   private rollbackTransaction(transaction: StorageTransaction): boolean {
@@ -457,7 +394,9 @@ export class TransactionalStorageManager {
     }
   }
 
-  private verifyDataIntegrity(): { valid: boolean; error?: string } {
+  private verifyDataIntegrity(
+    keys: string[] = Object.values(TransactionalStorageManager.STORAGE_KEYS),
+  ): { valid: boolean; error?: string } {
     try {
       const testKey = 'wpi-integrity-test';
       const testValue = 'test';
@@ -470,12 +409,14 @@ export class TransactionalStorageManager {
       }
 
       // Schedules live in IndexedDB and are checked separately
-      const preferences = this.loadPreferences();
-      if (!preferences.valid) {
-        return {
-          valid: false,
-          error: `Preferences data invalid: ${preferences.error}`,
-        };
+      if (keys.includes(TransactionalStorageManager.STORAGE_KEYS.PREFERENCES)) {
+        const preferences = this.loadPreferences();
+        if (!preferences.valid) {
+          return {
+            valid: false,
+            error: `Preferences data invalid: ${preferences.error}`,
+          };
+        }
       }
 
       return { valid: true };
@@ -503,35 +444,9 @@ export class TransactionalStorageManager {
       issues.push(`Data integrity issue: ${integrityCheck.error}`);
     }
 
-    if (this.activeTransactions.size > 0) {
-      const stuckTransactions = Array.from(
-        this.activeTransactions.values(),
-      ).filter(tx => Date.now() - tx.timestamp > 30_000); // 30 seconds
-
-      if (stuckTransactions.length > 0) {
-        issues.push(`${stuckTransactions.length} transactions stuck for >30s`);
-      }
-    }
-
     return {
       healthy: issues.length === 0,
       issues,
-    };
-  }
-
-  async getStorageStats(): Promise<{
-    totalSchedules: number;
-    estimatedSize: number;
-    isUsingIndexedDB: boolean;
-    schedulesSizes?: Map<string, number>;
-  }> {
-    await this.ensureInitialized();
-    const stats = await this.indexedDBStorage.getStorageStats();
-    return {
-      totalSchedules: stats.data?.totalSchedules ?? 0,
-      estimatedSize: stats.data?.estimatedSize ?? 0,
-      isUsingIndexedDB: true,
-      schedulesSizes: stats.data?.schedulesSizes,
     };
   }
 }

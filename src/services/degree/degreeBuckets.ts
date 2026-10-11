@@ -37,7 +37,13 @@ export const UMBRELLA_CATEGORIES: ReadonlySet<RequirementCategory> = new Set([
 export interface DegreeBucket {
   id: string;
   source: 'import' | 'custom';
+  /** Display name, after any user rename. */
   name: string;
+  /**
+   * Imported buckets only: the requirement's own name from the record, which a
+   * rename never touches. Keys the tracking-sheet rule lookup.
+   */
+  requirementName?: string;
   scope: string;
   category: RequirementCategory;
   status: RequirementStatus;
@@ -141,6 +147,7 @@ function fromRequirement(id: string, req: Requirement): DegreeBucket {
     id,
     source: 'import',
     name: req.name,
+    requirementName: req.name,
     scope: req.scope,
     category: req.category,
     status: req.status,
@@ -169,6 +176,15 @@ function applyOverride(
         ? o.coursesRemaining
         : bucket.coursesRemaining,
   };
+}
+
+/**
+ * The label to match a bucket against the tracking-sheet rules: the original
+ * requirement name, so a renamed bucket still finds its own rule. Falls back to
+ * the display name for buckets built without one.
+ */
+export function bucketRuleLabel(bucket: DegreeBucket): string {
+  return bucket.requirementName ?? bucket.name;
 }
 
 /**

@@ -1,6 +1,7 @@
 import { tick } from 'svelte';
 import { uiState } from '../../services/ui/uiState.svelte';
 import { DeviceDetection } from '../../utils/deviceDetection';
+import { QUARTER_TERMS } from '../../utils/typeGuards';
 import { reduceMotion } from '../transitions';
 
 /**
@@ -20,14 +21,18 @@ import { reduceMotion } from '../transitions';
  * ScheduleGrids is the only consumer, so a module-level singleton is fine.
  */
 
-export const TERMS = ['A', 'B', 'C', 'D'];
+export const TERMS = QUARTER_TERMS;
 
 // A phone has no room for four grids at once, so it is permanently focused and
-// can never zoom out - paging between terms is the only navigation there.
-export const focusLocked = DeviceDetection.isMobilePhone();
+// can never zoom out - paging between terms is the only navigation there. A
+// phone-width window counts too (a phone in "desktop site" mode has a desktop
+// UA), live: narrowing to it focuses a term, and widening lets it zoom out.
+const phoneWidth = window.matchMedia('(max-width: 560px)');
+const isFocusLocked = (): boolean =>
+  DeviceDetection.isMobilePhone() || phoneWidth.matches;
 
 class TermFocus {
-  term = $state.raw<string | null>(focusLocked ? TERMS[0] : null);
+  term = $state.raw<string | null>(isFocusLocked() ? TERMS[0] : null);
 }
 
 export const termFocus = new TermFocus();
@@ -56,6 +61,14 @@ let pendingDir = 0;
 // Set the moment a mutator commits, cleared when its animations finish. Clicks
 // and gestures no-op while it holds, so two morphs can never interleave.
 let busy = false;
+
+phoneWidth.addEventListener('change', e => {
+  if (!e.matches || termFocus.term !== null || busy) return;
+  // No captured box, so the card zooms from where CSS lands it - an instant
+  // swap - while the other three fade out.
+  if (gridEl) busy = true;
+  termFocus.term = TERMS[0];
+});
 
 function cardOf(term: string): HTMLElement | null {
   return (
@@ -140,14 +153,14 @@ export function toggleFocus(term: string): void {
   if (termFocus.term === term) unfocus();
 }
 
-export function unfocus(): void {
-  if (busy || focusLocked || termFocus.term === null || !gridEl) return;
+function unfocus(): void {
+  if (busy || isFocusLocked() || termFocus.term === null || !gridEl) return;
   capture(termFocus.term);
   busy = true;
   termFocus.term = null;
 }
 
-export function stepTerm(dir: 1 | -1): void {
+function stepTerm(dir: 1 | -1): void {
   if (busy || termFocus.term === null || !gridEl) return;
   const i = TERMS.indexOf(termFocus.term);
   pendingDir = dir;
@@ -248,6 +261,7 @@ export function termMotion(node: HTMLElement, term: string | null) {
   gridEl = node;
   let current = term;
   let accum = 0;
+  let touchStartX = 0;
   let touchStartY = 0;
   let swiping = false;
 
@@ -272,12 +286,22 @@ export function termMotion(node: HTMLElement, term: string | null) {
 
   function onTouchStart(e: TouchEvent): void {
     swiping = termFocus.term !== null && !busy && e.touches.length === 1;
-    if (swiping) touchStartY = e.touches[0].clientY;
+    if (swiping) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
   }
 
   function onTouchMove(e: TouchEvent): void {
     if (!swiping) return;
+    const dx = touchStartX - e.touches[0].clientX;
     const dy = touchStartY - e.touches[0].clientY;
+    // A mostly sideways drag is the phone page swipe (pageSwipe.svelte.ts),
+    // not a term page; give it up for the rest of the touch.
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) >= 10) swiping = false;
+      return;
+    }
     if (Math.abs(dy) < SWIPE_PX) return;
     swiping = false;
     // Swiping up pulls the next term into view, matching the wheel.
@@ -297,6 +321,16 @@ export function termMotion(node: HTMLElement, term: string | null) {
       termFocus.term === null ||
       node.offsetParent === null ||
       uiState.openModals.length > 0
+    )
+      return;
+    // Leave modified keys, keys something else already took, and keys aimed at
+    // a control that uses arrows itself (fields, sliders, resize handles).
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    const target = e.target as Element | null;
+    if (
+      target?.closest?.(
+        'input, textarea, select, [contenteditable], [role="slider"], [role="separator"], [role="radiogroup"]',
+      )
     )
       return;
     if (e.key === 'Escape') {

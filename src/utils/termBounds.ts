@@ -1,6 +1,7 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import type { DateRange } from '../types/common';
 import { logger } from './logger';
+import { parseLocalDate } from './localDate';
 
 interface TermBoundInfo {
   startDate: string;
@@ -16,7 +17,7 @@ interface YearTermBounds {
   D: TermBoundInfo;
 }
 
-export interface TermBoundsData {
+interface TermBoundsData {
   generated: string;
   years: Record<string, YearTermBounds>;
 }
@@ -90,16 +91,12 @@ export class TermBoundsService {
       year ?? Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
     const yearBounds = this.termBoundsCache.years[fallYear];
     if (!yearBounds) return null;
-    const termInfo = yearBounds[termLetter];
+    const termInfo = yearBounds[termLetter] as TermBoundInfo | undefined;
+    if (!termInfo) return null;
     return {
-      start: new Date(termInfo.startDate),
-      end: new Date(termInfo.endDate),
+      start: parseLocalDate(termInfo.startDate),
+      end: parseLocalDate(termInfo.endDate),
     };
-  }
-
-  public getMostRecentYear(): number | null {
-    if (!this.termBoundsCache) return null;
-    return Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
   }
 
   /**
@@ -117,21 +114,9 @@ export class TermBoundsService {
     let current = years[0];
     for (const y of years) {
       const prev = this.termBoundsCache.years[String(y - 1)];
-      const boundary = prev ? new Date(prev.D.endDate) : null; // null => earliest year, always passed
+      const boundary = prev ? parseLocalDate(prev.D.endDate) : null; // null => earliest year, always passed
       if (boundary === null || now >= boundary) current = y;
     }
     return current;
-  }
-
-  public getTermBoundsData(): TermBoundsData | null {
-    return this.termBoundsCache;
-  }
-
-  public isLoaded(): boolean {
-    return this.termBoundsCache !== null;
-  }
-
-  public _resetForTesting(): void {
-    this.termBoundsCache = null;
   }
 }

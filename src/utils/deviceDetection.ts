@@ -2,7 +2,9 @@ export class DeviceDetection {
   static isMobilePhone(): boolean {
     const ua = navigator.userAgent;
 
-    if (/iPad|Android.*(?!Mobile)|Tablet|PlayBook|Silk|Kindle/i.test(ua)) {
+    // Android tablets are the Android UAs without "Mobile"; the lookahead has to
+    // span the rest of the string, or it passes on every Android phone too.
+    if (/iPad|Android(?!.*Mobile)|Tablet|PlayBook|Silk|Kindle/i.test(ua)) {
       return false;
     }
 

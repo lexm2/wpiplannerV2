@@ -52,6 +52,14 @@
     setWidth(edge === 'right' ? startWidth + delta : startWidth - delta);
   }
 
+  function clearBodyStyles(): void {
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
+
+  // Ends the drag on pointerup, and also on pointercancel/lostpointercapture
+  // (the browser took the pointer, e.g. for a touch gesture), so the body
+  // cursor/user-select overrides never outlive the drag.
   function onPointerUp(e: PointerEvent): void {
     if (!dragging) return;
     dragging = false;
@@ -61,14 +69,21 @@
     } catch {
       /* no-op if capture was never established */
     }
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
+    clearBodyStyles();
     const w = currentWidth(handle);
     localStorage.setItem(config.storageKey, String(Math.round(w)));
   }
 
+  // Unmounted mid-drag (e.g. the panel closed): nothing else would clear them.
+  $effect(() => () => {
+    if (dragging) clearBodyStyles();
+  });
+
+  // Drop the override rather than writing defaultWidth back: the stylesheet's
+  // fallback is the real default, and for the right panel it adapts to the
+  // window width.
   function reset(): void {
-    setWidth(config.defaultWidth);
+    document.documentElement.style.removeProperty(config.cssVar);
     localStorage.removeItem(config.storageKey);
   }
 
@@ -105,6 +120,8 @@
   onpointerdown={onPointerDown}
   onpointermove={onPointerMove}
   onpointerup={onPointerUp}
+  onpointercancel={onPointerUp}
+  onlostpointercapture={onPointerUp}
   ondblclick={reset}
   onkeydown={onKeyDown}
 ></div>

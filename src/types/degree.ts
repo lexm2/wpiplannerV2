@@ -1,9 +1,9 @@
 /**
  * Data model for a parsed WPI Workday "View My Academic Progress" export.
  *
- * The shape mirrors academic_progress_parser_plan.md. A degree course is a
- * transcript line (grade / term / transfer flags) and is intentionally distinct
- * from the catalog `Course` in types/types.ts - they are different concepts.
+ * A degree course is a transcript line (grade / term / transfer flags) and is
+ * intentionally distinct from the catalog `Course` in types/types.ts - they are
+ * different concepts.
  *
  * The model is deliberately plain (no Map/Set) so it round-trips cleanly through
  * JSON for localStorage persistence.

@@ -29,27 +29,29 @@ export function clampToViewport(box: HTMLElement): void {
  * watch for it (bounded to 1s) and retry - a step's target is routinely still
  * being built by that same step's state transition when this first runs. Pass
  * `waitForTarget: false` from repeat callers (scroll/resize) so only the once-per-
- * step call arms that watcher.
+ * step call arms that watcher. Returns a disposer that stops it early - call it
+ * when the step changes or the box unmounts.
  */
 export function repositionIfObstructed(
   box: HTMLElement,
   selector: string,
   waitForTarget = true,
-): void {
+): () => void {
+  const noop = () => {};
   const target = document.querySelector(selector);
-  if (target && box.contains(target)) return;
+  if (target && box.contains(target)) return noop;
 
   const targetRect = target?.getBoundingClientRect();
 
   if (!targetRect || (targetRect.width === 0 && targetRect.height === 0)) {
-    if (!waitForTarget) return;
+    if (!waitForTarget) return noop;
     const obs = new MutationObserver(() => {
       const el = document.querySelector(selector);
       if (!el) return;
       const r = el.getBoundingClientRect();
       if (r.width === 0 && r.height === 0) return;
-      obs.disconnect();
-      repositionIfObstructed(box, selector);
+      dispose();
+      repositionIfObstructed(box, selector, false);
       clampToViewport(box);
     });
     obs.observe(document.body, {
@@ -58,8 +60,12 @@ export function repositionIfObstructed(
       subtree: true,
       attributeFilter: ['class', 'style'],
     });
-    setTimeout(() => obs.disconnect(), 1000);
-    return;
+    const timer = setTimeout(() => obs.disconnect(), 1000);
+    const dispose = () => {
+      obs.disconnect();
+      clearTimeout(timer);
+    };
+    return dispose;
   }
 
   const boxRect = box.getBoundingClientRect();
@@ -71,7 +77,7 @@ export function repositionIfObstructed(
       a.top > b.bottom
     );
 
-  if (!overlaps(boxRect, targetRect)) return;
+  if (!overlaps(boxRect, targetRect)) return noop;
 
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -91,9 +97,10 @@ export function repositionIfObstructed(
       box.style.left = `${pos.left}px`;
       box.style.top = `${pos.top}px`;
       box.style.bottom = 'auto';
-      return;
+      return noop;
     }
   }
+  return noop;
 }
 
 /**

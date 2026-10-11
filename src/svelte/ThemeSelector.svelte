@@ -2,6 +2,7 @@
   import { fly } from 'svelte/transition';
   import styles from '../styles/components/theme-selector.module.css';
   import { dur } from './transitions';
+  import { clickOutside } from './clickOutside';
   import { ThemeManager } from '../themes/ThemeManager';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
@@ -12,6 +13,7 @@
   const themes = tm.getAvailableThemes();
 
   let open = $state(false);
+  let trigger = $state<HTMLButtonElement | null>(null);
   // `uiState.currentThemeId` is a rune bumped by ThemeManager.setTheme - so the
   // active option + current-name text recompute on any theme change, including
   // the settings-menu "Toggle Theme" which calls themeManager.setTheme directly.
@@ -20,18 +22,21 @@
     themes.find(t => t.id === currentId)?.name ?? '',
   );
 
-  function toggle(e: MouseEvent): void {
-    e.stopPropagation();
-    open = !open;
-  }
-
   function selectTheme(id: string): void {
     tm.setTheme(id);
     open = false;
   }
+
+  function onKeydown(e: KeyboardEvent): void {
+    // Only while open, so Escape still reaches modals and the wizard otherwise.
+    if (!open || e.key !== 'Escape') return;
+    e.preventDefault();
+    open = false;
+    trigger?.focus();
+  }
 </script>
 
-<svelte:window onclick={() => (open = false)} />
+<svelte:window onkeydown={onKeydown} />
 
 <!--
   Global classes (.theme-dropdown/.theme-options/.dropdown-arrow) live in
@@ -45,22 +50,22 @@
   type="button"
   class={['theme-dropdown', { [styles['open']]: open }]}
   id="theme-dropdown"
+  bind:this={trigger}
   aria-haspopup="true"
   aria-expanded={open}
-  onclick={toggle}
+  onclick={() => (open = !open)}
 >
   <span id="current-theme-name">{currentName}</span>
   <span class="dropdown-arrow" id="theme-dropdown-arrow"
     >{@html getInlineSVG('CHEVRON_DOWN', 'dropdown-arrow-icon')}</span
   >
 </button>
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (container only stops propagation; its children are real buttons) -->
 {#if open}
   <div
     class="theme-options"
     id="theme-options"
     transition:fly={{ y: -8, duration: dur(200) }}
-    onclick={e => e.stopPropagation()}
+    use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
   >
     {#each themes as t (t.id)}
       <button

@@ -9,7 +9,7 @@
     AvailabilityFilterCriteria,
     ConflictCriteria,
   } from '../../types/filters';
-  import type { WeeklyTimeSlot } from '../../types/schedule';
+  import { isCalendarSlot } from '../../services/scheduling/calendarEventProvider';
 
   let {
     filterService,
@@ -20,9 +20,6 @@
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
   } = $props();
-
-  const isCalendarSlot = (slot: WeeklyTimeSlot): boolean =>
-    !!(slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/));
 
   const availCriteria = $derived(
     filterService.getCriteria<AvailabilityFilterCriteria>('availability'),
@@ -36,6 +33,10 @@
   const avoidConflicts = $derived(conflictCriteria?.avoidConflicts ?? false);
   const blockedSlots = $derived(conflictCriteria?.blockedSlots ?? []);
   const hasCalendarEvents = $derived(blockedSlots.some(isCalendarSlot));
+  // Unset means on: F conflicts with A and B, S with C and D.
+  const semesterSpans = $derived(
+    conflictCriteria?.semesterSpansQuarters ?? true,
+  );
 
   const calendarEventCount = $derived(
     autoScheduleOrchestrator?.getLocalEventCount() ?? 0,
@@ -69,16 +70,18 @@
 
   function onAvoidConflicts(checked: boolean): void {
     if (checked) {
-      const selectedCourses = courseSelectionService.getSelectedCourses() ?? [];
+      const selectedCourses = courseSelectionService.getSelectedCourses();
       filterService.addFilter('periodConflict', {
         avoidConflicts: true,
         selectedCourses,
         blockedSlots, // preserve existing (e.g. calendar) slots
+        semesterSpansQuarters: semesterSpans,
       });
     } else if (blockedSlots.length > 0) {
       filterService.addFilter('periodConflict', {
         avoidConflicts: false,
         blockedSlots,
+        semesterSpansQuarters: semesterSpans,
       });
     } else {
       filterService.removeFilter('periodConflict');
@@ -86,12 +89,10 @@
   }
 
   function onCalendarToggle(checked: boolean): void {
-    if (!autoScheduleOrchestrator) return;
     const avoid = avoidConflicts;
     const selectedCourses =
       conflictCriteria?.selectedCourses ??
-      courseSelectionService.getSelectedCourses() ??
-      [];
+      courseSelectionService.getSelectedCourses();
     const nonCalendarSlots = blockedSlots.filter(s => !isCalendarSlot(s));
 
     if (checked) {
@@ -101,16 +102,26 @@
         avoidConflicts: avoid,
         selectedCourses,
         blockedSlots: [...nonCalendarSlots, ...calendarSlots],
+        semesterSpansQuarters: semesterSpans,
       });
     } else if (nonCalendarSlots.length > 0 || avoid) {
       filterService.addFilter('periodConflict', {
         avoidConflicts: avoid,
         selectedCourses,
         blockedSlots: nonCalendarSlots,
+        semesterSpansQuarters: semesterSpans,
       });
     } else {
       filterService.removeFilter('periodConflict');
     }
+  }
+
+  function onSemesterSpans(checked: boolean): void {
+    if (!conflictCriteria) return;
+    filterService.addFilter('periodConflict', {
+      ...conflictCriteria,
+      semesterSpansQuarters: checked,
+    });
   }
 </script>
 
@@ -127,6 +138,15 @@
       label={`Hide sections that conflict with calendar events (${calendarCountText})`}
       checked={hasCalendarEvents}
       onchange={onCalendarToggle}
+    />
+  {/if}
+
+  {#if avoidConflicts || hasCalendarEvents}
+    <FilterToggle
+      id="semester-spans-filter"
+      label="Semester courses (F, S) conflict with their quarters (A and B, C and D)"
+      checked={semesterSpans}
+      onchange={onSemesterSpans}
     />
   {/if}
 

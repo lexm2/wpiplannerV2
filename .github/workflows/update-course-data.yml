@@ -5,7 +5,9 @@ on:
     branches:
       - master
   schedule:
-    - cron: '*/15 * * * *' # Every 15 minutes
+    # Every 15 minutes, clear of :00 and :30, when GitHub's scheduler is
+    # busiest and most likely to delay or drop a run.
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 concurrency:
@@ -37,7 +39,7 @@ jobs:
 
       - name: Fetch latest course data
         run: |
-          mkdir -p public
+          mkdir -p data
           bun run fetch-data
 
       - name: Run TypeScript converter
@@ -46,7 +48,7 @@ jobs:
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet public/course-data.json public/course-data-constructed.json; then
+          if git diff --quiet data/course-data.json public/course-data-constructed.json; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -60,37 +62,33 @@ jobs:
 
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add public/course-data.json public/course-data-constructed.json public/last-updated.json public/term-bounds.json
+          git add data/course-data.json public/course-data-constructed.json public/last-updated.json public/term-bounds.json
           git commit -m "Update course data $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git pull --rebase origin master
           git push
 
       # Gate the deploy. Deliberately typecheck + unit tests only: this job runs
-      # every 15 minutes, so no browser download and no e2e flake blocking a
+      # on a schedule, so no browser download and no e2e flake blocking a
       # data refresh. The full suite runs in ci.yml on pull requests.
       # A failure here stops the deploy but leaves the data commit above intact,
-      # so course data stays fresh even while app code is broken.
+      # so course data stays fresh even while app code is broken. Scheduled
+      # runs that found no new data stop before this: the live site is current.
       - name: TypeScript typecheck
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         run: bun run typecheck
 
       - name: Unit tests
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         run: bun run test
 
       - name: Build TypeScript application
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: bun run build
 
-      - name: Copy course data to build output
-        run: |
-          cp public/course-data.json dist/
-          cp public/course-data-constructed.json dist/
-          cp public/last-updated.json dist/
-          cp public/term-bounds.json dist/
-          echo "Course data files copied to dist/"
-          ls -la dist/*.json
-
       - name: Deploy to GitHub Pages
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,9 +1,5 @@
-import { SimpleTime } from './types';
+import { DayOfWeek } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
-
-export interface FilterCriteria {
-  [filterId: string]: unknown;
-}
 
 export interface ActiveFilter<TCriteria = unknown> {
   id: string;
@@ -46,6 +42,12 @@ export interface AcademicYearFilterCriteria {
 interface ConflictFilterCriteria {
   avoidConflicts: boolean;
   blockedSlots: WeeklyTimeSlot[];
+  /**
+   * A semester section (F/S) conflicts with the quarters it runs through
+   * (F: A and B, S: C and D). Unset means on; false keeps the exact-term
+   * comparison, where F only conflicts with F.
+   */
+  semesterSpansQuarters?: boolean;
 }
 
 export interface ConflictCriteria extends ConflictFilterCriteria {
@@ -80,6 +82,26 @@ export interface BookmarkFilterCriteria {
   showBookmarkedOnly: boolean;
 }
 
-export interface WakeUpTimeFilterCriteria {
-  wakeUpTime: SimpleTime;
+export type TimeGridMode = 'only' | 'avoid';
+
+/** One painted band on one weekday. Minutes from midnight; half-open [start, end). */
+export interface TimeWindow {
+  day: DayOfWeek;
+  startMin: number;
+  endMin: number;
+}
+
+/**
+ * `windows` is canonical: sorted by weekday then start, non-overlapping, and
+ * non-adjacent. TimesFilter's containment test depends on touching bands
+ * having been merged.
+ */
+export interface TimesFilterCriteria {
+  mode: TimeGridMode;
+  windows: TimeWindow[];
+  /**
+   * Keep sections with nothing on the grid (async, no meeting days). Unset
+   * means no: painting times is a statement about when classes meet.
+   */
+  includeAsync?: boolean;
 }

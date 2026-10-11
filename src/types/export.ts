@@ -2,7 +2,7 @@
  * Compact local export/import format (v4).
  * Keys are abbreviated to minimize size.
  */
-import { z } from 'zod';
+import * as z from 'zod';
 
 export interface MinimalSyncData {
   v: string;

@@ -5,6 +5,7 @@
   import { degreeState } from '../degree/degreeState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import type { DegreeBucket } from '../../services/degree/degreeBuckets';
+  import { onDestroy, tick } from 'svelte';
   import { flip } from 'svelte/animate';
   import { dur } from '../transitions';
 
@@ -113,6 +114,11 @@
     return 0;
   }
 
+  // Removes an in-progress drag's window listeners. Run on unmount too, so a
+  // modal closed mid-drag (Escape) doesn't apply the reorder on release.
+  let detachDrag: (() => void) | null = null;
+  onDestroy(() => detachDrag?.());
+
   function startReorder(e: PointerEvent, bucket: DegreeBucket): void {
     if (e.button !== 0 || editingId === bucket.id) return;
     const row = (e.currentTarget as HTMLElement).closest<HTMLElement>(
@@ -167,17 +173,17 @@
       dropIndex = next;
     };
 
-    const onUp = () => {
+    const detach = () => {
       handle.releasePointerCapture?.(e.pointerId);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
-      if (dropIndex !== null && dropIndex !== index) {
-        const ids = buckets.map(b => b.id);
-        const [moved] = ids.splice(index, 1);
-        ids.splice(dropIndex, 0, moved);
-        degreeBucketService.reorder(ids);
-      }
+      detachDrag = null;
+    };
+
+    const onUp = () => {
+      detach();
+      if (dropIndex !== null) moveBucket(index, dropIndex);
       dragId = null;
       dragDy = 0;
       dropIndex = null;
@@ -187,6 +193,50 @@
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
+    detachDrag = detach;
+  }
+
+  /** Move the bucket at `from` to `to`; shared by the drag and the keyboard. */
+  function moveBucket(from: number, to: number): boolean {
+    if (to === from || to < 0 || to >= buckets.length) return false;
+    const ids = buckets.map(b => b.id);
+    const [moved] = ids.splice(from, 1);
+    ids.splice(to, 0, moved);
+    degreeBucketService.reorder(ids);
+    return true;
+  }
+
+  // Read out by the live region below after a keyboard move.
+  let reorderStatus = $state('');
+
+  // The handle doubles as the keyboard control: the arrow keys (with or
+  // without Alt) move its bucket a slot, Home/End to either end.
+  async function onHandleKeydown(
+    e: KeyboardEvent,
+    bucket: DegreeBucket,
+  ): Promise<void> {
+    const from = buckets.findIndex(b => b.id === bucket.id);
+    const to =
+      e.key === 'ArrowUp'
+        ? from - 1
+        : e.key === 'ArrowDown'
+          ? from + 1
+          : e.key === 'Home'
+            ? 0
+            : e.key === 'End'
+              ? buckets.length - 1
+              : null;
+    if (to === null || from < 0 || dragId || editingId === bucket.id) return;
+    e.preventDefault();
+    if (!moveBucket(from, to)) return;
+    reorderStatus = `${bucket.name} moved to position ${to + 1} of ${buckets.length}`;
+    // The keyed #each moves the row's node, and moving a node drops its focus.
+    await tick();
+    listEl
+      ?.querySelector<HTMLElement>(
+        `[data-bucket-id="${CSS.escape(bucket.id)}"] .bucket-config-handle`,
+      )
+      ?.focus();
   }
 
   function targetLabel(bucket: DegreeBucket): string {
@@ -213,6 +263,13 @@
         Workday import created.
       </p>
 
+      <span id="bucket-config-reorder-hint" class="bucket-config-sr-only"
+        >Use the up and down arrow keys to move this bucket.</span
+      >
+      <span class="bucket-config-sr-only" role="status" aria-live="polite"
+        >{reorderStatus}</span
+      >
+
       <div class="bucket-config-list" role="list" bind:this={listEl}>
         {#each buckets as bucket, i (bucket.id)}
           <div
@@ -227,10 +284,14 @@
                 ? `translateY(${shiftFor(i)}px)`
                 : undefined}
           >
-            <span
+            <button
+              type="button"
               class="bucket-config-handle"
-              aria-hidden="true"
-              onpointerdown={e => startReorder(e, bucket)}>⠿</span
+              aria-label="Move {bucket.name}"
+              aria-describedby="bucket-config-reorder-hint"
+              onpointerdown={e => startReorder(e, bucket)}
+              onkeydown={e => void onHandleKeydown(e, bucket)}
+              ><span aria-hidden="true">⠿</span></button
             >
 
             {#if editingId === bucket.id}
@@ -242,7 +303,11 @@
                   autofocus
                   onkeydown={e => {
                     if (e.key === 'Enter') commitEdit();
-                    if (e.key === 'Escape') editingId = null;
+                    if (e.key === 'Escape') {
+                      // Claimed, so Modal leaves the dialog open.
+                      e.preventDefault();
+                      editingId = null;
+                    }
                   }}
                 />
                 <TextField
@@ -253,7 +318,11 @@
                   placeholder="Credits"
                   onkeydown={e => {
                     if (e.key === 'Enter') commitEdit();
-                    if (e.key === 'Escape') editingId = null;
+                    if (e.key === 'Escape') {
+                      // Claimed, so Modal leaves the dialog open.
+                      e.preventDefault();
+                      editingId = null;
+                    }
                   }}
                 />
                 <button
@@ -350,3 +419,26 @@
     </div>
   {/snippet}
 </Modal>
+
+<style>
+  /* The handle is a button for keyboard users, but keeps the bare glyph look
+     degree-page.css gives it. */
+  button.bucket-config-handle {
+    background: none;
+    border: 0;
+    font: inherit;
+    line-height: inherit;
+  }
+
+  .bucket-config-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

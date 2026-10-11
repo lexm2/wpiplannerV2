@@ -1,18 +1,18 @@
 <script lang="ts">
   import { uiState, closeModal } from '../../services/ui/uiState.svelte';
-  import MobileNotice from './MobileNotice.svelte';
   import Changelog from './Changelog.svelte';
   import Tutorials from './Tutorials.svelte';
   import SectionInfo from './SectionInfo.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
-  import DeleteLocalEvent from './DeleteLocalEvent.svelte';
   import LocalEvent from './LocalEvent.svelte';
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
   import SchedulePicker from './SchedulePicker.svelte';
   import FilterModal from './FilterModal.svelte';
   import BucketConfig from './BucketConfig.svelte';
   import CourseFinderModal from './CourseFinderModal.svelte';
+  import MoveCourseSheet from './MoveCourseSheet.svelte';
   import DegreeImportWarning from './DegreeImportWarning.svelte';
+  import TimeGridModal from './TimeGridModal.svelte';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { FilterService } from '../../services/filtering/FilterService';
@@ -50,14 +50,12 @@
   // Closing goes through closeModal(id) so uiState.openModals
   // stays the single source of truth (keeping tutorial snapshots correct);
   // that removal unmounts the component, after its ~225ms hide animation has
-  // already played. Payload modals (section-info, delete-local-event) read
+  // already played. Payload modals (section-info, confirm) read
   // their data from modalState (set by the trigger sites before modalOpened).
 </script>
 
 {#each uiState.openModals as id (id)}
-  {#if id === 'mobile-notice'}
-    <MobileNotice onRequestClose={() => closeModal('mobile-notice')} />
-  {:else if id === 'changelog'}
+  {#if id === 'changelog'}
     <Changelog onRequestClose={() => closeModal('changelog')} />
   {:else if id === 'tutorials'}
     {@const tutorial = getTutorial()}
@@ -68,8 +66,6 @@
     <SectionInfo onRequestClose={() => closeModal('section-info')} />
   {:else if id === 'confirm'}
     <ConfirmDialog onRequestClose={() => closeModal('confirm')} />
-  {:else if id === 'delete-local-event'}
-    <DeleteLocalEvent onRequestClose={() => closeModal('delete-local-event')} />
   {:else if id === 'local-event'}
     <LocalEvent onRequestClose={() => closeModal('local-event')} />
   {:else if id === 'auto-schedule-intro'}
@@ -91,6 +87,8 @@
     />
   {:else if id === 'course-finder'}
     <CourseFinderModal onRequestClose={() => closeModal('course-finder')} />
+  {:else if id === 'move-course'}
+    <MoveCourseSheet onRequestClose={() => closeModal('move-course')} />
   {:else if id === 'filter-modal'}
     <FilterModal
       typeId="filter-modal"
@@ -100,6 +98,11 @@
       {profileStateManager}
       {getDepartments}
       onRequestClose={() => closeModal('filter-modal')}
+    />
+  {:else if id === 'time-grid'}
+    <TimeGridModal
+      {filterService}
+      onRequestClose={() => closeModal('time-grid')}
     />
   {:else if id === 'auto-schedule-filter'}
     <FilterModal

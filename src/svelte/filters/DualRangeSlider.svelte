@@ -32,8 +32,12 @@
   const showLeftTip = $derived(hoverLeft || draggingLeft);
   const showRightTip = $derived(hoverRight || draggingRight);
 
+  // Fractional steps round through the integer inverse: 33 * 0.1 is
+  // 3.3000000000000003, but 33 / 10 is 3.3.
   function roundToStep(value: number): number {
-    return Math.round(value / step) * step;
+    if (step >= 1) return Math.round(value / step) * step;
+    const inv = Math.round(1 / step);
+    return Math.round(value * inv) / inv;
   }
 
   function setMinFromPct(pct: number): void {

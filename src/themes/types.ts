@@ -28,6 +28,7 @@ interface ThemeColors {
   info: string;
   gradientStart: string;
   gradientEnd: string;
+  toggleKnob: string;
 }
 
 /**

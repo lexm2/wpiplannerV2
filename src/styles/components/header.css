@@ -69,6 +69,11 @@
   justify-content: center;
   margin: 0 0.5rem;
   max-width: calc(100% - 400px);
+  /* The page tabs are controls, not text: a drag or long press on them should
+     not select their labels (or, on iOS, pop up the copy callout). */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .nav-tabs-pill {
@@ -79,6 +84,11 @@
   border: 1px solid var(--color-border);
   border-radius: 100px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* The phone tab bar's sliding marker; the desktop pill marks the tab itself. */
+.nav-tab-marker {
+  display: none;
 }
 
 .nav-tab {
@@ -227,13 +237,18 @@
   fill: var(--color-primary);
 }
 
-/* Settings dropdown menu - open/close animation lives in SettingsMenu.svelte. */
+/* While its menu is open, the gear reads as pressed. */
+.app-header .settings-menu-btn.open {
+  background: var(--color-surface-hover);
+}
+
+/* Settings dropdown menu - SettingsMenu.svelte places it against the gear and
+   runs its open/close animation, which grows from the gear's corner. */
 .settings-dropdown-menu {
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: calc(var(--spacing-header-height) + 0.5rem);
-  right: 2rem;
+  transform-origin: top right;
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius-large);
@@ -241,6 +256,10 @@
   z-index: 90;
   min-width: 200px;
   overflow: hidden;
+}
+
+.settings-dropdown-menu.up {
+  transform-origin: bottom right;
 }
 
 .settings-menu-item {
@@ -271,18 +290,18 @@
   cursor: not-allowed;
 }
 
+/* Colour only: each icon's own fill and stroke attributes (currentColor)
+   say which parts are drawn, so outline icons stay outlines. */
 .settings-menu-item svg {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  stroke: var(--color-text);
-  fill: var(--color-text);
-  transition: all 0.2s ease;
+  color: var(--color-text);
+  transition: color 0.2s ease;
 }
 
 .settings-menu-item:hover:not(:disabled) svg {
-  stroke: var(--color-primary);
-  fill: var(--color-primary);
+  color: var(--color-primary);
 }
 
 @media (max-width: 1600px) {
@@ -317,9 +336,7 @@
   /* The dropdown is a header-controls child (position:fixed) - keep it visible too. */
   .app-header
     .header-controls
-    > :not(.settings-menu-btn):not(.hamburger-btn):not(
-      .settings-dropdown-menu
-    ) {
+    > :not(.settings-menu-btn):not(.settings-dropdown-menu) {
     display: none;
   }
 
@@ -340,4 +357,151 @@
 
 html.is-mobile .header-navigation {
   max-width: none;
+}
+
+/* Phone widths: the whole header becomes one bar along the bottom, within
+   thumb reach - the page's drawer button, the page tabs, then the gear (the
+   only way to Schedules/theme/undo here) - and the top of the screen goes to
+   the page. The drawer slot holds its column even where a page has no drawer
+   (Degree), so the tabs sit in the same place on every page. #app gives up
+   the bar's height so no page runs underneath it. */
+@media (max-width: 560px) {
+  /* Not --spacing-*: ThemeManager sets those inline on <html>, which would
+     outrank anything set here. */
+  :root {
+    --tab-bar-height: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #app {
+    padding-bottom: var(--tab-bar-height);
+    /* A page pushed aside by a swipe must not widen the document. */
+    overflow: hidden;
+  }
+
+  /* The browser keeps vertical scrolling and pinch zoom; sideways travel is
+     left to the page swipe (horizontalSwipe.ts). */
+  .app-body {
+    touch-action: pan-y pinch-zoom;
+  }
+
+  /* Below the drawers (z-index 79/80) and modals, which cover it when open.
+     Like the tabs, none of the bar is selectable text. */
+  .app-header {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    height: var(--tab-bar-height);
+    padding: 0 0.25rem env(safe-area-inset-bottom, 0px);
+    border-bottom: none;
+    border-top: 1px solid var(--color-border);
+    box-shadow: none;
+  }
+
+  .header-content {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    align-items: center;
+  }
+
+  .header-drawer-toggle,
+  .app-header .header-controls {
+    justify-self: center;
+    margin-left: 0;
+  }
+
+  .header-navigation {
+    position: static;
+    transform: none;
+    margin: 0;
+    max-width: none;
+    align-self: stretch;
+  }
+
+  /* 44px touch targets, and one style for both: borderless icons in the text
+     colour, so the drawer button and the gear read as a pair. */
+  .app-header .settings-menu-btn,
+  .header-drawer-toggle .drawer-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-text);
+  }
+
+  .app-header .settings-menu-btn svg {
+    stroke: var(--color-text) !important;
+    fill: none;
+  }
+
+  .app-header .settings-menu-btn svg,
+  .header-drawer-toggle .drawer-toggle-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-tabs-pill {
+    flex: 1;
+    align-self: stretch;
+    gap: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* An active tab is marked by colour and a bar along the top of the bar.
+     The weight stays the same, so selecting a tab does not reflow its label. */
+  .nav-tabs-pill {
+    position: relative;
+  }
+
+  .nav-tab {
+    flex: 1;
+    border-radius: 0;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+  }
+
+  .nav-tab.active {
+    background: transparent;
+    color: var(--color-primary);
+    box-shadow: none;
+  }
+
+  /* One marker for all three tabs (PageTabs.svelte), so it slides from tab to
+     tab, and follows the finger through a page swipe (pageSwipe.svelte.ts).
+     It is its own box rather than an inset shadow on the tab: the tabs are
+     fractional pixels wide, and a shadow there bled a hairline down their
+     sides. */
+  .nav-tab-marker {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% / 3);
+    height: 3px;
+    background: var(--color-primary);
+    transform: translateX(calc(var(--tab-pos, 0) * 100%));
+    transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1);
+    pointer-events: none;
+  }
+
+  .nav-tab-marker.dragging {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-tab-marker {
+    transition: none;
+  }
 }

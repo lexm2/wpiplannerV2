@@ -1,0 +1,192 @@
+/* Times filter picker. The grid is gapless and paints its own lattice: gaps
+   between cells would sit inside the drag body's measured rect and drift the
+   pointer->row math by nearly a full row at the bottom. */
+
+.grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 60px repeat(5, 1fr);
+  /* One row per hour of the picker's range (TimeGridPicker sets the count);
+     minmax(0, ...) lets a wide range shrink rows rather than overflow. */
+  grid-template-rows: auto repeat(var(--grid-hours, 12), minmax(0, 1fr));
+  gap: 0;
+  container-type: inline-size;
+  font-size: 0.7rem;
+  /* 480px where there is room, shrinking with the viewport so the whole picker
+     fits without the modal body scrolling: a scrolled body slides the top rows
+     under the header mid-drag, and on touch the grid blocks the scroll. The
+     drag math measures the body's rect, so any height keeps it exact. */
+  flex: 0 1 480px;
+  min-height: 200px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.corner {
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* Header/label cells double as "select this whole column/row" buttons. */
+.headerBtn,
+.labelBtn {
+  border-width: 0;
+  border-right: 2px solid var(--color-border);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--effect-transition);
+}
+
+.headerBtn {
+  border-right-width: 0;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.headerBtn:hover,
+.labelBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+.body {
+  grid-column: 2 / -1;
+  grid-row: 2 / -1;
+  position: relative;
+  /* Pointer capture owns the gesture; without this, touch would scroll. */
+  touch-action: none;
+  user-select: none;
+  cursor: crosshair;
+}
+
+/* Solid line per hour, fainter per half hour, day separators. Drawn over the
+   body rather than built from cells so the measured rect stays contiguous. */
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.lines line {
+  stroke: var(--color-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: crispEdges;
+}
+
+.lines .halfLine {
+  stroke: color-mix(in srgb, var(--color-border) 45%, transparent);
+}
+
+.body:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.painted,
+.focusRing {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.paintedOnly {
+  background: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border-left: 2px solid var(--color-primary);
+}
+
+/* Primary and danger are both reds in most themes, so Avoid is told apart by
+   its diagonal hatch, not its colour: a struck-out band against Only's fill. */
+.paintedAvoid {
+  background-color: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  /* A tiled stripe rather than repeating-linear-gradient, whose thin hard
+     stops Firefox draws as a few stray lines. */
+  --hatch: color-mix(in srgb, var(--color-danger) 60%, transparent);
+  background-image: linear-gradient(
+    45deg,
+    var(--hatch) 0 12.5%,
+    transparent 12.5% 50%,
+    var(--hatch) 50% 62.5%,
+    transparent 62.5%
+  );
+  background-size: 8px 8px;
+  border-left: 2px dashed var(--color-danger);
+}
+
+.focusRing {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+/* The shared segmented buttons stretch to fill their row; here they size to
+   their labels, so "Avoid these times" stays on one line. */
+.toolbar :global(.segmented-btn) {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.summary {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  min-height: 1.5rem;
+}
+
+/* The row sets the spacing, not the shared button's own margin. */
+.summaryClear {
+  margin-top: 0;
+}
+
+.summaryClear:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.summaryText {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+/* Compact panel section: a summary line plus the button that opens the grid. */
+.panelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.panelSummary {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* Its own column context, so the day columns fill the width; min-height: 0
+   lets the modal body shrink it and, through it, the grid. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}

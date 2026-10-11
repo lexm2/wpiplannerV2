@@ -20,5 +20,7 @@ export function triggerFileDownload(
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  // Some browsers start the download asynchronously after the click returns;
+  // revoking straight away can cancel it, so give it a moment first.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

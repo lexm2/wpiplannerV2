@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, untrack } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
   import Modal from './Modal.svelte';
   import { modalState, showConfirm } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
@@ -7,13 +7,18 @@
   import { triggerFileDownload } from '../../utils/download';
   import { logger } from '../../utils/logger';
   import { ThemeManager } from '../../themes/ThemeManager';
-  import { openModal, showAppError } from '../../services/ui/uiState.svelte';
+  import {
+    openModal,
+    showAppError,
+    uiState,
+  } from '../../services/ui/uiState.svelte';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
   import TextField from '../ui/TextField.svelte';
+  import { clickOutside } from '../clickOutside';
 
   let {
     scheduleManagementService,
@@ -28,8 +33,6 @@
   } = $props();
 
   // Menu (⋮) popup geometry.
-  const MENU_WIDTH = 120;
-  const MENU_HEIGHT = 160;
   const MENU_OFFSET = 4;
   const VIEWPORT_PADDING = 8;
 
@@ -93,6 +96,8 @@
   // animates it). offsetWidth is one page wide.
   $effect(() => {
     const tab = activeTab;
+    // Copy mode belongs to the schedule list; leaving it ends the mode.
+    if (tab !== 'schedules') untrack(() => (copySourceId = null));
     const c = pagesContainer;
     if (!c) return;
     c.scrollLeft = tab === 'settings' ? c.offsetWidth : 0;
@@ -100,29 +105,43 @@
 
   // Per-item ⋮ menu
   let openMenuId = $state<string | null>(null);
+  // The ⋮ button that opened it: clicks there toggle rather than close-outside.
+  let menuTrigger = $state<HTMLElement | null>(null);
   let menuPos = $state<{ left: number; top: number }>({ left: 0, top: 0 });
 
-  function toggleMenu(e: MouseEvent, scheduleId: string): void {
+  async function toggleMenu(e: MouseEvent, scheduleId: string): Promise<void> {
     e.stopPropagation();
     if (openMenuId === scheduleId) {
       openMenuId = null;
       return;
     }
 
-    const btnRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    let left = btnRect.right - MENU_WIDTH;
-    let top = btnRect.bottom + MENU_OFFSET;
+    menuTrigger = e.currentTarget as HTMLElement;
+    const btnRect = menuTrigger.getBoundingClientRect();
+    openMenuId = scheduleId;
+    // Position from the menu's real size once it renders: its height depends
+    // on how many actions the row offers.
+    await tick();
+    const menu = pagesContainer?.querySelector<HTMLElement>(
+      `[data-schedule-id="${CSS.escape(scheduleId)}"] [data-visible="true"]`,
+    );
+    if (!menu) return;
+    const { width, height } = menu.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
+    let left = btnRect.right - width;
+    let top = btnRect.bottom + MENU_OFFSET;
     if (left < VIEWPORT_PADDING) left = VIEWPORT_PADDING;
-    else if (left + MENU_WIDTH > vw - VIEWPORT_PADDING)
-      left = vw - MENU_WIDTH - VIEWPORT_PADDING;
-    if (top + MENU_HEIGHT > vh - VIEWPORT_PADDING)
-      top = btnRect.top - MENU_HEIGHT - MENU_OFFSET;
+    else if (left + width > vw - VIEWPORT_PADDING)
+      left = vw - width - VIEWPORT_PADDING;
+    if (top + height > vh - VIEWPORT_PADDING)
+      top = btnRect.top - height - MENU_OFFSET;
+    // Neither side has room: pin it inside the window.
+    if (top < VIEWPORT_PADDING)
+      top = Math.max(VIEWPORT_PADDING, vh - height - VIEWPORT_PADDING);
 
     menuPos = { left, top };
-    openMenuId = scheduleId;
   }
 
   function closeMenus(): void {
@@ -133,16 +152,31 @@
   let editingId = $state<string | null>(null);
   let editValue = $state('');
 
-  function startEdit(schedule: Schedule): void {
+  async function startEdit(schedule: Schedule): Promise<void> {
     editingId = schedule.id;
     editValue = schedule.name;
+    // The field's autofocus only applies when nothing else has focus, and the
+    // Rename button that was just clicked does.
+    await tick();
+    pagesContainer
+      ?.querySelector<HTMLInputElement>(
+        `[data-schedule-id="${CSS.escape(schedule.id)}"] input`,
+      )
+      ?.focus();
   }
   async function commitEdit(schedule: Schedule): Promise<void> {
+    // Escape clears editingId first; removing the field then blurs it, and
+    // that blur must not save.
+    if (editingId !== schedule.id) return;
     const newName = editValue.trim();
     if (newName && newName !== schedule.name) {
       try {
-        await scheduleManagementService.renameSchedule(schedule.id, newName);
-        refreshTick++;
+        const result = await scheduleManagementService.renameSchedule(
+          schedule.id,
+          newName,
+        );
+        if (result.success) refreshTick++;
+        else showAppError(`Rename failed: ${result.error || 'Unknown error'}`);
       } catch (error) {
         logger.error('Failed to rename schedule:', error);
         showAppError('Failed to rename schedule. Please try again.');
@@ -155,13 +189,72 @@
       e.preventDefault();
       (e.currentTarget as HTMLInputElement).blur();
     } else if (e.key === 'Escape') {
+      // preventDefault tells Modal the key was used, so the picker stays open.
+      e.preventDefault();
       editingId = null;
+    }
+  }
+
+  // Copy-into mode: "Copy Into" picks the source, then clicking another row
+  // picks the target. Keyed off copySource rather than the id, so the mode
+  // ends by itself if the source schedule goes away (e.g. undone).
+  let copySourceId = $state<string | null>(null);
+  const copySource = $derived(
+    schedules.find(s => s.id === copySourceId) ?? null,
+  );
+
+  async function startCopy(schedule: Schedule): Promise<void> {
+    copySourceId = schedule.id;
+    // The Copy Into button is replaced by the copy-mode row content, so move
+    // focus to the first target instead of letting it fall to <body>.
+    await tick();
+    pagesContainer?.querySelector<HTMLElement>('.copy-target-btn')?.focus();
+  }
+
+  async function copyInto(targetId: string): Promise<void> {
+    const source = copySource;
+    copySourceId = null;
+    if (!source) return;
+    try {
+      const result = await scheduleManagementService.copyScheduleInto(
+        source.id,
+        targetId,
+      );
+      if (result.success) refreshTick++;
+      else showAppError(`Copy failed: ${result.error}`);
+    } catch (error) {
+      logger.error('Failed to copy schedule:', error);
+      showAppError('Failed to copy schedule. Please try again.');
+    }
+  }
+
+  function onRowClick(schedule: Schedule): void {
+    if (copySource) {
+      if (schedule.id !== copySource.id) void copyInto(schedule.id);
+      return;
+    }
+    if (editingId !== schedule.id) void switchToSchedule(schedule.id);
+  }
+
+  // Capture phase, so this runs before Modal's Escape handler: Escape backs
+  // out of an open menu or copy mode first, and only then closes the picker.
+  // Only while the picker is the top modal: a confirm stacked over it gets the
+  // key instead.
+  function onWindowKeydownCapture(e: KeyboardEvent): void {
+    if (e.key !== 'Escape') return;
+    if (uiState.openModals.at(-1) !== 'schedule-picker') return;
+    if (openMenuId) {
+      e.preventDefault();
+      closeMenus();
+    } else if (copySource) {
+      e.preventDefault();
+      copySourceId = null;
     }
   }
 
   // Schedule actions
   //
-  // setActiveSchedule reports failure by returning {success:false, error}
+  // The service methods report failure by returning {success:false, error}
   // rather than throwing, so the result needs checking as well as the catch.
   async function switchToSchedule(scheduleId: string): Promise<void> {
     try {
@@ -185,10 +278,13 @@
     try {
       switch (action) {
         case 'rename':
-          startEdit(schedule);
+          await startEdit(schedule);
           break;
         case 'duplicate':
           await duplicateSchedule(schedule);
+          break;
+        case 'copy-into':
+          await startCopy(schedule);
           break;
         case 'export':
           await exportSchedule(schedule.id);
@@ -210,11 +306,12 @@
   }
 
   async function duplicateSchedule(schedule: Schedule): Promise<void> {
-    await scheduleManagementService.duplicateSchedule(
+    const result = await scheduleManagementService.duplicateSchedule(
       schedule.id,
       `${schedule.name} (Copy)`,
     );
-    refreshTick++;
+    if (result.success) refreshTick++;
+    else showAppError(`Duplicate failed: ${result.error || 'Unknown error'}`);
   }
 
   // showConfirm fires onConfirm later, from the modal, by which point
@@ -222,8 +319,11 @@
   // surface its own failure.
   async function confirmDelete(schedule: Schedule): Promise<void> {
     try {
-      await scheduleManagementService.deleteSchedule(schedule.id);
-      refreshTick++;
+      const result = await scheduleManagementService.deleteSchedule(
+        schedule.id,
+      );
+      if (result.success) refreshTick++;
+      else showAppError(`Delete failed: ${result.error || 'Unknown error'}`);
     } catch (error) {
       logger.error('Failed to delete schedule:', error);
       showAppError('Failed to delete schedule. Please try again.');
@@ -245,8 +345,9 @@
   async function confirmCreate(name?: string): Promise<void> {
     if (!name) return;
     try {
-      await scheduleManagementService.createNewSchedule(name);
-      refreshTick++;
+      const result = await scheduleManagementService.createNewSchedule(name);
+      if (result.success) refreshTick++;
+      else showAppError(`Create failed: ${result.error || 'Unknown error'}`);
     } catch (error) {
       logger.error('Failed to create schedule:', error);
       showAppError('Failed to create schedule. Please try again.');
@@ -322,15 +423,27 @@
       const text = await file.text();
       if (target === 'new') {
         const name = file.name.replace(/\.json$/i, '');
-        const created = await scheduleManagementService.createNewSchedule(name);
-        if (created.success && created.schedule?.id) {
+        // Created inactive and only switched to once the import succeeds, so a
+        // bad file leaves neither an empty schedule nor a changed selection.
+        const created = await scheduleManagementService.createNewSchedule(
+          name,
+          { autoActivate: false },
+        );
+        const id = created.schedule?.id;
+        if (created.success && id) {
           const imported = await scheduleManagementService.importScheduleInto(
-            created.schedule.id,
+            id,
             text,
           );
-          if (!imported.success)
+          if (imported.success) {
+            await switchToSchedule(id);
+          } else {
+            await scheduleManagementService.deleteSchedule(id);
             showAppError(`Import failed: ${imported.error}`);
+          }
           refreshTick++;
+        } else {
+          showAppError(`Import failed: ${created.error || 'Unknown error'}`);
         }
       } else {
         const result = await scheduleManagementService.importScheduleInto(
@@ -426,8 +539,7 @@
   }
 </script>
 
-<!-- A click anywhere closes any open per-schedule menu. -->
-<svelte:window onclick={closeMenus} />
+<svelte:window onkeydowncapture={onWindowKeydownCapture} />
 
 <Modal
   typeId="schedule-picker"
@@ -439,8 +551,24 @@
   {#snippet children(close)}
     <div class="modal-body schedule-picker-body">
       <div class="modal-pages-container" bind:this={pagesContainer}>
-        <div class="modal-page schedules-page">
+        <div
+          class="modal-page schedules-page"
+          inert={activeTab !== 'schedules'}
+        >
           <div class="schedule-list">
+            {#if copySource}
+              <div class="schedule-copy-banner" role="status">
+                <span
+                  >Click a schedule to copy the courses from <strong
+                    >{copySource.name}</strong
+                  > into it.</span
+                >
+                <button
+                  class="btn btn-secondary"
+                  onclick={() => (copySourceId = null)}>Cancel</button
+                >
+              </div>
+            {/if}
             {#if schedules.length === 0}
               <div class="schedule-list-empty">No schedules found</div>
             {:else}
@@ -450,11 +578,11 @@
                 <div
                   class="schedule-item"
                   class:active={isActive}
+                  class:copy-source={copySource?.id === schedule.id}
+                  class:copy-target={copySource !== null &&
+                    copySource.id !== schedule.id}
                   data-schedule-id={schedule.id}
-                  onclick={() => {
-                    if (editingId !== schedule.id)
-                      void switchToSchedule(schedule.id);
-                  }}
+                  onclick={() => onRowClick(schedule)}
                 >
                   <div class="schedule-item-info">
                     {#if editingId === schedule.id}
@@ -474,7 +602,7 @@
                         class="schedule-item-name"
                         ondblclick={e => {
                           e.stopPropagation();
-                          startEdit(schedule);
+                          if (!copySource) void startEdit(schedule);
                         }}
                       >
                         {schedule.name}
@@ -487,61 +615,92 @@
                     </div>
                   </div>
 
-                  <div class="schedule-item-actions">
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('rename', schedule);
-                      }}>Rename</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('duplicate', schedule);
-                      }}>Duplicate</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('export', schedule);
-                      }}>Export</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('export-ics', schedule);
-                      }}>Export ICS</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('import', schedule);
-                      }}>Import</button
-                    >
-                    {#if schedules.length > 1}
+                  {#if copySource?.id === schedule.id}
+                    <div class="schedule-item-actions copy-hint">
+                      Copying from
+                    </div>
+                  {:else if copySource}
+                    <div class="schedule-item-actions">
                       <button
-                        class="btn-link inline-action-btn danger"
+                        class="btn-link copy-hint copy-target-btn"
+                        aria-label="Copy here: {schedule.name}"
                         onclick={e => {
                           e.stopPropagation();
-                          void handleAction('delete', schedule);
-                        }}>Delete</button
+                          void copyInto(schedule.id);
+                        }}>Copy here</button
                       >
-                    {/if}
-                    <button
-                      class="btn-link {styles['menuBtn']}"
-                      title="More options"
-                      onclick={e => toggleMenu(e, schedule.id)}>⋮</button
-                    >
-                  </div>
+                    </div>
+                  {:else}
+                    <div class="schedule-item-actions">
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('rename', schedule);
+                        }}>Rename</button
+                      >
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('duplicate', schedule);
+                        }}>Duplicate</button
+                      >
+                      {#if schedules.length > 1}
+                        <button
+                          class="btn-link inline-action-btn"
+                          onclick={e => {
+                            e.stopPropagation();
+                            void handleAction('copy-into', schedule);
+                          }}>Copy Into</button
+                        >
+                      {/if}
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('export', schedule);
+                        }}>Export</button
+                      >
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('export-ics', schedule);
+                        }}>Export ICS</button
+                      >
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('import', schedule);
+                        }}>Import</button
+                      >
+                      {#if schedules.length > 1}
+                        <button
+                          class="btn-link inline-action-btn danger"
+                          onclick={e => {
+                            e.stopPropagation();
+                            void handleAction('delete', schedule);
+                          }}>Delete</button
+                        >
+                      {/if}
+                      <button
+                        class="btn-link {styles['menuBtn']}"
+                        title="More options"
+                        onclick={e => toggleMenu(e, schedule.id)}>⋮</button
+                      >
+                    </div>
+                  {/if}
 
                   <div
                     class={styles['scheduleItemMenu']}
                     data-visible={openMenuId === schedule.id}
+                    use:clickOutside={{
+                      enabled: openMenuId === schedule.id,
+                      ignore: menuTrigger,
+                      onOutside: closeMenus,
+                    }}
                     style:left={`${menuPos.left}px`}
                     style:top={`${menuPos.top}px`}
                   >
@@ -559,6 +718,15 @@
                         void handleAction('duplicate', schedule);
                       }}>Duplicate</button
                     >
+                    {#if schedules.length > 1}
+                      <button
+                        class={styles['menuAction']}
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('copy-into', schedule);
+                        }}>Copy Into</button
+                      >
+                    {/if}
                     <button
                       class={styles['menuAction']}
                       onclick={e => {
@@ -582,7 +750,7 @@
                     >
                     {#if schedules.length > 1}
                       <button
-                        class="{styles['menuAction']} danger"
+                        class="{styles['menuAction']} {styles['danger']}"
                         onclick={e => {
                           e.stopPropagation();
                           void handleAction('delete', schedule);
@@ -606,7 +774,7 @@
           </div>
         </div>
 
-        <div class="modal-page settings-page">
+        <div class="modal-page settings-page" inert={activeTab !== 'settings'}>
           <button
             class="btn btn-primary"
             id="new-schedule-btn-settings"

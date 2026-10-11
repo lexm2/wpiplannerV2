@@ -233,9 +233,11 @@
   gap: 0.5rem;
 }
 
+/* Earned, in progress and transfer. The total is the progress bar's own
+   label, so it isn't repeated here. */
 .degree-credit-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   margin-top: 1.25rem;
 }
@@ -407,31 +409,9 @@
   --req-card-min-h: 14.25rem;
 }
 
-/* Legend on the left, layout controls on the right. */
-.degree-view-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.degree-view-toggle {
-  display: flex;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
 .degree-view-group {
   display: flex;
   gap: 0.25rem;
-}
-
-.degree-search-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
 }
 
 /* Sized like the other inline SVGs (see .filter-icon): the glyph this replaced
@@ -443,33 +423,6 @@
   flex-shrink: 0;
   pointer-events: none;
   color: inherit;
-}
-
-/* Divides the card-edge statuses from the progress-bar segments in the one
-   merged legend. */
-.degree-legend-sep {
-  width: 1px;
-  align-self: stretch;
-  background: var(--color-border);
-  margin: 0 0.25rem;
-}
-
-.degree-legend-edge {
-  width: 0.25rem;
-  height: 0.75rem;
-  border-radius: 1px;
-  flex-shrink: 0;
-  background: var(--color-border);
-}
-
-.degree-legend-edge.req-not_satisfied {
-  background: var(--color-danger);
-}
-.degree-legend-edge.req-in_progress {
-  background: var(--color-warning);
-}
-.degree-legend-edge.req-satisfied {
-  background: var(--color-success);
 }
 
 .degree-card-list {
@@ -593,19 +546,6 @@
   overflow: hidden;
 }
 
-.requirement-card-scope {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.requirement-card-remaining {
-  margin: 0.5rem 0 0;
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-}
-
 /* status pills */
 .req-status {
   flex-shrink: 0;
@@ -717,11 +657,6 @@
 /* schedule tiles get a primary accent */
 .requirement-course.is-schedule {
   border-left: 3px solid var(--color-primary);
-}
-
-.course-badge-schedule {
-  background: var(--color-primary-background);
-  color: var(--color-primary);
 }
 
 /* per-tile assign / remove controls */
@@ -926,11 +861,6 @@
   overflow: hidden;
 }
 
-.requirement-course-term {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-}
-
 /* empty placeholder tile - a clickable slot still needing a course */
 .requirement-course-empty {
   align-items: center;
@@ -1093,6 +1023,72 @@
   font-style: italic;
 }
 
+/* The rail clips anything wider than itself, so there the popup spans the
+   course it belongs to instead of hanging off its small button. */
+.degree-rail .requirement-course {
+  position: relative;
+}
+
+.degree-rail .assign-menu {
+  position: static;
+}
+
+.degree-rail .assign-menu-popup {
+  left: 0;
+  right: 0;
+  min-width: 0;
+}
+
+/* Too narrow there for a name and its label side by side. */
+.degree-rail .assign-menu-bucket {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* No room above the trigger (a course at the top of the rail, say): drop
+   down instead of running off the top of the screen. */
+.assign-menu-popup.opens-down {
+  bottom: auto;
+  top: calc(100% + 0.25rem);
+  transform-origin: top left;
+}
+
+/* A bucket choice: its name, what it still needs, and its bar, edged in its
+   status colour like the card it stands for. */
+.assign-menu-bucket {
+  --assign-edge: var(--color-text-secondary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
+  border-left: 3px solid var(--assign-edge);
+}
+
+.assign-menu-bucket.req-not_satisfied {
+  --assign-edge: var(--color-danger);
+}
+.assign-menu-bucket.req-in_progress {
+  --assign-edge: var(--color-warning);
+}
+.assign-menu-bucket.req-satisfied {
+  --assign-edge: var(--color-success);
+}
+
+.assign-menu-bucket-name {
+  line-height: 1.3;
+}
+
+.assign-menu-bucket-meta {
+  font-size: 0.7rem;
+  font-style: normal;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.assign-menu-bucket .degree-progress-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+}
+
 .assign-menu-empty {
   margin: 0;
   padding: 0.5rem 0.75rem;
@@ -1246,32 +1242,11 @@
 
 /* ---- Responsive ---- */
 
-/* Below the sidebar breakpoint the rail can't hold a column: stack it on top,
-   capped and scrolling on its own. */
+/* Below the sidebar breakpoint the rail can't hold a column, so DegreePage
+   drops it for the To place list at the top of the page. */
 @media (max-width: 991px) {
-  .degree-shell {
-    flex-direction: column;
-  }
-
   .degree-requirements {
     --req-card-min-w: 20rem;
-  }
-
-  /* Stacked, the rail is full-width: there is no width left to drag. */
-  .degree-rail .resize-handle {
-    display: none;
-  }
-
-  .degree-rail {
-    width: 100%;
-    max-height: 35vh;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .degree-rail-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   }
 
   .degree-content {
@@ -1279,22 +1254,546 @@
   }
 }
 
+/* One column: nothing to line a card up with, so the fixed height that keeps
+   grid rows even only leaves empty space under short buckets. */
 @media (max-width: 700px) {
   .degree-card-list {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  .degree-requirements {
+    --req-card-min-h: auto;
+  }
+
+  .requirement-card-name {
+    min-height: 0;
+  }
 }
 
+/* Phones. One 0.75rem gutter, the header's and the Classes page's, and
+   everything inside a card a further 0.75rem in: the page, the To place list,
+   the summary and every card share those two edges. Tap targets are 40px or
+   more. The rail, the legend and the drag affordances are gone - see
+   DegreePage, RequirementList and RequirementCard for what replaces them. */
 @media (max-width: 560px) {
-  .degree-credit-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  /* .requirement-courses is deliberately absent: it is one column by design. */
-  .degree-rail-list {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
   .degree-content {
-    padding: 1rem 1rem 3rem;
+    padding: 0.75rem 0.75rem 3rem;
+  }
+
+  .degree-summary,
+  .degree-card-list .requirement-card {
+    padding: 0.75rem;
+  }
+
+  .degree-card-list {
+    gap: 0.75rem;
+  }
+
+  .degree-filter-chip,
+  .requirement-card-toggle,
+  .degree-card-list .requirement-card-browse,
+  .degree-card-list .requirement-course-empty {
+    min-height: 40px;
+  }
+
+  .requirement-card-actions {
+    min-height: 40px;
+  }
+
+  .degree-dropzone {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* ---- To place, below 992px (ToPlaceList.svelte) ---- */
+.degree-to-place {
+  margin-bottom: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--effect-border-radius-large);
+}
+
+.degree-to-place-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 0.75rem;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.degree-to-place-title {
+  font-weight: var(--font-weight-bold);
+}
+
+.degree-to-place-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-heavy);
+  line-height: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.degree-to-place-hint {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.degree-to-place-chevron,
+.degree-summary-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.degree-to-place-head[aria-expanded='false'] .degree-to-place-chevron {
+  transform: rotate(-90deg);
+}
+
+.degree-to-place-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.4rem;
+  padding: 0 0.75rem 0.75rem;
+}
+
+.degree-to-place-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 0.5rem;
+  align-items: center;
+  min-height: 48px;
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+}
+
+.degree-to-place-name {
+  grid-column: 1;
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+}
+
+.degree-to-place-go {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+}
+
+/* ---- Phone: one-line summary (DegreeSummary.svelte) ---- */
+.degree-summary-compact {
+  margin-bottom: 0.75rem;
+}
+
+.degree-summary-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.degree-summary-toggle {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.degree-summary-compact .degree-summary-title {
+  max-width: 100%;
+  font-size: 1.0625rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.degree-summary-pct {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.degree-summary-pct .degree-summary-chevron {
+  width: 14px;
+  height: 14px;
+}
+
+.degree-summary-toggle[aria-expanded='true'] .degree-summary-chevron {
+  transform: rotate(180deg);
+}
+
+.degree-summary-more {
+  position: relative;
+}
+
+.degree-summary-more-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.degree-summary-more-btn[aria-expanded='true'] {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.degree-summary-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 12rem;
+  transform-origin: top right;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  box-shadow: var(--effect-shadow-large);
+  padding: 0.25rem;
+}
+
+.degree-summary-menu .assign-menu-item {
+  min-height: 44px;
+}
+
+.assign-menu-item.is-danger {
+  color: var(--color-danger);
+}
+
+.assign-menu-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.degree-summary-bar {
+  height: 6px;
+  margin-top: 0.4rem;
+}
+
+.degree-summary-compact .degree-summary-sub {
+  margin-top: 0.75rem;
+}
+
+.degree-summary-compact .degree-credit-stats {
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* ---- Search bar and toolbars (RequirementList.svelte) ---- */
+/* Wide: search, the status chips and the layout toggle share one row,
+   wrapping as the column narrows; the toggle keeps to the right. */
+.degree-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.degree-toolbar .degree-search-bar {
+  flex: 1 1 14rem;
+  max-width: 24rem;
+  min-height: 2.25rem;
+}
+
+.degree-toolbar .degree-filter-row {
+  margin-bottom: 0;
+}
+
+.degree-toolbar .degree-umbrella-toggle {
+  margin-left: 0;
+}
+
+.degree-toolbar .degree-filter-chip {
+  min-height: 2.25rem;
+}
+
+.degree-toolbar .degree-view-group {
+  margin-left: auto;
+}
+
+/* Phone: search and a Filter button. */
+/* Sticks once scrolled to, on the page's own background so cards pass under
+   it cleanly. */
+.degree-phone-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 0.5rem;
+  margin: -0.5rem 0 0.25rem;
+  padding: 0.5rem 0;
+  background: var(--color-background-alt);
+}
+
+.degree-search-bar:hover {
+  border-color: var(--color-border-hover);
+}
+
+.degree-search-bar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.degree-phone-toolbar .degree-search-bar {
+  min-height: 44px;
+}
+
+.degree-phone-toolbar .filter-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.degree-filter-panel {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius-large);
+}
+
+.degree-filter-panel .degree-filter-row {
+  margin-bottom: 0;
+}
+
+.degree-filter-panel .degree-umbrella-toggle {
+  margin-left: 0;
+}
+
+.degree-filter-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.degree-filter-layout-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* ---- Phone: a course row is one button (RequirementCard.svelte) ---- */
+.degree-card-list .requirement-course-tap {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  font-family: inherit;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.requirement-course-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.degree-card-list .requirement-course-tap .requirement-course-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
+/* The grade and Transfer badges sit on the row's own background, so they
+   need an edge to read as badges at all. */
+.requirement-course-tap .course-badge-grade,
+.requirement-course-tap .course-badge-transfer {
+  border: 1px solid var(--color-border);
+}
+
+/* ---- Phone: the Move sheet (MoveCourseSheet.svelte) ---- */
+.move-sheet-header {
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 0.75rem 0.75rem 1rem;
+}
+
+.move-sheet-course {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.move-sheet-title {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.move-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+}
+
+.move-sheet-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.move-sheet-buckets {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.move-sheet-bucket {
+  --move-edge: var(--color-text-secondary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--move-edge);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+}
+
+.move-sheet-bucket.req-not_satisfied {
+  --move-edge: var(--color-danger);
+}
+.move-sheet-bucket.req-in_progress {
+  --move-edge: var(--color-warning);
+}
+.move-sheet-bucket.req-satisfied {
+  --move-edge: var(--color-success);
+}
+
+.move-sheet-bucket:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  border-left-color: var(--move-edge);
+}
+
+.move-sheet-bucket.is-current {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.move-sheet-bucket-name {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+.move-sheet-bucket-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.move-sheet-bucket .degree-progress-bar {
+  grid-column: 1 / -1;
+  height: 6px;
+}
+
+.move-sheet-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
+}
+
+.move-sheet-actions .btn {
+  flex: 1;
+  min-height: 44px;
+}
+
+.move-sheet-actions .move-sheet-remove {
+  color: var(--color-danger);
+}
+
+/* A sheet from the bottom edge on phones, within thumb reach. Three classes
+   to outrank modal.css's `html.is-mobile .modal-backdrop` inset. */
+@media (max-width: 560px) {
+  .modal-backdrop.modal-container.move-sheet-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .move-sheet-modal .modal-dialog {
+    max-width: none;
+    border-radius: var(--effect-border-radius-large)
+      var(--effect-border-radius-large) 0 0;
+  }
+
+  .move-sheet-modal .modal-dialog,
+  .move-sheet-modal .modal-content {
+    max-height: 85dvh;
   }
 }
 

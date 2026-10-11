@@ -2,7 +2,11 @@ import { appState } from '../../core/state/appState.svelte';
 import { setPage, showAppError } from '../ui/uiState.svelte';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { FilterService } from '../filtering/FilterService';
-import { inferBucketDepartments, type DegreeBucket } from './degreeBuckets';
+import {
+  bucketRuleLabel,
+  inferBucketDepartments,
+  type DegreeBucket,
+} from './degreeBuckets';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { candidateCodes, findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
@@ -45,7 +49,7 @@ class DegreePlanService {
             record.major,
             classYear,
             bucket.category,
-            bucket.name,
+            bucketRuleLabel(bucket),
           )
         : null;
 
@@ -61,6 +65,10 @@ class DegreePlanService {
         this.filterService.removeFilter('department');
       }
     }
+
+    // A search left behind by openCourse would narrow the bucket's courses down
+    // to that one code, or to nothing.
+    this.filterService.removeFilter('searchText');
 
     const year =
       appState.activeSchedule?.year ??
@@ -91,8 +99,7 @@ class DegreePlanService {
     );
 
     if (!course) {
-      if (typeof alert === 'function')
-        showAppError(`${code} could not be found in the course catalog.`);
+      showAppError(`${code} could not be found in the course catalog.`);
       return;
     }
 

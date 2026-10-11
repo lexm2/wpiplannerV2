@@ -75,26 +75,35 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     }
   }
 
+  // Restarting mid-tutorial: stop the running one first, and hold cleaningUp
+  // so swapping back to the previous schedule doesn't trigger a second,
+  // concurrent teardown via onActiveScheduleChange.
   async function sharedSetup() {
-    await cleanupTutorial(false);
-    const stale = services.scheduleManagementService
-      .getAllSchedules()
-      .filter(s => s.name === 'Tutorial' || s.name.startsWith('Tutorial ('));
-    for (const s of stale) {
-      await services.scheduleManagementService.deleteSchedule(s.id, {
-        force: true,
-      });
+    tutorialService.cancel();
+    cleaningUp = true;
+    try {
+      await cleanupTutorial(false);
+      const stale = services.scheduleManagementService
+        .getAllSchedules()
+        .filter(s => s.name === 'Tutorial' || s.name.startsWith('Tutorial ('));
+      for (const s of stale) {
+        await services.scheduleManagementService.deleteSchedule(s.id, {
+          force: true,
+        });
+      }
+      previousScheduleId =
+        services.scheduleManagementService.getActiveScheduleId();
+      await services.courseDataService.addTutorialDepartment();
+      services.filterService.addFilter('department', { departments: ['TUT'] });
+      const tutorialId = `tutorial_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+      const result = await services.scheduleManagementService.createNewSchedule(
+        'Tutorial',
+        { id: tutorialId },
+      );
+      tutorialScheduleId = result.schedule?.id ?? null;
+    } finally {
+      cleaningUp = false;
     }
-    previousScheduleId =
-      services.scheduleManagementService.getActiveScheduleId();
-    await services.courseDataService.addTutorialDepartment();
-    services.filterService.addFilter('department', { departments: ['TUT'] });
-    const tutorialId = `tutorial_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    const result = await services.scheduleManagementService.createNewSchedule(
-      'Tutorial',
-      { id: tutorialId },
-    );
-    tutorialScheduleId = result.schedule?.id ?? null;
   }
 
   async function cleanupTutorial(setVisited: boolean) {

@@ -22,6 +22,11 @@ export const expandedTerm = new SvelteMap<string, string>();
 // The FLIP needs the *pre-swap* height; an action's update() runs post-swap.
 const pendingStartHeight = new Map<string, number>();
 
+// Courses whose collapse fade is still playing. Clicks on them are ignored
+// until it lands: a second collapse (or an expand the fade's end would then
+// undo) would lock the row again with no rune change to release it.
+const collapseInFlight = new Set<string>();
+
 const BADGE_STEP_MS = 40; // per-step delay of the diagonal crumb cascade (the app-wide stagger step)
 const BADGE_FADE_MS = 150;
 
@@ -57,13 +62,29 @@ function lockForFlip(item: HTMLElement, courseId: string): void {
   pendingStartHeight.set(courseId, h);
 }
 
+// The {#if} swap replaces the badge that was clicked with its counterpart in
+// the other branch, and removing a focused node drops focus to <body>. Once the
+// swap has landed, hand focus to the new badge for the same term - but only if
+// the old one had it and nothing else has taken it since.
+function restoreBadgeFocus(item: HTMLElement, term: string): void {
+  void tick().then(() => {
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+    item
+      .querySelector<HTMLElement>(
+        `button[data-term-badge][data-term="${CSS.escape(term)}"]`,
+      )
+      ?.focus();
+  });
+}
+
 export function toggleTerm(
   e: MouseEvent,
   courseId: string,
   term: string,
   available: boolean,
 ): void {
-  if (!available) return;
+  if (!available || collapseInFlight.has(courseId)) return;
   const item = (e.currentTarget as HTMLElement | null)?.closest(
     '[data-course-item]',
   ) as HTMLElement | null;
@@ -71,6 +92,9 @@ export function toggleTerm(
     '[data-term-sections]',
   ) as HTMLElement | null;
   const collapsing = expandedTerm.get(courseId) === term;
+  const hadFocus =
+    e.currentTarget instanceof HTMLElement &&
+    e.currentTarget === document.activeElement;
 
   // Collapsing with motion: play the open animation in reverse - fade the
   // section badges out diagonally from the bottom-right up to the top-left,
@@ -99,20 +123,24 @@ export function toggleTerm(
       ),
     );
     // Once the crumbs have faded out, lock the height and flip to collapsed.
+    collapseInFlight.add(courseId);
     void Promise.all(fades.map(a => a.finished))
       .then(() => {
         lockForFlip(item, courseId);
         expandedTerm.delete(courseId);
+        if (hadFocus) restoreBadgeFocus(item, term);
       })
       .catch(() => {
         /* a fade was cancelled (e.g. row unmounted) - skip */
-      });
+      })
+      .finally(() => collapseInFlight.delete(courseId));
     return;
   }
 
   if (item) lockForFlip(item, courseId);
   if (collapsing) expandedTerm.delete(courseId);
   else expandedTerm.set(courseId, term);
+  if (item && hadFocus) restoreBadgeFocus(item, term);
 }
 
 // Driven by the `expandedTerm` rune: when a course's expanded term changes,

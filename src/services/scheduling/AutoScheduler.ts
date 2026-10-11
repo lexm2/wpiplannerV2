@@ -1,5 +1,5 @@
 import type { Course, Section, SectionsByKind } from '../../types/types';
-import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
+import type { SelectedCourse } from '../../types/schedule';
 import { AcademicTerm } from '../../types/schedule';
 import type { SectionCandidate } from '../../types/scheduling';
 import {
@@ -22,6 +22,23 @@ interface CourseTypeInfo {
   isStandaloneLab: boolean;
 }
 
+/**
+ * Filters the auto-scheduler ignores. Conflicts are checked against the
+ * blocked masks instead (see getBlockedMasksByTerm), so the conflict filter's
+ * stale snapshot is skipped. The rest judge the course, not the section: they
+ * narrow the course list, but the user has already picked these courses, so
+ * e.g. a search or year left over from the Degree page must not block them.
+ */
+const NON_SECTION_FILTER_IDS = [
+  'periodConflict',
+  'searchText',
+  'department',
+  'academicYear',
+  'degreeBucket',
+  'graduateLevel',
+  'creditRange',
+];
+
 export interface MaskedCandidate {
   combination: SectionsByKind;
   mask: bigint;
@@ -35,35 +52,35 @@ export interface MaskedCandidate {
 export class AutoScheduler {
   constructor(private filterService: FilterService) {}
 
-  getBlockedMasksByTerm(): Map<string, bigint> {
-    const activeFilters = this.filterService.getActiveFilters();
+  /**
+   * Time that is already taken, per quarter: the conflict filter's blocked
+   * slots, plus the chosen sections of `fixedCourses` (courses locked in the
+   * auto-schedule intro), which block whether or not the filter is on.
+   *
+   * The filter's own `selectedCourses` is deliberately ignored: it is a
+   * snapshot from when "avoid conflicts" was switched on, and it holds the
+   * old sections of the very courses being rescheduled. The sections that
+   * stay put are exactly the fixed ones.
+   */
+  getBlockedMasksByTerm(
+    fixedCourses: SelectedCourse[] = [],
+  ): Map<string, bigint> {
+    const conflictFilter = new ConflictFilter();
+    const criteria = this.filterService
+      .getActiveFilters()
+      .find(f => f.id === 'periodConflict')?.criteria;
+    const blockedSlots = conflictFilter.isValidCriteria(criteria)
+      ? (criteria as ConflictCriteria).blockedSlots
+      : [];
 
-    const conflictFilter =
-      this.filterService.getRegisteredFilter('periodConflict');
-    if (conflictFilter instanceof ConflictFilter) {
-      const criteria = activeFilters.find(
-        f => f.id === 'periodConflict',
-      )?.criteria;
-      if (criteria && conflictFilter.isValidCriteria(criteria)) {
-        return conflictFilter.getBlockedMasksByTerm(
-          criteria as ConflictCriteria,
-        );
-      }
-    }
-
-    const blockedTimesCriteria = activeFilters.find(
-      f => f.id === 'blockedTimes',
-    )?.criteria as { blockedTimes?: WeeklyTimeSlot[] } | undefined;
-    const blockedTimes = blockedTimesCriteria?.blockedTimes;
-    if (blockedTimes && blockedTimes.length > 0) {
-      const tempFilter = new ConflictFilter();
-      return tempFilter.getBlockedMasksByTerm({
-        avoidConflicts: true,
-        blockedSlots: blockedTimes,
-      });
-    }
-
-    return new Map();
+    // The scheduler books time per quarter, so a semester slot always
+    // blocks both of its quarters, whatever the course-list toggle says.
+    return conflictFilter.getBlockedMasksByTerm({
+      avoidConflicts: true,
+      blockedSlots: blockedSlots ?? [],
+      selectedCourses: fixedCourses,
+      semesterSpansQuarters: true,
+    });
   }
 
   getMaskedCandidates(
@@ -75,16 +92,20 @@ export class AutoScheduler {
     const typeInfo = this.detectCourseTypes(course);
 
     const allowedTerms = selectedCourse.allowedTerms;
+    const passingCrns = this.getPassingCrns(course);
 
     if (typeInfo.isStandaloneLab) {
       const labs = course.standaloneLabs || [];
 
       for (const lab of labs) {
         if (allowedTerms && !allowedTerms.includes(lab.computedTerm)) continue;
-        if (!this.isValidSection(lab, blockedMasksByTerm, selectedCourse))
-          continue;
+        const mask = this.validSectionMask(
+          lab,
+          blockedMasksByTerm,
+          passingCrns,
+        );
+        if (mask === null) continue;
 
-        const mask = sectionToMask(lab);
         const candidate: MaskedCandidate = {
           combination: { lab },
           mask,
@@ -105,10 +126,12 @@ export class AutoScheduler {
       const lecture = lectureGroup.section;
       if (allowedTerms && !allowedTerms.includes(lecture.computedTerm))
         continue;
-      if (!this.isValidSection(lecture, blockedMasksByTerm, selectedCourse))
-        continue;
-
-      const lectureMask = sectionToMask(lecture);
+      const lectureMask = this.validSectionMask(
+        lecture,
+        blockedMasksByTerm,
+        passingCrns,
+      );
+      if (lectureMask === null) continue;
 
       const discussionCandidates: SectionCandidate[] = [];
       if (typeInfo.hasDiscussions) {
@@ -116,9 +139,12 @@ export class AutoScheduler {
 
         for (const d of discussions) {
           if (d.computedTerm !== lecture.computedTerm) continue;
-          if (!this.isValidSection(d, blockedMasksByTerm, selectedCourse))
-            continue;
-          const mask = sectionToMask(d);
+          const mask = this.validSectionMask(
+            d,
+            blockedMasksByTerm,
+            passingCrns,
+          );
+          if (mask === null) continue;
           if (masksConflict(lectureMask, mask)) continue;
           discussionCandidates.push({ section: d, mask });
         }
@@ -132,9 +158,12 @@ export class AutoScheduler {
 
         for (const l of labs) {
           if (l.computedTerm !== lecture.computedTerm) continue;
-          if (!this.isValidSection(l, blockedMasksByTerm, selectedCourse))
-            continue;
-          const mask = sectionToMask(l);
+          const mask = this.validSectionMask(
+            l,
+            blockedMasksByTerm,
+            passingCrns,
+          );
+          if (mask === null) continue;
           if (masksConflict(lectureMask, mask)) continue;
           labCandidates.push({ section: l, mask });
         }
@@ -169,12 +198,13 @@ export class AutoScheduler {
     return candidates;
   }
 
-  private isValidSection(
+  /** The section's mask, or null when it can't be scheduled. */
+  private validSectionMask(
     section: Section,
     blockedMasksByTerm: Map<string, bigint>,
-    selectedCourse: SelectedCourse,
-  ): boolean {
-    if (!this.hasValidTimeSlot(section)) return false;
+    passingCrns: Set<number>,
+  ): bigint | null {
+    if (!this.hasValidTimeSlot(section)) return null;
 
     // Check blocked time conflict using bitmask - O(1)
     const sectionMask = sectionToMask(section);
@@ -190,9 +220,9 @@ export class AutoScheduler {
     } else {
       blockedMask = blockedMasksByTerm.get(section.computedTerm) || 0n;
     }
-    if (masksConflict(sectionMask, blockedMask)) return false;
+    if (masksConflict(sectionMask, blockedMask)) return null;
 
-    return this.sectionPassesFilters(section, selectedCourse);
+    return passingCrns.has(section.crn) ? sectionMask : null;
   }
 
   private detectCourseTypes(course: Course): CourseTypeInfo {
@@ -230,13 +260,12 @@ export class AutoScheduler {
     });
   }
 
-  private sectionPassesFilters(
-    section: Section,
-    selectedCourse: SelectedCourse,
-  ): boolean {
-    if (!this.hasValidTimeSlot(section)) return false;
-
-    const filteredSections = this.filterService.apply([selectedCourse.course]);
-    return filteredSections.some(fs => fs.section.crn === section.crn);
+  /** CRNs of the course's sections that pass the section-level filters. */
+  private getPassingCrns(course: Course): Set<number> {
+    const filteredSections = this.filterService.applyExcluding(
+      [course],
+      NON_SECTION_FILTER_IDS,
+    );
+    return new Set(filteredSections.map(fs => fs.section.crn));
   }
 }

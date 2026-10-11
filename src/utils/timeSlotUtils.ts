@@ -2,21 +2,16 @@
 import type { WeeklyTimeSlot } from '../types/schedule';
 import { AcademicTerm } from '../types/schedule';
 
-/** Check if two time slots overlap on the same day. */
+/**
+ * Whether two slots overlap on the same day. Terms are not compared: whether
+ * two terms can clash depends on the caller (see ConflictFilter's
+ * semesterSpansQuarters).
+ */
 export function slotsOverlap(
   slot1: WeeklyTimeSlot,
   slot2: WeeklyTimeSlot,
 ): boolean {
   if (slot1.day !== slot2.day) return false;
-
-  // Terms must be compatible: same term, or one is ALL
-  if (
-    slot1.term !== slot2.term &&
-    slot1.term !== AcademicTerm.ALL &&
-    slot2.term !== AcademicTerm.ALL
-  ) {
-    return false;
-  }
 
   const start1 = slot1.startTime.hours * 60 + slot1.startTime.minutes;
   const end1 = slot1.endTime.hours * 60 + slot1.endTime.minutes;

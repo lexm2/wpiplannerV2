@@ -2,13 +2,41 @@ import { AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
 import { ConflictCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
-import {
-  periodToWeeklySlots,
-  sectionToWeeklySlots,
-  slotsOverlap,
-} from '../../../utils/timeSlotUtils';
+import { sectionToWeeklySlots } from '../../../utils/timeSlotUtils';
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
 import { getSelectedSections } from '../../../utils/courseUtils';
+
+const QUARTERS = [
+  AcademicTerm.A,
+  AcademicTerm.B,
+  AcademicTerm.C,
+  AcademicTerm.D,
+];
+
+/**
+ * The terms a slot occupies, for overlap tests and mask keys. With `spans`
+ * a semester term is its two quarters, so F meets A and B. Without it terms
+ * stand alone, and only ALL reaches every other term.
+ */
+function termsCovered(term: AcademicTerm, spans: boolean): AcademicTerm[] {
+  if (spans) {
+    if (term === AcademicTerm.ALL) return QUARTERS;
+    if (term === AcademicTerm.F) return [AcademicTerm.A, AcademicTerm.B];
+    if (term === AcademicTerm.S) return [AcademicTerm.C, AcademicTerm.D];
+    return [term];
+  }
+  if (term === AcademicTerm.ALL)
+    return [...QUARTERS, AcademicTerm.F, AcademicTerm.S];
+  return [term];
+}
+
+/** A blocked slot parsed once per apply: owning CRN, terms, minute range. */
+interface PreparedSlot {
+  crn: string;
+  terms: AcademicTerm[];
+  start: number;
+  end: number;
+}
 
 export class ConflictFilter implements SectionBasedFilter {
   readonly id = 'periodConflict';
@@ -19,11 +47,7 @@ export class ConflictFilter implements SectionBasedFilter {
 
   private blockedMasksByTerm: Map<string, bigint> = new Map();
 
-  apply(
-    sections: FilterableSection[],
-    criteria: unknown,
-    _activeFilters?: Map<string, unknown>,
-  ): FilterableSection[] {
+  apply(sections: FilterableSection[], criteria: unknown): FilterableSection[] {
     return this.applyToFilterableSections(
       sections,
       criteria as ConflictCriteria,
@@ -42,41 +66,67 @@ export class ConflictFilter implements SectionBasedFilter {
     if (blockedSlots.length === 0) {
       return sections;
     }
+    const spans = criteria.semesterSpansQuarters ?? true;
 
-    // Build set of selected section CRNs so we don't filter them out
+    // Selected section CRNs per course: a course is never hidden for clashing
+    // with its own picks, since another of its sections would replace them.
+    const ownCrnsByCourse = new Map<string, Set<string>>();
+    for (const sc of criteria.selectedCourses ?? []) {
+      ownCrnsByCourse.set(
+        sc.course.id,
+        new Set(getSelectedSections(sc).map(s => String(s.crn))),
+      );
+    }
     const selectedCrns = new Set(
-      (criteria.selectedCourses ?? [])
-        .flatMap(sc => getSelectedSections(sc))
-        .map(s => String(s.crn)),
+      [...ownCrnsByCourse.values()].flatMap(crns => [...crns]),
     );
+
+    // Parse each blocked slot once per apply, bucketed by day: the per-section
+    // test below is then plain number and set work.
+    const blockedByDay = new Map<string, PreparedSlot[]>();
+    for (const slot of blockedSlots) {
+      const prepared: PreparedSlot = {
+        crn: slot.id.split('-')[0],
+        terms: termsCovered(slot.term, spans),
+        start: slot.startTime.hours * 60 + slot.startTime.minutes,
+        end: slot.endTime.hours * 60 + slot.endTime.minutes,
+      };
+      const forDay = blockedByDay.get(slot.day);
+      if (forDay) forDay.push(prepared);
+      else blockedByDay.set(slot.day, [prepared]);
+    }
 
     return sections.filter(fs => {
       const currentCrn = String(fs.section.crn);
+      const ownCrns = ownCrnsByCourse.get(fs.course.id);
 
       // Never filter out a currently selected section
       if (selectedCrns.has(currentCrn)) {
         return true;
       }
 
-      // Exclude blocked slots that came from this section's own CRN
-      const relevantBlockedSlots = blockedSlots.filter(slot => {
-        const slotCrn = slot.id.split('-')[0];
-        return slotCrn !== currentCrn;
-      });
+      const sectionTerms = termsCovered(
+        fs.section.computedTerm || AcademicTerm.ALL,
+        spans,
+      );
 
-      if (relevantBlockedSlots.length === 0) {
-        return true;
-      }
-
-      for (const currentPeriod of fs.section.periods) {
-        const periodSlots = periodToWeeklySlots(
-          currentPeriod,
-          fs.section.computedTerm || AcademicTerm.ALL,
-        );
-        if (
-          this.hasConflictWithBlockedSlots(periodSlots, relevantBlockedSlots)
-        ) {
-          return false;
+      for (const period of fs.section.periods) {
+        const start = period.startTime.hours * 60 + period.startTime.minutes;
+        const end = period.endTime.hours * 60 + period.endTime.minutes;
+        for (const day of period.days) {
+          for (const blocked of blockedByDay.get(day) ?? []) {
+            // Skip blocked slots that came from this section's own course
+            if (blocked.crn === currentCrn || ownCrns?.has(blocked.crn)) {
+              continue;
+            }
+            if (
+              start < blocked.end &&
+              blocked.start < end &&
+              blocked.terms.some(t => sectionTerms.includes(t))
+            ) {
+              return false;
+            }
+          }
         }
       }
       return true;
@@ -97,36 +147,6 @@ export class ConflictFilter implements SectionBasedFilter {
     }
 
     return slots;
-  }
-
-  private hasConflictWithBlockedSlots(
-    testSlots: WeeklyTimeSlot[],
-    blockedSlots: WeeklyTimeSlot[],
-  ): boolean {
-    for (const testSlot of testSlots) {
-      for (const blockedSlot of blockedSlots) {
-        if (this.slotsConflict(testSlot, blockedSlot)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private slotsConflict(slot1: WeeklyTimeSlot, slot2: WeeklyTimeSlot): boolean {
-    if (
-      slot1.term !== AcademicTerm.ALL &&
-      slot2.term !== AcademicTerm.ALL &&
-      slot1.term !== slot2.term
-    ) {
-      return false;
-    }
-
-    if (slot1.day !== slot2.day) {
-      return false;
-    }
-
-    return slotsOverlap(slot1, slot2);
   }
 
   isValidCriteria(criteria: unknown): boolean {
@@ -151,35 +171,30 @@ export class ConflictFilter implements SectionBasedFilter {
     return 'Conflicts allowed';
   }
 
-  private precomputeBlockedMasks(blockedSlots: WeeklyTimeSlot[]): void {
-    this.blockedMasksByTerm.clear();
+  private precomputeBlockedMasks(
+    blockedSlots: WeeklyTimeSlot[],
+    spans: boolean,
+  ): Map<string, bigint> {
+    const masks = new Map<string, bigint>();
 
     for (const slot of blockedSlots) {
       const mask = weeklySlotToMask(slot);
       if (mask === 0n) continue;
 
-      let terms: string[];
-      if (slot.term === AcademicTerm.ALL) {
-        terms = ['A', 'B', 'C', 'D'];
-      } else if (slot.term === AcademicTerm.F) {
-        terms = ['A', 'B'];
-      } else if (slot.term === AcademicTerm.S) {
-        terms = ['C', 'D'];
-      } else {
-        terms = [slot.term];
-      }
-
-      for (const term of terms) {
-        const existing = this.blockedMasksByTerm.get(term) || 0n;
-        this.blockedMasksByTerm.set(term, existing | mask);
+      for (const term of termsCovered(slot.term, spans)) {
+        masks.set(term, (masks.get(term) || 0n) | mask);
       }
     }
+    return masks;
   }
 
   getBlockedMasksByTerm(criteria?: ConflictCriteria): Map<string, bigint> {
     if (criteria) {
       const blockedSlots = this.getBlockedSlots(criteria);
-      this.precomputeBlockedMasks(blockedSlots);
+      this.blockedMasksByTerm = this.precomputeBlockedMasks(
+        blockedSlots,
+        criteria.semesterSpansQuarters ?? true,
+      );
     }
     return new Map(this.blockedMasksByTerm);
   }

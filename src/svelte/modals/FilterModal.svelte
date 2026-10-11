@@ -34,6 +34,9 @@
 
 <Modal
   {typeId}
+  title={payload.mode === 'auto-schedule'
+    ? 'Auto-Schedule Settings'
+    : 'Filter Courses'}
   extraClass="filter-modal"
   dialogClass="filter-modal-dialog"
   {onRequestClose}

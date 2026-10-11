@@ -68,5 +68,15 @@
 }
 
 .menuAction.danger:hover {
-  background: #ffebee;
+  background: var(--color-danger-background);
+}
+
+/* From 1200px every action shows inline (.inline-action-btn in
+   schedule-picker-modal.css), so the overflow menu has nothing to add. The
+   open menu goes too, in case the window widens while it is showing. */
+@media (min-width: 1200px) {
+  .menuBtn,
+  .scheduleItemMenu[data-visible='true'] {
+    display: none;
+  }
 }

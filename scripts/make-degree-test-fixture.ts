@@ -2,7 +2,7 @@
  * Generates tests/fixtures/academic-progress-sample.xlsx - a small, sanitized
  * stand-in for a real Workday "View My Academic Progress" export.
  *
- * The real export (docs/View_My_Academic_Progress.xlsx) contains a student's
+ * The real export contains a student's
  * grades and full history, so it is git-ignored and never committed. This
  * fixture reproduces the export's exact structure (stray label row, header row
  * on row 2, the 7 columns) but contains only a handful of rows built from

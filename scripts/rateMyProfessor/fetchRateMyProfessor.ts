@@ -26,6 +26,11 @@ const OUTPUT_PATH = path.join(process.cwd(), 'public', 'rateMyProfessor.json');
 
 // Rate limiting configuration
 const DELAY_BETWEEN_REQUESTS_MS = 100;
+const REQUEST_TIMEOUT_MS = 15000;
+
+// Refuse to overwrite the existing file with a result smaller than this share of
+// it; CI commits whatever gets written, so an API outage must not wipe the data.
+const MIN_RESULT_RATIO = 0.5;
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -42,6 +47,7 @@ async function graphqlRequest(query: string, variables: any): Promise<any> {
       query,
       variables,
     }),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -71,8 +77,14 @@ async function searchTeachers(
           edges {
             node {
               id
+              legacyId
               firstName
               lastName
+              department
+              avgDifficulty
+              avgRating
+              numRatings
+              wouldTakeAgainPercent
               school {
                 id
                 name
@@ -100,29 +112,6 @@ async function searchTeachers(
   return data.newSearch.teachers.edges.map((edge: any) => edge.node);
 }
 
-async function getTeacher(id: string): Promise<any> {
-  const graphqlQuery = `
-    query TeacherQuery($id: ID!) {
-      node(id: $id) {
-        ... on Teacher {
-          id
-          legacyId
-          firstName
-          lastName
-          department
-          avgDifficulty
-          avgRating
-          numRatings
-          wouldTakeAgainPercent
-        }
-      }
-    }
-  `;
-
-  const data = await graphqlRequest(graphqlQuery, { id });
-  return data.node;
-}
-
 /**
  * Fetch all professors for WPI by searching through the alphabet
  */
@@ -134,6 +123,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
     // This is a workaround to get as many professors as possible
     const allTeachers = new Map<string, any>();
     const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    const failedLetters: string[] = [];
 
     console.log('Searching through alphabet to find all professors...');
 
@@ -154,78 +144,66 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
         );
       } catch (error) {
         console.error(`\nFailed to search for letter ${letter}:`, error);
+        failedLetters.push(letter);
       }
     }
 
-    console.log(
-      `\n\nFound ${allTeachers.size} unique professors. Fetching detailed information...`,
-    );
+    // A missing letter silently drops every professor only it would find
+    if (failedLetters.length > 0) {
+      throw new Error(
+        `Search failed for letter(s): ${failedLetters.join(', ')}`,
+      );
+    }
+
+    console.log(`\n\nFound ${allTeachers.size} unique professors.`);
 
     const teachers = Array.from(allTeachers.values());
 
     if (teachers.length === 0) {
-      console.warn('No professors found for WPI');
-      return [];
+      throw new Error('No professors found for WPI');
     }
 
-    const professors: Professor[] = [];
-    let successCount = 0;
-    let failureCount = 0;
-
-    // Fetch detailed information for each professor with rate limiting
-    for (let i = 0; i < teachers.length; i++) {
-      const teacher = teachers[i];
-
-      try {
-        // Add delay between requests to avoid overwhelming the API
-        if (i > 0) {
-          await sleep(DELAY_BETWEEN_REQUESTS_MS);
-        }
-
-        const details = await getTeacher(teacher.id);
-
-        if (!details) {
-          throw new Error('No details returned');
-        }
-
-        const professor: Professor = {
-          id: details.id,
-          legacyId: details.legacyId,
-          firstName: details.firstName || teacher.firstName,
-          lastName: details.lastName || teacher.lastName,
-          department: details.department || 'Unknown',
-          avgRating: details.avgRating || 0,
-          avgDifficulty: details.avgDifficulty || 0,
-          numRatings: details.numRatings || 0,
-          wouldTakeAgainPercent: details.wouldTakeAgainPercent ?? null,
-          profileUrl: `https://www.ratemyprofessors.com/professor/${details.legacyId}`,
-        };
-
-        professors.push(professor);
-        successCount++;
-
-        if ((i + 1) % 10 === 0) {
-          console.log(
-            `Progress: ${i + 1}/${teachers.length} professors processed`,
-          );
-        }
-      } catch (error) {
-        failureCount++;
-        console.error(
-          `Failed to fetch details for ${teacher.firstName} ${teacher.lastName}:`,
-          error,
-        );
-      }
-    }
-
-    console.log(
-      `\nCompleted: ${successCount} successful, ${failureCount} failed`,
-    );
+    // The search nodes already carry the rating fields, so no per-teacher
+    // detail request is needed.
+    const professors: Professor[] = teachers.map((teacher): Professor => ({
+      id: teacher.id,
+      legacyId: teacher.legacyId,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      department: teacher.department || 'Unknown',
+      avgRating: teacher.avgRating || 0,
+      avgDifficulty: teacher.avgDifficulty || 0,
+      numRatings: teacher.numRatings || 0,
+      wouldTakeAgainPercent: teacher.wouldTakeAgainPercent ?? null,
+      profileUrl: `https://www.ratemyprofessors.com/professor/${teacher.legacyId}`,
+    }));
 
     return professors;
   } catch (error) {
     console.error('Error fetching professors:', error);
     throw error;
+  }
+}
+
+/**
+ * Throws if the new result is drastically smaller than what's already on disk
+ */
+async function checkAgainstExisting(totalProfessors: number): Promise<void> {
+  let existingTotal: number;
+  try {
+    const existing = JSON.parse(
+      await fs.readFile(OUTPUT_PATH, 'utf-8'),
+    ) as Partial<RateMyProfessorData>;
+    existingTotal = existing.totalProfessors ?? 0;
+  } catch {
+    // No readable existing file, nothing to compare against
+    return;
+  }
+
+  if (totalProfessors < existingTotal * MIN_RESULT_RATIO) {
+    throw new Error(
+      `Only ${totalProfessors} professors fetched vs ${existingTotal} in the existing file; refusing to overwrite`,
+    );
   }
 }
 
@@ -272,6 +250,7 @@ async function main() {
       totalProfessors: professors.length,
     };
 
+    await checkAgainstExisting(data.totalProfessors);
     await saveToFile(data);
 
     const endTime = Date.now();

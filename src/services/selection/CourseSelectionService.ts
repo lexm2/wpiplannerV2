@@ -3,14 +3,13 @@ import { SelectedCourse } from '../../types/schedule';
 import type { CourseComponentSelections } from '../../types/scheduling';
 import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { DataValidator } from '../../core/validation/DataValidator';
-import { Validators } from '../../utils/validators';
+import { getAllSections } from '../../utils/courseUtils';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
 
 export interface CourseSelectionOptions {
   isRequired?: boolean;
   validateBeforeAdd?: boolean;
-  autoSave?: boolean;
 }
 
 export interface CourseSelectionResult {
@@ -167,13 +166,15 @@ export class CourseSelectionService {
         };
       }
 
+      // Section numbers are free text from the catalog ("A01 - ST: ..."), so
+      // the only real check is that this course has the section.
       if (
         sectionNumber !== null &&
-        !Validators.validateSectionNumber(sectionNumber)
+        !getAllSections(course).some(s => s.number === sectionNumber)
       ) {
         return {
           success: false,
-          error: 'Invalid section number format',
+          error: `Section "${sectionNumber}" not found in ${course.departmentAbbr}${course.number}`,
         };
       }
 
@@ -194,22 +195,6 @@ export class CourseSelectionService {
       return {
         success: false,
         error: `Error setting selected section: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  async clearAllSelections(): Promise<{ success: boolean; error?: string }> {
-    await this.ensureInitialized();
-
-    try {
-      this.profileStateManager.clearAllSelections('service');
-
-      return { success: true };
-    } catch (error) {
-      logger.error('Error clearing selections:', error);
-      return {
-        success: false,
-        error: `Error clearing selections: ${errorMessage(error)}`,
       };
     }
   }
@@ -346,80 +331,6 @@ export class CourseSelectionService {
     }
   }
 
-  // Section locking methods to prevent auto-scheduler from changing manual selections
-
-  async lockSection(
-    course: Course,
-    sectionCrn: string,
-  ): Promise<CourseSelectionResult> {
-    await this.ensureInitialized();
-
-    try {
-      if (!this.isCourseSelected(course)) {
-        return {
-          success: false,
-          error: 'Course must be selected before locking a section',
-        };
-      }
-
-      this.profileStateManager.lockSection(course, sectionCrn, 'service');
-
-      const selectedCourse = this.profileStateManager.getSelectedCourse(course);
-
-      return {
-        success: true,
-        course: selectedCourse,
-      };
-    } catch (error) {
-      logger.error('Error locking section:', error);
-      return {
-        success: false,
-        error: `Error locking section: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  async unlockSection(
-    course: Course,
-    sectionCrn: string,
-  ): Promise<CourseSelectionResult> {
-    await this.ensureInitialized();
-
-    try {
-      if (!this.isCourseSelected(course)) {
-        return {
-          success: false,
-          error: 'Course must be selected before unlocking a section',
-        };
-      }
-
-      this.profileStateManager.unlockSection(course, sectionCrn, 'service');
-
-      const selectedCourse = this.profileStateManager.getSelectedCourse(course);
-
-      return {
-        success: true,
-        course: selectedCourse,
-      };
-    } catch (error) {
-      logger.error('Error unlocking section:', error);
-      return {
-        success: false,
-        error: `Error unlocking section: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  isSectionLocked(course: Course, sectionCrn: string): boolean {
-    if (!this.isInitialized) return false;
-    return this.profileStateManager.isSectionLocked(course, sectionCrn);
-  }
-
-  getLockedSections(course: Course): Set<string> {
-    if (!this.isInitialized) return new Set();
-    return this.profileStateManager.getLockedSections(course);
-  }
-
   setCourseColor(courseId: string, color: string): boolean {
     if (!this.isInitialized) return false;
     this.profileStateManager.setCourseColor(courseId, color, 'service');
@@ -432,29 +343,13 @@ export class CourseSelectionService {
     return this.profileStateManager.getSelectedCourse(course) !== undefined;
   }
 
-  getSelectedCourse(course: Course): SelectedCourse | undefined {
-    if (!this.isInitialized) return undefined;
-
-    return this.profileStateManager.getSelectedCourse(course);
-  }
-
   getSelectedCourses(): SelectedCourse[] {
     if (!this.isInitialized) return [];
 
     return this.profileStateManager.getSelectedCourses();
   }
 
-  getSelectedCoursesCount(): number {
-    if (!this.isInitialized) return 0;
-
-    return this.profileStateManager.getSelectedCourses().length;
-  }
-
-  getSelectedCourseIds(): string[] {
-    return this.getSelectedCourses().map(sc => sc.course.id);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await -- awaited; paired with the ScheduleManagementService method
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by performInitialization
   async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
     const issues: string[] = [];
 
@@ -489,24 +384,6 @@ export class CourseSelectionService {
     };
   }
 
-  async save(): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureInitialized();
-      this.profileStateManager.save();
-      return { success: true };
-    } catch (error: unknown) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      };
-    }
-  }
-
-  hasUnsavedChanges(): boolean {
-    if (!this.isInitialized) return false;
-    return this.profileStateManager.hasUnsavedChanges();
-  }
-
   private async ensureInitialized(): Promise<void> {
     if (!this.isInitialized) {
       await this.initialize();
@@ -517,15 +394,17 @@ export class CourseSelectionService {
   private async attemptDataRepair(): Promise<boolean> {
     try {
       const selectedCourses = this.getSelectedCourses();
-      let repairedCount = 0;
-
-      selectedCourses.forEach(selectedCourse => {
-        this.dataValidator.repairSelectedCourse(selectedCourse);
-        repairedCount++;
-      });
+      // Count a course only if the repair actually changed it, so a health
+      // issue elsewhere (storage, say) does not trigger a pointless save.
+      const repairedCount = selectedCourses.filter(selectedCourse =>
+        this.dataValidator.repairSelectedCourse(selectedCourse),
+      ).length;
 
       if (repairedCount > 0) {
         logger.warn(`Repaired ${repairedCount} selected courses`);
+        // The repair edited the courses in place, so the schedules holding
+        // them look unchanged to save().
+        this.profileStateManager.forgetSavedSchedules();
         this.profileStateManager.save();
       }
 

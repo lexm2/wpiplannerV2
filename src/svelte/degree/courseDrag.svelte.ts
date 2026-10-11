@@ -72,9 +72,13 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
   let slotGap = 0;
   let slotOpen = true;
   let slotAnim: Animation | null = null;
+  let pointerX = 0;
+  let pointerY = 0;
 
   function onPointerDown(e: PointerEvent): void {
     if (!current.courseId) return;
+    // A tile still in flight - dragging, or easing home - would jump.
+    if (dragging) return;
     if (e.button !== 0 || e.pointerType === 'touch') return;
     // Let the tile's own controls take the press.
     if ((e.target as Element).closest('button, a, input, select, textarea'))
@@ -85,7 +89,7 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     capturedId = e.pointerId;
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('pointercancel', onPointerCancel);
   }
 
   function begin(e: PointerEvent): void {
@@ -133,7 +137,7 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     courseDrag.height = rect.height;
     courseDrag.settling = false;
 
-    startDragAutoScroll(e.clientX, e.clientY);
+    startDragAutoScroll(e.clientX, e.clientY, retarget);
   }
 
   function moveTo(x: number, y: number): void {
@@ -198,17 +202,42 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     e.preventDefault();
     moveTo(e.clientX, e.clientY);
     updateDragPointer(e.clientX, e.clientY);
-    const target = targetAt(e.clientX, e.clientY);
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    retarget();
+  }
+
+  /**
+   * Publish the target under the last pointer position. Runs on every move and
+   * after each auto-scroll step, when the pane slides under a still pointer.
+   */
+  function retarget(): void {
+    if (!dragging) return;
+    const target = targetAt(pointerX, pointerY);
     courseDrag.target = target;
     setSlotOpen(target === originTarget());
   }
 
-  function onPointerUp(e: PointerEvent): void {
+  function removeListeners(): void {
     releaseCapture();
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
-    window.removeEventListener('pointercancel', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerCancel);
     armed = false;
+  }
+
+  /** The browser took the pointer away - never a drop, so send the tile home. */
+  function onPointerCancel(): void {
+    removeListeners();
+    if (!dragging) return;
+    stopDragAutoScroll();
+    courseDrag.courseId = null;
+    courseDrag.target = null;
+    returnHome();
+  }
+
+  function onPointerUp(e: PointerEvent): void {
+    removeListeners();
     if (!dragging) return;
 
     stopDragAutoScroll();
@@ -301,10 +330,7 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
       current = next;
     },
     destroy() {
-      releaseCapture();
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
+      removeListeners();
       stopDragAutoScroll();
       finish();
       node.removeEventListener('pointerdown', onPointerDown);

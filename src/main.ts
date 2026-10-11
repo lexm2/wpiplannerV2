@@ -6,7 +6,6 @@ import { DeviceDetection } from './utils/deviceDetection';
 import { AppBootstrap } from './bootstrap/AppBootstrap';
 import { setupTutorial } from './services/tutorial/setupTutorial';
 import { appState } from './core/state/appState.svelte';
-import { openModal } from './services/ui/uiState.svelte';
 import type { ServiceContainer } from './bootstrap/ServiceContainer';
 
 DeviceDetection.initialize();
@@ -43,10 +42,6 @@ if (modalRootEl) {
       getDepartments: () => appState.loadedDepartments,
     },
   });
-}
-
-if (DeviceDetection.isMobilePhone()) {
-  openModal('mobile-notice');
 }
 
 services.tutorial = setupTutorial(services);

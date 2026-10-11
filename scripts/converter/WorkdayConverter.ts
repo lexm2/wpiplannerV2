@@ -69,14 +69,6 @@ export class WorkdayConverter {
     console.log(`Transformed ${coursesProcessed} courses`);
 
     const output: PlannerOutput = {
-      generated: new Date().toLocaleString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      }),
       departments: Array.from(departments.values()),
     };
 
@@ -102,7 +94,6 @@ export class WorkdayConverter {
           section.Offering_Period,
           section.Course_Section,
           section.Instructional_Format,
-          this.config,
         )
       ) {
         return false;
@@ -185,14 +176,13 @@ export class WorkdayConverter {
     console.log(`Total discussions: ${totalDiscussions}`);
     console.log(`Total labs: ${totalLabs}`);
     console.log(`Standalone labs: ${totalStandaloneLabs}`);
-    console.log(`Generated: ${output.generated}`);
     console.log('----------------------------\n');
   }
 
   private calculateTermBounds(sections: WorkdaySection[]): TermBoundsOutput {
     const uniqueYears = [
       ...new Set(sections.map(s => parseInt(s.Academic_Year))),
-    ].sort();
+    ].sort((a, b) => a - b);
     console.log(
       `[TermBounds] Detected academic years: ${uniqueYears.join(', ')}`,
     );

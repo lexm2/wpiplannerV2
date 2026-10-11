@@ -5,6 +5,8 @@
   import { AcademicTerm, EventType } from '../../types/schedule';
   import { DayOfWeek } from '../../types/types';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { formatLocalDate } from '../../utils/localDate';
+  import { QUARTER_TERMS } from '../../utils/typeGuards';
   import styles from '../../styles/components/local-event-modal.module.css';
   import Field from '../ui/Field.svelte';
   import TextField from '../ui/TextField.svelte';
@@ -25,7 +27,7 @@
     { value: DayOfWeek.THURSDAY, label: 'Thursday', short: 'T' },
     { value: DayOfWeek.FRIDAY, label: 'Friday', short: 'F' },
   ];
-  const TERMS = ['A', 'B', 'C', 'D'];
+  const TERMS = QUARTER_TERMS;
 
   function formatTime(hours: number, minutes: number): string {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
@@ -35,7 +37,7 @@
     return { hours: hours || 0, minutes: minutes || 0 };
   }
   function todayDate(): string {
-    return new Date().toISOString().split('T')[0];
+    return formatLocalDate();
   }
 
   const existing = $derived(payload?.existingEvent);
@@ -196,8 +198,11 @@
           <div class={styles['event-type-selector']}>
             <button
               type="button"
-              class={styles['event-type-option']}
-              class:selected={eventType === EventType.ONE_TIME}
+              class={[
+                styles['event-type-option'],
+                { [styles.selected]: eventType === EventType.ONE_TIME },
+              ]}
+              aria-pressed={eventType === EventType.ONE_TIME}
               onclick={() => (eventType = EventType.ONE_TIME)}
             >
               {@html getInlineSVG('CALENDAR_DOWN', 'type-icon')}
@@ -205,8 +210,11 @@
             </button>
             <button
               type="button"
-              class={styles['event-type-option']}
-              class:selected={eventType === EventType.RECURRING}
+              class={[
+                styles['event-type-option'],
+                { [styles.selected]: eventType === EventType.RECURRING },
+              ]}
+              aria-pressed={eventType === EventType.RECURRING}
               onclick={() => (eventType = EventType.RECURRING)}
             >
               {@html getInlineSVG('CALENDAR_REPEAT', 'type-icon')}
@@ -233,8 +241,12 @@
                 {#each WEEKDAYS as day (day.value)}
                   <button
                     type="button"
-                    class={styles['day-pill']}
-                    class:selected={selectedDays.has(day.value)}
+                    class={[
+                      styles['day-pill'],
+                      { [styles.selected]: selectedDays.has(day.value) },
+                    ]}
+                    aria-pressed={selectedDays.has(day.value)}
+                    aria-label={day.label}
                     title={day.label}
                     onclick={() => toggleDay(day.value)}
                   >

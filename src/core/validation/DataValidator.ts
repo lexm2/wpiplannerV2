@@ -1,7 +1,7 @@
 /**
  * Validates course data integrity and format consistency
  */
-import { Schedule, SelectedCourse } from '../../types/schedule';
+import type { SelectedCourse } from '../../types/schedule';
 import type { Course } from '../../types/types';
 import { getAllSections } from '../../utils/courseUtils';
 
@@ -24,17 +24,8 @@ interface ValidationWarning {
   suggestion?: string;
 }
 
-export interface SchemaValidationOptions {
-  allowPartialData?: boolean;
-  strict?: boolean;
-  repairInPlace?: boolean;
-}
-
 export class DataValidator {
-  validateSchedule(
-    schedule: unknown,
-    options: SchemaValidationOptions = {},
-  ): ValidationResult {
+  validateSchedule(schedule: unknown): ValidationResult {
     const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
     if (!schedule || typeof schedule !== 'object') {
@@ -58,10 +49,7 @@ export class DataValidator {
       'selectedCourses',
       result,
       (course: unknown, index: number) => {
-        const courseValidation = this.validateSelectedCourse(course, {
-          ...options,
-          allowPartialData: true,
-        });
+        const courseValidation = this.validateSelectedCourse(course);
         if (!courseValidation.valid) {
           courseValidation.errors.forEach(error => {
             result.errors.push({
@@ -85,17 +73,10 @@ export class DataValidator {
       result.valid = false;
     }
 
-    if (options.repairInPlace && result.valid) {
-      this.repairSchedule(scheduleObj as unknown as Schedule);
-    }
-
     return result;
   }
 
-  validateSelectedCourse(
-    selectedCourse: unknown,
-    options: SchemaValidationOptions = {},
-  ): ValidationResult {
+  validateSelectedCourse(selectedCourse: unknown): ValidationResult {
     const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
     if (!selectedCourse || typeof selectedCourse !== 'object') {
@@ -120,10 +101,7 @@ export class DataValidator {
       });
       result.valid = false;
     } else {
-      const courseValidation = this.validateCourse(
-        selectedCourseObj.course,
-        options,
-      );
+      const courseValidation = this.validateCourse(selectedCourseObj.course);
       if (!courseValidation.valid) {
         courseValidation.errors.forEach(error => {
           result.errors.push({
@@ -137,30 +115,19 @@ export class DataValidator {
     }
 
     if (typeof selectedCourseObj.isRequired !== 'boolean') {
-      if (options.repairInPlace) {
-        selectedCourseObj.isRequired = false;
-        result.warnings.push({
-          field: 'isRequired',
-          message: 'isRequired should be boolean, defaulted to false',
-        });
-      } else {
-        result.errors.push({
-          field: 'isRequired',
-          message: 'isRequired must be a boolean',
-          severity: 'error',
-          code: 'INVALID_TYPE',
-        });
-        result.valid = false;
-      }
+      result.errors.push({
+        field: 'isRequired',
+        message: 'isRequired must be a boolean',
+        severity: 'error',
+        code: 'INVALID_TYPE',
+      });
+      result.valid = false;
     }
 
     return result;
   }
 
-  validateCourse(
-    course: unknown,
-    _options: SchemaValidationOptions = {},
-  ): ValidationResult {
+  validateCourse(course: unknown): ValidationResult {
     const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
     if (!course || typeof course !== 'object') {
@@ -222,211 +189,13 @@ export class DataValidator {
     return result;
   }
 
-  validateDepartment(
-    department: unknown,
-    _options: SchemaValidationOptions = {},
-  ): ValidationResult {
-    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
-
-    if (!department || typeof department !== 'object') {
-      result.errors.push({
-        field: 'department',
-        message: 'Department must be an object',
-        severity: 'critical',
-        code: 'INVALID_TYPE',
-      });
-      result.valid = false;
-      return result;
-    }
-
-    const departmentObj = department as Record<string, unknown>;
-
-    this.validateRequiredField(departmentObj, 'abbreviation', 'string', result);
-    this.validateRequiredField(departmentObj, 'name', 'string', result);
-
-    if (
-      departmentObj.abbreviation &&
-      typeof departmentObj.abbreviation === 'string' &&
-      !/^[A-Z]{2,6}$/.test(departmentObj.abbreviation)
-    ) {
-      result.warnings.push({
-        field: 'abbreviation',
-        message: 'Department abbreviation should be 2-6 uppercase letters',
-        suggestion: 'Consider normalizing department abbreviations',
-      });
-    }
-
-    return result;
-  }
-
-  validateSchedulePreferences(
-    preferences: unknown,
-    _options: SchemaValidationOptions = {},
-  ): ValidationResult {
-    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
-
-    if (!preferences || typeof preferences !== 'object') {
-      result.errors.push({
-        field: 'preferences',
-        message: 'Preferences must be an object',
-        severity: 'critical',
-        code: 'INVALID_TYPE',
-      });
-      result.valid = false;
-      return result;
-    }
-
-    // Preferences are minimal (theme + bookmarks); no further validation needed
-    return result;
-  }
-
-  validateUserScheduleState(
-    userState: unknown,
-    options: SchemaValidationOptions = {},
-  ): ValidationResult {
-    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
-
-    if (!userState || typeof userState !== 'object') {
-      result.errors.push({
-        field: 'userState',
-        message: 'UserScheduleState must be an object',
-        severity: 'critical',
-        code: 'INVALID_TYPE',
-      });
-      result.valid = false;
-      return result;
-    }
-
-    const userStateObj = userState as Record<string, unknown>;
-
-    this.validateArray(
-      userStateObj,
-      'savedSchedules',
-      result,
-      (schedule: unknown, index: number) => {
-        const scheduleValidation = this.validateSchedule(schedule, options);
-        if (!scheduleValidation.valid) {
-          scheduleValidation.errors.forEach(error => {
-            result.errors.push({
-              ...error,
-              field: `savedSchedules[${index}].${error.field}`,
-            });
-          });
-          result.valid = false;
-        }
-        result.warnings.push(...scheduleValidation.warnings);
-      },
-    );
-
-    if (userStateObj.preferences) {
-      const preferencesValidation = this.validateSchedulePreferences(
-        userStateObj.preferences,
-        options,
-      );
-      if (!preferencesValidation.valid) {
-        preferencesValidation.errors.forEach(error => {
-          result.errors.push({
-            ...error,
-            field: `preferences.${error.field}`,
-          });
-        });
-        result.valid = false;
-      }
-      result.warnings.push(...preferencesValidation.warnings);
-    }
-
-    return result;
-  }
-
-  checkDataIntegrity(data: {
-    schedules?: Schedule[];
-    selectedCourses?: SelectedCourse[];
-    activeScheduleId?: string | null;
-  }): ValidationResult {
-    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
-
-    if (!data.schedules || !data.selectedCourses) {
-      return result; // Can't check integrity without both pieces
-    }
-
-    if (data.activeScheduleId) {
-      const activeScheduleExists = data.schedules.some(
-        s => s.id === data.activeScheduleId,
-      );
-      if (!activeScheduleExists) {
-        result.errors.push({
-          field: 'activeScheduleId',
-          message: 'Active schedule ID references non-existent schedule',
-          severity: 'error',
-          code: 'DANGLING_REFERENCE',
-        });
-        result.valid = false;
-      }
-    }
-
-    // Check for duplicate schedule IDs using Map for O(n) performance
-    const seenIds = new Map<string, number>();
-    const duplicateIds: string[] = [];
-
-    for (let i = 0; i < data.schedules.length; i++) {
-      const id = data.schedules[i].id;
-      if (seenIds.has(id)) {
-        duplicateIds.push(id);
-      } else {
-        seenIds.set(id, i);
-      }
-    }
-
-    if (duplicateIds.length > 0) {
-      result.errors.push({
-        field: 'schedules',
-        message: `Duplicate schedule IDs found: ${duplicateIds.join(', ')}`,
-        severity: 'critical',
-        code: 'DUPLICATE_IDS',
-      });
-      result.valid = false;
-    }
-
-    // Check for orphaned selected courses (courses not in any schedule)
-    const allScheduleCourses = new Set();
-    data.schedules.forEach(schedule => {
-      schedule.selectedCourses.forEach(sc => {
-        allScheduleCourses.add(sc.course.id);
-      });
-    });
-
-    const orphanedCourses = data.selectedCourses.filter(
-      sc => !allScheduleCourses.has(sc.course.id),
-    );
-    if (orphanedCourses.length > 0) {
-      result.warnings.push({
-        field: 'selectedCourses',
-        message: `${orphanedCourses.length} selected courses are not in any schedule`,
-        suggestion: 'Consider cleaning up orphaned course selections',
-      });
-    }
-
-    return result;
-  }
-
-  repairSchedule(schedule: Schedule): void {
-    if (!Array.isArray(schedule.generatedSchedules)) {
-      schedule.generatedSchedules = [];
-    }
-
-    if (!Array.isArray(schedule.selectedCourses)) {
-      schedule.selectedCourses = [];
-    }
-
-    schedule.selectedCourses.forEach(selectedCourse => {
-      this.repairSelectedCourse(selectedCourse);
-    });
-  }
-
-  repairSelectedCourse(selectedCourse: SelectedCourse): void {
+  /** Repairs `selectedCourse` in place; returns whether anything changed. */
+  repairSelectedCourse(selectedCourse: SelectedCourse): boolean {
     if (typeof selectedCourse.isRequired !== 'boolean') {
       selectedCourse.isRequired = false;
+      return true;
     }
+    return false;
   }
 
   private validateRequiredField(
@@ -477,13 +246,12 @@ export class DataValidator {
 
   validateBatch<T>(
     items: T[],
-    validator: (item: T, options?: SchemaValidationOptions) => ValidationResult,
-    options: SchemaValidationOptions = {},
+    validator: (item: T) => ValidationResult,
   ): ValidationResult {
     const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
     items.forEach((item, index) => {
-      const itemResult = validator(item, options);
+      const itemResult = validator(item);
       if (!itemResult.valid) {
         itemResult.errors.forEach(error => {
           result.errors.push({

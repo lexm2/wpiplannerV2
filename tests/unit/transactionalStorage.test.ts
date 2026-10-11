@@ -154,3 +154,72 @@ describe('clearAllData', () => {
     expect(localStorage.getItem('someone-elses-key')).toBe('keep me');
   });
 });
+
+describe('write scoping', () => {
+  it('does not fail or roll back an unrelated write over corrupt preferences', () => {
+    localStorage.setItem(STORAGE_KEYS.PREFERENCES, '{not valid json');
+    const m = mgr();
+    expect(m.saveActiveScheduleId('sched-1').success).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBe(
+      'sched-1',
+    );
+    // ...and the corrupt preferences were left for their own owner to fix.
+    expect(localStorage.getItem(STORAGE_KEYS.PREFERENCES)).toBe(
+      '{not valid json',
+    );
+  });
+
+  it('rolls back only the keys its write touches', () => {
+    const m = mgr();
+    m.saveActiveScheduleId('before');
+    const result = (
+      m as unknown as {
+        executeSyncTransaction: (
+          op: () => void,
+          keys: string[],
+        ) => { success: boolean };
+      }
+    ).executeSyncTransaction(() => {
+      // Another writer's key changes mid-transaction; it must survive.
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID, 'other-writer');
+      throw new Error('boom');
+    }, [STORAGE_KEYS.PREFERENCES]);
+    expect(result.success).toBe(false);
+    expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBe(
+      'other-writer',
+    );
+  });
+});
+
+describe('importData', () => {
+  function withSchedules(saveResult: { success: boolean; error?: string }) {
+    const m = mgr();
+    (m as unknown as { indexedDBStorage: unknown }).indexedDBStorage = {
+      checkCompatibility: () => Promise.resolve(true),
+      saveSchedule: () => Promise.resolve(saveResult),
+    };
+    return m;
+  }
+  const schedule = {
+    id: 's1',
+    name: 'Fall',
+    selectedCourses: [],
+    generatedSchedules: [],
+  } as never;
+
+  it('reports failure when a schedule cannot be saved', async () => {
+    const m = withSchedules({ success: false, error: 'quota exceeded' });
+    const result = await m.importData([schedule], 's1');
+    expect(result.success).toBe(false);
+    expect(result.error?.message).toContain('quota exceeded');
+    // Nothing points at a schedule that was never written.
+    expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBeNull();
+  });
+
+  it('reports success when every schedule saves', async () => {
+    const m = withSchedules({ success: true });
+    const result = await m.importData([schedule], 's1');
+    expect(result.success).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBe('s1');
+  });
+});

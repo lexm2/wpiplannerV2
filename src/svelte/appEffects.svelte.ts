@@ -1,9 +1,17 @@
 import { untrack } from 'svelte';
 import type { PageId } from '../types/uiState';
+import type { ConflictCriteria } from '../types/filters';
 import type { ServiceContainer } from '../bootstrap/ServiceContainer';
 import { uiState } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
 import { updateClientTimestamp } from './timestampState.svelte';
+import { wizardState } from './wizardState.svelte';
+import {
+  drawerMode,
+  isDrawerOpen,
+  openDrawer,
+  closeDrawer,
+} from './drawerState.svelte';
 
 /**
  * Installs the app's global side-effect bridges. Call once during App.svelte
@@ -59,12 +67,35 @@ export function installAppEffects(services: ServiceContainer): void {
         services.filterService.removeFilter('searchText');
         services.filterService.removeFilter('department');
       }
+      // A drawer belongs to the page it was opened on, which is now hidden.
+      if (page !== prevPage) closeDrawer();
       prevPage = page;
     });
   });
 
+  // Wizard -> schedule drawer. The wizard mounts inside the schedule sidebar,
+  // so where that sidebar is a drawer, opening the wizard slides it in (also on
+  // narrowing the window mid-wizard), and the wizard closing slides it back out
+  // - but only if the wizard was what opened it. Dismissing the drawer cancels
+  // the wizard (App.svelte's onDrawerClose), so the two never part.
+  let drawerForWizard = false;
+  $effect(() => {
+    const wizardOpen = wizardState.isOpen;
+    const asDrawer = drawerMode.schedule.current;
+    untrack(() => {
+      if (wizardOpen && asDrawer && !isDrawerOpen('schedule')) {
+        drawerForWizard = openDrawer('schedule');
+      } else if (!wizardOpen && drawerForWizard) {
+        drawerForWizard = false;
+        closeDrawer('schedule');
+      }
+    });
+  });
+
   // Selection change -> release colors for deselected courses + invalidate any
-  // generated auto-schedules. The initial run (mount, empty selection) is skipped.
+  // generated auto-schedules + refresh the sections "avoid conflicts" blocks
+  // against (it stores them, and would otherwise keep the selection from when
+  // it was switched on). The initial run (mount, empty selection) is skipped.
   let selectionInit = false;
   $effect(() => {
     appState.selectedById; // track selection identity changes
@@ -75,6 +106,15 @@ export function installAppEffects(services: ServiceContainer): void {
       }
       services.colorService.releaseUnselectedColors();
       services.autoScheduleOrchestrator.invalidateOnSelectionChange();
+
+      const conflict =
+        services.filterService.getCriteria<ConflictCriteria>('periodConflict');
+      if (conflict?.avoidConflicts) {
+        services.filterService.addFilter('periodConflict', {
+          ...conflict,
+          selectedCourses: services.courseSelectionService.getSelectedCourses(),
+        });
+      }
     });
   });
 
@@ -99,7 +139,6 @@ export function installAppEffects(services: ServiceContainer): void {
 
       if (!initialLoadDone) {
         initialLoadDone = true;
-        services.profileStateManager.seedUndoBaseline();
         updateClientTimestamp();
 
         // Backfill year for existing schedules that lack one.
@@ -114,6 +153,9 @@ export function installAppEffects(services: ServiceContainer): void {
             );
           }
         }
+        // After the backfill, so that housekeeping is part of the baseline
+        // rather than an undo step: Undo starts disabled on a fresh load.
+        services.profileStateManager.seedUndoBaseline();
 
         // Apply academic year filter based on the active schedule's year.
         if (!services.filterService.hasFilter('academicYear')) {

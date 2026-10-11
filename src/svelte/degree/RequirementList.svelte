@@ -4,7 +4,6 @@
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
   import RequirementCard from './RequirementCard.svelte';
-  import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
   import { courseDrag } from './courseDrag.svelte';
   import { degreeViewState } from './degreeViewState.svelte';
@@ -16,7 +15,8 @@
   import { openModal } from '../../services/ui/uiState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
-  import { dur } from '../transitions';
+  import { dur, slideFade } from '../transitions';
+  import { phoneLayout } from '../phoneLayout.svelte';
 
   /**
    * Cards glide when the grid reflows - a filter change, or a card expanding.
@@ -49,7 +49,8 @@
     selected = next;
   }
 
-  let showUmbrella = $state(false);
+  // Lives in degreeState: the phone's Move sheet offers the same buckets.
+  const showUmbrella = $derived(degreeState.showUmbrella);
   const umbrellaCount = $derived(
     degreeState.buckets.filter(b => UMBRELLA_CATEGORIES.has(b.category)).length,
   );
@@ -65,8 +66,7 @@
   const withStatus = $derived(
     visible.map(b => ({
       b,
-      status: effectiveProgress(b, degreeState.placements.get(b.id) ?? [])
-        .status,
+      status: degreeState.progressById.get(b.id)?.status ?? b.status,
     })),
   );
 
@@ -75,6 +75,11 @@
       ? withStatus.map(x => x.b)
       : withStatus.filter(x => selected.includes(x.status)).map(x => x.b),
   );
+
+  // Phone only: the chips, the degree-wide switch and the layout toggle fold
+  // into a panel behind one Filter button beside the search bar.
+  let filtersOpen = $state(false);
+  const filtering = $derived(!allActive || showUmbrella);
 
   const counts = $derived({
     all: visible.length,
@@ -103,7 +108,7 @@
       // The finder only names an aggregate the user placed a course in, so one
       // reaching here is a real destination and worth unhiding.
       if (targets.some(b => UMBRELLA_CATEGORIES.has(b.category)))
-        showUmbrella = true;
+        degreeState.showUmbrella = true;
       // Widen to All rather than adding the missing status: the user asked for
       // one bucket, not for a filter set they never chose.
       if (
@@ -111,8 +116,7 @@
         targets.some(
           b =>
             !selected.includes(
-              effectiveProgress(b, degreeState.placements.get(b.id) ?? [])
-                .status,
+              degreeState.progressById.get(b.id)?.status ?? b.status,
             ),
         )
       )
@@ -123,7 +127,8 @@
   });
 </script>
 
-<div class="degree-requirements">
+<!-- Shared by the wide layout's toolbar and the phone's. -->
+{#snippet statusChips()}
   <div
     class="degree-filter-row"
     role="group"
@@ -154,27 +159,84 @@
         class="degree-filter-chip degree-umbrella-toggle"
         class:active={showUmbrella}
         aria-pressed={showUmbrella}
-        onclick={() => (showUmbrella = !showUmbrella)}
+        onclick={() => (degreeState.showUmbrella = !showUmbrella)}
         >{showUmbrella ? 'Hide' : 'Show'} degree-wide
         <span class="degree-filter-count">{umbrellaCount}</span></button
       >
     {/if}
   </div>
+{/snippet}
 
-  <div class="degree-view-row">
-    <!-- The left edge is the card's status signal now, so the legend names it
-         alongside the progress-bar segments. -->
+{#snippet searchBar()}
+  <!-- Opens the course finder, which searches courses and buckets alike. -->
+  <button
+    type="button"
+    id="degree-course-search"
+    class="degree-search-bar"
+    onclick={() => openModal('course-finder')}
+  >
+    {@html getInlineSVG('SEARCH', 'degree-search-icon')}
+    <span>Search courses or buckets</span>
+  </button>
+{/snippet}
+
+{#snippet layoutToggle()}
+  <div role="group" aria-label="Bucket layout" class="degree-view-group">
+    <button
+      type="button"
+      id="degree-view-grid"
+      class="degree-filter-chip"
+      class:active={degreeViewState.bucketView === 'grid'}
+      aria-pressed={degreeViewState.bucketView === 'grid'}
+      onclick={() => degreeViewState.setBucketView('grid')}>Grid</button
+    >
+    <button
+      type="button"
+      id="degree-view-full"
+      class="degree-filter-chip"
+      class:active={degreeViewState.bucketView === 'full'}
+      aria-pressed={degreeViewState.bucketView === 'full'}
+      onclick={() => degreeViewState.setBucketView('full')}>Full</button
+    >
+  </div>
+{/snippet}
+
+<div class="degree-requirements">
+  {#if phoneLayout.current}
+    <!-- Sticks to the top of the page once scrolled to, like the Classes
+         page's toolbar: search the courses, or narrow the buckets. The legend
+         stays wide-only - each card's pill already names its status. -->
+    <div class="degree-phone-toolbar">
+      {@render searchBar()}
+      <button
+        type="button"
+        id="degree-filter-btn"
+        class="filter-btn"
+        class:active={filtering}
+        aria-label="Filter requirements"
+        aria-expanded={filtersOpen}
+        onclick={() => (filtersOpen = !filtersOpen)}
+        >{@html getInlineSVG('FILTER_FILLED', 'filter-icon')}</button
+      >
+    </div>
+    {#if filtersOpen}
+      <div class="degree-filter-panel" transition:slideFade={{ duration: 180 }}>
+        {@render statusChips()}
+        <div class="degree-filter-layout">
+          <span class="degree-filter-layout-label">Layout</span>
+          {@render layoutToggle()}
+        </div>
+      </div>
+    {/if}
+  {:else}
+    <!-- One row: search, status, layout. Each card's pill names its status,
+         so the legend only explains the bar colours. -->
+    <div class="degree-toolbar">
+      {@render searchBar()}
+      {@render statusChips()}
+      {@render layoutToggle()}
+    </div>
     <div class="degree-progress-legend" aria-hidden="true">
-      <span class="degree-legend-item"
-        ><span class="degree-legend-edge req-not_satisfied"></span> Not satisfied</span
-      >
-      <span class="degree-legend-item"
-        ><span class="degree-legend-edge req-in_progress"></span> In progress</span
-      >
-      <span class="degree-legend-item"
-        ><span class="degree-legend-edge req-satisfied"></span> Satisfied</span
-      >
-      <span class="degree-legend-sep" aria-hidden="true"></span>
       <span class="degree-legend-item"
         ><span class="degree-legend-swatch seg-earned"></span> Completed</span
       >
@@ -185,37 +247,7 @@
         ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
       >
     </div>
-
-    <div class="degree-view-toggle">
-      <div role="group" aria-label="Bucket layout" class="degree-view-group">
-        <button
-          type="button"
-          id="degree-view-grid"
-          class="degree-filter-chip"
-          class:active={degreeViewState.bucketView === 'grid'}
-          aria-pressed={degreeViewState.bucketView === 'grid'}
-          onclick={() => degreeViewState.setBucketView('grid')}>Grid</button
-        >
-        <button
-          type="button"
-          id="degree-view-full"
-          class="degree-filter-chip"
-          class:active={degreeViewState.bucketView === 'full'}
-          aria-pressed={degreeViewState.bucketView === 'full'}
-          onclick={() => degreeViewState.setBucketView('full')}>Full</button
-        >
-      </div>
-      <button
-        type="button"
-        id="degree-course-search"
-        class="degree-filter-chip degree-search-chip"
-        onclick={() => openModal('course-finder')}
-      >
-        {@html getInlineSVG('SEARCH', 'degree-search-icon')}
-        Search courses
-      </button>
-    </div>
-  </div>
+  {/if}
 
   {#if filtered.length === 0}
     <p class="empty-state">No requirements match this filter.</p>

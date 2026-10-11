@@ -5,17 +5,20 @@
   import DegreeSummary from './DegreeSummary.svelte';
   import RequirementList from './RequirementList.svelte';
   import UnassignedRail from './UnassignedRail.svelte';
+  import ToPlaceList from './ToPlaceList.svelte';
+  import { railStacked } from '../phoneLayout.svelte';
   import SidePanel from '../SidePanel.svelte';
   import { PANEL_WIDTHS } from '../panelWidths';
 
   let { degreeImportService }: { degreeImportService: DegreeImportService } =
     $props();
 
+  // A re-import that is still parsing, or that failed, keeps the old record on
+  // screen - DegreeSummary reports its progress instead.
   const record = $derived(degreeState.record);
-  const ready = $derived(degreeState.status === 'ready' && record !== null);
 </script>
 
-{#if ready && record}
+{#if record}
   <!-- Two independently-scrolling panes so the rail stays reachable while the
        bucket list scrolls. The rail leads in the DOM because it leads visually;
        keeping the two orders together is what makes tab order match the page. -->
@@ -23,20 +26,28 @@
     <!-- .degree-rail stays on the panel, not the scroller: courseDrag resolves
          the unassign target with closest('.degree-rail'), so a drop on the
          resize seam still counts as a drop on the rail. .degree-pane goes on
-         the scroller inside, which is what dragAutoScroll edge-scrolls. -->
-    <SidePanel
-      class="degree-rail"
-      label="Unassigned courses"
-      config={PANEL_WIDTHS.degreeRail}
-      edge="right"
-      resizeLabel="Resize the unassigned rail"
-    >
-      <div class="degree-pane degree-side-scroll">
-        <UnassignedRail />
-      </div>
-    </SidePanel>
+         the scroller inside, which is what dragAutoScroll edge-scrolls.
+         Below 992px, where the rail could only stack above the buckets as a
+         cramped second scroller, ToPlaceList at the top of the one scroller
+         stands in for it. -->
+    {#if !railStacked.current}
+      <SidePanel
+        class="degree-rail"
+        label="Unassigned courses"
+        config={PANEL_WIDTHS.degreeRail}
+        edge="right"
+        resizeLabel="Resize the unassigned rail"
+      >
+        <div class="degree-pane degree-side-scroll">
+          <UnassignedRail />
+        </div>
+      </SidePanel>
+    {/if}
     <div class="degree-pane degree-main">
       <div class="degree-content">
+        {#if railStacked.current}
+          <ToPlaceList />
+        {/if}
         <DegreeSummary {record} {degreeImportService} />
         <RequirementList />
       </div>

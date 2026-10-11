@@ -8,8 +8,14 @@
   import {
     degreeState,
     isExpanded,
+    openMoveSheet,
     toggleExpanded,
   } from './degreeState.svelte';
+  import { phoneLayout, placesBySheet } from '../phoneLayout.svelte';
+  import {
+    remainingLabel as remainingFor,
+    statusLabel as statusFor,
+  } from './progressLabels';
   import { degreeViewState } from './degreeViewState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
@@ -48,26 +54,15 @@
   );
   const tiles = $derived(degreeState.placements.get(bucket.id) ?? []);
 
-  // Recomputed from the courses currently placed here.
-  const progress = $derived(effectiveProgress(bucket, tiles));
+  // Recomputed from the courses currently placed here - shared with the list's
+  // status filter. The fallback only covers a card outliving its bucket.
+  const progress = $derived(
+    degreeState.progressById.get(bucket.id) ?? effectiveProgress(bucket, tiles),
+  );
   const satisfied = $derived(progress.status === 'satisfied');
 
-  const statusLabel = $derived(
-    satisfied
-      ? 'Satisfied'
-      : progress.status === 'in_progress'
-        ? 'In progress'
-        : 'Not satisfied',
-  );
-
-  const remainingLabel = $derived.by(() => {
-    if (satisfied) return null;
-    if (progress.creditsRemaining !== null)
-      return `${progress.creditsRemaining} credits left`;
-    if (progress.coursesRemaining !== null)
-      return `${progress.coursesRemaining} course${progress.coursesRemaining === 1 ? '' : 's'} left`;
-    return 'See requirement';
-  });
+  const statusLabel = $derived(statusFor(progress));
+  const remainingLabel = $derived(remainingFor(progress));
 
   type Entry =
     | { key: string; tile: DegreeTile; course?: undefined }
@@ -190,7 +185,49 @@
   {#if shown.length || (expanded && emptyTiles.length)}
     <div class="requirement-courses">
       {#each shown as entry (entry.key)}
-        {#if entry.course}
+        {#if phoneLayout.current}
+          <!-- A phone row is one button, code above a name that may wrap: a
+               schedule course opens the Move sheet, any other its catalog
+               entry. No drag, and no Assign or remove controls crowding the
+               name - the sheet holds both. -->
+          {@const course = entry.course}
+          {@const tile = entry.tile}
+          {@const code = course?.code ?? tile?.code ?? ''}
+          {@const movableId = tile?.kind === 'schedule' ? tile.courseId : null}
+          <button
+            type="button"
+            class="requirement-course requirement-course-tap"
+            class:is-transfer={course?.isTransfer}
+            class:is-progress={tile?.kind === 'planned'}
+            class:is-schedule={tile?.kind === 'schedule'}
+            data-course-id={tile?.courseId}
+            aria-label={movableId ? `Move ${code}` : `Show ${code}`}
+            onclick={() => {
+              if (movableId) openMoveSheet(movableId);
+              else if (course)
+                degreePlanService.openCourse(
+                  course.code,
+                  academicYearForPeriod(course.period),
+                );
+              else if (tile) degreePlanService.openCourse(tile.code, tile.year);
+            }}
+          >
+            <span class="requirement-course-text">
+              <span class="requirement-course-code">{code}</span>
+              <span class="requirement-course-title"
+                >{course?.title ?? tile?.title}</span
+              >
+            </span>
+            {#if course?.isTransfer}
+              <span class="course-badge course-badge-transfer">Transfer</span>
+            {:else if course?.grade}
+              <span class="course-badge course-badge-grade">{course.grade}</span
+              >
+            {:else if tile?.kind === 'planned'}
+              <span class="course-badge course-badge-progress">Planned</span>
+            {/if}
+          </button>
+        {:else if entry.course}
           {@const course = entry.course}
           <div class="requirement-course" class:is-transfer={course.isTransfer}>
             <button
@@ -214,12 +251,8 @@
           {@const tile = entry.tile}
           <!-- Only schedule tiles are movable; Workday's planned courses stay put. -->
           {@const movable =
-            tile.kind === 'schedule' && tile.courseId
-              ? {
-                  role: 'button',
-                  tabindex: 0,
-                  title: 'Drag to another bucket, or use the Assign menu',
-                }
+            tile.kind === 'schedule' && tile.courseId && !placesBySheet()
+              ? { title: 'Drag to another bucket, or use the Assign menu' }
               : {}}
           <div
             class="requirement-course"

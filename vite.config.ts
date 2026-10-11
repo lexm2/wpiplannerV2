@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import type { AtRule as AtRule_, Node, Plugin as PostcssPlugin } from 'postcss';
 
 // Shared constants in index.html
 const HTML_CONSTANTS: Record<string, string> = {
@@ -19,9 +20,34 @@ const htmlConstants = (): Plugin => ({
     ),
 });
 
+// Touch screens keep :hover on whatever was tapped last, so a hover style stays
+// stuck on until the next tap elsewhere. Every :hover selector (stylesheets and
+// component styles alike) is moved into @media (hover: hover), which only a
+// real pointer matches; the rest of its selector list stays where it was.
+const hoverOnlyWithPointer: PostcssPlugin = {
+  postcssPlugin: 'hover-only-with-pointer',
+  Rule(rule, { AtRule }) {
+    if (!rule.selector.includes(':hover')) return;
+    for (let p: Node | undefined = rule.parent; p; p = p.parent) {
+      if (p.type === 'atrule' && /hover:\s*hover/.test((p as AtRule_).params))
+        return;
+    }
+    const hover = rule.selectors.filter(s => s.includes(':hover'));
+    const rest = rule.selectors.filter(s => !s.includes(':hover'));
+    const media = new AtRule({ name: 'media', params: '(hover: hover)' });
+    media.append(rule.clone({ selectors: hover }));
+    rule.after(media);
+    if (rest.length > 0) rule.selectors = rest;
+    else rule.remove();
+  },
+};
+
 export default defineConfig({
   base: '/wpiplannerV2/',
   plugins: [svelte(), htmlConstants()],
+  css: {
+    postcss: { plugins: [hoverOnlyWithPointer] },
+  },
   publicDir: 'public',
   worker: {
     format: 'es',

@@ -10,6 +10,61 @@
     stroke 0.5s ease;
 }
 
+/* ThemeManager sets this for the frame a theme swap lands in. Without it every
+   element above, and every `var(--effect-transition)` rule, would fade its
+   colors on the main thread at once; the view transition below does the fade
+   on the compositor instead. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+  animation-timing-function: ease;
+}
+
+/* Mobile browsers flash a blue box over whatever is tapped; the pressed state
+   below shows a tap landed instead. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* With the tap box gone and hover styles limited to real pointers (see
+   vite.config.ts), a touch screen needs its own sign that a tap landed. */
+@media (hover: none) {
+  button:active:not(:disabled),
+  [role='button']:active {
+    opacity: 0.7;
+  }
+}
+
+/* Keyboard focus in the theme's colour rather than the browser's blue. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Touch screens show no focus outline at all: a tap, or a drawer's focus trap
+   moving focus to its close button, would otherwise ring a tab or button that
+   nobody reached by keyboard. !important outranks the components' own
+   :focus-visible rings. */
+@media (hover: none) and (pointer: coarse) {
+  :focus,
+  :focus-visible {
+    outline: none !important;
+  }
+}
+
+/* A tap or a script (a drawer's focus trap) focusing a button should not ring
+   it; keyboard focus still does, via :focus-visible. */
+button:focus:not(:focus-visible),
+[role='button']:focus:not(:focus-visible) {
+  outline: none;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--color-background);

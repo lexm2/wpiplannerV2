@@ -1,8 +1,7 @@
 import type { ScheduleResult } from './AutoScheduler';
-import type { AutoScheduleSettings } from '../../types/schedule';
-import { SectionScorer } from './SectionScorer';
 import { sectionsOf } from '../../utils/courseUtils';
 import { AcademicTerm } from '../../types/schedule';
+import { getDisplayTerms } from '../../utils/typeGuards';
 
 const TERM_EXPANSION: Partial<Record<AcademicTerm, AcademicTerm[]>> = {
   [AcademicTerm.F]: [AcademicTerm.A, AcademicTerm.B],
@@ -16,13 +15,15 @@ const TERM_EXPANSION: Partial<Record<AcademicTerm, AcademicTerm[]>> = {
 };
 
 export class ScheduleScorer {
-  private sectionScorer = new SectionScorer();
+  /** Sorts schedules best first, in place, scoring each one once. */
+  sortBest(schedules: ScheduleResult[][]): ScheduleResult[][] {
+    const scores = new Map(schedules.map(s => [s, this.score(s)]));
+    return schedules.sort((a, b) => scores.get(b)! - scores.get(a)!);
+  }
 
-  score(schedule: ScheduleResult[], settings: AutoScheduleSettings): number {
+  score(schedule: ScheduleResult[]): number {
     return (
-      this.termScore(schedule) * 1_000_000 -
-      this.gapMinutes(schedule) * 1_000 +
-      this.wakeScore(schedule, settings)
+      this.termScore(schedule) * 1_000_000 - this.gapMinutes(schedule) * 1_000
     );
   }
 
@@ -43,19 +44,23 @@ export class ScheduleScorer {
     return Math.max(0, 100 - deviation * 10);
   }
 
+  /** Idle minutes between classes, summed per quarter and day. */
   private gapMinutes(schedule: ScheduleResult[]): number {
     const byTermDay = new Map<string, { start: number; end: number }[]>();
     for (const result of schedule) {
       for (const section of sectionsOf(result.combination)) {
         for (const period of section.periods) {
           if (period.isAsync) continue;
-          for (const day of period.days) {
-            const key = `${section.computedTerm}-${day}`;
-            if (!byTermDay.has(key)) byTermDay.set(key, []);
-            byTermDay.get(key)!.push({
-              start: period.startTime.hours * 60 + period.startTime.minutes,
-              end: period.endTime.hours * 60 + period.endTime.minutes,
-            });
+          // A semester section sits in both of its quarters' days.
+          for (const quarter of getDisplayTerms(section.computedTerm)) {
+            for (const day of period.days) {
+              const key = `${quarter}-${day}`;
+              if (!byTermDay.has(key)) byTermDay.set(key, []);
+              byTermDay.get(key)!.push({
+                start: period.startTime.hours * 60 + period.startTime.minutes,
+                end: period.endTime.hours * 60 + period.endTime.minutes,
+              });
+            }
           }
         }
       }
@@ -69,22 +74,5 @@ export class ScheduleScorer {
       }
     }
     return total;
-  }
-
-  private wakeScore(
-    schedule: ScheduleResult[],
-    settings: AutoScheduleSettings,
-  ): number {
-    if (!settings.wakeUpTime) return 500;
-    let total = 0,
-      count = 0;
-    for (const result of schedule) {
-      total += this.sectionScorer.scoreCombination(
-        result.combination,
-        settings.wakeUpTime,
-      );
-      count++;
-    }
-    return count > 0 ? Math.round(total / count) : 500;
   }
 }

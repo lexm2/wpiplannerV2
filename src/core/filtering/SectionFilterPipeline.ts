@@ -9,11 +9,7 @@ export interface SectionBasedFilter {
   readonly description: string;
   readonly priority: number;
 
-  apply(
-    sections: FilterableSection[],
-    criteria: unknown,
-    activeFilters?: Map<string, unknown>,
-  ): FilterableSection[];
+  apply(sections: FilterableSection[], criteria: unknown): FilterableSection[];
   isValidCriteria(criteria: unknown): boolean;
   getDisplayValue(criteria: unknown): string;
 }
@@ -41,10 +37,6 @@ export class SectionFilterPipeline {
 
   registerFilter(filter: SectionBasedFilter): void {
     this.registeredFilters.set(filter.id, filter);
-  }
-
-  unregisterFilter(filterId: string): void {
-    this.registeredFilters.delete(filterId);
   }
 
   flattenCoursesToSections(courses: Course[]): FilterableSection[] {
@@ -258,7 +250,6 @@ export class SectionFilterPipeline {
       filteredSections = activeFilter.filter.apply(
         filteredSections,
         activeFilter.criteria,
-        activeFilters,
       );
     }
 

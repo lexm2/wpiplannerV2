@@ -3,6 +3,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  container: course-list / inline-size;
 }
 
 .content-header {
@@ -23,17 +24,13 @@
   flex: 1;
 }
 
-/* The FilterButtons Svelte component mounts here; `display: contents` lets its
-   children (clear-filters-btn + .filter-buttons) participate in the
-   .content-controls flex row exactly as the original inline DOM did. */
+/* The FilterButtons Svelte component mounts here: clear-filters-btn and
+   .filter-buttons, held together so the row can place them as one. */
 .content-controls-filter-host {
-  display: contents;
-}
-
-/* ViewToggle.svelte mounts here; display:contents lets its two buttons join the
-   .content-controls flex row, matching the filter host above. */
-.view-toggle {
-  display: contents;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .filter-buttons {
@@ -75,15 +72,9 @@
   cursor: not-allowed;
 }
 
-.filter-btn-wide {
-  padding: 0.5rem 1rem;
-  min-width: 80px;
-  font-size: 0.875rem;
-  line-height: 18px;
-}
-
 .filter-icon,
 .bookmark-icon,
+.view-toggle-icon,
 .eraser-icon {
   width: 18px;
   height: 18px;
@@ -118,13 +109,92 @@
   padding-left: 1rem;
 }
 
-@media (max-width: 1600px) {
-  #view-list,
-  #view-grid {
+/* Keyed to the list column, not the window: whether the toggle fits depends on
+   how wide the side panels are. The row needs ~480px (search field minimum,
+   filter buttons, toggle) plus the header's padding. */
+@container course-list (max-width: 540px) {
+  #view-toggle-btn {
     display: none;
+  }
+
+  /* Phone widths also carry the Details drawer button, which the field's
+     minimum would push off the row; the field takes what is left instead. */
+  .content-controls,
+  .content-controls .search-input-wrapper,
+  .search-field,
+  .search-field .field-shell {
+    min-width: 0;
+  }
+}
+
+/* Wherever the Classes page's panels are drawers, the List/Grid toggle lives
+   in the settings menu instead, and the search field sits centered in the
+   row, under the page tabs: the filter buttons to its left, Details at the
+   far right. The side columns share what is left, either one growing if its
+   buttons need more. */
+@media (max-width: 1200px) {
+  #view-toggle-btn {
+    display: none;
+  }
+}
+
+@media (min-width: 561px) and (max-width: 1200px) {
+  .content-controls {
+    display: grid;
+    grid-template-columns: 1fr minmax(12.5rem, 1.5fr) 1fr;
+  }
+
+  .content-controls > * {
+    grid-row: 1;
+  }
+
+  .content-controls-filter-host {
+    grid-column: 1;
+    justify-self: end;
+  }
+
+  .content-controls .search-input-wrapper {
+    grid-column: 2;
+  }
+
+  .content-controls .drawer-toggle-details {
+    grid-column: 3;
+    justify-self: end;
   }
 }
 
 html.is-mobile .filter-buttons {
   gap: 0.25rem;
+}
+
+/* Phone widths: the same 0.75rem gutter as the header, and a toolbar of just
+   search, Filter and Details. Clear All and "Show only bookmarked courses" are
+   both in the Filter modal, so their shortcut buttons go. */
+@media (max-width: 560px) {
+  .content-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .course-container {
+    padding: 0.75rem;
+  }
+
+  #clear-filters-btn,
+  #bookmark-filter-btn {
+    display: none;
+  }
+
+  .content-controls .filter-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Same height as the buttons beside it (it was 38px against their 44). */
+  .content-controls .search-field .field-shell {
+    min-height: 44px;
+  }
+
+  #search-clear-btn.search-clear-empty {
+    display: none;
+  }
 }

@@ -4,25 +4,30 @@ import {
   type RateMyProfessorData,
 } from '../../types/rateMyProfessor';
 
+// calculateFirstNameSimilarity's floor for a fuzzy first-name match: any
+// prefix or containment passes, and a plain edit-distance match needs about
+// two thirds of the letters right ("Jon" ~ "John", not "Jane" ~ "John").
+const MIN_FIRST_NAME_SCORE = 20;
+
 export class RateMyProfessorService {
   private data: RateMyProfessorData | null = null;
   private professorsByFullName: Map<string, Professor> = new Map();
   private professorsByLastName: Map<string, Professor[]> = new Map();
-  private loading: boolean = false;
-  private loadError: Error | null = null;
+  // findProfessor runs for every period on every filter pass, over a few
+  // hundred distinct names, so results are memoized until the data changes.
+  private matchCache: Map<string, Professor | null> = new Map();
+  private loadPromise: Promise<void> | null = null;
 
-  async loadData(): Promise<void> {
-    if (this.data) return;
+  loadData(): Promise<void> {
+    if (this.data) return Promise.resolve();
+    // Concurrent callers share the one in-flight load.
+    this.loadPromise ??= this.fetchData().finally(() => {
+      this.loadPromise = null;
+    });
+    return this.loadPromise;
+  }
 
-    if (this.loading) {
-      while (this.loading) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      return;
-    }
-
-    this.loading = true;
-
+  private async fetchData(): Promise<void> {
     try {
       const response = await fetch('./rateMyProfessor.json');
       if (!response.ok) {
@@ -34,6 +39,7 @@ export class RateMyProfessorService {
       // Parsed, not asserted: a scheduled job regenerates this file, so a
       // shape change arrives at runtime with no rebuild.
       this.data = RateMyProfessorDataSchema.parse(await response.json());
+      this.matchCache.clear();
 
       if (this.data && this.data.professors) {
         for (const professor of this.data.professors) {
@@ -50,10 +56,9 @@ export class RateMyProfessorService {
           this.professorsByLastName.get(lastName)!.push(professor);
         }
       }
-    } catch (error) {
-      this.loadError = error as Error;
-    } finally {
-      this.loading = false;
+    } catch {
+      // Ratings are optional: on a failed load every lookup returns null and
+      // the next loadData() call tries again.
     }
   }
 
@@ -137,40 +142,99 @@ export class RateMyProfessorService {
   }
 
   /**
+   * Whether two first names could be the same person: either is missing, an
+   * initial matching the other's first letter, or they are close enough
+   * (prefix, containment, or a near spelling). "John" never matches "Alice".
+   */
+  private firstNamesCompatible(query: string, candidate: string): boolean {
+    const q = query.split(' ')[0].replace(/[^a-z]/g, '');
+    const c = candidate.split(' ')[0].replace(/[^a-z]/g, '');
+    if (!q || !c) return true;
+    if (q.length === 1 || c.length === 1) return q[0] === c[0];
+    return this.calculateFirstNameSimilarity(q, c) >= MIN_FIRST_NAME_SCORE;
+  }
+
+  /**
    * Find a professor by name using conservative matching:
    * 1. Exact full name match
-   * 2. Last name lookup - if unique, return directly
-   * 3. If multiple share a last name, disambiguate via first name fuzzy matching
+   * 2. Last name lookup, keeping only candidates whose first name fits
+   * 3. If several fit, disambiguate via first name fuzzy matching
+   *
+   * Co-taught sections list several names ("Amy Curran; Laura Susanin");
+   * the first instructor that matches is used.
    */
   findProfessor(professorName: string): Professor | null {
     if (!this.data || !professorName) return null;
 
+    const cached = this.matchCache.get(professorName);
+    if (cached !== undefined) return cached;
+
+    let match: Professor | null = null;
+    for (const name of professorName.split(/\s*;\s*/)) {
+      if (!name) continue;
+      match = this.findSingleProfessor(name);
+      if (match) break;
+    }
+
+    this.matchCache.set(professorName, match);
+    return match;
+  }
+
+  private findSingleProfessor(professorName: string): Professor | null {
     const normalized = this.normalizeName(professorName);
 
-    if (this.professorsByFullName.has(normalized)) {
-      return this.professorsByFullName.get(normalized) || null;
-    }
+    const exact = this.professorsByFullName.get(normalized);
+    if (exact) return exact;
 
     const lastName = this.extractLastName(professorName);
     const candidates = this.professorsByLastName.get(lastName);
-
     if (!candidates || candidates.length === 0) return null;
-    if (candidates.length === 1) return candidates[0];
 
     const queryFirstName = this.extractFirstName(professorName);
     if (!queryFirstName) return candidates[0];
 
-    const scored = candidates.map(prof => ({
-      professor: prof,
-      score: this.calculateFirstNameSimilarity(
+    let best: Professor | null = null;
+    let bestScore = -1;
+    for (const prof of candidates) {
+      const firstName = this.normalizeName(prof.firstName);
+      if (!this.firstNamesCompatible(queryFirstName, firstName)) continue;
+      const score = this.calculateFirstNameSimilarity(
         queryFirstName,
-        this.normalizeName(prof.firstName),
-      ),
-    }));
+        firstName,
+      );
+      if (score > bestScore) {
+        best = prof;
+        bestScore = score;
+      }
+    }
+    return best;
+  }
 
-    scored.sort((a, b) => b.score - a.score);
+  /**
+   * The matched professor's ratings as numbers, at the precision
+   * getRatingDisplay shows: rating and difficulty to one decimal, the retake
+   * share to a whole percent (RMP's -1 for "not enough data" stays -1). Null
+   * when there is no match or the professor has no ratings.
+   */
+  getRatings(professorName: string): {
+    rating: number;
+    difficulty: number;
+    numRatings: number;
+    wouldTakeAgain: number | null;
+  } | null {
+    const professor = this.findProfessor(professorName);
 
-    return scored[0].professor;
+    if (!professor || professor.numRatings === 0) return null;
+
+    return {
+      rating: Number(professor.avgRating.toFixed(1)),
+      difficulty: Number(professor.avgDifficulty.toFixed(1)),
+      numRatings: professor.numRatings,
+      wouldTakeAgain:
+        professor.wouldTakeAgainPercent !== null
+          ? Math.round(professor.wouldTakeAgainPercent)
+          : null,
+    };
   }
 
   getRatingDisplay(professorName: string): {
@@ -180,18 +244,15 @@ export class RateMyProfessorService {
     wouldTakeAgain: string | null;
     hasData: boolean;
   } | null {
-    const professor = this.findProfessor(professorName);
-
-    if (!professor || professor.numRatings === 0) return null;
+    const ratings = this.getRatings(professorName);
+    if (!ratings) return null;
 
     return {
-      rating: professor.avgRating.toFixed(1),
-      difficulty: professor.avgDifficulty.toFixed(1),
-      numRatings: professor.numRatings,
+      rating: ratings.rating.toFixed(1),
+      difficulty: ratings.difficulty.toFixed(1),
+      numRatings: ratings.numRatings,
       wouldTakeAgain:
-        professor.wouldTakeAgainPercent !== null
-          ? `${Math.round(professor.wouldTakeAgainPercent)}%`
-          : null,
+        ratings.wouldTakeAgain !== null ? `${ratings.wouldTakeAgain}%` : null,
       hasData: true,
     };
   }
@@ -202,21 +263,8 @@ export class RateMyProfessorService {
     return professor.profileUrl;
   }
 
-  getAllProfessors(): Professor[] {
-    return this.data?.professors || [];
-  }
-
   isLoaded(): boolean {
     return this.data !== null;
-  }
-
-  getLoadError(): Error | null {
-    return this.loadError;
-  }
-
-  getLastUpdated(): Date | null {
-    if (!this.data) return null;
-    return new Date(this.data.lastUpdated);
   }
 }
 

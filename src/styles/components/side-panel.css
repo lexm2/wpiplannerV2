@@ -20,3 +20,178 @@
 .side-panel-left {
   border-left: 1px solid var(--color-border);
 }
+
+/* Drawer mode - SidePanel sets .side-panel-drawer wherever its page hides the
+   panel (drawerState.svelte.ts). Closed, it is parked off screen and
+   `visibility: hidden`, so nothing in it can be tabbed to or read out; the
+   visibility flip waits for the slide-out to finish. Fixed positioning also
+   takes it out of the page grid, which then lays out as if it were absent. */
+.side-panel.side-panel-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  height: auto;
+  z-index: 80;
+  width: min(var(--side-panel-drawer-width), calc(100vw - 3rem));
+  /* room for the drawer bar; contents size to what is left */
+  padding-top: 3.25rem;
+  /* Sideways travel is the swipe to close (SidePanel.svelte). */
+  touch-action: pan-y pinch-zoom;
+  box-shadow: var(--effect-shadow-large);
+  visibility: hidden;
+  transition:
+    transform 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.side-panel-drawer.side-panel-right {
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.side-panel-drawer.side-panel-left {
+  right: 0;
+  transform: translateX(100%);
+}
+
+.side-panel-drawer.side-panel-open {
+  visibility: visible;
+  transform: none;
+  transition: transform 0.25s ease;
+}
+
+/* Following a finger (SidePanel's swipe to close): no easing to lag behind. */
+.side-panel.side-panel-drawer.side-panel-dragging {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-panel.side-panel-drawer {
+    transition: none;
+  }
+}
+
+.side-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.side-panel-drawer-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.75rem 0 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.side-panel-drawer-title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.side-panel-drawer-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--effect-border-radius);
+}
+
+.side-panel-drawer-close:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* Drawer toggles show only where their panel is hidden - the same
+   breakpoints as drawerState.svelte.ts. */
+button.drawer-toggle {
+  display: none;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+}
+
+.drawer-toggle-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* How many items the drawer holds: a pill after the label, or pinned to the
+   button's top-right corner on phones, where the label is hidden. */
+button.drawer-toggle {
+  position: relative;
+}
+
+.drawer-toggle-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-heavy);
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1200px) {
+  button.drawer-toggle-departments,
+  button.drawer-toggle-details {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 1024px) {
+  button.drawer-toggle-schedule {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 560px) {
+  .drawer-toggle-label {
+    display: none;
+  }
+
+  /* The Degree page's slot in the bottom bar (ToPlaceButton.svelte). */
+  button.drawer-toggle-to-place {
+    display: inline-flex;
+  }
+
+  .drawer-toggle-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+  }
+
+  /* Phone drawers share one 1rem inner gutter (each page's contents match it),
+     and the close button is a full 44px target whose icon lines up with that
+     gutter's right edge. */
+  .side-panel-drawer-bar {
+    padding: 0 0.25rem 0 1rem;
+  }
+
+  .side-panel-drawer-close {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  /* Inside the button, so the bar's edge does not clip the ring. */
+  .side-panel-drawer-close:focus-visible {
+    outline-offset: -2px;
+  }
+}

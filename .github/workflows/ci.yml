@@ -2,7 +2,7 @@ name: CI
 
 # Gates code changes before they can reach master. The deploy pipeline
 # (update-course-data.yml) carries its own lighter gate — typecheck + unit tests
-# only — because it runs every 15 minutes and must not download a browser or be
+# only — because it runs on a schedule and must not download a browser or be
 # blocked by an e2e flake. The full suite lives here instead.
 on:
   pull_request:

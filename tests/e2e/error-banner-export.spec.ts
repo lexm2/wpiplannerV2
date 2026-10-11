@@ -1,4 +1,4 @@
-import { test, expect, type Download } from '@playwright/test';
+import { test, expect, type Download } from './fixtures';
 import { readFile } from 'node:fs/promises';
 
 /**
@@ -16,6 +16,12 @@ const DEGREE_RECORD = JSON.stringify({
   studentName: 'Test Student',
   programs: [],
   requirements: [],
+});
+
+// The forced boot failure is logged; nothing else may be.
+test.use({
+  expectedConsole:
+    /Failed to load course data|Failed to initialize application/,
 });
 
 test.beforeEach(async ({ page }) => {

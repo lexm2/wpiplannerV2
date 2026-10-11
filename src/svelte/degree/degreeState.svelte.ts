@@ -5,6 +5,7 @@ import {
   buildBuckets,
   computePlacements,
   computeUnassigned,
+  UMBRELLA_CATEGORIES,
   type DegreeBucket,
   type DegreeTile,
 } from '../../services/degree/degreeBuckets';
@@ -12,7 +13,12 @@ import {
   buildCourseIndex,
   type CourseIndexEntry,
 } from '../../services/degree/courseIndex';
+import {
+  effectiveProgress,
+  type EffectiveProgress,
+} from '../../services/degree/requirementProgress';
 import { appState } from '../../core/state/appState.svelte';
+import { openModal } from '../../services/ui/uiState.svelte';
 
 /**
  * Reactive state for the Degree page.
@@ -51,8 +57,35 @@ class DegreeState {
     ),
   );
 
+  /**
+   * Bucket id -> its live progress from the courses placed in it. Computed once
+   * here so the status filter, the cards and the focus jump share one pass.
+   */
+  progressById = $derived.by<Map<string, EffectiveProgress>>(
+    () =>
+      new Map(
+        this.buckets.map(b => [
+          b.id,
+          effectiveProgress(b, this.placements.get(b.id) ?? []),
+        ]),
+      ),
+  );
+
   /** Bucket ids whose card is expanded to show every course. Not persisted. */
   expanded = new SvelteSet<string>();
+
+  /**
+   * Whether the degree-wide buckets (Total Credits, Residency) are listed.
+   * Here rather than in RequirementList because the phone's Move sheet lists
+   * buckets too, and offers the same ones the page is showing.
+   */
+  showUmbrella = $state(false);
+
+  /** Whether the phone's "To place" list is open. Not persisted. */
+  toPlaceOpen = $state(true);
+
+  /** The course the phone's Move sheet is placing, while it is open. */
+  moving = $state.raw<string | null>(null);
 
   /** Every course the page knows about, and which buckets hold it. */
   courseIndex = $derived.by<CourseIndexEntry[]>(() =>
@@ -78,4 +111,27 @@ export function isExpanded(bucketId: string): boolean {
 export function toggleExpanded(bucketId: string): void {
   if (!degreeState.expanded.delete(bucketId))
     degreeState.expanded.add(bucketId);
+}
+
+/**
+ * Open the phone's Move sheet for a schedule course: the touch path for placing
+ * it, standing in for both dragging and the Assign menu there.
+ */
+export function openMoveSheet(courseId: string): void {
+  degreeState.moving = courseId;
+  openModal('move-course');
+}
+
+/**
+ * The buckets a course can be placed in from the Move sheet or the Assign
+ * menu: the ones the page is showing, so never a degree-wide bucket it hides -
+ * unless the course already sits in it.
+ */
+export function placeableBuckets(current: string | null): DegreeBucket[] {
+  return degreeState.buckets.filter(
+    b =>
+      degreeState.showUmbrella ||
+      !UMBRELLA_CATEGORIES.has(b.category) ||
+      b.id === current,
+  );
 }

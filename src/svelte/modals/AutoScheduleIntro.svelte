@@ -5,26 +5,53 @@
   import { modalState } from './modalState.svelte';
   import type { SelectedCourse } from '../../types/schedule';
   import { sectionsOf } from '../../utils/courseUtils';
+  import { QUARTER_TERMS, SEMESTER_TERMS } from '../../utils/typeGuards';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
   const payload = $derived(modalState.autoScheduleIntro);
 
-  const TERMS = ['A', 'B', 'C', 'D'];
-
   function hasPickedSections(sc: SelectedCourse): boolean {
     return sectionsOf(sc.selected).length > 0;
   }
 
-  function availableTerms(sc: SelectedCourse): Set<string> {
+  function computeAvailableTerms(sc: SelectedCourse): Set<string> {
     const terms = new Set<string>();
     sc.course.lectures?.forEach(lg => terms.add(lg.section.computedTerm));
     sc.course.standaloneLabs?.forEach(s => terms.add(s.computedTerm));
     return terms;
   }
 
+  // Computed once per payload rather than on every badge read. Read-only:
+  // callers copy before mutating.
+  const availableByCourse = $derived(
+    new Map(
+      (payload?.selectedCourses ?? []).map(sc => [
+        sc.course.id,
+        computeAvailableTerms(sc),
+      ]),
+    ),
+  );
+
+  function availableTerms(sc: SelectedCourse): ReadonlySet<string> {
+    return availableByCourse.get(sc.course.id) ?? computeAvailableTerms(sc);
+  }
+
+  // Semester terms (F spans A+B, S spans C+D) get a badge only when the
+  // course offers them, so quarter-only cards keep their four badges.
+  function badgeTerms(available: ReadonlySet<string>): string[] {
+    return [...QUARTER_TERMS, ...SEMESTER_TERMS.filter(t => available.has(t))];
+  }
+
+  // After a generation every course has sections; locking them all by default
+  // would leave nothing to schedule, so then every course starts included.
+  const allPicked = $derived(
+    !!payload?.selectedCourses.every(sc => hasPickedSections(sc)),
+  );
+
   // Per-course selected terms. Sections-already-picked courses start empty
-  // (excluded from auto-scheduling); others default to all available terms.
+  // (excluded from auto-scheduling) unless all of them are; others default to
+  // all available terms.
   // SvelteMap/SvelteSet so .size/.has reads in the template stay reactive.
   let termsByCourse = $state(new SvelteMap<string, SvelteSet<string>>());
 
@@ -34,11 +61,14 @@
     const p = payload;
     if (!p || p === seededFor) return;
     seededFor = p;
+    const lockPicked = !allPicked;
     const next = new SvelteMap<string, SvelteSet<string>>();
     for (const sc of p.selectedCourses) {
       next.set(
         sc.course.id,
-        new SvelteSet(hasPickedSections(sc) ? [] : availableTerms(sc)),
+        new SvelteSet(
+          lockPicked && hasPickedSections(sc) ? [] : availableTerms(sc),
+        ),
       );
     }
     termsByCourse = next;
@@ -56,9 +86,6 @@
     modalState.autoScheduleIntroTermPrefs = null;
   });
 
-  function isAvailable(sc: SelectedCourse, term: string): boolean {
-    return availableTerms(sc).has(term);
-  }
   function isSelected(sc: SelectedCourse, term: string): boolean {
     return !!termsByCourse.get(sc.course.id)?.has(term);
   }
@@ -73,6 +100,16 @@
       set.clear();
     } else {
       availableTerms(sc).forEach(t => set.add(t));
+    }
+  }
+
+  // The card is itself a checkbox for keyboard users. The target guard keeps
+  // Enter/Space on the nested term buttons toggling just that term.
+  function onCardKeydown(e: KeyboardEvent, sc: SelectedCourse): void {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleCard(sc);
     }
   }
 
@@ -112,17 +149,27 @@
     {#snippet children(close)}
       <div class="modal-body as-course-picker-body">
         <p class="as-picker-hint">
-          Courses with selected sections are locked by default. Click a course
-          to include it in auto-scheduling.
+          {#if allPicked}
+            All courses are included. Click a course to lock it to its current
+            sections.
+          {:else}
+            Courses with selected sections are locked by default. Click a course
+            to include it in auto-scheduling.
+          {/if}
         </p>
         <div class="as-course-grid">
           {#each payload.selectedCourses as sc (sc.course.id)}
-            <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (card is a click-to-toggle surface; term badges below are the granular controls) -->
+            {@const available = availableTerms(sc)}
             <div
               class="as-course-card"
               class:selected={cardSelected(sc)}
               data-course-id={sc.course.id}
+              role="checkbox"
+              tabindex="0"
+              aria-checked={cardSelected(sc)}
+              aria-label="{courseCode(sc)} {sc.course.name}"
               onclick={() => toggleCard(sc)}
+              onkeydown={e => onCardKeydown(e, sc)}
             >
               <div
                 class="as-course-card-accent"
@@ -138,14 +185,15 @@
               <div
                 class={['as-card-terms', listStyles['term-badges-container']]}
               >
-                {#each TERMS as term (term)}
-                  {#if isAvailable(sc, term)}
-                    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (term badge toggles one term; stops card toggle) -->
-                    <span
+                {#each badgeTerms(available) as term (term)}
+                  {#if available.has(term)}
+                    <button
+                      type="button"
                       class={[
                         listStyles['term-badge'],
                         { [listStyles['selected']]: isSelected(sc, term) },
                       ]}
+                      aria-pressed={isSelected(sc, term)}
                       data-term={term}
                       data-term-badge
                       data-course-id={sc.course.id}
@@ -155,7 +203,7 @@
                       }}
                     >
                       <span class={listStyles['term-letter']}>{term}</span>
-                    </span>
+                    </button>
                   {:else}
                     <span
                       class={[

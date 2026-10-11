@@ -9,7 +9,7 @@ INTERVAL="${REFRESH_INTERVAL_SECONDS:-900}"
 mkdir -p "$DATA_DIR"
 
 # Seed from the build's bundled data so nginx can serve before the first fetch.
-for f in course-data.json course-data-constructed.json term-bounds.json last-updated.json; do
+for f in course-data-constructed.json term-bounds.json last-updated.json; do
     if [ ! -f "$DATA_DIR/$f" ] && [ -f "/app/public/$f" ]; then
         cp "/app/public/$f" "$DATA_DIR/$f"
     fi
@@ -18,22 +18,53 @@ done
 refresh_once() {
     echo "[refresh] $(date -u +%FT%TZ) starting"
 
-    # The fetch/convert scripts write into /app/public/.
-    cd /app
+    # Called from an `if`, which disables set -e inside the function, so every
+    # step bails out explicitly; otherwise a failed fetch would still convert and
+    # publish stale data under a fresh last-updated.json.
+    # The fetch/convert scripts write into /app/data/ and /app/public/.
+    cd /app || return 1
 
-    bun run fetch-data
-    bun run convert
+    bun run fetch-data || return 1
+
+    # Compared against the raw copy kept in the volume (nginx does not serve
+    # it) rather than the last fetch, so a volume left over from an older
+    # image still gets refreshed. Leaving the files alone keeps their mtimes,
+    # and with them nginx's ETags, so browsers revalidate to a 304 instead of
+    # downloading the data again. The .gz is only written by a publish, so
+    # data seeded from the image still gets one.
+    if cmp -s data/course-data.json "$DATA_DIR/course-data.json" &&
+        [ -f "$DATA_DIR/course-data-constructed.json.gz" ]; then
+        echo "[refresh] $(date -u +%FT%TZ) unchanged, nothing to publish"
+        return 0
+    fi
+
+    bun run convert || return 1
 
     printf '{"timestamp":"%s","utc":"%s"}\n' \
         "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
         "$(date -u '+%Y-%m-%d %H:%M UTC')" \
-        > public/last-updated.json
+        > public/last-updated.json || return 1
+
+    # The catalog every visitor downloads goes out minified, with a gzip -9
+    # copy that nginx serves as is (gzip_static): about half what on-the-fly
+    # gzip sends, and no compressing per request. public/ keeps the readable
+    # copy. Published before the files below, as tmp+mv like them.
+    bun -e 'const [src, dst] = process.argv.slice(-2);
+        await Bun.write(dst, JSON.stringify(await Bun.file(src).json()));' \
+        public/course-data-constructed.json \
+        "$DATA_DIR/course-data-constructed.json.tmp" || return 1
+    gzip -9 -c "$DATA_DIR/course-data-constructed.json.tmp" \
+        > "$DATA_DIR/course-data-constructed.json.gz.tmp" || return 1
+    mv "$DATA_DIR/course-data-constructed.json.gz.tmp" "$DATA_DIR/course-data-constructed.json.gz" || return 1
+    mv "$DATA_DIR/course-data-constructed.json.tmp" "$DATA_DIR/course-data-constructed.json" || return 1
 
     # Publish via tmp+mv so nginx never reads a half-written file.
-    for f in course-data.json course-data-constructed.json term-bounds.json last-updated.json; do
-        if [ -f "public/$f" ]; then
-            cp "public/$f" "$DATA_DIR/$f.tmp"
-            mv "$DATA_DIR/$f.tmp" "$DATA_DIR/$f"
+    # The raw copy goes last: it marks this data as published.
+    for f in public/term-bounds.json public/last-updated.json data/course-data.json; do
+        if [ -f "$f" ]; then
+            name="$(basename "$f")"
+            cp "$f" "$DATA_DIR/$name.tmp" || return 1
+            mv "$DATA_DIR/$name.tmp" "$DATA_DIR/$name" || return 1
         fi
     done
 

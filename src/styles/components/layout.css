@@ -1,8 +1,17 @@
 .app-body {
   flex: 1;
   display: grid;
+  /* Until it is dragged, the right panel takes its 700px only where that still
+     leaves the course list 560px. A narrower window (a 1280px laptop) shrinks
+     the panel first, down to its 360px drag minimum, so the list keeps room
+     for course names and the List/Grid toggle. A dragged width still wins. */
+  --right-panel-default-width: clamp(
+    360px,
+    100vw - var(--panel-sidebar-width, var(--spacing-sidebar-width)) - 560px,
+    var(--spacing-right-panel-width)
+  );
   grid-template-columns:
     var(--panel-sidebar-width, var(--spacing-sidebar-width))
-    1fr var(--panel-right-width, var(--spacing-right-panel-width));
+    1fr var(--panel-right-width, var(--right-panel-default-width));
   overflow: hidden;
 }

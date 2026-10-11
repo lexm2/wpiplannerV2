@@ -12,8 +12,9 @@ import { STORAGE_KEYS } from '../utils/storageKeys';
  * Singleton theme system with JSON-based themes and pluggable storage strategy for persistence
  */
 
+/** Where later theme choices are saved. The saved theme is read only once,
+ * before first paint, by the bootstrap storage below. */
 export interface ThemeStorage {
-  loadThemePreference(): string;
   saveThemePreference(themeId: string): void;
 }
 
@@ -68,11 +69,21 @@ function cssEntries<T extends object>(obj: T): [string, T[keyof T]][] {
   return Object.entries(obj) as [string, T[keyof T]][];
 }
 
+// Read per switch, not cached: the OS setting can change while the app is open.
+function prefersReducedMotion(): boolean {
+  return (
+    typeof matchMedia !== 'undefined' &&
+    matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 export class ThemeManager {
   private static instance: ThemeManager;
   private currentTheme: ThemeId = 'wpi-dark';
   private themes: Map<ThemeId, ThemeDefinition> = new Map();
-  private storage: ThemeStorage = new DefaultThemeStorage();
+  private readonly bootStorage = new DefaultThemeStorage();
+  private storage: ThemeStorage = this.bootStorage;
+  private switchToken = 0;
 
   private constructor() {
     this.initializeThemes();
@@ -84,10 +95,6 @@ export class ThemeManager {
       ThemeManager.instance = new ThemeManager();
     }
     return ThemeManager.instance;
-  }
-
-  static resetInstance(): void {
-    ThemeManager.instance = null!;
   }
 
   /**
@@ -107,12 +114,13 @@ export class ThemeManager {
   }
 
   private loadSavedTheme(): void {
-    const savedTheme = this.storage.loadThemePreference();
+    const savedTheme = this.bootStorage.loadThemePreference();
     if (savedTheme && this.themes.has(savedTheme)) {
       this.currentTheme = savedTheme;
     }
 
-    this.applyTheme(this.currentTheme);
+    // Before first paint: nothing to fade from.
+    this.applyTheme(this.currentTheme, false);
     uiState.currentThemeId = this.currentTheme;
   }
 
@@ -142,23 +150,25 @@ export class ThemeManager {
     return Array.from(this.themes.values());
   }
 
-  getCurrentTheme(): ThemeDefinition | null {
-    return this.themes.get(this.currentTheme) || null;
-  }
-
   getCurrentThemeId(): ThemeId {
     return this.currentTheme;
   }
 
-  setTheme(themeId: ThemeId): boolean {
+  /**
+   * Shows a theme and, unless `persist` is false, saves it as the
+   * preference. Startup applies the stored preference with persist off, so
+   * loading it doesn't write it straight back.
+   */
+  setTheme(themeId: ThemeId, { persist = true } = {}): boolean {
     if (!this.themes.has(themeId)) {
       logger.error(`Theme '${themeId}' not found`);
       return false;
     }
 
+    const changed = themeId !== this.currentTheme;
     this.currentTheme = themeId;
-    this.applyTheme(themeId);
-    this.saveThemePreference(themeId);
+    if (changed) this.applyTheme(themeId, true);
+    if (persist) this.saveThemePreference(themeId);
     // Notify reactive consumers (e.g. the Svelte ThemeSelector) of the new
     // visible theme - ThemeManager has no listener system of its own.
     uiState.currentThemeId = themeId;
@@ -166,10 +176,50 @@ export class ThemeManager {
     return true;
   }
 
-  private applyTheme(themeId: ThemeId): void {
+  /**
+   * Swaps the theme in one style recalc, then (where supported) crossfades the
+   * old and new frames with a view transition.
+   *
+   * The swap used to be animated with CSS transitions, so every element on the
+   * page - thousands once the course list has paged in a few hundred rows -
+   * recalculated style and repainted on every frame of the fade. A view
+   * transition fades two snapshots on the compositor instead, so its cost
+   * doesn't grow with the DOM. `theme-switching` (reset.css) keeps CSS
+   * transitions from starting while the new colors land.
+   */
+  private applyTheme(themeId: ThemeId, animate: boolean): void {
     const theme = this.themes.get(themeId);
     if (!theme) return;
 
+    const root = document.documentElement;
+    const token = ++this.switchToken;
+    root.classList.add('theme-switching');
+    // Only the latest switch clears the class, so rapid toggles can't let
+    // transitions back in while a newer swap is still landing.
+    const done = () => {
+      if (token === this.switchToken) root.classList.remove('theme-switching');
+    };
+    const write = () => this.writeTheme(theme);
+
+    if (
+      animate &&
+      typeof document.startViewTransition === 'function' &&
+      !prefersReducedMotion()
+    ) {
+      const transition = document.startViewTransition(write);
+      // `ready` rejects when a newer switch skips this one; that's expected.
+      transition.ready.catch(() => {});
+      void transition.finished.then(done, done);
+      return;
+    }
+
+    write();
+    // The first frame commits the new colors with transitions off; the second
+    // turns them back on once there's nothing left to animate.
+    requestAnimationFrame(() => requestAnimationFrame(done));
+  }
+
+  private writeTheme(theme: ThemeDefinition): void {
     const root = document.documentElement;
 
     cssEntries(theme.colors).forEach(([key, value]) => {
@@ -184,17 +234,12 @@ export class ThemeManager {
       root.style.setProperty(`--effect-${this.kebabCase(key)}`, value);
     });
 
-    const classList = Array.from(document.body.classList);
-    const oldThemeClass = classList.find(cls => cls.startsWith('theme-'));
-    if (oldThemeClass) {
-      document.body.classList.remove(oldThemeClass);
-    }
-
-    // Force reflow then defer class addition to enable CSS transitions
-    void document.documentElement.offsetHeight;
-    requestAnimationFrame(() => {
-      document.body.classList.add(`theme-${themeId}`);
-    });
+    const body = document.body.classList;
+    const oldThemeClass = Array.from(body).find(cls =>
+      cls.startsWith('theme-'),
+    );
+    if (oldThemeClass) body.remove(oldThemeClass);
+    body.add(`theme-${theme.id}`);
   }
 
   private kebabCase(str: string): string {
@@ -203,83 +248,5 @@ export class ThemeManager {
 
   private saveThemePreference(themeId: ThemeId): void {
     this.storage.saveThemePreference(themeId);
-  }
-
-  detectSystemPreference(): ThemeId {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'wpi-dark';
-      }
-      if (window.matchMedia('(prefers-contrast: high)').matches) {
-        return 'high-contrast';
-      }
-    }
-    return 'wpi-dark';
-  }
-
-  useSystemPreference(): boolean {
-    const preferredTheme = this.detectSystemPreference();
-    return this.setTheme(preferredTheme);
-  }
-
-  // Temporary application without saving; resetToCurrentTheme() restores on cancel
-  previewTheme(themeId: ThemeId): boolean {
-    if (!this.themes.has(themeId)) return false;
-    this.applyTheme(themeId);
-    // Reflect the visible theme; currentTheme / storage are intentionally left unchanged.
-    uiState.currentThemeId = themeId;
-    return true;
-  }
-
-  resetToCurrentTheme(): void {
-    this.applyTheme(this.currentTheme);
-    uiState.currentThemeId = this.currentTheme;
-  }
-
-  exportCurrentTheme(): string {
-    const theme = this.getCurrentTheme();
-    if (!theme) throw new Error('No current theme to export');
-    return JSON.stringify(theme, null, 2);
-  }
-
-  importTheme(themeJson: string): boolean {
-    try {
-      const theme: unknown = JSON.parse(themeJson);
-      if (this.isValidTheme(theme)) {
-        this.registerTheme(theme);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      logger.error('Failed to import theme:', error);
-      return false;
-    }
-  }
-
-  getThemeById(themeId: ThemeId): ThemeDefinition | null {
-    return this.themes.get(themeId) || null;
-  }
-
-  hasTheme(themeId: ThemeId): boolean {
-    return this.themes.has(themeId);
-  }
-
-  removeTheme(themeId: ThemeId): boolean {
-    const builtInThemes = [
-      'wpi-classic',
-      'wpi-dark',
-      'wpi-light',
-      'high-contrast',
-    ];
-    if (builtInThemes.includes(themeId)) {
-      logger.warn(`Cannot remove built-in theme: ${themeId}`);
-      return false;
-    }
-
-    if (this.currentTheme === themeId) {
-      this.setTheme('wpi-dark');
-    }
-
-    return this.themes.delete(themeId);
   }
 }

@@ -32,7 +32,6 @@
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
   let query = $state('');
-  let searchEl = $state<HTMLInputElement | null>(null);
 
   const sort = $derived(degreeViewState.courseSort);
   const sortLabel = $derived(
@@ -93,10 +92,6 @@
     onRequestClose();
     focusBuckets([bucketId], bucketId);
   }
-
-  $effect(() => {
-    searchEl?.focus();
-  });
 </script>
 
 <Modal
@@ -114,7 +109,6 @@
         id="course-finder-search"
         placeholder="Course code, title, or bucket"
         aria-label="Search courses"
-        bind:this={searchEl}
         bind:value={query}
       />
       <!-- One button stepping through the modes, rather than four chips: only

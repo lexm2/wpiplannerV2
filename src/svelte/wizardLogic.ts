@@ -12,15 +12,13 @@ import type {
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
 import type { AcademicYearFilterCriteria } from '../types/filters';
-
-const TERM_ORDER = ['A', 'B', 'C', 'D', 'E'];
+import { TERM_ORDER, semesterTermLabel } from '../utils/typeGuards';
 
 const TERM_NAMES: Record<string, string> = {
   A: 'A Term (Fall 1)',
   B: 'B Term (Fall 2)',
   C: 'C Term (Spring 1)',
   D: 'D Term (Spring 2)',
-  E: 'E Term (Summer)',
 };
 
 /**
@@ -162,7 +160,7 @@ function getAllLabsForCourse(
   return Array.from(all.values());
 }
 
-/** Group sections by academic term, ordered A->E. */
+/** Group sections by academic term: quarters A-D, then semesters F, S. */
 export function groupSectionsByTerm(
   sections: Section[],
 ): Array<{ term: string; sections: Section[] }> {
@@ -174,12 +172,18 @@ export function groupSectionsByTerm(
   }
 
   return Array.from(grouped.entries())
-    .sort((a, b) => TERM_ORDER.indexOf(a[0]) - TERM_ORDER.indexOf(b[0]))
+    .sort((a, b) => termRank(a[0]) - termRank(b[0]))
     .map(([term, sections]) => ({ term, sections }));
 }
 
+// Unrecognised terms ('Unknown') go last rather than ahead of A.
+function termRank(term: string): number {
+  const i = TERM_ORDER.indexOf(term);
+  return i === -1 ? TERM_ORDER.length : i;
+}
+
 export function getTermName(term: string): string {
-  return TERM_NAMES[term] || `${term} Term`;
+  return TERM_NAMES[term] || semesterTermLabel(term) || `${term} Term`;
 }
 
 /** Async = explicit flag or a 12:00-12:00 placeholder time. */
@@ -218,7 +222,7 @@ export function describeActiveFilters(
 
   const descriptions: string[] = [];
   for (const filter of filterService.getActiveFilters()) {
-    if (filter.id === 'periodRmpRating' && filter.criteria) {
+    if (filter.id === 'rmpRating' && filter.criteria) {
       const c = filter.criteria as {
         minRating?: number;
         maxRating?: number;

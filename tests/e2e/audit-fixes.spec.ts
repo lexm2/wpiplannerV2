@@ -1,7 +1,7 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 /**
- * Regression guards for the defects fixed from audits/2026-08-20-code-surface-audit.md.
+ * Regression guards for defects fixed from a code surface audit.
  * Each of these bugs was invisible to tsc/svelte-check/unit tests, which is how
  * they survived; these assertions are the thing that keeps them fixed.
  */
@@ -49,6 +49,9 @@ test.beforeEach(async ({ page }) => {
 test('right panel default width is 700px, not the old 320px', async ({
   page,
 }) => {
+  // 700px is the wide-screen default; narrower windows shrink it to keep the
+  // course list usable (narrow-layout.spec.ts covers 1280px).
+  await page.setViewportSize({ width: 1920, height: 1080 });
   await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
   await page.waitForTimeout(500);

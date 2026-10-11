@@ -18,13 +18,32 @@ import type {
 } from '../../types/rawData';
 import { appState } from '../../core/state/appState.svelte';
 import { logger } from '../../utils/logger';
-import { z } from 'zod';
+import * as z from 'zod';
 
 // Departments stay loosely typed on purpose -- see fetchFreshData.
 const CourseDataEnvelopeSchema = z.object({
   departments: z.array(z.custom<RawDepartment>()).optional(),
   generated: z.string().optional(),
 });
+
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&',
+  nbsp: ' ',
+  quot: '"',
+  apos: "'",
+  lt: '<',
+  gt: '>',
+};
+
+/** Decodes one HTML entity; unknown named ones become a space. */
+function decodeEntity(body: string): string {
+  if (body.startsWith('#')) {
+    const hex = body[1] === 'x' || body[1] === 'X';
+    const code = parseInt(body.slice(hex ? 2 : 1), hex ? 16 : 10);
+    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : ' ';
+  }
+  return NAMED_ENTITIES[body.toLowerCase()] ?? ' ';
+}
 
 /**
  * Fetches and transforms WPI course catalog data with duplicate resolution and HTML sanitization.
@@ -34,13 +53,30 @@ export class CourseDataService {
   private static readonly WPI_COURSE_DATA_URL =
     './course-data-constructed.json';
   private scheduleDB: ScheduleDB | null = null;
-  private latestAcademicYear: number | undefined;
+  // Started by prefetchCourseData(), consumed by the next loadCourseData().
+  private prefetched: Promise<ScheduleDB> | null = null;
 
   constructor() {}
 
+  /**
+   * Starts the fetch + parse without publishing anything, so the download
+   * overlaps the rest of startup. loadCourseData() picks up the result; a
+   * failure stays parked until then and surfaces there, as if it had fetched.
+   */
+  prefetchCourseData(): void {
+    if (this.prefetched) return;
+    const pending = this.fetchFreshData();
+    // Marks the rejection handled for the window between now and the await in
+    // loadCourseData() (or forever, if an earlier startup step throws first).
+    pending.catch(() => {});
+    this.prefetched = pending;
+  }
+
   async loadCourseData(): Promise<ScheduleDB> {
     try {
-      const freshData = await this.fetchFreshData();
+      const pending = this.prefetched ?? this.fetchFreshData();
+      this.prefetched = null;
+      const freshData = await pending;
       this.scheduleDB = freshData;
 
       appState.loadedDepartments = freshData.departments;
@@ -87,11 +123,6 @@ export class CourseDataService {
     const realDepartments = this.parseConstructedDepartments(
       jsonData.departments,
     );
-    const latestYear = Math.max(
-      ...realDepartments.flatMap(d => d.courses.map(c => c.academicYear ?? 0)),
-    );
-    this.latestAcademicYear = latestYear || undefined;
-
     const scheduleDB: ScheduleDB = {
       departments: [...realDepartments],
       generated: jsonData.generated || new Date().toISOString(),
@@ -135,6 +166,7 @@ export class CourseDataService {
             );
           } else {
             // Production fallback: derive a synthetic unique ID
+            const originalId = courseId;
             const fallbackId = `${department.abbreviation}-${courseData.number}`;
             logger.error(
               `DUPLICATE ID: "${courseId}" for ${department.abbreviation}${courseData.number}`,
@@ -152,7 +184,7 @@ export class CourseDataService {
 
             logger.error('[Data Quality Issue]', {
               type: 'duplicate_course_id',
-              originalId: courseId,
+              originalId,
               fallbackId: courseId,
               timestamp: Date.now(),
             });
@@ -343,44 +375,14 @@ export class CourseDataService {
   }
 
   private stripHtml(html: string): string {
+    // Only real entities: a bare "&" in prose ("reading & listening") must
+    // not swallow the text up to the next semicolon.
     return html
       .replace(/<[^>]*>/g, '')
-      .replace(/&[^;]+;/g, ' ')
+      .replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, (_entity, body: string) =>
+        decodeEntity(body),
+      )
       .trim();
-  }
-
-  getScheduleDB(): ScheduleDB | null {
-    return this.scheduleDB;
-  }
-
-  searchCourses(query: string, departments?: string[]): Course[] {
-    if (!this.scheduleDB) return [];
-
-    const allCourses: Course[] = [];
-
-    for (const dept of this.scheduleDB.departments) {
-      if (
-        departments &&
-        departments.length > 0 &&
-        !departments.includes(dept.abbreviation.toLowerCase())
-      ) {
-        continue;
-      }
-      allCourses.push(...dept.courses);
-    }
-
-    if (!query.trim()) {
-      return allCourses;
-    }
-
-    const queryLower = query.toLowerCase();
-    return allCourses.filter(
-      course =>
-        course.name.toLowerCase().includes(queryLower) ||
-        course.number.toLowerCase().includes(queryLower) ||
-        course.id.toLowerCase().includes(queryLower) ||
-        course.departmentAbbr.toLowerCase().includes(queryLower),
-    );
   }
 
   getAllDepartments(): Department[] {
@@ -430,10 +432,6 @@ export class CourseDataService {
     );
   }
 
-  getLatestAcademicYear(): number | undefined {
-    return this.latestAcademicYear;
-  }
-
   filterDepartments(predicate: (d: Department) => boolean): void {
     if (!this.scheduleDB) return;
     this.scheduleDB = {
@@ -448,6 +446,11 @@ export class CourseDataService {
     const response = await fetch('./tutorial-courses.json', {
       cache: 'no-cache',
     });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch tutorial courses: ${response.status} ${response.statusText}`,
+      );
+    }
     const json = (await response.json()) as { courses: RawCourse[] };
     const parsedCourses = json.courses.map(raw => {
       const lectures = this.parseLectureGroups(raw.lectures ?? []);
