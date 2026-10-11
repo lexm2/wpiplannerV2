@@ -160,3 +160,17 @@ test('add event day pills show which days are selected', async ({ page }) => {
   // Polled: the pill eases between its colours.
   await expect.poll(() => bg(tue)).toBe(await bg(mon));
 });
+
+test('escape closes the theme dropdown', async ({ page }) => {
+  await load(page);
+  await page.click('#theme-dropdown');
+  await expect(page.locator('#theme-options')).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#theme-options')).toHaveCount(0);
+  await expect(page.locator('#theme-dropdown')).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  );
+  await expect(page.locator('#theme-dropdown')).toBeFocused();
+});
