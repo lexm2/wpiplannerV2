@@ -22,6 +22,11 @@ export const expandedTerm = new SvelteMap<string, string>();
 // The FLIP needs the *pre-swap* height; an action's update() runs post-swap.
 const pendingStartHeight = new Map<string, number>();
 
+// Courses whose collapse fade is still playing. Clicks on them are ignored
+// until it lands: a second collapse (or an expand the fade's end would then
+// undo) would lock the row again with no rune change to release it.
+const collapseInFlight = new Set<string>();
+
 const BADGE_STEP_MS = 40; // per-step delay of the diagonal crumb cascade (the app-wide stagger step)
 const BADGE_FADE_MS = 150;
 
@@ -63,7 +68,7 @@ export function toggleTerm(
   term: string,
   available: boolean,
 ): void {
-  if (!available) return;
+  if (!available || collapseInFlight.has(courseId)) return;
   const item = (e.currentTarget as HTMLElement | null)?.closest(
     '[data-course-item]',
   ) as HTMLElement | null;
@@ -99,6 +104,7 @@ export function toggleTerm(
       ),
     );
     // Once the crumbs have faded out, lock the height and flip to collapsed.
+    collapseInFlight.add(courseId);
     void Promise.all(fades.map(a => a.finished))
       .then(() => {
         lockForFlip(item, courseId);
@@ -106,7 +112,8 @@ export function toggleTerm(
       })
       .catch(() => {
         /* a fade was cancelled (e.g. row unmounted) - skip */
-      });
+      })
+      .finally(() => collapseInFlight.delete(courseId));
     return;
   }
 

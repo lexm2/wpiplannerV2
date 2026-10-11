@@ -350,7 +350,10 @@
   border-color: var(--color-primary);
 }
 
-.eraser-icon {
+/* Scoped to this button: a bare .eraser-icon also styled the Clear-filters
+   button's icon (main-content.css). The hover state lives in header.css, next
+   to the remove button's matching rule. */
+.course-clear-sections-btn .eraser-icon {
   width: 16px;
   height: 16px;
   display: block;
@@ -358,11 +361,6 @@
   stroke: currentColor;
   color: var(--color-text-secondary);
   opacity: 0.7;
-}
-
-.course-clear-sections-btn:hover .eraser-icon {
-  opacity: 1;
-  color: var(--color-warning);
 }
 
 .term-sections {

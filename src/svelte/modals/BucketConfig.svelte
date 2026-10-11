@@ -5,6 +5,7 @@
   import { degreeState } from '../degree/degreeState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import type { DegreeBucket } from '../../services/degree/degreeBuckets';
+  import { onDestroy } from 'svelte';
   import { flip } from 'svelte/animate';
   import { dur } from '../transitions';
 
@@ -113,6 +114,11 @@
     return 0;
   }
 
+  // Removes an in-progress drag's window listeners. Run on unmount too, so a
+  // modal closed mid-drag (Escape) doesn't apply the reorder on release.
+  let detachDrag: (() => void) | null = null;
+  onDestroy(() => detachDrag?.());
+
   function startReorder(e: PointerEvent, bucket: DegreeBucket): void {
     if (e.button !== 0 || editingId === bucket.id) return;
     const row = (e.currentTarget as HTMLElement).closest<HTMLElement>(
@@ -167,11 +173,16 @@
       dropIndex = next;
     };
 
-    const onUp = () => {
+    const detach = () => {
       handle.releasePointerCapture?.(e.pointerId);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
+      detachDrag = null;
+    };
+
+    const onUp = () => {
+      detach();
       if (dropIndex !== null && dropIndex !== index) {
         const ids = buckets.map(b => b.id);
         const [moved] = ids.splice(index, 1);
@@ -187,6 +198,7 @@
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
+    detachDrag = detach;
   }
 
   function targetLabel(bucket: DegreeBucket): string {
@@ -242,7 +254,11 @@
                   autofocus
                   onkeydown={e => {
                     if (e.key === 'Enter') commitEdit();
-                    if (e.key === 'Escape') editingId = null;
+                    if (e.key === 'Escape') {
+                      // Claimed, so Modal leaves the dialog open.
+                      e.preventDefault();
+                      editingId = null;
+                    }
                   }}
                 />
                 <TextField
@@ -253,7 +269,11 @@
                   placeholder="Credits"
                   onkeydown={e => {
                     if (e.key === 'Enter') commitEdit();
-                    if (e.key === 'Escape') editingId = null;
+                    if (e.key === 'Escape') {
+                      // Claimed, so Modal leaves the dialog open.
+                      e.preventDefault();
+                      editingId = null;
+                    }
                   }}
                 />
                 <button

@@ -41,13 +41,25 @@
       action();
     };
   }
+
+  function onKeydown(e: KeyboardEvent): void {
+    // Only while open, so Escape still reaches modals and the wizard otherwise.
+    if (!open || e.key !== 'Escape') return;
+    e.preventDefault();
+    open = false;
+    trigger?.focus();
+  }
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <button
   id="settings-menu-btn"
   class="btn btn-icon settings-menu-btn"
   title="Settings"
   aria-label="Settings menu"
+  aria-haspopup="true"
+  aria-expanded={open}
   bind:this={trigger}
   onclick={() => (open = !open)}
   >{@html getInlineSVG('SETTINGS', 'settings-icon')}</button

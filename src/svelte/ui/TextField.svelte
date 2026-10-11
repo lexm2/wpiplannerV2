@@ -98,13 +98,13 @@
   {panel}
   {fieldClass}
 >
-  {#snippet children({ describedBy })}
+  {#snippet children({ describedBy, controlId })}
     <div class={['field-shell', { 'field-shell--multiline': multiline }]}>
       {#if multiline}
         <!-- svelte-ignore a11y_autofocus (callers opt in deliberately; trapFocus resolves [autofocus]) -->
         <textarea
           class="field-control field-control--multiline"
-          {id}
+          id={controlId}
           {value}
           {placeholder}
           {disabled}
@@ -125,7 +125,7 @@
         <input
           class="field-control"
           {type}
-          {id}
+          id={controlId}
           {value}
           {placeholder}
           {disabled}

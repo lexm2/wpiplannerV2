@@ -7,7 +7,11 @@
   import { triggerFileDownload } from '../../utils/download';
   import { logger } from '../../utils/logger';
   import { ThemeManager } from '../../themes/ThemeManager';
-  import { openModal, showAppError } from '../../services/ui/uiState.svelte';
+  import {
+    openModal,
+    showAppError,
+    uiState,
+  } from '../../services/ui/uiState.svelte';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
@@ -167,8 +171,12 @@
     const newName = editValue.trim();
     if (newName && newName !== schedule.name) {
       try {
-        await scheduleManagementService.renameSchedule(schedule.id, newName);
-        refreshTick++;
+        const result = await scheduleManagementService.renameSchedule(
+          schedule.id,
+          newName,
+        );
+        if (result.success) refreshTick++;
+        else showAppError(`Rename failed: ${result.error || 'Unknown error'}`);
       } catch (error) {
         logger.error('Failed to rename schedule:', error);
         showAppError('Failed to rename schedule. Please try again.');
@@ -230,8 +238,11 @@
 
   // Capture phase, so this runs before Modal's Escape handler: Escape backs
   // out of an open menu or copy mode first, and only then closes the picker.
+  // Only while the picker is the top modal: a confirm stacked over it gets the
+  // key instead.
   function onWindowKeydownCapture(e: KeyboardEvent): void {
     if (e.key !== 'Escape') return;
+    if (uiState.openModals.at(-1) !== 'schedule-picker') return;
     if (openMenuId) {
       e.preventDefault();
       closeMenus();
@@ -243,7 +254,7 @@
 
   // Schedule actions
   //
-  // setActiveSchedule reports failure by returning {success:false, error}
+  // The service methods report failure by returning {success:false, error}
   // rather than throwing, so the result needs checking as well as the catch.
   async function switchToSchedule(scheduleId: string): Promise<void> {
     try {
@@ -295,11 +306,12 @@
   }
 
   async function duplicateSchedule(schedule: Schedule): Promise<void> {
-    await scheduleManagementService.duplicateSchedule(
+    const result = await scheduleManagementService.duplicateSchedule(
       schedule.id,
       `${schedule.name} (Copy)`,
     );
-    refreshTick++;
+    if (result.success) refreshTick++;
+    else showAppError(`Duplicate failed: ${result.error || 'Unknown error'}`);
   }
 
   // showConfirm fires onConfirm later, from the modal, by which point
@@ -307,8 +319,11 @@
   // surface its own failure.
   async function confirmDelete(schedule: Schedule): Promise<void> {
     try {
-      await scheduleManagementService.deleteSchedule(schedule.id);
-      refreshTick++;
+      const result = await scheduleManagementService.deleteSchedule(
+        schedule.id,
+      );
+      if (result.success) refreshTick++;
+      else showAppError(`Delete failed: ${result.error || 'Unknown error'}`);
     } catch (error) {
       logger.error('Failed to delete schedule:', error);
       showAppError('Failed to delete schedule. Please try again.');
@@ -330,8 +345,9 @@
   async function confirmCreate(name?: string): Promise<void> {
     if (!name) return;
     try {
-      await scheduleManagementService.createNewSchedule(name);
-      refreshTick++;
+      const result = await scheduleManagementService.createNewSchedule(name);
+      if (result.success) refreshTick++;
+      else showAppError(`Create failed: ${result.error || 'Unknown error'}`);
     } catch (error) {
       logger.error('Failed to create schedule:', error);
       showAppError('Failed to create schedule. Please try again.');
@@ -426,6 +442,8 @@
             showAppError(`Import failed: ${imported.error}`);
           }
           refreshTick++;
+        } else {
+          showAppError(`Import failed: ${created.error || 'Unknown error'}`);
         }
       } else {
         const result = await scheduleManagementService.importScheduleInto(
@@ -533,7 +551,10 @@
   {#snippet children(close)}
     <div class="modal-body schedule-picker-body">
       <div class="modal-pages-container" bind:this={pagesContainer}>
-        <div class="modal-page schedules-page">
+        <div
+          class="modal-page schedules-page"
+          inert={activeTab !== 'schedules'}
+        >
           <div class="schedule-list">
             {#if copySource}
               <div class="schedule-copy-banner" role="status">
@@ -729,7 +750,7 @@
                     >
                     {#if schedules.length > 1}
                       <button
-                        class="{styles['menuAction']} danger"
+                        class="{styles['menuAction']} {styles['danger']}"
                         onclick={e => {
                           e.stopPropagation();
                           void handleAction('delete', schedule);
@@ -753,7 +774,7 @@
           </div>
         </div>
 
-        <div class="modal-page settings-page">
+        <div class="modal-page settings-page" inert={activeTab !== 'settings'}>
           <button
             class="btn btn-primary"
             id="new-schedule-btn-settings"

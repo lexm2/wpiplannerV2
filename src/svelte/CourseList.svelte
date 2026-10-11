@@ -75,10 +75,30 @@
       : `${sorted.length.toLocaleString()} course${sorted.length === 1 ? '' : 's'}`,
   );
 
+  // What the result set is "of": the filter criteria plus which departments
+  // are loaded. Keyed on this rather than on `sorted`, whose identity also
+  // changes on a data refresh and - with avoid-conflicts on - on every
+  // selection (appEffects rewrites periodConflict's selectedCourses), neither
+  // of which should throw the reader back to the first page.
+  const resultKey = $derived(
+    JSON.stringify([
+      filterService
+        .getActiveFilters()
+        .map(f =>
+          f.id === 'periodConflict'
+            ? [f.id, { ...(f.criteria as object), selectedCourses: undefined }]
+            : [f.id, f.criteria],
+        )
+        .sort(([a], [b]) => String(a).localeCompare(String(b))),
+      appState.loadedDepartments.map(d => d.abbreviation),
+    ]),
+  );
+
   // A new result set starts at the top; without this, clearing a filter after
-  // scrolling deep renders every match at once.
-  $effect(() => {
-    sorted;
+  // scrolling deep renders every match at once. Pre, so the first render of
+  // the new results is already paged.
+  $effect.pre(() => {
+    resultKey;
     courseListState.resetPaging();
   });
 

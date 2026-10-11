@@ -70,37 +70,35 @@
     return getDepartmentCategory(dept).toLowerCase().includes(lq);
   }
 
-  // Expand the chosen values (categories -> their departments) and write.
-  function applyFromSelection(values: string[]): void {
-    let departments: string[] = [];
-    if (isCategoryMode) {
-      values.forEach(category => {
-        departments.push(
-          ...allDepartments.filter(d => getDepartmentCategory(d) === category),
-        );
-      });
-    } else {
-      departments = values;
-    }
+  function writeDepartments(departments: string[]): void {
     if (departments.length > 0)
       filterService.addFilter('department', { departments });
     else filterService.removeFilter('department');
   }
 
+  function departmentsIn(category: string): string[] {
+    return allDepartments.filter(d => getDepartmentCategory(d) === category);
+  }
+
+  // Only the toggled entry's departments change. A category stands for all
+  // of its departments, so a partly-selected one isn't expanded by a click
+  // elsewhere, and departments outside the listed categories ('Other', or no
+  // longer in the catalog) are kept.
   function toggleItem(value: string, checked: boolean): void {
-    const current = items.filter(it => it.checked).map(it => it.value);
-    const next = checked
-      ? [...new Set([...current, value])]
-      : current.filter(v => v !== value);
-    applyFromSelection(next);
+    const changed = isCategoryMode ? departmentsIn(value) : [value];
+    const rest = activeDepartments.filter(d => !changed.includes(d));
+    writeDepartments(checked ? [...rest, ...changed] : rest);
   }
 
   function selectAll(): void {
-    applyFromSelection(items.map(it => it.value));
+    const listed = isCategoryMode
+      ? items.flatMap(it => departmentsIn(it.value))
+      : allDepartments;
+    writeDepartments([...new Set([...activeDepartments, ...listed])]);
   }
 
   function selectNone(): void {
-    applyFromSelection([]);
+    writeDepartments([]);
   }
 
   // <input>.indeterminate is a property, not an attribute - set it imperatively.

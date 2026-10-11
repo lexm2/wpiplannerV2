@@ -70,7 +70,12 @@
     return `${count} courses match current filters`;
   });
 
+  // Rate My Professor debounces its writes; flushed before anything reads the
+  // criteria or resets them.
+  let rmpFilter = $state<ReturnType<typeof RmpRatingFilter>>();
+
   function onPrimary(): void {
+    rmpFilter?.flush();
     if (isAuto && onGenerate) {
       requestClose();
       onGenerate();
@@ -85,6 +90,8 @@
   let resetNonce = $state(0);
 
   function onClearAll(): void {
+    // Otherwise the remount's flush would write the old values over the reset.
+    rmpFilter?.flush();
     filterService.resetFilters(activeYear);
     resetNonce++;
   }
@@ -115,7 +122,7 @@
     <TimesFilter {filterService} />
     <CreditHoursFilter {filterService} />
     {#key resetNonce}
-      <RmpRatingFilter {filterService} />
+      <RmpRatingFilter {filterService} bind:this={rmpFilter} />
     {/key}
   </div>
 </div>

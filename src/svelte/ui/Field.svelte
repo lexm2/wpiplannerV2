@@ -11,6 +11,8 @@
   interface FieldParts {
     /** hint id then error id, whichever exist - for the control's aria-describedby. */
     describedBy?: string;
+    /** The id the label points at: `controlId`, or the generated one. Put it on the control. */
+    controlId: string;
   }
 
   let {
@@ -81,13 +83,16 @@
         {label}{#if required}<span class="field-required">*</span>{/if}
       </span>
     {:else}
-      <label class="field-label" for={controlId} id={labelId}>
+      <label class="field-label" for={base} id={labelId}>
         {label}{#if required}<span class="field-required">*</span>{/if}
       </label>
     {/if}
   {/if}
 
-  {@render children({ describedBy: group ? undefined : describedBy })}
+  {@render children({
+    describedBy: group ? undefined : describedBy,
+    controlId: base,
+  })}
 
   {#if hint}<span class="field-hint" id={hintId}>{hint}</span>{/if}
 

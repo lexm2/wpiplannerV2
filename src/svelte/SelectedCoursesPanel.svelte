@@ -49,6 +49,8 @@
   }
 
   function onItemKeydown(e: KeyboardEvent, course: Course): void {
+    // Enter/Space on the nested remove button belongs to that button.
+    if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleSelect(course);

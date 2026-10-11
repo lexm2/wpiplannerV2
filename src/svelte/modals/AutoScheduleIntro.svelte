@@ -161,12 +161,15 @@
               >
                 {#each badgeTerms(sc) as term (term)}
                   {#if isAvailable(sc, term)}
-                    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (term badge toggles one term; stops card toggle) -->
-                    <span
+                    <!-- A button so the terms are reachable by keyboard; the card
+                         toggle has no key equivalent, but these cover it. -->
+                    <button
+                      type="button"
                       class={[
                         listStyles['term-badge'],
                         { [listStyles['selected']]: isSelected(sc, term) },
                       ]}
+                      aria-pressed={isSelected(sc, term)}
                       data-term={term}
                       data-term-badge
                       data-course-id={sc.course.id}
@@ -176,7 +179,7 @@
                       }}
                     >
                       <span class={listStyles['term-letter']}>{term}</span>
-                    </span>
+                    </button>
                   {:else}
                     <span
                       class={[

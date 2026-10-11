@@ -107,10 +107,15 @@
   }
 
   function handleKeydown(e: KeyboardEvent): void {
-    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    // Leave text fields their own native undo.
+    const target = e.target as Element | null;
+    if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
+    const key = e.key.toLowerCase();
+    if (key === 'z' && !e.shiftKey) {
       e.preventDefault();
       handleUndo();
-    } else if (e.ctrlKey && e.key === 'y') {
+    } else if (key === 'y' || (key === 'z' && e.shiftKey)) {
       e.preventDefault();
       handleRedo();
     }

@@ -77,7 +77,17 @@
     </div>
   {/if}
   <div class="schedule-grid" style:--grid-hours={timeSlots.length}>
-    <div class="time-label term-letter-label">{term}</div>
+    <!-- The keyboard way into the term zoom the card's click gives a mouse. -->
+    <button
+      type="button"
+      class="time-label term-letter-label"
+      aria-pressed={focused}
+      aria-label={`Zoom to ${term} term`}
+      onclick={e => {
+        e.stopPropagation(); // the card's own click would toggle it back
+        onToggleFocus();
+      }}>{term}</button
+    >
     {#each WEEKDAYS as day (day)}
       <div class="day-header">{TimeUtils.getDayAbbr(day)}</div>
     {/each}
@@ -153,3 +163,17 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* Look like the plain label it replaced: drop the UA button chrome, keeping
+     the global .time-label/.term-letter-label rules (border-right included). */
+  button.term-letter-label {
+    margin: 0;
+    border: 0;
+    border-right: 2px solid var(--color-border);
+    line-height: inherit;
+    cursor: pointer;
+    /* The card clips overflow, so ring inside the cell. */
+    outline-offset: -2px;
+  }
+</style>

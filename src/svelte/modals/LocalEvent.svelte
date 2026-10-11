@@ -5,6 +5,7 @@
   import { AcademicTerm, EventType } from '../../types/schedule';
   import { DayOfWeek } from '../../types/types';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { formatLocalDate } from '../../utils/localDate';
   import { QUARTER_TERMS } from '../../utils/typeGuards';
   import styles from '../../styles/components/local-event-modal.module.css';
   import Field from '../ui/Field.svelte';
@@ -36,7 +37,7 @@
     return { hours: hours || 0, minutes: minutes || 0 };
   }
   function todayDate(): string {
-    return new Date().toISOString().split('T')[0];
+    return formatLocalDate();
   }
 
   const existing = $derived(payload?.existingEvent);
@@ -245,6 +246,7 @@
                       { [styles.selected]: selectedDays.has(day.value) },
                     ]}
                     aria-pressed={selectedDays.has(day.value)}
+                    aria-label={day.label}
                     title={day.label}
                     onclick={() => toggleDay(day.value)}
                   >

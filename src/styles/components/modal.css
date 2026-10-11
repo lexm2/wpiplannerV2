@@ -1486,6 +1486,17 @@ html.is-mobile .changelog-modal-body {
   justify-content: flex-end;
 }
 
+/* The selectable term badges are buttons; undo the UA button styles that
+   .term-badge doesn't already set, so they match the span badges. */
+.as-card-terms button {
+  margin: 0;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* `.as-card-terms .term-badge.selected` lived here; `.term-badge` is hashed by
    course-list.module.css now, so that rule moved there. */
 

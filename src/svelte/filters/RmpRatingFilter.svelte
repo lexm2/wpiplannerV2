@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import DualRangeSlider from './DualRangeSlider.svelte';
   import Field from '../ui/Field.svelte';
   import FilterSection from './FilterSection.svelte';
@@ -49,7 +50,20 @@
 
   // 300ms debounce: any slider drag / checkbox flip resets the timer. The
   // effect depends only on local state, so writing to the service can't
-  // re-trigger it.
+  // re-trigger it. The first run is the mount seed, which is already what the
+  // service holds, so it writes nothing.
+  let pending: ReturnType<typeof setTimeout> | undefined;
+  let seeded = false;
+
+  /** Write a pending change now. FilterPanel calls this before it generates
+   * or resets; unmounting calls it so closing the modal keeps the change. */
+  export function flush(): void {
+    if (pending === undefined) return;
+    clearTimeout(pending);
+    pending = undefined;
+    writeFilter();
+  }
+
   $effect(() => {
     ratingMin;
     ratingMax;
@@ -58,9 +72,18 @@
     retakeMin;
     retakeMax;
     includeWithoutData;
-    const t = setTimeout(writeFilter, 300);
-    return () => clearTimeout(t);
+    if (!seeded) {
+      seeded = true;
+      return;
+    }
+    clearTimeout(pending);
+    pending = setTimeout(() => {
+      pending = undefined;
+      writeFilter();
+    }, 300);
   });
+
+  onDestroy(flush);
 </script>
 
 <FilterSection title="Rate My Professor">

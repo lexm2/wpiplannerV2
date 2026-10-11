@@ -22,6 +22,32 @@
       filterService.removeFilter('creditRange');
     }
   }
+
+  // Typed values clamp to 1-4 and push the other bound along rather than
+  // being rejected. The field is rewritten afterwards, because when the stored
+  // value doesn't change (7 clamped to an existing 4, or junk) nothing would
+  // re-render it and it would keep showing a number the filter isn't using.
+  function clamp(n: number): number {
+    return Math.min(4, Math.max(1, n));
+  }
+
+  function onMinChange(input: HTMLInputElement): void {
+    const n = parseInt(input.value);
+    if (!Number.isNaN(n)) {
+      const min = clamp(n);
+      update(min, Math.max(min, maxCredits));
+    }
+    input.value = String(minCredits);
+  }
+
+  function onMaxChange(input: HTMLInputElement): void {
+    const n = parseInt(input.value);
+    if (!Number.isNaN(n)) {
+      const max = clamp(n);
+      update(Math.min(minCredits, max), max);
+    }
+    input.value = String(maxCredits);
+  }
 </script>
 
 <FilterSection title="Credit Hours">
@@ -36,11 +62,7 @@
         min={1}
         max={4}
         value={String(minCredits)}
-        onchange={e =>
-          update(
-            parseInt((e.currentTarget as HTMLInputElement).value),
-            maxCredits,
-          )}
+        onchange={e => onMinChange(e.currentTarget as HTMLInputElement)}
       />
       <TextField
         id="credit-max"
@@ -51,11 +73,7 @@
         min={1}
         max={4}
         value={String(maxCredits)}
-        onchange={e =>
-          update(
-            minCredits,
-            parseInt((e.currentTarget as HTMLInputElement).value),
-          )}
+        onchange={e => onMaxChange(e.currentTarget as HTMLInputElement)}
       />
     </div>
     <div class="filter-quick-select">

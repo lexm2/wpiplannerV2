@@ -27,26 +27,34 @@
   let professorMode = $state(false);
   let dropdownOpen = $state(false);
 
+  // The shared `searchText` filter's query. Reading getActiveFilters() (a
+  // SvelteMap) makes this reactive; as a $derived string it only propagates
+  // when the query itself changes, not on writes to unrelated filters.
+  const filterQuery = $derived(
+    (
+      filterService.getActiveFilters().find(x => x.id === 'searchText')
+        ?.criteria as SearchTextFilterCriteria | undefined
+    )?.query ?? '',
+  );
+
   // EXTERNAL sync: when the shared `searchText` filter changes from outside this
   // component - the page-switch reset (removeFilter) or the FilterModal editing
-  // the same filter - adopt its query. Reading getActiveFilters() (a SvelteMap)
-  // makes this reactive. The guard avoids no-op churn and, crucially, this only
-  // fires on debounced/external filter writes, so it never overwrites a
-  // keystroke that hasn't been committed to the filter yet.
+  // the same filter - adopt its query. The guard avoids no-op churn and,
+  // crucially, this only fires on debounced/external filter writes, so it never
+  // overwrites a keystroke that hasn't been committed to the filter yet.
   $effect(() => {
-    // Track ONLY the filter (the SvelteMap). The compare/assign to `query` must
-    // be untracked - otherwise reading `query` here makes it a dependency, and
-    // every keystroke would re-run this effect and reset `query` back to the
-    // (not-yet-debounced) filter value, clobbering what the user typed.
-    const f = filterService.getActiveFilters().find(x => x.id === 'searchText');
-    const filterQuery =
-      (f?.criteria as SearchTextFilterCriteria | undefined)?.query ?? '';
+    // Track ONLY filterQuery. The compare/assign to `query` must be untracked -
+    // otherwise reading `query` here makes it a dependency, and every keystroke
+    // would re-run this effect and reset `query` back to the (not-yet-debounced)
+    // filter value, clobbering what the user typed.
+    const committed = filterQuery;
     untrack(() => {
-      if (filterQuery !== query) {
-        query = filterQuery;
+      // Trimmed: a whitespace-only query commits as "no filter".
+      if (committed.trim() !== query.trim()) {
+        query = committed;
         // If the filter was cleared externally (e.g. page-switch reset), drop the
         // professor mode + dropdown too.
-        if (filterQuery === '') {
+        if (committed === '') {
           professorMode = false;
           dropdownOpen = false;
         }
@@ -54,14 +62,19 @@
     });
   });
 
+  // Every professor in the catalog, gathered once per catalog load rather than
+  // per keystroke. `appState.loadedDepartments` is a rune, so this recomputes
+  // when the catalog loads.
+  const allProfessors = $derived(
+    getAvailableProfessors(appState.loadedDepartments.flatMap(d => d.courses)),
+  );
+
   // Professor autocomplete (only in professor mode with a non-empty query).
-  // `appState.loadedDepartments` is a rune, so this recomputes when the
-  // catalog loads.
   const professorMatches = $derived.by(() => {
     if (!professorMode || query.length === 0) return [];
-    const courses = appState.loadedDepartments.flatMap(d => d.courses);
-    return getAvailableProfessors(courses)
-      .filter(p => p.toLowerCase().includes(query.toLowerCase()))
+    const needle = query.toLowerCase();
+    return allProfessors
+      .filter(p => p.toLowerCase().includes(needle))
       .slice(0, 10);
   });
 
@@ -97,11 +110,53 @@
       });
   }
 
-  // Hide the dropdown shortly after blur so a click on an option still registers.
-  function onBlur(): void {
-    setTimeout(() => {
+  let dropdownEl = $state<HTMLElement | null>(null);
+
+  // Close once focus leaves both the field and the dropdown, so a keyboard user
+  // can Tab/ArrowDown from the field into the options. Options swallow
+  // mousedown, so a click on one never blurs the field in the first place.
+  function onFocusOut(e: FocusEvent): void {
+    const next = e.relatedTarget as Node | null;
+    if (next && (dropdownEl?.contains(next) || next === searchInput())) return;
+    dropdownOpen = false;
+  }
+
+  function searchInput(): HTMLElement | null {
+    return document.getElementById('search-input');
+  }
+
+  function options(): HTMLElement[] {
+    return Array.from(
+      dropdownEl?.querySelectorAll<HTMLElement>('.professor-option') ?? [],
+    );
+  }
+
+  function onInputKeydown(e: KeyboardEvent): void {
+    if (!dropdownOpen || professorMatches.length === 0) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
       dropdownOpen = false;
-    }, 150);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      options()[0]?.focus();
+    }
+  }
+
+  function onDropdownKeydown(e: KeyboardEvent): void {
+    const opts = options();
+    const i = opts.indexOf(e.target as HTMLElement);
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      dropdownOpen = false;
+      searchInput()?.focus();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      opts[Math.min(i + 1, opts.length - 1)]?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (i <= 0) searchInput()?.focus();
+      else opts[i - 1]?.focus();
+    }
   }
 
   function toggleMode(): void {
@@ -123,6 +178,8 @@
     query = professor;
     dropdownOpen = false;
     applySearch();
+    // Picked from the keyboard, focus was on the option that just unmounted.
+    searchInput()?.focus();
   }
 </script>
 
@@ -134,20 +191,26 @@
   placeholder={professorMode ? 'Search professors...' : 'Search courses...'}
   bind:value={query}
   oninput={onInput}
-  onblur={onBlur}
+  onkeydown={onInputKeydown}
+  onblur={onFocusOut}
   {trailing}
 />
 {#if dropdownOpen && professorMatches.length > 0}
+  <!-- svelte-ignore a11y_no_static_element_interactions (arrow keys between the option buttons) -->
   <div
     id="search-professor-dropdown"
     class="professor-dropdown"
+    bind:this={dropdownEl}
     transition:slideFade={{ duration: 150 }}
+    onfocusout={onFocusOut}
+    onkeydown={onDropdownKeydown}
   >
     {#each professorMatches as professor (professor)}
       <button
         type="button"
         class="professor-option"
         data-professor={professor}
+        onmousedown={e => e.preventDefault()}
         onclick={() => selectProfessor(professor)}>{professor}</button
       >
     {/each}

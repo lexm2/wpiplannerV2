@@ -189,7 +189,7 @@
 }
 
 .schedule-picker-modal-dialog .inline-action-btn.danger:hover {
-  background: #ffebee;
+  background: var(--color-danger-background);
 }
 
 /* Schedule Name Input - Inline Editing. The chrome comes from the shared

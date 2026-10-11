@@ -62,7 +62,7 @@
 }
 
 .skipBtn:hover {
-  background: rgba(212, 66, 79, 0.6);
+  background: rgba(var(--color-primary-rgb), 0.6);
   border-color: var(--color-primary);
 }
 

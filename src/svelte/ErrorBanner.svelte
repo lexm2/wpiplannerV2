@@ -9,7 +9,14 @@
 
   let clearing = $state(false);
   let exporting = $state(false);
-  let exportError = $state<string | null>(null);
+  // Tagged with the error it was raised under, so a new error doesn't inherit
+  // the previous one's export failure.
+  let exportFailure = $state<{ for: typeof error; message: string } | null>(
+    null,
+  );
+  const exportError = $derived(
+    exportFailure?.for === error ? exportFailure.message : null,
+  );
 
   // Downloads everything "Clear Data & Reload" would destroy. The schedules
   // file comes from the same export the Schedule Picker uses, so it re-imports;
@@ -17,7 +24,8 @@
   async function exportData(): Promise<void> {
     if (exporting) return;
     exporting = true;
-    exportError = null;
+    exportFailure = null;
+    const forError = error;
     try {
       const timestamp = new Date().toISOString().split('T')[0];
       const result = await uiState.appError?.onExportData?.();
@@ -25,7 +33,10 @@
       if (!result?.success || !result.data) {
         // NOT showAppError: that replaces uiState.appError wholesale, which
         // would tear down this banner and lose its Clear Data action.
-        exportError = `Export failed: ${result?.error ?? 'Unknown error'}`;
+        exportFailure = {
+          for: forError,
+          message: `Export failed: ${result?.error ?? 'Unknown error'}`,
+        };
         return;
       }
       triggerFileDownload(
@@ -46,6 +57,11 @@
           'application/json',
         );
       }
+    } catch (err) {
+      exportFailure = {
+        for: forError,
+        message: `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+      };
     } finally {
       exporting = false;
     }

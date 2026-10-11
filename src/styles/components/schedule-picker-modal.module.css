@@ -68,7 +68,7 @@
 }
 
 .menuAction.danger:hover {
-  background: #ffebee;
+  background: var(--color-danger-background);
 }
 
 /* From 1200px every action shows inline (.inline-action-btn in

@@ -323,6 +323,16 @@ export function termMotion(node: HTMLElement, term: string | null) {
       uiState.openModals.length > 0
     )
       return;
+    // Leave modified keys, keys something else already took, and keys aimed at
+    // a control that uses arrows itself (fields, sliders, resize handles).
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    const target = e.target as Element | null;
+    if (
+      target?.closest?.(
+        'input, textarea, select, [contenteditable], [role="slider"], [role="separator"], [role="radiogroup"]',
+      )
+    )
+      return;
     if (e.key === 'Escape') {
       e.preventDefault();
       unfocus();

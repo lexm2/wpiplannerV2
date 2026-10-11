@@ -1,6 +1,8 @@
 <script lang="ts">
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
+  import { showAppError } from '../services/ui/uiState.svelte';
+  import { logger } from '../utils/logger';
   import type { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator';
 
   let {
@@ -27,12 +29,24 @@
   // which updates appState.selectedCourses - the declarative grid reacts on its
   // own, and the orchestrator publishes appState.autoScheduleIndex so this
   // footer's progress updates too. No after-navigate callback needed.
-  async function prev(): Promise<void> {
-    await autoScheduleOrchestrator.navigateSchedule(-1);
+  // One step at a time: a second click while the first is still applying
+  // would race it. Guarded here rather than by disabling the button, which
+  // would drop keyboard focus on every step.
+  let navigating = $state(false);
+  async function navigate(direction: -1 | 1): Promise<void> {
+    if (navigating || generating) return;
+    navigating = true;
+    try {
+      await autoScheduleOrchestrator.navigateSchedule(direction);
+    } catch (error) {
+      logger.error('Failed to navigate schedules:', error);
+      showAppError('Failed to switch schedules. Please try again.');
+    } finally {
+      navigating = false;
+    }
   }
-  async function next(): Promise<void> {
-    await autoScheduleOrchestrator.navigateSchedule(1);
-  }
+  const prev = (): Promise<void> => navigate(-1);
+  const next = (): Promise<void> => navigate(1);
 </script>
 
 <div class="schedule-footer-row">
@@ -54,6 +68,7 @@
         class="btn btn-secondary schedule-nav-btn"
         title="Previous schedule"
         aria-label="Previous schedule"
+        disabled={generating}
         onclick={prev}
         >{@html getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon')}</button
       >
@@ -69,6 +84,7 @@
         class="btn btn-secondary schedule-nav-btn"
         title="Next schedule"
         aria-label="Next schedule"
+        disabled={generating}
         onclick={next}
         >{@html getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon')}</button
       >

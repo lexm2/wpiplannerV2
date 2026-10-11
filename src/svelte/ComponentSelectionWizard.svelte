@@ -348,7 +348,9 @@
                         href={rmpUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="professor-link">{professor}</a
+                        class="professor-link"
+                        onclick={e => e.stopPropagation()}
+                        onkeydown={e => e.stopPropagation()}>{professor}</a
                       >
                     {:else}
                       {professor}

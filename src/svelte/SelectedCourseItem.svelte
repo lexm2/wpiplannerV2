@@ -54,6 +54,8 @@
   // The whole header opens the wizard; the control buttons stopPropagation so a
   // click on them doesn't also open the wizard.
   function handleHeaderKeydown(e: KeyboardEvent): void {
+    // Enter/Space on a nested control button belongs to that button.
+    if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onOpenWizard();
