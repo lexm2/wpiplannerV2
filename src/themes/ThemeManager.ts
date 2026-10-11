@@ -68,11 +68,22 @@ function cssEntries<T extends object>(obj: T): [string, T[keyof T]][] {
   return Object.entries(obj) as [string, T[keyof T]][];
 }
 
+// Read per switch, not cached: the OS setting can change while the app is open.
+function prefersReducedMotion(): boolean {
+  return (
+    typeof matchMedia !== 'undefined' &&
+    matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 export class ThemeManager {
   private static instance: ThemeManager;
   private currentTheme: ThemeId = 'wpi-dark';
   private themes: Map<ThemeId, ThemeDefinition> = new Map();
   private storage: ThemeStorage = new DefaultThemeStorage();
+  // The theme on screen, which previewTheme() can move away from currentTheme.
+  private appliedTheme: ThemeId | null = null;
+  private switchToken = 0;
 
   private constructor() {
     this.initializeThemes();
@@ -112,7 +123,8 @@ export class ThemeManager {
       this.currentTheme = savedTheme;
     }
 
-    this.applyTheme(this.currentTheme);
+    // Before first paint: nothing to fade from.
+    this.applyTheme(this.currentTheme, false);
     uiState.currentThemeId = this.currentTheme;
   }
 
@@ -157,7 +169,7 @@ export class ThemeManager {
     }
 
     this.currentTheme = themeId;
-    this.applyTheme(themeId);
+    this.applyTheme(themeId, true);
     this.saveThemePreference(themeId);
     // Notify reactive consumers (e.g. the Svelte ThemeSelector) of the new
     // visible theme - ThemeManager has no listener system of its own.
@@ -166,10 +178,51 @@ export class ThemeManager {
     return true;
   }
 
-  private applyTheme(themeId: ThemeId): void {
+  /**
+   * Swaps the theme in one style recalc, then (where supported) crossfades the
+   * old and new frames with a view transition.
+   *
+   * The swap used to be animated with CSS transitions, so every element on the
+   * page - thousands once the course list has paged in a few hundred rows -
+   * recalculated style and repainted on every frame of the fade. A view
+   * transition fades two snapshots on the compositor instead, so its cost
+   * doesn't grow with the DOM. `theme-switching` (reset.css) keeps CSS
+   * transitions from starting while the new colors land.
+   */
+  private applyTheme(themeId: ThemeId, animate: boolean): void {
     const theme = this.themes.get(themeId);
-    if (!theme) return;
+    if (!theme || themeId === this.appliedTheme) return;
+    this.appliedTheme = themeId;
 
+    const root = document.documentElement;
+    const token = ++this.switchToken;
+    root.classList.add('theme-switching');
+    // Only the latest switch clears the class, so rapid toggles can't let
+    // transitions back in while a newer swap is still landing.
+    const done = () => {
+      if (token === this.switchToken) root.classList.remove('theme-switching');
+    };
+    const write = () => this.writeTheme(theme);
+
+    if (
+      animate &&
+      typeof document.startViewTransition === 'function' &&
+      !prefersReducedMotion()
+    ) {
+      const transition = document.startViewTransition(write);
+      // `ready` rejects when a newer switch skips this one; that's expected.
+      transition.ready.catch(() => {});
+      void transition.finished.then(done, done);
+      return;
+    }
+
+    write();
+    // The first frame commits the new colors with transitions off; the second
+    // turns them back on once there's nothing left to animate.
+    requestAnimationFrame(() => requestAnimationFrame(done));
+  }
+
+  private writeTheme(theme: ThemeDefinition): void {
     const root = document.documentElement;
 
     cssEntries(theme.colors).forEach(([key, value]) => {
@@ -184,17 +237,12 @@ export class ThemeManager {
       root.style.setProperty(`--effect-${this.kebabCase(key)}`, value);
     });
 
-    const classList = Array.from(document.body.classList);
-    const oldThemeClass = classList.find(cls => cls.startsWith('theme-'));
-    if (oldThemeClass) {
-      document.body.classList.remove(oldThemeClass);
-    }
-
-    // Force reflow then defer class addition to enable CSS transitions
-    void document.documentElement.offsetHeight;
-    requestAnimationFrame(() => {
-      document.body.classList.add(`theme-${themeId}`);
-    });
+    const body = document.body.classList;
+    const oldThemeClass = Array.from(body).find(cls =>
+      cls.startsWith('theme-'),
+    );
+    if (oldThemeClass) body.remove(oldThemeClass);
+    body.add(`theme-${theme.id}`);
   }
 
   private kebabCase(str: string): string {
@@ -225,14 +273,14 @@ export class ThemeManager {
   // Temporary application without saving; resetToCurrentTheme() restores on cancel
   previewTheme(themeId: ThemeId): boolean {
     if (!this.themes.has(themeId)) return false;
-    this.applyTheme(themeId);
+    this.applyTheme(themeId, true);
     // Reflect the visible theme; currentTheme / storage are intentionally left unchanged.
     uiState.currentThemeId = themeId;
     return true;
   }
 
   resetToCurrentTheme(): void {
-    this.applyTheme(this.currentTheme);
+    this.applyTheme(this.currentTheme, true);
     uiState.currentThemeId = this.currentTheme;
   }
 

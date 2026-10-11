@@ -10,6 +10,22 @@
     stroke 0.5s ease;
 }
 
+/* ThemeManager sets this for the frame a theme swap lands in. Without it every
+   element above, and every `var(--effect-transition)` rule, would fade its
+   colors on the main thread at once; the view transition below does the fade
+   on the compositor instead. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+  animation-timing-function: ease;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--color-background);
