@@ -10,6 +10,30 @@ import {
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
 import { getSelectedSections } from '../../../utils/courseUtils';
 
+const QUARTERS = [
+  AcademicTerm.A,
+  AcademicTerm.B,
+  AcademicTerm.C,
+  AcademicTerm.D,
+];
+
+/**
+ * The terms a slot occupies, for overlap tests and mask keys. With `spans`
+ * a semester term is its two quarters, so F meets A and B. Without it terms
+ * stand alone, and only ALL reaches every other term.
+ */
+function termsCovered(term: AcademicTerm, spans: boolean): AcademicTerm[] {
+  if (spans) {
+    if (term === AcademicTerm.ALL) return QUARTERS;
+    if (term === AcademicTerm.F) return [AcademicTerm.A, AcademicTerm.B];
+    if (term === AcademicTerm.S) return [AcademicTerm.C, AcademicTerm.D];
+    return [term];
+  }
+  if (term === AcademicTerm.ALL)
+    return [...QUARTERS, AcademicTerm.F, AcademicTerm.S];
+  return [term];
+}
+
 export class ConflictFilter implements SectionBasedFilter {
   readonly id = 'periodConflict';
   readonly name = 'Time Conflicts';
@@ -42,6 +66,7 @@ export class ConflictFilter implements SectionBasedFilter {
     if (blockedSlots.length === 0) {
       return sections;
     }
+    const spans = criteria.semesterSpansQuarters ?? true;
 
     // Selected section CRNs per course: a course is never hidden for clashing
     // with its own picks, since another of its sections would replace them.
@@ -81,7 +106,11 @@ export class ConflictFilter implements SectionBasedFilter {
           fs.section.computedTerm || AcademicTerm.ALL,
         );
         if (
-          this.hasConflictWithBlockedSlots(periodSlots, relevantBlockedSlots)
+          this.hasConflictWithBlockedSlots(
+            periodSlots,
+            relevantBlockedSlots,
+            spans,
+          )
         ) {
           return false;
         }
@@ -109,10 +138,11 @@ export class ConflictFilter implements SectionBasedFilter {
   private hasConflictWithBlockedSlots(
     testSlots: WeeklyTimeSlot[],
     blockedSlots: WeeklyTimeSlot[],
+    spans: boolean,
   ): boolean {
     for (const testSlot of testSlots) {
       for (const blockedSlot of blockedSlots) {
-        if (this.slotsConflict(testSlot, blockedSlot)) {
+        if (this.slotsConflict(testSlot, blockedSlot, spans)) {
           return true;
         }
       }
@@ -120,12 +150,13 @@ export class ConflictFilter implements SectionBasedFilter {
     return false;
   }
 
-  private slotsConflict(slot1: WeeklyTimeSlot, slot2: WeeklyTimeSlot): boolean {
-    if (
-      slot1.term !== AcademicTerm.ALL &&
-      slot2.term !== AcademicTerm.ALL &&
-      slot1.term !== slot2.term
-    ) {
+  private slotsConflict(
+    slot1: WeeklyTimeSlot,
+    slot2: WeeklyTimeSlot,
+    spans: boolean,
+  ): boolean {
+    const terms2 = termsCovered(slot2.term, spans);
+    if (!termsCovered(slot1.term, spans).some(t => terms2.includes(t))) {
       return false;
     }
 
@@ -158,25 +189,17 @@ export class ConflictFilter implements SectionBasedFilter {
     return 'Conflicts allowed';
   }
 
-  private precomputeBlockedMasks(blockedSlots: WeeklyTimeSlot[]): void {
+  private precomputeBlockedMasks(
+    blockedSlots: WeeklyTimeSlot[],
+    spans: boolean,
+  ): void {
     this.blockedMasksByTerm.clear();
 
     for (const slot of blockedSlots) {
       const mask = weeklySlotToMask(slot);
       if (mask === 0n) continue;
 
-      let terms: string[];
-      if (slot.term === AcademicTerm.ALL) {
-        terms = ['A', 'B', 'C', 'D'];
-      } else if (slot.term === AcademicTerm.F) {
-        terms = ['A', 'B'];
-      } else if (slot.term === AcademicTerm.S) {
-        terms = ['C', 'D'];
-      } else {
-        terms = [slot.term];
-      }
-
-      for (const term of terms) {
+      for (const term of termsCovered(slot.term, spans)) {
         const existing = this.blockedMasksByTerm.get(term) || 0n;
         this.blockedMasksByTerm.set(term, existing | mask);
       }
@@ -186,7 +209,10 @@ export class ConflictFilter implements SectionBasedFilter {
   getBlockedMasksByTerm(criteria?: ConflictCriteria): Map<string, bigint> {
     if (criteria) {
       const blockedSlots = this.getBlockedSlots(criteria);
-      this.precomputeBlockedMasks(blockedSlots);
+      this.precomputeBlockedMasks(
+        blockedSlots,
+        criteria.semesterSpansQuarters ?? true,
+      );
     }
     return new Map(this.blockedMasksByTerm);
   }

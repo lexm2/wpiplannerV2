@@ -46,6 +46,12 @@ export interface AcademicYearFilterCriteria {
 interface ConflictFilterCriteria {
   avoidConflicts: boolean;
   blockedSlots: WeeklyTimeSlot[];
+  /**
+   * A semester section (F/S) conflicts with the quarters it runs through
+   * (F: A and B, S: C and D). Unset means on; false keeps the exact-term
+   * comparison, where F only conflicts with F.
+   */
+  semesterSpansQuarters?: boolean;
 }
 
 export interface ConflictCriteria extends ConflictFilterCriteria {

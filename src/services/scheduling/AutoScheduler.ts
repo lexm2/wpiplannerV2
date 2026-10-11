@@ -56,10 +56,13 @@ export class AutoScheduler {
       ? (criteria as ConflictCriteria).blockedSlots
       : [];
 
+    // The scheduler books time per quarter, so a semester slot always
+    // blocks both of its quarters, whatever the course-list toggle says.
     return conflictFilter.getBlockedMasksByTerm({
       avoidConflicts: true,
       blockedSlots: blockedSlots ?? [],
       selectedCourses: fixedCourses,
+      semesterSpansQuarters: true,
     });
   }
 
