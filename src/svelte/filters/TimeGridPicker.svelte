@@ -392,11 +392,14 @@
 
   <div class={styles.summary}>
     <span class={styles.summaryText} aria-live="polite">{summary}</span>
-    {#if previewWindows.length > 0}
-      <button type="button" class="filter-clear-btn" onclick={clearAll}
-        >Clear</button
-      >
-    {/if}
+    <!-- Always shown (disabled while empty), so the row keeps its height and
+         the grid does not shift when the first cell is painted. -->
+    <button
+      type="button"
+      class="filter-clear-btn {styles.summaryClear}"
+      disabled={previewWindows.length === 0}
+      onclick={clearAll}>Clear</button
+    >
   </div>
 
   <p class={styles.hint}>

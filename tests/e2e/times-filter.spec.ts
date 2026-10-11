@@ -174,6 +174,20 @@ test('clearing the grid removes the filter entirely', async ({ page }) => {
   ).toBe(false);
 });
 
+// Clear used to appear only once something was painted, growing the summary
+// row and nudging the grid up mid-drag. It is always there now, just disabled.
+test('painting the first cell does not move the grid', async ({ page }) => {
+  await openPicker(page);
+  const clear = page.locator(GRID).getByRole('button', { name: 'Clear' });
+  await expect(clear).toBeDisabled();
+  const before = await page.locator(BODY).boundingBox();
+
+  await drag(page, { day: 1, at: AT_10AM }, { day: 1, at: AT_1130AM });
+  await expect(clear).toBeEnabled();
+
+  expect(await page.locator(BODY).boundingBox()).toEqual(before);
+});
+
 test('escape closes only the picker, leaving the filter modal open', async ({
   page,
 }) => {
@@ -463,17 +477,6 @@ test.describe('on a phone', () => {
   });
 
   test('the whole picker fits at 390x844', async ({ page }) => {
-    // The phone notice opens over everything on load.
-    await page.addInitScript(() => {
-      const dismiss = () =>
-        [...document.querySelectorAll('button')]
-          .find(b => b.textContent?.trim() === 'Got it')
-          ?.click();
-      new MutationObserver(dismiss).observe(document, {
-        childList: true,
-        subtree: true,
-      });
-    });
     await openPicker(page);
     await expect(page.locator('html.is-mobile')).toHaveCount(1);
     await expectPickerFits(page);

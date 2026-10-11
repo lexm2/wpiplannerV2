@@ -151,6 +151,16 @@
   min-height: 1.5rem;
 }
 
+/* The row sets the spacing, not the shared button's own margin. */
+.summaryClear {
+  margin-top: 0;
+}
+
+.summaryClear:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .summaryText {
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
