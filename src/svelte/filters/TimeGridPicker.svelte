@@ -43,7 +43,12 @@
 
   let focusCell = $state<Cell>({ dayIndex: 0, row: 0 });
   let showFocus = $state(false);
-  let keyBrush: Brush | null = null;
+  // The keyboard's drag: Space or the first Shift+Arrow sets the anchor, and
+  // each Shift+Arrow redraws the rectangle to the focus over `keyBase`, the
+  // cells as they were before the run, so it can shrink back like a drag.
+  let keyAnchor: Cell | null = null;
+  let keyBrush: Brush = 'paint';
+  let keyBase: ReadonlySet<number> = new Set();
 
   let bodyEl = $state<HTMLDivElement | null>(null);
 
@@ -121,6 +126,7 @@
     if (e.button !== 0 || !bodyEl) return;
     e.preventDefault();
     const cell = cellAt(e.clientX, e.clientY);
+    keyAnchor = null;
     anchor = cell;
     focusCell = cell;
     // Starting on a painted cell erases, on an empty one paints, which makes a
@@ -187,26 +193,32 @@
     commit(new Set());
   }
 
+  /**
+   * Starts a keyboard run at the focus, the counterpart of pointerdown. Same
+   * rule as the pointer: the cell the run starts on decides the brush.
+   */
+  function startKeyRun(): void {
+    keyAnchor = focusCell;
+    keyBrush = cells.has(cellIndex(focusCell.dayIndex, focusCell.row))
+      ? 'erase'
+      : 'paint';
+    keyBase = cells;
+  }
+
   function moveFocus(dDay: number, dRow: number, extend: boolean): void {
-    if (extend && keyBrush === null) {
-      // Same rule as the pointer: the cell the run starts on decides.
-      keyBrush = cells.has(cellIndex(focusCell.dayIndex, focusCell.row))
-        ? 'erase'
-        : 'paint';
-      commit(applyRect(cells, rectOf(focusCell, focusCell), keyBrush));
-    }
+    if (!extend) keyAnchor = null;
+    else if (!keyAnchor) startKeyRun();
     focusCell = {
       dayIndex: clamp(focusCell.dayIndex + dDay, 0, GRID_DAYS.length - 1),
       row: clamp(focusCell.row + dRow, 0, ROWS_PER_DAY - 1),
     };
-    if (extend && keyBrush) {
-      commit(applyRect(cells, rectOf(focusCell, focusCell), keyBrush));
+    if (keyAnchor) {
+      commit(applyRect(keyBase, rectOf(keyAnchor, focusCell), keyBrush));
     }
   }
 
   function onKeyDown(e: KeyboardEvent): void {
     const extend = e.shiftKey;
-    if (!extend) keyBrush = null;
 
     switch (e.key) {
       case 'ArrowUp':
@@ -222,35 +234,34 @@
         moveFocus(1, 0, extend);
         break;
       case 'Home':
+        keyAnchor = null;
         focusCell = { ...focusCell, row: 0 };
         break;
       case 'End':
+        keyAnchor = null;
         focusCell = { ...focusCell, row: ROWS_PER_DAY - 1 };
         break;
       case 'PageUp':
+        keyAnchor = null;
         focusCell = {
           ...focusCell,
           dayIndex: clamp(focusCell.dayIndex - 1, 0, GRID_DAYS.length - 1),
         };
         break;
       case 'PageDown':
+        keyAnchor = null;
         focusCell = {
           ...focusCell,
           dayIndex: clamp(focusCell.dayIndex + 1, 0, GRID_DAYS.length - 1),
         };
         break;
       case ' ':
-      case 'Enter': {
-        const i = cellIndex(focusCell.dayIndex, focusCell.row);
-        commit(
-          applyRect(
-            cells,
-            rectOf(focusCell, focusCell),
-            cells.has(i) ? 'erase' : 'paint',
-          ),
-        );
+      case 'Enter':
+        // Toggles the cell like a click, and leaves the run open so Shift+Arrow
+        // carries on with the same brush rather than undoing the toggle.
+        startKeyRun();
+        commit(applyRect(keyBase, rectOf(focusCell, focusCell), keyBrush));
         break;
-      }
       default:
         return;
     }
@@ -322,7 +333,7 @@
       onfocus={() => (showFocus = true)}
       onblur={() => {
         showFocus = false;
-        keyBrush = null;
+        keyAnchor = null;
       }}
     >
       {#each previewWindows as w (`${w.day}-${w.startMin}`)}

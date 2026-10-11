@@ -294,3 +294,36 @@ test('the chosen mode survives reopening with nothing painted', async ({
   await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
   await expect(summary(page)).toHaveText('Avoid Tue 10:00 AM-12:00 PM');
 });
+
+test('shift and arrow keys paint a rectangle from the anchor', async ({
+  page,
+}) => {
+  await openPicker(page);
+  // Focus starts on Mon 8:00.
+  await page.locator(BODY).focus();
+
+  await page.keyboard.press('Shift+ArrowRight');
+  await page.keyboard.press('Shift+ArrowDown');
+  await expect(summary(page)).toHaveText('Only Mon, Tue 8:00-9:00 AM');
+
+  // Like dragging back, moving toward the anchor shrinks the rectangle.
+  await page.keyboard.press('Shift+ArrowLeft');
+  await expect(summary(page)).toHaveText('Only Mon 8:00-9:00 AM');
+});
+
+test('space then shift and arrow keys keeps painting', async ({ page }) => {
+  await openPicker(page);
+  await page.locator(BODY).focus();
+
+  // Space toggles the anchor on, like pressing the mouse on an empty cell,
+  // so extending from it paints rather than erasing.
+  await page.keyboard.press('Space');
+  await expect(summary(page)).toHaveText('Only Mon 8:00-8:30 AM');
+  await page.keyboard.press('Shift+ArrowRight');
+  await expect(summary(page)).toHaveText('Only Mon, Tue 8:00-8:30 AM');
+
+  // A run started on a painted cell without Space erases, as a drag would.
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('Shift+ArrowRight');
+  await expect(summary(page)).toHaveText('Any time');
+});
