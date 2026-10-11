@@ -98,8 +98,7 @@ export class ScheduleManagementService {
 
       // Auto-generate a unique name instead of rejecting duplicates
       const existingSchedules = this.profileStateManager.getAllSchedules();
-      const uniqueName = this.generateUniqueScheduleName(name);
-      name = uniqueName;
+      name = this.generateUniqueScheduleName(name);
 
       let selectedCourses: SelectedCourse[] = [];
 
@@ -250,11 +249,17 @@ export class ScheduleManagementService {
     }
   }
 
+  /**
+   * Name policy: a rename is typed by the user, so a clash is reported back
+   * rather than silently changed; create and duplicate pick their own names
+   * and uniquify instead. All three trim, and compare case-sensitively.
+   */
   async renameSchedule(
     scheduleId: string,
     newName: string,
   ): Promise<ScheduleOperationResult> {
-    if (!newName || newName.trim().length === 0) {
+    const name = newName?.trim();
+    if (!name) {
       return {
         success: false,
         error: 'Schedule name cannot be empty',
@@ -262,16 +267,21 @@ export class ScheduleManagementService {
     }
 
     const existingSchedules = this.profileStateManager.getAllSchedules();
+    const current = existingSchedules.find(s => s.id === scheduleId);
+    // Renaming to the name it already has is a successful no-op.
+    if (current && current.name.trim() === name) {
+      return { success: true, schedule: current };
+    }
     if (
-      existingSchedules.some(s => s.name === newName && s.id !== scheduleId)
+      existingSchedules.some(s => s.id !== scheduleId && s.name.trim() === name)
     ) {
       return {
         success: false,
-        error: `A schedule with the name "${newName}" already exists`,
+        error: `A schedule with the name "${name}" already exists`,
       };
     }
 
-    return this.updateSchedule(scheduleId, { name: newName });
+    return this.updateSchedule(scheduleId, { name });
   }
 
   async duplicateSchedule(
@@ -290,7 +300,7 @@ export class ScheduleManagementService {
 
       const duplicatedSchedule = this.profileStateManager.duplicateSchedule(
         scheduleId,
-        newName,
+        this.generateUniqueScheduleName(newName),
         'api',
       );
 
@@ -634,9 +644,13 @@ export class ScheduleManagementService {
     }
   }
 
-  private generateUniqueScheduleName(baseName: string): string {
-    const existingSchedules = this.getAllSchedules();
-    const existingNames = new Set(existingSchedules.map(s => s.name));
+  private generateUniqueScheduleName(name: string): string {
+    // Straight from ProfileStateManager: getAllSchedules() reads empty until
+    // initialization finishes.
+    const existingNames = new Set(
+      this.profileStateManager.getAllSchedules().map(s => s.name.trim()),
+    );
+    const baseName = name.trim();
 
     if (!existingNames.has(baseName)) {
       return baseName;

@@ -62,6 +62,22 @@ function lockForFlip(item: HTMLElement, courseId: string): void {
   pendingStartHeight.set(courseId, h);
 }
 
+// The {#if} swap replaces the badge that was clicked with its counterpart in
+// the other branch, and removing a focused node drops focus to <body>. Once the
+// swap has landed, hand focus to the new badge for the same term - but only if
+// the old one had it and nothing else has taken it since.
+function restoreBadgeFocus(item: HTMLElement, term: string): void {
+  void tick().then(() => {
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+    item
+      .querySelector<HTMLElement>(
+        `button[data-term-badge][data-term="${CSS.escape(term)}"]`,
+      )
+      ?.focus();
+  });
+}
+
 export function toggleTerm(
   e: MouseEvent,
   courseId: string,
@@ -76,6 +92,9 @@ export function toggleTerm(
     '[data-term-sections]',
   ) as HTMLElement | null;
   const collapsing = expandedTerm.get(courseId) === term;
+  const hadFocus =
+    e.currentTarget instanceof HTMLElement &&
+    e.currentTarget === document.activeElement;
 
   // Collapsing with motion: play the open animation in reverse - fade the
   // section badges out diagonally from the bottom-right up to the top-left,
@@ -109,6 +128,7 @@ export function toggleTerm(
       .then(() => {
         lockForFlip(item, courseId);
         expandedTerm.delete(courseId);
+        if (hadFocus) restoreBadgeFocus(item, term);
       })
       .catch(() => {
         /* a fade was cancelled (e.g. row unmounted) - skip */
@@ -120,6 +140,7 @@ export function toggleTerm(
   if (item) lockForFlip(item, courseId);
   if (collapsing) expandedTerm.delete(courseId);
   else expandedTerm.set(courseId, term);
+  if (item && hadFocus) restoreBadgeFocus(item, term);
 }
 
 // Driven by the `expandedTerm` rune: when a course's expanded term changes,
