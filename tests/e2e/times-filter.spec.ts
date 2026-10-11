@@ -277,3 +277,20 @@ for (const theme of THEMES) {
     expect(await image()).toContain('linear-gradient');
   });
 }
+
+test('the chosen mode survives reopening with nothing painted', async ({
+  page,
+}) => {
+  await openPicker(page);
+  await modeButton(page, 'Avoid').click();
+  await page.locator(GRID).getByRole('button', { name: 'Done' }).click();
+  await page.waitForTimeout(SETTLE_MS);
+
+  await page.click('#edit-times-btn');
+  await page.waitForTimeout(SETTLE_MS);
+  await expect(modeButton(page, 'Avoid')).toHaveClass(/\bactive\b/);
+
+  // Painting now applies the remembered mode.
+  await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
+  await expect(summary(page)).toHaveText('Avoid Tue 10:00 AM-12:00 PM');
+});

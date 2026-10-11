@@ -1,3 +1,11 @@
+<script lang="ts" module>
+  import type { TimeGridMode } from '../../types/filters';
+
+  // An empty grid stores no filter, and so no mode; this keeps the last mode
+  // picked so reopening on nothing painted does not snap back to Only.
+  let lastMode: TimeGridMode = 'only';
+</script>
+
 <script lang="ts">
   import { untrack } from 'svelte';
   import Modal from './Modal.svelte';
@@ -6,7 +14,6 @@
   import type { FilterService } from '../../services/filtering/FilterService';
   import type {
     AsyncFilterCriteria,
-    TimeGridMode,
     TimesFilterCriteria,
     TimeWindow,
   } from '../../types/filters';
@@ -24,13 +31,14 @@
     filterService.getCriteria<TimesFilterCriteria>('times'),
   );
   const initialWindows: TimeWindow[] = seed?.windows ?? [];
-  const initialMode: TimeGridMode = seed?.mode ?? 'only';
+  const initialMode: TimeGridMode = seed?.mode ?? lastMode;
 
   const includeAsync = $derived(
     filterService.getCriteria<AsyncFilterCriteria>('async')?.include !== false,
   );
 
   function onchange(mode: TimeGridMode, windows: TimeWindow[]): void {
+    lastMode = mode;
     // An empty grid drops the filter so it stops counting toward the badge.
     if (windows.length > 0) filterService.addFilter('times', { mode, windows });
     else filterService.removeFilter('times');
