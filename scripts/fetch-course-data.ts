@@ -156,7 +156,7 @@ async function fetchCourseData(): Promise<void> {
     }
 
     console.error(
-      'This error is typically temporary. The GitHub Actions workflow will retry in 15 minutes.',
+      'This error is typically temporary. The next scheduled refresh will retry.',
     );
     process.exit(1);
   }

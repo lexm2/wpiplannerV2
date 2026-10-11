@@ -5,7 +5,9 @@ on:
     branches:
       - master
   schedule:
-    - cron: '*/15 * * * *' # Every 15 minutes
+    # Every 15 minutes, clear of :00 and :30, when GitHub's scheduler is
+    # busiest and most likely to delay or drop a run.
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 concurrency:
@@ -66,7 +68,7 @@ jobs:
           git push
 
       # Gate the deploy. Deliberately typecheck + unit tests only: this job runs
-      # every 15 minutes, so no browser download and no e2e flake blocking a
+      # on a schedule, so no browser download and no e2e flake blocking a
       # data refresh. The full suite runs in ci.yml on pull requests.
       # A failure here stops the deploy but leaves the data commit above intact,
       # so course data stays fresh even while app code is broken. Scheduled
