@@ -128,16 +128,13 @@ button.drawer-toggle {
   flex-shrink: 0;
 }
 
-/* How many items the drawer holds, pinned to the button's top-right corner so
-   it still shows where the label is hidden. */
+/* How many items the drawer holds: a pill after the label, or pinned to the
+   button's top-right corner on phones, where the label is hidden. */
 button.drawer-toggle {
   position: relative;
 }
 
 .drawer-toggle-count {
-  position: absolute;
-  top: 2px;
-  right: 2px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
@@ -167,6 +164,12 @@ button.drawer-toggle {
 @media (max-width: 560px) {
   .drawer-toggle-label {
     display: none;
+  }
+
+  .drawer-toggle-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
   }
 
   /* Phone drawers share one 1rem inner gutter (each page's contents match it),
