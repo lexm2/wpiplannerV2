@@ -26,6 +26,28 @@ html.theme-switching *::after {
   animation-timing-function: ease;
 }
 
+/* Mobile browsers flash a blue box over whatever is tapped; the pressed state
+   below shows a tap landed instead. */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* With the tap box gone and hover styles limited to real pointers (see
+   vite.config.ts), a touch screen needs its own sign that a tap landed. */
+@media (hover: none) {
+  button:active:not(:disabled),
+  [role='button']:active {
+    opacity: 0.7;
+  }
+}
+
+/* A tap or a script (a drawer's focus trap) focusing a button should not ring
+   it; keyboard focus still does, via :focus-visible. */
+button:focus:not(:focus-visible),
+[role='button']:focus:not(:focus-visible) {
+  outline: none;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--color-background);
