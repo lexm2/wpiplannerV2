@@ -237,13 +237,18 @@
   fill: var(--color-primary);
 }
 
-/* Settings dropdown menu - open/close animation lives in SettingsMenu.svelte. */
+/* While its menu is open, the gear reads as pressed. */
+.app-header .settings-menu-btn.open {
+  background: var(--color-surface-hover);
+}
+
+/* Settings dropdown menu - SettingsMenu.svelte places it against the gear and
+   runs its open/close animation, which grows from the gear's corner. */
 .settings-dropdown-menu {
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: calc(var(--spacing-header-height) + 0.5rem);
-  right: 2rem;
+  transform-origin: top right;
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius-large);
@@ -251,6 +256,10 @@
   z-index: 90;
   min-width: 200px;
   overflow: hidden;
+}
+
+.settings-dropdown-menu.up {
+  transform-origin: bottom right;
 }
 
 .settings-menu-item {
@@ -488,13 +497,6 @@ html.is-mobile .header-navigation {
 
   .nav-tab-marker.dragging {
     transition: none;
-  }
-
-  /* The menu opens upward from the gear, now at the bottom right. */
-  .settings-dropdown-menu {
-    top: auto;
-    bottom: calc(var(--tab-bar-height) + 0.5rem);
-    right: 0.5rem;
   }
 }
 

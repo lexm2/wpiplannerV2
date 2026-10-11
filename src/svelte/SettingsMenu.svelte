@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
+  import { scale } from 'svelte/transition';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
   import { dur } from './transitions';
@@ -23,9 +23,28 @@
   let open = $state(false);
   let trigger = $state<HTMLButtonElement | null>(null);
 
-  // At phone widths the gear sits in the bottom bar (header.css), so the menu
-  // opens upward and rises into place instead of dropping down.
-  const bottomBar = window.matchMedia('(max-width: 560px)');
+  // The menu hangs from the gear: its corner meets the button's, a few px
+  // off, and it grows out of that corner. At phone widths the gear sits in the
+  // bottom bar (header.css), so there it opens upward instead.
+  const GAP = 4;
+  let anchor = $state({ top: 0, bottom: 0, right: 0, up: false });
+
+  function place(): void {
+    if (!trigger) return;
+    const r = trigger.getBoundingClientRect();
+    const up = r.top > window.innerHeight / 2;
+    anchor = {
+      top: r.bottom + GAP,
+      bottom: window.innerHeight - r.top + GAP,
+      right: window.innerWidth - r.right,
+      up,
+    };
+  }
+
+  function toggle(): void {
+    if (!open) place();
+    open = !open;
+  }
 
   // appState.canUndo/canRedo are runes published by UndoRedoManager - the same
   // source the header UndoRedoButtons use - so the items' disabled state stays
@@ -51,7 +70,7 @@
   }
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<svelte:window onkeydown={onKeydown} onresize={() => open && place()} />
 
 <button
   id="settings-menu-btn"
@@ -60,16 +79,20 @@
   aria-label="Settings menu"
   aria-haspopup="true"
   aria-expanded={open}
+  class:open
   bind:this={trigger}
-  onclick={() => (open = !open)}
-  >{@html getInlineSVG('SETTINGS', 'settings-icon')}</button
+  onclick={toggle}>{@html getInlineSVG('SETTINGS', 'settings-icon')}</button
 >
 
 {#if open}
   <div
     class="settings-dropdown-menu"
+    class:up={anchor.up}
     id="settings-dropdown-menu"
-    transition:fly={{ y: bottomBar.matches ? 10 : -10, duration: dur(200) }}
+    style:top={anchor.up ? 'auto' : `${anchor.top}px`}
+    style:bottom={anchor.up ? `${anchor.bottom}px` : 'auto'}
+    style:right="{anchor.right}px"
+    transition:scale={{ start: 0.92, duration: dur(150) }}
     use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
   >
     <button class="settings-menu-item" onclick={choose(onSchedules)}>
