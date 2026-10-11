@@ -117,11 +117,13 @@ describe('term letters', () => {
     expect(termOf('MA 1024-AD03-ACL (group 2) - Calculus IV')).toBe('A');
   });
 
-  // BUG: an interest list's number never names its term (Course_Section has
-  // no "Fall"/"Spring"), so every one becomes "Interest List-A Term" and falls
-  // back to term A - including B, C and D term lists in the real feed.
-  it.skip('places a D-term interest list in D', () => {
-    expect(termOf('CH 1020-DL-Interest List - Chemical Reactions')).toBe('D');
+  // The term comes from the list's code; Course_Section never names it.
+  it.each([
+    ['CH 1020-DL-Interest List - Chemical Reactions', 'D'],
+    ['CS 3733-BL - Interest List - Software Engineering', 'B'],
+    ['CS 2303-CX-Interest List - Systems Programming Concepts', 'C'],
+  ])('places interest list %s in %s', (cs, expected) => {
+    expect(termOf(cs)).toBe(expected);
   });
 });
 

@@ -25616,13 +25616,13 @@
             {
               "section": {
                 "crn": 351497,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -25638,7 +25638,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -28393,13 +28393,13 @@
             {
               "section": {
                 "crn": 349373,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -28415,7 +28415,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -30035,13 +30035,13 @@
             {
               "section": {
                 "crn": 352264,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -30057,7 +30057,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -31187,13 +31187,13 @@
             {
               "section": {
                 "crn": 351283,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -31209,7 +31209,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -41001,13 +41001,13 @@
             {
               "section": {
                 "crn": 349935,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -41023,7 +41023,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -41648,13 +41648,13 @@
             {
               "section": {
                 "crn": 349329,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -41670,7 +41670,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -42528,13 +42528,13 @@
             {
               "section": {
                 "crn": 351671,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -42550,7 +42550,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -43931,13 +43931,13 @@
             {
               "section": {
                 "crn": 349601,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -43953,7 +43953,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -82083,13 +82083,13 @@
             {
               "section": {
                 "crn": 350213,
-                "number": "Interest List-A Term",
+                "number": "Interest List-Fall",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "F",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -82105,7 +82105,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-Fall",
                     "days": [],
                     "isAsync": true
                   }
@@ -85599,13 +85599,13 @@
             {
               "section": {
                 "crn": 349787,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -85621,7 +85621,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -91215,13 +91215,13 @@
             {
               "section": {
                 "crn": 349369,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -91237,7 +91237,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -96677,13 +96677,13 @@
             {
               "section": {
                 "crn": 351589,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -96699,7 +96699,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -98489,13 +98489,13 @@
             {
               "section": {
                 "crn": 352493,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -98511,7 +98511,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -106055,13 +106055,13 @@
             {
               "section": {
                 "crn": 349677,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -106077,7 +106077,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -111414,13 +111414,13 @@
             {
               "section": {
                 "crn": 351669,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -111436,7 +111436,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -117996,13 +117996,13 @@
             {
               "section": {
                 "crn": 352428,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -118018,7 +118018,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -124883,13 +124883,13 @@
             {
               "section": {
                 "crn": 349945,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -124905,7 +124905,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -133234,13 +133234,13 @@
             {
               "section": {
                 "crn": 351595,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -133256,7 +133256,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -137944,13 +137944,13 @@
             {
               "section": {
                 "crn": 352090,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -137966,7 +137966,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -146044,13 +146044,13 @@
             {
               "section": {
                 "crn": 349927,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -146066,7 +146066,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -146414,13 +146414,13 @@
             {
               "section": {
                 "crn": 351670,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -146436,7 +146436,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -146928,13 +146928,13 @@
             {
               "section": {
                 "crn": 352440,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -146950,7 +146950,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -147753,13 +147753,13 @@
             {
               "section": {
                 "crn": 349359,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -147775,7 +147775,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -148123,13 +148123,13 @@
             {
               "section": {
                 "crn": 350943,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -148145,7 +148145,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -148629,13 +148629,13 @@
             {
               "section": {
                 "crn": 352496,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -148651,7 +148651,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -149180,13 +149180,13 @@
             {
               "section": {
                 "crn": 350941,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -149202,7 +149202,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -149299,13 +149299,13 @@
             {
               "section": {
                 "crn": 351076,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -149321,7 +149321,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -152001,13 +152001,13 @@
             {
               "section": {
                 "crn": 349940,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -152023,7 +152023,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -152243,13 +152243,13 @@
             {
               "section": {
                 "crn": 351536,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -152265,7 +152265,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -152581,13 +152581,13 @@
             {
               "section": {
                 "crn": 352087,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -152603,7 +152603,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -153012,13 +153012,13 @@
             {
               "section": {
                 "crn": 349287,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -153034,7 +153034,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -153254,13 +153254,13 @@
             {
               "section": {
                 "crn": 352086,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -153276,7 +153276,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -153783,13 +153783,13 @@
             {
               "section": {
                 "crn": 349800,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -153805,7 +153805,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -154057,13 +154057,13 @@
             {
               "section": {
                 "crn": 351537,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -154079,7 +154079,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -154363,13 +154363,13 @@
             {
               "section": {
                 "crn": 352273,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -154385,7 +154385,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -184202,13 +184202,13 @@
             {
               "section": {
                 "crn": 351051,
-                "number": "Interest List-A Term",
+                "number": "Interest List-C Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "C",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -184224,7 +184224,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-C Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -190451,13 +190451,13 @@
             {
               "section": {
                 "crn": 349928,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -190473,7 +190473,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -201055,13 +201055,13 @@
             {
               "section": {
                 "crn": 352091,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 1,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -201077,7 +201077,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 1,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -206409,13 +206409,13 @@
             {
               "section": {
                 "crn": 349790,
-                "number": "Interest List-A Term",
+                "number": "Interest List-B Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "B",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -206431,7 +206431,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-B Term",
                     "days": [],
                     "isAsync": true
                   }
@@ -208529,13 +208529,13 @@
             {
               "section": {
                 "crn": 352497,
-                "number": "Interest List-A Term",
+                "number": "Interest List-D Term",
                 "seats": 0,
                 "seatsAvailable": 0,
                 "actualWaitlist": 0,
                 "maxWaitlist": 999,
                 "note": "IntList",
-                "computedTerm": "A",
+                "computedTerm": "D",
                 "isGps": false,
                 "isInterestList": true,
                 "periods": [
@@ -208551,7 +208551,7 @@
                     "seatsAvailable": 0,
                     "actualWaitlist": 0,
                     "maxWaitlist": 999,
-                    "specificSection": "Interest List-A Term",
+                    "specificSection": "Interest List-D Term",
                     "days": [],
                     "isAsync": true
                   }

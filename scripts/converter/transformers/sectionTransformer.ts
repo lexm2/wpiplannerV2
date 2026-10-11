@@ -62,7 +62,9 @@ export function transformSection(
   const note = isInterestList ? 'IntList' : clusterId || null;
 
   // Graduate courses keep F/S, undergraduate use A/B/C/D
-  const computedTerm = extractTermLetter(sectionNumber);
+  const computedTerm = isInterestList
+    ? interestListTerm(courseSectionFull)
+    : extractTermLetter(sectionNumber);
 
   const sectionDetails = workdaySection.Section_Details || '';
   const meetingPatterns = parseSectionDetails(sectionDetails);
@@ -137,12 +139,10 @@ function extractSectionNumber(
 
   // Check for Interest List
   if (courseSectionFull.includes('Interest List')) {
-    const term = courseSectionFull.includes('Fall')
-      ? 'Fall'
-      : courseSectionFull.includes('Spring')
-        ? 'Spring'
-        : 'A Term';
-    return `Interest List-${term}`;
+    const term = interestListTerm(courseSectionFull);
+    const label =
+      term === 'F' ? 'Fall' : term === 'S' ? 'Spring' : `${term} Term`;
+    return `Interest List-${label}`;
   }
 
   // Check for special sections (GPS, Special Topics)
@@ -191,6 +191,17 @@ export function isSpecialSection(
   }
 
   return false;
+}
+
+/**
+ * An interest list's term is the first letter of its code: "CH 1020-DL-Interest
+ * List" is D term, "MA 501-FD - Interest List" fall. Course_Section never
+ * names the season, so the code is the only place it appears.
+ */
+function interestListTerm(courseSectionFull: string): string {
+  const code = courseSectionFull.slice(courseSectionFull.indexOf('-') + 1);
+  const match = code.match(/^\s*([ABCDFS])/i);
+  return match ? match[1].toUpperCase() : 'A';
 }
 
 /**
