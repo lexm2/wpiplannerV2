@@ -2,6 +2,7 @@
   import { fly } from 'svelte/transition';
   import styles from '../styles/components/theme-selector.module.css';
   import { dur } from './transitions';
+  import { clickOutside } from './clickOutside';
   import { ThemeManager } from '../themes/ThemeManager';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
@@ -21,11 +22,6 @@
     themes.find(t => t.id === currentId)?.name ?? '',
   );
 
-  function toggle(e: MouseEvent): void {
-    e.stopPropagation();
-    open = !open;
-  }
-
   function selectTheme(id: string): void {
     tm.setTheme(id);
     open = false;
@@ -40,7 +36,7 @@
   }
 </script>
 
-<svelte:window onclick={() => (open = false)} onkeydown={onKeydown} />
+<svelte:window onkeydown={onKeydown} />
 
 <!--
   Global classes (.theme-dropdown/.theme-options/.dropdown-arrow) live in
@@ -57,20 +53,19 @@
   bind:this={trigger}
   aria-haspopup="true"
   aria-expanded={open}
-  onclick={toggle}
+  onclick={() => (open = !open)}
 >
   <span id="current-theme-name">{currentName}</span>
   <span class="dropdown-arrow" id="theme-dropdown-arrow"
     >{@html getInlineSVG('CHEVRON_DOWN', 'dropdown-arrow-icon')}</span
   >
 </button>
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (container only stops propagation; its children are real buttons) -->
 {#if open}
   <div
     class="theme-options"
     id="theme-options"
     transition:fly={{ y: -8, duration: dur(200) }}
-    onclick={e => e.stopPropagation()}
+    use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
   >
     {#each themes as t (t.id)}
       <button

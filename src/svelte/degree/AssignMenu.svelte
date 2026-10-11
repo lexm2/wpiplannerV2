@@ -2,6 +2,7 @@
   import { degreeState } from './degreeState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { scaleFade } from '../transitions';
+  import { clickOutside } from '../clickOutside';
 
   /** The click/keyboard path for placing a course, alongside dragging. */
   let {
@@ -15,6 +16,7 @@
   } = $props();
 
   let open = $state(false);
+  let trigger = $state<HTMLButtonElement | null>(null);
 
   function choose(bucketId: string): void {
     open = false;
@@ -25,7 +27,6 @@
 </script>
 
 <svelte:window
-  onclick={() => (open = false)}
   onkeydown={e => {
     if (e.key === 'Escape') open = false;
   }}
@@ -38,20 +39,17 @@
     aria-label={label}
     aria-expanded={open}
     title={label}
-    onclick={e => {
-      e.stopPropagation();
-      open = !open;
-    }}>Assign&hellip;</button
+    bind:this={trigger}
+    onclick={() => (open = !open)}>Assign&hellip;</button
   >
 
   {#if open}
-    <!-- Clicks inside must not reach the window handler that closes the menu. -->
     <div
       class="assign-menu-popup"
       role="menu"
       tabindex="-1"
       transition:scaleFade={{ duration: 150 }}
-      onclick={e => e.stopPropagation()}
+      use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
       onkeydown={e => e.stopPropagation()}
     >
       {#each degreeState.buckets as bucket (bucket.id)}

@@ -14,6 +14,7 @@
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
   import TextField from '../ui/TextField.svelte';
+  import { clickOutside } from '../clickOutside';
 
   let {
     scheduleManagementService,
@@ -100,6 +101,8 @@
 
   // Per-item ⋮ menu
   let openMenuId = $state<string | null>(null);
+  // The ⋮ button that opened it: clicks there toggle rather than close-outside.
+  let menuTrigger = $state<HTMLElement | null>(null);
   let menuPos = $state<{ left: number; top: number }>({ left: 0, top: 0 });
 
   async function toggleMenu(e: MouseEvent, scheduleId: string): Promise<void> {
@@ -109,7 +112,8 @@
       return;
     }
 
-    const btnRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    menuTrigger = e.currentTarget as HTMLElement;
+    const btnRect = menuTrigger.getBoundingClientRect();
     openMenuId = scheduleId;
     // Position from the menu's real size once it renders: its height depends
     // on how many actions the row offers.
@@ -517,8 +521,7 @@
   }
 </script>
 
-<!-- A click anywhere closes any open per-schedule menu. -->
-<svelte:window onclick={closeMenus} onkeydowncapture={onWindowKeydownCapture} />
+<svelte:window onkeydowncapture={onWindowKeydownCapture} />
 
 <Modal
   typeId="schedule-picker"
@@ -672,6 +675,11 @@
                   <div
                     class={styles['scheduleItemMenu']}
                     data-visible={openMenuId === schedule.id}
+                    use:clickOutside={{
+                      enabled: openMenuId === schedule.id,
+                      ignore: menuTrigger,
+                      onOutside: closeMenus,
+                    }}
                     style:left={`${menuPos.left}px`}
                     style:top={`${menuPos.top}px`}
                   >
