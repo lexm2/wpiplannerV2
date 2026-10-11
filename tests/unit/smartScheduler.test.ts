@@ -236,3 +236,84 @@ describe('SmartScheduler.buildCandidateData locked courses', () => {
     expect(candidateNumbers(filterServiceWith(), selection)).toBeNull();
   });
 });
+
+describe('SmartScheduler.buildCandidateData with "avoid conflicts" on', () => {
+  it("never blocks a course with its own current sections from the filter's snapshot", () => {
+    // The filter was switched on after a generation, so its snapshot holds
+    // MA1022's old AL01; the course was then unlocked to be rescheduled.
+    const old = section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01');
+    const sameTime = section(AcademicTerm.A, [M], '10:00', '10:50', 'AL02');
+    const ma1022 = course('MA1022', [old, sameTime]);
+    const fs = filterServiceWith({
+      avoidConflicts: true,
+      blockedSlots: [],
+      selectedCourses: [picked(ma1022, old)],
+    });
+
+    expect(candidateNumbers(fs, [picked(ma1022, old)])).toEqual([
+      ['AL01', 'AL02'],
+    ]);
+  });
+
+  it("doesn't block with the old sections of another course being rescheduled", () => {
+    const csOld = section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01');
+    const cs2102 = course('CS2102', [
+      csOld,
+      section(AcademicTerm.A, [T], '10:00', '10:50', 'AL02'),
+    ]);
+    const ma1022 = course('MA1022', [
+      section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01'),
+    ]);
+    const fs = filterServiceWith({
+      avoidConflicts: true,
+      blockedSlots: [],
+      selectedCourses: [picked(cs2102, csOld)],
+    });
+
+    expect(
+      candidateNumbers(fs, [picked(cs2102, csOld), picked(ma1022, null)]),
+    ).toEqual([['AL01', 'AL02'], ['AL01']]);
+  });
+
+  it('blocks with the current selection, not the one when the filter was enabled', () => {
+    // Enabled before anything was picked: the snapshot is empty.
+    const fs = filterServiceWith({
+      avoidConflicts: true,
+      blockedSlots: [],
+      selectedCourses: [],
+    });
+    const lockedLec = section(AcademicTerm.A, [M], '10:00', '10:50');
+    const ma1022 = course('MA1022', [
+      section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01'),
+      section(AcademicTerm.A, [M], '12:00', '12:50', 'AL02'),
+    ]);
+
+    expect(
+      candidateNumbers(fs, [
+        picked(course('CS2102', [lockedLec]), lockedLec, []),
+        picked(ma1022, null),
+      ]),
+    ).toEqual([['AL02']]);
+  });
+
+  it('still honours blocked calendar slots', () => {
+    const fs = filterServiceWith({
+      avoidConflicts: false,
+      blockedSlots: [
+        {
+          id: 'local-1-abc-A-M',
+          day: M,
+          startTime: { hours: 10, minutes: 0 },
+          endTime: { hours: 11, minutes: 0 },
+          term: AcademicTerm.A,
+        },
+      ],
+    });
+    const ma1022 = course('MA1022', [
+      section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01'),
+      section(AcademicTerm.A, [M], '12:00', '12:50', 'AL02'),
+    ]);
+
+    expect(candidateNumbers(fs, [picked(ma1022, null)])).toEqual([['AL02']]);
+  });
+});

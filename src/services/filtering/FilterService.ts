@@ -252,6 +252,19 @@ export class FilterService {
     return this.sectionPipeline.reconstructCourses(filtered);
   }
 
+  /** Like apply(), but skipping the given section filters. */
+  applyExcluding(courses: Course[], excludeIds: string[]): FilterableSection[] {
+    const criteriaMap = this.getCriteriaMap();
+    criteriaMap.delete('bookmark');
+    for (const id of excludeIds) {
+      criteriaMap.delete(id);
+    }
+
+    const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+    if (criteriaMap.size === 0) return sections;
+    return this.sectionPipeline.applyFilters(sections, criteriaMap);
+  }
+
   getFilterOptions(
     filterId: string,
     courses: Course[],

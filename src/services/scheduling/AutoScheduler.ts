@@ -39,6 +39,11 @@ export class AutoScheduler {
    * Time that is already taken, per quarter: the conflict filter's blocked
    * slots, plus the chosen sections of `fixedCourses` (courses locked in the
    * auto-schedule intro), which block whether or not the filter is on.
+   *
+   * The filter's own `selectedCourses` is deliberately ignored: it is a
+   * snapshot from when "avoid conflicts" was switched on, and it holds the
+   * old sections of the very courses being rescheduled. The sections that
+   * stay put are exactly the fixed ones.
    */
   getBlockedMasksByTerm(
     fixedCourses: SelectedCourse[] = [],
@@ -47,14 +52,14 @@ export class AutoScheduler {
     const criteria = this.filterService
       .getActiveFilters()
       .find(f => f.id === 'periodConflict')?.criteria;
-    const active = conflictFilter.isValidCriteria(criteria)
-      ? (criteria as ConflictCriteria)
-      : null;
+    const blockedSlots = conflictFilter.isValidCriteria(criteria)
+      ? (criteria as ConflictCriteria).blockedSlots
+      : [];
 
     return conflictFilter.getBlockedMasksByTerm({
       avoidConflicts: true,
-      blockedSlots: active?.blockedSlots ?? [],
-      selectedCourses: [...(active?.selectedCourses ?? []), ...fixedCourses],
+      blockedSlots: blockedSlots ?? [],
+      selectedCourses: fixedCourses,
     });
   }
 
@@ -228,7 +233,12 @@ export class AutoScheduler {
   ): boolean {
     if (!this.hasValidTimeSlot(section)) return false;
 
-    const filteredSections = this.filterService.apply([selectedCourse.course]);
+    // Time conflicts are checked against the blocked masks instead (see
+    // getBlockedMasksByTerm), so skip the conflict filter's stale snapshot.
+    const filteredSections = this.filterService.applyExcluding(
+      [selectedCourse.course],
+      ['periodConflict'],
+    );
     return filteredSections.some(fs => fs.section.crn === section.crn);
   }
 }
