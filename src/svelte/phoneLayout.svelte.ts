@@ -17,3 +17,10 @@ const coarsePointer = new MediaQuery('(pointer: coarse)');
 export function placesBySheet(): boolean {
   return phoneLayout.current || coarsePointer.current;
 }
+
+/**
+ * Below 992px the Degree page has no room for the Unassigned rail as a
+ * column, and stacked above the buckets it was a cramped second scroller -
+ * so from there down the page lists those courses at its top instead.
+ */
+export const railStacked = new MediaQuery('(max-width: 991px)');

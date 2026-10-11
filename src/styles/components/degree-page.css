@@ -1294,32 +1294,11 @@
 
 /* ---- Responsive ---- */
 
-/* Below the sidebar breakpoint the rail can't hold a column: stack it on top,
-   capped and scrolling on its own. */
+/* Below the sidebar breakpoint the rail can't hold a column, so DegreePage
+   drops it for the To place list at the top of the page. */
 @media (max-width: 991px) {
-  .degree-shell {
-    flex-direction: column;
-  }
-
   .degree-requirements {
     --req-card-min-w: 20rem;
-  }
-
-  /* Stacked, the rail is full-width: there is no width left to drag. */
-  .degree-rail .resize-handle {
-    display: none;
-  }
-
-  .degree-rail {
-    width: 100%;
-    max-height: 35vh;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .degree-rail-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   }
 
   .degree-content {
@@ -1378,7 +1357,7 @@
   }
 }
 
-/* ---- Phone: To place (ToPlaceList.svelte) ---- */
+/* ---- To place, below 992px (ToPlaceList.svelte) ---- */
 .degree-to-place {
   margin-bottom: 0.75rem;
   background: var(--color-surface);
@@ -1441,6 +1420,7 @@
 
 .degree-to-place-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   gap: 0.4rem;
   padding: 0 0.75rem 0.75rem;
 }

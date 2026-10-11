@@ -6,7 +6,7 @@
   import RequirementList from './RequirementList.svelte';
   import UnassignedRail from './UnassignedRail.svelte';
   import ToPlaceList from './ToPlaceList.svelte';
-  import { phoneLayout } from '../phoneLayout.svelte';
+  import { railStacked } from '../phoneLayout.svelte';
   import SidePanel from '../SidePanel.svelte';
   import { PANEL_WIDTHS } from '../panelWidths';
 
@@ -27,8 +27,10 @@
          the unassign target with closest('.degree-rail'), so a drop on the
          resize seam still counts as a drop on the rail. .degree-pane goes on
          the scroller inside, which is what dragAutoScroll edge-scrolls.
-         A phone gets ToPlaceList at the top of the one scroller instead. -->
-    {#if !phoneLayout.current}
+         Below 992px, where the rail could only stack above the buckets as a
+         cramped second scroller, ToPlaceList at the top of the one scroller
+         stands in for it. -->
+    {#if !railStacked.current}
       <SidePanel
         class="degree-rail"
         label="Unassigned courses"
@@ -43,7 +45,7 @@
     {/if}
     <div class="degree-pane degree-main">
       <div class="degree-content">
-        {#if phoneLayout.current}
+        {#if railStacked.current}
           <ToPlaceList />
         {/if}
         <DegreeSummary {record} {degreeImportService} />

@@ -4,10 +4,11 @@
   import { slideFade } from '../transitions';
 
   /**
-   * The phone's stand-in for the Unassigned rail: the same courses, at the top
-   * of the page's one scroller instead of in a second pane of their own, which
-   * on a phone took a third of the screen. It folds to a single row, and each
-   * course opens the Move sheet. Placing the last one removes it altogether.
+   * The Unassigned rail's stand-in wherever the rail would have to stack above
+   * the buckets (below 992px): the same courses, at the top of the page's one
+   * scroller instead of in a capped second pane that clipped them. It folds to
+   * a single row, each course opens the Move sheet, and placing the last one
+   * removes it.
    */
   const tiles = $derived(degreeState.unassigned);
 </script>
