@@ -5,6 +5,7 @@
 ### Added
 - Copy Into button in the Schedules list. Pick a schedule, then click another to add its courses to that one
 - Auto-Schedule shows F and S term badges for semester courses
+- Conflict filter option to count semester courses (F, S) as conflicting with their quarters (A and B, C and D). On by default
 
 ### Changed
 - Auto-Schedule is much faster with many courses
