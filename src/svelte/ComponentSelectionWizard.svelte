@@ -7,6 +7,7 @@
   import { slideX, dur } from './transitions';
   import { wizardState } from './wizardState.svelte';
   import { showConfirm } from './modals/modalState.svelte';
+  import { uiState } from '../services/ui/uiState.svelte';
   import {
     determineAvailableSteps,
     getOptionsWithFilterInfo,
@@ -172,7 +173,15 @@
   }
 
   function onKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape') cancel();
+    // A modal opened over the wizard (filters, section info) takes Escape for
+    // itself. Which window listener runs first depends on mount order, so check
+    // both that none is open and that none has just closed on this key.
+    if (
+      e.key === 'Escape' &&
+      !e.defaultPrevented &&
+      uiState.openModals.length === 0
+    )
+      cancel();
   }
 </script>
 

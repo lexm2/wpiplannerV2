@@ -71,6 +71,9 @@
   function onKeydown(event: KeyboardEvent): void {
     if (event.defaultPrevented) return;
     if (closeOnEscape && isTop && event.key === 'Escape') {
+      // Claimed, so window listeners that run after this one (the section
+      // wizard) know the key was spent on the modal.
+      event.preventDefault();
       close();
     }
   }
