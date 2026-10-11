@@ -915,9 +915,10 @@ html.is-mobile .schedule-page-layout {
   grid-template-columns: 1fr;
 }
 
-/* A phone is permanently focused on one term (termFocus.focusLocked), so the
-   card runs full bleed and vertical swipes page between terms instead of
-   scrolling - the old scroll-snap column this replaces lived at max-width 1024. */
+/* A phone is permanently focused on one term (termFocus's isFocusLocked), so
+   the card runs full bleed and vertical swipes page between terms instead of
+   scrolling - the old scroll-snap column this replaces lived at max-width 1024.
+   A phone-width window is locked the same way, so it gets the same rules. */
 html.is-mobile .schedule-main {
   padding: 0;
 }
@@ -931,4 +932,21 @@ html.is-mobile .terms-grid {
 html.is-mobile .term-graph {
   min-height: 0;
   border-radius: 0;
+}
+
+@media (max-width: 560px) {
+  .schedule-main {
+    padding: 0;
+  }
+
+  .terms-grid {
+    gap: 0;
+    border-radius: 0;
+    touch-action: none;
+  }
+
+  .term-graph {
+    min-height: 0;
+    border-radius: 0;
+  }
 }

@@ -24,11 +24,15 @@ import { reduceMotion } from '../transitions';
 export const TERMS = QUARTER_TERMS;
 
 // A phone has no room for four grids at once, so it is permanently focused and
-// can never zoom out - paging between terms is the only navigation there.
-const focusLocked = DeviceDetection.isMobilePhone();
+// can never zoom out - paging between terms is the only navigation there. A
+// phone-width window counts too (a phone in "desktop site" mode has a desktop
+// UA), live: narrowing to it focuses a term, and widening lets it zoom out.
+const phoneWidth = window.matchMedia('(max-width: 560px)');
+const isFocusLocked = (): boolean =>
+  DeviceDetection.isMobilePhone() || phoneWidth.matches;
 
 class TermFocus {
-  term = $state.raw<string | null>(focusLocked ? TERMS[0] : null);
+  term = $state.raw<string | null>(isFocusLocked() ? TERMS[0] : null);
 }
 
 export const termFocus = new TermFocus();
@@ -57,6 +61,14 @@ let pendingDir = 0;
 // Set the moment a mutator commits, cleared when its animations finish. Clicks
 // and gestures no-op while it holds, so two morphs can never interleave.
 let busy = false;
+
+phoneWidth.addEventListener('change', e => {
+  if (!e.matches || termFocus.term !== null || busy) return;
+  // No captured box, so the card zooms from where CSS lands it - an instant
+  // swap - while the other three fade out.
+  if (gridEl) busy = true;
+  termFocus.term = TERMS[0];
+});
 
 function cardOf(term: string): HTMLElement | null {
   return (
@@ -142,7 +154,7 @@ export function toggleFocus(term: string): void {
 }
 
 function unfocus(): void {
-  if (busy || focusLocked || termFocus.term === null || !gridEl) return;
+  if (busy || isFocusLocked() || termFocus.term === null || !gridEl) return;
   capture(termFocus.term);
   busy = true;
   termFocus.term = null;
