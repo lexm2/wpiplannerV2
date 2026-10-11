@@ -249,3 +249,22 @@ test('a course with no usable section is named, on separate banner lines', async
   const text = await message.evaluate(el => (el as HTMLElement).innerText);
   expect(text).toMatch(/\n• /);
 });
+
+test('the intro offers a semester-only course its F term', async ({ page }) => {
+  await loadApp(page);
+  await selectCourses(page, ['AE601']);
+  await page.click('#auto-schedule-btn');
+
+  const card = page
+    .locator('[data-modal-type="auto-schedule-intro"] .as-course-card')
+    .filter({ has: page.locator('.as-course-code', { hasText: 'AE601' }) });
+  const fall = card.locator('[data-term-badge][data-term="F"]');
+  await expect(fall).toHaveCount(1);
+  await expect(fall).not.toHaveClass(/unavailable/);
+  await expect(fall).toHaveClass(/selected/);
+
+  // Its only term: deselecting it leaves the course out.
+  await fall.click();
+  await expect(fall).not.toHaveClass(/selected/);
+  await expect(card).not.toHaveClass(/(^|\s)selected(\s|$)/);
+});

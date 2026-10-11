@@ -11,6 +11,14 @@
   const payload = $derived(modalState.autoScheduleIntro);
 
   const TERMS = ['A', 'B', 'C', 'D'];
+  // Semester terms (F spans A+B, S spans C+D) get a badge only when the
+  // course offers them, so quarter-only cards keep their four badges.
+  const SEMESTER_TERMS = ['F', 'S'];
+
+  function badgeTerms(sc: SelectedCourse): string[] {
+    const available = availableTerms(sc);
+    return [...TERMS, ...SEMESTER_TERMS.filter(t => available.has(t))];
+  }
 
   function hasPickedSections(sc: SelectedCourse): boolean {
     return sectionsOf(sc.selected).length > 0;
@@ -153,7 +161,7 @@
               <div
                 class={['as-card-terms', listStyles['term-badges-container']]}
               >
-                {#each TERMS as term (term)}
+                {#each badgeTerms(sc) as term (term)}
                   {#if isAvailable(sc, term)}
                     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (term badge toggles one term; stops card toggle) -->
                     <span
