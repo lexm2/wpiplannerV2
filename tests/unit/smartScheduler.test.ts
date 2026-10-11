@@ -13,7 +13,9 @@ import {
   type Period,
   type Section,
 } from '../../src/types/types';
-import { AcademicTerm } from '../../src/types/schedule';
+import { AcademicTerm, type SelectedCourse } from '../../src/types/schedule';
+import type { ConflictCriteria } from '../../src/types/filters';
+import { FilterService } from '../../src/services/filtering/FilterService';
 import { sectionsOf } from '../../src/utils/courseUtils';
 import { getDisplayTerms } from '../../src/utils/typeGuards';
 
@@ -157,5 +159,80 @@ describe('SmartScheduler.findSchedules semester/quarter conflicts', () => {
     ]);
 
     expect(schedulesFor([ae601, other])).toHaveLength(1);
+  });
+});
+
+function filterServiceWith(conflict?: ConflictCriteria): FilterService {
+  const fs = new FilterService();
+  fs.setConflictDetector();
+  if (conflict) fs.addFilter('periodConflict', conflict);
+  return fs;
+}
+
+function picked(
+  c: Course,
+  lecture: Section | null,
+  allowedTerms?: string[],
+): SelectedCourse {
+  return {
+    course: c,
+    selected: lecture ? { lecture } : {},
+    isRequired: false,
+    lockedSections: new Set(),
+    ...(allowedTerms && { allowedTerms }),
+  };
+}
+
+/** Lecture numbers offered per scheduled course, or null if none can be. */
+function candidateNumbers(
+  fs: FilterService,
+  selection: SelectedCourse[],
+): string[][] | null {
+  const input = new SmartScheduler(fs).buildCandidateData(selection);
+  return (
+    input?.candidatesPerCourse.map(cs =>
+      cs.map(c => c.combination.lecture!.number),
+    ) ?? null
+  );
+}
+
+describe('SmartScheduler.buildCandidateData locked courses', () => {
+  it("blocks the locked course's chosen section for the courses being scheduled", () => {
+    const cs2102Lec = section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01');
+    const cs2102 = course('CS2102', [cs2102Lec]);
+    const ma1022 = course('MA1022', [
+      section(AcademicTerm.A, [M], '10:00', '10:50', 'AL01'),
+      section(AcademicTerm.A, [M], '13:00', '13:50', 'AL02'),
+    ]);
+
+    const selection = [picked(cs2102, cs2102Lec, []), picked(ma1022, null)];
+    expect(candidateNumbers(filterServiceWith(), selection)).toEqual([
+      ['AL02'],
+    ]);
+  });
+
+  it('blocks both quarters for a locked semester (F) section', () => {
+    const ae601Lec = section(AcademicTerm.F, [W], '15:00', '17:50');
+    const ae601 = course('AE601', [ae601Lec]);
+    const ce575 = course('CE575', [
+      section(AcademicTerm.A, [T, W], '16:00', '17:50', 'A01'),
+      section(AcademicTerm.B, [W], '16:00', '16:50', 'B01'),
+      section(AcademicTerm.C, [W], '16:00', '16:50', 'C01'),
+    ]);
+
+    const selection = [picked(ae601, ae601Lec, []), picked(ce575, null)];
+    expect(candidateNumbers(filterServiceWith(), selection)).toEqual([['C01']]);
+  });
+
+  it('leaves the course unschedulable when every section clashes with a locked one', () => {
+    const lockedLec = section(AcademicTerm.A, [M], '10:00', '10:50');
+    const selection = [
+      picked(course('CS2102', [lockedLec]), lockedLec, []),
+      picked(
+        course('MA1022', [section(AcademicTerm.A, [M], '10:00', '10:50')]),
+        null,
+      ),
+    ];
+    expect(candidateNumbers(filterServiceWith(), selection)).toBeNull();
   });
 });

@@ -35,23 +35,27 @@ export interface MaskedCandidate {
 export class AutoScheduler {
   constructor(private filterService: FilterService) {}
 
-  getBlockedMasksByTerm(): Map<string, bigint> {
-    const activeFilters = this.filterService.getActiveFilters();
+  /**
+   * Time that is already taken, per quarter: the conflict filter's blocked
+   * slots, plus the chosen sections of `fixedCourses` (courses locked in the
+   * auto-schedule intro), which block whether or not the filter is on.
+   */
+  getBlockedMasksByTerm(
+    fixedCourses: SelectedCourse[] = [],
+  ): Map<string, bigint> {
+    const conflictFilter = new ConflictFilter();
+    const criteria = this.filterService
+      .getActiveFilters()
+      .find(f => f.id === 'periodConflict')?.criteria;
+    const active = conflictFilter.isValidCriteria(criteria)
+      ? (criteria as ConflictCriteria)
+      : null;
 
-    const conflictFilter =
-      this.filterService.getRegisteredFilter('periodConflict');
-    if (conflictFilter instanceof ConflictFilter) {
-      const criteria = activeFilters.find(
-        f => f.id === 'periodConflict',
-      )?.criteria;
-      if (criteria && conflictFilter.isValidCriteria(criteria)) {
-        return conflictFilter.getBlockedMasksByTerm(
-          criteria as ConflictCriteria,
-        );
-      }
-    }
-
-    return new Map();
+    return conflictFilter.getBlockedMasksByTerm({
+      avoidConflicts: true,
+      blockedSlots: active?.blockedSlots ?? [],
+      selectedCourses: [...(active?.selectedCourses ?? []), ...fixedCourses],
+    });
   }
 
   getMaskedCandidates(

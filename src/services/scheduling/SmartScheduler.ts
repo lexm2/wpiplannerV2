@@ -24,7 +24,11 @@ export class SmartScheduler {
       return { candidatesPerCourse: [], courses: [] };
 
     const autoScheduler = new AutoScheduler(this.filterService);
-    const blockedMasks = autoScheduler.getBlockedMasksByTerm();
+    // A course with no allowed terms was locked in the intro: it keeps its
+    // current sections, so those block the courses being scheduled.
+    const blockedMasks = autoScheduler.getBlockedMasksByTerm(
+      selectedCourses.filter(sc => sc.allowedTerms?.length === 0),
+    );
 
     const candidatesPerCourse: MaskedCandidate[][] = [];
     const scheduledCourses: Course[] = [];
