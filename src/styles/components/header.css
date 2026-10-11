@@ -341,3 +341,36 @@
 html.is-mobile .header-navigation {
   max-width: none;
 }
+
+/* Phone widths: the centred pill is wider than the room left of the gear, so
+   absolute centring put the Degree tab on top of it (and the gear is the only
+   way to Schedules/theme/undo here). Put the nav back in the flex row instead,
+   so the two can never overlap. */
+@media (max-width: 560px) {
+  .app-header {
+    padding: 0.75rem;
+  }
+
+  .header-content {
+    gap: 0.5rem;
+  }
+
+  .header-navigation {
+    position: static;
+    transform: none;
+    margin: 0;
+    max-width: none;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  .nav-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Keep the menu's right edge under the gear's at the tighter padding. */
+  .settings-dropdown-menu {
+    right: 0.75rem;
+  }
+}
