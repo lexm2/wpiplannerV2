@@ -11,22 +11,36 @@
 
   const payload = $derived(modalState.autoScheduleIntro);
 
-  // Semester terms (F spans A+B, S spans C+D) get a badge only when the
-  // course offers them, so quarter-only cards keep their four badges.
-  function badgeTerms(sc: SelectedCourse): string[] {
-    const available = availableTerms(sc);
-    return [...QUARTER_TERMS, ...SEMESTER_TERMS.filter(t => available.has(t))];
-  }
-
   function hasPickedSections(sc: SelectedCourse): boolean {
     return sectionsOf(sc.selected).length > 0;
   }
 
-  function availableTerms(sc: SelectedCourse): Set<string> {
+  function computeAvailableTerms(sc: SelectedCourse): Set<string> {
     const terms = new Set<string>();
     sc.course.lectures?.forEach(lg => terms.add(lg.section.computedTerm));
     sc.course.standaloneLabs?.forEach(s => terms.add(s.computedTerm));
     return terms;
+  }
+
+  // Computed once per payload rather than on every badge read. Read-only:
+  // callers copy before mutating.
+  const availableByCourse = $derived(
+    new Map(
+      (payload?.selectedCourses ?? []).map(sc => [
+        sc.course.id,
+        computeAvailableTerms(sc),
+      ]),
+    ),
+  );
+
+  function availableTerms(sc: SelectedCourse): ReadonlySet<string> {
+    return availableByCourse.get(sc.course.id) ?? computeAvailableTerms(sc);
+  }
+
+  // Semester terms (F spans A+B, S spans C+D) get a badge only when the
+  // course offers them, so quarter-only cards keep their four badges.
+  function badgeTerms(available: ReadonlySet<string>): string[] {
+    return [...QUARTER_TERMS, ...SEMESTER_TERMS.filter(t => available.has(t))];
   }
 
   // After a generation every course has sections; locking them all by default
@@ -72,9 +86,6 @@
     modalState.autoScheduleIntroTermPrefs = null;
   });
 
-  function isAvailable(sc: SelectedCourse, term: string): boolean {
-    return availableTerms(sc).has(term);
-  }
   function isSelected(sc: SelectedCourse, term: string): boolean {
     return !!termsByCourse.get(sc.course.id)?.has(term);
   }
@@ -89,6 +100,16 @@
       set.clear();
     } else {
       availableTerms(sc).forEach(t => set.add(t));
+    }
+  }
+
+  // The card is itself a checkbox for keyboard users. The target guard keeps
+  // Enter/Space on the nested term buttons toggling just that term.
+  function onCardKeydown(e: KeyboardEvent, sc: SelectedCourse): void {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleCard(sc);
     }
   }
 
@@ -138,12 +159,17 @@
         </p>
         <div class="as-course-grid">
           {#each payload.selectedCourses as sc (sc.course.id)}
-            <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (card is a click-to-toggle surface; term badges below are the granular controls) -->
+            {@const available = availableTerms(sc)}
             <div
               class="as-course-card"
               class:selected={cardSelected(sc)}
               data-course-id={sc.course.id}
+              role="checkbox"
+              tabindex="0"
+              aria-checked={cardSelected(sc)}
+              aria-label="{courseCode(sc)} {sc.course.name}"
               onclick={() => toggleCard(sc)}
+              onkeydown={e => onCardKeydown(e, sc)}
             >
               <div
                 class="as-course-card-accent"
@@ -159,10 +185,8 @@
               <div
                 class={['as-card-terms', listStyles['term-badges-container']]}
               >
-                {#each badgeTerms(sc) as term (term)}
-                  {#if isAvailable(sc, term)}
-                    <!-- A button so the terms are reachable by keyboard; the card
-                         toggle has no key equivalent, but these cover it. -->
+                {#each badgeTerms(available) as term (term)}
+                  {#if available.has(term)}
                     <button
                       type="button"
                       class={[

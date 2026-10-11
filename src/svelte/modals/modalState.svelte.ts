@@ -18,11 +18,6 @@ export interface ConfirmPayload {
   onConfirm: (value?: string) => void;
 }
 
-interface DeleteLocalEventPayload {
-  title: string;
-  onConfirm: () => void;
-}
-
 interface LocalEventPayload {
   /** Callback when the event is saved */
   onSave: (
@@ -51,7 +46,6 @@ interface AutoScheduleIntroPayload {
 class ModalState {
   sectionInfo = $state.raw<SectionData | null>(null);
   confirm = $state.raw<ConfirmPayload | null>(null);
-  deleteLocalEvent = $state.raw<DeleteLocalEventPayload | null>(null);
   localEvent = $state.raw<LocalEventPayload | null>(null);
   autoScheduleIntro = $state.raw<AutoScheduleIntroPayload | null>(null);
   // Tutorial-driven term-preference overrides. The component merges these

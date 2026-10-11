@@ -71,6 +71,8 @@
   const halfLines = hours.map(h => h * 2 + 1);
   const hourLines = hours.slice(1).map(h => h * 2);
   const dayLines = GRID_DAYS.slice(1).map((_, i) => i + 1);
+  // One day column's share of the grid width, in percent.
+  const DAY_PCT = 100 / GRID_DAYS.length;
 
   function clamp(v: number, lo: number, hi: number): number {
     return Math.max(lo, Math.min(v, hi));
@@ -371,8 +373,8 @@
           class="{styles.painted} {gridMode === 'only'
             ? styles.paintedOnly
             : styles.paintedAvoid}"
-          style:left="{GRID_DAYS.indexOf(w.day) * 20}%"
-          style:width="20%"
+          style:left="{GRID_DAYS.indexOf(w.day) * DAY_PCT}%"
+          style:width="{DAY_PCT}%"
           style:top={topPct(w.startMin)}
           style:height={heightPct(w.startMin, w.endMin)}
         ></div>
@@ -381,8 +383,8 @@
       {#if showFocus}
         <div
           class={styles.focusRing}
-          style:left="{focusCell.dayIndex * 20}%"
-          style:width="20%"
+          style:left="{focusCell.dayIndex * DAY_PCT}%"
+          style:width="{DAY_PCT}%"
           style:top={topPct(rowStartMin(focusCell.row, range))}
           style:height={heightPct(0, CELL_MINUTES)}
         ></div>

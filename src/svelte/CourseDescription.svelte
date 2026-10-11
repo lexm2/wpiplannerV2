@@ -4,7 +4,8 @@
   import { getInlineSVG } from '../utils/iconPaths';
   import { seatsLabel } from '../utils/courseUtils';
   import { courseListState } from './courseListState.svelte';
-  import { untrack } from 'svelte';
+  import { formatCredits } from './selectedCourseUtils';
+  import { isAsyncPeriod } from './wizardLogic';
   import type { CourseDataService } from '../services/data/courseDataService';
   import type { Course, Section } from '../types/types';
 
@@ -22,13 +23,7 @@
 
   const course = $derived(courseListState.selectedCourse);
 
-  const credits = $derived(
-    course
-      ? course.minCredits === course.maxCredits
-        ? `${course.minCredits} credits`
-        : `${course.minCredits}-${course.maxCredits} credits`
-      : '',
-  );
+  const credits = $derived(course ? formatCredits(course) : '');
   const yearLabel = $derived(
     course?.academicYear
       ? `${course.academicYear}-${course.academicYear + 1}`
@@ -87,14 +82,9 @@
     return all.filter(t => t.show).map(({ id, label }) => ({ id, label }));
   });
 
-  // Active tab resets to the first visible tab whenever the course changes.
-  let activeTab = $state('lectures');
-  $effect(() => {
-    course?.id; // track course change
-    untrack(() => {
-      activeTab = tabs[0]?.id ?? 'lectures';
-    });
-  });
+  // Active tab resets to the first visible tab whenever the course changes;
+  // clicking a tab overrides it until then.
+  let activeTab = $derived(tabs[0]?.id ?? 'lectures');
 
   interface SectionGroup {
     heading: string;
@@ -150,17 +140,6 @@
     course ? sectionsForTab(course, activeTab) : null,
   );
 
-  function isAsyncSection(section: Section): boolean {
-    const period = section.periods[0];
-    return !!(
-      period?.isAsync ||
-      (period &&
-        period.startTime.hours === 12 &&
-        period.startTime.minutes === 0 &&
-        period.endTime.hours === 12 &&
-        period.endTime.minutes === 0)
-    );
-  }
   function sectionDays(section: Section): string {
     const period = section.periods[0];
     return period ? Array.from(period.days).join(', ').toUpperCase() : 'TBA';
@@ -231,7 +210,7 @@
             <div class={styles['sections-list']}>
               {#each activeGroup.sections as section (section.crn)}
                 {@const interest = section.isInterestList}
-                {@const async = isAsyncSection(section)}
+                {@const async = isAsyncPeriod(section.periods[0])}
                 {@const rmpUrl = professorRmpUrl(section)}
                 <div class={styles['section-list-item']}>
                   <div class={styles['section-header']}>

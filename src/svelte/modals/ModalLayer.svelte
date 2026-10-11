@@ -4,7 +4,6 @@
   import Tutorials from './Tutorials.svelte';
   import SectionInfo from './SectionInfo.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
-  import DeleteLocalEvent from './DeleteLocalEvent.svelte';
   import LocalEvent from './LocalEvent.svelte';
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
   import SchedulePicker from './SchedulePicker.svelte';
@@ -50,7 +49,7 @@
   // Closing goes through closeModal(id) so uiState.openModals
   // stays the single source of truth (keeping tutorial snapshots correct);
   // that removal unmounts the component, after its ~225ms hide animation has
-  // already played. Payload modals (section-info, delete-local-event) read
+  // already played. Payload modals (section-info, confirm) read
   // their data from modalState (set by the trigger sites before modalOpened).
 </script>
 
@@ -66,8 +65,6 @@
     <SectionInfo onRequestClose={() => closeModal('section-info')} />
   {:else if id === 'confirm'}
     <ConfirmDialog onRequestClose={() => closeModal('confirm')} />
-  {:else if id === 'delete-local-event'}
-    <DeleteLocalEvent onRequestClose={() => closeModal('delete-local-event')} />
   {:else if id === 'local-event'}
     <LocalEvent onRequestClose={() => closeModal('local-event')} />
   {:else if id === 'auto-schedule-intro'}

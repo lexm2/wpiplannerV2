@@ -70,7 +70,7 @@
 
   function onAvoidConflicts(checked: boolean): void {
     if (checked) {
-      const selectedCourses = courseSelectionService.getSelectedCourses() ?? [];
+      const selectedCourses = courseSelectionService.getSelectedCourses();
       filterService.addFilter('periodConflict', {
         avoidConflicts: true,
         selectedCourses,
@@ -89,12 +89,10 @@
   }
 
   function onCalendarToggle(checked: boolean): void {
-    if (!autoScheduleOrchestrator) return;
     const avoid = avoidConflicts;
     const selectedCourses =
       conflictCriteria?.selectedCourses ??
-      courseSelectionService.getSelectedCourses() ??
-      [];
+      courseSelectionService.getSelectedCourses();
     const nonCalendarSlots = blockedSlots.filter(s => !isCalendarSlot(s));
 
     if (checked) {

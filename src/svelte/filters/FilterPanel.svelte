@@ -57,9 +57,8 @@
 
   const previewText = $derived.by(() => {
     if (isAuto) {
-      if (!autoScheduleOrchestrator) return 'Configure filters then generate';
       const selected =
-        coursesToSchedule ?? courseSelectionService.getSelectedCourses() ?? [];
+        coursesToSchedule ?? courseSelectionService.getSelectedCourses();
       if (selected.length === 0) return 'No courses selected';
       const courses = selected.map(sc => sc.course);
       const sections = filterService.apply(courses);

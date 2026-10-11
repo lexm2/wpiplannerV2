@@ -30,15 +30,14 @@
   // fade-out (when the store nulls config).
   const cfg = wizardState.config!;
   const { course, courseDataService, filterService } = cfg;
-  const isLabOnly = courseDataService.isLabOnlyCourse(course);
 
   const STEP_LABELS: Record<ComponentKind, string> = {
-    lecture: isLabOnly ? 'Lab Section' : 'Lecture',
+    lecture: 'Lecture',
     discussion: 'Discussion',
     lab: 'Lab',
   };
   const STEP_TITLES: Record<ComponentKind, string> = {
-    lecture: isLabOnly ? 'Select Lab Section' : 'Select Lecture',
+    lecture: 'Select Lecture',
     discussion: 'Select Discussion',
     lab: 'Select Lab',
   };

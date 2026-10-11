@@ -1,5 +1,5 @@
 import { appState } from '../../core/state/appState.svelte';
-import { modalState } from '../../svelte/modals/modalState.svelte';
+import { modalState, showConfirm } from '../../svelte/modals/modalState.svelte';
 import { openModal } from '../ui/uiState.svelte';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { LocalCalendarEvent } from '../../types/schedule';
@@ -44,11 +44,13 @@ class LocalEventService {
 
     const localEvent = (schedule.localEvents || []).find(e => e.id === eventId);
     const title = localEvent?.title || 'Untitled Event';
-    modalState.deleteLocalEvent = {
-      title,
+    showConfirm({
+      title: 'Delete Event',
+      message: `Delete "${title}"?`,
+      confirmLabel: 'Delete',
+      variant: 'danger',
       onConfirm: () => this.delete(eventId),
-    };
-    openModal('delete-local-event');
+    });
   }
 
   private add(
