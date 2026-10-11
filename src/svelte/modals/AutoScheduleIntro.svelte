@@ -23,8 +23,15 @@
     return terms;
   }
 
+  // After a generation every course has sections; locking them all by default
+  // would leave nothing to schedule, so then every course starts included.
+  const allPicked = $derived(
+    !!payload?.selectedCourses.every(sc => hasPickedSections(sc)),
+  );
+
   // Per-course selected terms. Sections-already-picked courses start empty
-  // (excluded from auto-scheduling); others default to all available terms.
+  // (excluded from auto-scheduling) unless all of them are; others default to
+  // all available terms.
   // SvelteMap/SvelteSet so .size/.has reads in the template stay reactive.
   let termsByCourse = $state(new SvelteMap<string, SvelteSet<string>>());
 
@@ -34,11 +41,14 @@
     const p = payload;
     if (!p || p === seededFor) return;
     seededFor = p;
+    const lockPicked = !allPicked;
     const next = new SvelteMap<string, SvelteSet<string>>();
     for (const sc of p.selectedCourses) {
       next.set(
         sc.course.id,
-        new SvelteSet(hasPickedSections(sc) ? [] : availableTerms(sc)),
+        new SvelteSet(
+          lockPicked && hasPickedSections(sc) ? [] : availableTerms(sc),
+        ),
       );
     }
     termsByCourse = next;
@@ -112,8 +122,13 @@
     {#snippet children(close)}
       <div class="modal-body as-course-picker-body">
         <p class="as-picker-hint">
-          Courses with selected sections are locked by default. Click a course
-          to include it in auto-scheduling.
+          {#if allPicked}
+            All courses are included. Click a course to lock it to its current
+            sections.
+          {:else}
+            Courses with selected sections are locked by default. Click a course
+            to include it in auto-scheduling.
+          {/if}
         </p>
         <div class="as-course-grid">
           {#each payload.selectedCourses as sc (sc.course.id)}

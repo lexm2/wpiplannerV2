@@ -142,6 +142,94 @@ async function generateFromIntro(page: Page): Promise<void> {
   });
 }
 
+const COURSES = ['CS2102', 'MA1022', 'PH1110', 'CH1010'];
+
+test('Restart with the intro defaults regenerates every course', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+
+  await page.click('#auto-schedule-btn');
+  await generateFromIntro(page);
+  await expect(page.locator('.error-banner')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Restart auto-schedule' }).click();
+  await generateFromIntro(page);
+
+  await expect(page.locator('.error-banner')).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Restart auto-schedule' }),
+  ).toBeVisible();
+});
+
+test('no generated option overlaps the courses locked in the intro', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+  await page.click('#auto-schedule-btn');
+  await generateFromIntro(page);
+
+  // Lock everything but MA1022 to the sections just generated.
+  await page.getByRole('button', { name: 'Restart auto-schedule' }).click();
+  const intro = page.locator('[data-modal-type="auto-schedule-intro"]');
+  for (const code of ['CS2102', 'PH1110', 'CH1010']) {
+    await intro
+      .locator('.as-course-card', {
+        has: page.locator('.as-course-code', { hasText: code }),
+      })
+      .click();
+  }
+  await generateFromIntro(page);
+  await expect(page.locator('.error-banner')).toHaveCount(0);
+
+  const overlaps = await page.evaluate(() => {
+    const quarters = (t: string): string[] =>
+      t === 'F' ? ['A', 'B'] : t === 'S' ? ['C', 'D'] : [t];
+    const minutes = (t: any): number => t.hours * 60 + t.minutes;
+    const sectionsOf = (combo: any): any[] =>
+      ['lecture', 'discussion', 'lab'].map(k => combo[k]).filter(Boolean);
+    const clash = (a: any, b: any): boolean =>
+      quarters(a.computedTerm).some(q =>
+        quarters(b.computedTerm).includes(q),
+      ) &&
+      a.periods.some((p: any) =>
+        b.periods.some(
+          (r: any) =>
+            !p.isAsync &&
+            !r.isAsync &&
+            [...p.days].some((d: string) => r.days.has(d)) &&
+            minutes(p.startTime) < minutes(r.endTime) &&
+            minutes(r.startTime) < minutes(p.endTime),
+        ),
+      );
+
+    const services = (window as any).services;
+    const locked = services.courseSelectionService
+      .getSelectedCourses()
+      .filter(
+        (sc: any) =>
+          `${sc.course.departmentAbbr}${sc.course.number}` !== 'MA1022',
+      )
+      .flatMap((sc: any) => sectionsOf(sc.selected));
+    const options = services.autoScheduleOrchestrator.getGeneratedSchedules();
+    const found: string[] = [];
+    options.forEach((option: any[], i: number) => {
+      for (const result of option) {
+        for (const s of sectionsOf(result.combination)) {
+          for (const l of locked.filter((l: any) => clash(s, l))) {
+            found.push(`option ${i}: ${s.number} vs ${l.number}`);
+          }
+        }
+      }
+    });
+    return { count: options.length, found };
+  });
+  expect(overlaps.count).toBeGreaterThan(0);
+  expect(overlaps.found).toEqual([]);
+});
+
 test('a course with no usable section is named, on separate banner lines', async ({
   page,
 }) => {
