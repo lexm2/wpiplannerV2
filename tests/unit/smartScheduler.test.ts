@@ -317,3 +317,107 @@ describe('SmartScheduler.buildCandidateData with "avoid conflicts" on', () => {
     expect(candidateNumbers(fs, [picked(ma1022, null)])).toEqual([['AL02']]);
   });
 });
+
+/** Deterministic PRNG (mulberry32) so a failing case can be replayed. */
+function rng(seed: number): () => number {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = seed;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Random candidates on a coarse grid of times, so clashes are common. */
+function randomGroup(seed: number): MaskedCandidate[][] {
+  const rand = rng(seed);
+  const pick = <T>(xs: T[]): T => xs[Math.floor(rand() * xs.length)];
+  const terms = [AcademicTerm.A, AcademicTerm.B, AcademicTerm.F];
+  const days = [M, T, W];
+  const n = 1 + Math.floor(rand() * 5);
+  return Array.from({ length: n }, () =>
+    Array.from({ length: 1 + Math.floor(rand() * 5) }, () => {
+      const start = 8 + Math.floor(rand() * 6);
+      const s = section(
+        pick(terms),
+        [pick(days)],
+        `${start}:00`,
+        `${start}:50`,
+      );
+      return {
+        combination: { lecture: s },
+        mask: sectionToMask(s),
+        term: s.computedTerm,
+      };
+    }),
+  );
+}
+
+const internals = SmartScheduler as unknown as {
+  bestForTermGroup(c: MaskedCandidate[][]): object[] | null;
+  gapForSelections(s: MaskedCandidate[]): number;
+};
+
+/** Every combination in order, keeping the first with the smallest gap. */
+function bruteForce(group: MaskedCandidate[][]): object[] | null {
+  let best: MaskedCandidate[] | null = null;
+  let bestGap = Infinity;
+  const visit = (i: number, chosen: MaskedCandidate[]): void => {
+    if (i === group.length) {
+      const clash = chosen.some((a, x) =>
+        chosen.slice(x + 1).some(b => {
+          const qa = getDisplayTerms(a.term);
+          const shared = getDisplayTerms(b.term).some(q => qa.includes(q));
+          return shared && (a.mask & b.mask) !== 0n;
+        }),
+      );
+      if (clash) return;
+      const gap = internals.gapForSelections(chosen);
+      if (gap < bestGap) {
+        bestGap = gap;
+        best = [...chosen];
+      }
+      return;
+    }
+    for (const c of group[i]) visit(i + 1, [...chosen, c]);
+  };
+  visit(0, []);
+  return best && (best as MaskedCandidate[]).map(c => c.combination);
+}
+
+describe('SmartScheduler group search', () => {
+  it('picks the same combination as an exhaustive search', () => {
+    for (let seed = 1; seed <= 400; seed++) {
+      const group = randomGroup(seed);
+      expect(internals.bestForTermGroup(group), `seed ${seed}`).toEqual(
+        bruteForce(group),
+      );
+    }
+  });
+
+  it('abandons a branch at its first clash instead of enumerating past it', () => {
+    // The first two courses only meet at the same time, so no combination
+    // works; an exhaustive walk would still visit all 8^8 of them.
+    const clashing = () =>
+      Array.from({ length: 8 }, () =>
+        section(AcademicTerm.A, [M], '9:00', '9:50'),
+      );
+    const free = (i: number) =>
+      Array.from({ length: 8 }, (_, j) =>
+        section(AcademicTerm.A, [T], `${8 + j}:00`, `${8 + j}:50`, `${i}${j}`),
+      );
+    const group = [clashing(), clashing(), ...[0, 1, 2, 3, 4, 5].map(free)].map(
+      sections =>
+        sections.map(s => ({
+          combination: { lecture: s },
+          mask: sectionToMask(s),
+          term: s.computedTerm,
+        })),
+    );
+
+    const started = performance.now();
+    expect(internals.bestForTermGroup(group)).toBeNull();
+    expect(performance.now() - started).toBeLessThan(100);
+  });
+});

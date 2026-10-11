@@ -80,6 +80,7 @@ export class SmartScheduler {
     }
 
     const results: ScheduleResult[][] = [];
+    const bestByGroup = new Map<string, SectionsByKind[] | null>();
 
     for (const assignment of assignments) {
       if (results.length >= maxResults) break;
@@ -96,10 +97,17 @@ export class SmartScheduler {
       let valid = true;
 
       for (const indices of SmartScheduler.overlappingGroups(termGroups)) {
-        const groupCandidates = indices.map(i =>
-          candidatesPerCourse[i].filter(c => c.term === assignment[i]),
-        );
-        const combos = SmartScheduler.bestForTermGroup(groupCandidates);
+        // Assignments share most of their groups, and a group's best
+        // combination depends only on its courses and their terms.
+        const key = indices.map(i => `${i}:${assignment[i]}`).join(',');
+        let combos = bestByGroup.get(key);
+        if (combos === undefined) {
+          const groupCandidates = indices.map(i =>
+            candidatesPerCourse[i].filter(c => c.term === assignment[i]),
+          );
+          combos = SmartScheduler.bestForTermGroup(groupCandidates);
+          bestByGroup.set(key, combos);
+        }
         if (!combos) {
           valid = false;
           break;
@@ -175,58 +183,50 @@ export class SmartScheduler {
     return merged.map(g => g.indices.sort((a, b) => a - b));
   }
 
+  /**
+   * The conflict-free combination with the least idle time, or null. A
+   * depth-first walk in course order that abandons a branch at its first
+   * clash, so combinations are visited in the same order as the full
+   * cartesian product (ties still go to the first one found) while clashing
+   * prefixes are never extended.
+   */
   private static bestForTermGroup(
     candidatesPerCourse: MaskedCandidate[][],
   ): SectionsByKind[] | null {
     const n = candidatesPerCourse.length;
     if (n === 0) return [];
 
-    const sizes = candidatesPerCourse.map(c => c.length);
-    const indices = new Array<number>(n).fill(0);
-
     let bestGap = Infinity;
     let bestCombo: SectionsByKind[] | null = null;
 
-    while (true) {
-      // Occupied time per quarter: a semester section fills both of its own.
-      const occupied = new Map<string, bigint>();
-      let conflict = false;
-      const selections: MaskedCandidate[] = [];
+    // Occupied time per quarter: a semester section fills both of its own.
+    const occupied = new Map<string, bigint>();
+    const selections: MaskedCandidate[] = [];
 
-      for (let i = 0; i < n; i++) {
-        const candidate = candidatesPerCourse[i][indices[i]];
-        const quarters = getDisplayTerms(candidate.term);
-        if (
-          quarters.some(q =>
-            masksConflict(candidate.mask, occupied.get(q) ?? 0n),
-          )
-        ) {
-          conflict = true;
-          break;
-        }
-        for (const q of quarters) {
-          occupied.set(q, (occupied.get(q) ?? 0n) | candidate.mask);
-        }
-        selections.push(candidate);
-      }
-
-      if (!conflict) {
+    const visit = (i: number): void => {
+      if (i === n) {
         const gap = SmartScheduler.gapForSelections(selections);
         if (gap < bestGap) {
           bestGap = gap;
           bestCombo = selections.map(s => s.combination);
         }
+        return;
       }
+      for (const candidate of candidatesPerCourse[i]) {
+        // Nothing can beat zero idle time, and ties keep the first found.
+        if (bestGap === 0) return;
+        const quarters = getDisplayTerms(candidate.term);
+        const before = quarters.map(q => occupied.get(q) ?? 0n);
+        if (before.some(mask => masksConflict(candidate.mask, mask))) continue;
 
-      let pos = n - 1;
-      while (pos >= 0) {
-        indices[pos]++;
-        if (indices[pos] < sizes[pos]) break;
-        indices[pos] = 0;
-        pos--;
+        quarters.forEach((q, k) => occupied.set(q, before[k] | candidate.mask));
+        selections.push(candidate);
+        visit(i + 1);
+        selections.pop();
+        quarters.forEach((q, k) => occupied.set(q, before[k]));
       }
-      if (pos < 0) break;
-    }
+    };
+    visit(0);
 
     return bestCombo;
   }
