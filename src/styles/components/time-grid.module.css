@@ -129,11 +129,15 @@
 
 .toolbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: center;
   margin-bottom: 0.75rem;
-  flex-wrap: wrap;
+}
+
+/* The shared segmented buttons stretch to fill their row; here they size to
+   their labels, so "Avoid these times" stays on one line. */
+.toolbar :global(.segmented-btn) {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .summary {

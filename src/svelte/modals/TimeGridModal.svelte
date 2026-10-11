@@ -1,9 +1,10 @@
 <script lang="ts" module>
   import type { TimeGridMode } from '../../types/filters';
 
-  // An empty grid stores no filter, and so no mode; this keeps the last mode
-  // picked so reopening on nothing painted does not snap back to Only.
+  // An empty grid stores no filter, and so no mode or async choice; these keep
+  // the last ones picked so reopening on nothing painted does not reset them.
   let lastMode: TimeGridMode = 'only';
+  let lastIncludeAsync = false;
 </script>
 
 <script lang="ts">
@@ -14,11 +15,7 @@
   import { appState } from '../../core/state/appState.svelte';
   import { gridRangeOf } from '../../utils/gridRange';
   import type { FilterService } from '../../services/filtering/FilterService';
-  import type {
-    AsyncFilterCriteria,
-    TimesFilterCriteria,
-    TimeWindow,
-  } from '../../types/filters';
+  import type { TimesFilterCriteria, TimeWindow } from '../../types/filters';
 
   let {
     filterService,
@@ -40,21 +37,29 @@
     gridRangeOf(initialWindows, appState.catalogRange),
   );
 
-  const includeAsync = $derived(
-    filterService.getCriteria<AsyncFilterCriteria>('async')?.include !== false,
-  );
+  let mode = initialMode;
+  let windows = initialWindows;
+  let includeAsync = $state(seed?.includeAsync ?? lastIncludeAsync);
 
-  function onchange(mode: TimeGridMode, windows: TimeWindow[]): void {
+  function save(): void {
     lastMode = mode;
+    lastIncludeAsync = includeAsync;
     // An empty grid drops the filter so it stops counting toward the badge.
-    if (windows.length > 0) filterService.addFilter('times', { mode, windows });
-    else filterService.removeFilter('times');
+    if (windows.length === 0) filterService.removeFilter('times');
+    else if (includeAsync)
+      filterService.addFilter('times', { mode, windows, includeAsync });
+    else filterService.addFilter('times', { mode, windows });
+  }
+
+  function onchange(nextMode: TimeGridMode, nextWindows: TimeWindow[]): void {
+    mode = nextMode;
+    windows = nextWindows;
+    save();
   }
 
   function onAsyncChange(checked: boolean): void {
-    // Including async is the default state, stored as no filter at all.
-    if (checked) filterService.removeFilter('async');
-    else filterService.addFilter('async', { include: false });
+    includeAsync = checked;
+    save();
   }
 </script>
 
@@ -72,18 +77,15 @@
         {range}
         mode={initialMode}
         {onchange}
-      >
-        {#snippet toolbarExtra()}
-          <FilterToggle
-            id="include-async-filter"
-            label="Include async classes"
-            checked={includeAsync}
-            onchange={onAsyncChange}
-          />
-        {/snippet}
-      </TimeGridPicker>
+      />
     </div>
     <div class="modal-footer">
+      <FilterToggle
+        id="include-async-filter"
+        label="Include async classes"
+        checked={includeAsync}
+        onchange={onAsyncChange}
+      />
       <button class="modal-btn btn-primary" onclick={close}>Done</button>
     </div>
   {/snippet}

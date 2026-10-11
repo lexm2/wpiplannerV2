@@ -195,12 +195,32 @@ describe('TimesFilter', () => {
       ['zero length', fs('zero-length', [period([T], 10, 0, 10, 0)])],
     ];
 
+    // Painting times is a statement about when classes meet, so classes
+    // that never meet are left out unless the user asks for them.
     for (const [label, section] of untimed) {
-      it(`keeps a ${label} section in both modes`, () => {
-        expect(filter.apply([section], only(tueThu10to12))).toHaveLength(1);
-        expect(filter.apply([section], avoid(tueThu10to12))).toHaveLength(1);
+      it(`hides a ${label} section in both modes by default`, () => {
+        expect(filter.apply([section], only(tueThu10to12))).toEqual([]);
+        expect(filter.apply([section], avoid(tueThu10to12))).toEqual([]);
+      });
+
+      it(`keeps a ${label} section in both modes when async is included`, () => {
+        const withAsync = (c: TimesFilterCriteria) => ({
+          ...c,
+          includeAsync: true,
+        });
+        expect(
+          filter.apply([section], withAsync(only(tueThu10to12))),
+        ).toHaveLength(1);
+        expect(
+          filter.apply([section], withAsync(avoid(tueThu10to12))),
+        ).toHaveLength(1);
       });
     }
+
+    it('leaves every section alone when nothing is painted', () => {
+      const [, section] = untimed[0];
+      expect(filter.apply([section], only([]))).toHaveLength(1);
+    });
   });
 
   describe('isValidCriteria', () => {

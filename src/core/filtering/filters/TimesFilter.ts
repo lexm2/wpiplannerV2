@@ -4,6 +4,7 @@ import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import {
   describeWindows,
+  isAsyncSection,
   periodInsideWindows,
   periodOverlapsWindows,
   timedPeriods,
@@ -20,6 +21,9 @@ const VALID_DAYS = new Set<string>(Object.values(DayOfWeek));
  * painted region; `avoid` drops a section when any timed period overlaps it.
  * The two are mirror images: a section passes `only` exactly when none of its
  * meetings fall outside the selection.
+ *
+ * A section with nothing on the grid (async) has no meetings to test, so it
+ * is kept only when the criteria ask for it with `includeAsync`.
  */
 export class TimesFilter implements SectionBasedFilter {
   readonly id = 'times';
@@ -39,11 +43,8 @@ export class TimesFilter implements SectionBasedFilter {
     const whitelist = criteria.mode === 'only';
 
     return sections.filter(fs => {
+      if (isAsyncSection(fs.section)) return criteria.includeAsync === true;
       const periods = timedPeriods(fs.section);
-
-      // Nothing on the grid means no schedule constraint, so neither mode has
-      // grounds to drop it.
-      if (periods.length === 0) return true;
 
       return whitelist
         ? periods.every(p => periodInsideWindows(p, byDay))
@@ -57,6 +58,8 @@ export class TimesFilter implements SectionBasedFilter {
 
     if (c.mode !== 'only' && c.mode !== 'avoid') return false;
     if (!Array.isArray(c.windows)) return false;
+    if (c.includeAsync !== undefined && typeof c.includeAsync !== 'boolean')
+      return false;
 
     // An empty window list is valid - it is the cleared state.
     return c.windows.every(w => {
@@ -72,6 +75,10 @@ export class TimesFilter implements SectionBasedFilter {
   }
 
   getDisplayValue(criteria: TimesFilterCriteria): string {
-    return describeWindows(criteria?.windows ?? [], criteria?.mode ?? 'only');
+    const times = describeWindows(
+      criteria?.windows ?? [],
+      criteria?.mode ?? 'only',
+    );
+    return criteria?.includeAsync ? `${times} • async included` : times;
   }
 }

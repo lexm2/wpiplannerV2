@@ -753,6 +753,22 @@ html.is-mobile .section-enrollment-waitlist {
   align-items: stretch;
 }
 
+/* "Include async classes" sits beside Done, so the two centre on one line. */
+.time-grid-modal .modal-footer {
+  align-items: center;
+}
+
+/* The off track is --color-border, which nearly matches the footer's own
+   background; mix in the secondary text colour so it reads as a switch. */
+.time-grid-modal .modal-footer .filter-toggle:not(:checked) {
+  background: color-mix(in srgb, var(--color-text-secondary) 45%, transparent);
+}
+
+/* Phones stack the footer with Done on top; keep the toggle at the right. */
+html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
+  align-self: flex-end;
+}
+
 /* Add/Edit Event: the form's day pills, term toggles and start/end time row all
    crowd at the 500px default, so this one runs about twice as wide. */
 .modal-dialog.local-event-dialog {

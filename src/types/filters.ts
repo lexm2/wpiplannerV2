@@ -103,8 +103,9 @@ export interface TimeWindow {
 export interface TimesFilterCriteria {
   mode: TimeGridMode;
   windows: TimeWindow[];
-}
-
-export interface AsyncFilterCriteria {
-  include: boolean;
+  /**
+   * Keep sections with nothing on the grid (async, no meeting days). Unset
+   * means no: painting times is a statement about when classes meet.
+   */
+  includeAsync?: boolean;
 }

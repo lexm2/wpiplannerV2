@@ -3,10 +3,7 @@
   import { openModal } from '../../services/ui/uiState.svelte';
   import { describeWindows } from '../../utils/timeWindows';
   import type { FilterService } from '../../services/filtering/FilterService';
-  import type {
-    AsyncFilterCriteria,
-    TimesFilterCriteria,
-  } from '../../types/filters';
+  import type { TimesFilterCriteria } from '../../types/filters';
   import styles from '../../styles/components/time-grid.module.css';
 
   let { filterService }: { filterService: FilterService } = $props();
@@ -15,16 +12,12 @@
     filterService.getCriteria<TimesFilterCriteria>('times'),
   );
 
-  const hideAsync = $derived(
-    filterService.getCriteria<AsyncFilterCriteria>('async')?.include === false,
-  );
-
   const summary = $derived(
     [
       criteria?.windows?.length
         ? describeWindows(criteria.windows, criteria.mode)
         : 'Any time',
-      hideAsync ? 'no async' : null,
+      criteria?.includeAsync ? 'async included' : null,
     ]
       .filter(Boolean)
       .join(' • '),
@@ -32,13 +25,12 @@
 
   function clear(): void {
     filterService.removeFilter('times');
-    filterService.removeFilter('async');
   }
 </script>
 
 <FilterSection title="Times">
   {#snippet actions()}
-    {#if criteria || hideAsync}
+    {#if criteria}
       <button class="filter-clear-btn" onclick={clear}>Clear</button>
     {/if}
   {/snippet}

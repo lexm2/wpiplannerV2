@@ -251,7 +251,7 @@ test('one svg overlay draws a line per hour, half hour and day', async ({
   });
 });
 
-test('painting every day as Only keeps every timed course', async ({
+test('painting every day as Only, with async included, keeps every course', async ({
   page,
 }) => {
   await openPicker(page);
@@ -268,6 +268,9 @@ test('painting every day as Only keeps every timed course', async ({
   for (const w of await timesWindows(page)) {
     expect(w).toMatchObject({ startMin, endMin });
   }
+  // Every timed course fits; async-only ones wait for the toggle.
+  expect(await previewCount(page)).toBeLessThan(before);
+  await page.check('#include-async-filter');
   expect(await previewCount(page)).toBe(before);
 });
 
@@ -304,37 +307,96 @@ test('avoiding the hours before 8 AM hides sections that start then', async ({
   expect(earliest).toBeGreaterThanOrEqual(480);
 });
 
-test('the async toggle hides sections with no meeting time', async ({
+test('async classes are left out once times are painted, unless included', async ({
   page,
 }) => {
   await openPicker(page);
-  const before = await previewCount(page);
+  const toggle = page.locator('#include-async-filter');
+  await expect(toggle).not.toBeChecked();
+  const asyncShown = () =>
+    page.evaluate(() => {
+      const svc: any = (window as any).services;
+      const isAsync = (s: any) =>
+        s.periods.every((p: any) => p.isAsync || p.days.size === 0);
+      const courses = svc.courseDataService
+        .getAllDepartments()
+        .flatMap((d: any) => d.courses);
+      return svc.filterService
+        .apply(courses)
+        .some((fs: any) => isAsync(fs.section));
+    });
 
-  await page.uncheck('#include-async-filter');
-  expect(await previewCount(page)).toBeLessThan(before);
+  // Nothing painted: no constraint, async classes stay.
+  expect(await asyncShown()).toBe(true);
+
+  // Painting times (here: avoid the first hour) leaves async classes out.
+  const { startMin } = await pickerRange(page);
+  await drag(page, { day: 0, at: startMin }, { day: 4, at: startMin + 30 });
+  await page
+    .locator(GRID)
+    .getByRole('button', { name: 'Avoid these times' })
+    .click();
+  expect(await asyncShown()).toBe(false);
+
+  await toggle.check();
+  expect(await asyncShown()).toBe(true);
   expect(
-    await page.evaluate(() =>
-      (window as any).services.filterService.hasFilter('async'),
+    await page.evaluate(
+      () =>
+        (window as any).services.filterService.getCriteria('times')
+          .includeAsync,
     ),
   ).toBe(true);
 
-  // The panel behind the picker reports it alongside the time summary.
+  // The choice survives reopening.
   await page.locator(GRID).getByRole('button', { name: 'Done' }).click();
   await page.waitForTimeout(SETTLE_MS);
   await expect(page.locator('#edit-times-btn').locator('..')).toContainText(
-    'Any time • no async',
+    'async included',
   );
-
-  // Re-checking it drops the filter rather than storing a no-op criteria.
   await page.click('#edit-times-btn');
   await page.waitForTimeout(SETTLE_MS);
-  await page.check('#include-async-filter');
-  expect(await previewCount(page)).toBe(before);
+  await expect(page.locator('#include-async-filter')).toBeChecked();
+});
+
+test('the mode buttons sit on one line, centred over the grid', async ({
+  page,
+}) => {
+  await openPicker(page);
+  const only = page
+    .locator(GRID)
+    .getByRole('button', { name: 'Only these times' });
+  const avoid = page
+    .locator(GRID)
+    .getByRole('button', { name: 'Avoid these times' });
+  const [o, a] = [(await only.boundingBox())!, (await avoid.boundingBox())!];
+  // Same height: neither label wraps onto a second line.
+  expect(Math.abs(o.height - a.height)).toBeLessThanOrEqual(1);
+  expect(o.height).toBeLessThan(40);
+
+  const grid = (await page.locator(`${GRID} [role="grid"]`).boundingBox())!;
+  const dialog = (await page.locator(`${GRID} .modal-dialog`).boundingBox())!;
+  const centre = (o.x + a.x + a.width) / 2;
+  expect(Math.abs(centre - (dialog.x + dialog.width / 2))).toBeLessThanOrEqual(
+    2,
+  );
+  expect(o.y + o.height).toBeLessThan(grid.y);
+});
+
+test('the async toggle sits at the bottom right, beside Done', async ({
+  page,
+}) => {
+  await openPicker(page);
+  const footer = page.locator(`${GRID} .modal-footer`);
+  await expect(footer.locator('#include-async-filter')).toHaveCount(1);
+  const done = (await footer
+    .getByRole('button', { name: 'Done' })
+    .boundingBox())!;
+  const toggle = (await footer.locator('.filter-toggle-label').boundingBox())!;
+  expect(toggle.x + toggle.width).toBeLessThanOrEqual(done.x);
   expect(
-    await page.evaluate(() =>
-      (window as any).services.filterService.hasFilter('async'),
-    ),
-  ).toBe(false);
+    Math.abs(toggle.y + toggle.height / 2 - (done.y + done.height / 2)),
+  ).toBeLessThanOrEqual(4);
 });
 
 /**

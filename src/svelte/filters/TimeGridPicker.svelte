@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { untrack, type Snippet } from 'svelte';
+  import { untrack } from 'svelte';
   import { TimeUtils } from '../../utils/timeUtils';
   import type { TimeGridMode, TimeWindow } from '../../types/filters';
   import { gridHours, hourLabel, type GridRange } from '../../utils/gridRange';
@@ -20,15 +20,12 @@
     range: initialRange,
     mode: initialMode = 'only',
     onchange,
-    toolbarExtra,
   }: {
     windows: TimeWindow[];
     /** The hours shown; fixed while the picker is open. */
     range: GridRange;
     mode?: TimeGridMode;
     onchange: (mode: TimeGridMode, windows: TimeWindow[]) => void;
-    /** Rendered at the right of the toolbar. */
-    toolbarExtra?: Snippet;
   } = $props();
 
   type Cell = { dayIndex: number; row: number };
@@ -300,7 +297,6 @@
         onclick={() => setMode('avoid')}>Avoid these times</button
       >
     </div>
-    {@render toolbarExtra?.()}
   </div>
 
   <div class={styles.grid} style:--grid-hours={hours.length}>
