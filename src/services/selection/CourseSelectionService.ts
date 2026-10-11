@@ -3,7 +3,7 @@ import { SelectedCourse } from '../../types/schedule';
 import type { CourseComponentSelections } from '../../types/scheduling';
 import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { DataValidator } from '../../core/validation/DataValidator';
-import { Validators } from '../../utils/validators';
+import { getAllSections } from '../../utils/courseUtils';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
 
@@ -167,13 +167,15 @@ export class CourseSelectionService {
         };
       }
 
+      // Section numbers are free text from the catalog ("A01 - ST: ..."), so
+      // the only real check is that this course has the section.
       if (
         sectionNumber !== null &&
-        !Validators.validateSectionNumber(sectionNumber)
+        !getAllSections(course).some(s => s.number === sectionNumber)
       ) {
         return {
           success: false,
-          error: 'Invalid section number format',
+          error: `Section "${sectionNumber}" not found in ${course.departmentAbbr}${course.number}`,
         };
       }
 
