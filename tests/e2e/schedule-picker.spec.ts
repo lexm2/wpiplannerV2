@@ -101,3 +101,28 @@ test('undo starts disabled on a fresh load', async ({ page }) => {
   await load(page);
   await expect(page.locator('#undo-btn')).toBeDisabled();
 });
+
+test.describe('More options button', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test('is hidden while every action shows inline', async ({ page }) => {
+    await load(page);
+    await page.click('#schedule-picker-btn');
+    const row = firstRow(page);
+    await expect(row.getByRole('button', { name: 'Rename' })).toBeVisible();
+    await expect(row.getByTitle('More options')).toBeHidden();
+  });
+
+  test('comes back when the actions no longer fit', async ({ page }) => {
+    await page.setViewportSize({ width: 1000, height: 700 });
+    await load(page);
+    await page.click('#settings-menu-btn');
+    await page
+      .locator('#settings-dropdown-menu .settings-menu-item')
+      .first()
+      .click();
+    const row = firstRow(page);
+    await expect(row.getByRole('button', { name: 'Rename' })).toBeHidden();
+    await expect(row.getByTitle('More options')).toBeVisible();
+  });
+});

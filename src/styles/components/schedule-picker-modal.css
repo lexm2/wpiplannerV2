@@ -263,14 +263,6 @@
     height: 90vh;
   }
 
-  .schedule-picker-modal-dialog .menu-btn {
-    display: none;
-  }
-
-  .schedule-picker-modal-dialog .schedule-item-menu {
-    display: none !important;
-  }
-
   .schedule-picker-modal-dialog .inline-action-btn {
     display: inline-block;
     padding: 0.5rem 0.75rem;
