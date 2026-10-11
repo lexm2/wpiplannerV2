@@ -72,23 +72,13 @@ export class SmartScheduler {
     ]);
 
     const numDistinctTerms = new Set(termOptionsPerCourse.flat()).size;
-    let assignments = SmartScheduler.enumerateTermAssignments(
+    // Prefer at most 3 courses per term, relaxing only when no assignment
+    // fits. A relaxed cap of 3 or less admits nothing the first pass didn't.
+    const relaxed = Math.ceil(courses.length / Math.max(numDistinctTerms, 1));
+    const assignments = SmartScheduler.firstNonEmpty(
       termOptionsPerCourse,
-      3,
+      relaxed > 3 ? [3, relaxed, Infinity] : [3, Infinity],
     );
-    if (assignments.length === 0) {
-      const relaxed = Math.ceil(courses.length / Math.max(numDistinctTerms, 1));
-      assignments = SmartScheduler.enumerateTermAssignments(
-        termOptionsPerCourse,
-        relaxed,
-      );
-    }
-    if (assignments.length === 0) {
-      assignments = SmartScheduler.enumerateTermAssignments(
-        termOptionsPerCourse,
-        Infinity,
-      );
-    }
 
     const results: ScheduleResult[][] = [];
     const bestByGroup = new Map<string, SectionsByKind[] | null>();
@@ -141,16 +131,39 @@ export class SmartScheduler {
     return results;
   }
 
-  private static enumerateTermAssignments(
+  /**
+   * Assignments under the first cap that admits any, generated lazily: the
+   * caller stops at maxResults, long before the ~4^n full set.
+   */
+  private static firstNonEmpty(
+    termOptions: string[][],
+    caps: number[],
+  ): Iterable<string[]> {
+    for (const cap of caps) {
+      const assignments = SmartScheduler.enumerateTermAssignments(
+        termOptions,
+        cap,
+      );
+      const first = assignments.next();
+      if (first.done) continue;
+      return (function* () {
+        yield first.value;
+        yield* assignments;
+      })();
+    }
+    return [];
+  }
+
+  private static *enumerateTermAssignments(
     termOptions: string[][],
     maxPerTerm: number,
-  ): string[][] {
-    const results: string[][] = [];
+  ): Generator<string[], void, undefined> {
     const counts = new Map<string, number>();
+    const current: string[] = [];
 
-    const dfs = (i: number, current: string[]): void => {
+    function* dfs(i: number): Generator<string[], void, undefined> {
       if (i === termOptions.length) {
-        results.push([...current]);
+        yield [...current];
         return;
       }
       for (const term of termOptions[i]) {
@@ -158,14 +171,13 @@ export class SmartScheduler {
         if (count >= maxPerTerm) continue;
         counts.set(term, count + 1);
         current.push(term);
-        dfs(i + 1, current);
+        yield* dfs(i + 1);
         current.pop();
         counts.set(term, count);
       }
-    };
+    }
 
-    dfs(0, []);
-    return results;
+    yield* dfs(0);
   }
 
   /**

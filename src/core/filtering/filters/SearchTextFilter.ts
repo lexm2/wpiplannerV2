@@ -1,6 +1,30 @@
 import { SearchTextFilterCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
+import type { Course } from '../../../types/types';
+
+// Lowercased course-level search text, built once per Course rather than once
+// per section per keystroke. Catalog Course objects are never mutated (a data
+// refresh builds new ones), so entries cannot go stale.
+const haystackCache = new WeakMap<Course, string>();
+
+function courseHaystack(course: Course): string {
+  let text = haystackCache.get(course);
+  if (text === undefined) {
+    const courseCode = `${course.departmentAbbr}${course.number}`;
+    text = [
+      course.id,
+      course.name,
+      course.description,
+      course.departmentName,
+      courseCode,
+    ]
+      .join(' ')
+      .toLowerCase();
+    haystackCache.set(course, text);
+  }
+  return text;
+}
 
 export class SearchTextFilter implements SectionBasedFilter {
   readonly id = 'searchText';
@@ -25,17 +49,7 @@ export class SearchTextFilter implements SectionBasedFilter {
     }
 
     return sections.filter(fs => {
-      const course = fs.course;
-      const courseCode = `${course.departmentAbbr}${course.number}`;
-      const courseText = [
-        course.id,
-        course.name,
-        course.description,
-        course.departmentName,
-        courseCode,
-      ]
-        .join(' ')
-        .toLowerCase();
+      const courseText = courseHaystack(fs.course);
 
       if (courseText.includes(query) || this.fuzzyMatch(courseText, query)) {
         return true;

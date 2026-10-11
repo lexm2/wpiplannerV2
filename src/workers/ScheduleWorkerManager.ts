@@ -147,8 +147,7 @@ export class ScheduleWorkerManager {
     maxResults: number,
   ): ScheduleResult[][] {
     const schedules = SmartScheduler.findSchedules(input, maxResults);
-    const scorer = new ScheduleScorer();
-    schedules.sort((a, b) => scorer.score(b) - scorer.score(a));
+    new ScheduleScorer().sortBest(schedules);
     return schedules;
   }
 

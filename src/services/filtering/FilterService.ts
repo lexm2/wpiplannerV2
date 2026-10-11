@@ -190,11 +190,10 @@ export class FilterService {
     // Remove bookmark from criteriaMap - it's handled post-pipeline in filterCourses()
     criteriaMap.delete('bookmark');
 
-    if (criteriaMap.size === 0) {
-      return this.sectionPipeline.flattenCoursesToSections(courses);
-    }
-
     const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+    if (criteriaMap.size === 0) {
+      return sections;
+    }
     return this.sectionPipeline.applyFilters(sections, criteriaMap);
   }
 
@@ -207,12 +206,27 @@ export class FilterService {
       return courses;
     }
 
-    const filteredSections = this.apply(courses);
-    let filteredCourses = this.resolveToCourses(filteredSections);
-
     const criteriaMap = this.getCriteriaMap();
     const bookmarkCriteria = criteriaMap.get('bookmark') as
       BookmarkFilterCriteria | undefined;
+    const searchCriteria = criteriaMap.get('searchText') as
+      SearchTextFilterCriteria | undefined;
+    criteriaMap.delete('bookmark');
+
+    // With no section filters, flattening and rebuilding would only copy each
+    // course and drop those without sections, so do just the latter.
+    let filteredCourses: Course[];
+    if (criteriaMap.size === 0) {
+      filteredCourses = courses.filter(
+        c => !!c.lectures?.length || !!c.standaloneLabs?.length,
+      );
+    } else {
+      const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+      filteredCourses = this.resolveToCourses(
+        this.sectionPipeline.applyFilters(sections, criteriaMap),
+      );
+    }
+
     if (
       bookmarkCriteria &&
       bookmarkCriteria.showBookmarkedOnly &&
@@ -224,8 +238,6 @@ export class FilterService {
       );
     }
 
-    const searchCriteria = criteriaMap.get('searchText') as
-      SearchTextFilterCriteria | undefined;
     if (searchCriteria && searchCriteria.query) {
       filteredCourses = rankCoursesByRelevance(
         filteredCourses,

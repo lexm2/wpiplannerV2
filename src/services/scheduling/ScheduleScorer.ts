@@ -15,6 +15,12 @@ const TERM_EXPANSION: Partial<Record<AcademicTerm, AcademicTerm[]>> = {
 };
 
 export class ScheduleScorer {
+  /** Sorts schedules best first, in place, scoring each one once. */
+  sortBest(schedules: ScheduleResult[][]): ScheduleResult[][] {
+    const scores = new Map(schedules.map(s => [s, this.score(s)]));
+    return schedules.sort((a, b) => scores.get(b)! - scores.get(a)!);
+  }
+
   score(schedule: ScheduleResult[]): number {
     return (
       this.termScore(schedule) * 1_000_000 - this.gapMinutes(schedule) * 1_000

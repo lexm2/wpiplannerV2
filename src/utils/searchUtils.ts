@@ -12,11 +12,13 @@ export function rankCoursesByRelevance(
 
   const queryLower = query.toLowerCase();
 
-  return courses.sort((a, b) => {
-    const scoreA = calculateRelevanceScore(a, queryLower);
-    const scoreB = calculateRelevanceScore(b, queryLower);
-    return scoreB - scoreA;
-  });
+  // Score each course once rather than on every comparison. Sorts in place,
+  // as callers expect the same array back.
+  const scores = new Map<Course, number>();
+  for (const course of courses) {
+    scores.set(course, calculateRelevanceScore(course, queryLower));
+  }
+  return courses.sort((a, b) => scores.get(b)! - scores.get(a)!);
 }
 
 /**
