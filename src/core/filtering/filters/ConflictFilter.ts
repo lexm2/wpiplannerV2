@@ -43,25 +43,32 @@ export class ConflictFilter implements SectionBasedFilter {
       return sections;
     }
 
-    // Build set of selected section CRNs so we don't filter them out
+    // Selected section CRNs per course: a course is never hidden for clashing
+    // with its own picks, since another of its sections would replace them.
+    const ownCrnsByCourse = new Map<string, Set<string>>();
+    for (const sc of criteria.selectedCourses ?? []) {
+      ownCrnsByCourse.set(
+        sc.course.id,
+        new Set(getSelectedSections(sc).map(s => String(s.crn))),
+      );
+    }
     const selectedCrns = new Set(
-      (criteria.selectedCourses ?? [])
-        .flatMap(sc => getSelectedSections(sc))
-        .map(s => String(s.crn)),
+      [...ownCrnsByCourse.values()].flatMap(crns => [...crns]),
     );
 
     return sections.filter(fs => {
       const currentCrn = String(fs.section.crn);
+      const ownCrns = ownCrnsByCourse.get(fs.course.id);
 
       // Never filter out a currently selected section
       if (selectedCrns.has(currentCrn)) {
         return true;
       }
 
-      // Exclude blocked slots that came from this section's own CRN
+      // Exclude blocked slots that came from this section's own course
       const relevantBlockedSlots = blockedSlots.filter(slot => {
         const slotCrn = slot.id.split('-')[0];
-        return slotCrn !== currentCrn;
+        return slotCrn !== currentCrn && !ownCrns?.has(slotCrn);
       });
 
       if (relevantBlockedSlots.length === 0) {

@@ -78,3 +78,37 @@ test('calendar-events toggle reflects its state and turns off cleanly', async ({
   await expect(toggle).not.toBeChecked();
   expect(await blockedSlotCount(page)).toBeNull();
 });
+
+test('"avoid conflicts" follows the selection made after it was switched on', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await page.click('#filter-btn');
+  await page.check('#avoid-conflicts-filter');
+  await page.keyboard.press('Escape');
+
+  const picked = await page.evaluate(async () => {
+    const services = (window as any).services;
+    const course = services.courseDataService
+      .getAllDepartments()
+      .find((d: any) => d.abbreviation === 'CS')
+      .courses.find((c: any) => c.lectures?.length);
+    await services.courseSelectionService.selectCourse(course);
+    await services.courseSelectionService.setSelectedSection(
+      course,
+      course.lectures[0].section.number,
+    );
+    return course.id;
+  });
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as any).services.filterService
+            .getCriteria('periodConflict')
+            ?.selectedCourses?.map((sc: any) => sc.course.id) ?? [],
+      ),
+    )
+    .toEqual([picked]);
+});

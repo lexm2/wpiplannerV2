@@ -1,5 +1,6 @@
 import { untrack } from 'svelte';
 import type { PageId } from '../types/uiState';
+import type { ConflictCriteria } from '../types/filters';
 import type { ServiceContainer } from '../bootstrap/ServiceContainer';
 import { uiState } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
@@ -64,7 +65,9 @@ export function installAppEffects(services: ServiceContainer): void {
   });
 
   // Selection change -> release colors for deselected courses + invalidate any
-  // generated auto-schedules. The initial run (mount, empty selection) is skipped.
+  // generated auto-schedules + refresh the sections "avoid conflicts" blocks
+  // against (it stores them, and would otherwise keep the selection from when
+  // it was switched on). The initial run (mount, empty selection) is skipped.
   let selectionInit = false;
   $effect(() => {
     appState.selectedById; // track selection identity changes
@@ -75,6 +78,15 @@ export function installAppEffects(services: ServiceContainer): void {
       }
       services.colorService.releaseUnselectedColors();
       services.autoScheduleOrchestrator.invalidateOnSelectionChange();
+
+      const conflict =
+        services.filterService.getCriteria<ConflictCriteria>('periodConflict');
+      if (conflict?.avoidConflicts) {
+        services.filterService.addFilter('periodConflict', {
+          ...conflict,
+          selectedCourses: services.courseSelectionService.getSelectedCourses(),
+        });
+      }
     });
   });
 
