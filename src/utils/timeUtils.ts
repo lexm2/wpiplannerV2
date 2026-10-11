@@ -1,14 +1,6 @@
 import { Time, DayOfWeek } from '../types/types';
 
 export class TimeUtils {
-  // Schedule grid: 8 AM to 8 PM, hourly slots
-  static readonly START_HOUR = 8;
-  static readonly END_HOUR = 20;
-  static readonly TOTAL_HOURS = 12;
-  static readonly SLOTS_PER_HOUR = 1;
-  static readonly TOTAL_TIME_SLOTS =
-    TimeUtils.TOTAL_HOURS * TimeUtils.SLOTS_PER_HOUR;
-
   static readonly DAYS_ORDER = [
     DayOfWeek.MONDAY,
     DayOfWeek.TUESDAY,

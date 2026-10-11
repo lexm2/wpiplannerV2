@@ -2,14 +2,14 @@
   import { untrack, type Snippet } from 'svelte';
   import { TimeUtils } from '../../utils/timeUtils';
   import type { TimeGridMode, TimeWindow } from '../../types/filters';
+  import { gridHours, hourLabel, type GridRange } from '../../utils/gridRange';
   import {
     CELL_MINUTES,
     GRID_DAYS,
-    GRID_START_MIN,
-    ROWS_PER_DAY,
-    cellIndex,
+    cellIndex as cellIndexIn,
     cellsFromWindows,
     describeWindows,
+    rowCount,
     rowStartMin,
     windowsFromCells,
   } from '../../utils/timeWindows';
@@ -17,11 +17,14 @@
 
   let {
     windows,
+    range: initialRange,
     mode: initialMode = 'only',
     onchange,
     toolbarExtra,
   }: {
     windows: TimeWindow[];
+    /** The hours shown; fixed while the picker is open. */
+    range: GridRange;
     mode?: TimeGridMode;
     onchange: (mode: TimeGridMode, windows: TimeWindow[]) => void;
     /** Rendered at the right of the toolbar. */
@@ -32,8 +35,16 @@
   type Rect = { d0: number; d1: number; r0: number; r1: number };
   type Brush = 'paint' | 'erase';
 
+  // Cells are row indices into this range, so it holds still while they live.
+  const range = untrack(() => initialRange);
+  const rows = rowCount(range);
+  const cellIndex = (dayIndex: number, row: number) =>
+    cellIndexIn(dayIndex, row, range);
+
   // Seeded once; the picker owns the selection while it is open.
-  let cells = $state.raw<Set<number>>(untrack(() => cellsFromWindows(windows)));
+  let cells = $state.raw<Set<number>>(
+    untrack(() => cellsFromWindows(windows, range)),
+  );
   let gridMode = $state<TimeGridMode>(untrack(() => initialMode));
 
   // A rectangle from an anchor cell, so a fast flick cannot skip cells.
@@ -55,18 +66,10 @@
   const painted = $derived(
     dragRect ? applyRect(cells, dragRect, brush) : cells,
   );
-  const previewWindows = $derived(windowsFromCells(painted));
+  const previewWindows = $derived(windowsFromCells(painted, range));
   const summary = $derived(describeWindows(previewWindows, gridMode));
 
-  const hours = Array.from({ length: TimeUtils.TOTAL_TIME_SLOTS }, (_, i) => i);
-
-  function hourLabel(i: number): string {
-    return TimeUtils.formatTime({
-      hours: TimeUtils.START_HOUR + i,
-      minutes: 0,
-      displayTime: '',
-    });
-  }
+  const hours = Array.from({ length: gridHours(range) }, (_, i) => i);
 
   function clamp(v: number, lo: number, hi: number): number {
     return Math.max(lo, Math.min(v, hi));
@@ -109,9 +112,9 @@
         GRID_DAYS.length - 1,
       ),
       row: clamp(
-        Math.floor(((clientY - r.top) / r.height) * ROWS_PER_DAY),
+        Math.floor(((clientY - r.top) / r.height) * rows),
         0,
-        ROWS_PER_DAY - 1,
+        rows - 1,
       ),
     };
   }
@@ -119,7 +122,7 @@
   /** Single write path; runs on commit, never per pointermove. */
   function commit(next: Set<number>): void {
     cells = next;
-    onchange(gridMode, windowsFromCells(cells));
+    onchange(gridMode, windowsFromCells(cells, range));
   }
 
   function onPointerDown(e: PointerEvent): void {
@@ -159,9 +162,7 @@
   }
 
   function toggleColumn(dayIndex: number): void {
-    const full = Array.from({ length: ROWS_PER_DAY }, (_, r) =>
-      cellIndex(dayIndex, r),
-    );
+    const full = Array.from({ length: rows }, (_, r) => cellIndex(dayIndex, r));
     const allPainted = full.every(i => cells.has(i));
     const next = new Set(cells);
     for (const i of full) {
@@ -186,7 +187,7 @@
 
   function setMode(next: TimeGridMode): void {
     gridMode = next;
-    onchange(gridMode, windowsFromCells(cells));
+    onchange(gridMode, windowsFromCells(cells, range));
   }
 
   function clearAll(): void {
@@ -210,7 +211,7 @@
     else if (!keyAnchor) startKeyRun();
     focusCell = {
       dayIndex: clamp(focusCell.dayIndex + dDay, 0, GRID_DAYS.length - 1),
-      row: clamp(focusCell.row + dRow, 0, ROWS_PER_DAY - 1),
+      row: clamp(focusCell.row + dRow, 0, rows - 1),
     };
     if (keyAnchor) {
       commit(applyRect(keyBase, rectOf(keyAnchor, focusCell), keyBrush));
@@ -239,7 +240,7 @@
         break;
       case 'End':
         keyAnchor = null;
-        focusCell = { ...focusCell, row: ROWS_PER_DAY - 1 };
+        focusCell = { ...focusCell, row: rows - 1 };
         break;
       case 'PageUp':
         keyAnchor = null;
@@ -268,12 +269,14 @@
     e.preventDefault();
   }
 
+  const spanMin = range.endMin - range.startMin;
+
   function topPct(startMin: number): string {
-    return `${((startMin - GRID_START_MIN) / (ROWS_PER_DAY * CELL_MINUTES)) * 100}%`;
+    return `${((startMin - range.startMin) / spanMin) * 100}%`;
   }
 
   function heightPct(startMin: number, endMin: number): string {
-    return `${((endMin - startMin) / (ROWS_PER_DAY * CELL_MINUTES)) * 100}%`;
+    return `${((endMin - startMin) / spanMin) * 100}%`;
   }
 </script>
 
@@ -296,7 +299,7 @@
     {@render toolbarExtra?.()}
   </div>
 
-  <div class={styles.grid}>
+  <div class={styles.grid} style:--grid-hours={hours.length}>
     <div class="time-label {styles.corner}"></div>
     {#each GRID_DAYS as day, i (day)}
       <button
@@ -313,8 +316,8 @@
         class="time-label {styles.labelBtn}"
         style:grid-column="1"
         style:grid-row={hour + 2}
-        title={`Select ${hourLabel(hour)} on every day`}
-        onclick={() => toggleHour(hour)}>{hourLabel(hour)}</button
+        title={`Select ${hourLabel(range, hour)} on every day`}
+        onclick={() => toggleHour(hour)}>{hourLabel(range, hour)}</button
       >
     {/each}
 
@@ -353,7 +356,7 @@
           class={styles.focusRing}
           style:left="{focusCell.dayIndex * 20}%"
           style:width="20%"
-          style:top={topPct(rowStartMin(focusCell.row))}
+          style:top={topPct(rowStartMin(focusCell.row, range))}
           style:height={heightPct(0, CELL_MINUTES)}
         ></div>
       {/if}

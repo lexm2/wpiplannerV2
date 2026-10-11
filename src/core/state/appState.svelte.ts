@@ -4,6 +4,7 @@ import type {
   SchedulePreferences,
 } from '../../types/schedule';
 import type { Department } from '../../types/types';
+import { catalogGridRange } from '../../utils/timeWindows';
 
 /**
  * Reactive application state (Svelte 5 runes) - the single source of truth that
@@ -82,6 +83,12 @@ class AppState {
   selectedById = $derived(
     new Map(this.selectedCourses.map(sc => [sc.course.id, sc])),
   );
+
+  /**
+   * The hours the catalog's classes span, for the Times picker. Recomputed
+   * once per catalog load, not per render.
+   */
+  catalogRange = $derived(catalogGridRange(this.loadedDepartments));
 
   /** Bookmarked course ids as a Set, derived from preferences. */
   bookmarkedIds = $derived(new Set(this.preferences.bookmarkedCourseIds ?? []));

@@ -6,7 +6,9 @@
   display: grid;
   width: 100%;
   grid-template-columns: 60px repeat(5, 1fr);
-  grid-template-rows: auto repeat(12, 1fr);
+  /* One row per hour of the picker's range (TimeGridPicker sets the count);
+     minmax(0, ...) lets a wide range shrink rows rather than overflow. */
+  grid-template-rows: auto repeat(var(--grid-hours, 12), minmax(0, 1fr));
   gap: 0;
   container-type: inline-size;
   font-size: 0.7rem;
@@ -61,12 +63,12 @@
     repeating-linear-gradient(
       to bottom,
       var(--color-border) 0 1px,
-      transparent 1px calc(100% / 12)
+      transparent 1px calc(100% / var(--grid-hours, 12))
     ),
     repeating-linear-gradient(
       to bottom,
       color-mix(in srgb, var(--color-border) 45%, transparent) 0 1px,
-      transparent 1px calc(100% / 24)
+      transparent 1px calc(100% / var(--grid-hours, 12) / 2)
     ),
     repeating-linear-gradient(
       to right,

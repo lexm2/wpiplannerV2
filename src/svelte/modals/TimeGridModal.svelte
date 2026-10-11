@@ -11,6 +11,8 @@
   import Modal from './Modal.svelte';
   import TimeGridPicker from '../filters/TimeGridPicker.svelte';
   import FilterToggle from '../filters/FilterToggle.svelte';
+  import { appState } from '../../core/state/appState.svelte';
+  import { gridRangeOf } from '../../utils/gridRange';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type {
     AsyncFilterCriteria,
@@ -32,6 +34,11 @@
   );
   const initialWindows: TimeWindow[] = seed?.windows ?? [];
   const initialMode: TimeGridMode = seed?.mode ?? lastMode;
+  // The catalog's hours, widened for any stored window outside them so
+  // reopening never trims a selection.
+  const range = untrack(() =>
+    gridRangeOf(initialWindows, appState.catalogRange),
+  );
 
   const includeAsync = $derived(
     filterService.getCriteria<AsyncFilterCriteria>('async')?.include !== false,
@@ -60,7 +67,12 @@
 >
   {#snippet children(close)}
     <div class="modal-body">
-      <TimeGridPicker windows={initialWindows} mode={initialMode} {onchange}>
+      <TimeGridPicker
+        windows={initialWindows}
+        {range}
+        mode={initialMode}
+        {onchange}
+      >
         {#snippet toolbarExtra()}
           <FilterToggle
             id="include-async-filter"

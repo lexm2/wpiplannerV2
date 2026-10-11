@@ -33,33 +33,93 @@ async function openPicker(page: Page): Promise<void> {
   await page.waitForTimeout(SETTLE_MS);
 }
 
-/** Grid geometry, in viewport pixels: 5 day columns by 24 half-hour rows. */
+const hourLabels = (page: Page) =>
+  page.locator(`${GRID} [title^="Select "][title$=" on every day"]`);
+
+/** Minutes after midnight for an hour label like "6:00 AM". */
+function labelMin(text: string): number {
+  const m = text.trim().match(/^(\d+):00 (AM|PM)$/);
+  if (!m) throw new Error(`not an hour label: ${text}`);
+  return ((Number(m[1]) % 12) + (m[2] === 'PM' ? 12 : 0)) * 60;
+}
+
+/** The hours the picker shows, read off its row labels. */
+async function pickerRange(page: Page) {
+  const labels = await hourLabels(page).allTextContents();
+  const startMin = labelMin(labels[0]);
+  return { startMin, endMin: startMin + labels.length * 60 };
+}
+
+/**
+ * Grid geometry, in viewport pixels: 5 day columns by one row per 30 minutes
+ * of the picker's range. `y(min)` is the middle of the row starting at `min`.
+ */
 async function geometry(page: Page) {
   const r = await page.locator(BODY).boundingBox();
   if (!r) throw new Error('grid body has no box');
+  const { startMin, endMin } = await pickerRange(page);
+  const rows = (endMin - startMin) / 30;
   return {
+    startMin,
+    endMin,
     x: (dayIndex: number) => r.x + (r.width / 5) * (dayIndex + 0.5),
-    y: (row: number) => r.y + (r.height / 24) * (row + 0.5),
+    y: (min: number) => r.y + (r.height / rows) * ((min - startMin) / 30 + 0.5),
   };
 }
 
-/** Row 4 is 10:00 AM (row 0 is 8:00, half-hour rows). */
-const ROW_10AM = 4;
-const ROW_1130AM = 7;
+const AT_10AM = 600;
+const AT_1130AM = 690;
 
+/** Drags between the rows starting at `from.at` and `to.at` (minutes). */
 async function drag(
   page: Page,
-  from: { day: number; row: number },
-  to: { day: number; row: number },
+  from: { day: number; at: number },
+  to: { day: number; at: number },
 ): Promise<void> {
   const g = await geometry(page);
-  await page.mouse.move(g.x(from.day), g.y(from.row));
+  await page.mouse.move(g.x(from.day), g.y(from.at));
   await page.mouse.down();
-  await page.mouse.move(g.x(to.day), g.y(to.row), { steps: 8 });
+  await page.mouse.move(g.x(to.day), g.y(to.at), { steps: 8 });
   await page.mouse.up();
 }
 
+/** The earliest start and latest end over every timed catalog period. */
+async function catalogSpan(page: Page) {
+  return page.evaluate(() => {
+    let startMin = Infinity;
+    let endMin = -Infinity;
+    const depts = (
+      window as any
+    ).services.courseDataService.getAllDepartments();
+    for (const d of depts)
+      for (const c of d.courses)
+        for (const lg of c.lectures ?? [])
+          for (const s of [
+            lg.section,
+            ...lg.compatibleDiscussions,
+            ...lg.compatibleLabs,
+          ])
+            for (const p of s.periods) {
+              const a = p.startTime.hours * 60 + p.startTime.minutes;
+              const b = p.endTime.hours * 60 + p.endTime.minutes;
+              if (p.isAsync || p.days.size === 0 || b <= a) continue;
+              startMin = Math.min(startMin, a);
+              endMin = Math.max(endMin, b);
+            }
+    return { startMin, endMin };
+  });
+}
+
+const timesWindows = (page: Page) =>
+  page.evaluate(
+    () =>
+      (window as any).services.filterService.getCriteria('times')?.windows ??
+      [],
+  );
+
 const summary = (page: Page) => page.locator(`${GRID} [aria-live]`);
+const modeButton = (page: Page, mode: 'Only' | 'Avoid') =>
+  page.locator(GRID).getByRole('button', { name: `${mode} these times` });
 const previewCount = async (page: Page): Promise<number> => {
   const text = (await page.locator('.filter-preview').textContent()) ?? '';
   return Number(text.match(/^(\d+)/)?.[1] ?? NaN);
@@ -72,7 +132,7 @@ test('dragging a window filters the course list to courses that fit it', async (
   const before = await previewCount(page);
 
   // Tue 10:00 through Thu 11:30 - a Tue/Thu 10-12 gap.
-  await drag(page, { day: 1, row: ROW_10AM }, { day: 3, row: ROW_1130AM });
+  await drag(page, { day: 1, at: AT_10AM }, { day: 3, at: AT_1130AM });
 
   await expect(summary(page)).toHaveText(
     'Only Tue, Wed, Thu 10:00 AM-12:00 PM',
@@ -89,11 +149,11 @@ test('dragging a window filters the course list to courses that fit it', async (
 
 test('dragging back over a painted region erases it', async ({ page }) => {
   await openPicker(page);
-  await drag(page, { day: 1, row: ROW_10AM }, { day: 3, row: ROW_1130AM });
+  await drag(page, { day: 1, at: AT_10AM }, { day: 3, at: AT_1130AM });
   await expect(summary(page)).toContainText('Tue, Wed, Thu');
 
   // Starting the drag on an already-painted cell subtracts instead of adding.
-  await drag(page, { day: 2, row: ROW_10AM }, { day: 2, row: ROW_1130AM });
+  await drag(page, { day: 2, at: AT_10AM }, { day: 2, at: AT_1130AM });
   await expect(summary(page)).toHaveText('Only Tue, Thu 10:00 AM-12:00 PM');
 });
 
@@ -101,7 +161,7 @@ test('clearing the grid removes the filter entirely', async ({ page }) => {
   await openPicker(page);
   const before = await previewCount(page);
 
-  await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
+  await drag(page, { day: 1, at: AT_10AM }, { day: 1, at: AT_1130AM });
   expect(await previewCount(page)).toBeLessThan(before);
 
   await page.locator(GRID).getByRole('button', { name: 'Clear' }).click();
@@ -127,13 +187,79 @@ test('escape closes only the picker, leaving the filter modal open', async ({
 
 test('a painted selection survives reopening the picker', async ({ page }) => {
   await openPicker(page);
-  await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
+  await drag(page, { day: 1, at: AT_10AM }, { day: 1, at: AT_1130AM });
   await page.locator(GRID).getByRole('button', { name: 'Done' }).click();
   await page.waitForTimeout(SETTLE_MS);
 
   await page.click('#edit-times-btn');
   await page.waitForTimeout(SETTLE_MS);
   await expect(summary(page)).toHaveText('Only Tue 10:00 AM-12:00 PM');
+});
+
+test('the picker spans every hour the catalog meets', async ({ page }) => {
+  await openPicker(page);
+  const catalog = await catalogSpan(page);
+  // The premise: classes run from before 8 AM to after 8 PM.
+  expect(catalog.startMin).toBeLessThan(480);
+  expect(catalog.endMin).toBeGreaterThan(1200);
+
+  expect(await pickerRange(page)).toEqual({
+    startMin: Math.floor(catalog.startMin / 60) * 60,
+    endMin: Math.ceil(catalog.endMin / 60) * 60,
+  });
+});
+
+test('painting every day as Only keeps every timed course', async ({
+  page,
+}) => {
+  await openPicker(page);
+  const before = await previewCount(page);
+
+  for (const day of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']) {
+    await page
+      .locator(GRID)
+      .getByRole('button', { name: day, exact: true })
+      .click();
+  }
+  const { startMin, endMin } = await pickerRange(page);
+  expect(await timesWindows(page)).toHaveLength(5);
+  for (const w of await timesWindows(page)) {
+    expect(w).toMatchObject({ startMin, endMin });
+  }
+  expect(await previewCount(page)).toBe(before);
+});
+
+test('avoiding the hours before 8 AM hides sections that start then', async ({
+  page,
+}) => {
+  await openPicker(page);
+  const before = await previewCount(page);
+  const { startMin } = await pickerRange(page);
+
+  await modeButton(page, 'Avoid').click();
+  await drag(page, { day: 0, at: startMin }, { day: 4, at: 450 });
+  expect(await timesWindows(page)).toHaveLength(5);
+  for (const w of await timesWindows(page)) {
+    expect(w).toMatchObject({ startMin, endMin: 480 });
+  }
+  expect(await previewCount(page)).toBeLessThan(before);
+
+  // Every section the list still offers meets no earlier than 8:00.
+  const earliest = await page.evaluate(() => {
+    const { courseDataService, filterService } = (window as any).services;
+    const courses = courseDataService
+      .getAllDepartments()
+      .flatMap((d: any) => d.courses);
+    let min = Infinity;
+    for (const fs of filterService.apply(courses))
+      for (const p of fs.section.periods) {
+        const a = p.startTime.hours * 60 + p.startTime.minutes;
+        const b = p.endTime.hours * 60 + p.endTime.minutes;
+        if (!p.isAsync && p.days.size > 0 && b > a) min = Math.min(min, a);
+      }
+    return min;
+  });
+  expect(earliest).toBeGreaterThanOrEqual(480);
 });
 
 test('the async toggle hides sections with no meeting time', async ({
@@ -176,7 +302,8 @@ test('the async toggle hides sections with no meeting time', async ({
  */
 async function expectPickerFits(page: Page): Promise<void> {
   // Something painted, so the summary's Clear button is showing too.
-  await drag(page, { day: 0, row: 0 }, { day: 0, row: 0 });
+  const { startMin, endMin } = await geometry(page);
+  await drag(page, { day: 0, at: startMin }, { day: 0, at: startMin });
   await expect(
     page.locator(GRID).getByRole('button', { name: 'Clear' }),
   ).toBeVisible();
@@ -199,10 +326,16 @@ async function expectPickerFits(page: Page): Promise<void> {
     await expect(control).toBeInViewport({ ratio: 0.99 });
   }
 
-  // The pixel->row math still lands on the last row: 7:30 PM is row 23.
+  // The pixel->row math still lands on the first and last rows, which the
+  // wider range has made the shortest they have been.
   await page.locator(GRID).getByRole('button', { name: 'Clear' }).click();
-  await drag(page, { day: 4, row: 23 }, { day: 4, row: 23 });
-  await expect(summary(page)).toHaveText('Only Fri 7:30-8:00 PM');
+  for (const at of [startMin, endMin - 30]) {
+    await drag(page, { day: 4, at }, { day: 4, at });
+    expect(await timesWindows(page)).toEqual([
+      { day: 'F', startMin: at, endMin: at + 30 },
+    ]);
+    await page.locator(GRID).getByRole('button', { name: 'Clear' }).click();
+  }
 }
 
 for (const size of [
@@ -256,16 +389,13 @@ async function useTheme(page: Page, theme: string): Promise<void> {
   );
 }
 
-const modeButton = (page: Page, mode: 'Only' | 'Avoid') =>
-  page.locator(GRID).getByRole('button', { name: `${mode} these times` });
-
 for (const theme of THEMES) {
   test(`avoid paint is patterned apart from only paint in ${theme}`, async ({
     page,
   }) => {
     await useTheme(page, theme);
     await openPicker(page);
-    await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
+    await drag(page, { day: 1, at: AT_10AM }, { day: 1, at: AT_1130AM });
 
     const painted = page.locator(`${BODY} > [class*="painted"]`).first();
     const image = () =>
@@ -291,16 +421,45 @@ test('the chosen mode survives reopening with nothing painted', async ({
   await expect(modeButton(page, 'Avoid')).toHaveClass(/\bactive\b/);
 
   // Painting now applies the remembered mode.
-  await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
+  await drag(page, { day: 1, at: AT_10AM }, { day: 1, at: AT_1130AM });
   await expect(summary(page)).toHaveText('Avoid Tue 10:00 AM-12:00 PM');
+});
+
+/** Focuses the grid, which puts the focus on Mon's first row, then moves it
+ * down to the row starting at `min`. */
+async function focusAt(page: Page, min: number): Promise<void> {
+  const { startMin } = await pickerRange(page);
+  await page.locator(BODY).focus();
+  for (let at = startMin; at < min; at += 30) {
+    await page.keyboard.press('ArrowDown');
+  }
+}
+
+test('the keyboard reaches both ends of the range', async ({ page }) => {
+  await openPicker(page);
+  const { startMin, endMin } = await pickerRange(page);
+  await page.locator(BODY).focus();
+
+  // Focus starts on the first row.
+  await page.keyboard.press('Space');
+  expect(await timesWindows(page)).toEqual([
+    { day: 'M', startMin, endMin: startMin + 30 },
+  ]);
+
+  // End jumps to the last row; Shift+ArrowUp grows the rectangle back up.
+  await page.keyboard.press('End');
+  await page.keyboard.press('Shift+ArrowUp');
+  expect(await timesWindows(page)).toEqual([
+    { day: 'M', startMin, endMin: startMin + 30 },
+    { day: 'M', startMin: endMin - 60, endMin },
+  ]);
 });
 
 test('shift and arrow keys paint a rectangle from the anchor', async ({
   page,
 }) => {
   await openPicker(page);
-  // Focus starts on Mon 8:00.
-  await page.locator(BODY).focus();
+  await focusAt(page, 480);
 
   await page.keyboard.press('Shift+ArrowRight');
   await page.keyboard.press('Shift+ArrowDown');
@@ -313,7 +472,7 @@ test('shift and arrow keys paint a rectangle from the anchor', async ({
 
 test('space then shift and arrow keys keeps painting', async ({ page }) => {
   await openPicker(page);
-  await page.locator(BODY).focus();
+  await focusAt(page, 480);
 
   // Space toggles the anchor on, like pressing the mouse on an empty cell,
   // so extending from it paints rather than erasing.
