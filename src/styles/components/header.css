@@ -69,6 +69,11 @@
   justify-content: center;
   margin: 0 0.5rem;
   max-width: calc(100% - 400px);
+  /* The page tabs are controls, not text: a drag or long press on them should
+     not select their labels (or, on iOS, pop up the copy callout). */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .nav-tabs-pill {
@@ -359,8 +364,12 @@ html.is-mobile .header-navigation {
     padding-bottom: var(--tab-bar-height);
   }
 
-  /* Below the drawers (z-index 79/80) and modals, which cover it when open. */
+  /* Below the drawers (z-index 79/80) and modals, which cover it when open.
+     Like the tabs, none of the bar is selectable text. */
   .app-header {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
     position: fixed;
     left: 0;
     right: 0;
