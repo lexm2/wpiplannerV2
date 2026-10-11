@@ -437,17 +437,6 @@
   vertical-align: middle;
 }
 
-@media (max-height: 1100px) {
-  .wizard-content {
-    padding-bottom: 0;
-  }
-
-  .wizard-footer {
-    background-color: transparent;
-    border-top: none;
-  }
-}
-
 .wizard-filtered-notice {
   display: flex;
   align-items: center;

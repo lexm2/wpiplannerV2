@@ -117,3 +117,16 @@ test('section info lists meeting days in week order', async ({ page }) => {
     new RegExp(`^${expected}\\s`),
   );
 });
+
+test('the wizard footer is opaque over the section cards', async ({ page }) => {
+  // Below the 1100px-tall breakpoint the footer overlays the scrolling cards.
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await setupSchedule(page);
+  await openWizard(page);
+
+  const bg = await page
+    .locator('[class*="wizard-footer"]')
+    .evaluate(el => getComputedStyle(el).backgroundColor);
+  expect(bg).not.toBe('rgba(0, 0, 0, 0)');
+  expect(bg).not.toBe('transparent');
+});
