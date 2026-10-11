@@ -159,6 +159,38 @@
     }
   }
 
+  // Copy-into mode: "Copy Into" picks the source, then clicking another row
+  // picks the target.
+  let copySourceId = $state<string | null>(null);
+  const copySource = $derived(
+    schedules.find(s => s.id === copySourceId) ?? null,
+  );
+
+  async function copyInto(targetId: string): Promise<void> {
+    const sourceId = copySourceId;
+    copySourceId = null;
+    if (!sourceId) return;
+    try {
+      const result = await scheduleManagementService.copyScheduleInto(
+        sourceId,
+        targetId,
+      );
+      if (result.success) refreshTick++;
+      else showAppError(`Copy failed: ${result.error}`);
+    } catch (error) {
+      logger.error('Failed to copy schedule:', error);
+      showAppError('Failed to copy schedule. Please try again.');
+    }
+  }
+
+  function onRowClick(schedule: Schedule): void {
+    if (copySourceId) {
+      if (schedule.id !== copySourceId) void copyInto(schedule.id);
+      return;
+    }
+    if (editingId !== schedule.id) void switchToSchedule(schedule.id);
+  }
+
   // Schedule actions
   //
   // setActiveSchedule reports failure by returning {success:false, error}
@@ -189,6 +221,9 @@
           break;
         case 'duplicate':
           await duplicateSchedule(schedule);
+          break;
+        case 'copy-into':
+          copySourceId = schedule.id;
           break;
         case 'export':
           await exportSchedule(schedule.id);
@@ -441,6 +476,19 @@
       <div class="modal-pages-container" bind:this={pagesContainer}>
         <div class="modal-page schedules-page">
           <div class="schedule-list">
+            {#if copySource}
+              <div class="schedule-copy-banner" role="status">
+                <span
+                  >Click a schedule to copy the courses from <strong
+                    >{copySource.name}</strong
+                  > into it.</span
+                >
+                <button
+                  class="btn btn-secondary"
+                  onclick={() => (copySourceId = null)}>Cancel</button
+                >
+              </div>
+            {/if}
             {#if schedules.length === 0}
               <div class="schedule-list-empty">No schedules found</div>
             {:else}
@@ -450,11 +498,11 @@
                 <div
                   class="schedule-item"
                   class:active={isActive}
+                  class:copy-source={copySourceId === schedule.id}
+                  class:copy-target={copySourceId !== null &&
+                    copySourceId !== schedule.id}
                   data-schedule-id={schedule.id}
-                  onclick={() => {
-                    if (editingId !== schedule.id)
-                      void switchToSchedule(schedule.id);
-                  }}
+                  onclick={() => onRowClick(schedule)}
                 >
                   <div class="schedule-item-info">
                     {#if editingId === schedule.id}
@@ -487,57 +535,74 @@
                     </div>
                   </div>
 
-                  <div class="schedule-item-actions">
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('rename', schedule);
-                      }}>Rename</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('duplicate', schedule);
-                      }}>Duplicate</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('export', schedule);
-                      }}>Export</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('export-ics', schedule);
-                      }}>Export ICS</button
-                    >
-                    <button
-                      class="btn-link inline-action-btn"
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('import', schedule);
-                      }}>Import</button
-                    >
-                    {#if schedules.length > 1}
+                  {#if copySourceId === schedule.id}
+                    <div class="schedule-item-actions copy-hint">
+                      Copying from
+                    </div>
+                  {:else if copySourceId}
+                    <div class="schedule-item-actions copy-hint">Copy here</div>
+                  {:else}
+                    <div class="schedule-item-actions">
                       <button
-                        class="btn-link inline-action-btn danger"
+                        class="btn-link inline-action-btn"
                         onclick={e => {
                           e.stopPropagation();
-                          void handleAction('delete', schedule);
-                        }}>Delete</button
+                          void handleAction('rename', schedule);
+                        }}>Rename</button
                       >
-                    {/if}
-                    <button
-                      class="btn-link {styles['menuBtn']}"
-                      title="More options"
-                      onclick={e => toggleMenu(e, schedule.id)}>⋮</button
-                    >
-                  </div>
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('duplicate', schedule);
+                        }}>Duplicate</button
+                      >
+                      {#if schedules.length > 1}
+                        <button
+                          class="btn-link inline-action-btn"
+                          onclick={e => {
+                            e.stopPropagation();
+                            void handleAction('copy-into', schedule);
+                          }}>Copy Into</button
+                        >
+                      {/if}
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('export', schedule);
+                        }}>Export</button
+                      >
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('export-ics', schedule);
+                        }}>Export ICS</button
+                      >
+                      <button
+                        class="btn-link inline-action-btn"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('import', schedule);
+                        }}>Import</button
+                      >
+                      {#if schedules.length > 1}
+                        <button
+                          class="btn-link inline-action-btn danger"
+                          onclick={e => {
+                            e.stopPropagation();
+                            void handleAction('delete', schedule);
+                          }}>Delete</button
+                        >
+                      {/if}
+                      <button
+                        class="btn-link {styles['menuBtn']}"
+                        title="More options"
+                        onclick={e => toggleMenu(e, schedule.id)}>⋮</button
+                      >
+                    </div>
+                  {/if}
 
                   <div
                     class={styles['scheduleItemMenu']}
@@ -559,6 +624,15 @@
                         void handleAction('duplicate', schedule);
                       }}>Duplicate</button
                     >
+                    {#if schedules.length > 1}
+                      <button
+                        class={styles['menuAction']}
+                        onclick={e => {
+                          e.stopPropagation();
+                          void handleAction('copy-into', schedule);
+                        }}>Copy Into</button
+                      >
+                    {/if}
                     <button
                       class={styles['menuAction']}
                       onclick={e => {

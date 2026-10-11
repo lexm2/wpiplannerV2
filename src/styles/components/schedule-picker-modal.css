@@ -370,3 +370,42 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
 html.is-mobile .schedule-picker-modal-dialog .modal-footer {
   display: none;
 }
+
+/* Copy-into mode: a banner names the source, and every other row becomes a
+   drop target. */
+.schedule-picker-modal-dialog .schedule-copy-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary-background);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.schedule-picker-modal-dialog .schedule-item.copy-source {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.schedule-picker-modal-dialog .schedule-item.copy-source:hover {
+  background: none;
+}
+
+.schedule-picker-modal-dialog .schedule-item.copy-target:hover {
+  background: var(--color-primary-background);
+}
+
+.schedule-picker-modal-dialog .copy-hint {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.schedule-picker-modal-dialog .schedule-item.copy-target:hover .copy-hint {
+  color: var(--color-primary);
+}

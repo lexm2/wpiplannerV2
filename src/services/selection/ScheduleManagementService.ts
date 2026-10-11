@@ -576,33 +576,73 @@ export class ScheduleManagementService {
 
       const importedCourses =
         this.profileStateManager.parseImportCourses(jsonData);
-      const existing = this.profileStateManager
-        .getAllSchedules()
-        .find(s => s.id === scheduleId);
-      if (!existing) {
-        return { success: false, error: 'Schedule not found' };
-      }
-
-      const existingIds = new Set(
-        existing.selectedCourses.map(c => c.course.id),
-      );
-      const merged = [
-        ...existing.selectedCourses,
-        ...importedCourses.filter(c => !existingIds.has(c.course.id)),
-      ];
-
-      const result = await this.updateSchedule(scheduleId, {
-        selectedCourses: merged,
-      });
-
-      if (result.success && scheduleId === this.getActiveScheduleId()) {
-        this.profileStateManager.setActiveSchedule(scheduleId, 'api');
-      }
-
-      return result;
+      return await this.mergeCoursesInto(scheduleId, importedCourses);
     } catch (error) {
       return { success: false, error: `Import failed: ${errorMessage(error)}` };
     }
+  }
+
+  /**
+   * Add every course from one schedule to another, the in-app version of
+   * exporting the source and importing it into the target.
+   */
+  async copyScheduleInto(
+    sourceId: string,
+    targetId: string,
+  ): Promise<ScheduleOperationResult> {
+    try {
+      await this.ensureInitialized();
+
+      if (sourceId === targetId) {
+        return {
+          success: false,
+          error: 'Cannot copy a schedule into itself',
+        };
+      }
+      const source = this.getScheduleById(sourceId);
+      if (!source) {
+        return { success: false, error: 'Schedule not found' };
+      }
+
+      // Transient courses are never saved or exported, so leave them behind
+      // here too.
+      return await this.mergeCoursesInto(
+        targetId,
+        source.selectedCourses.filter(sc => !sc.course.transient),
+      );
+    } catch (error) {
+      return { success: false, error: `Copy failed: ${errorMessage(error)}` };
+    }
+  }
+
+  /**
+   * Append the courses the target does not already have. Courses it does have
+   * keep their own section picks.
+   */
+  private async mergeCoursesInto(
+    scheduleId: string,
+    courses: SelectedCourse[],
+  ): Promise<ScheduleOperationResult> {
+    const existing = this.getScheduleById(scheduleId);
+    if (!existing) {
+      return { success: false, error: 'Schedule not found' };
+    }
+
+    const existingIds = new Set(existing.selectedCourses.map(c => c.course.id));
+    const merged = [
+      ...existing.selectedCourses,
+      ...courses.filter(c => !existingIds.has(c.course.id)),
+    ];
+
+    const result = await this.updateSchedule(scheduleId, {
+      selectedCourses: merged,
+    });
+
+    if (result.success && scheduleId === this.getActiveScheduleId()) {
+      this.profileStateManager.setActiveSchedule(scheduleId, 'api');
+    }
+
+    return result;
   }
 
   getCourseSelectionService(): CourseSelectionService {
