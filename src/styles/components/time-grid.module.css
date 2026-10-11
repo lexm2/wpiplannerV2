@@ -87,7 +87,6 @@
 }
 
 .painted,
-.preview,
 .focusRing {
   position: absolute;
   pointer-events: none;
@@ -115,11 +114,6 @@
   );
   background-size: 8px 8px;
   border-left: 2px dashed var(--color-danger);
-}
-
-.preview {
-  border: 2px dashed var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
 }
 
 .focusRing {

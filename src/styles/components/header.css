@@ -327,9 +327,7 @@
   /* The dropdown is a header-controls child (position:fixed) - keep it visible too. */
   .app-header
     .header-controls
-    > :not(.settings-menu-btn):not(.hamburger-btn):not(
-      .settings-dropdown-menu
-    ) {
+    > :not(.settings-menu-btn):not(.settings-dropdown-menu) {
     display: none;
   }
 

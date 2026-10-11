@@ -360,15 +360,15 @@
 }
 
 .rmp-rating.excellent {
-  color: #4caf50;
+  color: var(--color-success);
 }
 
 .rmp-rating.good {
-  color: #ff9800;
+  color: var(--color-warning);
 }
 
 .rmp-rating.poor {
-  color: #f44336;
+  color: var(--color-error);
 }
 
 .rmp-details {

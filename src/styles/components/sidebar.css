@@ -103,47 +103,8 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.department-list.multi-select-active .department-item.active {
-  position: relative;
-  background: var(--color-primary) !important;
-  color: var(--color-text-inverse) !important;
-}
-
-.department-list.multi-select-active .department-item.active::after {
-  content: '✓';
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-weight: bold;
-  font-size: 0.8rem;
-  color: var(--color-text-inverse);
-  z-index: 1;
-}
-
 .department-item[data-dept-id].active {
   background: var(--color-primary) !important;
   color: var(--color-text-inverse) !important;
   font-weight: var(--font-weight-medium);
-}
-
-.department-list.multi-select-active .department-item.active {
-  border-left: 3px solid var(--color-text-inverse);
-  padding-left: calc(0.75rem - 3px);
-}
-
-.department-item.debug-selected {
-  outline: 2px solid red !important;
-  outline-offset: 1px;
-}
-
-.sidebar-header h2 {
-  transition: var(--effect-transition);
-  font-size: 1.1rem;
-  color: var(--color-text);
-}
-
-.department-list.multi-select-active {
-  border-left: 3px solid var(--color-primary);
-  padding-left: calc(1rem - 3px);
 }

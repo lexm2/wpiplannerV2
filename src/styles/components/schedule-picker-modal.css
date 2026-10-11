@@ -295,8 +295,7 @@
   }
 
   .schedule-picker-modal-dialog .modal-header,
-  .schedule-picker-modal-dialog .modal-footer,
-  .schedule-picker-modal-dialog .schedule-picker-toolbar {
+  .schedule-picker-modal-dialog .modal-footer {
     padding: 1rem 1.25rem;
   }
 
@@ -328,8 +327,7 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
     height: 85vh;
   }
 
-  .schedule-picker-modal-dialog .modal-header,
-  .schedule-picker-modal-dialog .schedule-picker-toolbar {
+  .schedule-picker-modal-dialog .modal-header {
     padding: 0.75rem 1.25rem;
   }
 
@@ -344,8 +342,7 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
     height: 90vh;
   }
 
-  .schedule-picker-modal-dialog .modal-header,
-  .schedule-picker-modal-dialog .schedule-picker-toolbar {
+  .schedule-picker-modal-dialog .modal-header {
     padding: 0.5rem 1rem;
   }
 

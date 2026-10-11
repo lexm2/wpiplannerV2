@@ -97,60 +97,6 @@
   margin-top: 0.85rem;
 }
 
-.modal-header.info {
-  background: linear-gradient(
-    135deg,
-    var(--color-info, #007bff),
-    var(--color-primary)
-  );
-  color: var(--color-text-inverse);
-}
-
-.modal-header.warning {
-  background: linear-gradient(
-    135deg,
-    var(--color-warning),
-    var(--color-warning)
-  );
-  color: var(--color-text-inverse);
-}
-
-.modal-header.error {
-  background: linear-gradient(135deg, var(--color-error), var(--color-error));
-  color: var(--color-text-inverse);
-}
-
-.modal-header.success {
-  background: linear-gradient(
-    135deg,
-    var(--color-success),
-    var(--color-success)
-  );
-  color: var(--color-text-inverse);
-}
-
-.modal-header.info .modal-title,
-.modal-header.warning .modal-title,
-.modal-header.error .modal-title,
-.modal-header.success .modal-title {
-  color: var(--color-text-inverse);
-}
-
-.modal-header.info .modal-close,
-.modal-header.warning .modal-close,
-.modal-header.error .modal-close,
-.modal-header.success .modal-close {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.modal-header.info .modal-close:hover,
-.modal-header.warning .modal-close:hover,
-.modal-header.error .modal-close:hover,
-.modal-header.success .modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-text-inverse);
-}
-
 .modal-footer {
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   display: flex;

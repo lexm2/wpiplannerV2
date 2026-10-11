@@ -29,41 +29,10 @@
   flex-shrink: 0;
 }
 
-.schedule-selector-container {
-  margin-bottom: 1rem;
-}
-
 .schedule-filter-controls {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-}
-
-.filter-btn.active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-}
-
-.filtered-section {
-  border-left: 3px solid var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.05);
-}
-
-.highlighted-period {
-  background: rgba(var(--color-primary-rgb), 0.1);
-  border-left: 2px solid var(--color-primary);
-  padding-left: 0.5rem;
-}
-
-.highlighted-period .period-type-label {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-primary);
-}
-
-.highlighted-period .period-schedule {
-  color: var(--color-text);
-  font-weight: var(--font-weight-medium);
 }
 
 .schedule-sidebar-content {
@@ -308,11 +277,11 @@
 }
 
 .selected-component.dis {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 
 .selected-component.lab {
-  background: #10b981;
+  background: var(--color-success);
 }
 
 .incomplete-warning {
@@ -322,7 +291,7 @@
 }
 
 .incomplete-warning .warning-icon {
-  color: #f59e0b;
+  color: var(--color-warning);
   vertical-align: middle;
   cursor: help;
 }
@@ -361,172 +330,6 @@
   stroke: currentColor;
   color: var(--color-text-secondary);
   opacity: 0.7;
-}
-
-.term-sections {
-  margin-bottom: 0.75rem;
-}
-
-.term-sections:last-child {
-  margin-bottom: 0;
-}
-
-.term-label {
-  font-size: 0.8rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.section-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--effect-border-radius);
-  background: var(--color-surface);
-  margin-bottom: 0.25rem;
-  transition: var(--effect-transition);
-  cursor: pointer;
-}
-
-.section-option:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-background);
-}
-
-.section-option.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-background);
-}
-
-.section-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.section-periods {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.period-info {
-  padding: 0.3rem 0;
-  border-left: 3px solid transparent;
-  padding-left: 0.5rem;
-  border-radius: 2px;
-  transition: var(--effect-transition);
-}
-
-.period-info[data-period-type*='lec'] {
-  border-left-color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.03);
-}
-
-.period-info[data-period-type*='lab'] {
-  border-left-color: #10b981;
-  background: rgba(16, 185, 129, 0.03);
-}
-
-.period-info[data-period-type*='dis'],
-.period-info[data-period-type*='rec'] {
-  border-left-color: #f59e0b;
-  background: rgba(245, 158, 11, 0.03);
-}
-
-.period-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.2rem;
-}
-
-.period-type-label {
-  font-size: 0.65rem;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-inverse);
-  background: var(--color-text-secondary);
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
-  text-transform: uppercase;
-  min-width: 28px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.period-info[data-period-type*='lec'] .period-type-label {
-  background: var(--color-primary);
-}
-
-.period-info[data-period-type*='lab'] .period-type-label {
-  background: #10b981;
-}
-
-.period-info[data-period-type*='dis'] .period-type-label,
-.period-info[data-period-type*='rec'] .period-type-label {
-  background: #f59e0b;
-}
-
-.period-schedule {
-  font-size: 0.75rem;
-  color: var(--color-text);
-  font-family: var(--font-family-mono);
-  font-weight: var(--font-weight-medium);
-}
-
-.period-details {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.period-professor {
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
-}
-
-.period-location {
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-.period-location::before {
-  content: '• ';
-  color: var(--color-border);
-}
-
-.section-select-btn {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: var(--effect-transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.section-select-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-background);
-}
-
-.section-select-btn.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
 }
 
 .schedule-main {
@@ -705,20 +508,14 @@
   min-height: 2rem;
 }
 
-.time-slot,
 .schedule-cell {
   background: var(--color-surface);
   border: 1px solid transparent;
   position: relative;
 }
 
-.time-slot:hover,
 .schedule-cell:hover {
   background: var(--color-background-alt);
-}
-
-.schedule-cell.occupied {
-  position: relative;
 }
 
 /* Absolute overlay layer for the declarative grid (ScheduleGrids/TermGrid):
@@ -793,12 +590,6 @@
   opacity: 0.8;
   box-shadow: 0 0 8px 2px var(--preview-color, var(--color-primary));
   /* height and top set inline based on actual class duration */
-}
-
-.section-preview.conflict {
-  border-color: #ff9800;
-  border-width: 3px;
-  background: rgba(255, 152, 0, 0.1);
 }
 
 .conflict-overlay {
