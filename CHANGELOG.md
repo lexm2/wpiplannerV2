@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026-10-10]
+
+### Added
+- Copy Into button in the Schedules list. Pick a schedule, then click another to add its courses to that one
+
 ## [2026-09-01]
 
 ### Added
