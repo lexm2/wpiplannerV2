@@ -12,8 +12,9 @@ import { STORAGE_KEYS } from '../utils/storageKeys';
  * Singleton theme system with JSON-based themes and pluggable storage strategy for persistence
  */
 
+/** Where later theme choices are saved. The saved theme is read only once,
+ * before first paint, by the bootstrap storage below. */
 export interface ThemeStorage {
-  loadThemePreference(): string;
   saveThemePreference(themeId: string): void;
 }
 
@@ -80,7 +81,8 @@ export class ThemeManager {
   private static instance: ThemeManager;
   private currentTheme: ThemeId = 'wpi-dark';
   private themes: Map<ThemeId, ThemeDefinition> = new Map();
-  private storage: ThemeStorage = new DefaultThemeStorage();
+  private readonly bootStorage = new DefaultThemeStorage();
+  private storage: ThemeStorage = this.bootStorage;
   private switchToken = 0;
 
   private constructor() {
@@ -112,7 +114,7 @@ export class ThemeManager {
   }
 
   private loadSavedTheme(): void {
-    const savedTheme = this.storage.loadThemePreference();
+    const savedTheme = this.bootStorage.loadThemePreference();
     if (savedTheme && this.themes.has(savedTheme)) {
       this.currentTheme = savedTheme;
     }
@@ -152,7 +154,12 @@ export class ThemeManager {
     return this.currentTheme;
   }
 
-  setTheme(themeId: ThemeId): boolean {
+  /**
+   * Shows a theme and, unless `persist` is false, saves it as the
+   * preference. Startup applies the stored preference with persist off, so
+   * loading it doesn't write it straight back.
+   */
+  setTheme(themeId: ThemeId, { persist = true } = {}): boolean {
     if (!this.themes.has(themeId)) {
       logger.error(`Theme '${themeId}' not found`);
       return false;
@@ -161,7 +168,7 @@ export class ThemeManager {
     const changed = themeId !== this.currentTheme;
     this.currentTheme = themeId;
     if (changed) this.applyTheme(themeId, true);
-    this.saveThemePreference(themeId);
+    if (persist) this.saveThemePreference(themeId);
     // Notify reactive consumers (e.g. the Svelte ThemeSelector) of the new
     // visible theme - ThemeManager has no listener system of its own.
     uiState.currentThemeId = themeId;

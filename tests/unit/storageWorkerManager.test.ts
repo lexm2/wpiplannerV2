@@ -33,7 +33,7 @@ describe('StorageWorkerManager fallback', () => {
     );
   });
 
-  it('decompresses to the serialized string, not a parsed object', async () => {
+  it('round-trips through the loader, Sets included', async () => {
     const m = freshManager();
     await m.initialize();
     const data = { id: 'a', locked: new Set(['1']) };
@@ -41,12 +41,11 @@ describe('StorageWorkerManager fallback', () => {
       WorkerTaskType.COMPRESS_DATA,
       { data },
     );
-    const decompressed = await m.executeTask<string>(
-      WorkerTaskType.DECOMPRESS_DATA,
-      { compressed },
-    );
-    expect(typeof decompressed).toBe('string');
-    const parsed = JSON.parse(decompressed, setReviver) as typeof data;
+    // Decoded the way IndexedDBStorageManager.loadAllSchedules reads rows.
+    const parsed = JSON.parse(
+      LZString.decompress(compressed),
+      setReviver,
+    ) as typeof data;
     expect(parsed.locked).toEqual(new Set(['1']));
   });
 });

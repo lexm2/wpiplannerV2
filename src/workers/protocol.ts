@@ -1,6 +1,5 @@
 export enum WorkerTaskType {
   COMPRESS_DATA = 'compress_data',
-  DECOMPRESS_DATA = 'decompress_data',
   GENERATE_SCHEDULES = 'generate_schedules',
 }
 

@@ -40,8 +40,6 @@ export class AppBootstrap {
     // It must not re-read: storage has not loaded yet.
     const themeManager = ThemeManager.getInstance();
     themeManager.setStorage({
-      loadThemePreference: () =>
-        profileStateManager.getPreferences().theme || 'wpi-dark',
       saveThemePreference: (themeId: string) =>
         profileStateManager.updatePreferences(
           { theme: themeId },
@@ -220,7 +218,7 @@ export class AppBootstrap {
       // Apply the saved theme now that storage has loaded.
       const savedTheme =
         services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
-      services.themeManager.setTheme(savedTheme);
+      services.themeManager.setTheme(savedTheme, { persist: false });
 
       if (!localStorage.getItem(STORAGE_KEYS.VISITED)) {
         await services.tutorial?.start('welcome');

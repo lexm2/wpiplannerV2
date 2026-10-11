@@ -11,7 +11,7 @@ interface PendingTask {
 }
 
 /**
- * Manages the storage web worker for off-thread compression/decompression.
+ * Manages the storage web worker for off-thread compression.
  * Falls back to main-thread execution if workers are unavailable.
  */
 export class StorageWorkerManager {
@@ -146,15 +146,11 @@ export class StorageWorkerManager {
     type: WorkerTaskType,
     payload: unknown,
   ): Promise<T> {
-    const typedPayload = payload as { data?: unknown; compressed?: string };
+    const typedPayload = payload as { data?: unknown };
     switch (type) {
       case WorkerTaskType.COMPRESS_DATA: {
         const serialized = JSON.stringify(typedPayload.data, setReplacer);
         return LZString.compress(serialized) as T;
-      }
-
-      case WorkerTaskType.DECOMPRESS_DATA: {
-        return LZString.decompress(typedPayload.compressed!) as T;
       }
 
       default:
