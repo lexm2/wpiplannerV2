@@ -29,9 +29,10 @@ refresh_once() {
     # Compared against what is published rather than the last fetch, so a
     # volume left over from an older image still gets refreshed. Leaving the
     # files alone keeps their mtimes, and with them nginx's ETags, so browsers
-    # revalidate to a 304 instead of downloading the data again.
+    # revalidate to a 304 instead of downloading the data again. The .gz is
+    # only written by a publish, so data seeded from the image still gets one.
     if cmp -s public/course-data.json "$DATA_DIR/course-data.json" &&
-        [ -f "$DATA_DIR/course-data-constructed.json" ]; then
+        [ -f "$DATA_DIR/course-data-constructed.json.gz" ]; then
         echo "[refresh] $(date -u +%FT%TZ) unchanged, nothing to publish"
         return 0
     fi
@@ -43,9 +44,22 @@ refresh_once() {
         "$(date -u '+%Y-%m-%d %H:%M UTC')" \
         > public/last-updated.json || return 1
 
+    # The catalog every visitor downloads goes out minified, with a gzip -9
+    # copy that nginx serves as is (gzip_static): about half what on-the-fly
+    # gzip sends, and no compressing per request. public/ keeps the readable
+    # copy. Published before the files below, as tmp+mv like them.
+    bun -e 'const [src, dst] = process.argv.slice(-2);
+        await Bun.write(dst, JSON.stringify(await Bun.file(src).json()));' \
+        public/course-data-constructed.json \
+        "$DATA_DIR/course-data-constructed.json.tmp" || return 1
+    gzip -9 -c "$DATA_DIR/course-data-constructed.json.tmp" \
+        > "$DATA_DIR/course-data-constructed.json.gz.tmp" || return 1
+    mv "$DATA_DIR/course-data-constructed.json.gz.tmp" "$DATA_DIR/course-data-constructed.json.gz" || return 1
+    mv "$DATA_DIR/course-data-constructed.json.tmp" "$DATA_DIR/course-data-constructed.json" || return 1
+
     # Publish via tmp+mv so nginx never reads a half-written file.
     # The raw copy goes last: it marks this data as published.
-    for f in course-data-constructed.json term-bounds.json last-updated.json course-data.json; do
+    for f in term-bounds.json last-updated.json course-data.json; do
         if [ -f "public/$f" ]; then
             cp "public/$f" "$DATA_DIR/$f.tmp" || return 1
             mv "$DATA_DIR/$f.tmp" "$DATA_DIR/$f" || return 1

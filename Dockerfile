@@ -8,6 +8,11 @@ RUN bun install --frozen-lockfile
 
 COPY . .
 RUN bun run build
+# Precompressed copies for nginx's gzip_static, at a level too slow to use
+# per request. Hashed assets and the static JSON never change once built.
+RUN find dist -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' \
+        -o -name '*.json' -o -name '*.svg' -o -name '*.txt' -o -name '*.xml' \) \
+        -size +1k -exec gzip -9 -k {} \;
 
 FROM nginx:1.27-alpine AS runtime
 

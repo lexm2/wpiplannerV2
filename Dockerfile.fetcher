@@ -5,8 +5,9 @@ RUN apk add --no-cache bash coreutils
 
 WORKDIR /app
 
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# No bun install: the fetch and convert scripts only use Bun's built-in
+# modules, and package.json is here just for its `bun run` scripts.
+COPY package.json ./
 
 COPY tsconfig.json ./
 COPY scripts ./scripts
