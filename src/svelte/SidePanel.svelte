@@ -5,6 +5,7 @@
   import { trapFocus } from './modals/trapFocus';
   import { fade } from 'svelte/transition';
   import { dur } from './transitions';
+  import { horizontalSwipe } from './horizontalSwipe';
   import {
     drawerMode,
     isDrawerOpen,
@@ -32,8 +33,8 @@
    * With `drawer`, the panel becomes an off-canvas drawer wherever its page
    * hides it (see drawerState): parked off screen until opened, then slid in
    * over a backdrop with focus trapped inside, and closed by the backdrop,
-   * Escape or its close button. It slides from the side it docks on - the
-   * opposite of `edge`.
+   * Escape, its close button, or a swipe back toward the side it docks on. It
+   * slides from that side - the opposite of `edge`.
    */
   interface Props {
     /** Drives the handle: which custom property to write, bounds, persistence. */
@@ -104,6 +105,40 @@
     const trap = trapFocus(node);
     return () => trap.destroy();
   }
+
+  let backdrop = $state<HTMLDivElement | null>(null);
+
+  // Past this share of its width, or flicked, a dragged drawer closes;
+  // otherwise it springs back open.
+  const CLOSE_AT = 0.35;
+  const FLICK = 0.5; // px/ms
+
+  // Swipe toward the side it docks on to close: the drawer follows the finger
+  // (only outward; .side-panel-dragging holds its transition off meanwhile)
+  // and the backdrop fades with it. Letting go hands back to the drawer's CSS
+  // transition, which runs from wherever the finger left it, either to closed
+  // or back to open.
+  function swipeToClose(node: HTMLElement): () => void {
+    // A panel whose handle faces right docks on the left, and closes leftward.
+    const out = edge === 'right' ? -1 : 1;
+    return horizontalSwipe(node, {
+      onMove(dx) {
+        const travel = Math.max(0, dx * out);
+        node.classList.add('side-panel-dragging');
+        node.style.transform = `translateX(${travel * out}px)`;
+        if (backdrop)
+          backdrop.style.opacity = String(1 - travel / node.offsetWidth);
+      },
+      onEnd(dx, vx) {
+        const travel = dx * out;
+        node.classList.remove('side-panel-dragging');
+        node.style.transform = '';
+        if (backdrop) backdrop.style.opacity = '';
+        const flicked = vx * out > FLICK && travel > 0;
+        if (travel > node.offsetWidth * CLOSE_AT || flicked) close();
+      },
+    });
+  }
 </script>
 
 <svelte:window onkeydown={onKeydown} />
@@ -114,6 +149,7 @@
     class="side-panel-backdrop"
     transition:fade={{ duration: dur(200) }}
     onclick={close}
+    bind:this={backdrop}
   ></div>
 {/if}
 
@@ -126,6 +162,7 @@
   role={open ? 'dialog' : undefined}
   style:--side-panel-drawer-width="var({config.cssVar}, {config.defaultWidth}px)"
   {@attach open ? focusTrap : undefined}
+  {@attach open ? swipeToClose : undefined}
   {...rest}
 >
   {#if asDrawer && drawer}

@@ -35,6 +35,8 @@
   width: min(var(--side-panel-drawer-width), calc(100vw - 3rem));
   /* room for the drawer bar; contents size to what is left */
   padding-top: 3.25rem;
+  /* Sideways travel is the swipe to close (SidePanel.svelte). */
+  touch-action: pan-y pinch-zoom;
   box-shadow: var(--effect-shadow-large);
   visibility: hidden;
   transition:
@@ -56,6 +58,11 @@
   visibility: visible;
   transform: none;
   transition: transform 0.25s ease;
+}
+
+/* Following a finger (SidePanel's swipe to close): no easing to lag behind. */
+.side-panel.side-panel-drawer.side-panel-dragging {
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

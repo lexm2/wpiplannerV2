@@ -185,6 +185,73 @@ const selectedLectureCrn = (page: Page, id: string) =>
     id,
   );
 
+/**
+ * One finger from (x, y), moved by (dx, dy) over `frames` animation frames,
+ * then lifted. Firefox has no touch-drag API, so the TouchEvents are built in
+ * the page; a few frames is a flick, many is a slow drag.
+ */
+async function touchDrag(
+  page: Page,
+  x: number,
+  y: number,
+  dx: number,
+  dy: number,
+  frames: number,
+): Promise<void> {
+  await page.evaluate(
+    async ({ x, y, dx, dy, frames }) => {
+      const target = document.elementFromPoint(x, y)!;
+      const fire = (type: string, cx: number, cy: number) => {
+        const touch = new Touch({
+          identifier: 1,
+          target,
+          clientX: cx,
+          clientY: cy,
+        });
+        target.dispatchEvent(
+          new TouchEvent(type, {
+            touches: type === 'touchend' ? [] : [touch],
+            changedTouches: [touch],
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      };
+      fire('touchstart', x, y);
+      for (let i = 1; i <= frames; i++) {
+        await new Promise(r => requestAnimationFrame(r));
+        fire('touchmove', x + (dx * i) / frames, y + (dy * i) / frames);
+      }
+      fire('touchend', x + dx, y + dy);
+    },
+    { x, y, dx, dy, frames },
+  );
+}
+
+test.describe('phone gestures', () => {
+  test.use({ viewport: PHONE, userAgent: IPHONE_UA, hasTouch: true });
+
+  const activeTab = (page: Page) =>
+    page.evaluate(() => document.querySelector('.nav-tab.active')!.id);
+
+  test('swiping a drawer toward its side closes it', async ({ page }) => {
+    await boot(page);
+    const drawer = page.locator('.sidebar');
+    await page.locator('.drawer-toggle-departments').tap();
+    await expect(drawer).toBeVisible();
+
+    // A short, slow drag springs back open - and, with a drawer open, the
+    // pages underneath do not move.
+    await touchDrag(page, 250, 400, -40, 0, 30);
+    await page.waitForTimeout(400);
+    await expect(drawer).toBeVisible();
+    expect(await activeTab(page)).toBe('planner-tab');
+
+    await touchDrag(page, 250, 400, -200, 0, 10);
+    await expect(drawer).toBeHidden();
+  });
+});
+
 // The single-term view follows the width live, not just the width at load.
 test('narrowing a wide window to phone width focuses one term', async ({
   page,
