@@ -261,6 +261,7 @@ export function termMotion(node: HTMLElement, term: string | null) {
   gridEl = node;
   let current = term;
   let accum = 0;
+  let touchStartX = 0;
   let touchStartY = 0;
   let swiping = false;
 
@@ -285,12 +286,22 @@ export function termMotion(node: HTMLElement, term: string | null) {
 
   function onTouchStart(e: TouchEvent): void {
     swiping = termFocus.term !== null && !busy && e.touches.length === 1;
-    if (swiping) touchStartY = e.touches[0].clientY;
+    if (swiping) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
   }
 
   function onTouchMove(e: TouchEvent): void {
     if (!swiping) return;
+    const dx = touchStartX - e.touches[0].clientX;
     const dy = touchStartY - e.touches[0].clientY;
+    // A mostly sideways drag is the phone page swipe (pageSwipe.svelte.ts),
+    // not a term page; give it up for the rest of the touch.
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) >= 10) swiping = false;
+      return;
+    }
     if (Math.abs(dy) < SWIPE_PX) return;
     swiping = false;
     // Swiping up pulls the next term into view, matching the wheel.

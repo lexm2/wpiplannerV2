@@ -86,6 +86,11 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+/* The phone tab bar's sliding marker; the desktop pill marks the tab itself. */
+.nav-tab-marker {
+  display: none;
+}
+
 .nav-tab {
   padding: 0.5rem 1.25rem;
   font-size: 0.95rem;
@@ -362,6 +367,14 @@ html.is-mobile .header-navigation {
 
   #app {
     padding-bottom: var(--tab-bar-height);
+    /* A page pushed aside by a swipe must not widen the document. */
+    overflow: hidden;
+  }
+
+  /* The browser keeps vertical scrolling and pinch zoom; sideways travel is
+     left to the page swipe (horizontalSwipe.ts). */
+  .app-body {
+    touch-action: pan-y pinch-zoom;
   }
 
   /* Below the drawers (z-index 79/80) and modals, which cover it when open.
@@ -437,11 +450,13 @@ html.is-mobile .header-navigation {
     box-shadow: none;
   }
 
-  /* An active tab is marked by colour and a bar along its top edge, the usual
-     tab-bar treatment, rather than the desktop pill fill. The weight stays the
-     same, so selecting a tab does not reflow its label. */
-  .nav-tab {
+  /* An active tab is marked by colour and a bar along the top of the bar.
+     The weight stays the same, so selecting a tab does not reflow its label. */
+  .nav-tabs-pill {
     position: relative;
+  }
+
+  .nav-tab {
     flex: 1;
     border-radius: 0;
     padding: 0;
@@ -455,16 +470,26 @@ html.is-mobile .header-navigation {
     box-shadow: none;
   }
 
-  /* Its own box, not an inset shadow: the tabs are fractional pixels wide, and
-     a shadow there bled a hairline down both sides of the active tab. */
-  .nav-tab.active::before {
-    content: '';
+  /* One marker for all three tabs (PageTabs.svelte), so it slides from tab to
+     tab, and follows the finger through a page swipe (pageSwipe.svelte.ts).
+     It is its own box rather than an inset shadow on the tab: the tabs are
+     fractional pixels wide, and a shadow there bled a hairline down their
+     sides. */
+  .nav-tab-marker {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
+    width: calc(100% / 3);
     height: 3px;
     background: var(--color-primary);
+    transform: translateX(calc(var(--tab-pos, 0) * 100%));
+    transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1);
+    pointer-events: none;
+  }
+
+  .nav-tab-marker.dragging {
+    transition: none;
   }
 
   /* The menu opens upward from the gear, now at the bottom right. */
@@ -472,5 +497,11 @@ html.is-mobile .header-navigation {
     top: auto;
     bottom: calc(var(--tab-bar-height) + 0.5rem);
     right: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-tab-marker {
+    transition: none;
   }
 }

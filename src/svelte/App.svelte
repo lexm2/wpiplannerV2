@@ -21,6 +21,7 @@
   import { autoScheduleService } from '../services/scheduling/autoScheduleService';
   import { timestampState } from './timestampState.svelte';
   import { installAppEffects } from './appEffects.svelte';
+  import { installPageSwipe } from './pageSwipe.svelte';
   import { DebouncedOperation } from '../utils/RequestCancellation';
 
   import DepartmentSidebar from './DepartmentSidebar.svelte';
@@ -121,6 +122,10 @@
   // the effects register in this component's scope. Untracked for the same reason
   // as debouncedSearch above: one-time wiring off the stable singleton container.
   untrack(() => installAppEffects(services));
+
+  // Swiping sideways between pages on a phone. Its callbacks read the page
+  // when a swipe happens, so the effect itself tracks nothing and runs once.
+  $effect(() => installPageSwipe(() => uiState.currentPage, switchToPageView));
 </script>
 
 <svelte:window onkeydown={handleKeydown} />

@@ -234,6 +234,47 @@ test.describe('phone gestures', () => {
   const activeTab = (page: Page) =>
     page.evaluate(() => document.querySelector('.nav-tab.active')!.id);
 
+  // The marker's left edge, in tabs from the first one.
+  const markerAt = (page: Page) =>
+    page.evaluate(() => {
+      const marker = document
+        .querySelector('.nav-tab-marker')!
+        .getBoundingClientRect();
+      const first = document
+        .querySelector('#planner-tab')!
+        .getBoundingClientRect();
+      return Math.round((marker.left - first.left) / first.width);
+    });
+
+  test('swiping sideways moves between pages, and the marker follows', async ({
+    page,
+  }) => {
+    await boot(page);
+    await touchDrag(page, 250, 400, -200, 0, 10);
+    await expect.poll(() => activeTab(page)).toBe('schedule-tab');
+    await expect.poll(() => markerAt(page)).toBe(1);
+
+    await touchDrag(page, 250, 400, -200, 0, 10);
+    await expect.poll(() => activeTab(page)).toBe('degree-tab');
+    // Past the last page there is nothing to swipe to.
+    await touchDrag(page, 250, 400, -200, 0, 10);
+    await page.waitForTimeout(400);
+    expect(await activeTab(page)).toBe('degree-tab');
+
+    await touchDrag(page, 150, 400, 200, 0, 10);
+    await expect.poll(() => activeTab(page)).toBe('schedule-tab');
+    await expect.poll(() => markerAt(page)).toBe(1);
+  });
+
+  test('a short drag or a vertical one stays on the page', async ({ page }) => {
+    await boot(page);
+    await touchDrag(page, 250, 400, -60, 0, 30);
+    await touchDrag(page, 200, 600, 0, -200, 10);
+    await page.waitForTimeout(400);
+    expect(await activeTab(page)).toBe('planner-tab');
+    expect(await markerAt(page)).toBe(0);
+  });
+
   test('swiping a drawer toward its side closes it', async ({ page }) => {
     await boot(page);
     const drawer = page.locator('.sidebar');

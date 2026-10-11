@@ -1,5 +1,6 @@
 <script lang="ts">
   import { uiState } from '../services/ui/uiState.svelte';
+  import { PAGE_ORDER, pageDrag } from './pageSwipe.svelte';
   import type { PageId } from '../types/uiState';
 
   let {
@@ -11,6 +12,10 @@
   // onSwitch runs the page-switch side-effects (close wizard / switch page) in
   // App.svelte.
   const page = $derived(uiState.currentPage);
+
+  // The phone tab bar's marker: one bar that slides to the current tab, and
+  // tracks a page swipe as it happens (header.css; hidden on desktop).
+  const markerAt = $derived(PAGE_ORDER.indexOf(page) - pageDrag.offset);
 </script>
 
 <button
@@ -34,3 +39,9 @@
   aria-label="Degree view"
   onclick={() => onSwitch('degree')}>Degree</button
 >
+<span
+  class="nav-tab-marker"
+  class:dragging={pageDrag.dragging}
+  style:--tab-pos={markerAt}
+  aria-hidden="true"
+></span>
