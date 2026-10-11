@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { degreeState } from './degreeState.svelte';
+  import { degreeState, openMoveSheet } from './degreeState.svelte';
+  import { phoneLayout } from '../phoneLayout.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { scaleFade } from '../transitions';
   import { clickOutside } from '../clickOutside';
 
-  /** The click/keyboard path for placing a course, alongside dragging. */
+  /** The click/keyboard path for placing a course, alongside dragging. On a
+   * phone it opens the Move sheet instead (MoveCourseSheet). */
   let {
     courseId,
     currentBucketId = null,
@@ -23,6 +25,12 @@
     if (bucketId !== currentBucketId) {
       degreeBucketService.assign(courseId, bucketId);
     }
+  }
+
+  // A phone has no room for the popup, so the button opens the Move sheet.
+  function onTrigger(): void {
+    if (phoneLayout.current) openMoveSheet(courseId);
+    else open = !open;
   }
 
   function closeAndRefocus(): void {
@@ -50,7 +58,7 @@
     aria-expanded={open}
     title={label}
     bind:this={trigger}
-    onclick={() => (open = !open)}
+    onclick={onTrigger}
     onkeydown={e => {
       if (e.key === 'Escape' && open) {
         e.stopPropagation();

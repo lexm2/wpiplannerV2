@@ -1281,6 +1281,170 @@
   }
 }
 
+/* ---- Phone: a course row is one button (RequirementCard.svelte) ---- */
+.degree-card-list .requirement-course-tap {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  font-family: inherit;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.requirement-course-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.degree-card-list .requirement-course-tap .requirement-course-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
+/* The grade and Transfer badges sit on the row's own background, so they
+   need an edge to read as badges at all. */
+.requirement-course-tap .course-badge-grade,
+.requirement-course-tap .course-badge-transfer {
+  border: 1px solid var(--color-border);
+}
+
+/* ---- Phone: the Move sheet (MoveCourseSheet.svelte) ---- */
+.move-sheet-header {
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 0.75rem 0.75rem 1rem;
+}
+
+.move-sheet-course {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.move-sheet-title {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.move-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+}
+
+.move-sheet-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.move-sheet-buckets {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.move-sheet-bucket {
+  --move-edge: var(--color-text-secondary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--move-edge);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+}
+
+.move-sheet-bucket.req-not_satisfied {
+  --move-edge: var(--color-danger);
+}
+.move-sheet-bucket.req-in_progress {
+  --move-edge: var(--color-warning);
+}
+.move-sheet-bucket.req-satisfied {
+  --move-edge: var(--color-success);
+}
+
+.move-sheet-bucket:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  border-left-color: var(--move-edge);
+}
+
+.move-sheet-bucket.is-current {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.move-sheet-bucket-name {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+.move-sheet-bucket-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.move-sheet-bucket .degree-progress-bar {
+  grid-column: 1 / -1;
+  height: 6px;
+}
+
+.move-sheet-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
+}
+
+.move-sheet-actions .btn {
+  flex: 1;
+  min-height: 44px;
+}
+
+.move-sheet-actions .move-sheet-remove {
+  color: var(--color-danger);
+}
+
+/* A sheet from the bottom edge on phones, within thumb reach. Three classes
+   to outrank modal.css's `html.is-mobile .modal-backdrop` inset. */
+@media (max-width: 560px) {
+  .modal-backdrop.modal-container.move-sheet-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .move-sheet-modal .modal-dialog {
+    max-width: none;
+    border-radius: var(--effect-border-radius-large)
+      var(--effect-border-radius-large) 0 0;
+  }
+
+  .move-sheet-modal .modal-dialog,
+  .move-sheet-modal .modal-content {
+    max-height: 85dvh;
+  }
+}
+
 /* Touch: drag is unavailable, so the Assign menu is the path - size it for a finger. */
 html.is-mobile .assign-menu-trigger,
 html.is-mobile .requirement-course-remove {

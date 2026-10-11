@@ -48,7 +48,8 @@
     selected = next;
   }
 
-  let showUmbrella = $state(false);
+  // Lives in degreeState: the phone's Move sheet offers the same buckets.
+  const showUmbrella = $derived(degreeState.showUmbrella);
   const umbrellaCount = $derived(
     degreeState.buckets.filter(b => UMBRELLA_CATEGORIES.has(b.category)).length,
   );
@@ -101,7 +102,7 @@
       // The finder only names an aggregate the user placed a course in, so one
       // reaching here is a real destination and worth unhiding.
       if (targets.some(b => UMBRELLA_CATEGORIES.has(b.category)))
-        showUmbrella = true;
+        degreeState.showUmbrella = true;
       // Widen to All rather than adding the missing status: the user asked for
       // one bucket, not for a filter set they never chose.
       if (
@@ -151,7 +152,7 @@
         class="degree-filter-chip degree-umbrella-toggle"
         class:active={showUmbrella}
         aria-pressed={showUmbrella}
-        onclick={() => (showUmbrella = !showUmbrella)}
+        onclick={() => (degreeState.showUmbrella = !showUmbrella)}
         >{showUmbrella ? 'Hide' : 'Show'} degree-wide
         <span class="degree-filter-count">{umbrellaCount}</span></button
       >

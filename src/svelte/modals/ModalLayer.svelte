@@ -10,6 +10,7 @@
   import FilterModal from './FilterModal.svelte';
   import BucketConfig from './BucketConfig.svelte';
   import CourseFinderModal from './CourseFinderModal.svelte';
+  import MoveCourseSheet from './MoveCourseSheet.svelte';
   import DegreeImportWarning from './DegreeImportWarning.svelte';
   import TimeGridModal from './TimeGridModal.svelte';
   import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
@@ -86,6 +87,8 @@
     />
   {:else if id === 'course-finder'}
     <CourseFinderModal onRequestClose={() => closeModal('course-finder')} />
+  {:else if id === 'move-course'}
+    <MoveCourseSheet onRequestClose={() => closeModal('move-course')} />
   {:else if id === 'filter-modal'}
     <FilterModal
       typeId="filter-modal"
