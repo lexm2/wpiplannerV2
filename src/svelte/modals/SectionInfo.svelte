@@ -5,6 +5,7 @@
   import { modalState } from './modalState.svelte';
   import { rateMyProfessorService } from '../../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { TimeUtils } from '../../utils/timeUtils';
   import {
     getPeriodTypeClass,
     getPeriodTypeLabel,
@@ -64,7 +65,8 @@
   }
 
   function periodDays(period: Period): string {
-    return Array.from(period.days).sort().join(', ').toUpperCase();
+    // Week order: the day codes (M, T, W, R, F) do not sort alphabetically.
+    return TimeUtils.DAYS_ORDER.filter(d => period.days.has(d)).join(', ');
   }
 
   function periodTime(period: Period): string {

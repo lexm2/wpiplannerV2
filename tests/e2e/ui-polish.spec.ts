@@ -99,3 +99,21 @@ test('escape over the wizard closes only section info', async ({ page }) => {
   await expect(modal).toHaveCount(0);
   await expect(wizard(page)).toHaveCount(1);
 });
+
+test('section info lists meeting days in week order', async ({ page }) => {
+  const id = await setupSchedule(page);
+  const expected = await page.evaluate(courseId => {
+    const services = (window as any).services;
+    const course = services.courseDataService
+      .getAllDepartments()
+      .flatMap((d: any) => d.courses)
+      .find((c: any) => c.id === courseId);
+    const days: Set<string> = course.lectures[0].section.periods[0].days;
+    return ['M', 'T', 'W', 'R', 'F'].filter(d => days.has(d)).join(', ');
+  }, id);
+
+  await page.locator(`.section-block[data-course-id="${id}"]`).first().click();
+  await expect(page.locator('.section-period-schedule').first()).toHaveText(
+    new RegExp(`^${expected}\\s`),
+  );
+});
