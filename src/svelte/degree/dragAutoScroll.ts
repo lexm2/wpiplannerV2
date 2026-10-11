@@ -1,7 +1,7 @@
 /**
  * Edge auto-scroll while dragging a course: holding it near the top or bottom
  * of the pane under the pointer scrolls that pane, so off-screen buckets are
- * reachable. The rAF loop drives scrolling, not an animation (see CLAUDE.md).
+ * reachable. The rAF loop drives scrolling, not an animation.
  */
 const EDGE = 90; // px from an edge where scrolling kicks in
 const MAX_SPEED = 22; // px per frame at the very edge
