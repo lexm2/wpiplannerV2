@@ -141,7 +141,6 @@
                   degreePlanService.openCourse(tile.code, tile.year);
                 }}>{tile.code}</button
               >
-              <span class="course-badge course-badge-schedule">Schedule</span>
             </div>
             <span class="requirement-course-title">{tile.title}</span>
             {#if courseId}

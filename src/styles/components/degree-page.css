@@ -233,9 +233,11 @@
   gap: 0.5rem;
 }
 
+/* Earned, in progress and transfer. The total is the progress bar's own
+   label, so it isn't repeated here. */
 .degree-credit-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   margin-top: 1.25rem;
 }
@@ -655,11 +657,6 @@
 /* schedule tiles get a primary accent */
 .requirement-course.is-schedule {
   border-left: 3px solid var(--color-primary);
-}
-
-.course-badge-schedule {
-  background: var(--color-primary-background);
-  color: var(--color-primary);
 }
 
 /* per-tile assign / remove controls */
@@ -1523,7 +1520,6 @@
 }
 
 .degree-summary-compact .degree-credit-stats {
-  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin-top: 0.5rem;
 }

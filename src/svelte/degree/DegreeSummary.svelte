@@ -255,11 +255,6 @@
           class="degree-stat-label">Transfer</span
         >
       </div>
-      <div class="degree-stat">
-        <span class="degree-stat-value">{required ?? '-'}</span><span
-          class="degree-stat-label">Required</span
-        >
-      </div>
     </div>
   </section>
 {/if}
