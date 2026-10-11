@@ -143,7 +143,13 @@
       {#if currentPage === 'planner'}
         <DrawerToggle drawer="departments" label="Departments" side="left" />
       {:else if currentPage === 'schedule'}
-        <DrawerToggle drawer="schedule" label="Courses" side="left" />
+        <DrawerToggle
+          drawer="schedule"
+          label="Courses"
+          side="left"
+          icon="list"
+          count={appState.selectedCourses.length}
+        />
       {/if}
     </div>
     <nav class="header-navigation" aria-label="Main navigation">

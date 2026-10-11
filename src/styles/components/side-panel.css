@@ -121,6 +121,29 @@ button.drawer-toggle {
   flex-shrink: 0;
 }
 
+/* How many items the drawer holds, pinned to the button's top-right corner so
+   it still shows where the label is hidden. */
+button.drawer-toggle {
+  position: relative;
+}
+
+.drawer-toggle-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-heavy);
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 1200px) {
   button.drawer-toggle-departments,
   button.drawer-toggle-details {
