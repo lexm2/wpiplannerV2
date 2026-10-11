@@ -563,9 +563,15 @@ export class ScheduleManagementService {
     try {
       await this.ensureInitialized();
 
-      // safeParse so a malformed file gets the same friendly message as an
-      // out-of-date one, rather than a schema throw.
-      const parsed = MinimalSyncDataSchema.safeParse(JSON.parse(jsonData));
+      // safeParse, and a guarded JSON.parse, so a malformed file gets the same
+      // friendly message as an out-of-date one rather than a parser error.
+      let json: unknown;
+      try {
+        json = JSON.parse(jsonData);
+      } catch {
+        json = undefined;
+      }
+      const parsed = MinimalSyncDataSchema.safeParse(json);
       if (!parsed.success || !parsed.data.v.startsWith('4')) {
         return {
           success: false,
@@ -578,7 +584,7 @@ export class ScheduleManagementService {
         this.profileStateManager.parseImportCourses(jsonData);
       return await this.mergeCoursesInto(scheduleId, importedCourses);
     } catch (error) {
-      return { success: false, error: `Import failed: ${errorMessage(error)}` };
+      return { success: false, error: errorMessage(error) };
     }
   }
 
@@ -611,7 +617,7 @@ export class ScheduleManagementService {
         source.selectedCourses.filter(sc => !sc.course.transient),
       );
     } catch (error) {
-      return { success: false, error: `Copy failed: ${errorMessage(error)}` };
+      return { success: false, error: errorMessage(error) };
     }
   }
 
@@ -634,15 +640,9 @@ export class ScheduleManagementService {
       ...courses.filter(c => !existingIds.has(c.course.id)),
     ];
 
-    const result = await this.updateSchedule(scheduleId, {
-      selectedCourses: merged,
-    });
-
-    if (result.success && scheduleId === this.getActiveScheduleId()) {
-      this.profileStateManager.setActiveSchedule(scheduleId, 'api');
-    }
-
-    return result;
+    // updateSchedule also refreshes the live selection when the target is
+    // the active schedule.
+    return this.updateSchedule(scheduleId, { selectedCourses: merged });
   }
 
   getCourseSelectionService(): CourseSelectionService {

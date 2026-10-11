@@ -64,10 +64,12 @@
   }
 
   // Escape is bound on the window, so every stacked dialog sees the same
-  // event. Only the topmost closes.
+  // event. Only the topmost closes, and not when something inside it already
+  // used the key (preventDefault), such as cancelling an edit.
   const isTop = $derived(uiState.openModals.at(-1) === typeId);
 
   function onKeydown(event: KeyboardEvent): void {
+    if (event.defaultPrevented) return;
     if (closeOnEscape && isTop && event.key === 'Escape') {
       close();
     }

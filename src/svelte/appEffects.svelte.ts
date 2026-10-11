@@ -99,7 +99,6 @@ export function installAppEffects(services: ServiceContainer): void {
 
       if (!initialLoadDone) {
         initialLoadDone = true;
-        services.profileStateManager.seedUndoBaseline();
         updateClientTimestamp();
 
         // Backfill year for existing schedules that lack one.
@@ -114,6 +113,9 @@ export function installAppEffects(services: ServiceContainer): void {
             );
           }
         }
+        // After the backfill, so that housekeeping is part of the baseline
+        // rather than an undo step: Undo starts disabled on a fresh load.
+        services.profileStateManager.seedUndoBaseline();
 
         // Apply academic year filter based on the active schedule's year.
         if (!services.filterService.hasFilter('academicYear')) {

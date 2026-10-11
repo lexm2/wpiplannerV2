@@ -480,6 +480,14 @@ export class ProfileStateManager {
       );
 
       if (scheduleId === this.state.activeScheduleId) {
+        // The live selection mirrors the active schedule, so a course-list
+        // change has to reach it too. Doing it here, rather than through
+        // setActiveSchedule, keeps the undo history.
+        if (updates.selectedCourses) {
+          this.state.selectedCourses = this.resolveCourseReferences([
+            ...updates.selectedCourses,
+          ]);
+        }
         this.signalActivation(source);
       }
       return true;

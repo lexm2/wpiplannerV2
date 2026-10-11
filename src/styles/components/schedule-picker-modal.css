@@ -382,7 +382,14 @@ html.is-mobile .schedule-picker-modal-dialog .modal-footer {
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1.5rem;
-  background: var(--color-primary-background);
+  /* The tint is translucent; layer it over the surface so rows scrolling
+     under the sticky banner don't show through. */
+  background:
+    linear-gradient(
+      var(--color-primary-background),
+      var(--color-primary-background)
+    ),
+    var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
   font-size: 0.9rem;
@@ -404,6 +411,19 @@ html.is-mobile .schedule-picker-modal-dialog .modal-footer {
 .schedule-picker-modal-dialog .copy-hint {
   color: var(--color-text-secondary);
   font-size: 0.9rem;
+}
+
+.schedule-picker-modal-dialog .copy-target-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+}
+
+.schedule-picker-modal-dialog .copy-target-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .schedule-picker-modal-dialog .schedule-item.copy-target:hover .copy-hint {

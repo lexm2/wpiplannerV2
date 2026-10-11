@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, untrack } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
   import Modal from './Modal.svelte';
   import { modalState, showConfirm } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
@@ -28,8 +28,6 @@
   } = $props();
 
   // Menu (⋮) popup geometry.
-  const MENU_WIDTH = 120;
-  const MENU_HEIGHT = 160;
   const MENU_OFFSET = 4;
   const VIEWPORT_PADDING = 8;
 
@@ -93,6 +91,8 @@
   // animates it). offsetWidth is one page wide.
   $effect(() => {
     const tab = activeTab;
+    // Copy mode belongs to the schedule list; leaving it ends the mode.
+    if (tab !== 'schedules') untrack(() => (copySourceId = null));
     const c = pagesContainer;
     if (!c) return;
     c.scrollLeft = tab === 'settings' ? c.offsetWidth : 0;
@@ -102,7 +102,7 @@
   let openMenuId = $state<string | null>(null);
   let menuPos = $state<{ left: number; top: number }>({ left: 0, top: 0 });
 
-  function toggleMenu(e: MouseEvent, scheduleId: string): void {
+  async function toggleMenu(e: MouseEvent, scheduleId: string): Promise<void> {
     e.stopPropagation();
     if (openMenuId === scheduleId) {
       openMenuId = null;
@@ -110,19 +110,30 @@
     }
 
     const btnRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    let left = btnRect.right - MENU_WIDTH;
-    let top = btnRect.bottom + MENU_OFFSET;
+    openMenuId = scheduleId;
+    // Position from the menu's real size once it renders: its height depends
+    // on how many actions the row offers.
+    await tick();
+    const menu = pagesContainer?.querySelector<HTMLElement>(
+      `[data-schedule-id="${CSS.escape(scheduleId)}"] [data-visible="true"]`,
+    );
+    if (!menu) return;
+    const { width, height } = menu.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
+    let left = btnRect.right - width;
+    let top = btnRect.bottom + MENU_OFFSET;
     if (left < VIEWPORT_PADDING) left = VIEWPORT_PADDING;
-    else if (left + MENU_WIDTH > vw - VIEWPORT_PADDING)
-      left = vw - MENU_WIDTH - VIEWPORT_PADDING;
-    if (top + MENU_HEIGHT > vh - VIEWPORT_PADDING)
-      top = btnRect.top - MENU_HEIGHT - MENU_OFFSET;
+    else if (left + width > vw - VIEWPORT_PADDING)
+      left = vw - width - VIEWPORT_PADDING;
+    if (top + height > vh - VIEWPORT_PADDING)
+      top = btnRect.top - height - MENU_OFFSET;
+    // Neither side has room: pin it inside the window.
+    if (top < VIEWPORT_PADDING)
+      top = Math.max(VIEWPORT_PADDING, vh - height - VIEWPORT_PADDING);
 
     menuPos = { left, top };
-    openMenuId = scheduleId;
   }
 
   function closeMenus(): void {
@@ -133,11 +144,22 @@
   let editingId = $state<string | null>(null);
   let editValue = $state('');
 
-  function startEdit(schedule: Schedule): void {
+  async function startEdit(schedule: Schedule): Promise<void> {
     editingId = schedule.id;
     editValue = schedule.name;
+    // The field's autofocus only applies when nothing else has focus, and the
+    // Rename button that was just clicked does.
+    await tick();
+    pagesContainer
+      ?.querySelector<HTMLInputElement>(
+        `[data-schedule-id="${CSS.escape(schedule.id)}"] input`,
+      )
+      ?.focus();
   }
   async function commitEdit(schedule: Schedule): Promise<void> {
+    // Escape clears editingId first; removing the field then blurs it, and
+    // that blur must not save.
+    if (editingId !== schedule.id) return;
     const newName = editValue.trim();
     if (newName && newName !== schedule.name) {
       try {
@@ -155,24 +177,35 @@
       e.preventDefault();
       (e.currentTarget as HTMLInputElement).blur();
     } else if (e.key === 'Escape') {
+      // preventDefault tells Modal the key was used, so the picker stays open.
+      e.preventDefault();
       editingId = null;
     }
   }
 
   // Copy-into mode: "Copy Into" picks the source, then clicking another row
-  // picks the target.
+  // picks the target. Keyed off copySource rather than the id, so the mode
+  // ends by itself if the source schedule goes away (e.g. undone).
   let copySourceId = $state<string | null>(null);
   const copySource = $derived(
     schedules.find(s => s.id === copySourceId) ?? null,
   );
 
+  async function startCopy(schedule: Schedule): Promise<void> {
+    copySourceId = schedule.id;
+    // The Copy Into button is replaced by the copy-mode row content, so move
+    // focus to the first target instead of letting it fall to <body>.
+    await tick();
+    pagesContainer?.querySelector<HTMLElement>('.copy-target-btn')?.focus();
+  }
+
   async function copyInto(targetId: string): Promise<void> {
-    const sourceId = copySourceId;
+    const source = copySource;
     copySourceId = null;
-    if (!sourceId) return;
+    if (!source) return;
     try {
       const result = await scheduleManagementService.copyScheduleInto(
-        sourceId,
+        source.id,
         targetId,
       );
       if (result.success) refreshTick++;
@@ -184,11 +217,24 @@
   }
 
   function onRowClick(schedule: Schedule): void {
-    if (copySourceId) {
-      if (schedule.id !== copySourceId) void copyInto(schedule.id);
+    if (copySource) {
+      if (schedule.id !== copySource.id) void copyInto(schedule.id);
       return;
     }
     if (editingId !== schedule.id) void switchToSchedule(schedule.id);
+  }
+
+  // Capture phase, so this runs before Modal's Escape handler: Escape backs
+  // out of an open menu or copy mode first, and only then closes the picker.
+  function onWindowKeydownCapture(e: KeyboardEvent): void {
+    if (e.key !== 'Escape') return;
+    if (openMenuId) {
+      e.preventDefault();
+      closeMenus();
+    } else if (copySource) {
+      e.preventDefault();
+      copySourceId = null;
+    }
   }
 
   // Schedule actions
@@ -217,13 +263,13 @@
     try {
       switch (action) {
         case 'rename':
-          startEdit(schedule);
+          await startEdit(schedule);
           break;
         case 'duplicate':
           await duplicateSchedule(schedule);
           break;
         case 'copy-into':
-          copySourceId = schedule.id;
+          await startCopy(schedule);
           break;
         case 'export':
           await exportSchedule(schedule.id);
@@ -357,14 +403,24 @@
       const text = await file.text();
       if (target === 'new') {
         const name = file.name.replace(/\.json$/i, '');
-        const created = await scheduleManagementService.createNewSchedule(name);
-        if (created.success && created.schedule?.id) {
+        // Created inactive and only switched to once the import succeeds, so a
+        // bad file leaves neither an empty schedule nor a changed selection.
+        const created = await scheduleManagementService.createNewSchedule(
+          name,
+          { autoActivate: false },
+        );
+        const id = created.schedule?.id;
+        if (created.success && id) {
           const imported = await scheduleManagementService.importScheduleInto(
-            created.schedule.id,
+            id,
             text,
           );
-          if (!imported.success)
+          if (imported.success) {
+            await switchToSchedule(id);
+          } else {
+            await scheduleManagementService.deleteSchedule(id);
             showAppError(`Import failed: ${imported.error}`);
+          }
           refreshTick++;
         }
       } else {
@@ -462,7 +518,7 @@
 </script>
 
 <!-- A click anywhere closes any open per-schedule menu. -->
-<svelte:window onclick={closeMenus} />
+<svelte:window onclick={closeMenus} onkeydowncapture={onWindowKeydownCapture} />
 
 <Modal
   typeId="schedule-picker"
@@ -498,9 +554,9 @@
                 <div
                   class="schedule-item"
                   class:active={isActive}
-                  class:copy-source={copySourceId === schedule.id}
-                  class:copy-target={copySourceId !== null &&
-                    copySourceId !== schedule.id}
+                  class:copy-source={copySource?.id === schedule.id}
+                  class:copy-target={copySource !== null &&
+                    copySource.id !== schedule.id}
                   data-schedule-id={schedule.id}
                   onclick={() => onRowClick(schedule)}
                 >
@@ -522,7 +578,7 @@
                         class="schedule-item-name"
                         ondblclick={e => {
                           e.stopPropagation();
-                          startEdit(schedule);
+                          if (!copySource) void startEdit(schedule);
                         }}
                       >
                         {schedule.name}
@@ -535,12 +591,21 @@
                     </div>
                   </div>
 
-                  {#if copySourceId === schedule.id}
+                  {#if copySource?.id === schedule.id}
                     <div class="schedule-item-actions copy-hint">
                       Copying from
                     </div>
-                  {:else if copySourceId}
-                    <div class="schedule-item-actions copy-hint">Copy here</div>
+                  {:else if copySource}
+                    <div class="schedule-item-actions">
+                      <button
+                        class="btn-link copy-hint copy-target-btn"
+                        aria-label="Copy here: {schedule.name}"
+                        onclick={e => {
+                          e.stopPropagation();
+                          void copyInto(schedule.id);
+                        }}>Copy here</button
+                      >
+                    </div>
                   {:else}
                     <div class="schedule-item-actions">
                       <button
