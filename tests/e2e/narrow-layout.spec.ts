@@ -80,3 +80,102 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
     });
   });
 }
+
+/**
+ * Select a lecture-only course with at least two lectures in one term, on its
+ * first lecture, and open the Schedule page. Returns the course id and the
+ * crn of a different lecture to switch to.
+ */
+async function scheduleOneCourse(
+  page: Page,
+): Promise<{ id: string; otherCrn: string }> {
+  const picked = await page.evaluate(async () => {
+    const s = (window as any).services;
+    const course = s.courseDataService
+      .getAllDepartments()
+      .flatMap((d: any) => d.courses)
+      .find(
+        (c: any) =>
+          (c.lectures?.length ?? 0) >= 2 &&
+          !c.standaloneLabs?.length &&
+          c.lectures.every(
+            (l: any) =>
+              !l.compatibleDiscussions.length && !l.compatibleLabs.length,
+          ) &&
+          c.lectures[1].section.computedTerm ===
+            c.lectures[0].section.computedTerm,
+      );
+    await s.courseSelectionService.selectCourse(course);
+    await s.courseSelectionService.setSelectedSection(
+      course,
+      course.lectures[0].section.number,
+    );
+    return {
+      id: course.id as string,
+      otherCrn: String(course.lectures[1].section.crn),
+    };
+  });
+  await page.click('#schedule-tab');
+  return picked;
+}
+
+const selectedLectureCrn = (page: Page, id: string) =>
+  page.evaluate(
+    courseId =>
+      String(
+        (window as any).services.courseSelectionService
+          .getSelectedCourses()
+          .find((sc: any) => sc.course.id === courseId)?.selected.lecture?.crn,
+      ),
+    id,
+  );
+
+const WIZARD_CASES = [
+  { name: '1000x700 window', viewport: { width: 1000, height: 700 } },
+  { name: 'phone', viewport: PHONE, userAgent: IPHONE_UA, hasTouch: true },
+];
+
+for (const { name, ...options } of WIZARD_CASES) {
+  test.describe(`on a ${name}`, () => {
+    test.use(options);
+
+    async function openChangeSections(page: Page, id: string) {
+      await page
+        .locator(`.section-block[data-course-id="${id}"]`)
+        .first()
+        .click();
+      await page.getByRole('button', { name: 'Change Sections' }).click();
+    }
+
+    test('Change Sections opens a usable wizard', async ({ page }) => {
+      await boot(page);
+      const { id, otherCrn } = await scheduleOneCourse(page);
+      await openChangeSections(page, id);
+
+      const card = page.locator(`[data-crn="${otherCrn}"]`);
+      await expect(card).toBeVisible({ timeout: 5000 });
+      await card.click({ timeout: 5000 });
+      await page.locator('#wizard-next-btn').click({ timeout: 5000 });
+
+      await expect(card).toBeHidden();
+      expect(await selectedLectureCrn(page, id)).toBe(otherCrn);
+    });
+
+    test('cancelling the wizard puts the narrow layout back', async ({
+      page,
+    }) => {
+      await boot(page);
+      const { id } = await scheduleOneCourse(page);
+      await openChangeSections(page, id);
+
+      await page
+        .locator('.sidebar-panel')
+        .getByRole('button', { name: 'Cancel', exact: true })
+        .click({ timeout: 5000 });
+
+      await expect(page.locator('.schedule-sidebar')).toBeHidden();
+      const grid = await hitTargetAtCentre(page, '.schedule-main');
+      expect(grid.ok, `grid covered by ${grid.hit}`).toBe(true);
+    });
+  });
+}

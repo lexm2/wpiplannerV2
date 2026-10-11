@@ -910,10 +910,6 @@ html.is-mobile .schedule-page-layout {
   grid-template-columns: 1fr;
 }
 
-html.is-mobile .schedule-sidebar {
-  display: none;
-}
-
 /* A phone is permanently focused on one term (termFocus.focusLocked), so the
    card runs full bleed and vertical swipes page between terms instead of
    scrolling - the old scroll-snap column this replaces lived at max-width 1024. */

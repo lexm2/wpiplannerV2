@@ -52,4 +52,26 @@ html.is-mobile .content-header {
   .schedule-page-layout {
     grid-template-columns: 1fr;
   }
+
+  /* The component wizard mounts inside the schedule sidebar, so hiding the
+     sidebar hid the wizard too and "Change Sections" did nothing. While it is
+     open the sidebar comes back as a drawer over the grid, leaving the rest of
+     the grid visible for the wizard's previews. The wizard's own Close/Cancel
+     dismiss it, which drops `.wizard-open` and the drawer with it. */
+  .schedule-sidebar.wizard-open {
+    display: flex;
+    position: fixed;
+    top: var(--spacing-header-height);
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    width: min(
+      var(
+        --panel-schedule-sidebar-width,
+        var(--spacing-schedule-sidebar-width)
+      ),
+      100vw
+    );
+    box-shadow: var(--effect-shadow-large);
+  }
 }

@@ -250,8 +250,10 @@
   style:display={currentPage === 'schedule' ? 'flex' : 'none'}
 >
   <div class="schedule-page-layout">
+    <!-- `wizard-open` lets a narrow layout, which hides this sidebar, show it
+         as a drawer while the wizard (mounted inside it) is in use. -->
     <SidePanel
-      class="schedule-sidebar"
+      class="schedule-sidebar {wizardState.isOpen ? 'wizard-open' : ''}"
       label="Schedule courses"
       config={PANEL_WIDTHS.scheduleSidebar}
       edge="right"
