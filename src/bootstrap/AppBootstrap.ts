@@ -152,18 +152,28 @@ export class AppBootstrap {
       courseDataService,
     } = services;
 
+    // The small static fetches depend on nothing, so they run while storage
+    // loads. None of them rejects (each logs and falls back), and RMP is
+    // caught here too so a bad ratings file can never hold up course data.
+    const rmpLoad = rateMyProfessorService
+      .loadData()
+      .catch(error => logger.warn('Rate My Professor data failed:', error));
+    const termBoundsLoad = TermBoundsService.getInstance().loadTermBounds();
+    const timestampLoad = loadServerTimestamp();
+
     const storageWorker = StorageWorkerManager.getInstance();
     await storageWorker.initialize();
 
     await profileStateManager.loadFromStorage();
-    await rateMyProfessorService.loadData();
     await courseSelectionService.initialize();
     await scheduleManagementService.initialize();
 
-    await TermBoundsService.getInstance().loadTermBounds();
-
+    // Course data last: setting it fires the first-load effect in
+    // appEffects, which reads the loaded profile and the term bounds (the
+    // default academic year). Ratings keep their old place ahead of it too.
+    await Promise.all([rmpLoad, termBoundsLoad]);
     await courseDataService.loadCourseData();
-    await loadServerTimestamp();
+    await timestampLoad;
 
     // Rehydrate a previously-imported degree record (no-op if none/invalid).
     await services.degreeImportService.load();
@@ -187,12 +197,18 @@ export class AppBootstrap {
     });
   }
 
-  // Async app startup, run after the component shell is mounted. Loads data +
-  // storage, applies the saved theme, wires the auto-scheduler's calendar
-  // provider, registers the unload handler, and auto-starts the welcome
-  // tutorial on first visit. Views show loading states until
-  // appState.loadedDepartments populates (App.svelte's $effect drives the sync).
+  // Async app startup, run after the component shell is mounted. Wires the
+  // auto-scheduler's calendar provider and registers the unload handler first,
+  // so a failed load cannot skip them; then loads data + storage, applies the
+  // saved theme, and auto-starts the welcome tutorial on first visit. Views
+  // show loading states until appState.loadedDepartments populates
+  // (App.svelte's $effect drives the sync).
   static async startApp(services: ServiceContainer): Promise<void> {
+    services.autoScheduleOrchestrator.setCalendarEventProvider(
+      calendarEventProvider,
+    );
+    AppBootstrap.setupWindowUnloadHandler();
+
     try {
       await AppBootstrap.initializeAsyncServices(services);
 
@@ -200,11 +216,6 @@ export class AppBootstrap {
       const savedTheme =
         services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
       services.themeManager.setTheme(savedTheme);
-
-      services.autoScheduleOrchestrator.setCalendarEventProvider(
-        calendarEventProvider,
-      );
-      AppBootstrap.setupWindowUnloadHandler();
 
       if (!localStorage.getItem(STORAGE_KEYS.VISITED)) {
         await services.tutorial?.start('welcome');

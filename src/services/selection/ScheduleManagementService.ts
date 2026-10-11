@@ -24,13 +24,6 @@ export interface ScheduleCreationOptions {
   includeCurrentCourses?: boolean;
   copyFromSchedule?: string;
   autoActivate?: boolean;
-  autoSave?: boolean;
-}
-
-export interface ScheduleUpdateOptions {
-  updateName?: string;
-  updateCourses?: boolean;
-  autoSave?: boolean;
 }
 
 /**
@@ -93,7 +86,6 @@ export class ScheduleManagementService {
       includeCurrentCourses = false,
       copyFromSchedule,
       autoActivate = true,
-      autoSave = true,
     } = options;
 
     try {
@@ -126,39 +118,42 @@ export class ScheduleManagementService {
         selectedCourses = this.profileStateManager.getSelectedCourses();
       }
 
-      const schedule = this.profileStateManager.createSchedule(name, 'api', id);
-
-      if (selectedCourses.length > 0) {
-        const updateResult = await this.updateScheduleCourses(
-          schedule.id,
-          selectedCourses,
+      // Each step below saves on its own; batched, they save once.
+      return await this.profileStateManager.withBatch(async () => {
+        const schedule = this.profileStateManager.createSchedule(
+          name,
+          'api',
+          id,
         );
-        if (!updateResult.success) {
-          return {
-            success: false,
-            error: `Schedule created but failed to add courses: ${updateResult.error}`,
-          };
-        }
-      }
 
-      if (autoActivate) {
-        const activateResult = await this.setActiveSchedule(schedule.id);
-        if (!activateResult.success) {
-          logger.warn(
-            'Schedule created but failed to activate:',
-            activateResult.error,
+        if (selectedCourses.length > 0) {
+          const updateResult = await this.updateScheduleCourses(
+            schedule.id,
+            selectedCourses,
           );
+          if (!updateResult.success) {
+            return {
+              success: false,
+              error: `Schedule created but failed to add courses: ${updateResult.error}`,
+            };
+          }
         }
-      }
 
-      if (autoSave) {
-        this.profileStateManager.save();
-      }
+        if (autoActivate) {
+          const activateResult = await this.setActiveSchedule(schedule.id);
+          if (!activateResult.success) {
+            logger.warn(
+              'Schedule created but failed to activate:',
+              activateResult.error,
+            );
+          }
+        }
 
-      return {
-        success: true,
-        schedule,
-      };
+        return {
+          success: true,
+          schedule,
+        };
+      });
     } catch (error) {
       logger.error('Error creating schedule:', error);
       return {
@@ -211,10 +206,8 @@ export class ScheduleManagementService {
   async updateSchedule(
     scheduleId: string,
     updates: Partial<Schedule>,
-    options: ScheduleUpdateOptions = {},
   ): Promise<ScheduleOperationResult> {
     await this.ensureInitialized();
-    const { autoSave = true } = options;
 
     try {
       const schedules = this.profileStateManager.getAllSchedules();
@@ -237,11 +230,8 @@ export class ScheduleManagementService {
         };
       }
 
+      // Saves on its own.
       this.profileStateManager.updateSchedule(scheduleId, updates, 'api');
-
-      if (autoSave) {
-        this.profileStateManager.save();
-      }
 
       const finalSchedule = this.profileStateManager
         .getAllSchedules()
@@ -311,8 +301,6 @@ export class ScheduleManagementService {
         };
       }
 
-      this.profileStateManager.save();
-
       return {
         success: true,
         schedule: duplicatedSchedule,
@@ -353,8 +341,8 @@ export class ScheduleManagementService {
         };
       }
 
-      // Must be awaited: deleteSchedule reassigns activeScheduleId only after
-      // storage resolves, so save() below would persist pre-delete state.
+      // Saves on its own, once activeScheduleId has moved off the deleted
+      // schedule (which happens only after storage resolves).
       const deleted = await this.profileStateManager.deleteSchedule(
         scheduleId,
         'api',
@@ -366,8 +354,6 @@ export class ScheduleManagementService {
           error: `Failed to delete schedule "${scheduleId}"`,
         };
       }
-
-      this.profileStateManager.save();
 
       return { success: true };
     } catch (error) {
@@ -701,7 +687,6 @@ export class ScheduleManagementService {
         'system',
       );
       this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
-      this.profileStateManager.save();
     } else if (!this.profileStateManager.getActiveSchedule()) {
       // No active schedule recorded: fall back to the most recent one. (Asks
       // ProfileStateManager directly: this.getActiveScheduleId() reads null

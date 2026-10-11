@@ -10,7 +10,6 @@ import { errorMessage } from '../../utils/errorMessage';
 export interface CourseSelectionOptions {
   isRequired?: boolean;
   validateBeforeAdd?: boolean;
-  autoSave?: boolean;
 }
 
 export interface CourseSelectionResult {
@@ -538,6 +537,9 @@ export class CourseSelectionService {
 
       if (repairedCount > 0) {
         logger.warn(`Repaired ${repairedCount} selected courses`);
+        // The repair edited the courses in place, so the schedules holding
+        // them look unchanged to save().
+        this.profileStateManager.forgetSavedSchedules();
         this.profileStateManager.save();
       }
 

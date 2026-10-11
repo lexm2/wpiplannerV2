@@ -61,4 +61,28 @@ describe('UndoRedoManager', () => {
     m.captureSnapshot('a', schedules('a', 'b', 'c'), prefs);
     expect([...m.undo()!.schedules.keys()]).toEqual(['a', 'b']);
   });
+
+  it('returns a fresh copy of the entry, with Sets revived', () => {
+    const m = new UndoRedoManager();
+    const withLock = schedules('a');
+    withLock.get('a')!.selectedCourses = [
+      {
+        course: { id: 'CS1101' },
+        selected: {},
+        isRequired: false,
+        lockedSections: new Set(['123']),
+      } as unknown as Schedule['selectedCourses'][number],
+    ];
+    m.captureSnapshot('a', withLock, prefs);
+    m.captureSnapshot('a', schedules('a'), prefs);
+
+    const back = m.undo()!;
+    const locked = back.schedules.get('a')!.selectedCourses[0].lockedSections;
+    expect(locked).toBeInstanceOf(Set);
+    expect([...locked]).toEqual(['123']);
+    // Mutating what undo() handed out cannot corrupt the history.
+    back.schedules.get('a')!.name = 'changed';
+    m.redo();
+    expect(m.undo()!.schedules.get('a')!.name).toBe('a');
+  });
 });

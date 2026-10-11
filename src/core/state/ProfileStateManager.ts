@@ -45,6 +45,9 @@ export class ProfileStateManager {
   private undoRedoManager: UndoRedoManager;
   private isRestoringState = false;
   private pendingSavePromises = new Set<Promise<void>>();
+  // The schedule object each id last saved successfully. Schedules in state
+  // are replaced, never mutated, so an unchanged object needs no re-save.
+  private savedSchedules = new Map<string, Schedule>();
   private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
   public isBatchUpdate = false;
 
@@ -532,6 +535,7 @@ export class ProfileStateManager {
         s => s.id !== scheduleId,
       );
 
+      this.savedSchedules.delete(scheduleId);
       const deleteResult = await this.storageManager.deleteSchedule(scheduleId);
       if (!deleteResult.success) {
         logger.warn(
@@ -730,6 +734,15 @@ export class ProfileStateManager {
     return this.undoRedoManager.canRedo();
   }
 
+  /**
+   * Make the next save write every schedule. save() skips a schedule whose
+   * object is unchanged, so a caller that edited one in place calls this
+   * first.
+   */
+  forgetSavedSchedules(): void {
+    this.savedSchedules.clear();
+  }
+
   save(skipSnapshot = false): void {
     const savePromise = this.executeSave(skipSnapshot);
     this.pendingSavePromises.add(savePromise);
@@ -754,7 +767,10 @@ export class ProfileStateManager {
         this.state.activeScheduleId,
       );
 
-      const savePromises = this.state.schedules.map(schedule => {
+      const toSave = this.state.schedules.filter(
+        schedule => this.savedSchedules.get(schedule.id) !== schedule,
+      );
+      const savePromises = toSave.map(schedule => {
         const scheduleToSave = {
           ...schedule,
           selectedCourses: schedule.selectedCourses.filter(
@@ -764,6 +780,14 @@ export class ProfileStateManager {
         return this.storageManager.saveSchedule(scheduleToSave);
       });
       const results = await Promise.all(savePromises);
+      results.forEach((result, i) => {
+        if (result.success) this.savedSchedules.set(toSave[i].id, toSave[i]);
+      });
+      // Drop deleted schedules, so one restored later is written again.
+      const liveIds = new Set(this.state.schedules.map(s => s.id));
+      for (const id of this.savedSchedules.keys()) {
+        if (!liveIds.has(id)) this.savedSchedules.delete(id);
+      }
 
       const preferencesResult = this.storageManager.savePreferences(
         this.state.preferences,
@@ -806,6 +830,7 @@ export class ProfileStateManager {
     try {
       this.state.isLoading = true;
       this.isLoadingFlag = true;
+      this.savedSchedules.clear();
 
       const preferencesResult = this.storageManager.loadPreferences();
       if (preferencesResult.valid && preferencesResult.data) {
@@ -942,6 +967,7 @@ export class ProfileStateManager {
       );
 
       if (result.success) {
+        this.savedSchedules.clear();
         this.state.schedules = [];
         this.state.selectedCourses = [];
         this.state.activeScheduleId = null;
@@ -1200,6 +1226,8 @@ export class ProfileStateManager {
   async clearAllData(): Promise<{ success: boolean; error?: string }> {
     try {
       const result = await this.storageManager.clearAllDataComplete();
+      // Cleared even on failure: storage may be partly wiped.
+      this.savedSchedules.clear();
       if (!result.success) {
         return {
           success: false,

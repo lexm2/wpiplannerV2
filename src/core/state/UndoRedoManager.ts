@@ -11,9 +11,10 @@ export interface StateSnapshot {
 
 export class UndoRedoManager {
   private maxHistorySize = 100;
-  private history: StateSnapshot[] = [];
-  // Serialized form of each history entry, parallel to `history`.
-  private serialized: string[] = [];
+  // Each entry is kept serialized and only parsed when undo/redo returns it:
+  // most entries are never revisited, and a string is far smaller than the
+  // object graph it encodes.
+  private history: Array<{ timestamp: number; serialized: string }> = [];
   private currentIndex = -1;
 
   captureSnapshot(
@@ -25,34 +26,19 @@ export class UndoRedoManager {
       [activeScheduleId, Array.from(schedules.entries()), preferences],
       setReplacer,
     );
-    // One action can reach save() more than once (ProfileStateManager saves,
-    // then ScheduleManagementService autosaves). An unchanged state is not a
-    // new step, and must not cost an Undo press or drop the redo branch.
-    if (serialized === this.serialized[this.currentIndex]) return;
+    // One action can reach save() more than once (a no-op edit, or several
+    // steps that each save). An unchanged state is not a new step, and must
+    // not cost an Undo press or drop the redo branch.
+    if (serialized === this.history[this.currentIndex]?.serialized) return;
 
     if (this.currentIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.currentIndex + 1);
-      this.serialized = this.serialized.slice(0, this.currentIndex + 1);
     }
 
-    const [, entries, prefs] = JSON.parse(serialized, setReviver) as [
-      string | null,
-      Array<[string, Schedule]>,
-      SchedulePreferences,
-    ];
-    const snapshot: StateSnapshot = {
-      timestamp: Date.now(),
-      activeScheduleId,
-      schedules: new Map(entries),
-      preferences: prefs,
-    };
-
-    this.history.push(snapshot);
-    this.serialized.push(serialized);
+    this.history.push({ timestamp: Date.now(), serialized });
 
     if (this.history.length > this.maxHistorySize) {
       this.history.shift();
-      this.serialized.shift();
     } else {
       this.currentIndex++;
     }
@@ -72,7 +58,6 @@ export class UndoRedoManager {
     preferences: SchedulePreferences,
   ): void {
     this.history = [];
-    this.serialized = [];
     this.currentIndex = -1;
     this.captureSnapshot(activeScheduleId, schedules, preferences);
   }
@@ -84,7 +69,7 @@ export class UndoRedoManager {
 
     this.currentIndex--;
     this.notifyListeners();
-    return this.history[this.currentIndex];
+    return this.snapshotAt(this.currentIndex);
   }
 
   redo(): StateSnapshot | null {
@@ -94,7 +79,7 @@ export class UndoRedoManager {
 
     this.currentIndex++;
     this.notifyListeners();
-    return this.history[this.currentIndex];
+    return this.snapshotAt(this.currentIndex);
   }
 
   canUndo(): boolean {
@@ -107,9 +92,23 @@ export class UndoRedoManager {
 
   clear(): void {
     this.history = [];
-    this.serialized = [];
     this.currentIndex = -1;
     this.notifyListeners();
+  }
+
+  /** Parse a history entry back into a fresh snapshot. */
+  private snapshotAt(index: number): StateSnapshot {
+    const { timestamp, serialized } = this.history[index];
+    const [activeScheduleId, entries, preferences] = JSON.parse(
+      serialized,
+      setReviver,
+    ) as [string | null, Array<[string, Schedule]>, SchedulePreferences];
+    return {
+      timestamp,
+      activeScheduleId,
+      schedules: new Map(entries),
+      preferences,
+    };
   }
 
   /** Publish current undo/redo availability for reactive consumers. */
