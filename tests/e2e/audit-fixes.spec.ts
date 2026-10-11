@@ -1,7 +1,7 @@
 import { test, expect, type Page } from './fixtures';
 
 /**
- * Regression guards for the defects fixed from audits/2026-08-20-code-surface-audit.md.
+ * Regression guards for defects fixed from a code surface audit.
  * Each of these bugs was invisible to tsc/svelte-check/unit tests, which is how
  * they survived; these assertions are the thing that keeps them fixed.
  */

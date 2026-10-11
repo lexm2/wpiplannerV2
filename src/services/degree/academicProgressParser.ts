@@ -1,7 +1,7 @@
 /**
  * Parses the matrix produced by xlsxReader (a WPI "View My Academic Progress"
- * export) into a structured StudentRecord. See academic_progress_parser_plan.md
- * for the full spec; the helpers below are exported for unit testing.
+ * export) into a structured StudentRecord. The helpers below are exported for
+ * unit testing.
  */
 import type {
   AcademicPeriod,
