@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 /**
  * An over-enrolled section arrives with a negative seatsAvailable (QA saw

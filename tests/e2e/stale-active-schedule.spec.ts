@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 /**
  * A saved active-schedule id whose schedule is gone, which reloading during
@@ -19,10 +19,6 @@ async function load(page: Page): Promise<void> {
 test('a stale active schedule id falls back to a real schedule', async ({
   page,
 }) => {
-  const warnings: string[] = [];
-  page.on('console', m => {
-    if (m.type() === 'warning') warnings.push(m.text());
-  });
   await page.addInitScript(() => localStorage.setItem('wpi_visited', '1'));
   await page.goto('/');
   await load(page);
@@ -49,5 +45,5 @@ test('a stale active schedule id falls back to a real schedule', async ({
       ),
     )
     .toBe(realId);
-  expect(warnings.filter(w => w.includes('Health check'))).toEqual([]);
+  // The fixture also fails the test on the health check's warning.
 });

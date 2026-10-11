@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 /**
  * Regression guards for the defects fixed from audits/2026-08-20-code-surface-audit.md.

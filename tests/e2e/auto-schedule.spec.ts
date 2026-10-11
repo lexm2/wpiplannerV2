@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 /**
  * Auto-schedule flows that need the real app: the filter panel's toggles, the
@@ -230,24 +230,34 @@ test('no generated option overlaps the courses locked in the intro', async ({
   expect(overlaps.found).toEqual([]);
 });
 
-test('a course with no usable section is named, on separate banner lines', async ({
-  page,
-}) => {
-  await loadApp(page);
-  await selectCourses(page, ['CS2102']);
-  // A term no section is offered in leaves CS2102 with nothing to pick.
-  await page.evaluate(() =>
-    (window as any).services.filterService.addFilter('term', { terms: ['Z'] }),
-  );
+test.describe('no usable section', () => {
+  // The scheduler reports why it produced nothing; here that is the point.
+  test.use({
+    expectedConsole:
+      /No valid candidates for CS2102|No schedule generated: no-candidates/,
+  });
 
-  await page.click('#auto-schedule-btn');
-  await generateFromIntro(page);
+  test('a course with no usable section is named, on separate banner lines', async ({
+    page,
+  }) => {
+    await loadApp(page);
+    await selectCourses(page, ['CS2102']);
+    // A term no section is offered in leaves CS2102 with nothing to pick.
+    await page.evaluate(() =>
+      (window as any).services.filterService.addFilter('term', {
+        terms: ['Z'],
+      }),
+    );
 
-  const message = page.locator('.error-banner-text p').first();
-  await expect(message).toContainText('CS2102');
-  // innerText keeps the line breaks only if they are rendered.
-  const text = await message.evaluate(el => (el as HTMLElement).innerText);
-  expect(text).toMatch(/\n• /);
+    await page.click('#auto-schedule-btn');
+    await generateFromIntro(page);
+
+    const message = page.locator('.error-banner-text p').first();
+    await expect(message).toContainText('CS2102');
+    // innerText keeps the line breaks only if they are rendered.
+    const text = await message.evaluate(el => (el as HTMLElement).innerText);
+    expect(text).toMatch(/\n• /);
+  });
 });
 
 test('the Auto-Schedule button is disabled while generating', async ({

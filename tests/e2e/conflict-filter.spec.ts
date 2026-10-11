@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 /** The conflict filter's semester-spans-quarters toggle in the filter panel. */
 

@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator } from './fixtures';
 
 /**
  * The schedule grid's time range follows the schedule: 8 AM-8 PM by default,

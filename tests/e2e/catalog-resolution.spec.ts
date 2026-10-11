@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 
 /** A saved selection is re-pointed at the live catalog once it loads. */
 
@@ -9,6 +9,10 @@ test.beforeEach(async ({ page }) => {
 
 async function load(page: Page): Promise<void> {
   await page.goto('/');
+  await dataLoaded(page);
+}
+
+async function dataLoaded(page: Page): Promise<void> {
   await page.waitForFunction(
     () =>
       (window as any).services?.courseDataService?.getAllDepartments()?.length >
@@ -40,7 +44,7 @@ test('a reloaded selection uses the live catalog objects', async ({ page }) => {
   warnings.length = 0;
 
   await page.reload();
-  await load(page);
+  await dataLoaded(page);
   await expect
     .poll(() =>
       page.evaluate(id => {
