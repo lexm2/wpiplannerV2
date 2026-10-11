@@ -11,7 +11,7 @@
     openMoveSheet,
     toggleExpanded,
   } from './degreeState.svelte';
-  import { phoneLayout } from '../phoneLayout.svelte';
+  import { phoneLayout, placesBySheet } from '../phoneLayout.svelte';
   import {
     remainingLabel as remainingFor,
     statusLabel as statusFor,
@@ -251,7 +251,7 @@
           {@const tile = entry.tile}
           <!-- Only schedule tiles are movable; Workday's planned courses stay put. -->
           {@const movable =
-            tile.kind === 'schedule' && tile.courseId
+            tile.kind === 'schedule' && tile.courseId && !placesBySheet()
               ? { title: 'Drag to another bucket, or use the Assign menu' }
               : {}}
           <div

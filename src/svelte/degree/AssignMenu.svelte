@@ -1,12 +1,13 @@
 <script lang="ts">
   import { degreeState, openMoveSheet } from './degreeState.svelte';
-  import { phoneLayout } from '../phoneLayout.svelte';
+  import { placesBySheet } from '../phoneLayout.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { scaleFade } from '../transitions';
   import { clickOutside } from '../clickOutside';
 
   /** The click/keyboard path for placing a course, alongside dragging. On a
-   * phone it opens the Move sheet instead (MoveCourseSheet). */
+   * phone or a touch screen it opens the Move sheet instead (MoveCourseSheet),
+   * since touch can't drag. */
   let {
     courseId,
     currentBucketId = null,
@@ -27,9 +28,10 @@
     }
   }
 
-  // A phone has no room for the popup, so the button opens the Move sheet.
+  // Touch can't drag, and a phone has no room for the popup, so there the
+  // button opens the Move sheet.
   function onTrigger(): void {
-    if (phoneLayout.current) openMoveSheet(courseId);
+    if (placesBySheet()) openMoveSheet(courseId);
     else open = !open;
   }
 

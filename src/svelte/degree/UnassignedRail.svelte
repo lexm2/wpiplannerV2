@@ -14,6 +14,7 @@
     SLOT_MS,
   } from './courseDrag.svelte';
   import { slideFade } from '../transitions';
+  import { placesBySheet } from '../phoneLayout.svelte';
 
   /**
    * The rail behaves like the bucket-config list: nothing grows or shrinks in
@@ -97,7 +98,9 @@
     </p>
   {:else}
     <p class="degree-rail-hint">
-      Drag onto a bucket, or use a course's Assign menu.
+      {placesBySheet()
+        ? "Use a course's Assign button to place it."
+        : "Drag onto a bucket, or use a course's Assign menu."}
     </p>
     <div class="degree-rail-list" bind:this={listEl}>
       {#each slots as slot (slot.key)}
@@ -125,7 +128,9 @@
             class="requirement-course requirement-course-draggable is-schedule"
             data-course-id={courseId}
             use:draggableCourse={{ courseId, from: null }}
-            title="Drag onto a bucket to place it"
+            title={placesBySheet()
+              ? undefined
+              : 'Drag onto a bucket to place it'}
           >
             <div class="requirement-course-top">
               <button
