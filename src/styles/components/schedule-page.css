@@ -652,7 +652,7 @@
   flex: 1;
   display: grid;
   grid-template-columns: 60px repeat(5, 1fr);
-  grid-template-rows: auto repeat(12, 1fr);
+  grid-template-rows: auto repeat(var(--grid-hours, 12), minmax(0, 1fr));
   gap: 1px;
   container-type: inline-size;
   background: var(--color-border);
@@ -660,12 +660,13 @@
   overflow: hidden;
   min-height: 150px;
   /* positioned so the absolutely-placed .block-layer resolves its containing
-     block to its grid area (the 5-day × 12-hour body), not .term-graph. */
+     block to its grid area (the 5-day × hour-row body), not .term-graph.
+     TermGrid sets --grid-hours from the schedule's time range. */
   position: relative;
 }
 
 .term-graph.focused-term .schedule-grid {
-  grid-template-rows: auto repeat(12, 1fr);
+  grid-template-rows: auto repeat(var(--grid-hours, 12), minmax(0, 1fr));
   overflow: hidden;
   min-height: 0;
 }
@@ -678,7 +679,11 @@
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
-  padding: 0.25rem;
+  /* No vertical padding or min-content floor: a widened range packs more hour
+     rows into the same card, and they must shrink rather than overflow it. */
+  padding: 0 0.25rem;
+  min-height: 0;
+  overflow: hidden;
   border-right: 2px solid var(--color-border);
 }
 
@@ -719,15 +724,15 @@
 }
 
 /* Absolute overlay layer for the declarative grid (ScheduleGrids/TermGrid):
-   spans the 5 day columns × 12 time rows; blocks are positioned inside it by
-   percentage over the full 8 AM-8 PM body. */
+   spans the 5 day columns × the hour rows; blocks are positioned inside it by
+   percentage over the grid's whole time range. */
 .block-layer {
   grid-column: 2 / -1;
   grid-row: 2 / -1;
   /* position:absolute (not relative): keeps the grid area as the block-layer's
-     containing block while removing it from auto-placement, so the 60 background
+     containing block while removing it from auto-placement, so the background
      cells are NOT pushed into implicit rows below it. inset:0 stretches it to
-     fill that grid area (the 5-day × 12-hour body) so block percentages resolve
+     fill that grid area (the 5-day × hour-row body) so block percentages resolve
      against the full body height. */
   position: absolute;
   inset: 0;

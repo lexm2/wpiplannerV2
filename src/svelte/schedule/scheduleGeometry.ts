@@ -12,20 +12,17 @@ import {
 } from '../../types/schedule';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
 import { getSelectedSections, sectionsOf } from '../../utils/courseUtils';
-import { TimeUtils } from '../../utils/timeUtils';
+import { gridRangeOf, type GridRange } from '../../utils/gridRange';
 
 /**
  * Pure geometry/data helpers for the declarative schedule grid (no Svelte/DOM).
  *
  * The grid uses an absolute-overlay model: each section/event/preview/conflict
- * is one block positioned over the full 12-hour (8 AM-8 PM) term body by
- * percentage.
+ * is one block positioned over the term body by percentage. Blocks carry their
+ * minutes, not their offsets: the body's time range is only known once every
+ * term's blocks are (see {@link scheduleRange}), and {@link verticalStyle}
+ * places a block against it.
  */
-
-// Single source of truth for the grid's time bounds - shared with TermGrid's
-// hour labels so the block math and the grid scaffold can never drift.
-const START_MIN = TimeUtils.START_HOUR * 60; // top of the grid body (8:00 AM)
-const SPAN_MIN = TimeUtils.TOTAL_HOURS * 60; // 8 AM-8 PM = 12 hours
 
 /** Monday-Friday, in grid-column order. */
 export const WEEKDAYS: DayOfWeek[] = [
@@ -42,10 +39,10 @@ export interface GridBlock {
   key: string;
   kind: BlockKind;
   label: string;
-  // Inline geometry (percentages over the term body; left/width carry a 1px
-  // inset so adjacent-day blocks keep the grid's inter-column gap).
-  top: string;
-  height: string;
+  startMin: number;
+  endMin: number;
+  // Horizontal geometry (percentages over the term body, with a 1px inset so
+  // adjacent-day blocks keep the grid's inter-column gap).
   left: string;
   width: string;
   color?: string;
@@ -61,19 +58,23 @@ export interface TermBlocks {
   hasConflict: boolean;
 }
 
-function clampMinutes(min: number): number {
-  return Math.max(START_MIN, Math.min(min, START_MIN + SPAN_MIN));
+/**
+ * The range every term grid shares: 8 AM-8 PM unless a block needs more, so
+ * paging between terms keeps the same time axis.
+ */
+export function scheduleRange(terms: Iterable<TermBlocks>): GridRange {
+  return gridRangeOf([...terms].flatMap(t => t.blocks));
 }
 
-function verticalStyle(
-  startMin: number,
-  endMin: number,
+/** A block's top/height as percentages of a body showing `range`. */
+export function verticalStyle(
+  range: GridRange,
+  b: GridBlock,
 ): { top: string; height: string } {
-  const s = clampMinutes(startMin);
-  const e = clampMinutes(endMin);
+  const span = range.endMin - range.startMin;
   return {
-    top: `${((s - START_MIN) / SPAN_MIN) * 100}%`,
-    height: `${((e - s) / SPAN_MIN) * 100}%`,
+    top: `${((b.startMin - range.startMin) / span) * 100}%`,
+    height: `${((b.endMin - b.startMin) / span) * 100}%`,
   };
 }
 
@@ -289,7 +290,8 @@ export function buildTermBlocks(
           color,
           courseId: sc.course.id,
           sectionNumber: section.number,
-          ...verticalStyle(r.startMin, r.endMin),
+          startMin: r.startMin,
+          endMin: r.endMin,
           left: '',
           width: '',
         };
@@ -348,7 +350,8 @@ export function buildTermBlocks(
         kind: 'conflict',
         label: '',
         conflictInfo: [...region.labels].join(', '),
-        ...verticalStyle(region.start, region.end),
+        startMin: region.start,
+        endMin: region.end,
         ...fullWidth(dayIndex),
       });
     }
@@ -368,7 +371,8 @@ export function buildTermBlocks(
         label: title,
         title,
         eventId: ev.id,
-        ...verticalStyle(startMin, endMin),
+        startMin,
+        endMin,
         left: '',
         width: '',
       };
@@ -413,7 +417,8 @@ export function buildTermBlocks(
           color,
           courseId: termHoverCourse.course.id,
           sectionNumber: section.number,
-          ...verticalStyle(r.startMin, r.endMin),
+          startMin: r.startMin,
+          endMin: r.endMin,
           ...fullWidth(r.dayIndex),
         });
       }

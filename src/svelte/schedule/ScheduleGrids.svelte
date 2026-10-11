@@ -12,6 +12,7 @@
     collectSelectedSections,
     courseShowsInTerm,
     buildTermBlocks,
+    scheduleRange,
     type TermBlocks,
   } from './scheduleGeometry';
   import TermGrid from './TermGrid.svelte';
@@ -92,6 +93,8 @@
     }
     return result;
   });
+
+  const range = $derived(scheduleRange(Object.values(blocksByTerm)));
 </script>
 
 <!-- Focus state, its zoom/page animation and the wheel/touch/key input that
@@ -108,6 +111,7 @@
       {term}
       blocks={blocksByTerm[term].blocks}
       hasConflict={blocksByTerm[term].hasConflict}
+      {range}
       focused={termFocus.term === term}
       hidden={termFocus.term !== null && termFocus.term !== term}
       onToggleFocus={() => toggleFocus(term)}
