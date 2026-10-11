@@ -45,6 +45,8 @@
   import DegreePage from './degree/DegreePage.svelte';
   import SidePanel from './SidePanel.svelte';
   import DrawerToggle from './DrawerToggle.svelte';
+  import ToPlaceButton from './degree/ToPlaceButton.svelte';
+  import { degreeState } from './degree/degreeState.svelte';
   import ErrorBanner from './ErrorBanner.svelte';
   import { PANEL_WIDTHS, applyStoredPanelWidths } from './panelWidths';
   import { logger } from '../utils/logger';
@@ -160,6 +162,8 @@
           icon="list"
           count={appState.selectedCourses.length}
         />
+      {:else if currentPage === 'degree' && degreeState.record}
+        <ToPlaceButton />
       {/if}
     </div>
     <nav class="header-navigation" aria-label="Main navigation">

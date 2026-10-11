@@ -80,6 +80,9 @@ class DegreeState {
    */
   showUmbrella = $state(false);
 
+  /** Whether the phone's "To place" list is open. Not persisted. */
+  toPlaceOpen = $state(true);
+
   /** The course the phone's Move sheet is placing, while it is open. */
   moving = $state.raw<string | null>(null);
 

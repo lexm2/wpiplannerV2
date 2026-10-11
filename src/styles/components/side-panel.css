@@ -166,6 +166,11 @@ button.drawer-toggle {
     display: none;
   }
 
+  /* The Degree page's slot in the bottom bar (ToPlaceButton.svelte). */
+  button.drawer-toggle-to-place {
+    display: inline-flex;
+  }
+
   .drawer-toggle-count {
     position: absolute;
     top: 2px;

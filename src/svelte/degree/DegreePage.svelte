@@ -5,6 +5,8 @@
   import DegreeSummary from './DegreeSummary.svelte';
   import RequirementList from './RequirementList.svelte';
   import UnassignedRail from './UnassignedRail.svelte';
+  import ToPlaceList from './ToPlaceList.svelte';
+  import { phoneLayout } from '../phoneLayout.svelte';
   import SidePanel from '../SidePanel.svelte';
   import { PANEL_WIDTHS } from '../panelWidths';
 
@@ -24,20 +26,26 @@
     <!-- .degree-rail stays on the panel, not the scroller: courseDrag resolves
          the unassign target with closest('.degree-rail'), so a drop on the
          resize seam still counts as a drop on the rail. .degree-pane goes on
-         the scroller inside, which is what dragAutoScroll edge-scrolls. -->
-    <SidePanel
-      class="degree-rail"
-      label="Unassigned courses"
-      config={PANEL_WIDTHS.degreeRail}
-      edge="right"
-      resizeLabel="Resize the unassigned rail"
-    >
-      <div class="degree-pane degree-side-scroll">
-        <UnassignedRail />
-      </div>
-    </SidePanel>
+         the scroller inside, which is what dragAutoScroll edge-scrolls.
+         A phone gets ToPlaceList at the top of the one scroller instead. -->
+    {#if !phoneLayout.current}
+      <SidePanel
+        class="degree-rail"
+        label="Unassigned courses"
+        config={PANEL_WIDTHS.degreeRail}
+        edge="right"
+        resizeLabel="Resize the unassigned rail"
+      >
+        <div class="degree-pane degree-side-scroll">
+          <UnassignedRail />
+        </div>
+      </SidePanel>
+    {/if}
     <div class="degree-pane degree-main">
       <div class="degree-content">
+        {#if phoneLayout.current}
+          <ToPlaceList />
+        {/if}
         <DegreeSummary {record} {degreeImportService} />
         <RequirementList />
       </div>

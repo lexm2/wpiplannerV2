@@ -1281,6 +1281,104 @@
   }
 }
 
+/* ---- Phone: To place (ToPlaceList.svelte) ---- */
+.degree-to-place {
+  margin-bottom: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--effect-border-radius-large);
+}
+
+.degree-to-place-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 0.75rem;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.degree-to-place-title {
+  font-weight: var(--font-weight-bold);
+}
+
+.degree-to-place-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-heavy);
+  line-height: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.degree-to-place-hint {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.degree-to-place-chevron,
+.degree-summary-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.degree-to-place-head[aria-expanded='false'] .degree-to-place-chevron {
+  transform: rotate(-90deg);
+}
+
+.degree-to-place-list {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0 0.75rem 0.75rem;
+}
+
+.degree-to-place-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 0.5rem;
+  align-items: center;
+  min-height: 48px;
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  cursor: pointer;
+}
+
+.degree-to-place-name {
+  grid-column: 1;
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+}
+
+.degree-to-place-go {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+}
+
 /* ---- Phone: a course row is one button (RequirementCard.svelte) ---- */
 .degree-card-list .requirement-course-tap {
   width: 100%;
