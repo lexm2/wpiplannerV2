@@ -8,7 +8,7 @@
   typeId="mobile-notice"
   closeOnBackdrop={false}
   closeOnEscape={false}
-  title="Mobile Not Supported"
+  title="Limited Mobile Support"
   showHeader
   hideClose
   {onRequestClose}
@@ -16,8 +16,9 @@
   {#snippet children(close)}
     <div class="modal-body">
       <p>
-        Mobile support was temporarily removed to make it easier to ship new
-        features. Please use a desktop browser for the best experience.
+        The planner is built for desktop. On a phone the side panels open as
+        drawers from the header and toolbar buttons, but a desktop browser gives
+        the best experience.
       </p>
     </div>
     <div class="modal-footer">

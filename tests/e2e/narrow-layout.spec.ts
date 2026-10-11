@@ -24,7 +24,7 @@ async function boot(page: Page): Promise<void> {
     undefined,
     { timeout: 30000 },
   );
-  // A phone UA gets the one-off "Mobile Not Supported" notice first.
+  // A phone UA gets the one-off "Limited Mobile Support" notice first.
   const notice = page.getByRole('button', { name: 'Got it' });
   if (await notice.isVisible()) await notice.click();
 }
