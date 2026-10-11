@@ -209,6 +209,48 @@ test('the picker spans every hour the catalog meets', async ({ page }) => {
   });
 });
 
+test('one svg overlay draws a line per hour, half hour and day', async ({
+  page,
+}) => {
+  await openPicker(page);
+  const { startMin, endMin } = await pickerRange(page);
+  const hours = (endMin - startMin) / 60;
+
+  // A background gradient whose stripe is not a whole pixel tall drops most
+  // of its 1px lines in Firefox; scale-free crisp strokes always land on one.
+  const overlay = page.locator(`${BODY} > svg`);
+  await expect(overlay).toHaveCount(1);
+  await expect(overlay).toHaveAttribute('aria-hidden', 'true');
+  await expect(overlay).toHaveAttribute('preserveAspectRatio', 'none');
+  expect(await overlay.evaluate(el => getComputedStyle(el).pointerEvents)).toBe(
+    'none',
+  );
+  expect(
+    await page
+      .locator(BODY)
+      .evaluate(el => getComputedStyle(el).backgroundImage),
+  ).toBe('none');
+
+  // Interior lines only: the body's edges sit against the grid's borders.
+  await expect(overlay.locator('line[data-line="hour"]')).toHaveCount(
+    hours - 1,
+  );
+  await expect(overlay.locator('line[data-line="half"]')).toHaveCount(hours);
+  await expect(overlay.locator('line[data-line="day"]')).toHaveCount(4);
+
+  const stroke = await overlay
+    .locator('line')
+    .first()
+    .evaluate(el => ({
+      effect: getComputedStyle(el).getPropertyValue('vector-effect'),
+      rendering: getComputedStyle(el).getPropertyValue('shape-rendering'),
+    }));
+  expect(stroke).toEqual({
+    effect: 'non-scaling-stroke',
+    rendering: 'crispedges',
+  });
+});
+
 test('painting every day as Only keeps every timed course', async ({
   page,
 }) => {

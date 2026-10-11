@@ -57,24 +57,28 @@
   touch-action: none;
   user-select: none;
   cursor: crosshair;
-  /* Solid line per hour, fainter per half hour, day separators every 20%.
-     Drawn rather than built from cells so the rect stays contiguous. */
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      var(--color-border) 0 1px,
-      transparent 1px calc(100% / var(--grid-hours, 12))
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-border) 45%, transparent) 0 1px,
-      transparent 1px calc(100% / var(--grid-hours, 12) / 2)
-    ),
-    repeating-linear-gradient(
-      to right,
-      var(--color-border) 0 1px,
-      transparent 1px 20%
-    );
+}
+
+/* Solid line per hour, fainter per half hour, day separators. Drawn over the
+   body rather than built from cells so the measured rect stays contiguous. */
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.lines line {
+  stroke: var(--color-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: crispEdges;
+}
+
+.lines .halfLine {
+  stroke: color-mix(in srgb, var(--color-border) 45%, transparent);
 }
 
 .body:focus-visible {

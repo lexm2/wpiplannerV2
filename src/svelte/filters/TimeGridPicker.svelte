@@ -70,6 +70,10 @@
   const summary = $derived(describeWindows(previewWindows, gridMode));
 
   const hours = Array.from({ length: gridHours(range) }, (_, i) => i);
+  // Interior gridlines in row units: odd rows begin on the half hour.
+  const halfLines = hours.map(h => h * 2 + 1);
+  const hourLines = hours.slice(1).map(h => h * 2);
+  const dayLines = GRID_DAYS.slice(1).map((_, i) => i + 1);
 
   function clamp(v: number, lo: number, hi: number): number {
     return Math.max(lo, Math.min(v, hi));
@@ -339,6 +343,33 @@
         keyAnchor = null;
       }}
     >
+      <!-- One overlay rather than a background gradient: Firefox drops most 1px
+           stops of a stripe that is not a whole pixel tall. Scaled to the body
+           with unscaled crisp strokes, every line lands on a pixel. -->
+      <svg
+        class={styles.lines}
+        viewBox="0 0 {GRID_DAYS.length} {rows}"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {#each halfLines as y (y)}
+          <line
+            data-line="half"
+            class={styles.halfLine}
+            x1="0"
+            x2={GRID_DAYS.length}
+            y1={y}
+            y2={y}
+          />
+        {/each}
+        {#each hourLines as y (y)}
+          <line data-line="hour" x1="0" x2={GRID_DAYS.length} y1={y} y2={y} />
+        {/each}
+        {#each dayLines as x (x)}
+          <line data-line="day" x1={x} x2={x} y1="0" y2={rows} />
+        {/each}
+      </svg>
+
       {#each previewWindows as w (`${w.day}-${w.startMin}`)}
         <div
           class="{styles.painted} {gridMode === 'only'
