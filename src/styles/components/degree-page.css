@@ -1379,6 +1379,127 @@
   color: var(--color-text-secondary);
 }
 
+/* ---- Phone: one-line summary (DegreeSummary.svelte) ---- */
+.degree-summary-compact {
+  margin-bottom: 0.75rem;
+}
+
+.degree-summary-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.degree-summary-toggle {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.degree-summary-compact .degree-summary-title {
+  max-width: 100%;
+  font-size: 1.0625rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.degree-summary-pct {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.degree-summary-pct .degree-summary-chevron {
+  width: 14px;
+  height: 14px;
+}
+
+.degree-summary-toggle[aria-expanded='true'] .degree-summary-chevron {
+  transform: rotate(180deg);
+}
+
+.degree-summary-more {
+  position: relative;
+}
+
+.degree-summary-more-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.degree-summary-more-btn[aria-expanded='true'] {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.degree-summary-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 12rem;
+  transform-origin: top right;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  box-shadow: var(--effect-shadow-large);
+  padding: 0.25rem;
+}
+
+.degree-summary-menu .assign-menu-item {
+  min-height: 44px;
+}
+
+.assign-menu-item.is-danger {
+  color: var(--color-danger);
+}
+
+.assign-menu-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.degree-summary-bar {
+  height: 6px;
+  margin-top: 0.4rem;
+}
+
+.degree-summary-compact .degree-summary-sub {
+  margin-top: 0.75rem;
+}
+
+.degree-summary-compact .degree-credit-stats {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 /* ---- Phone: a course row is one button (RequirementCard.svelte) ---- */
 .degree-card-list .requirement-course-tap {
   width: 100%;
