@@ -77,8 +77,14 @@ async function searchTeachers(
           edges {
             node {
               id
+              legacyId
               firstName
               lastName
+              department
+              avgDifficulty
+              avgRating
+              numRatings
+              wouldTakeAgainPercent
               school {
                 id
                 name
@@ -104,29 +110,6 @@ async function searchTeachers(
   }
 
   return data.newSearch.teachers.edges.map((edge: any) => edge.node);
-}
-
-async function getTeacher(id: string): Promise<any> {
-  const graphqlQuery = `
-    query TeacherQuery($id: ID!) {
-      node(id: $id) {
-        ... on Teacher {
-          id
-          legacyId
-          firstName
-          lastName
-          department
-          avgDifficulty
-          avgRating
-          numRatings
-          wouldTakeAgainPercent
-        }
-      }
-    }
-  `;
-
-  const data = await graphqlRequest(graphqlQuery, { id });
-  return data.node;
 }
 
 /**
@@ -172,9 +155,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
       );
     }
 
-    console.log(
-      `\n\nFound ${allTeachers.size} unique professors. Fetching detailed information...`,
-    );
+    console.log(`\n\nFound ${allTeachers.size} unique professors.`);
 
     const teachers = Array.from(allTeachers.values());
 
@@ -182,59 +163,20 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
       throw new Error('No professors found for WPI');
     }
 
-    const professors: Professor[] = [];
-    let successCount = 0;
-    let failureCount = 0;
-
-    // Fetch detailed information for each professor with rate limiting
-    for (let i = 0; i < teachers.length; i++) {
-      const teacher = teachers[i];
-
-      try {
-        // Add delay between requests to avoid overwhelming the API
-        if (i > 0) {
-          await sleep(DELAY_BETWEEN_REQUESTS_MS);
-        }
-
-        const details = await getTeacher(teacher.id);
-
-        if (!details) {
-          throw new Error('No details returned');
-        }
-
-        const professor: Professor = {
-          id: details.id,
-          legacyId: details.legacyId,
-          firstName: details.firstName || teacher.firstName,
-          lastName: details.lastName || teacher.lastName,
-          department: details.department || 'Unknown',
-          avgRating: details.avgRating || 0,
-          avgDifficulty: details.avgDifficulty || 0,
-          numRatings: details.numRatings || 0,
-          wouldTakeAgainPercent: details.wouldTakeAgainPercent ?? null,
-          profileUrl: `https://www.ratemyprofessors.com/professor/${details.legacyId}`,
-        };
-
-        professors.push(professor);
-        successCount++;
-
-        if ((i + 1) % 10 === 0) {
-          console.log(
-            `Progress: ${i + 1}/${teachers.length} professors processed`,
-          );
-        }
-      } catch (error) {
-        failureCount++;
-        console.error(
-          `Failed to fetch details for ${teacher.firstName} ${teacher.lastName}:`,
-          error,
-        );
-      }
-    }
-
-    console.log(
-      `\nCompleted: ${successCount} successful, ${failureCount} failed`,
-    );
+    // The search nodes already carry the rating fields, so no per-teacher
+    // detail request is needed.
+    const professors: Professor[] = teachers.map((teacher): Professor => ({
+      id: teacher.id,
+      legacyId: teacher.legacyId,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      department: teacher.department || 'Unknown',
+      avgRating: teacher.avgRating || 0,
+      avgDifficulty: teacher.avgDifficulty || 0,
+      numRatings: teacher.numRatings || 0,
+      wouldTakeAgainPercent: teacher.wouldTakeAgainPercent ?? null,
+      profileUrl: `https://www.ratemyprofessors.com/professor/${teacher.legacyId}`,
+    }));
 
     return professors;
   } catch (error) {

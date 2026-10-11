@@ -42,17 +42,13 @@ export class RMPRatingFilter implements SectionBasedFilter {
       if (professors.length === 0) return criteria.includeWithoutData ?? true;
 
       return professors.some(professor => {
-        const rmpData = this.rmpService.getRatingDisplay(professor);
+        const ratings = this.rmpService.getRatings(professor);
 
-        if (!rmpData) {
+        if (!ratings) {
           return criteria.includeWithoutData ?? true;
         }
 
-        const rating = parseFloat(rmpData.rating);
-        const difficulty = parseFloat(rmpData.difficulty);
-        const wouldTakeAgain = rmpData.wouldTakeAgain
-          ? parseInt(rmpData.wouldTakeAgain)
-          : null;
+        const { rating, difficulty, wouldTakeAgain } = ratings;
 
         if (
           criteria.minRating !== undefined &&

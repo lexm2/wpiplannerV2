@@ -210,6 +210,33 @@ export class RateMyProfessorService {
     return best;
   }
 
+  /**
+   * The matched professor's ratings as numbers, at the precision
+   * getRatingDisplay shows: rating and difficulty to one decimal, the retake
+   * share to a whole percent (RMP's -1 for "not enough data" stays -1). Null
+   * when there is no match or the professor has no ratings.
+   */
+  getRatings(professorName: string): {
+    rating: number;
+    difficulty: number;
+    numRatings: number;
+    wouldTakeAgain: number | null;
+  } | null {
+    const professor = this.findProfessor(professorName);
+
+    if (!professor || professor.numRatings === 0) return null;
+
+    return {
+      rating: Number(professor.avgRating.toFixed(1)),
+      difficulty: Number(professor.avgDifficulty.toFixed(1)),
+      numRatings: professor.numRatings,
+      wouldTakeAgain:
+        professor.wouldTakeAgainPercent !== null
+          ? Math.round(professor.wouldTakeAgainPercent)
+          : null,
+    };
+  }
+
   getRatingDisplay(professorName: string): {
     rating: string;
     difficulty: string;
@@ -217,18 +244,15 @@ export class RateMyProfessorService {
     wouldTakeAgain: string | null;
     hasData: boolean;
   } | null {
-    const professor = this.findProfessor(professorName);
-
-    if (!professor || professor.numRatings === 0) return null;
+    const ratings = this.getRatings(professorName);
+    if (!ratings) return null;
 
     return {
-      rating: professor.avgRating.toFixed(1),
-      difficulty: professor.avgDifficulty.toFixed(1),
-      numRatings: professor.numRatings,
+      rating: ratings.rating.toFixed(1),
+      difficulty: ratings.difficulty.toFixed(1),
+      numRatings: ratings.numRatings,
       wouldTakeAgain:
-        professor.wouldTakeAgainPercent !== null
-          ? `${Math.round(professor.wouldTakeAgainPercent)}%`
-          : null,
+        ratings.wouldTakeAgain !== null ? `${ratings.wouldTakeAgain}%` : null,
       hasData: true,
     };
   }

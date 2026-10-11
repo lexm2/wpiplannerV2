@@ -4,7 +4,7 @@ This script fetches Rate My Professor data for all professors at Worcester Polyt
 
 ## Overview
 
-The script uses direct GraphQL queries to the Rate My Professors API to retrieve professor ratings, difficulty scores, and other metrics. It searches through the alphabet (a-z) to find all professors at WPI, then fetches detailed information for each professor.
+The script uses direct GraphQL queries to the Rate My Professors API to retrieve professor ratings, difficulty scores, and other metrics. It searches through the alphabet (a-z) to find all professors at WPI; each search result already carries the professor's ratings, so no per-professor request is made.
 
 ## Files
 
@@ -23,9 +23,8 @@ npm run fetch-rmp-data
 ```
 
 This will:
-1. Search for all professors at WPI (by searching through a-z)
-2. Fetch detailed information for each professor
-3. Save the data to `public/rateMyProfessor.json`
+1. Search for all professors at WPI (by searching through a-z), ratings included
+2. Save the data to `public/rateMyProfessor.json`
 
 ### Automated Execution
 
@@ -98,16 +97,12 @@ Since the Rate My Professors API doesn't support fetching all professors at once
 
 ### 2. Data Fetching
 
-For each professor found:
-1. Fetch detailed information via GraphQL query
-2. Extract ratings, difficulty, department, etc.
-3. Add 100ms delay between requests to avoid overwhelming the API
+The search query requests each teacher's legacy ID, department, rating, difficulty, rating count and would-take-again percentage directly, so the 26 letter searches are the only requests made.
 
 ### 3. Rate Limiting
 
 - **Between letter searches**: 100ms delay
-- **Between professor detail fetches**: 100ms delay
-- Typical execution time: ~2-3 minutes for 900+ professors
+- Typical execution time: a few seconds
 
 ## Technical Details
 
@@ -121,8 +116,7 @@ The script communicates directly with the Rate My Professors GraphQL API:
 
 ### Queries Used
 
-1. **Search Teachers**: Finds professors by name/letter at a specific school
-2. **Get Teacher**: Fetches detailed information for a specific professor
+1. **Search Teachers**: Finds professors by name/letter at a specific school, with their rating fields
 
 ## Troubleshooting
 

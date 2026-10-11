@@ -113,6 +113,45 @@ describe('RateMyProfessorService.findProfessor', () => {
   });
 });
 
+describe('RateMyProfessorService.getRatings', () => {
+  it('rounds to the precision getRatingDisplay shows', async () => {
+    const service = await serviceWith([
+      { ...prof('Amy', 'Curran', 3.96), wouldTakeAgainPercent: 88.8889 },
+    ]);
+    expect(service.getRatings('Amy Curran')).toEqual({
+      rating: 4,
+      difficulty: 3,
+      numRatings: 10,
+      wouldTakeAgain: 89,
+    });
+    expect(service.getRatingDisplay('Amy Curran')).toEqual({
+      rating: '4.0',
+      difficulty: '3.0',
+      numRatings: 10,
+      wouldTakeAgain: '89%',
+      hasData: true,
+    });
+  });
+
+  it('returns null for an unmatched or unrated professor', async () => {
+    const service = await serviceWith([
+      { ...prof('Amy', 'Curran'), numRatings: 0 },
+    ]);
+    expect(service.getRatings('Amy Curran')).toBeNull();
+    expect(service.getRatings('Laura Susanin')).toBeNull();
+  });
+
+  it("keeps RMP's -1 retake share and a missing one as null", async () => {
+    const service = await serviceWith([
+      { ...prof('Amy', 'Curran'), wouldTakeAgainPercent: -1 },
+      prof('Laura', 'Susanin'),
+    ]);
+    expect(service.getRatings('Amy Curran')?.wouldTakeAgain).toBe(-1);
+    expect(service.getRatingDisplay('Amy Curran')?.wouldTakeAgain).toBe('-1%');
+    expect(service.getRatings('Laura Susanin')?.wouldTakeAgain).toBeNull();
+  });
+});
+
 describe('RMPRatingFilter', () => {
   function sectionTaughtBy(...professors: string[]): FilterableSection {
     return {
@@ -147,6 +186,44 @@ describe('RMPRatingFilter', () => {
 
     expect(
       filter.apply([section], { minRating: 4, includeWithoutData: true }),
+    ).toEqual([]);
+  });
+
+  it('compares the rounded rating, as displayed', async () => {
+    // 3.96 shows as 4.0, so it passes a 4.0 minimum
+    const service = await serviceWith([prof('Amy', 'Curran', 3.96)]);
+    const filter = new RMPRatingFilter(service);
+    const section = sectionTaughtBy('Amy Curran');
+
+    expect(filter.apply([section], { minRating: 4 })).toEqual([section]);
+  });
+
+  it('ignores a missing retake share but filters on -1', async () => {
+    const service = await serviceWith([
+      prof('Laura', 'Susanin'),
+      { ...prof('Amy', 'Curran'), wouldTakeAgainPercent: -1 },
+    ]);
+    const filter = new RMPRatingFilter(service);
+    const missing = sectionTaughtBy('Laura Susanin');
+    const negative = sectionTaughtBy('Amy Curran');
+
+    expect(
+      filter.apply([missing, negative], { minWouldTakeAgain: 50 }),
+    ).toEqual([missing]);
+  });
+
+  it('treats a professor with no ratings as having no data', async () => {
+    const service = await serviceWith([
+      { ...prof('Amy', 'Curran', 1), numRatings: 0 },
+    ]);
+    const filter = new RMPRatingFilter(service);
+    const section = sectionTaughtBy('Amy Curran');
+
+    expect(
+      filter.apply([section], { minRating: 4, includeWithoutData: true }),
+    ).toEqual([section]);
+    expect(
+      filter.apply([section], { minRating: 4, includeWithoutData: false }),
     ).toEqual([]);
   });
 });
