@@ -131,10 +131,12 @@ function extractSectionNumber(
   );
 
   if (hasAppendix) {
-    // Extract: "CS 1101-A01-Quiz" -> "A01"
-    const dashIndex = courseSectionFull.indexOf('-');
-    const secondDashIndex = courseSectionFull.indexOf('-', dashIndex + 6);
-    return courseSectionFull.substring(dashIndex + 1, secondDashIndex - 1);
+    // Keep just the code: "CS 1101-A01-Quiz" -> "A01",
+    // "MA 1024-AD03-ACL (group 2)" -> "AD03", like a plain "(group N)" suffix.
+    const code = courseSectionFull
+      .slice(courseSectionFull.indexOf('-') + 1)
+      .match(/^[A-Z0-9]+/);
+    if (code) return code[0];
   }
 
   // Check for Interest List
@@ -155,22 +157,16 @@ function extractSectionNumber(
   // Standard section: "CS 1101-A01 - Intro" -> "A01"
   const dashIndex = courseSectionFull.indexOf('-');
   const secondDashIndex = courseSectionFull.indexOf('-', dashIndex + 1);
-
-  if (secondDashIndex === -1) {
-    // No second dash, take everything after first dash
-    return courseSectionFull.substring(dashIndex + 1).trim();
-  }
-
-  let sectionNumber = courseSectionFull
-    .substring(dashIndex + 1, secondDashIndex - 1)
-    .trim();
+  let sectionNumber = courseSectionFull.substring(
+    dashIndex + 1,
+    secondDashIndex === -1 ? undefined : secondDashIndex,
+  );
 
   // Remove parenthetical suffixes: "A01 (Honors)" -> "A01"
   const parenIndex = sectionNumber.indexOf('(');
-  if (parenIndex !== -1) {
-    sectionNumber = sectionNumber.substring(0, parenIndex - 1).trim();
-  }
+  if (parenIndex !== -1) sectionNumber = sectionNumber.substring(0, parenIndex);
 
+  sectionNumber = sectionNumber.trim();
   return sectionNumber;
 }
 

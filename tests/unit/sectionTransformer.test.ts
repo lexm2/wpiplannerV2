@@ -52,19 +52,23 @@ describe('section numbers', () => {
     ).toBe('C02');
   });
 
-  // Appendix sections (sectionNumberAppendices) currently keep the appendix
-  // and any parenthetical in the number, unlike a plain "(group N)" suffix.
-  // Whether they should is pending a product decision; these pin what the
-  // converter does today.
+  // Appendix sections (sectionNumberAppendices) keep just their code, the
+  // way a plain "(group N)" suffix is dropped.
   it.each([
-    ['MA 1024-AD03-ACL (group 2) - Calculus IV', 'AD03-ACL (group 2)'],
-    ['MA 1024-AL06-ACL (group 3) - Calculus IV', 'AL06-ACL (group 3)'],
-    [
-      'PH 1110-AS01-Multipurpose - General Physics-Mechanics',
-      'AS01-Multipurpose',
-    ],
-    ['CS 1101-A01-Quiz - Introduction To Program Design', 'A01-Quiz'],
-  ])('appendix %s -> %s (current behaviour)', (cs, expected) => {
+    ['MA 1024-AD03-ACL (group 2) - Calculus IV', 'AD03'],
+    ['MA 1024-AL06-ACL (group 3) - Calculus IV', 'AL06'],
+    ['PH 1110-AS01-Multipurpose - General Physics-Mechanics', 'AS01'],
+    ['CS 1101-A01-Quiz - Introduction To Program Design', 'A01'],
+    ['CS 1101-A01-Quiz', 'A01'],
+  ])('appendix %s -> %s', (cs, expected) => {
+    expect(numberOf(cs)).toBe(expected);
+  });
+
+  it.each([
+    ['CS 1101-A01(Honors) - Intro', 'A01'],
+    ['CS 1101-A01 (group 2)', 'A01'],
+    ['CS 1101-A01', 'A01'],
+  ])('reads %s as %s without losing a character', (cs, expected) => {
     expect(numberOf(cs)).toBe(expected);
   });
 

@@ -120175,7 +120175,7 @@
             {
               "section": {
                 "crn": 348829,
-                "number": "AL01-ACL (group 2)",
+                "number": "AL01",
                 "seats": 70,
                 "seatsAvailable": 6,
                 "actualWaitlist": 0,
@@ -120197,7 +120197,7 @@
                     "seatsAvailable": 6,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "AL01-ACL (group 2)",
+                    "specificSection": "AL01",
                     "days": [
                       "M",
                       "T",
@@ -120211,7 +120211,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 348815,
-                  "number": "AD03-ACL (group 2)",
+                  "number": "AD03",
                   "seats": 35,
                   "seatsAvailable": 1,
                   "actualWaitlist": 0,
@@ -120233,7 +120233,7 @@
                       "seatsAvailable": 1,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AD03-ACL (group 2)",
+                      "specificSection": "AD03",
                       "days": [
                         "F"
                       ],
@@ -120243,7 +120243,7 @@
                 },
                 {
                   "crn": 348813,
-                  "number": "AD04-ACL (group 2)",
+                  "number": "AD04",
                   "seats": 35,
                   "seatsAvailable": 5,
                   "actualWaitlist": 0,
@@ -120265,7 +120265,7 @@
                       "seatsAvailable": 5,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AD04-ACL (group 2)",
+                      "specificSection": "AD04",
                       "days": [
                         "F"
                       ],
@@ -121368,7 +121368,7 @@
             {
               "section": {
                 "crn": 348804,
-                "number": "AL06-ACL (group 3)",
+                "number": "AL06",
                 "seats": 60,
                 "seatsAvailable": 12,
                 "actualWaitlist": 0,
@@ -121390,7 +121390,7 @@
                     "seatsAvailable": 12,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "AL06-ACL (group 3)",
+                    "specificSection": "AL06",
                     "days": [
                       "M",
                       "T",
@@ -121404,7 +121404,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 348802,
-                  "number": "AD06-ACL (group 3)",
+                  "number": "AD06",
                   "seats": 30,
                   "seatsAvailable": 0,
                   "actualWaitlist": 0,
@@ -121426,7 +121426,7 @@
                       "seatsAvailable": 0,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AD06-ACL (group 3)",
+                      "specificSection": "AD06",
                       "days": [
                         "F"
                       ],
@@ -121436,7 +121436,7 @@
                 },
                 {
                   "crn": 349060,
-                  "number": "AD08-ACL (group 3)",
+                  "number": "AD08",
                   "seats": 30,
                   "seatsAvailable": 12,
                   "actualWaitlist": 0,
@@ -121458,7 +121458,7 @@
                       "seatsAvailable": 12,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AD08-ACL (group 3)",
+                      "specificSection": "AD08",
                       "days": [
                         "F"
                       ],
@@ -123754,7 +123754,7 @@
             {
               "section": {
                 "crn": 348410,
-                "number": "AL09-ACL (group 6)",
+                "number": "AL09",
                 "seats": 60,
                 "seatsAvailable": 1,
                 "actualWaitlist": 0,
@@ -123776,7 +123776,7 @@
                     "seatsAvailable": 1,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "AL09-ACL (group 6)",
+                    "specificSection": "AL09",
                     "days": [
                       "M",
                       "T",
@@ -123790,7 +123790,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 348389,
-                  "number": "AD10-ACL (group 6)",
+                  "number": "AD10",
                   "seats": 35,
                   "seatsAvailable": -2,
                   "actualWaitlist": 0,
@@ -123812,7 +123812,7 @@
                       "seatsAvailable": -2,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AD10-ACL (group 6)",
+                      "specificSection": "AD10",
                       "days": [
                         "F"
                       ],
@@ -123822,7 +123822,7 @@
                 },
                 {
                   "crn": 348391,
-                  "number": "AD11-ACL (group 6)",
+                  "number": "AD11",
                   "seats": 25,
                   "seatsAvailable": 3,
                   "actualWaitlist": 0,
@@ -123844,7 +123844,7 @@
                       "seatsAvailable": 3,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AD11-ACL (group 6)",
+                      "specificSection": "AD11",
                       "days": [
                         "F"
                       ],
@@ -181468,7 +181468,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 348678,
-                  "number": "AS01-Multipurpose",
+                  "number": "AS01",
                   "seats": 70,
                   "seatsAvailable": 23,
                   "actualWaitlist": 0,
@@ -181490,7 +181490,7 @@
                       "seatsAvailable": 23,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "AS01-Multipurpose",
+                      "specificSection": "AS01",
                       "days": [
                         "W"
                       ],
@@ -185787,7 +185787,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 351052,
-                  "number": "CS02-Multipurpose",
+                  "number": "CS02",
                   "seats": 80,
                   "seatsAvailable": 76,
                   "actualWaitlist": 0,
@@ -185809,7 +185809,7 @@
                       "seatsAvailable": 76,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "CS02-Multipurpose",
+                      "specificSection": "CS02",
                       "days": [
                         "W"
                       ],
@@ -187008,7 +187008,7 @@
             {
               "section": {
                 "crn": 351062,
-                "number": "CT01-Multipurpose",
+                "number": "CT01",
                 "seats": 54,
                 "seatsAvailable": 51,
                 "actualWaitlist": 0,
@@ -187030,7 +187030,7 @@
                     "seatsAvailable": 51,
                     "actualWaitlist": 0,
                     "maxWaitlist": 0,
-                    "specificSection": "CT01-Multipurpose",
+                    "specificSection": "CT01",
                     "days": [],
                     "isAsync": true
                   }
@@ -195723,7 +195723,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 349270,
-                  "number": "BS01-Multipurpose",
+                  "number": "BS01",
                   "seats": 110,
                   "seatsAvailable": 65,
                   "actualWaitlist": 0,
@@ -195745,7 +195745,7 @@
                       "seatsAvailable": 65,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "BS01-Multipurpose",
+                      "specificSection": "BS01",
                       "days": [
                         "W"
                       ],
@@ -197445,7 +197445,7 @@
               "compatibleDiscussions": [
                 {
                   "crn": 349661,
-                  "number": "BS02-Multipurpose",
+                  "number": "BS02",
                   "seats": 110,
                   "seatsAvailable": 84,
                   "actualWaitlist": 0,
@@ -197467,7 +197467,7 @@
                       "seatsAvailable": 84,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "BS02-Multipurpose",
+                      "specificSection": "BS02",
                       "days": [
                         "W"
                       ],
@@ -199189,7 +199189,7 @@
                 },
                 {
                   "crn": 349270,
-                  "number": "BS01-Multipurpose",
+                  "number": "BS01",
                   "seats": 110,
                   "seatsAvailable": 65,
                   "actualWaitlist": 0,
@@ -199211,7 +199211,7 @@
                       "seatsAvailable": 65,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "BS01-Multipurpose",
+                      "specificSection": "BS01",
                       "days": [
                         "W"
                       ],
@@ -199221,7 +199221,7 @@
                 },
                 {
                   "crn": 349661,
-                  "number": "BS02-Multipurpose",
+                  "number": "BS02",
                   "seats": 110,
                   "seatsAvailable": 84,
                   "actualWaitlist": 0,
@@ -199243,7 +199243,7 @@
                       "seatsAvailable": 84,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "BS02-Multipurpose",
+                      "specificSection": "BS02",
                       "days": [
                         "W"
                       ],
@@ -199450,7 +199450,7 @@
                 },
                 {
                   "crn": 351876,
-                  "number": "DS01-Multipurpose",
+                  "number": "DS01",
                   "seats": 110,
                   "seatsAvailable": 81,
                   "actualWaitlist": 0,
@@ -199472,7 +199472,7 @@
                       "seatsAvailable": 81,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "DS01-Multipurpose",
+                      "specificSection": "DS01",
                       "days": [
                         "W"
                       ],
@@ -199482,7 +199482,7 @@
                 },
                 {
                   "crn": 351966,
-                  "number": "DS02-Multipurpose",
+                  "number": "DS02",
                   "seats": 110,
                   "seatsAvailable": 104,
                   "actualWaitlist": 0,
@@ -199504,7 +199504,7 @@
                       "seatsAvailable": 104,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "DS02-Multipurpose",
+                      "specificSection": "DS02",
                       "days": [
                         "W"
                       ],
@@ -202960,7 +202960,7 @@
                 },
                 {
                   "crn": 351876,
-                  "number": "DS01-Multipurpose",
+                  "number": "DS01",
                   "seats": 110,
                   "seatsAvailable": 81,
                   "actualWaitlist": 0,
@@ -202982,7 +202982,7 @@
                       "seatsAvailable": 81,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "DS01-Multipurpose",
+                      "specificSection": "DS01",
                       "days": [
                         "W"
                       ],
@@ -204759,7 +204759,7 @@
                 },
                 {
                   "crn": 351966,
-                  "number": "DS02-Multipurpose",
+                  "number": "DS02",
                   "seats": 110,
                   "seatsAvailable": 104,
                   "actualWaitlist": 0,
@@ -204781,7 +204781,7 @@
                       "seatsAvailable": 104,
                       "actualWaitlist": 0,
                       "maxWaitlist": 0,
-                      "specificSection": "DS02-Multipurpose",
+                      "specificSection": "DS02",
                       "days": [
                         "W"
                       ],
