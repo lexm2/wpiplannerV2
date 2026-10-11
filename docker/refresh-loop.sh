@@ -25,6 +25,17 @@ refresh_once() {
     cd /app || return 1
 
     bun run fetch-data || return 1
+
+    # Compared against what is published rather than the last fetch, so a
+    # volume left over from an older image still gets refreshed. Leaving the
+    # files alone keeps their mtimes, and with them nginx's ETags, so browsers
+    # revalidate to a 304 instead of downloading the data again.
+    if cmp -s public/course-data.json "$DATA_DIR/course-data.json" &&
+        [ -f "$DATA_DIR/course-data-constructed.json" ]; then
+        echo "[refresh] $(date -u +%FT%TZ) unchanged, nothing to publish"
+        return 0
+    fi
+
     bun run convert || return 1
 
     printf '{"timestamp":"%s","utc":"%s"}\n' \
@@ -33,7 +44,8 @@ refresh_once() {
         > public/last-updated.json || return 1
 
     # Publish via tmp+mv so nginx never reads a half-written file.
-    for f in course-data.json course-data-constructed.json term-bounds.json last-updated.json; do
+    # The raw copy goes last: it marks this data as published.
+    for f in course-data-constructed.json term-bounds.json last-updated.json course-data.json; do
         if [ -f "public/$f" ]; then
             cp "public/$f" "$DATA_DIR/$f.tmp" || return 1
             mv "$DATA_DIR/$f.tmp" "$DATA_DIR/$f" || return 1

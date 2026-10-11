@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { renameSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,6 +8,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const WPI_DATA_URL = 'https://courselistings.wpi.edu/assets/prod-data-raw.json';
 // A full listing is ~4,000 sections; anything far below that is a bad response.
 const MIN_REPORT_ENTRIES = 1000;
+
+const RAW_OUTPUT_PATH = join(__dirname, '..', 'public', 'course-data.json');
 
 interface FetchOptions extends RequestInit {
   timeout?: number;
@@ -83,6 +85,10 @@ async function fetchJsonWithRetry(
   throw new Error('Unexpected: loop exited without returning or throwing');
 }
 
+function readFileOrNull(path: string): string | null {
+  return existsSync(path) ? readFileSync(path, 'utf8') : null;
+}
+
 async function fetchCourseData(): Promise<void> {
   try {
     console.log('Starting WPI course data fetch process...');
@@ -105,17 +111,23 @@ async function fetchCourseData(): Promise<void> {
     }
     console.log(`Data contains ${entries.length} entries`);
 
-    // Save raw data for section construction pipeline (tmp + rename so a
-    // crash mid-write never leaves a truncated file behind)
-    console.log('Saving raw course data...');
-    const rawOutputPath = join(__dirname, '..', 'public', 'course-data.json');
-    const tmpPath = `${rawOutputPath}.tmp`;
+    // WPI regenerates the file every 10 minutes whether or not anything
+    // changed, so an identical copy is left alone: an unchanged file is what
+    // tells the refresh loop and CI there is nothing to convert or publish.
     const jsonString = JSON.stringify(data, null, 2);
-    writeFileSync(tmpPath, jsonString);
-    renameSync(tmpPath, rawOutputPath);
-    console.log(
-      `Raw data saved to ${rawOutputPath} (${Math.round((jsonString.length / 1024 / 1024) * 100) / 100} MB)`,
-    );
+    if (jsonString === readFileOrNull(RAW_OUTPUT_PATH)) {
+      console.log('Data is identical to the saved copy, leaving it untouched');
+    } else {
+      // Save raw data for section construction pipeline (tmp + rename so a
+      // crash mid-write never leaves a truncated file behind)
+      console.log('Saving raw course data...');
+      const tmpPath = `${RAW_OUTPUT_PATH}.tmp`;
+      writeFileSync(tmpPath, jsonString);
+      renameSync(tmpPath, RAW_OUTPUT_PATH);
+      console.log(
+        `Raw data saved to ${RAW_OUTPUT_PATH} (${Math.round((jsonString.length / 1024 / 1024) * 100) / 100} MB)`,
+      );
+    }
 
     console.log('Course data fetch completed successfully!');
   } catch (error) {

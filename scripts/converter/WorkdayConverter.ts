@@ -69,14 +69,6 @@ export class WorkdayConverter {
     console.log(`Transformed ${coursesProcessed} courses`);
 
     const output: PlannerOutput = {
-      generated: new Date().toLocaleString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      }),
       departments: Array.from(departments.values()),
     };
 
@@ -184,7 +176,6 @@ export class WorkdayConverter {
     console.log(`Total discussions: ${totalDiscussions}`);
     console.log(`Total labs: ${totalLabs}`);
     console.log(`Standalone labs: ${totalStandaloneLabs}`);
-    console.log(`Generated: ${output.generated}`);
     console.log('----------------------------\n');
   }
 

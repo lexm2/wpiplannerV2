@@ -21,7 +21,7 @@ const TIMESTAMP_FORMAT: Intl.DateTimeFormatOptions = {
   hour12: true,
 };
 
-// public/last-updated.json, rewritten by the deploy job every 15 minutes.
+// public/last-updated.json, rewritten whenever the course data changes.
 const LastUpdatedSchema = z.object({ timestamp: z.string() });
 
 function formatTimestamp(date: Date): string {

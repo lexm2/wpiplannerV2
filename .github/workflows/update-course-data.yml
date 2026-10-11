@@ -69,19 +69,24 @@ jobs:
       # every 15 minutes, so no browser download and no e2e flake blocking a
       # data refresh. The full suite runs in ci.yml on pull requests.
       # A failure here stops the deploy but leaves the data commit above intact,
-      # so course data stays fresh even while app code is broken.
+      # so course data stays fresh even while app code is broken. Scheduled
+      # runs that found no new data stop before this: the live site is current.
       - name: TypeScript typecheck
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         run: bun run typecheck
 
       - name: Unit tests
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         run: bun run test
 
       - name: Build TypeScript application
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: bun run build
 
       - name: Copy course data to build output
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         run: |
           cp public/course-data.json dist/
           cp public/course-data-constructed.json dist/
@@ -91,6 +96,7 @@ jobs:
           ls -la dist/*.json
 
       - name: Deploy to GitHub Pages
+        if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
