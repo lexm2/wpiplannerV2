@@ -20,9 +20,6 @@ async function boot(page: Page): Promise<void> {
     undefined,
     { timeout: 30000 },
   );
-  // A phone UA gets the one-off mobile notice first.
-  const notice = page.getByRole('button', { name: 'Got it' });
-  if (await notice.isVisible()) await notice.click();
 }
 
 /** Select a couple of courses so the schedule sidebar has something to act on. */

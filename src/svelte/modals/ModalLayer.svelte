@@ -1,6 +1,5 @@
 <script lang="ts">
   import { uiState, closeModal } from '../../services/ui/uiState.svelte';
-  import MobileNotice from './MobileNotice.svelte';
   import Changelog from './Changelog.svelte';
   import Tutorials from './Tutorials.svelte';
   import SectionInfo from './SectionInfo.svelte';
@@ -56,9 +55,7 @@
 </script>
 
 {#each uiState.openModals as id (id)}
-  {#if id === 'mobile-notice'}
-    <MobileNotice onRequestClose={() => closeModal('mobile-notice')} />
-  {:else if id === 'changelog'}
+  {#if id === 'changelog'}
     <Changelog onRequestClose={() => closeModal('changelog')} />
   {:else if id === 'tutorials'}
     {@const tutorial = getTutorial()}
