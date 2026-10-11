@@ -167,9 +167,11 @@
   <!-- No `hidden={query === ''}` here: the old attribute never took effect
        (.search-clear-btn set `display: flex`, which outranks the UA's [hidden]
        rule), so the button has always been permanently visible. Kept as-is
-       rather than silently changing behaviour. -->
+       rather than silently changing behaviour. Phone widths do hide it while
+       empty (main-content.css), where the field has no room to spare. -->
   <button
     id="search-clear-btn"
+    class:search-clear-empty={query === ''}
     title="Clear search"
     aria-label="Clear search"
     onclick={clear}>{@html getInlineSVG('X', 'x-icon')}</button

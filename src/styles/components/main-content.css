@@ -141,3 +141,30 @@
 html.is-mobile .filter-buttons {
   gap: 0.25rem;
 }
+
+/* Phone widths: the same 0.75rem gutter as the header, and a toolbar of just
+   search, Filter and Details. Clear All and "Show only bookmarked courses" are
+   both in the Filter modal, so their shortcut buttons go. */
+@media (max-width: 560px) {
+  .content-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .course-container {
+    padding: 0.75rem;
+  }
+
+  #clear-filters-btn,
+  #bookmark-filter-btn {
+    display: none;
+  }
+
+  .content-controls .filter-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  #search-clear-btn.search-clear-empty {
+    display: none;
+  }
+}

@@ -142,8 +142,9 @@
         onclick={() => selectCourse(course)}
       >
         <div class={listStyles['course-card-header']}>
+          <!-- Code above name, buttons stacked at the right: the same layout
+               the list rows take at phone widths. -->
           <div class={listStyles['course-card-info']}>
-            <div class={listStyles['course-title-main']}>{course.name}</div>
             <div class={listStyles['course-code-row']}>
               <div class={listStyles['course-code']}>
                 {course.departmentAbbr}{course.number}
@@ -152,6 +153,7 @@
                   >At capacity</span
                 >{/if}
             </div>
+            <div class={listStyles['course-title-main']}>{course.name}</div>
           </div>
           <div class={listStyles['course-card-buttons']}>
             <button

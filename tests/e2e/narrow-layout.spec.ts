@@ -24,9 +24,6 @@ async function boot(page: Page): Promise<void> {
     undefined,
     { timeout: 30000 },
   );
-  // A phone UA gets the one-off "Limited Mobile Support" notice first.
-  const notice = page.getByRole('button', { name: 'Got it' });
-  if (await notice.isVisible()) await notice.click();
 }
 
 /** The element a tap at the centre of `selector` would actually land on. */
@@ -77,6 +74,56 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
         const tabHit = await hitTargetAtCentre(page, tab);
         expect(tabHit.ok, `${tab} covered by ${tabHit.hit}`).toBe(true);
       }
+    });
+
+    // The page tabs are a bottom tab bar here, in the same place on every
+    // page, and no page content runs underneath it.
+    test('the page tabs sit in a bottom bar on every page', async ({
+      page,
+    }) => {
+      await boot(page);
+      for (const tab of ['#planner-tab', '#schedule-tab', '#degree-tab']) {
+        await page.click(tab);
+        const box = await page.evaluate(() => {
+          const r = document
+            .querySelector('.header-navigation')!
+            .getBoundingClientRect();
+          const body = [...document.querySelectorAll<HTMLElement>('.app-body')]
+            .find(el => el.offsetParent !== null)!
+            .getBoundingClientRect();
+          return {
+            left: r.left,
+            width: r.width,
+            bottomGap: window.innerHeight - r.bottom,
+            overlap: body.bottom - r.top,
+            vw: window.innerWidth,
+          };
+        });
+        expect(box.left, `${tab} page`).toBe(0);
+        expect(box.width, `${tab} page`).toBe(box.vw);
+        expect(box.bottomGap, `${tab} page`).toBe(0);
+        expect(box.overlap, `${tab} page`).toBeLessThanOrEqual(0);
+      }
+    });
+
+    test('the schedule opens on one term', async ({ page }) => {
+      await boot(page);
+      await page.click('#schedule-tab');
+      await expect(page.locator('[data-focused-term="A"]')).toBeVisible();
+    });
+
+    test('course names wrap instead of being cut off', async ({ page }) => {
+      await boot(page);
+      const clipped = await page.evaluate(() =>
+        [...document.querySelectorAll('[data-course-item]')]
+          .slice(0, 20)
+          .map(el =>
+            el.querySelector<HTMLElement>('[class*="course-name-text"]')!,
+          )
+          .filter(t => t.scrollWidth > t.clientWidth)
+          .map(t => t.textContent),
+      );
+      expect(clipped).toEqual([]);
     });
   });
 }
@@ -129,6 +176,19 @@ const selectedLectureCrn = (page: Page, id: string) =>
       ),
     id,
   );
+
+// The single-term view follows the width live, not just the width at load.
+test('narrowing a wide window to phone width focuses one term', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await boot(page);
+  await page.click('#schedule-tab');
+  await expect(page.locator('[data-focused-term]')).toHaveCount(0);
+
+  await page.setViewportSize(PHONE);
+  await expect(page.locator('[data-focused-term="A"]')).toBeVisible();
+});
 
 const WIZARD_CASES = [
   { name: '1000x700 window', viewport: { width: 1000, height: 700 } },

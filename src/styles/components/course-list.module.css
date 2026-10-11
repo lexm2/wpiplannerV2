@@ -62,7 +62,7 @@
 }
 
 .course-select-btn:hover,
-.course-select-btn:focus {
+.course-select-btn:focus-visible {
   border-color: var(--color-primary);
   color: var(--color-primary);
   background: var(--color-primary-background);
@@ -84,7 +84,7 @@
 }
 
 .course-select-btn:not(.selected):hover :global(.plus-icon),
-.course-select-btn:not(.selected):focus :global(.plus-icon) {
+.course-select-btn:not(.selected):focus-visible :global(.plus-icon) {
   stroke: var(--color-primary);
 }
 
@@ -107,7 +107,7 @@
 }
 
 .course-bookmark-btn:hover,
-.course-bookmark-btn:focus {
+.course-bookmark-btn:focus-visible {
   border-color: var(--color-warning);
   color: var(--color-warning);
   background: var(--color-warning-background);
@@ -125,7 +125,7 @@
 }
 
 .course-bookmark-btn:not(.bookmarked):hover :global(.bookmark-icon),
-.course-bookmark-btn:not(.bookmarked):focus :global(.bookmark-icon) {
+.course-bookmark-btn:not(.bookmarked):focus-visible :global(.bookmark-icon) {
   stroke: var(--color-warning);
 }
 
@@ -479,6 +479,100 @@
 @media (max-width: 1440px) {
   .course-sections {
     display: none;
+  }
+}
+
+/* The stacked layout - grid cards, and list rows at phone widths - demotes the
+   bookmark under + to a borderless icon; bookmarked, the icon itself fills. */
+.course-card .course-bookmark-btn:not(.bookmarked) {
+  border-color: transparent;
+  background: transparent;
+}
+
+.course-card .course-bookmark-btn.bookmarked {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-warning);
+}
+
+.course-card .course-bookmark-btn.bookmarked :global(.bookmark-icon) {
+  fill: var(--color-warning);
+}
+
+/* Phone widths: one row left the name ~100px, so most titles were cut off.
+   Rows take the grid card's layout instead: code above the full, wrapping
+   name, with + over the bookmark at the right where the thumb is. */
+@media (max-width: 560px) {
+  .course-list {
+    gap: 0.5rem;
+  }
+
+  .course-item {
+    padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  }
+
+  .course-header-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    /* + spans the code line and the top of the name, so the name starts right
+       under the code instead of below a button-high first row. */
+    grid-template-areas:
+      'code select'
+      'name select'
+      'name bookmark';
+    grid-template-rows: auto 1fr auto;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+    align-items: start;
+  }
+
+  .course-select-btn,
+  .course-bookmark-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .course-select-btn {
+    grid-area: select;
+  }
+
+  .course-bookmark-btn {
+    grid-area: bookmark;
+  }
+
+  .course-bookmark-btn:not(.bookmarked) {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .course-bookmark-btn.bookmarked {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-warning);
+  }
+
+  .course-bookmark-btn.bookmarked :global(.bookmark-icon) {
+    fill: var(--color-warning);
+  }
+
+  .course-code {
+    grid-area: code;
+    justify-self: start;
+    align-self: center;
+    font-size: 0.8rem;
+    padding: 0.125rem 0.375rem;
+  }
+
+  .course-name {
+    grid-area: name;
+    align-self: start;
+  }
+
+  .course-name-text {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    top: 0;
   }
 }
 
