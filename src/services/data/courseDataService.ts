@@ -53,13 +53,30 @@ export class CourseDataService {
   private static readonly WPI_COURSE_DATA_URL =
     './course-data-constructed.json';
   private scheduleDB: ScheduleDB | null = null;
-  private latestAcademicYear: number | undefined;
+  // Started by prefetchCourseData(), consumed by the next loadCourseData().
+  private prefetched: Promise<ScheduleDB> | null = null;
 
   constructor() {}
 
+  /**
+   * Starts the fetch + parse without publishing anything, so the download
+   * overlaps the rest of startup. loadCourseData() picks up the result; a
+   * failure stays parked until then and surfaces there, as if it had fetched.
+   */
+  prefetchCourseData(): void {
+    if (this.prefetched) return;
+    const pending = this.fetchFreshData();
+    // Marks the rejection handled for the window between now and the await in
+    // loadCourseData() (or forever, if an earlier startup step throws first).
+    pending.catch(() => {});
+    this.prefetched = pending;
+  }
+
   async loadCourseData(): Promise<ScheduleDB> {
     try {
-      const freshData = await this.fetchFreshData();
+      const pending = this.prefetched ?? this.fetchFreshData();
+      this.prefetched = null;
+      const freshData = await pending;
       this.scheduleDB = freshData;
 
       appState.loadedDepartments = freshData.departments;
@@ -106,11 +123,6 @@ export class CourseDataService {
     const realDepartments = this.parseConstructedDepartments(
       jsonData.departments,
     );
-    const latestYear = Math.max(
-      ...realDepartments.flatMap(d => d.courses.map(c => c.academicYear ?? 0)),
-    );
-    this.latestAcademicYear = latestYear || undefined;
-
     const scheduleDB: ScheduleDB = {
       departments: [...realDepartments],
       generated: jsonData.generated || new Date().toISOString(),
@@ -373,40 +385,6 @@ export class CourseDataService {
       .trim();
   }
 
-  getScheduleDB(): ScheduleDB | null {
-    return this.scheduleDB;
-  }
-
-  searchCourses(query: string, departments?: string[]): Course[] {
-    if (!this.scheduleDB) return [];
-
-    const allCourses: Course[] = [];
-
-    for (const dept of this.scheduleDB.departments) {
-      if (
-        departments &&
-        departments.length > 0 &&
-        !departments.includes(dept.abbreviation.toLowerCase())
-      ) {
-        continue;
-      }
-      allCourses.push(...dept.courses);
-    }
-
-    if (!query.trim()) {
-      return allCourses;
-    }
-
-    const queryLower = query.toLowerCase();
-    return allCourses.filter(
-      course =>
-        course.name.toLowerCase().includes(queryLower) ||
-        course.number.toLowerCase().includes(queryLower) ||
-        course.id.toLowerCase().includes(queryLower) ||
-        course.departmentAbbr.toLowerCase().includes(queryLower),
-    );
-  }
-
   getAllDepartments(): Department[] {
     return this.scheduleDB?.departments || [];
   }
@@ -452,10 +430,6 @@ export class CourseDataService {
         course.standaloneLabs.length > 0) ||
       false
     );
-  }
-
-  getLatestAcademicYear(): number | undefined {
-    return this.latestAcademicYear;
   }
 
   filterDepartments(predicate: (d: Department) => boolean): void {

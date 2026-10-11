@@ -49,7 +49,10 @@ export class AppBootstrap {
         ),
     });
 
+    // The catalog is by far the largest download, so it starts here, before
+    // the shell mounts, and is only applied later in initializeAsyncServices.
     const courseDataService = new CourseDataService();
+    courseDataService.prefetchCourseData();
     const courseSelectionService = new CourseSelectionService(
       profileStateManager,
     );
@@ -171,6 +174,8 @@ export class AppBootstrap {
     // Course data last: setting it fires the first-load effect in
     // appEffects, which reads the loaded profile and the term bounds (the
     // default academic year). Ratings keep their old place ahead of it too.
+    // The fetch itself has been running since createServices; this only
+    // waits for it and publishes the result (or throws its failure).
     await Promise.all([rmpLoad, termBoundsLoad]);
     await courseDataService.loadCourseData();
     await timestampLoad;

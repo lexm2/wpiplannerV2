@@ -17,7 +17,7 @@ interface YearTermBounds {
   D: TermBoundInfo;
 }
 
-export interface TermBoundsData {
+interface TermBoundsData {
   generated: string;
   years: Record<string, YearTermBounds>;
 }
@@ -99,11 +99,6 @@ export class TermBoundsService {
     };
   }
 
-  public getMostRecentYear(): number | null {
-    if (!this.termBoundsCache) return null;
-    return Math.max(...Object.keys(this.termBoundsCache.years).map(Number));
-  }
-
   /**
    * Returns the current academic year (the fall year, e.g. 2026 for "2026-2027").
    * The year flips into `y` at the start of summer, i.e. right after the previous
@@ -123,17 +118,5 @@ export class TermBoundsService {
       if (boundary === null || now >= boundary) current = y;
     }
     return current;
-  }
-
-  public getTermBoundsData(): TermBoundsData | null {
-    return this.termBoundsCache;
-  }
-
-  public isLoaded(): boolean {
-    return this.termBoundsCache !== null;
-  }
-
-  public _resetForTesting(): void {
-    this.termBoundsCache = null;
   }
 }

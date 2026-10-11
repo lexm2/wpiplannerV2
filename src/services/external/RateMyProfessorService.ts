@@ -17,7 +17,6 @@ export class RateMyProfessorService {
   // hundred distinct names, so results are memoized until the data changes.
   private matchCache: Map<string, Professor | null> = new Map();
   private loadPromise: Promise<void> | null = null;
-  private loadError: Error | null = null;
 
   loadData(): Promise<void> {
     if (this.data) return Promise.resolve();
@@ -57,8 +56,9 @@ export class RateMyProfessorService {
           this.professorsByLastName.get(lastName)!.push(professor);
         }
       }
-    } catch (error) {
-      this.loadError = error as Error;
+    } catch {
+      // Ratings are optional: on a failed load every lookup returns null and
+      // the next loadData() call tries again.
     }
   }
 
@@ -239,21 +239,8 @@ export class RateMyProfessorService {
     return professor.profileUrl;
   }
 
-  getAllProfessors(): Professor[] {
-    return this.data?.professors || [];
-  }
-
   isLoaded(): boolean {
     return this.data !== null;
-  }
-
-  getLoadError(): Error | null {
-    return this.loadError;
-  }
-
-  getLastUpdated(): Date | null {
-    if (!this.data) return null;
-    return new Date(this.data.lastUpdated);
   }
 }
 
