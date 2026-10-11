@@ -67,8 +67,11 @@
     localStorage.setItem(config.storageKey, String(Math.round(w)));
   }
 
+  // Drop the override rather than writing defaultWidth back: the stylesheet's
+  // fallback is the real default, and for the right panel it adapts to the
+  // window width.
   function reset(): void {
-    setWidth(config.defaultWidth);
+    document.documentElement.style.removeProperty(config.cssVar);
     localStorage.removeItem(config.storageKey);
   }
 

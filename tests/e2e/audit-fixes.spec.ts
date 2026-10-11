@@ -49,6 +49,9 @@ test.beforeEach(async ({ page }) => {
 test('right panel default width is 700px, not the old 320px', async ({
   page,
 }) => {
+  // 700px is the wide-screen default; narrower windows shrink it to keep the
+  // course list usable (narrow-layout.spec.ts covers 1280px).
+  await page.setViewportSize({ width: 1920, height: 1080 });
   await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
   await page.waitForTimeout(500);

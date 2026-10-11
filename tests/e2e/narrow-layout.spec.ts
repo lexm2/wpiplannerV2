@@ -179,3 +179,52 @@ for (const { name, ...options } of WIZARD_CASES) {
     });
   });
 }
+
+/**
+ * The right panel defaults to 700px, which on a 1280px laptop left the course
+ * list ~270px wide: names cut to "El…" and no List/Grid toggle. The default
+ * has to give way to the list there, while a dragged width still wins.
+ */
+test.describe('Classes page at 1280x720', () => {
+  test.use({ viewport: { width: 1280, height: 720 } });
+
+  const widths = (page: Page) =>
+    page.evaluate(() => {
+      const w = (sel: string) =>
+        Math.round(document.querySelector(sel)!.getBoundingClientRect().width);
+      return { list: w('.main-content'), panel: w('[data-right-panel]') };
+    });
+
+  test('the course list keeps a usable width by default', async ({ page }) => {
+    await boot(page);
+    const { list, panel } = await widths(page);
+    expect(list, `list ${list}px beside a ${panel}px panel`).toBeGreaterThan(
+      500,
+    );
+    expect(panel).toBeGreaterThanOrEqual(360);
+    await expect(page.locator('#view-grid')).toBeVisible();
+
+    // The course name is not cut down to a couple of letters.
+    const name = page.locator('[data-course-item]').first().getByText(/\w{6}/);
+    await expect(name.first()).toBeVisible();
+  });
+
+  test('a stored drag width still wins', async ({ page }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem('wpi-planner-width-right-panel', '640'),
+    );
+    await boot(page);
+    expect((await widths(page)).panel).toBe(640);
+  });
+
+  test('double-click reset returns to the adaptive default', async ({
+    page,
+  }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem('wpi-planner-width-right-panel', '640'),
+    );
+    await boot(page);
+    await page.locator('[data-right-panel] .resize-handle').dblclick();
+    expect((await widths(page)).list).toBeGreaterThan(500);
+  });
+});

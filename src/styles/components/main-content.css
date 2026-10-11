@@ -3,6 +3,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  container: course-list / inline-size;
 }
 
 .content-header {
@@ -118,7 +119,10 @@
   padding-left: 1rem;
 }
 
-@media (max-width: 1600px) {
+/* Keyed to the list column, not the window: whether the toggle fits depends on
+   how wide the side panels are. The row needs ~480px (search field minimum,
+   filter buttons, toggle) plus the header's padding. */
+@container course-list (max-width: 540px) {
   #view-list,
   #view-grid {
     display: none;
