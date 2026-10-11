@@ -4,8 +4,10 @@ import {
   computePlacements,
   computeUnassigned,
   inferBucketDepartments,
+  bucketRuleLabel,
   type DegreeBucket,
 } from '../../src/services/degree/degreeBuckets';
+import { getDegreeBucketCriteria } from '../../src/services/degree/degreeBucketRules';
 import {
   findCatalogCourse,
   candidateCodes,
@@ -195,6 +197,43 @@ describe('buildBuckets', () => {
     );
     expect(buckets[0].name).toBe('Major core');
     expect(buckets[0].creditsRequired).toBe(18);
+  });
+
+  it('keeps the requirement name for rule lookup when a bucket is renamed', () => {
+    const sci = record([req('Mathematics', 'major_specific')]);
+    const [bucket] = buildBuckets(
+      sci,
+      config({ overrides: { 'req:Mathematics': { name: 'My math' } } }),
+    );
+    expect(bucket.name).toBe('My math');
+    expect(bucketRuleLabel(bucket)).toBe('Mathematics');
+    // The renamed bucket still finds its own major_specific rule, not the first.
+    expect(
+      getDegreeBucketCriteria(
+        'Computer Science',
+        2030,
+        bucket.category,
+        bucketRuleLabel(bucket),
+      )?.label,
+    ).toMatch(/^MATHEMATICS/);
+  });
+
+  it('falls back to the display name when no requirement name is known', () => {
+    const custom = buildBuckets(
+      null,
+      config({
+        custom: [
+          {
+            id: 'custom:1',
+            name: 'Robotics minor',
+            creditsRequired: null,
+            coursesRemaining: null,
+            departments: [],
+          },
+        ],
+      }),
+    )[0];
+    expect(bucketRuleLabel(custom)).toBe('Robotics minor');
   });
 
   it('respects the configured order', () => {

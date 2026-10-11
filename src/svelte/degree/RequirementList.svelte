@@ -4,7 +4,6 @@
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
   import RequirementCard from './RequirementCard.svelte';
-  import { effectiveProgress } from '../../services/degree/requirementProgress';
   import { degreeState } from './degreeState.svelte';
   import { courseDrag } from './courseDrag.svelte';
   import { degreeViewState } from './degreeViewState.svelte';
@@ -65,8 +64,7 @@
   const withStatus = $derived(
     visible.map(b => ({
       b,
-      status: effectiveProgress(b, degreeState.placements.get(b.id) ?? [])
-        .status,
+      status: degreeState.progressById.get(b.id)?.status ?? b.status,
     })),
   );
 
@@ -111,8 +109,7 @@
         targets.some(
           b =>
             !selected.includes(
-              effectiveProgress(b, degreeState.placements.get(b.id) ?? [])
-                .status,
+              degreeState.progressById.get(b.id)?.status ?? b.status,
             ),
         )
       )

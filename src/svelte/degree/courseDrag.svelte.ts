@@ -72,6 +72,8 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
   let slotGap = 0;
   let slotOpen = true;
   let slotAnim: Animation | null = null;
+  let pointerX = 0;
+  let pointerY = 0;
 
   function onPointerDown(e: PointerEvent): void {
     if (!current.courseId) return;
@@ -135,7 +137,7 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     courseDrag.height = rect.height;
     courseDrag.settling = false;
 
-    startDragAutoScroll(e.clientX, e.clientY);
+    startDragAutoScroll(e.clientX, e.clientY, retarget);
   }
 
   function moveTo(x: number, y: number): void {
@@ -200,7 +202,18 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     e.preventDefault();
     moveTo(e.clientX, e.clientY);
     updateDragPointer(e.clientX, e.clientY);
-    const target = targetAt(e.clientX, e.clientY);
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    retarget();
+  }
+
+  /**
+   * Publish the target under the last pointer position. Runs on every move and
+   * after each auto-scroll step, when the pane slides under a still pointer.
+   */
+  function retarget(): void {
+    if (!dragging) return;
+    const target = targetAt(pointerX, pointerY);
     courseDrag.target = target;
     setSlotOpen(target === originTarget());
   }

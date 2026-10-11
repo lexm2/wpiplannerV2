@@ -48,8 +48,11 @@
   );
   const tiles = $derived(degreeState.placements.get(bucket.id) ?? []);
 
-  // Recomputed from the courses currently placed here.
-  const progress = $derived(effectiveProgress(bucket, tiles));
+  // Recomputed from the courses currently placed here - shared with the list's
+  // status filter. The fallback only covers a card outliving its bucket.
+  const progress = $derived(
+    degreeState.progressById.get(bucket.id) ?? effectiveProgress(bucket, tiles),
+  );
   const satisfied = $derived(progress.status === 'satisfied');
 
   const statusLabel = $derived(

@@ -2,7 +2,11 @@ import { appState } from '../../core/state/appState.svelte';
 import { setPage, showAppError } from '../ui/uiState.svelte';
 import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { FilterService } from '../filtering/FilterService';
-import { inferBucketDepartments, type DegreeBucket } from './degreeBuckets';
+import {
+  bucketRuleLabel,
+  inferBucketDepartments,
+  type DegreeBucket,
+} from './degreeBuckets';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { candidateCodes, findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
@@ -45,7 +49,7 @@ class DegreePlanService {
             record.major,
             classYear,
             bucket.category,
-            bucket.name,
+            bucketRuleLabel(bucket),
           )
         : null;
 

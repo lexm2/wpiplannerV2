@@ -12,6 +12,10 @@ import {
   buildCourseIndex,
   type CourseIndexEntry,
 } from '../../services/degree/courseIndex';
+import {
+  effectiveProgress,
+  type EffectiveProgress,
+} from '../../services/degree/requirementProgress';
 import { appState } from '../../core/state/appState.svelte';
 
 /**
@@ -49,6 +53,20 @@ class DegreeState {
       appState.selectedCourses,
       this.config.assignments,
     ),
+  );
+
+  /**
+   * Bucket id -> its live progress from the courses placed in it. Computed once
+   * here so the status filter, the cards and the focus jump share one pass.
+   */
+  progressById = $derived.by<Map<string, EffectiveProgress>>(
+    () =>
+      new Map(
+        this.buckets.map(b => [
+          b.id,
+          effectiveProgress(b, this.placements.get(b.id) ?? []),
+        ]),
+      ),
   );
 
   /** Bucket ids whose card is expanded to show every course. Not persisted. */
