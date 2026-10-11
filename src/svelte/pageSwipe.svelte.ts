@@ -86,12 +86,23 @@ function pinNeighbour(el: HTMLElement, page: PageId, x: number): void {
   el.style.left = '0';
   el.style.right = '0';
   el.style.bottom = 'var(--tab-bar-height)';
+  // Sized by top and bottom alone: the schedule page's own height: 100% would
+  // otherwise mean the whole screen here, running its last rows under the
+  // bottom bar and changing the grid's scale once the swipe lands.
+  el.style.height = 'auto';
   el.style.transform = `translateX(${x}px)`;
 }
 
 function unpin(el: HTMLElement, keepDisplay: boolean): void {
   if (!keepDisplay) el.style.display = 'none';
-  for (const prop of ['position', 'top', 'left', 'right', 'bottom'] as const)
+  for (const prop of [
+    'position',
+    'top',
+    'left',
+    'right',
+    'bottom',
+    'height',
+  ] as const)
     el.style[prop] = '';
   el.style.transform = '';
 }

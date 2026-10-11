@@ -266,6 +266,47 @@ test.describe('phone gestures', () => {
     await expect.poll(() => markerAt(page)).toBe(1);
   });
 
+  // The incoming page is pinned beside the current one for the drag. It
+  // must stop at the bottom bar as it will once it lands - the schedule's own
+  // height: 100% once stretched it to the whole screen, so its hour rows
+  // changed size the moment the swipe finished.
+  test('the incoming page is its final size mid-swipe', async ({ page }) => {
+    await boot(page);
+    const heights = await page.evaluate(async () => {
+      const target = document.elementFromPoint(300, 400)!;
+      const fire = (type: string, x: number) => {
+        const touch = new Touch({
+          identifier: 1,
+          target,
+          clientX: x,
+          clientY: 400,
+        });
+        target.dispatchEvent(
+          new TouchEvent(type, {
+            touches: type === 'touchend' ? [] : [touch],
+            changedTouches: [touch],
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      };
+      fire('touchstart', 300);
+      for (let i = 1; i <= 10; i++) {
+        await new Promise(r => requestAnimationFrame(r));
+        fire('touchmove', 300 - i * 15);
+      }
+      const schedule = document
+        .querySelector('#schedule-page')!
+        .getBoundingClientRect();
+      const bar = document
+        .querySelector('.app-header')!
+        .getBoundingClientRect();
+      fire('touchend', 150);
+      return { bottom: schedule.bottom, barTop: bar.top };
+    });
+    expect(heights.bottom).toBe(heights.barTop);
+  });
+
   test('a short drag or a vertical one stays on the page', async ({ page }) => {
     await boot(page);
     await touchDrag(page, 250, 400, -60, 0, 30);
