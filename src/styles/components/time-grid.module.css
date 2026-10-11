@@ -93,9 +93,22 @@
   border-left: 2px solid var(--color-primary);
 }
 
+/* Primary and danger are both reds in most themes, so Avoid is told apart by
+   its diagonal hatch, not its colour: a struck-out band against Only's fill. */
 .paintedAvoid {
-  background: color-mix(in srgb, var(--color-danger) 30%, transparent);
-  border-left: 2px solid var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  /* A tiled stripe rather than repeating-linear-gradient, whose thin hard
+     stops Firefox draws as a few stray lines. */
+  --hatch: color-mix(in srgb, var(--color-danger) 60%, transparent);
+  background-image: linear-gradient(
+    45deg,
+    var(--hatch) 0 12.5%,
+    transparent 12.5% 50%,
+    var(--hatch) 50% 62.5%,
+    transparent 62.5%
+  );
+  background-size: 8px 8px;
+  border-left: 2px dashed var(--color-danger);
 }
 
 .preview {

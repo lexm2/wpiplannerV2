@@ -242,3 +242,38 @@ test.describe('on a phone', () => {
     await expectPickerFits(page);
   });
 });
+
+const THEMES = ['wpi-dark', 'wpi-light', 'wpi-classic', 'high-contrast'];
+
+async function useTheme(page: Page, theme: string): Promise<void> {
+  await page.addInitScript(
+    t =>
+      localStorage.setItem(
+        'wpi-planner-preferences',
+        JSON.stringify({ theme: t }),
+      ),
+    theme,
+  );
+}
+
+const modeButton = (page: Page, mode: 'Only' | 'Avoid') =>
+  page.locator(GRID).getByRole('button', { name: `${mode} these times` });
+
+for (const theme of THEMES) {
+  test(`avoid paint is patterned apart from only paint in ${theme}`, async ({
+    page,
+  }) => {
+    await useTheme(page, theme);
+    await openPicker(page);
+    await drag(page, { day: 1, row: ROW_10AM }, { day: 1, row: ROW_1130AM });
+
+    const painted = page.locator(`${BODY} > [class*="painted"]`).first();
+    const image = () =>
+      painted.evaluate(el => getComputedStyle(el).backgroundImage);
+    // Every theme's primary and danger are both red, so colour alone cannot
+    // tell the modes apart; Avoid carries a hatch on top.
+    expect(await image()).toBe('none');
+    await modeButton(page, 'Avoid').click();
+    expect(await image()).toContain('linear-gradient');
+  });
+}
