@@ -97,10 +97,25 @@ export class ProfileStateManager {
     }
   }
 
+  /**
+   * Attach (or refresh) the catalog, and point every saved selection at its
+   * live course and section objects. Storage loads before the catalog does,
+   * so until this runs selections hold the stored copies, with stale seat
+   * counts. Not an edit: nothing is saved and no undo step is recorded.
+   */
   setCourseData(departments: Department[]): void {
     this.allDepartments = departments;
     logger.log(
       `[CATALOG] Course catalog set with ${departments.length} departments`,
+    );
+    if (departments.length === 0) return;
+
+    this.state.schedules = this.state.schedules.map(s => ({
+      ...s,
+      selectedCourses: this.resolveCourseReferences(s.selectedCourses),
+    }));
+    this.state.selectedCourses = this.resolveCourseReferences(
+      this.state.selectedCourses,
     );
   }
 
@@ -947,12 +962,9 @@ export class ProfileStateManager {
   private resolveCourseReferences(
     selectedCourses: SelectedCourse[],
   ): SelectedCourse[] {
-    if (this.allDepartments.length === 0) {
-      logger.warn(
-        'Course catalog not available, skipping section reference resolution',
-      );
-      return selectedCourses;
-    }
+    // Before the catalog loads there is nothing to resolve against;
+    // setCourseData resolves everything once it arrives.
+    if (this.allDepartments.length === 0) return selectedCourses;
 
     logger.log(
       `Resolving course references for ${selectedCourses.length} courses`,
