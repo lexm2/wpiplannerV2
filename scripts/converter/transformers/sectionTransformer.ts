@@ -25,8 +25,8 @@ export function transformSection(
   const courseSectionFull = workdaySection.Course_Section;
   const instructionalFormat = workdaySection.Instructional_Format;
 
-  // Skip cancelled sections (e.g. "X Cancel - 03/17/2026 - ...")
-  if (/\bX\s+(Cancel|Cancelled)\b/i.test(courseSectionFull)) {
+  // Skip cancelled sections (e.g. "X Cancel - 03/17/2026 - ...", "X-Cancel-Draft ...", "X-Canceled-...")
+  if (/\bX[\s-]+Cancel(l?ed)?\b/i.test(courseSectionFull)) {
     return [];
   }
 

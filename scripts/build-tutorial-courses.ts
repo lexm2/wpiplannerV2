@@ -154,6 +154,19 @@ for (const dept of data.departments) {
   }
 }
 
+// Target ids carry the academic year, so they go stale when the data rolls over;
+// fail rather than silently write a partial tutorial department
+const matched = new Set(
+  data.departments.flatMap((d: { courses: { id: string }[] }) =>
+    d.courses.map(c => c.id),
+  ),
+);
+const missing = Object.keys(targetMap).filter(id => !matched.has(id));
+if (missing.length > 0) {
+  console.error(`Target courses not found: ${missing.join(', ')}`);
+  process.exit(1);
+}
+
 writeFileSync(
   './public/tutorial-courses.json',
   JSON.stringify({ courses }, null, 2),

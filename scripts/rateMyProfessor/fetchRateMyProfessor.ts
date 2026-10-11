@@ -26,6 +26,11 @@ const OUTPUT_PATH = path.join(process.cwd(), 'public', 'rateMyProfessor.json');
 
 // Rate limiting configuration
 const DELAY_BETWEEN_REQUESTS_MS = 100;
+const REQUEST_TIMEOUT_MS = 15000;
+
+// Refuse to overwrite the existing file with a result smaller than this share of
+// it; CI commits whatever gets written, so an API outage must not wipe the data.
+const MIN_RESULT_RATIO = 0.5;
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -42,6 +47,7 @@ async function graphqlRequest(query: string, variables: any): Promise<any> {
       query,
       variables,
     }),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -134,6 +140,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
     // This is a workaround to get as many professors as possible
     const allTeachers = new Map<string, any>();
     const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    const failedLetters: string[] = [];
 
     console.log('Searching through alphabet to find all professors...');
 
@@ -154,7 +161,15 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
         );
       } catch (error) {
         console.error(`\nFailed to search for letter ${letter}:`, error);
+        failedLetters.push(letter);
       }
+    }
+
+    // A missing letter silently drops every professor only it would find
+    if (failedLetters.length > 0) {
+      throw new Error(
+        `Search failed for letter(s): ${failedLetters.join(', ')}`,
+      );
     }
 
     console.log(
@@ -164,8 +179,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
     const teachers = Array.from(allTeachers.values());
 
     if (teachers.length === 0) {
-      console.warn('No professors found for WPI');
-      return [];
+      throw new Error('No professors found for WPI');
     }
 
     const professors: Professor[] = [];
@@ -229,6 +243,28 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
   }
 }
 
+/**
+ * Throws if the new result is drastically smaller than what's already on disk
+ */
+async function checkAgainstExisting(totalProfessors: number): Promise<void> {
+  let existingTotal: number;
+  try {
+    const existing = JSON.parse(
+      await fs.readFile(OUTPUT_PATH, 'utf-8'),
+    ) as Partial<RateMyProfessorData>;
+    existingTotal = existing.totalProfessors ?? 0;
+  } catch {
+    // No readable existing file, nothing to compare against
+    return;
+  }
+
+  if (totalProfessors < existingTotal * MIN_RESULT_RATIO) {
+    throw new Error(
+      `Only ${totalProfessors} professors fetched vs ${existingTotal} in the existing file; refusing to overwrite`,
+    );
+  }
+}
+
 async function saveToFile(data: RateMyProfessorData): Promise<void> {
   try {
     const dataDir = path.dirname(OUTPUT_PATH);
@@ -272,6 +308,7 @@ async function main() {
       totalProfessors: professors.length,
     };
 
+    await checkAgainstExisting(data.totalProfessors);
     await saveToFile(data);
 
     const endTime = Date.now();

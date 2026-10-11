@@ -18,22 +18,25 @@ done
 refresh_once() {
     echo "[refresh] $(date -u +%FT%TZ) starting"
 
+    # Called from an `if`, which disables set -e inside the function, so every
+    # step bails out explicitly; otherwise a failed fetch would still convert and
+    # publish stale data under a fresh last-updated.json.
     # The fetch/convert scripts write into /app/public/.
-    cd /app
+    cd /app || return 1
 
-    bun run fetch-data
-    bun run convert
+    bun run fetch-data || return 1
+    bun run convert || return 1
 
     printf '{"timestamp":"%s","utc":"%s"}\n' \
         "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
         "$(date -u '+%Y-%m-%d %H:%M UTC')" \
-        > public/last-updated.json
+        > public/last-updated.json || return 1
 
     # Publish via tmp+mv so nginx never reads a half-written file.
     for f in course-data.json course-data-constructed.json term-bounds.json last-updated.json; do
         if [ -f "public/$f" ]; then
-            cp "public/$f" "$DATA_DIR/$f.tmp"
-            mv "$DATA_DIR/$f.tmp" "$DATA_DIR/$f"
+            cp "public/$f" "$DATA_DIR/$f.tmp" || return 1
+            mv "$DATA_DIR/$f.tmp" "$DATA_DIR/$f" || return 1
         fi
     done
 

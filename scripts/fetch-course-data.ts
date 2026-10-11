@@ -1,27 +1,30 @@
 #!/usr/bin/env bun
 
-import { writeFileSync } from 'fs';
+import { renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const WPI_DATA_URL = 'https://courselistings.wpi.edu/assets/prod-data-raw.json';
+// A full listing is ~4,000 sections; anything far below that is a bad response.
+const MIN_REPORT_ENTRIES = 1000;
 
 interface FetchOptions extends RequestInit {
   timeout?: number;
 }
 
-async function fetchWithRetry(
+// Thrown for responses a retry won't fix (4xx other than timeouts/rate limits).
+class PermanentHttpError extends Error {}
+
+/**
+ * Fetches and parses JSON, retrying on failure. The timeout is per attempt and
+ * covers reading the body too, since the payload is large and can stall mid-read.
+ */
+async function fetchJsonWithRetry(
   url: string,
   options: FetchOptions = {},
   maxRetries = 3,
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort(),
-    options.timeout || 30000,
-  );
-
+): Promise<unknown> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(
@@ -30,7 +33,7 @@ async function fetchWithRetry(
 
       const response = await fetch(url, {
         ...options,
-        signal: controller.signal,
+        signal: AbortSignal.timeout(options.timeout || 30000),
         headers: {
           'User-Agent':
             'WPI-Course-Planner/1.0 (+https://github.com/lexm2/wpiplannerV2)',
@@ -41,7 +44,12 @@ async function fetchWithRetry(
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const message = `HTTP ${response.status}: ${response.statusText}`;
+        const retryable =
+          response.status >= 500 ||
+          response.status === 408 ||
+          response.status === 429;
+        throw retryable ? new Error(message) : new PermanentHttpError(message);
       }
 
       const contentLength = response.headers.get('content-length');
@@ -51,17 +59,16 @@ async function fetchWithRetry(
         );
       }
 
-      clearTimeout(timeout);
-      return response;
+      console.log('Successfully connected, parsing JSON data...');
+      return await response.json();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       console.error(`Attempt ${attempt} failed:`, errorMessage);
 
-      if (attempt === maxRetries) {
-        clearTimeout(timeout);
+      if (attempt === maxRetries || error instanceof PermanentHttpError) {
         throw new Error(
-          `Failed after ${maxRetries} attempts. Last error: ${errorMessage}`,
+          `Failed after ${attempt} attempt(s). Last error: ${errorMessage}`,
           { cause: error },
         );
       }
@@ -80,23 +87,32 @@ async function fetchCourseData(): Promise<void> {
   try {
     console.log('Starting WPI course data fetch process...');
 
-    const response = await fetchWithRetry(WPI_DATA_URL, { timeout: 45000 });
-    console.log('Successfully connected, parsing JSON data...');
-
-    const data = await response.json();
+    const data = await fetchJsonWithRetry(WPI_DATA_URL, { timeout: 45000 });
     console.log('Data parsed successfully');
 
-    const dataKeys = Object.keys(data);
-    console.log(
-      `Data contains ${dataKeys.length} top-level properties:`,
-      dataKeys,
-    );
+    // Refuse to overwrite good data with an empty or truncated listing.
+    const entries =
+      data && typeof data === 'object'
+        ? (data as { Report_Entry?: unknown }).Report_Entry
+        : undefined;
+    if (!Array.isArray(entries)) {
+      throw new Error('Response has no Report_Entry array');
+    }
+    if (entries.length < MIN_REPORT_ENTRIES) {
+      throw new Error(
+        `Only ${entries.length} entries in Report_Entry (expected at least ${MIN_REPORT_ENTRIES})`,
+      );
+    }
+    console.log(`Data contains ${entries.length} entries`);
 
-    // Save raw data for section construction pipeline
+    // Save raw data for section construction pipeline (tmp + rename so a
+    // crash mid-write never leaves a truncated file behind)
     console.log('Saving raw course data...');
     const rawOutputPath = join(__dirname, '..', 'public', 'course-data.json');
+    const tmpPath = `${rawOutputPath}.tmp`;
     const jsonString = JSON.stringify(data, null, 2);
-    writeFileSync(rawOutputPath, jsonString);
+    writeFileSync(tmpPath, jsonString);
+    renameSync(tmpPath, rawOutputPath);
     console.log(
       `Raw data saved to ${rawOutputPath} (${Math.round((jsonString.length / 1024 / 1024) * 100) / 100} MB)`,
     );
@@ -118,6 +134,7 @@ async function fetchCourseData(): Promise<void> {
 
     if (
       errorMessage.includes('timeout') ||
+      errorMessage.includes('timed out') ||
       errorMessage.includes('AbortError')
     ) {
       console.error(
