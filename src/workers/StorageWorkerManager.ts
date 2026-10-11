@@ -3,6 +3,7 @@ import { WorkerTaskType } from './protocol';
 import LZString from 'lz-string';
 import { logger } from '../utils/logger';
 import { errorMessage } from '../utils/errorMessage';
+import { setReplacer } from '../utils/jsonSerializer';
 
 interface PendingTask {
   resolve: (value: unknown) => void;
@@ -39,13 +40,17 @@ export class StorageWorkerManager {
       return;
     }
 
+    if (!this.worker) this.worker = this.createWorker();
+  }
+
+  private createWorker(): Worker | null {
     try {
-      this.worker = new Worker(
+      const worker = new Worker(
         new URL('./storage.worker.ts', import.meta.url),
         { type: 'module' },
       );
 
-      this.worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
+      worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
         const response = e.data;
         const pending = this.pendingTasks.get(response.id);
         if (!pending) return;
@@ -59,23 +64,34 @@ export class StorageWorkerManager {
         }
       };
 
-      this.worker.onerror = (error: ErrorEvent) => {
+      worker.onerror = (error: ErrorEvent) => {
         logger.error('[StorageWorker] Worker error:', error.message);
         this.fallbackMode = true;
-
-        for (const [taskId, task] of this.pendingTasks.entries()) {
-          task.reject(new Error(`Worker crashed: ${error.message}`));
-          this.pendingTasks.delete(taskId);
-        }
+        this.rejectAll(new Error(`Worker crashed: ${error.message}`));
       };
+      return worker;
     } catch (error) {
       logger.error('[StorageWorker] Failed to initialize:', error);
       this.fallbackMode = true;
+      return null;
+    }
+  }
+
+  private rejectAll(reason: Error): void {
+    for (const [taskId, task] of this.pendingTasks.entries()) {
+      this.pendingTasks.delete(taskId);
+      task.reject(reason);
     }
   }
 
   async executeTask<T>(type: WorkerTaskType, payload: unknown): Promise<T> {
-    if (this.fallbackMode || !this.worker) {
+    // terminate() runs on every beforeunload, but a bfcache restore brings the
+    // page back without re-running startup: recreate the worker on demand.
+    if (!this.fallbackMode && !this.worker && typeof Worker !== 'undefined') {
+      this.worker = this.createWorker();
+    }
+    const worker = this.worker;
+    if (this.fallbackMode || !worker) {
       return this.executeFallback<T>(type, payload);
     }
 
@@ -110,7 +126,7 @@ export class StorageWorkerManager {
       // (a Svelte deep-state Proxy, say) throws here - after the task was
       // registered. Unwind it rather than leaving a pending entry behind.
       try {
-        this.worker!.postMessage(request);
+        worker.postMessage(request);
       } catch (error) {
         this.pendingTasks.delete(taskId);
         clearTimeout(timeout);
@@ -123,6 +139,8 @@ export class StorageWorkerManager {
     });
   }
 
+  // Must produce exactly what storage.worker.ts does, since rows written in
+  // one mode are read back in the other.
   // eslint-disable-next-line @typescript-eslint/require-await -- executeTask returns it directly as Promise<T>
   private async executeFallback<T>(
     type: WorkerTaskType,
@@ -131,13 +149,12 @@ export class StorageWorkerManager {
     const typedPayload = payload as { data?: unknown; compressed?: string };
     switch (type) {
       case WorkerTaskType.COMPRESS_DATA: {
-        const serialized = JSON.stringify(typedPayload.data);
+        const serialized = JSON.stringify(typedPayload.data, setReplacer);
         return LZString.compress(serialized) as T;
       }
 
       case WorkerTaskType.DECOMPRESS_DATA: {
-        const decompressed = LZString.decompress(typedPayload.compressed!);
-        return JSON.parse(decompressed || 'null') as T;
+        return LZString.decompress(typedPayload.compressed!) as T;
       }
 
       default:
@@ -148,6 +165,6 @@ export class StorageWorkerManager {
   terminate(): void {
     this.worker?.terminate();
     this.worker = null;
-    this.pendingTasks.clear();
+    this.rejectAll(new Error('Storage worker terminated'));
   }
 }

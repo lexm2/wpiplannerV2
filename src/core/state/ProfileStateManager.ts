@@ -663,8 +663,14 @@ export class ProfileStateManager {
   }): void {
     this.state.activeScheduleId = snapshot.activeScheduleId;
 
+    // The clone detaches every Course from the catalog, so point all
+    // schedules back at it (as loadFromStorage and setCourseData do), not
+    // just the active one: switching to another schedule reads these.
     const schedulesArray = Array.from(snapshot.schedules.values());
-    this.state.schedules = deepClone(schedulesArray);
+    this.state.schedules = deepClone(schedulesArray).map(s => ({
+      ...s,
+      selectedCourses: this.resolveCourseReferences(s.selectedCourses),
+    }));
     this.state.preferences = deepClone(snapshot.preferences);
 
     if (this.state.activeScheduleId) {
@@ -744,7 +750,9 @@ export class ProfileStateManager {
         );
       }
 
-      this.storageManager.saveActiveScheduleId(this.state.activeScheduleId);
+      const activeIdResult = this.storageManager.saveActiveScheduleId(
+        this.state.activeScheduleId,
+      );
 
       const savePromises = this.state.schedules.map(schedule => {
         const scheduleToSave = {
@@ -757,15 +765,20 @@ export class ProfileStateManager {
       });
       const results = await Promise.all(savePromises);
 
-      this.storageManager.savePreferences(this.state.preferences);
+      const preferencesResult = this.storageManager.savePreferences(
+        this.state.preferences,
+      );
 
       // A rejected write comes back as a result, not a throw: falling through
       // here would mark the state clean while the schedule is silently gone on
-      // the next reload. Stay dirty and say so instead.
-      const failed = results.filter(r => !r.success);
+      // the next reload. Stay dirty and say so instead. The localStorage
+      // writes (active id, preferences) fail the same way on a full quota.
+      const failed = [...results, activeIdResult, preferencesResult].filter(
+        r => !r.success,
+      );
       if (failed.length > 0) {
         logger.error(
-          `Save failed for ${failed.length} schedule(s):`,
+          `Save failed for ${failed.length} write(s):`,
           failed.map(f => f.error),
         );
         showAppError(

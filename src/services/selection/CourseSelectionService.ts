@@ -521,9 +521,19 @@ export class CourseSelectionService {
       const selectedCourses = this.getSelectedCourses();
       let repairedCount = 0;
 
+      // Count a course only if the repair actually changed it, so a health
+      // issue elsewhere (storage, say) does not trigger a pointless save.
+      // Repairs only touch top-level fields, so a shallow compare suffices.
       selectedCourses.forEach(selectedCourse => {
+        const before = { ...selectedCourse };
         this.dataValidator.repairSelectedCourse(selectedCourse);
-        repairedCount++;
+        const keys = new Set([
+          ...Object.keys(before),
+          ...Object.keys(selectedCourse),
+        ]) as Set<keyof SelectedCourse>;
+        if ([...keys].some(k => before[k] !== selectedCourse[k])) {
+          repairedCount++;
+        }
       });
 
       if (repairedCount > 0) {

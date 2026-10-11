@@ -51,6 +51,10 @@ export class IndexedDBStorageManager {
 
   private db: IDBDatabase | null = null;
   private initPromise: Promise<void> | null = null;
+  // Tail of the write queue. saveSchedule awaits compression before opening
+  // its transaction, so without this a delete or clear issued while a save
+  // is compressing would land first and then be undone by the late put.
+  private writeQueue: Promise<unknown> = Promise.resolve();
 
   async initialize(): Promise<void> {
     if (this.initPromise) {
@@ -118,7 +122,20 @@ export class IndexedDBStorageManager {
     return this.initPromise;
   }
 
-  async saveSchedule(schedule: Schedule): Promise<StorageResult<void>> {
+  /** Runs writes one at a time, in call order. */
+  private enqueueWrite<T>(write: () => Promise<T>): Promise<T> {
+    const result = this.writeQueue.then(write, write);
+    this.writeQueue = result.catch(() => undefined);
+    return result;
+  }
+
+  saveSchedule(schedule: Schedule): Promise<StorageResult<void>> {
+    return this.enqueueWrite(() => this.writeSchedule(schedule));
+  }
+
+  private async writeSchedule(
+    schedule: Schedule,
+  ): Promise<StorageResult<void>> {
     try {
       await this.initialize();
       const db = this.ensureDbInitialized();
@@ -151,16 +168,18 @@ export class IndexedDBStorageManager {
           schemaVersion: SCHEDULE_SCHEMA_VERSION,
         };
 
-        const request = store.put(dataToStore);
+        store.put(dataToStore);
 
-        request.onsuccess = () => {
+        // Settle on the transaction, not the put request: a quota error can
+        // abort the transaction after the request itself has succeeded.
+        transaction.oncomplete = () => {
           resolve({ success: true });
         };
 
-        request.onerror = () => {
+        transaction.onabort = () => {
           resolve({
             success: false,
-            error: `Failed to save schedule: ${request.error?.message}`,
+            error: `Failed to save schedule: ${transaction.error?.message}`,
           });
         };
       });
@@ -269,35 +288,36 @@ export class IndexedDBStorageManager {
         );
         const request = store.getAll();
 
+        // As in loadSchedule, a throw from these handlers would leave the
+        // promise pending and the app stuck loading, so each row is decoded
+        // on its own and a bad one is skipped rather than failing them all.
         request.onsuccess = () => {
-          const results = request.result || [];
-          const deserialized = results.map(
-            (stored: Record<string, unknown>) => {
-              const version = stored.schemaVersion as number | undefined;
-              if (stored.serializedData) {
-                // Handle both compressed and legacy uncompressed data
-                const serialized = stored.serializedData as string;
-                const json = stored.compressed
-                  ? LZString.decompress(serialized)
-                  : serialized;
-
-                return migrateStoredSchedule(
-                  JSON.parse(json || serialized, setReviver),
-                  version,
-                );
-              }
-              return migrateStoredSchedule(stored, version);
-            },
-          );
+          const results = (request.result || []) as StoredScheduleRow[];
+          const deserialized: Schedule[] = [];
+          for (const stored of results) {
+            try {
+              deserialized.push(this.decodeRow(stored));
+            } catch (error) {
+              logger.error(
+                `Skipping unreadable schedule row "${String(stored?.id)}":`,
+                error,
+              );
+            }
+          }
           resolve({ success: true, data: deserialized });
         };
 
-        request.onerror = () => {
+        const fail = (error: DOMException | null) => {
           resolve({
             success: false,
-            error: `Failed to load schedules: ${request.error?.message}`,
+            error: `Failed to load schedules: ${error?.message}`,
+            data: [],
           });
         };
+        request.onerror = () => fail(request.error);
+        // Settles the promise if the transaction dies without a request
+        // error (resolve is a no-op once onsuccess has run).
+        transaction.onabort = () => fail(transaction.error);
       });
     } catch (error) {
       return {
@@ -308,7 +328,13 @@ export class IndexedDBStorageManager {
     }
   }
 
-  async deleteSchedule(scheduleId: string): Promise<StorageResult<void>> {
+  deleteSchedule(scheduleId: string): Promise<StorageResult<void>> {
+    return this.enqueueWrite(() => this.removeSchedule(scheduleId));
+  }
+
+  private async removeSchedule(
+    scheduleId: string,
+  ): Promise<StorageResult<void>> {
     try {
       await this.initialize();
       const db = this.ensureDbInitialized();
@@ -340,6 +366,27 @@ export class IndexedDBStorageManager {
         error: `Exception deleting schedule: ${errorMessage(error)}`,
       };
     }
+  }
+
+  /** Decodes one row from loadAllSchedules (rows from any past format). */
+  private decodeRow(stored: StoredScheduleRow): Schedule {
+    const version = stored.schemaVersion;
+    if (!stored.serializedData) {
+      // Pre-serialization row: it stored the schedule object directly.
+      return migrateStoredSchedule(stored, version);
+    }
+
+    // Handle both compressed and legacy uncompressed data
+    const serialized = stored.serializedData;
+    const json = stored.compressed
+      ? LZString.decompress(serialized)
+      : serialized;
+
+    const parsed: unknown = JSON.parse(json || serialized, setReviver);
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('Stored schedule is not an object');
+    }
+    return migrateStoredSchedule(parsed, version);
   }
 
   async getStorageStats(): Promise<StorageResult<StorageStats>> {
@@ -380,7 +427,11 @@ export class IndexedDBStorageManager {
     }
   }
 
-  async clearAllSchedules(): Promise<StorageResult<void>> {
+  clearAllSchedules(): Promise<StorageResult<void>> {
+    return this.enqueueWrite(() => this.removeAllSchedules());
+  }
+
+  private async removeAllSchedules(): Promise<StorageResult<void>> {
     try {
       await this.initialize();
       const db = this.ensureDbInitialized();

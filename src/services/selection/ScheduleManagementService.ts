@@ -66,8 +66,9 @@ export class ScheduleManagementService {
 
   private async performInitialization(): Promise<boolean> {
     try {
+      // ProfileStateManager is already loaded by AppBootstrap before this
+      // service (see the note in CourseSelectionService).
       await this.courseSelectionService.initialize();
-      await this.profileStateManager.loadFromStorage();
       await this.initializeDefaultScheduleIfNeeded();
 
       this.isInitialized = true;
@@ -701,8 +702,10 @@ export class ScheduleManagementService {
       );
       this.profileStateManager.setActiveSchedule(defaultSchedule.id, 'system');
       this.profileStateManager.save();
-    } else if (!this.getActiveScheduleId()) {
-      // No active schedule recorded: fall back to the most recent one
+    } else if (!this.profileStateManager.getActiveSchedule()) {
+      // No active schedule recorded: fall back to the most recent one. (Asks
+      // ProfileStateManager directly: this.getActiveScheduleId() reads null
+      // until initialization finishes, which is exactly when this runs.)
       this.profileStateManager.setActiveSchedule(
         existingSchedules[existingSchedules.length - 1].id,
         'system',
