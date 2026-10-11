@@ -1293,8 +1293,9 @@
   .degree-rail-list {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
+  /* The same 0.75rem side gutter as the header and the Classes page. */
   .degree-content {
-    padding: 1rem 1rem 3rem;
+    padding: 1rem 0.75rem 3rem;
   }
 }
 
