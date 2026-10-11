@@ -939,7 +939,9 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: white;
+  background: var(--color-toggle-knob);
+  /* Edges the knob on a light track, where it would otherwise blend in. */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   transition: var(--effect-transition);
 }
 

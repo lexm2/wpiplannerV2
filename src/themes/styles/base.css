@@ -27,6 +27,7 @@
   --color-danger-hover: #e03428;
   --color-danger-background: rgba(255, 69, 58, 0.15);
   --color-info: #64d2ff;
+  --color-toggle-knob: #ffffff;
 
   /* Gradient colors */
   --gradient-start: rgba(212, 66, 79, 0.15);

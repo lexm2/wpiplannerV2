@@ -30,7 +30,8 @@
     "dangerBackground": "rgba(255, 69, 58, 0.15)",
     "info": "#64d2ff",
     "gradientStart": "rgba(212, 66, 79, 0.15)",
-    "gradientEnd": "rgba(212, 66, 79, 0.35)"
+    "gradientEnd": "rgba(212, 66, 79, 0.35)",
+    "toggleKnob": "#ffffff"
   },
   "spacing": {
     "baseUnit": "1rem",
