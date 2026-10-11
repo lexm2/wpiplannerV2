@@ -11,23 +11,12 @@ export class AvailabilityFilter implements SectionBasedFilter {
   apply(
     sections: FilterableSection[],
     criteria: AvailabilityFilterCriteria,
-    activeFilters?: Map<string, unknown>,
   ): FilterableSection[] {
     if (!criteria.availableOnly && !criteria.minAvailable) {
       return sections;
     }
 
-    const termCriteria = activeFilters?.get('term') as
-      { terms?: string[] } | undefined;
-    const activeTerms = termCriteria?.terms
-      ? new Set(termCriteria.terms.map((t: string) => t.toUpperCase()))
-      : null;
-
     return sections.filter(fs => {
-      if (activeTerms && !activeTerms.has(fs.section.computedTerm)) {
-        return false;
-      }
-
       if (criteria.availableOnly && fs.section.seatsAvailable <= 0) {
         return false;
       }

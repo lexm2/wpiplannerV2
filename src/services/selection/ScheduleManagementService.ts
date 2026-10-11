@@ -385,10 +385,6 @@ export class ScheduleManagementService {
     return schedules.find(s => s.id === scheduleId) || null;
   }
 
-  loadSchedule(scheduleId: string): Schedule | null {
-    return this.getScheduleById(scheduleId);
-  }
-
   private async updateScheduleCourses(
     scheduleId: string,
     selectedCourses: SelectedCourse[],
@@ -420,26 +416,6 @@ export class ScheduleManagementService {
         error: `Failed to update schedule courses: ${errorMessage(error)}`,
       };
     }
-  }
-
-  async save(): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureInitialized();
-      this.profileStateManager.save();
-      return {
-        success: true,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: `Save failed: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  hasUnsavedChanges(): boolean {
-    if (!this.isInitialized) return false;
-    return this.profileStateManager.hasUnsavedChanges();
   }
 
   async exportSchedule(
@@ -526,13 +502,7 @@ export class ScheduleManagementService {
         };
       }
 
-      const result = ICSGenerator.generateICS(schedule, options);
-
-      if (!result.success) {
-        return result;
-      }
-
-      return result;
+      return ICSGenerator.generateICS(schedule, options);
     } catch (error) {
       return {
         success: false,
@@ -636,40 +606,6 @@ export class ScheduleManagementService {
     return this.courseSelectionService;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await -- awaited; paired with the CourseSelectionService method
-  async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
-    const issues: string[] = [];
-
-    try {
-      if (!this.isInitialized) {
-        issues.push('Service not initialized');
-      }
-
-      const schedules = this.getAllSchedules();
-      const validation = this.dataValidator.validateBatch(schedules, schedule =>
-        this.dataValidator.validateSchedule(schedule),
-      );
-
-      if (!validation.valid) {
-        issues.push(
-          `Schedule validation: ${validation.errors.length} errors found`,
-        );
-      }
-
-      const activeScheduleId = this.getActiveScheduleId();
-      if (activeScheduleId && !schedules.some(s => s.id === activeScheduleId)) {
-        issues.push('Active schedule ID references non-existent schedule');
-      }
-    } catch (error) {
-      issues.push(`Health check error: ${errorMessage(error)}`);
-    }
-
-    return {
-      healthy: issues.length === 0,
-      issues,
-    };
-  }
-
   private async ensureInitialized(): Promise<void> {
     if (!this.isInitialized) {
       await this.initialize();
@@ -716,10 +652,6 @@ export class ScheduleManagementService {
     } while (existingNames.has(candidateName));
 
     return candidateName;
-  }
-
-  async getStorageStats() {
-    return this.profileStateManager.getStorageStats();
   }
 
   async clearAllSchedules(): Promise<void> {

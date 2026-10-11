@@ -81,8 +81,6 @@ export class ThemeManager {
   private currentTheme: ThemeId = 'wpi-dark';
   private themes: Map<ThemeId, ThemeDefinition> = new Map();
   private storage: ThemeStorage = new DefaultThemeStorage();
-  // The theme on screen, which previewTheme() can move away from currentTheme.
-  private appliedTheme: ThemeId | null = null;
   private switchToken = 0;
 
   private constructor() {
@@ -95,10 +93,6 @@ export class ThemeManager {
       ThemeManager.instance = new ThemeManager();
     }
     return ThemeManager.instance;
-  }
-
-  static resetInstance(): void {
-    ThemeManager.instance = null!;
   }
 
   /**
@@ -154,10 +148,6 @@ export class ThemeManager {
     return Array.from(this.themes.values());
   }
 
-  getCurrentTheme(): ThemeDefinition | null {
-    return this.themes.get(this.currentTheme) || null;
-  }
-
   getCurrentThemeId(): ThemeId {
     return this.currentTheme;
   }
@@ -168,8 +158,9 @@ export class ThemeManager {
       return false;
     }
 
+    const changed = themeId !== this.currentTheme;
     this.currentTheme = themeId;
-    this.applyTheme(themeId, true);
+    if (changed) this.applyTheme(themeId, true);
     this.saveThemePreference(themeId);
     // Notify reactive consumers (e.g. the Svelte ThemeSelector) of the new
     // visible theme - ThemeManager has no listener system of its own.
@@ -191,8 +182,7 @@ export class ThemeManager {
    */
   private applyTheme(themeId: ThemeId, animate: boolean): void {
     const theme = this.themes.get(themeId);
-    if (!theme || themeId === this.appliedTheme) return;
-    this.appliedTheme = themeId;
+    if (!theme) return;
 
     const root = document.documentElement;
     const token = ++this.switchToken;
@@ -251,83 +241,5 @@ export class ThemeManager {
 
   private saveThemePreference(themeId: ThemeId): void {
     this.storage.saveThemePreference(themeId);
-  }
-
-  detectSystemPreference(): ThemeId {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'wpi-dark';
-      }
-      if (window.matchMedia('(prefers-contrast: high)').matches) {
-        return 'high-contrast';
-      }
-    }
-    return 'wpi-dark';
-  }
-
-  useSystemPreference(): boolean {
-    const preferredTheme = this.detectSystemPreference();
-    return this.setTheme(preferredTheme);
-  }
-
-  // Temporary application without saving; resetToCurrentTheme() restores on cancel
-  previewTheme(themeId: ThemeId): boolean {
-    if (!this.themes.has(themeId)) return false;
-    this.applyTheme(themeId, true);
-    // Reflect the visible theme; currentTheme / storage are intentionally left unchanged.
-    uiState.currentThemeId = themeId;
-    return true;
-  }
-
-  resetToCurrentTheme(): void {
-    this.applyTheme(this.currentTheme, true);
-    uiState.currentThemeId = this.currentTheme;
-  }
-
-  exportCurrentTheme(): string {
-    const theme = this.getCurrentTheme();
-    if (!theme) throw new Error('No current theme to export');
-    return JSON.stringify(theme, null, 2);
-  }
-
-  importTheme(themeJson: string): boolean {
-    try {
-      const theme: unknown = JSON.parse(themeJson);
-      if (this.isValidTheme(theme)) {
-        this.registerTheme(theme);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      logger.error('Failed to import theme:', error);
-      return false;
-    }
-  }
-
-  getThemeById(themeId: ThemeId): ThemeDefinition | null {
-    return this.themes.get(themeId) || null;
-  }
-
-  hasTheme(themeId: ThemeId): boolean {
-    return this.themes.has(themeId);
-  }
-
-  removeTheme(themeId: ThemeId): boolean {
-    const builtInThemes = [
-      'wpi-classic',
-      'wpi-dark',
-      'wpi-light',
-      'high-contrast',
-    ];
-    if (builtInThemes.includes(themeId)) {
-      logger.warn(`Cannot remove built-in theme: ${themeId}`);
-      return false;
-    }
-
-    if (this.currentTheme === themeId) {
-      this.setTheme('wpi-dark');
-    }
-
-    return this.themes.delete(themeId);
   }
 }

@@ -40,23 +40,6 @@ export class TimeUtils {
     }
   }
 
-  /** Format days for display, e.g. "MWF", "TR" */
-  static formatDays(days: Set<DayOfWeek>): string {
-    const dayAbbreviations: { [key in DayOfWeek]: string } = {
-      [DayOfWeek.MONDAY]: 'M',
-      [DayOfWeek.TUESDAY]: 'T',
-      [DayOfWeek.WEDNESDAY]: 'W',
-      [DayOfWeek.THURSDAY]: 'R',
-      [DayOfWeek.FRIDAY]: 'F',
-      [DayOfWeek.SATURDAY]: 'S',
-      [DayOfWeek.SUNDAY]: 'U',
-    };
-
-    return TimeUtils.DAYS_ORDER.filter(day => days.has(day))
-      .map(day => dayAbbreviations[day])
-      .join('');
-  }
-
   static getDayName(day: DayOfWeek): string {
     const dayNames: { [key in DayOfWeek]: string } = {
       [DayOfWeek.MONDAY]: 'Monday',

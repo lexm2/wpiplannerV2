@@ -3,7 +3,7 @@
  */
 
 import { Schedule } from '../../types/schedule';
-import { setReplacer, setReviver } from '../../utils/jsonSerializer';
+import { setReviver } from '../../utils/jsonSerializer';
 import {
   migrateStoredSchedule,
   SCHEDULE_SCHEMA_VERSION,
@@ -32,12 +32,6 @@ interface StoredScheduleRow {
   timestamp: number;
   compressed?: boolean;
   schemaVersion?: number;
-}
-
-interface StorageStats {
-  totalSchedules: number;
-  estimatedSize: number;
-  schedulesSizes: Map<string, number>;
 }
 
 export class IndexedDBStorageManager {
@@ -191,88 +185,6 @@ export class IndexedDBStorageManager {
     }
   }
 
-  async loadSchedule(scheduleId: string): Promise<StorageResult<Schedule>> {
-    try {
-      await this.initialize();
-      const db = this.ensureDbInitialized();
-
-      return new Promise(resolve => {
-        const transaction = db.transaction(
-          [IndexedDBStorageManager.STORE_NAMES.SCHEDULES],
-          'readonly',
-        );
-        const store = transaction.objectStore(
-          IndexedDBStorageManager.STORE_NAMES.SCHEDULES,
-        );
-        const request = store.get(scheduleId);
-
-        request.onsuccess = async () => {
-          // Every path must reach resolve(). loadSchedule's try/catch cannot
-          // see a throw from here -- it runs long after that block returned --
-          // so an uncaught one would leave the promise pending forever.
-          try {
-            const stored = request.result as StoredScheduleRow | undefined;
-
-            if (!stored) {
-              resolve({ success: false, error: 'Schedule not found' });
-              return;
-            }
-
-            // Pre-serialization row: it stored the schedule object directly.
-            if (!stored.serializedData) {
-              resolve({
-                success: true,
-                data: migrateStoredSchedule(stored, stored.schemaVersion),
-              });
-              return;
-            }
-
-            let serialized = stored.serializedData;
-            if (stored.compressed) {
-              const workerPool = StorageWorkerManager.getInstance();
-              const decompressed = await workerPool.executeTask<string>(
-                WorkerTaskType.DECOMPRESS_DATA,
-                { compressed: stored.serializedData },
-              );
-
-              if (!decompressed) {
-                resolve({
-                  success: false,
-                  error: 'Failed to decompress schedule data',
-                });
-                return;
-              }
-              serialized = decompressed;
-            }
-
-            const deserialized: unknown = JSON.parse(serialized, setReviver);
-            resolve({
-              success: true,
-              data: migrateStoredSchedule(deserialized, stored.schemaVersion),
-            });
-          } catch (error) {
-            resolve({
-              success: false,
-              error: `Failed to read schedule: ${errorMessage(error)}`,
-            });
-          }
-        };
-
-        request.onerror = () => {
-          resolve({
-            success: false,
-            error: `Failed to load schedule: ${request.error?.message}`,
-          });
-        };
-      });
-    } catch (error) {
-      return {
-        success: false,
-        error: `Exception loading schedule: ${errorMessage(error)}`,
-      };
-    }
-  }
-
   async loadAllSchedules(): Promise<StorageResult<Schedule[]>> {
     try {
       await this.initialize();
@@ -288,8 +200,8 @@ export class IndexedDBStorageManager {
         );
         const request = store.getAll();
 
-        // As in loadSchedule, a throw from these handlers would leave the
-        // promise pending and the app stuck loading, so each row is decoded
+        // Every path must reach resolve(): the outer try/catch cannot see a
+        // throw from these handlers, which would leave the promise pending and the app stuck loading, so each row is decoded
         // on its own and a bad one is skipped rather than failing them all.
         request.onsuccess = () => {
           const results = (request.result || []) as StoredScheduleRow[];
@@ -389,44 +301,6 @@ export class IndexedDBStorageManager {
     return migrateStoredSchedule(parsed, version);
   }
 
-  async getStorageStats(): Promise<StorageResult<StorageStats>> {
-    try {
-      const schedulesResult = await this.loadAllSchedules();
-
-      if (!schedulesResult.success || !schedulesResult.data) {
-        return {
-          success: false,
-          error: 'Failed to load schedules for stats calculation',
-        };
-      }
-
-      const schedules = schedulesResult.data;
-      const schedulesSizes = new Map<string, number>();
-      let totalSize = 0;
-
-      schedules.forEach(schedule => {
-        const serialized = JSON.stringify(schedule, setReplacer);
-        const size = new Blob([serialized]).size;
-        schedulesSizes.set(schedule.id, size);
-        totalSize += size;
-      });
-
-      return {
-        success: true,
-        data: {
-          totalSchedules: schedules.length,
-          estimatedSize: totalSize,
-          schedulesSizes,
-        },
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: `Exception calculating storage stats: ${errorMessage(error)}`,
-      };
-    }
-  }
-
   clearAllSchedules(): Promise<StorageResult<void>> {
     return this.enqueueWrite(() => this.removeAllSchedules());
   }
@@ -477,16 +351,6 @@ export class IndexedDBStorageManager {
     } catch (error) {
       logger.error('IndexedDB compatibility check failed:', error);
       return false;
-    }
-  }
-
-  // The other half of initialize()'s lifecycle pair.
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async close(): Promise<void> {
-    if (this.db) {
-      this.db.close();
-      this.db = null;
-      this.initPromise = null;
     }
   }
 

@@ -4,7 +4,11 @@
 
 import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerCourse } from '../types/outputTypes.js';
-import { transformSection, categorizeSections } from './sectionTransformer.js';
+import {
+  transformSection,
+  categorizeSections,
+  isSpecialSection,
+} from './sectionTransformer.js';
 import { buildLectureGroups } from './lectureGroupBuilder.js';
 import { sanitizeHTML, extractCategory } from '../utils/htmlSanitizer.js';
 import { ConverterConfig } from '../ConverterConfig.js';
@@ -37,9 +41,11 @@ export function transformCourse(
       ? courseTitle.substring(titleDashIndex + 2).trim()
       : courseSection.substring(courseSection.lastIndexOf('-') + 1).trim();
 
-  const isSpecialCourse =
-    config.specialCourses.some(sc => subjectAndNumber.includes(sc)) ||
-    config.specialSections.some(ss => courseSection.includes(ss));
+  const isSpecialCourse = isSpecialSection(
+    courseSection,
+    subjectAndNumber,
+    config,
+  );
 
   const descriptionRaw = isSpecialCourse
     ? firstSection.Course_Description

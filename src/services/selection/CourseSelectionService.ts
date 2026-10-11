@@ -199,22 +199,6 @@ export class CourseSelectionService {
     }
   }
 
-  async clearAllSelections(): Promise<{ success: boolean; error?: string }> {
-    await this.ensureInitialized();
-
-    try {
-      this.profileStateManager.clearAllSelections('service');
-
-      return { success: true };
-    } catch (error) {
-      logger.error('Error clearing selections:', error);
-      return {
-        success: false,
-        error: `Error clearing selections: ${errorMessage(error)}`,
-      };
-    }
-  }
-
   async clearCourseComponents(course: Course): Promise<CourseSelectionResult> {
     await this.ensureInitialized();
 
@@ -347,80 +331,6 @@ export class CourseSelectionService {
     }
   }
 
-  // Section locking methods to prevent auto-scheduler from changing manual selections
-
-  async lockSection(
-    course: Course,
-    sectionCrn: string,
-  ): Promise<CourseSelectionResult> {
-    await this.ensureInitialized();
-
-    try {
-      if (!this.isCourseSelected(course)) {
-        return {
-          success: false,
-          error: 'Course must be selected before locking a section',
-        };
-      }
-
-      this.profileStateManager.lockSection(course, sectionCrn, 'service');
-
-      const selectedCourse = this.profileStateManager.getSelectedCourse(course);
-
-      return {
-        success: true,
-        course: selectedCourse,
-      };
-    } catch (error) {
-      logger.error('Error locking section:', error);
-      return {
-        success: false,
-        error: `Error locking section: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  async unlockSection(
-    course: Course,
-    sectionCrn: string,
-  ): Promise<CourseSelectionResult> {
-    await this.ensureInitialized();
-
-    try {
-      if (!this.isCourseSelected(course)) {
-        return {
-          success: false,
-          error: 'Course must be selected before unlocking a section',
-        };
-      }
-
-      this.profileStateManager.unlockSection(course, sectionCrn, 'service');
-
-      const selectedCourse = this.profileStateManager.getSelectedCourse(course);
-
-      return {
-        success: true,
-        course: selectedCourse,
-      };
-    } catch (error) {
-      logger.error('Error unlocking section:', error);
-      return {
-        success: false,
-        error: `Error unlocking section: ${errorMessage(error)}`,
-      };
-    }
-  }
-
-  isSectionLocked(course: Course, sectionCrn: string): boolean {
-    if (!this.isInitialized) return false;
-    return this.profileStateManager.isSectionLocked(course, sectionCrn);
-  }
-
-  getLockedSections(course: Course): Set<string> {
-    if (!this.isInitialized) return new Set();
-    return this.profileStateManager.getLockedSections(course);
-  }
-
   setCourseColor(courseId: string, color: string): boolean {
     if (!this.isInitialized) return false;
     this.profileStateManager.setCourseColor(courseId, color, 'service');
@@ -433,29 +343,13 @@ export class CourseSelectionService {
     return this.profileStateManager.getSelectedCourse(course) !== undefined;
   }
 
-  getSelectedCourse(course: Course): SelectedCourse | undefined {
-    if (!this.isInitialized) return undefined;
-
-    return this.profileStateManager.getSelectedCourse(course);
-  }
-
   getSelectedCourses(): SelectedCourse[] {
     if (!this.isInitialized) return [];
 
     return this.profileStateManager.getSelectedCourses();
   }
 
-  getSelectedCoursesCount(): number {
-    if (!this.isInitialized) return 0;
-
-    return this.profileStateManager.getSelectedCourses().length;
-  }
-
-  getSelectedCourseIds(): string[] {
-    return this.getSelectedCourses().map(sc => sc.course.id);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await -- awaited; paired with the ScheduleManagementService method
+  // eslint-disable-next-line @typescript-eslint/require-await -- awaited by performInitialization
   async performHealthCheck(): Promise<{ healthy: boolean; issues: string[] }> {
     const issues: string[] = [];
 
@@ -490,24 +384,6 @@ export class CourseSelectionService {
     };
   }
 
-  async save(): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureInitialized();
-      this.profileStateManager.save();
-      return { success: true };
-    } catch (error: unknown) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      };
-    }
-  }
-
-  hasUnsavedChanges(): boolean {
-    if (!this.isInitialized) return false;
-    return this.profileStateManager.hasUnsavedChanges();
-  }
-
   private async ensureInitialized(): Promise<void> {
     if (!this.isInitialized) {
       await this.initialize();
@@ -518,22 +394,11 @@ export class CourseSelectionService {
   private async attemptDataRepair(): Promise<boolean> {
     try {
       const selectedCourses = this.getSelectedCourses();
-      let repairedCount = 0;
-
       // Count a course only if the repair actually changed it, so a health
       // issue elsewhere (storage, say) does not trigger a pointless save.
-      // Repairs only touch top-level fields, so a shallow compare suffices.
-      selectedCourses.forEach(selectedCourse => {
-        const before = { ...selectedCourse };
-        this.dataValidator.repairSelectedCourse(selectedCourse);
-        const keys = new Set([
-          ...Object.keys(before),
-          ...Object.keys(selectedCourse),
-        ]) as Set<keyof SelectedCourse>;
-        if ([...keys].some(k => before[k] !== selectedCourse[k])) {
-          repairedCount++;
-        }
-      });
+      const repairedCount = selectedCourses.filter(selectedCourse =>
+        this.dataValidator.repairSelectedCourse(selectedCourse),
+      ).length;
 
       if (repairedCount > 0) {
         logger.warn(`Repaired ${repairedCount} selected courses`);

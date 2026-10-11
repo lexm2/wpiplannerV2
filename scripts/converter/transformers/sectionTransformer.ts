@@ -61,10 +61,8 @@ export function transformSection(
   const clusterId = workdaySection.CF_LRV_Cluster_Ref_ID || null;
   const note = isInterestList ? 'IntList' : clusterId || null;
 
-  const isGraduate = workdaySection.Academic_Level === 'Graduate';
-
   // Graduate courses keep F/S, undergraduate use A/B/C/D
-  const computedTerm = extractTermLetter(sectionNumber, isGraduate);
+  const computedTerm = extractTermLetter(sectionNumber);
 
   const sectionDetails = workdaySection.Section_Details || '';
   const meetingPatterns = parseSectionDetails(sectionDetails);
@@ -179,7 +177,7 @@ function extractSectionNumber(
 /**
  * Checks if a section is special (GPS, Special Topics, etc.)
  */
-function isSpecialSection(
+export function isSpecialSection(
   courseSectionFull: string,
   subjectAndNumber: string,
   config: ConverterConfig,
@@ -200,17 +198,10 @@ function isSpecialSection(
  * For undergraduate: "A01" -> "A", "DL08" -> "D"
  * For graduate: "F01" -> "F" (Fall), "S01" -> "S" (Spring)
  */
-function extractTermLetter(sectionNumber: string, isGraduate: boolean): string {
+function extractTermLetter(sectionNumber: string): string {
+  // Graduate F/S terms are kept; the UI displays them as A+B or C+D
   const match = sectionNumber.match(/^([ABCDFS])/i);
-  const termLetter = match ? match[1].toUpperCase() : 'A';
-
-  // Graduate courses keep F/S terms, UI handles display as A+B or C+D
-  if (isGraduate && (termLetter === 'F' || termLetter === 'S')) {
-    return termLetter;
-  }
-
-  // Standard undergraduate terms (A/B/C/D)
-  return termLetter;
+  return match ? match[1].toUpperCase() : 'A';
 }
 
 /**

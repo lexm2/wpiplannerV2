@@ -66,21 +66,6 @@ export class OperationManager {
     }
   }
 
-  cancelAllOperations(reason?: string): void {
-    for (const [_id, tokenSource] of this.activeOperations) {
-      tokenSource.cancel(reason || 'All operations cancelled');
-    }
-    this.activeOperations.clear();
-  }
-
-  isOperationActive(operationId: string): boolean {
-    return this.activeOperations.has(operationId);
-  }
-
-  getActiveOperationCount(): number {
-    return this.activeOperations.size;
-  }
-
   completeOperation(operationId: string): void {
     this.activeOperations.delete(operationId);
   }
@@ -155,9 +140,5 @@ export class DebouncedOperation {
     const reject = this.rejectPending;
     this.rejectPending = null;
     reject?.(new CancellationError(reason));
-  }
-
-  setDelay(delay: number): void {
-    this.delay = Math.max(0, Math.min(5000, delay));
   }
 }

@@ -48,7 +48,6 @@ export class ProfileStateManager {
   // The schedule object each id last saved successfully. Schedules in state
   // are replaced, never mutated, so an unchanged object needs no re-save.
   private savedSchedules = new Map<string, Schedule>();
-  private beforeUnloadHandler: ((e: BeforeUnloadEvent) => void) | null = null;
   public isBatchUpdate = false;
 
   private constructor(storageManager?: TransactionalStorageManager) {
@@ -74,30 +73,15 @@ export class ProfileStateManager {
     return ProfileStateManager.instance;
   }
 
-  public static resetInstance(): void {
-    if (ProfileStateManager.instance) {
-      ProfileStateManager.instance.destroy();
-      ProfileStateManager.instance = null;
-    }
-  }
-
   private setupBeforeUnloadHandler(): void {
     if (typeof window === 'undefined') return;
 
-    this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+    window.addEventListener('beforeunload', (e: BeforeUnloadEvent) => {
       if (this.pendingSavePromises.size > 0) {
         // Calling preventDefault() triggers the browser's "leave site?" prompt.
         e.preventDefault();
       }
-    };
-
-    window.addEventListener('beforeunload', this.beforeUnloadHandler);
-  }
-
-  destroy(): void {
-    if (this.beforeUnloadHandler && typeof window !== 'undefined') {
-      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
-    }
+    });
   }
 
   /**
@@ -160,16 +144,8 @@ export class ProfileStateManager {
     return { ...this.state.preferences };
   }
 
-  hasUnsavedChanges(): boolean {
-    return this.state.hasUnsavedChanges;
-  }
-
   hasPendingSaves(): boolean {
     return this.pendingSavePromises.size > 0;
-  }
-
-  isLoading(): boolean {
-    return this.state.isLoading || this.isLoadingFlag;
   }
 
   /**
@@ -341,52 +317,6 @@ export class ProfileStateManager {
     });
   }
 
-  clearAllSelections(_source: string = 'user'): void {
-    this.withStateUpdate(() => {
-      this.state.selectedCourses = [];
-      this.updateActiveScheduleWithCurrentCourses();
-    });
-  }
-
-  lockSection(
-    course: Course,
-    sectionCrn: string,
-    _source: string = 'user',
-  ): void {
-    this.withStateUpdate(() => {
-      const found = this.patchSelectedCourse(course.id, sc => {
-        const lockedSections = new Set(sc.lockedSections ?? []);
-        lockedSections.add(sectionCrn);
-        return { ...sc, lockedSections };
-      });
-      if (found) {
-        this.updateActiveScheduleWithCurrentCourses();
-      }
-    });
-  }
-
-  unlockSection(
-    course: Course,
-    sectionCrn: string,
-    _source: string = 'user',
-  ): void {
-    this.withStateUpdate(() => {
-      let changed = false;
-      this.patchSelectedCourse(course.id, sc => {
-        if (sc.lockedSections?.has(sectionCrn)) {
-          const lockedSections = new Set(sc.lockedSections);
-          lockedSections.delete(sectionCrn);
-          changed = true;
-          return { ...sc, lockedSections };
-        }
-        return sc;
-      });
-      if (changed) {
-        this.updateActiveScheduleWithCurrentCourses();
-      }
-    });
-  }
-
   setCourseColor(
     courseId: string,
     color: string,
@@ -401,28 +331,6 @@ export class ProfileStateManager {
         this.updateActiveScheduleWithCurrentCourses();
       }
     });
-  }
-
-  isSectionLocked(course: Course, sectionCrn: string): boolean {
-    const selectedCourse = this.state.selectedCourses.find(
-      sc => sc.course.id === course.id,
-    );
-    return selectedCourse?.lockedSections?.has(sectionCrn) || false;
-  }
-
-  getLockedSections(course: Course): Set<string> {
-    const selectedCourse = this.state.selectedCourses.find(
-      sc => sc.course.id === course.id,
-    );
-    return selectedCourse?.lockedSections || new Set();
-  }
-
-  getNewestAcademicYear(): number | undefined {
-    const years = this.allDepartments
-      .flatMap(d => d.courses)
-      .map(c => c.academicYear)
-      .filter(Boolean) as number[];
-    return years.length ? Math.max(...years) : undefined;
   }
 
   /**
@@ -1187,24 +1095,6 @@ export class ProfileStateManager {
     }
   }
 
-  /** Synchronous version of withBatch for non-async batch operations. */
-  withBatchSync<T>(fn: () => T): T {
-    const wasBatch = this.isBatchUpdate;
-    if (!wasBatch) {
-      this.isBatchUpdate = true;
-    }
-
-    try {
-      const result = fn();
-      return result;
-    } finally {
-      if (!wasBatch) {
-        this.isBatchUpdate = false;
-        this.save();
-      }
-    }
-  }
-
   private updateActiveScheduleWithCurrentCourses(): void {
     const activeId = this.state.activeScheduleId;
     if (!activeId) return;
@@ -1217,10 +1107,6 @@ export class ProfileStateManager {
 
   private generateScheduleId(): string {
     return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-  }
-
-  async getStorageStats() {
-    return this.storageManager.getStorageStats();
   }
 
   async clearAllData(): Promise<{ success: boolean; error?: string }> {

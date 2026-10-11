@@ -102,7 +102,6 @@ export class WorkdayConverter {
           section.Offering_Period,
           section.Course_Section,
           section.Instructional_Format,
-          this.config,
         )
       ) {
         return false;
@@ -192,7 +191,7 @@ export class WorkdayConverter {
   private calculateTermBounds(sections: WorkdaySection[]): TermBoundsOutput {
     const uniqueYears = [
       ...new Set(sections.map(s => parseInt(s.Academic_Year))),
-    ].sort();
+    ].sort((a, b) => a - b);
     console.log(
       `[TermBounds] Detected academic years: ${uniqueYears.join(', ')}`,
     );

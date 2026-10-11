@@ -33,23 +33,6 @@ export class FilterService {
     this.sectionPipeline.registerFilter(filter);
   }
 
-  unregisterFilter(filterId: string): boolean {
-    const removed = this.registeredFilters.delete(filterId);
-    if (removed) {
-      this.removeFilter(filterId);
-      this.sectionPipeline.unregisterFilter(filterId);
-    }
-    return removed;
-  }
-
-  getRegisteredFilter(filterId: string): SectionBasedFilter | undefined {
-    return this.registeredFilters.get(filterId);
-  }
-
-  getAvailableFilters(): SectionBasedFilter[] {
-    return Array.from(this.registeredFilters.values());
-  }
-
   setConflictDetector(): void {
     const conflictFilter = new ConflictFilter();
     this.registerFilter(conflictFilter);
@@ -134,14 +117,6 @@ export class FilterService {
     return true;
   }
 
-  toggleFilter(filterId: string, criteria: unknown): boolean {
-    if (this.hasFilter(filterId)) {
-      return this.removeFilter(filterId);
-    } else {
-      return this.addFilter(filterId, criteria);
-    }
-  }
-
   hasFilter(filterId: string): boolean {
     return this.filterState.hasFilter(filterId);
   }
@@ -165,19 +140,6 @@ export class FilterService {
 
   isEmpty(): boolean {
     return this.filterState.isEmpty();
-  }
-
-  getFilterSummary(): string {
-    const activeFilters = this.getActiveFilters();
-    if (activeFilters.length === 0) {
-      return 'No filters active';
-    }
-
-    if (activeFilters.length === 1) {
-      return `1 filter: ${activeFilters[0].displayValue}`;
-    }
-
-    return `${activeFilters.length} filters active`;
   }
 
   apply(courses: Course[]): FilterableSection[] {

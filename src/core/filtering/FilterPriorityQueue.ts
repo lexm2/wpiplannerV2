@@ -24,20 +24,8 @@ export class FilterPriorityQueue<T> {
     return min;
   }
 
-  peek(): T | null {
-    return this.heap.length > 0 ? this.heap[0].item : null;
-  }
-
-  size(): number {
-    return this.heap.length;
-  }
-
   isEmpty(): boolean {
     return this.heap.length === 0;
-  }
-
-  clear(): void {
-    this.heap = [];
   }
 
   private bubbleUp(index: number): void {

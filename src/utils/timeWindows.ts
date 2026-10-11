@@ -123,7 +123,7 @@ export function cellsFromWindows(
   return cells;
 }
 
-export type DayWindows = Map<DayOfWeek, { startMin: number; endMin: number }[]>;
+type DayWindows = Map<DayOfWeek, { startMin: number; endMin: number }[]>;
 
 export function windowsByDay(windows: readonly TimeWindow[]): DayWindows {
   const byDay: DayWindows = new Map();

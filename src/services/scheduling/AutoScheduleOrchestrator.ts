@@ -9,7 +9,6 @@ import type { ScheduleResult } from './AutoScheduler';
 import { SmartScheduler } from './SmartScheduler';
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager';
 import { logger } from '../../utils/logger';
-import { sectionsOf } from '../../utils/courseUtils';
 
 export interface CalendarEventProvider {
   getAllLocalEventBlockedTimes(): WeeklyTimeSlot[];
@@ -27,7 +26,6 @@ export class AutoScheduleOrchestrator {
   private generatedSchedules: ScheduleResult[][] = [];
   private currentScheduleIndex: number = 0;
   private isApplyingAutoSchedule: boolean = false;
-  private autoAppliedCRNs: Set<string> = new Set();
   private courseSelectionService: CourseSelectionService;
   private filterService: FilterService;
   private calendarEventProvider: CalendarEventProvider | null = null;
@@ -62,14 +60,6 @@ export class AutoScheduleOrchestrator {
 
   getGeneratedSchedules(): ScheduleResult[][] {
     return this.generatedSchedules;
-  }
-
-  getCurrentScheduleIndex(): number {
-    return this.currentScheduleIndex;
-  }
-
-  getIsApplyingAutoSchedule(): boolean {
-    return this.isApplyingAutoSchedule;
   }
 
   getAllCalendarBlockedTimes(): WeeklyTimeSlot[] {
@@ -139,19 +129,11 @@ export class AutoScheduleOrchestrator {
     }
 
     this.isApplyingAutoSchedule = true;
-    this.autoAppliedCRNs = new Set();
     try {
-      const selections: CourseComponentSelections[] = [];
-
-      for (const result of schedule) {
-        for (const section of sectionsOf(result.combination)) {
-          this.autoAppliedCRNs.add(String(section.crn));
-        }
-        selections.push({
-          course: result.course,
-          selected: result.combination,
-        });
-      }
+      const selections: CourseComponentSelections[] = schedule.map(result => ({
+        course: result.course,
+        selected: result.combination,
+      }));
 
       if (selections.length > 0) {
         await this.courseSelectionService.batchSetSelectedComponents(

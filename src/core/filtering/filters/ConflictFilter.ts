@@ -47,11 +47,7 @@ export class ConflictFilter implements SectionBasedFilter {
 
   private blockedMasksByTerm: Map<string, bigint> = new Map();
 
-  apply(
-    sections: FilterableSection[],
-    criteria: unknown,
-    _activeFilters?: Map<string, unknown>,
-  ): FilterableSection[] {
+  apply(sections: FilterableSection[], criteria: unknown): FilterableSection[] {
     return this.applyToFilterableSections(
       sections,
       criteria as ConflictCriteria,

@@ -1,5 +1,5 @@
 import { SvelteMap } from 'svelte/reactivity';
-import { ActiveFilter, FilterCriteria } from '../../types/filters';
+import { ActiveFilter } from '../../types/filters';
 
 /**
  * Manages active filters as reactive state.
@@ -57,18 +57,6 @@ export class FilterState {
 
   getActiveFilters(): ActiveFilter[] {
     return Array.from(this.activeFilters.values());
-  }
-
-  getFilterCriteria(): FilterCriteria {
-    const criteria: FilterCriteria = {};
-    for (const [id, filter] of this.activeFilters) {
-      criteria[id] = filter.criteria;
-    }
-    return criteria;
-  }
-
-  getActiveFilterIds(): string[] {
-    return Array.from(this.activeFilters.keys());
   }
 
   getFilterCount(): number {

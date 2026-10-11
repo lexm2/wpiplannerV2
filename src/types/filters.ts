@@ -1,10 +1,6 @@
 import { DayOfWeek } from './types';
 import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
 
-export interface FilterCriteria {
-  [filterId: string]: unknown;
-}
-
 export interface ActiveFilter<TCriteria = unknown> {
   id: string;
   name: string;

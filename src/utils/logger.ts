@@ -20,18 +20,6 @@ class Logger {
   error(...args: unknown[]): void {
     console.error(...args);
   }
-
-  debug(...args: unknown[]): void {
-    if (this.isDev) {
-      console.debug(...args);
-    }
-  }
-
-  info(...args: unknown[]): void {
-    if (this.isDev) {
-      console.info(...args);
-    }
-  }
 }
 
 export const logger = new Logger();
