@@ -949,4 +949,12 @@ html.is-mobile .term-graph {
     min-height: 0;
     border-radius: 0;
   }
+
+  /* The Courses drawer's rows take the drawer bar's 1rem gutter. */
+  .schedule-sidebar-header,
+  .schedule-sidebar-content,
+  .schedule-footer-row {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
