@@ -4,6 +4,25 @@
 
 ### Added
 - Copy Into button in the Schedules list. Pick a schedule, then click another to add its courses to that one
+- Auto-Schedule shows F and S term badges for semester courses
+
+### Changed
+- Auto-Schedule is much faster with many courses
+- When Auto-Schedule can't build a schedule, it names the courses that caused it
+- The Times picker fits on laptop and phone screens, and Avoid times are striped so they look different from Only times
+- The course list stays wider on laptop screens
+- Over-enrolled sections show as Full instead of a negative seat count
+
+### Fixed
+- Auto-Schedule no longer overlaps semester (F/S) courses with quarter courses, or ignores courses you kept locked
+- Auto-Schedule no longer gets stuck after it times out
+- The calendar events toggle in Auto-Schedule shows when it's on and turns off properly
+- Undo works after copying, importing or duplicating a schedule, and starts off when the page loads
+- Escape closes only the top window, and cancels a rename instead of saving it
+- Change Sections works on narrow screens
+- The settings button can be tapped on phones
+- Selected days now show as selected in Add Event
+- A failed import no longer leaves an empty schedule behind
 
 ## [2026-09-01]
 
