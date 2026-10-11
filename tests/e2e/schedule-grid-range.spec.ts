@@ -144,3 +144,16 @@ test('a section ending after 8 PM is drawn to its end, not clipped', async ({
   expect(Math.abs(bottom - (await yOf(card, endMin)))).toBeLessThanOrEqual(2);
   expect((await labels(card)).at(-1)).toBe(hourText(endMin - 1));
 });
+
+test('every term shares one time axis', async ({ page }) => {
+  // One early section in one term widens all four grids alike, so side-by-side
+  // terms line up hour for hour and paging between them keeps the same axis.
+  const { startMin } = await selectSection(page, 'earliest');
+  const axes = await Promise.all(
+    ['A', 'B', 'C', 'D'].map(term =>
+      labels(page.locator(`.term-graph[data-term="${term}"]`)),
+    ),
+  );
+  expect(axes[0][0]).toBe(hourText(startMin));
+  for (const axis of axes.slice(1)) expect(axis).toEqual(axes[0]);
+});
