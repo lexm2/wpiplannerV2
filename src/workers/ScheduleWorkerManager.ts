@@ -14,6 +14,8 @@ interface PendingTask {
   reject: (reason: Error) => void;
 }
 
+const TIMEOUT_MS = 60_000;
+
 export class ScheduleWorkerManager {
   private static instance: ScheduleWorkerManager | null = null;
   private worker: Worker | null = null;
@@ -26,13 +28,17 @@ export class ScheduleWorkerManager {
       this.fallbackMode = true;
       return;
     }
+    this.worker = this.createWorker();
+  }
+
+  private createWorker(): Worker | null {
     try {
-      this.worker = new Worker(
+      const worker = new Worker(
         new URL('./schedule.worker.ts', import.meta.url),
         { type: 'module' },
       );
 
-      this.worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
+      worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
         const { id, success, data, error } = e.data;
         const pending = this.pendingTasks.get(id);
         if (!pending) return;
@@ -44,17 +50,33 @@ export class ScheduleWorkerManager {
         }
       };
 
-      this.worker.onerror = (error: ErrorEvent) => {
+      worker.onerror = (error: ErrorEvent) => {
         logger.error('[ScheduleWorker] Worker error:', error.message);
         this.fallbackMode = true;
-        for (const [taskId, task] of this.pendingTasks.entries()) {
-          task.reject(new Error(`Worker crashed: ${error.message}`));
-          this.pendingTasks.delete(taskId);
-        }
+        this.rejectAll(new Error(`Worker crashed: ${error.message}`));
       };
+      return worker;
     } catch {
       this.fallbackMode = true;
+      return null;
     }
+  }
+
+  private rejectAll(reason: Error): void {
+    for (const [taskId, task] of this.pendingTasks.entries()) {
+      this.pendingTasks.delete(taskId);
+      task.reject(reason);
+    }
+  }
+
+  /**
+   * Stops a worker stuck on a long job. Without this the job keeps running,
+   * and the next request queues behind it and times out in turn.
+   */
+  private restartWorker(reason: Error): void {
+    this.worker?.terminate();
+    this.worker = null;
+    this.rejectAll(reason);
   }
 
   static getInstance(): ScheduleWorkerManager {
@@ -68,7 +90,9 @@ export class ScheduleWorkerManager {
     input: SchedulerInput,
     maxResults: number,
   ): Promise<ScheduleResult[][]> {
-    if (this.fallbackMode || !this.worker) {
+    if (!this.fallbackMode && !this.worker) this.worker = this.createWorker();
+    const worker = this.worker;
+    if (this.fallbackMode || !worker) {
       return this.executeFallback(input, maxResults);
     }
 
@@ -83,10 +107,13 @@ export class ScheduleWorkerManager {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         if (this.pendingTasks.has(taskId)) {
-          this.pendingTasks.delete(taskId);
-          reject(new Error(`Schedule generation timed out`));
+          this.restartWorker(
+            new Error(
+              `Schedule generation timed out after ${TIMEOUT_MS / 1000} seconds`,
+            ),
+          );
         }
-      }, 60_000);
+      }, TIMEOUT_MS);
 
       this.pendingTasks.set(taskId, {
         resolve: value => {
@@ -102,7 +129,7 @@ export class ScheduleWorkerManager {
       // postMessage structured-clones the payload; an unclonable value throws
       // here, after the task was registered. Unwind rather than leak it.
       try {
-        this.worker!.postMessage(request);
+        worker.postMessage(request);
       } catch (error) {
         this.pendingTasks.delete(taskId);
         clearTimeout(timeout);

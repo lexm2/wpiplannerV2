@@ -114,7 +114,7 @@ export class AutoScheduleOrchestrator {
       this.notifyStateChange();
       return true;
     } catch (error) {
-      logger.error('[Auto-Schedule] Error generating schedules:', error);
+      // Reset and rethrow; the caller logs and reports it.
       this.generatedSchedules = [];
       this.currentScheduleIndex = 0;
       this.notifyStateChange();

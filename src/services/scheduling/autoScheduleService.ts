@@ -7,6 +7,7 @@ import type { FilterService } from '../filtering/FilterService';
 import type { CourseColorService } from './CourseColorService';
 import type { AutoScheduleOrchestrator } from './AutoScheduleOrchestrator';
 import { logger } from '../../utils/logger';
+import { errorMessage } from '../../utils/errorMessage';
 
 /**
  * Standalone auto-schedule modal orchestration for the schedule page.
@@ -126,9 +127,13 @@ class AutoScheduleService {
       // applied the schedule via batchSetSelectedComponents, and AutoScheduleControls
       // reacts via appState.autoScheduleCount/Index.
     } catch (error) {
-      logger.error('[Auto-Schedule] Error generating schedules:', error);
+      // The message as a string: some consoles render a bare Error as "Error".
+      logger.error(
+        `[Auto-Schedule] Error generating schedules: ${errorMessage(error)}`,
+        error,
+      );
       showAppError(
-        'An error occurred while generating the schedule. Please try again.',
+        `An error occurred while generating the schedule: ${errorMessage(error)}.\n\nTry including fewer courses or narrowing their terms.`,
       );
     } finally {
       appState.scheduleGenerating = false;
