@@ -17,6 +17,8 @@
   const generatedCount = $derived(appState.autoScheduleCount);
   const currentIndex = $derived(appState.autoScheduleIndex);
   const hasSchedules = $derived(generatedCount > 0);
+  // No second run while one is in flight (the grid shows its overlay).
+  const generating = $derived(appState.scheduleGenerating);
   const progressPct = $derived(
     hasSchedules ? ((currentIndex + 1) / generatedCount) * 100 : 0,
   );
@@ -40,6 +42,7 @@
       class="btn btn-primary auto-schedule-btn"
       title="Automatically generate a schedule"
       aria-label="Auto-generate schedule"
+      disabled={generating}
       onclick={onOpenAutoSchedule}
       >{@html getInlineSVG('WAND', 'auto-schedule-icon')}<span
         >Auto-Schedule</span
@@ -58,6 +61,7 @@
         class="btn btn-secondary schedule-nav-btn"
         title="Restart auto-schedule"
         aria-label="Restart auto-schedule"
+        disabled={generating}
         onclick={onOpenAutoSchedule}
         >{@html getInlineSVG('REFRESH', 'schedule-nav-icon')}</button
       >

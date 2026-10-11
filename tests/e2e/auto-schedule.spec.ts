@@ -250,6 +250,37 @@ test('a course with no usable section is named, on separate banner lines', async
   expect(text).toMatch(/\n• /);
 });
 
+test('the Auto-Schedule button is disabled while generating', async ({
+  page,
+}) => {
+  // Hold each job back so the generating state lasts long enough to see.
+  await page.addInitScript(() => {
+    const RealWorker = window.Worker;
+    window.Worker = class extends RealWorker {
+      postMessage(message: unknown): void {
+        setTimeout(() => super.postMessage(message), 1500);
+      }
+    };
+  });
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+
+  const button = page.locator('#auto-schedule-btn');
+  await button.click();
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+  await page.click('#modal-primary-btn');
+
+  await expect(page.locator('.schedule-generating-overlay')).toBeVisible();
+  await expect(button).toBeDisabled();
+
+  await expect(page.locator('.schedule-generating-overlay')).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Restart auto-schedule' }),
+  ).toBeEnabled();
+});
+
 test('the intro offers a semester-only course its F term', async ({ page }) => {
   await loadApp(page);
   await selectCourses(page, ['AE601']);
