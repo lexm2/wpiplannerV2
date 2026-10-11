@@ -113,13 +113,22 @@ describe('TimesFilter', () => {
       expect(filter.apply(sample, only(tueThu10to12))).toEqual([]);
     });
 
-    it('keeps a section when one of its periods fits and another does not', () => {
-      // A lab outside the gap does not disqualify a lecture that fits it.
+    it('drops a section when one of its periods fits and another does not', () => {
+      // "Only these times" means every meeting is inside them: a section that
+      // also meets Wednesday afternoon does not fit a Tue/Thu morning gap.
+      // (Labs and discussions are their own sections, filtered separately.)
       const sample = [
         fs('mixed', [period([T], 10, 0, 10, 50), period([W], 14, 0, 15, 50)]),
       ];
+      expect(filter.apply(sample, only(tueThu10to12))).toEqual([]);
+    });
+
+    it('keeps a section when every one of its periods fits', () => {
+      const sample = [
+        fs('split', [period([T], 10, 0, 10, 50), period([R], 11, 0, 11, 50)]),
+      ];
       expect(names(filter.apply(sample, only(tueThu10to12)))).toEqual([
-        'mixed',
+        'split',
       ]);
     });
 

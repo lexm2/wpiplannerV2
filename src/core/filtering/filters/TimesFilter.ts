@@ -16,9 +16,10 @@ const VALID_DAYS = new Set<string>(Object.values(DayOfWeek));
  * Restricts courses by when they meet, using the weekly grid painted in the
  * Times modal.
  *
- * `only` keeps a section when at least one timed period fits entirely inside
- * the painted region; `avoid` drops a section when any timed period overlaps
- * it.
+ * `only` keeps a section when every timed period fits entirely inside the
+ * painted region; `avoid` drops a section when any timed period overlaps it.
+ * The two are mirror images: a section passes `only` exactly when none of its
+ * meetings fall outside the selection.
  */
 export class TimesFilter implements SectionBasedFilter {
   readonly id = 'times';
@@ -45,7 +46,7 @@ export class TimesFilter implements SectionBasedFilter {
       if (periods.length === 0) return true;
 
       return whitelist
-        ? periods.some(p => periodInsideWindows(p, byDay))
+        ? periods.every(p => periodInsideWindows(p, byDay))
         : !periods.some(p => periodOverlapsWindows(p, byDay));
     });
   }
