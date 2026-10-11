@@ -16,6 +16,7 @@
 - The course list stays wider on laptop screens
 - Over-enrolled sections show as Full instead of a negative seat count
 - "Only these times" now requires every meeting of a section to fit, not just one
+- Once you pick times, async classes are left out unless you turn on "Include async classes", now at the bottom of the Times window
 - The Times picker covers every hour classes meet (6 AM to 9 PM), and its grid lines draw in every browser
 - The schedule grid grows to fit classes before 8 AM or after 8 PM instead of cutting them off
 
