@@ -127,7 +127,7 @@
   });
 </script>
 
-<!-- Shared by the wide layout's rows and the phone's filter panel. -->
+<!-- Shared by the wide layout's toolbar and the phone's. -->
 {#snippet statusChips()}
   <div
     class="degree-filter-row"
@@ -167,6 +167,19 @@
   </div>
 {/snippet}
 
+{#snippet searchBar()}
+  <!-- Opens the course finder, which searches courses and buckets alike. -->
+  <button
+    type="button"
+    id="degree-course-search"
+    class="degree-search-bar"
+    onclick={() => openModal('course-finder')}
+  >
+    {@html getInlineSVG('SEARCH', 'degree-search-icon')}
+    <span>Search courses or buckets</span>
+  </button>
+{/snippet}
+
 {#snippet layoutToggle()}
   <div role="group" aria-label="Bucket layout" class="degree-view-group">
     <button
@@ -194,15 +207,7 @@
          page's toolbar: search the courses, or narrow the buckets. The legend
          stays wide-only - each card's pill already names its status. -->
     <div class="degree-phone-toolbar">
-      <button
-        type="button"
-        id="degree-course-search"
-        class="degree-search-bar"
-        onclick={() => openModal('course-finder')}
-      >
-        {@html getInlineSVG('SEARCH', 'degree-search-icon')}
-        <span>Search courses or buckets</span>
-      </button>
+      {@render searchBar()}
       <button
         type="button"
         id="degree-filter-btn"
@@ -224,45 +229,23 @@
       </div>
     {/if}
   {:else}
-    {@render statusChips()}
-
-    <div class="degree-view-row">
-      <!-- The left edge is the card's status signal now, so the legend names it
-           alongside the progress-bar segments. -->
-      <div class="degree-progress-legend" aria-hidden="true">
-        <span class="degree-legend-item"
-          ><span class="degree-legend-edge req-not_satisfied"></span> Not satisfied</span
-        >
-        <span class="degree-legend-item"
-          ><span class="degree-legend-edge req-in_progress"></span> In progress</span
-        >
-        <span class="degree-legend-item"
-          ><span class="degree-legend-edge req-satisfied"></span> Satisfied</span
-        >
-        <span class="degree-legend-sep" aria-hidden="true"></span>
-        <span class="degree-legend-item"
-          ><span class="degree-legend-swatch seg-earned"></span> Completed</span
-        >
-        <span class="degree-legend-item"
-          ><span class="degree-legend-swatch seg-planned"></span> Planned</span
-        >
-        <span class="degree-legend-item"
-          ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
-        >
-      </div>
-
-      <div class="degree-view-toggle">
-        {@render layoutToggle()}
-        <button
-          type="button"
-          id="degree-course-search"
-          class="degree-filter-chip degree-search-chip"
-          onclick={() => openModal('course-finder')}
-        >
-          {@html getInlineSVG('SEARCH', 'degree-search-icon')}
-          Search courses
-        </button>
-      </div>
+    <!-- One row: search, status, layout. Each card's pill names its status,
+         so the legend only explains the bar colours. -->
+    <div class="degree-toolbar">
+      {@render searchBar()}
+      {@render statusChips()}
+      {@render layoutToggle()}
+    </div>
+    <div class="degree-progress-legend" aria-hidden="true">
+      <span class="degree-legend-item"
+        ><span class="degree-legend-swatch seg-earned"></span> Completed</span
+      >
+      <span class="degree-legend-item"
+        ><span class="degree-legend-swatch seg-planned"></span> Planned</span
+      >
+      <span class="degree-legend-item"
+        ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
+      >
     </div>
   {/if}
 

@@ -407,31 +407,9 @@
   --req-card-min-h: 14.25rem;
 }
 
-/* Legend on the left, layout controls on the right. */
-.degree-view-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.degree-view-toggle {
-  display: flex;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
 .degree-view-group {
   display: flex;
   gap: 0.25rem;
-}
-
-.degree-search-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
 }
 
 /* Sized like the other inline SVGs (see .filter-icon): the glyph this replaced
@@ -443,33 +421,6 @@
   flex-shrink: 0;
   pointer-events: none;
   color: inherit;
-}
-
-/* Divides the card-edge statuses from the progress-bar segments in the one
-   merged legend. */
-.degree-legend-sep {
-  width: 1px;
-  align-self: stretch;
-  background: var(--color-border);
-  margin: 0 0.25rem;
-}
-
-.degree-legend-edge {
-  width: 0.25rem;
-  height: 0.75rem;
-  border-radius: 1px;
-  flex-shrink: 0;
-  background: var(--color-border);
-}
-
-.degree-legend-edge.req-not_satisfied {
-  background: var(--color-danger);
-}
-.degree-legend-edge.req-in_progress {
-  background: var(--color-warning);
-}
-.degree-legend-edge.req-satisfied {
-  background: var(--color-success);
 }
 
 .degree-card-list {
@@ -1577,7 +1528,40 @@
   margin-top: 0.5rem;
 }
 
-/* ---- Phone: search bar and filter panel (RequirementList.svelte) ---- */
+/* ---- Search bar and toolbars (RequirementList.svelte) ---- */
+/* Wide: search, the status chips and the layout toggle share one row,
+   wrapping as the column narrows; the toggle keeps to the right. */
+.degree-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.degree-toolbar .degree-search-bar {
+  flex: 1 1 14rem;
+  max-width: 24rem;
+  min-height: 2.25rem;
+}
+
+.degree-toolbar .degree-filter-row {
+  margin-bottom: 0;
+}
+
+.degree-toolbar .degree-umbrella-toggle {
+  margin-left: 0;
+}
+
+.degree-toolbar .degree-filter-chip {
+  min-height: 2.25rem;
+}
+
+.degree-toolbar .degree-view-group {
+  margin-left: auto;
+}
+
+/* Phone: search and a Filter button. */
 /* Sticks once scrolled to, on the page's own background so cards pass under
    it cleanly. */
 .degree-phone-toolbar {
@@ -1591,10 +1575,13 @@
   background: var(--color-background-alt);
 }
 
+.degree-search-bar:hover {
+  border-color: var(--color-border-hover);
+}
+
 .degree-search-bar {
   flex: 1;
   min-width: 0;
-  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1607,6 +1594,10 @@
   font-size: 0.9rem;
   text-align: left;
   cursor: pointer;
+}
+
+.degree-phone-toolbar .degree-search-bar {
+  min-height: 44px;
 }
 
 .degree-phone-toolbar .filter-btn {
