@@ -1,6 +1,7 @@
 import { tick } from 'svelte';
 import { uiState } from '../../services/ui/uiState.svelte';
 import { DeviceDetection } from '../../utils/deviceDetection';
+import { QUARTER_TERMS } from '../../utils/typeGuards';
 import { reduceMotion } from '../transitions';
 
 /**
@@ -20,7 +21,7 @@ import { reduceMotion } from '../transitions';
  * ScheduleGrids is the only consumer, so a module-level singleton is fine.
  */
 
-export const TERMS = ['A', 'B', 'C', 'D'];
+export const TERMS = QUARTER_TERMS;
 
 // A phone has no room for four grids at once, so it is permanently focused and
 // can never zoom out - paging between terms is the only navigation there.

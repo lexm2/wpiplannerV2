@@ -5,19 +5,17 @@
   import { modalState } from './modalState.svelte';
   import type { SelectedCourse } from '../../types/schedule';
   import { sectionsOf } from '../../utils/courseUtils';
+  import { QUARTER_TERMS, SEMESTER_TERMS } from '../../utils/typeGuards';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
   const payload = $derived(modalState.autoScheduleIntro);
 
-  const TERMS = ['A', 'B', 'C', 'D'];
   // Semester terms (F spans A+B, S spans C+D) get a badge only when the
   // course offers them, so quarter-only cards keep their four badges.
-  const SEMESTER_TERMS = ['F', 'S'];
-
   function badgeTerms(sc: SelectedCourse): string[] {
     const available = availableTerms(sc);
-    return [...TERMS, ...SEMESTER_TERMS.filter(t => available.has(t))];
+    return [...QUARTER_TERMS, ...SEMESTER_TERMS.filter(t => available.has(t))];
   }
 
   function hasPickedSections(sc: SelectedCourse): boolean {

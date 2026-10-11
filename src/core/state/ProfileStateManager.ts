@@ -16,6 +16,7 @@ import { ScheduleState } from '../../types/ScheduleState';
 import type { TransactionResult } from '../storage/TransactionalStorageManager';
 import { TransactionalStorageManager } from '../storage/TransactionalStorageManager';
 import { getAllSections } from '../../utils/courseUtils';
+import { TERM_ORDER } from '../../utils/typeGuards';
 import { logger } from '../../utils/logger';
 import { deepClone } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
@@ -997,7 +998,7 @@ export class ProfileStateManager {
 
         if (
           typeof liveSection.computedTerm !== 'string' ||
-          !['A', 'B', 'C', 'D'].includes(liveSection.computedTerm)
+          !TERM_ORDER.includes(liveSection.computedTerm)
         ) {
           logger.error(
             `Resolved section CRN ${liveSection.crn} has invalid computedTerm: ${liveSection.computedTerm}`,

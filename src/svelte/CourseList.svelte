@@ -3,6 +3,7 @@
   import { appState } from '../core/state/appState.svelte';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
+  import { semesterTermLabel } from '../utils/typeGuards';
   import { courseListState } from './courseListState.svelte';
   import { buildCourseView } from './courseView';
   import { expandedTerm, toggleTerm, termFlip } from './termExpansion.svelte';
@@ -325,7 +326,9 @@
                       ]}
                       data-term={t.term}
                       data-term-badge
-                      title={t.allFull ? 'All sections full' : undefined}
+                      title={t.allFull
+                        ? 'All sections full'
+                        : semesterTermLabel(t.term)}
                       onclick={e => {
                         e.stopPropagation();
                         toggleTerm(e, course.id, t.term, true);

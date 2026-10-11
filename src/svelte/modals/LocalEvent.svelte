@@ -5,6 +5,7 @@
   import { AcademicTerm, EventType } from '../../types/schedule';
   import { DayOfWeek } from '../../types/types';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { QUARTER_TERMS } from '../../utils/typeGuards';
   import styles from '../../styles/components/local-event-modal.module.css';
   import Field from '../ui/Field.svelte';
   import TextField from '../ui/TextField.svelte';
@@ -25,7 +26,7 @@
     { value: DayOfWeek.THURSDAY, label: 'Thursday', short: 'T' },
     { value: DayOfWeek.FRIDAY, label: 'Friday', short: 'F' },
   ];
-  const TERMS = ['A', 'B', 'C', 'D'];
+  const TERMS = QUARTER_TERMS;
 
   function formatTime(hours: number, minutes: number): string {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
