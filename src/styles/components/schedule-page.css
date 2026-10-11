@@ -957,4 +957,12 @@ html.is-mobile .term-graph {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+
+  /* The term warning sat in the card's top-right corner, on top of the "Fri"
+     header. It belongs to the whole term, so it moves beside the term letter
+     in the corner cell. */
+  .term-conflict-warning {
+    right: auto;
+    left: 0.25rem;
+  }
 }
