@@ -1,6 +1,7 @@
 import { SelectedCourse } from '../../types/schedule';
 import type { WeeklyTimeSlot } from '../../types/schedule';
 import type { CourseComponentSelections } from '../../types/scheduling';
+import type { Course } from '../../types/types';
 import { CourseSelectionService } from '../selection/CourseSelectionService';
 import { FilterService } from '../filtering/FilterService';
 import { appState } from '../../core/state/appState.svelte';
@@ -14,6 +15,13 @@ export interface CalendarEventProvider {
   getAllLocalEventBlockedTimes(): WeeklyTimeSlot[];
   getLocalEventCount(): number;
 }
+
+/** Why generateSchedules did or didn't produce a schedule. */
+export type GenerateOutcome =
+  | { status: 'generated' }
+  | { status: 'nothing-to-schedule' }
+  | { status: 'no-candidates'; courses: Course[] }
+  | { status: 'no-schedules' };
 
 export class AutoScheduleOrchestrator {
   private generatedSchedules: ScheduleResult[][] = [];
@@ -83,28 +91,31 @@ export class AutoScheduleOrchestrator {
     this.notifyStateChange();
   }
 
-  async generateSchedules(selectedCourses: SelectedCourse[]): Promise<boolean> {
+  async generateSchedules(
+    selectedCourses: SelectedCourse[],
+  ): Promise<GenerateOutcome> {
     try {
       const scheduler = new SmartScheduler(this.filterService);
-      const input = scheduler.buildCandidateData(selectedCourses);
+      const built = scheduler.buildCandidateData(selectedCourses);
 
-      if (!input) {
-        this.generatedSchedules = [];
-        this.currentScheduleIndex = 0;
-        this.notifyStateChange();
-        return false;
+      if (!built.ok) {
+        this.resetSchedules();
+        return { status: 'no-candidates', courses: built.unschedulable };
+      }
+      // Every course was left locked in the intro.
+      if (built.input.courses.length === 0) {
+        this.resetSchedules();
+        return { status: 'nothing-to-schedule' };
       }
 
       const allSchedules = await ScheduleWorkerManager.getInstance().generate(
-        input,
+        built.input,
         500,
       );
 
       if (allSchedules.length === 0) {
-        this.generatedSchedules = [];
-        this.currentScheduleIndex = 0;
-        this.notifyStateChange();
-        return false;
+        this.resetSchedules();
+        return { status: 'no-schedules' };
       }
 
       this.generatedSchedules = allSchedules;
@@ -112,12 +123,10 @@ export class AutoScheduleOrchestrator {
 
       await this.applyScheduleAtIndex(0);
       this.notifyStateChange();
-      return true;
+      return { status: 'generated' };
     } catch (error) {
       // Reset and rethrow; the caller logs and reports it.
-      this.generatedSchedules = [];
-      this.currentScheduleIndex = 0;
-      this.notifyStateChange();
+      this.resetSchedules();
       throw error;
     }
   }

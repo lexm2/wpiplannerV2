@@ -188,11 +188,10 @@ function candidateNumbers(
   fs: FilterService,
   selection: SelectedCourse[],
 ): string[][] | null {
-  const input = new SmartScheduler(fs).buildCandidateData(selection);
-  return (
-    input?.candidatesPerCourse.map(cs =>
-      cs.map(c => c.combination.lecture!.number),
-    ) ?? null
+  const build = new SmartScheduler(fs).buildCandidateData(selection);
+  if (!build.ok) return null;
+  return build.input.candidatesPerCourse.map(cs =>
+    cs.map(c => c.combination.lecture!.number),
   );
 }
 
@@ -234,6 +233,34 @@ describe('SmartScheduler.buildCandidateData locked courses', () => {
       ),
     ];
     expect(candidateNumbers(filterServiceWith(), selection)).toBeNull();
+  });
+
+  it('names every course that has no usable section', () => {
+    const lockedLec = section(AcademicTerm.A, [M], '10:00', '10:50');
+    const selection = [
+      picked(course('CS2102', [lockedLec]), lockedLec, []),
+      picked(
+        course('MA1022', [section(AcademicTerm.A, [M], '10:00', '10:50')]),
+        null,
+      ),
+      picked(
+        course('CH1010', [section(AcademicTerm.A, [T], '10:00', '10:50')]),
+        null,
+      ),
+      picked(
+        course('PH1110', [section(AcademicTerm.A, [M], '10:00', '10:50')]),
+        null,
+      ),
+    ];
+
+    const build = new SmartScheduler(filterServiceWith()).buildCandidateData(
+      selection,
+    );
+    expect(build.ok).toBe(false);
+    expect(!build.ok && build.unschedulable.map(c => c.id)).toEqual([
+      'MA1022',
+      'PH1110',
+    ]);
   });
 });
 

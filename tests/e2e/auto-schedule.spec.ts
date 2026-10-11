@@ -112,3 +112,52 @@ test('"avoid conflicts" follows the selection made after it was switched on', as
     )
     .toEqual([picked]);
 });
+
+/** Selects courses by code (no sections picked) and opens the schedule page. */
+async function selectCourses(page: Page, codes: string[]): Promise<void> {
+  await page.evaluate(async codes => {
+    const services = (window as any).services;
+    const all = services.courseDataService
+      .getAllDepartments()
+      .flatMap((d: any) => d.courses);
+    for (const code of codes) {
+      const course = all.find(
+        (c: any) => `${c.departmentAbbr}${c.number}` === code,
+      );
+      if (!course) throw new Error(`No course ${code} in the catalog`);
+      await services.courseSelectionService.selectCourse(course);
+    }
+  }, codes);
+  await page.click('#schedule-tab');
+}
+
+/** Intro -> filter modal -> Generate, then wait for the overlay to clear. */
+async function generateFromIntro(page: Page): Promise<void> {
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+  await page.click('#modal-primary-btn');
+  await expect(page.locator('.schedule-generating-overlay')).toHaveCount(0, {
+    timeout: 60_000,
+  });
+}
+
+test('a course with no usable section is named, on separate banner lines', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, ['CS2102']);
+  // A term no section is offered in leaves CS2102 with nothing to pick.
+  await page.evaluate(() =>
+    (window as any).services.filterService.addFilter('term', { terms: ['Z'] }),
+  );
+
+  await page.click('#auto-schedule-btn');
+  await generateFromIntro(page);
+
+  const message = page.locator('.error-banner-text p').first();
+  await expect(message).toContainText('CS2102');
+  // innerText keeps the line breaks only if they are rendered.
+  const text = await message.evaluate(el => (el as HTMLElement).innerText);
+  expect(text).toMatch(/\n• /);
+});

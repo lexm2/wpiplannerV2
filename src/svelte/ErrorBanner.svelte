@@ -65,7 +65,7 @@
 {#if error}
   <div class="error-banner" role="alert">
     <div class="error-banner-text">
-      <p>{error.message}</p>
+      <p class="error-banner-message">{error.message}</p>
       {#if error.onClearData}
         <p>
           Your saved data may be outdated or deprecated. Clearing it will reset
@@ -129,6 +129,11 @@
 
   .error-banner-text p {
     margin: 0;
+  }
+
+  /* Messages carry their own line breaks (e.g. a "\n•" list of causes). */
+  .error-banner-message {
+    white-space: pre-line;
   }
 
   .error-banner-text p + p {

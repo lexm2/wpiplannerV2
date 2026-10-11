@@ -5,7 +5,11 @@ import type { SelectedCourse } from '../../types/schedule';
 import type { CourseSelectionService } from '../selection/CourseSelectionService';
 import type { FilterService } from '../filtering/FilterService';
 import type { CourseColorService } from './CourseColorService';
-import type { AutoScheduleOrchestrator } from './AutoScheduleOrchestrator';
+import type {
+  AutoScheduleOrchestrator,
+  GenerateOutcome,
+} from './AutoScheduleOrchestrator';
+import type { Course } from '../../types/types';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
 
@@ -114,14 +118,12 @@ class AutoScheduleService {
     appState.scheduleGenerating = true;
 
     try {
-      const success =
+      const outcome =
         await this.orchestrator.generateSchedules(selectedCourses);
 
-      if (!success) {
-        logger.warn('[Auto-Schedule] No valid schedules found');
-        showAppError(
-          'Could not generate a valid schedule.\n\nCommon causes:\n• Missing or invalid time/day data for course sections\n• Active schedule filters that exclude all sections\n• Course sections with conflicts',
-        );
+      if (outcome.status !== 'generated') {
+        logger.warn(`[Auto-Schedule] No schedule generated: ${outcome.status}`);
+        showAppError(failureMessage(outcome));
       }
       // On success the grid and footer re-render on their own: the orchestrator
       // applied the schedule via batchSetSelectedComponents, and AutoScheduleControls
@@ -138,6 +140,29 @@ class AutoScheduleService {
     } finally {
       appState.scheduleGenerating = false;
     }
+  }
+}
+
+/** "A", "A and B", "A, B and C". */
+function listCourses(courses: Course[]): string {
+  const codes = courses.map(c => `${c.departmentAbbr}${c.number}`);
+  if (codes.length <= 1) return codes.join('');
+  return `${codes.slice(0, -1).join(', ')} and ${codes[codes.length - 1]}`;
+}
+
+/** Banner text for a generation that produced no schedule. */
+function failureMessage(
+  outcome: Exclude<GenerateOutcome, { status: 'generated' }>,
+): string {
+  switch (outcome.status) {
+    case 'nothing-to-schedule':
+      return 'No courses are included in auto-scheduling: every course is locked to its current sections.\n\nRestart and click the courses you want rescheduled.';
+    case 'no-candidates': {
+      const one = outcome.courses.length === 1;
+      return `Could not generate a schedule: no section of ${listCourses(outcome.courses)} can be used.\n\nCommon causes:\n• Active schedule filters exclude all of ${one ? 'its' : 'their'} sections\n• ${one ? 'Its' : 'Their'} sections clash with locked courses or calendar events\n• ${one ? 'Its' : 'Their'} sections are missing time/day data`;
+    }
+    case 'no-schedules':
+      return 'Could not generate a schedule: every combination of the included courses has a time conflict.\n\nTry locking fewer courses, allowing more terms, or removing a course.';
   }
 }
 

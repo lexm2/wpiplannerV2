@@ -58,4 +58,27 @@ describe('autoScheduleService error reporting', () => {
       true,
     );
   });
+
+  it('names the courses that have no usable section', async () => {
+    setup(() =>
+      Promise.resolve({
+        status: 'no-candidates',
+        courses: [
+          { departmentAbbr: 'CS', number: '2102' },
+          { departmentAbbr: 'MA', number: '1022' },
+        ],
+      }),
+    );
+
+    const message = await run();
+
+    expect(message).toMatch(/CS2102 and MA1022/);
+    expect(message).not.toContain('Could not generate a valid schedule.\n');
+  });
+
+  it('says so when every course was left locked', async () => {
+    setup(() => Promise.resolve({ status: 'nothing-to-schedule' }));
+
+    expect(await run()).toMatch(/No courses are included/);
+  });
 });

@@ -16,12 +16,16 @@ export interface SchedulerInput {
   courses: Course[];
 }
 
+/** Candidates for each course to schedule, or the courses that have none. */
+export type CandidateData =
+  { ok: true; input: SchedulerInput } | { ok: false; unschedulable: Course[] };
+
 export class SmartScheduler {
   constructor(private filterService: FilterService) {}
 
-  buildCandidateData(selectedCourses: SelectedCourse[]): SchedulerInput | null {
+  buildCandidateData(selectedCourses: SelectedCourse[]): CandidateData {
     if (selectedCourses.length === 0)
-      return { candidatesPerCourse: [], courses: [] };
+      return { ok: true, input: { candidatesPerCourse: [], courses: [] } };
 
     const autoScheduler = new AutoScheduler(this.filterService);
     // A course with no allowed terms was locked in the intro: it keeps its
@@ -32,6 +36,8 @@ export class SmartScheduler {
 
     const candidatesPerCourse: MaskedCandidate[][] = [];
     const scheduledCourses: Course[] = [];
+    // Keep going past the first failure so the user hears about all of them.
+    const unschedulable: Course[] = [];
     for (const sc of selectedCourses) {
       if (sc.allowedTerms?.length === 0) continue;
       const candidates = autoScheduler.getMaskedCandidates(sc, blockedMasks);
@@ -39,13 +45,18 @@ export class SmartScheduler {
         logger.warn(
           `[SmartScheduler] No valid candidates for ${sc.course.departmentAbbr}${sc.course.number}`,
         );
-        return null;
+        unschedulable.push(sc.course);
+        continue;
       }
       candidatesPerCourse.push(candidates);
       scheduledCourses.push(sc.course);
     }
 
-    return { candidatesPerCourse, courses: scheduledCourses };
+    if (unschedulable.length > 0) return { ok: false, unschedulable };
+    return {
+      ok: true,
+      input: { candidatesPerCourse, courses: scheduledCourses },
+    };
   }
 
   static findSchedules(
