@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
-const INPUT_PATH = join(projectRoot, 'public', 'course-data.json');
+const INPUT_PATH = join(projectRoot, 'data', 'course-data.json');
 const OUTPUT_PATH = join(projectRoot, 'public', 'course-data-constructed.json');
 
 async function main() {

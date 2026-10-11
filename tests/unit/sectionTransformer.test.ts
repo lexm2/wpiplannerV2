@@ -1,6 +1,6 @@
 /**
  * Converter section parsing, run on Course_Section strings taken from the real
- * Workday feed (public/course-data.json) with the production converter config.
+ * Workday feed (data/course-data.json) with the production converter config.
  * Section numbers and term letters come out of transformSection, since the
  * parsers behind them are module-private.
  */

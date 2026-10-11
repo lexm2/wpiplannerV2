@@ -8,6 +8,9 @@ RUN bun install --frozen-lockfile
 
 COPY . .
 RUN bun run build
+# nginx serves the live data from the fetcher's volume, so the build's copies
+# would never be read.
+RUN rm dist/course-data-constructed.json dist/term-bounds.json dist/last-updated.json
 # Precompressed copies for nginx's gzip_static, at a level too slow to use
 # per request. Hashed assets and the static JSON never change once built.
 RUN find dist -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' \

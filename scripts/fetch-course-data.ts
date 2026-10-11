@@ -9,7 +9,8 @@ const WPI_DATA_URL = 'https://courselistings.wpi.edu/assets/prod-data-raw.json';
 // A full listing is ~4,000 sections; anything far below that is a bad response.
 const MIN_REPORT_ENTRIES = 1000;
 
-const RAW_OUTPUT_PATH = join(__dirname, '..', 'public', 'course-data.json');
+// The converter's input. Kept out of public/ since the app never fetches it.
+const RAW_OUTPUT_PATH = join(__dirname, '..', 'data', 'course-data.json');
 
 interface FetchOptions extends RequestInit {
   timeout?: number;

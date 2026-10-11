@@ -12,6 +12,7 @@ COPY package.json ./
 COPY tsconfig.json ./
 COPY scripts ./scripts
 COPY public ./public
+COPY data ./data
 
 COPY docker/refresh-loop.sh /usr/local/bin/refresh-loop.sh
 RUN chmod +x /usr/local/bin/refresh-loop.sh
