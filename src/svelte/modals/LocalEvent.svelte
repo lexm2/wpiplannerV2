@@ -196,8 +196,11 @@
           <div class={styles['event-type-selector']}>
             <button
               type="button"
-              class={styles['event-type-option']}
-              class:selected={eventType === EventType.ONE_TIME}
+              class={[
+                styles['event-type-option'],
+                { [styles.selected]: eventType === EventType.ONE_TIME },
+              ]}
+              aria-pressed={eventType === EventType.ONE_TIME}
               onclick={() => (eventType = EventType.ONE_TIME)}
             >
               {@html getInlineSVG('CALENDAR_DOWN', 'type-icon')}
@@ -205,8 +208,11 @@
             </button>
             <button
               type="button"
-              class={styles['event-type-option']}
-              class:selected={eventType === EventType.RECURRING}
+              class={[
+                styles['event-type-option'],
+                { [styles.selected]: eventType === EventType.RECURRING },
+              ]}
+              aria-pressed={eventType === EventType.RECURRING}
               onclick={() => (eventType = EventType.RECURRING)}
             >
               {@html getInlineSVG('CALENDAR_REPEAT', 'type-icon')}
@@ -233,8 +239,11 @@
                 {#each WEEKDAYS as day (day.value)}
                   <button
                     type="button"
-                    class={styles['day-pill']}
-                    class:selected={selectedDays.has(day.value)}
+                    class={[
+                      styles['day-pill'],
+                      { [styles.selected]: selectedDays.has(day.value) },
+                    ]}
+                    aria-pressed={selectedDays.has(day.value)}
                     title={day.label}
                     onclick={() => toggleDay(day.value)}
                   >

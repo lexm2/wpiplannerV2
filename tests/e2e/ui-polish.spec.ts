@@ -130,3 +130,33 @@ test('the wizard footer is opaque over the section cards', async ({ page }) => {
   expect(bg).not.toBe('rgba(0, 0, 0, 0)');
   expect(bg).not.toBe('transparent');
 });
+
+test('add event day pills show which days are selected', async ({ page }) => {
+  await setupSchedule(page);
+  await page.click('#calendar-events-btn');
+  const modal = page.locator('[data-modal-type="local-event"]');
+  await expect(modal).toBeVisible();
+  await page.waitForTimeout(SETTLE_MS);
+
+  const bg = (l: ReturnType<Page['locator']>) =>
+    l.evaluate(el => getComputedStyle(el).backgroundColor);
+
+  // The event type toggle has the same selected styling, and the same bug.
+  const recurring = modal.getByRole('button', { name: 'Recurring' });
+  const oneTime = modal.getByRole('button', { name: 'One-time' });
+  expect(await bg(recurring)).not.toBe(await bg(oneTime));
+  await expect(recurring).toHaveAttribute('aria-pressed', 'true');
+  await expect(oneTime).toHaveAttribute('aria-pressed', 'false');
+
+  // Monday is selected by default.
+  const mon = modal.locator('button[title="Monday"]');
+  const tue = modal.locator('button[title="Tuesday"]');
+  expect(await bg(mon)).not.toBe(await bg(tue));
+  await expect(mon).toHaveAttribute('aria-pressed', 'true');
+  await expect(tue).toHaveAttribute('aria-pressed', 'false');
+
+  await tue.click();
+  await expect(tue).toHaveAttribute('aria-pressed', 'true');
+  // Polled: the pill eases between its colours.
+  await expect.poll(() => bg(tue)).toBe(await bg(mon));
+});
