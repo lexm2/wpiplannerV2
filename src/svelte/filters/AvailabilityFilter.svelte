@@ -9,7 +9,7 @@
     AvailabilityFilterCriteria,
     ConflictCriteria,
   } from '../../types/filters';
-  import type { WeeklyTimeSlot } from '../../types/schedule';
+  import { isCalendarSlot } from '../../services/scheduling/calendarEventProvider';
 
   let {
     filterService,
@@ -20,9 +20,6 @@
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
   } = $props();
-
-  const isCalendarSlot = (slot: WeeklyTimeSlot): boolean =>
-    !!(slot.id?.includes('calendar-') || slot.id?.match(/^[0-9a-f-]{36}/));
 
   const availCriteria = $derived(
     filterService.getCriteria<AvailabilityFilterCriteria>('availability'),
