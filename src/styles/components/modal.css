@@ -968,6 +968,8 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
 
 .filter-toggle {
   position: relative;
+  /* Never squeezed by a long label beside it, so every switch is one size. */
+  flex-shrink: 0;
   width: 50px;
   height: 24px;
   appearance: none;
@@ -1111,22 +1113,36 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   font-size: 0.9rem;
 }
 
+/* A phone's Filter modal is a full screen, edge to edge: the backdrop's inset
+   left an 8px strip down each side of a dialog that already ran top to
+   bottom. dvh is the height actually visible; 100vh runs under the browser's
+   toolbar on phones and hid the footer. */
+html.is-mobile .modal-backdrop.filter-modal {
+  padding: 0;
+}
+
 html.is-mobile .filter-modal .modal-dialog {
   max-width: 100%;
   width: 100%;
   margin: 0;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
+  border-radius: 0;
 }
 
 html.is-mobile .filter-modal .modal-content {
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
   border-radius: 0;
 }
 
 html.is-mobile .filter-modal-body {
   max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
 }
 
 html.is-mobile .filter-checkbox-grid {
