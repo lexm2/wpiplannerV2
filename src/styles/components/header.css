@@ -281,18 +281,18 @@
   cursor: not-allowed;
 }
 
+/* Colour only: each icon's own fill and stroke attributes (currentColor)
+   say which parts are drawn, so outline icons stay outlines. */
 .settings-menu-item svg {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  stroke: var(--color-text);
-  fill: var(--color-text);
-  transition: all 0.2s ease;
+  color: var(--color-text);
+  transition: color 0.2s ease;
 }
 
 .settings-menu-item:hover:not(:disabled) svg {
-  stroke: var(--color-primary);
-  fill: var(--color-primary);
+  color: var(--color-primary);
 }
 
 @media (max-width: 1600px) {
