@@ -3285,7 +3285,7 @@
       "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Art",
-      "Waitlist_Waitlist_Capacity": "1/12",
+      "Waitlist_Waitlist_Capacity": "0/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349834"
     },
     {
@@ -8095,7 +8095,7 @@
       "Course_Title": "BB 3815 - Physiologic Systems Laboratory",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "16/16",
+      "Enrolled_Capacity": "15/16",
       "Instructional_Format": "Laboratory",
       "Instructors": "Chris Collins",
       "Locations": "Goddard Hall 205 BB Lab",
@@ -8103,10 +8103,10 @@
       "Meeting_Patterns": "T-F | 1:00 PM - 3:50 PM",
       "Offering_Period": "2026 Fall B Term",
       "Section_Details": "Goddard Hall 205 BB Lab | T-F | 1:00 PM - 3:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Biology",
-      "Waitlist_Waitlist_Capacity": "1/5",
+      "Waitlist_Waitlist_Capacity": "0/5",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-350008"
     },
     {
@@ -35837,7 +35837,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Electrical and Computer Engineering",
-      "Waitlist_Waitlist_Capacity": "9/15",
+      "Waitlist_Waitlist_Capacity": "8/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-352380"
     },
     {
@@ -39836,7 +39836,7 @@
       "Course_Title": "EN 2225 - The Literature Of Sin",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "33/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Michelle Ephraim",
       "Locations": "Stratton Hall 313",
@@ -46504,7 +46504,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "German",
-      "Waitlist_Waitlist_Capacity": "1/12",
+      "Waitlist_Waitlist_Capacity": "0/12",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349690"
     },
     {
@@ -47995,7 +47995,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "History",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-354583"
     },
     {
@@ -48091,7 +48091,7 @@
       "Course_Title": "HI 2320 - Modern European History",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/35",
+      "Enrolled_Capacity": "31/35",
       "Instructional_Format": "Lecture",
       "Instructors": "Elise Franklin",
       "Locations": "Higgins Labs 114",
@@ -49109,7 +49109,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Humanities",
-      "Waitlist_Waitlist_Capacity": "2/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349254"
     },
     {
@@ -65616,7 +65616,7 @@
       "Course_Title": "MA 1024 - Calculus IV",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "30/35",
+      "Enrolled_Capacity": "31/35",
       "Instructional_Format": "Laboratory",
       "Locations": "Stratton Hall 116 Computer Lab",
       "Meeting_Day_Patterns": "M",
@@ -65913,7 +65913,7 @@
       "Course_Title": "MA 1024 - Calculus IV",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "34/35",
+      "Enrolled_Capacity": "33/35",
       "Instructional_Format": "Laboratory",
       "Locations": "Stratton Hall 116 Computer Lab",
       "Meeting_Day_Patterns": "T",
@@ -77935,7 +77935,7 @@
       "Course_Title": "ME 2312 - Introduction To Computational Solutions For Engineering Problems",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "28/30",
+      "Enrolled_Capacity": "27/30",
       "Instructional_Format": "Lecture",
       "Instructors": "Mehul Bhatia",
       "Locations": "Higgins Labs 031 ME Computer Lab",
@@ -77963,7 +77963,7 @@
       "Course_Title": "ME 2810 - Introduction to Manufacturing Engineering",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "23/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Christopher Brown",
       "Locations": "Stratton Hall 311; Stratton Hall 207",
@@ -79021,7 +79021,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "D Term",
       "Subject": "Mechanical Engineering",
-      "Waitlist_Waitlist_Capacity": "5/10",
+      "Waitlist_Waitlist_Capacity": "4/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-355987"
     },
     {
@@ -86370,7 +86370,7 @@
       "Course_Title": "MU 1100 - Foundations of Music Theory and Aural Skills",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Monica Hatch Moysey",
       "Locations": "Alden Hall B06 Janet Earle Room",
@@ -86378,10 +86378,10 @@
       "Meeting_Patterns": "M-T-R-F | 4:00 PM - 4:50 PM",
       "Offering_Period": "2026 Fall B Term",
       "Section_Details": "Alden Hall B06 Janet Earle Room | M-T-R-F | 4:00 PM - 4:50 PM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Music",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-350124"
     },
     {
@@ -92078,7 +92078,7 @@
       "Course_Title": "PH 1110 - General Physics-Mechanics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "98/100",
+      "Enrolled_Capacity": "97/100",
       "Instructional_Format": "Lecture",
       "Instructors": "Kateryna Friedman",
       "Locations": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -92090,7 +92090,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2026 Fall B Term: PH 1110 - General Physics-Mechanics (a)",
       "Subject": "Physics",
-      "Waitlist_Waitlist_Capacity": "1/20",
+      "Waitlist_Waitlist_Capacity": "0/20",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-359307"
     },
     {
@@ -101789,7 +101789,7 @@
       "Course_Title": "PY 1731 - Introduction To Philosophy And Religion",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Gueno",
       "Locations": "Washburn 323",
@@ -101797,10 +101797,10 @@
       "Meeting_Patterns": "M-T-R-F | 8:00 AM - 8:50 AM",
       "Offering_Period": "2026 Fall B Term",
       "Section_Details": "Washburn 323 | M-T-R-F | 8:00 AM - 8:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-354591"
     },
     {
@@ -103294,7 +103294,7 @@
       "Course_Title": "RBE 2020 - Embedded Systems for Robotics",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "54/60",
+      "Enrolled_Capacity": "52/60",
       "Instructional_Format": "Lecture",
       "Instructors": "Jennifer Stander",
       "Locations": "Kaven Hall 116",
@@ -103306,7 +103306,7 @@
       "Starting_Academic_Period_Type": "B Term",
       "Student_Course_Section_Cluster": "2026 Fall B Term: RBE 2020 - Embedded Systems for Robotics ()",
       "Subject": "Robotics Engineering",
-      "Waitlist_Waitlist_Capacity": "2/15",
+      "Waitlist_Waitlist_Capacity": "0/15",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349972"
     },
     {
@@ -105869,7 +105869,7 @@
       "Course_Title": "RE 1731 - Introduction To Philosophy And Religion",
       "Credits": "3",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "25/25",
+      "Enrolled_Capacity": "24/25",
       "Instructional_Format": "Lecture",
       "Instructors": "Michael Gueno",
       "Locations": "Washburn 323",
@@ -105877,10 +105877,10 @@
       "Meeting_Patterns": "M-T-R-F | 8:00 AM - 8:50 AM",
       "Offering_Period": "2026 Fall B Term",
       "Section_Details": "Washburn 323 | M-T-R-F | 8:00 AM - 8:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Religion; Philosophy",
-      "Waitlist_Waitlist_Capacity": "3/10",
+      "Waitlist_Waitlist_Capacity": "1/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-354591"
     },
     {
@@ -111023,7 +111023,7 @@
       "Course_Title": "WPE 1077 - Swimming For Fitness",
       "Credits": "0.75",
       "Delivery_Mode": "In-Person",
-      "Enrolled_Capacity": "20/20",
+      "Enrolled_Capacity": "19/20",
       "Instructional_Format": "Workshop",
       "Instructors": "Lawrence Noble",
       "Locations": "Recreation Center Pool Lanes 1-3",
@@ -111031,10 +111031,10 @@
       "Meeting_Patterns": "T-R | 9:00 AM - 9:50 AM",
       "Offering_Period": "2026 Fall B Term",
       "Section_Details": "Recreation Center Pool Lanes 1-3 | T-R | 9:00 AM - 9:50 AM",
-      "Section_Status": "Waitlist",
+      "Section_Status": "Open",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "1/10",
+      "Waitlist_Waitlist_Capacity": "0/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349438"
     },
     {
@@ -114921,7 +114921,7 @@
       "Section_Status": "Waitlist",
       "Starting_Academic_Period_Type": "B Term",
       "Subject": "Wellness and Physical Education",
-      "Waitlist_Waitlist_Capacity": "7/10",
+      "Waitlist_Waitlist_Capacity": "8/10",
       "cour_sec_def_referenceID": "COURSE_SECTION_DEFINITION-3-349526"
     },
     {
