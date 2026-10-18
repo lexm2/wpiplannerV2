@@ -4,7 +4,7 @@
  */
 import * as z from 'zod';
 
-export interface MinimalSyncData {
+export interface ExportData {
   v: string;
   a: number | null;
   s: [string, (string | null)[], number?][];
@@ -20,7 +20,7 @@ export interface MinimalSyncData {
  * older build. The `v` check is left to callers so a well-formed but outdated
  * file can get "please re-export" rather than a schema error.
  */
-export const MinimalSyncDataSchema = z.object({
+export const ExportDataSchema = z.object({
   v: z.string(),
   a: z.number().nullable(),
   s: z.array(
@@ -37,4 +37,4 @@ export const MinimalSyncDataSchema = z.object({
       th: z.string().optional(),
     })
     .optional(),
-}) satisfies z.ZodType<MinimalSyncData>;
+}) satisfies z.ZodType<ExportData>;

@@ -9,7 +9,7 @@ import {
 } from '../../utils/icsGenerator';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
-import { MinimalSyncDataSchema } from '../../types/export';
+import { ExportDataSchema } from '../../types/export';
 
 export interface ScheduleOperationResult {
   success: boolean;
@@ -440,7 +440,7 @@ export class ScheduleManagementService {
         };
       }
 
-      const parsed = MinimalSyncDataSchema.parse(JSON.parse(data));
+      const parsed = ExportDataSchema.parse(JSON.parse(data));
       const scheduleIndex = this.profileStateManager
         .getAllSchedules()
         .findIndex(s => s.id === scheduleId);
@@ -538,7 +538,7 @@ export class ScheduleManagementService {
       } catch {
         json = undefined;
       }
-      const parsed = MinimalSyncDataSchema.safeParse(json);
+      const parsed = ExportDataSchema.safeParse(json);
       if (!parsed.success || !parsed.data.v.startsWith('4')) {
         return {
           success: false,

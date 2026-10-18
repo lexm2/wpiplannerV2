@@ -1,6 +1,6 @@
 import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
-import type { MinimalSyncData } from './export';
+import type { ExportData } from './export';
 import { ScheduleState, findCourseById } from './ScheduleState';
 import type { SelectedCourse } from './schedule';
 import {
@@ -36,7 +36,7 @@ export class ApplicationState {
   }
 
   /** Convert to minimal format for export. */
-  toMinimalFormat(): MinimalSyncData {
+  toMinimalFormat(): ExportData {
     return {
       v: this.version,
       a: this.getActiveScheduleIndex(),
@@ -66,7 +66,7 @@ export class ApplicationState {
    * Hydrate from minimal export format using the department catalog.
    */
   static fromMinimalFormat(
-    data: MinimalSyncData,
+    data: ExportData,
     courseCatalog: Department[],
   ): ApplicationState {
     const schedules = data.s.map(([name, coursesArray, year]) => {
