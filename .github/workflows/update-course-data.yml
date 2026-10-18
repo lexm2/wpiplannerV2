@@ -83,8 +83,6 @@ jobs:
 
       - name: Build TypeScript application
         if: steps.changes.outputs.changed == 'true' || github.event_name != 'schedule'
-        env:
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: bun run build
 
       - name: Deploy to GitHub Pages

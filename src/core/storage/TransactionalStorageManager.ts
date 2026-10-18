@@ -234,7 +234,7 @@ export class TransactionalStorageManager {
 
   /**
    * Expects full Schedule objects with Course/Section references. The caller
-   * (ProfileStateManager) is responsible for converting from SyncData (IDs only)
+   * (ProfileStateManager) is responsible for converting from ExportData (IDs only)
    * to full objects before calling this method.
    */
   async importData(

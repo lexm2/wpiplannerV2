@@ -20,7 +20,7 @@ import { TERM_ORDER } from '../../utils/typeGuards';
 import { logger } from '../../utils/logger';
 import { deepClone } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
-import { MinimalSyncDataSchema } from '../../types/export';
+import { ExportDataSchema } from '../../types/export';
 import { UndoRedoManager } from './UndoRedoManager';
 import { appState } from './appState.svelte';
 import { TermBoundsService } from '../../utils/termBounds';
@@ -851,7 +851,7 @@ export class ProfileStateManager {
   }
 
   parseImportCourses(data: string): SelectedCourse[] {
-    const parsed = MinimalSyncDataSchema.parse(JSON.parse(data));
+    const parsed = ExportDataSchema.parse(JSON.parse(data));
     const applicationState = ApplicationState.fromMinimalFormat(
       parsed,
       this.allDepartments,
@@ -861,7 +861,7 @@ export class ProfileStateManager {
 
   async importData(data: string): Promise<TransactionResult> {
     try {
-      const parsed = MinimalSyncDataSchema.parse(JSON.parse(data));
+      const parsed = ExportDataSchema.parse(JSON.parse(data));
       const applicationState = ApplicationState.fromMinimalFormat(
         parsed,
         this.allDepartments,
