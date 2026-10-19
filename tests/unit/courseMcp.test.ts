@@ -161,9 +161,9 @@ describe('MCP server', () => {
     expect(data.total).toBe(0);
     // PSY 1400 meets Monday evenings, in B term.
     expect(data.relaxations).toEqual([
-      { filter: 'term', total: 1, terms: ['B'] },
-      { filter: 'department', total: 0, terms: [] },
-      { filter: 'times', total: 0, terms: [] },
+      { filter: 'term', total: 1, terms: ['B'], restores: [] },
+      { filter: 'department', total: 0, terms: [], restores: [] },
+      { filter: 'times', total: 0, terms: [], restores: [] },
     ]);
     expect(text).toContain(
       'Most restrictive: filters.term. Leaving out one filter at a time: without term, 1 course (in B).',
@@ -171,6 +171,47 @@ describe('MCP server', () => {
     expect(text).toContain(
       'Leaving out department or times alone still finds nothing.',
     );
+  });
+
+  it('blames the filter that keeps out the course a code names', async () => {
+    const { text, data } = await tool('search_courses', {
+      filters: {
+        searchText: { query: 'PH 1110' },
+        term: { terms: ['B'] },
+        times: {
+          mode: 'avoid',
+          days: ['W', 'R'],
+          earliestStart: '14:00',
+          latestEnd: '15:00',
+        },
+      },
+    });
+    expect(data.total).toBe(0);
+    // Leaving out the search finds more courses, but the student asked
+    // for PH 1110: the times are what keep it out.
+    expect(data.relaxations.map((r: { filter: string }) => r.filter)).toEqual([
+      'times',
+      'searchText',
+      'term',
+    ]);
+    expect(text).toContain(
+      'Most restrictive: filters.times; without it, PH 1110 is back.',
+    );
+    expect(text).not.toContain('Most restrictive: filters.searchText');
+    // A topic search, too, comes after the filters that narrow it.
+    const topic = await tool('search_courses', {
+      filters: {
+        searchText: { query: 'physics' },
+        times: {
+          mode: 'avoid',
+          days: ['W', 'R'],
+          earliestStart: '14:00',
+          latestEnd: '15:00',
+        },
+        department: { departments: ['PH'] },
+      },
+    });
+    expect(topic.data.relaxations[0].filter).toBe('times');
   });
 
   it('says when the offset runs past the end', async () => {

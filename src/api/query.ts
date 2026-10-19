@@ -35,7 +35,11 @@ import {
   SearchTextFilter,
 } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
-import { describeMatch, type SearchMatch } from '../utils/searchUtils';
+import {
+  describeMatch,
+  parseSearchQuery,
+  type SearchMatch,
+} from '../utils/searchUtils';
 import { TERM_ORDER } from '../utils/typeGuards';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
@@ -491,6 +495,11 @@ interface Relaxation {
   total: number;
   /** Terms the courses found without it run in. */
   terms: string[];
+  /**
+   * With a searchText naming a course by code: the codes it names that
+   * leaving this filter out brings back (["ES 3002"]); else empty.
+   */
+  restores: string[];
 }
 
 /** How many filters an empty search tries leaving out, one at a time. */
@@ -500,11 +509,23 @@ const MAX_RELAXED = 6;
  * The same search with each given filter left out in turn, so an empty
  * result can say which filter emptied it. The year stays: it is a choice
  * of what can be scheduled, not a narrowing. Bounded at MAX_RELAXED reruns.
+ *
+ * Ordered by blame, most to blame first. The text search says what the
+ * student is looking for, and the other filters narrow it, so a filter
+ * that brings back the course a code names comes first (ES 3002 with
+ * avoid W 10-11: times), the one bringing back least besides it ahead,
+ * and the search itself comes after every other filter that finds
+ * anything; the rest by how many courses come back.
  */
 function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
   const ids = (Object.keys(query.filters) as (keyof CourseQuery['filters'])[])
     .filter(id => id !== 'academicYear' && query.filters[id] !== undefined)
     .slice(0, MAX_RELAXED);
+  const text = query.filters.searchText;
+  const namesCourse =
+    !!text && !text.professorOnly && !!parseSearchQuery(text.query).code?.dept;
+  const rank = (r: Relaxation) =>
+    r.restores.length ? 0 : r.filter === 'searchText' ? 2 : 1;
   return ids
     .map(filter => {
       const filters = { ...query.filters };
@@ -515,13 +536,26 @@ function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
           readQuery(catalog, { ...query, filters }).criteria,
         ),
       );
+      const restores =
+        namesCourse && filter !== 'searchText'
+          ? found
+              .filter(c => describeMatch(c, text.query) === 'code')
+              .map(courseCode)
+          : [];
       return {
         filter,
         total: found.length,
         terms: termsOf(found.flatMap(primarySections)),
+        restores,
       };
     })
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => {
+      const helps = (r: Relaxation) => (r.total > 0 ? 0 : 1);
+      // Among filters that bring the named course back, the smallest
+      // change: the one that brings back least besides.
+      const order = rank(a) === 0 ? a.total - b.total : b.total - a.total;
+      return helps(a) - helps(b) || rank(a) - rank(b) || order;
+    });
 }
 
 const EVERY_DAY = Object.values(DayOfWeek);

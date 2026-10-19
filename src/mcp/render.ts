@@ -334,9 +334,15 @@ function relaxationLines(
   const helps = relaxations.filter(r => r.total > 0);
   const stuck = relaxations.filter(r => r.total === 0).map(r => r.filter);
   const lines: string[] = [];
+  const first = helps[0];
+  if (first?.restores.length) {
+    lines.push(
+      `Most restrictive: filters.${first.filter}; without it, ${first.restores.join(', ')} ${first.restores.length === 1 ? 'is' : 'are'} back.`,
+    );
+  }
   if (helps.length) {
     lines.push(
-      `Most restrictive: filters.${helps[0].filter}. Leaving out one filter at a time: ${helps
+      `${first.restores.length ? '' : `Most restrictive: filters.${first.filter}. `}Leaving out one filter at a time: ${helps
         .map(
           r =>
             `without ${r.filter}, ${r.total} course${r.total === 1 ? '' : 's'}${r.terms.length ? ` (in ${r.terms.join(', ')})` : ''}`,
