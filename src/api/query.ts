@@ -36,6 +36,7 @@ import {
 } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
 import {
+  acronymExpansions,
   describeMatch,
   parseSearchQuery,
   type SearchMatch,
@@ -810,6 +811,17 @@ const byNumber = (a: Course, b: Course) =>
   a.departmentAbbr.localeCompare(b.departmentAbbr) ||
   a.number.localeCompare(b.number);
 
+/** '"AI" read as AI or artificial intelligence.', for each acronym in the query. */
+function acronymNotices(query: string): string[] {
+  return parseSearchQuery(query).words.flatMap(word => {
+    const expansions = acronymExpansions(word);
+    if (!expansions.length) return [];
+    return [
+      `"${word.toUpperCase()}" read as ${word.toUpperCase()} or ${expansions.join(' or ')}.`,
+    ];
+  });
+}
+
 const SORT_NOTICE: Record<Exclude<CourseQuery['sort'], 'relevance'>, string> = {
   rating:
     'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
@@ -974,6 +986,7 @@ export function runCourseQuery(
       `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
     );
   }
+  if (text && !text.professorOnly) notices.push(...acronymNotices(text.query));
   if (query.sort !== 'relevance') notices.push(SORT_NOTICE[query.sort]);
   if (read.year === 'all') {
     notices.push(

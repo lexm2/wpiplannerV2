@@ -10,6 +10,7 @@ import {
   matchCourseText,
   parseSearchQuery,
   describeMatch,
+  acronymExpansions,
 } from '../../src/utils/searchUtils';
 import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
@@ -282,6 +283,55 @@ describe('short words, acronyms and numerals', () => {
     // Initials alone are not enough: "Accelerated Introduction" is not AI.
     expect(matches('AI', accelerated)).toBe(false);
     expect(describeMatch(intro, 'AI')).toBe('title');
+  });
+
+  it('ranks a spelled-out acronym level with the word itself', () => {
+    rankCoursesByRelevance([definer], 'AI');
+    const spelled = make('ENV', '2720', 'Artificial Intelligence and Society');
+    const literal = make('IMGD', '2720', 'AI in Writing and Society');
+    const diff =
+      calculateRelevanceScore(spelled, 'AI') -
+      calculateRelevanceScore(literal, 'AI');
+    // Only the tie-breaks (name length) tell them apart.
+    expect(Math.abs(diff)).toBeLessThan(1);
+    expect(acronymExpansions('ai')).toEqual(['artificial intelligence']);
+  });
+
+  it('puts what a student can take first among equal matches', () => {
+    const lecture = (seatsAvailable: number) =>
+      ({
+        lectures: [
+          {
+            section: { crn: seatsAvailable, seatsAvailable, periods: [] },
+            compatibleDiscussions: [],
+            compatibleLabs: [],
+          },
+        ],
+      }) as unknown as Partial<Course>;
+    const full = course({ ...make('CS', '2001', 'Robotics'), ...lecture(0) });
+    const open = course({ ...make('CS', '2002', 'Robotics'), ...lecture(5) });
+    const higher = course({ ...make('CS', '3001', 'Robotics'), ...lecture(5) });
+    const graduate = course({
+      ...make('CS', '4001', 'Robotics'),
+      ...lecture(5),
+      isGraduate: true,
+    });
+    // Open seats outweigh one level, undergraduate a level and more; a
+    // weaker match is never lifted over a stronger one.
+    expect(ids([graduate, higher, full, open], 'robotics')).toEqual([
+      'CS-2002-2026',
+      'CS-3001-2026',
+      'CS-2001-2026',
+      'CS-4001-2026',
+    ]);
+    const weak = course({
+      ...make('CS', '1000', 'Other', 'All about robotics.'),
+      ...lecture(5),
+    });
+    expect(ids([weak, full], 'robotics')).toEqual([
+      'CS-2001-2026',
+      'CS-1000-2026',
+    ]);
   });
 
   it('treats Roman numerals as digits and takes a prefix of a long word', () => {

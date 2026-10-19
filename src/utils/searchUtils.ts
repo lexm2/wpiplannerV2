@@ -142,20 +142,34 @@ function sameExpansion(run: string[], expansion: string): boolean {
  * use the acronym.
  */
 function acronymIn(word: string, text: CourseText): boolean {
+  return acronymStart(word, text) !== -1;
+}
+
+/** Where in the name the words `word` stands for start; -1 when they don't. */
+function acronymStart(word: string, text: CourseText): number {
   if (word.length < 2 || word.length > 4 || !/^[a-z]+$/.test(word)) {
-    return false;
+    return -1;
   }
   const defined = definedAcronyms.get(word);
   const usedHere = text.descriptionTokens.includes(word);
-  if (!defined && !usedHere) return false;
+  if (!defined && !usedHere) return -1;
   const tokens = text.nameTokens;
-  return tokens.some((_, i) => {
+  return tokens.findIndex((_, i) => {
     const run = tokens.slice(i, i + word.length);
     if (run.length < word.length) return false;
     if (run.some(t => t.length < 3 || ACRONYM_STOP.has(t))) return false;
     if (run.map(t => t[0]).join('') !== word) return false;
     return usedHere || [...defined!].some(e => sameExpansion(run, e));
   });
+}
+
+/**
+ * The phrases a query word is read as, by the acronyms the catalog
+ * defines: "ai" is "artificial intelligence". Learned as courses are
+ * prepared (prepareSearch), so empty before any search has run.
+ */
+export function acronymExpansions(word: string): string[] {
+  return [...(definedAcronyms.get(word.toLowerCase()) ?? [])];
 }
 
 interface CourseText {
@@ -456,13 +470,20 @@ function wordScore(text: CourseText, words: string[]): number {
   if (name === words.join(' ')) score += 850;
   if (phrase?.index === 0) score += 20;
   if (phrase) score += 400;
+  // An acronym spelled out in the name is the same phrase: "AI" for
+  // "Artificial Intelligence" ranks with "AI in Writing", not below it.
+  if (!phrase && words.length === 1) {
+    const at = acronymStart(words[0], text);
+    if (at === 0) score += 20;
+    if (at !== -1) score += 400;
+  }
 
   let wordsInName = 0;
   for (const word of words) {
     const short = isShort(word);
     let inName = 0;
-    if (text.nameTokens.includes(word)) inName = 120;
-    else if (acronymIn(word, text)) inName = 110;
+    // An acronym the name spells out counts as the word itself.
+    if (text.nameTokens.includes(word) || acronymIn(word, text)) inName = 120;
     else if (short && text.nameTokens.some(t => shortWordIs(word, t)))
       inName = 100;
     else if (!short && text.nameTokens.some(t => t.startsWith(word)))
@@ -499,6 +520,24 @@ function wordScore(text: CourseText, words: string[]): number {
   return score;
 }
 
+/**
+ * Among courses matching a word query alike, the ones a student can most
+ * likely take first: lower levels (10 a level), undergraduate over
+ * graduate (30), and one with an open seat over a full one (25, more than
+ * the name starting with the words). Together less than a word's showing
+ * in the name, so they reorder equals and never lift a weaker match. The
+ * filtered course holds only the matching sections, so the seats are
+ * those of the terms searched.
+ */
+function likelyFit(course: Course): number {
+  let score = 0;
+  const level = courseLevel(course);
+  if (level !== null) score += (9 - Math.min(level, 9)) * 10;
+  if (!course.isGraduate) score += 30;
+  if (getAllSections(course).some(s => s.seatsAvailable > 0)) score += 25;
+  return score;
+}
+
 /** Above any word match, as a department code's prefix ranks. */
 const DEPARTMENT_SCORE = 2200;
 
@@ -524,10 +563,7 @@ export function calculateRelevanceScore(course: Course, query: string): number {
     score = DEPARTMENT_SCORE;
   } else {
     score = wordScore(text, parsed.words);
-    // Among courses matching alike, introductory ones first: a level is
-    // worth less than a word's showing in the name.
-    const level = courseLevel(course);
-    if (score > 0 && level !== null) score += (9 - Math.min(level, 9)) * 10;
+    if (score > 0) score += likelyFit(course);
     if (score === 0 && matchCourseText(course, parsed).all) score = 1;
   }
 

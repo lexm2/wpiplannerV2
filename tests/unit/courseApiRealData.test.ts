@@ -126,6 +126,17 @@ describe('ranking on the real catalog', () => {
     expect(search('PE').total).toBeLessThan(50);
   });
 
+  it('puts the undergraduate AI courses a first-year can take first', () => {
+    const ai = search('AI', 12);
+    const codes = ai.courses.map(c => c.code);
+    // "Artificial Intelligence" spelled out ranks with "AI" itself.
+    expect(codes.slice(0, 2)).toContain('DS 1010');
+    expect(codes).toContain('CS 4341');
+    const graduate = ai.courses.map(c => c.isGraduate);
+    expect(graduate.indexOf(true)).toBeGreaterThan(graduate.lastIndexOf(false));
+    expect(ai.notices).toContain('"AI" read as AI or artificial intelligence.');
+  });
+
   it('ranks calculus by number and numeral, whatever the spelling', () => {
     for (const q of ['calculus', 'calc 1', 'calculus 1', 'calc I']) {
       expect(top(q, 1), q).toEqual(['MA 1021']);
