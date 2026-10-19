@@ -122,6 +122,8 @@ const COURSE_PARAMS = new Set([
   'offeringPattern',
   'earliestStart',
   'latestEnd',
+  'includeAsync',
+  'includeInterestLists',
   'includeEndedTerms',
   'includeSections',
   'offset',
@@ -227,6 +229,18 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
       throw new HttpError(400, 'times must be JSON');
     }
   }
+  if (
+    params.has('earliestStart') ||
+    params.has('latestEnd') ||
+    params.has('includeAsync')
+  ) {
+    filters.times = {
+      ...(filters.times as object | undefined),
+      earliestStart: str('earliestStart'),
+      latestEnd: str('latestEnd'),
+      includeAsync: bool('includeAsync'),
+    };
+  }
   if (RMP_PARAMS.some(k => params.has(k)) || params.has('includeWithoutData')) {
     filters.rmpRating = {
       ...Object.fromEntries(RMP_PARAMS.map(k => [k, num(k)])),
@@ -242,9 +256,8 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
 
   return {
     filters,
-    earliestStart: str('earliestStart'),
-    latestEnd: str('latestEnd'),
     includeEndedTerms: bool('includeEndedTerms'),
+    includeInterestLists: bool('includeInterestLists'),
     includeSections: bool('includeSections'),
     offset: num('offset'),
     limit: num('limit'),

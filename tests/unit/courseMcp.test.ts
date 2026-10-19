@@ -81,6 +81,14 @@ describe('MCP server', () => {
     expect(prefix.data.total).toBeGreaterThan(0);
   });
 
+  it('names the right place for a key given in the wrong one', async () => {
+    const { text, isError } = await tool('search_courses', {
+      filters: { earliestStart: '17:00' },
+    });
+    expect(isError).toBe(true);
+    expect(text).toContain('it goes in filters.times.earliestStart');
+  });
+
   it('says when the offset runs past the end', async () => {
     const result = await tool('search_courses', { offset: 50 });
     expect(result.text).toContain(

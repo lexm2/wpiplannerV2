@@ -4,8 +4,8 @@
  * criteria shapes of src/types/filters.ts, so a filter panel's active filters
  * map onto it one to one. The departures, all resolved here into those
  * shapes: periodConflict takes the CRNs a student already has; department
- * and degreeAttribute accept loose names; earliestStart/latestEnd expand
- * into times windows.
+ * and degreeAttribute accept loose names; times takes earliestStart/latestEnd
+ * as shorthand for its windows.
  */
 import * as z from 'zod';
 import type { Course, Section } from '../types/types';
@@ -41,6 +41,7 @@ import { currentAcademicYear, type Catalog } from './catalog';
 import { endedTerms, termDates, yearLabel, type TermLetter } from './calendar';
 import { blockedSlotsForCrns } from './conflicts';
 import { ApiError } from './errors';
+import { strictObject } from './schemaHints';
 import {
   DELIVERY_MODES,
   resolveDegreeAttributes,
@@ -84,7 +85,7 @@ const YearSchema = z
     'Academic year by its fall year: 2026 means 2026-27 (fall 2026 through spring 2027).',
   );
 
-const TimeWindowSchema = z.object({
+const TimeWindowSchema = strictObject({
   day: z
     .enum(DayOfWeek)
     .describe('M, T, W, R (Thursday), F, S (Saturday) or U (Sunday)'),
@@ -118,10 +119,10 @@ const RMP_BOUNDS = [
   'minNumRatings',
 ] as const;
 
-const FiltersSchema = z
-  .object({
-    searchText: z
-      .object({
+const FiltersSchema = strictObject(
+  {
+    searchText: strictObject(
+      {
         query: z
           .string()
           .trim()
@@ -137,36 +138,35 @@ const FiltersSchema = z
           .boolean()
           .optional()
           .describe('Match the words against instructor names only.'),
-      })
-      .strict()
-      .optional(),
-    department: z
-      .object({
+      },
+      querySchema,
+    ).optional(),
+    department: strictObject(
+      {
         departments: z
           .array(z.string().min(1))
           .min(1)
           .describe(
             'Abbreviations ("CS", "MA") or full names ("Computer Science"), any case.',
           ),
-      })
-      .strict()
-      .optional(),
-    term: z
-      .object({ terms: z.array(TermSchema).min(1) })
-      .strict()
+      },
+      querySchema,
+    ).optional(),
+    term: strictObject({ terms: z.array(TermSchema).min(1) }, querySchema)
       .optional()
       .describe(
         'Keep sections in any of these terms. For everything running during A term, ask for ["A", "F"]. Naming a term that has ended keeps its sections.',
       ),
-    academicYear: z
-      .object({ year: z.union([YearSchema, z.literal('all')]) })
-      .strict()
+    academicYear: strictObject(
+      { year: z.union([YearSchema, z.literal('all')]) },
+      querySchema,
+    )
       .optional()
       .describe(
         'Defaults to the current academic year, the only one students can schedule. A year whose schedule is not published yet is refused with a pointer to planning instead. "all" searches every year.',
       ),
-    availability: z
-      .object({
+    availability: strictObject(
+      {
         availableOnly: z
           .boolean()
           .default(false)
@@ -185,30 +185,32 @@ const FiltersSchema = z
           .describe(
             'Keep only sections with at most this many students waitlisted; 0 for no waitlist.',
           ),
-      })
-      .strict()
-      .optional(),
-    creditRange: z
-      .object({
+      },
+      querySchema,
+    ).optional(),
+    creditRange: strictObject(
+      {
         min: z.number().min(0),
         max: z.number().min(0),
-      })
-      .strict()
+      },
+      querySchema,
+    )
       .refine(c => c.max >= c.min, 'max must be at least min')
       .optional()
       .describe(
         'Keep courses whose credit range overlaps [min, max]. A standard WPI course is 1/3 unit = 3 credits.',
       ),
-    graduateLevel: z
-      .object({ level: z.enum(['all', 'undergraduate', 'graduate']) })
-      .strict()
-      .optional(),
-    courseLevel: z
-      .object({
+    graduateLevel: strictObject(
+      { level: z.enum(['all', 'undergraduate', 'graduate']) },
+      querySchema,
+    ).optional(),
+    courseLevel: strictObject(
+      {
         min: z.number().int().min(1).max(9).optional(),
         max: z.number().int().min(1).max(9).optional(),
-      })
-      .strict()
+      },
+      querySchema,
+    )
       .refine(
         c => c.min === undefined || c.max === undefined || c.max >= c.min,
         'max must be at least min',
@@ -217,26 +219,27 @@ const FiltersSchema = z
       .describe(
         'Bounds on the first digit of the course number: 1 = 1000-level (MA 1022), 4 = 4000-level; 1-4 undergraduate, 5+ graduate (DS 502 and CS 5007 are both 5). {min: 3, max: 4} for upper-level undergraduate.',
       ),
-    degreeAttribute: z
-      .object({
+    degreeAttribute: strictObject(
+      {
         attributes: z
           .array(z.string().min(1))
           .min(1)
           .describe(
             'Degree requirements a course counts toward, any of them: "Humanities and Arts", "Social Sciences", "Capstone Design Experience"... (get_catalog_info lists all, with counts). Case-insensitive; a unique start like "social science" works.',
           ),
-      })
-      .strict()
-      .optional(),
-    deliveryMode: z
-      .object({ modes: z.array(z.enum(DELIVERY_MODES)).min(1) })
-      .strict()
+      },
+      querySchema,
+    ).optional(),
+    deliveryMode: strictObject(
+      { modes: z.array(z.enum(DELIVERY_MODES)).min(1) },
+      querySchema,
+    )
       .optional()
       .describe(
         'Keep sections taught In-Person, Online or Hybrid. Asynchronous is different: it describes a meeting with no set time and shows as "Async"; an Online section may still meet live.',
       ),
-    offeringPattern: z
-      .object({
+    offeringPattern: strictObject(
+      {
         categories: z
           .array(z.union([z.literal(1), z.literal(2), z.literal(3)]))
           .min(1)
@@ -249,43 +252,60 @@ const FiltersSchema = z
           .describe(
             'Also keep courses with no category on record (most graduate courses). Default false.',
           ),
-      })
-      .strict()
+      },
+      querySchema,
+    )
       .optional()
       .describe(
         'The only signal of what a later year will offer: Cat. I courses are likely to run again next year.',
       ),
-    times: z
-      .object({
+    times: strictObject(
+      {
         mode: z
           .enum(['only', 'avoid'])
+          .default('only')
           .describe(
-            '"only": every meeting of a section must fall inside the windows. "avoid": drop sections with any meeting overlapping a window.',
+            'Default "only": every meeting of a section must fall inside the times. "avoid": drop sections with any meeting overlapping them.',
           ),
+        earliestStart: ClockSchema.optional().describe(
+          'Shorthand for windows on every day: meetings start at or after this ("17:00" for evening classes).',
+        ),
+        latestEnd: ClockSchema.optional().describe(
+          'Shorthand for windows on every day: meetings end by this ("12:00").',
+        ),
         windows: z
           .array(TimeWindowSchema)
           .min(
             1,
-            'give at least one window; to restrict start and end times on every day, use earliestStart/latestEnd instead',
+            'give at least one window; to bound start and end times on every day, use earliestStart/latestEnd instead',
           )
           .refine(
             ws => ws.every(w => w.startMin < w.endMin),
             'each window must end after it starts',
           )
+          .optional()
           .describe(
-            'Weekly time windows, one per day and band; give each weekday its own entry.',
+            'Weekly time windows, one per day and band, each weekday its own entry. Give these or earliestStart/latestEnd.',
           ),
         includeAsync: z
           .boolean()
           .optional()
           .describe(
-            'Also keep sections with no scheduled meetings (async, TBD). Default false.',
+            'Also keep sections with no scheduled meetings (async, TBD): "evening or online" is earliestStart "17:00" with includeAsync true. Default false.',
           ),
-      })
-      .strict()
-      .optional(),
-    rmpRating: z
-      .object({
+      },
+      querySchema,
+    )
+      .refine(
+        t => !!t.windows !== !!(t.earliestStart || t.latestEnd),
+        'give either windows or earliestStart/latestEnd',
+      )
+      .optional()
+      .describe(
+        'When sections meet: earliestStart/latestEnd for every day, or windows for particular days and bands.',
+      ),
+    rmpRating: strictObject(
+      {
         minRating: z.number().min(0).max(5).optional(),
         maxRating: z.number().min(0).max(5).optional(),
         minDifficulty: z.number().min(0).max(5).optional(),
@@ -311,14 +331,15 @@ const FiltersSchema = z
           .describe(
             'Keep lectures whose instructors have no Rate My Professor data. DEFAULT: false when any bound above is given (so minRating 4 means rated 4+), true otherwise.',
           ),
-      })
-      .strict()
+      },
+      querySchema,
+    )
       .optional()
       .describe(
         "Rate My Professor bounds on 0-5 scales, judged on the lecture's instructors; a lecture passes when any of them does.",
       ),
-    periodConflict: z
-      .object({
+    periodConflict: strictObject(
+      {
         crns: z
           .array(z.number().int().positive())
           .min(1)
@@ -331,22 +352,17 @@ const FiltersSchema = z
           .describe(
             'Default true: an F section conflicts with A and B, S with C and D. False compares terms exactly.',
           ),
-      })
-      .strict()
-      .optional(),
-  })
-  .strict();
+      },
+      querySchema,
+    ).optional(),
+  },
+  querySchema,
+);
 
-export const CourseQuerySchema = z
-  .object({
+export const CourseQuerySchema = strictObject(
+  {
     filters: FiltersSchema.default({}).describe(
       'Filters by id; every one given must match. Omit a filter to not restrict on it.',
-    ),
-    earliestStart: ClockSchema.optional().describe(
-      'Shorthand for times: every meeting starts at or after this, any day ("10:00"). Cannot be combined with filters.times.',
-    ),
-    latestEnd: ClockSchema.optional().describe(
-      'Shorthand for times: every meeting ends by this, any day ("17:00").',
     ),
     includeEndedTerms: z
       .boolean()
@@ -379,10 +395,16 @@ export const CourseQuerySchema = z
       .max(MAX_LIMIT)
       .default(DEFAULT_LIMIT)
       .describe(`Page size, 1-${MAX_LIMIT}; default ${DEFAULT_LIMIT}.`),
-  })
-  .strict();
+  },
+  querySchema,
+);
 
 export type CourseQuery = z.infer<typeof CourseQuerySchema>;
+
+/** For unknown-key errors: where each key does belong. */
+function querySchema(): unknown {
+  return CourseQuerySchema;
+}
 
 export interface CourseRow extends CourseSummary {
   /** The matching lecture (or standalone lab) sections, with includeSections. */
@@ -426,16 +448,13 @@ const minutes = (clock: string) => {
   return h * 60 + m;
 };
 
-/** earliestStart/latestEnd as one "only" window per day. */
-function clockWindows(query: CourseQuery): TimeWindow[] | null {
-  if (!query.earliestStart && !query.latestEnd) return null;
-  if (query.filters.times) {
-    throw new ApiError(
-      'Give either filters.times or earliestStart/latestEnd, not both.',
-    );
-  }
-  const startMin = query.earliestStart ? minutes(query.earliestStart) : 0;
-  const endMin = query.latestEnd ? minutes(query.latestEnd) : 1440;
+type TimesInput = NonNullable<CourseQuery['filters']['times']>;
+
+/** The times filter's windows: as given, or one per day from the shorthand. */
+function timeWindows(times: TimesInput): TimeWindow[] {
+  if (times.windows) return times.windows;
+  const startMin = times.earliestStart ? minutes(times.earliestStart) : 0;
+  const endMin = times.latestEnd ? minutes(times.latestEnd) : 1440;
   if (endMin <= startMin) {
     throw new ApiError('latestEnd must be after earliestStart.');
   }
@@ -534,12 +553,11 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
       filters.offeringPattern,
     );
 
-  const windows = clockWindows(query);
-  if (filters.times || windows) {
+  if (filters.times) {
     set<TimesFilterCriteria>('times', {
-      mode: filters.times?.mode ?? 'only',
-      windows: canonicalWindows(windows ?? filters.times!.windows),
-      includeAsync: filters.times?.includeAsync,
+      mode: filters.times.mode,
+      windows: canonicalWindows(timeWindows(filters.times)),
+      includeAsync: filters.times.includeAsync,
     });
   }
 
@@ -663,9 +681,7 @@ export function runCourseQuery(
   const includeSections =
     query.includeSections ??
     (Object.keys(query.filters).some(id => !SECTION_LIST_FILTERS.has(id)) ||
-      !!query.filters.searchText?.professorOnly ||
-      !!query.earliestStart ||
-      !!query.latestEnd);
+      !!query.filters.searchText?.professorOnly);
 
   // How each course matched a text search; instructor-only searches are
   // about people, not topics.

@@ -137,16 +137,45 @@ describe('course search', () => {
       'CS-2102-2026',
       'MA-1021-2026',
     ]);
+    const post = await call('/courses/search', {
+      filters: { times: { earliestStart: '10:00', latestEnd: '12:00' } },
+    });
+    expect(codes(post.body)).toEqual(codes(body));
     const both = await call('/courses/search', {
-      earliestStart: '10:00',
       filters: {
         times: {
-          mode: 'avoid',
+          earliestStart: '10:00',
           windows: [{ day: 'M', startMin: 0, endMin: 60 }],
         },
       },
     });
     expect(both.status).toBe(400);
+  });
+
+  it('keeps async sections alongside the shorthand when asked', async () => {
+    // "Evening or online": CS 500 is async, the other two meet at 18:00.
+    const { body } = await call('/courses?earliestStart=18:00&includeAsync=1');
+    expect(codes(body)).toEqual([
+      'CS-500-2026',
+      'DS-502-2026',
+      'PSY-1400-2026',
+    ]);
+  });
+
+  it('says where a misplaced or misspelt key belongs', async () => {
+    const inFilters = await call('/courses/search', {
+      filters: { earliestStart: '17:00' },
+    });
+    expect(inFilters.status).toBe(400);
+    expect(inFilters.body.details[0].message).toContain(
+      '"earliestStart" does not go in filters; it goes in filters.times.earliestStart.',
+    );
+    const top = await call('/courses/search', { query: 'robotics' });
+    expect(top.body.details[0].message).toContain(
+      'it goes in filters.searchText.query',
+    );
+    const typo = await call('/courses/search', { limt: 5 });
+    expect(typo.body.details[0].message).toContain('did you mean "limit"?');
   });
 
   it('drops sections that clash with the CRNs the caller has', async () => {
