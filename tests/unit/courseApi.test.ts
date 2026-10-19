@@ -385,8 +385,12 @@ describe('new filters', () => {
 
   it('bounds the waitlist', async () => {
     const { body } = await call('/courses?maxWaitlisted=0');
+    // PSY 1400 has 5 waiting, CS 1101 2 beside its open seats.
     expect(codes(body)).not.toContain('PSY-1400-2026');
-    expect(body.total).toBe(7);
+    expect(codes(body)).not.toContain('CS-1101-2026');
+    expect(body.total).toBe(6);
+    const two = await call('/courses?maxWaitlisted=2');
+    expect(codes(two.body)).toContain('CS-1101-2026');
   });
 
   it('leaves unrated instructors out once a rating bound is given', async () => {

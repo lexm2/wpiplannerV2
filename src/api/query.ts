@@ -35,6 +35,7 @@ import {
   SearchTextFilter,
 } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
+import { getAllSections } from '../utils/courseUtils';
 import {
   acronymExpansions,
   describeMatch,
@@ -829,6 +830,35 @@ const byNumber = (a: Course, b: Course) =>
   a.departmentAbbr.localeCompare(b.departmentAbbr) ||
   a.number.localeCompare(b.number);
 
+// A query asking to register, rather than for a topic.
+const REGISTRATION_RE =
+  /\b(register|registering|registration|enroll|enrol|enrolling|enrollment|sign(ing)? ?up)\b/i;
+
+const REGISTRATION_NOTE =
+  'Registration is in WPI Workday, with the CRNs listed here; this catalog is read-only and cannot register anyone.';
+
+/**
+ * "Hybrid: none in 2026-27 matching the other filters." for each delivery
+ * mode asked for alongside others that no matching section has.
+ */
+function missingModes(
+  query: CourseQuery,
+  matches: Course[],
+  year: number | 'all',
+): string[] {
+  const modes = query.filters.deliveryMode?.modes ?? [];
+  if (modes.length < 2 || matches.length === 0) return [];
+  const found = new Set(
+    matches.flatMap(c =>
+      getAllSections(c).map(s => s.deliveryMode.toLowerCase()),
+    ),
+  );
+  const where = year === 'all' ? 'any year' : yearLabel(year);
+  return modes
+    .filter(m => !found.has(m.toLowerCase()))
+    .map(m => `${m}: none in ${where} matching the other filters.`);
+}
+
 /** "Did you mean Gillian Smith?" for a search that found nothing. */
 function instructorNotice(inYear: Course[], query: string): string[] {
   const names = suggestInstructors(inYear, query);
@@ -1026,6 +1056,8 @@ export function runCourseQuery(
   }
   if (text && !text.professorOnly) notices.push(...acronymNotices(text.query));
   if (query.sort !== 'relevance') notices.push(SORT_NOTICE[query.sort]);
+  notices.push(...missingModes(query, matches, read.year));
+  if (text && REGISTRATION_RE.test(text.query)) notices.push(REGISTRATION_NOTE);
   if (search?.descriptionOnly && query.limit === undefined) {
     if (matches.length > LOOSE_LIMIT) {
       notices.push(

@@ -112,6 +112,16 @@ function seats(s: {
   return s.waitlist > 0 ? `${open}, waitlist ${s.waitlist}` : open;
 }
 
+/**
+ * The once-per-response note for "26/100 open, waitlist 1", which reads
+ * as a contradiction but is what Workday reports.
+ */
+const WAITLIST_NOTE =
+  'A waitlist beside open seats is as Workday reports it: students on it may be waiting for a different section or time.';
+
+const waitlistBesideSeats = (s: { seatsAvailable: number; waitlist: number }) =>
+  s.seatsAvailable > 0 && s.waitlist > 0;
+
 /** Status and mode only when they are not the common Open / In-Person. */
 function exceptions(s: { status: string; deliveryMode: string }): string[] {
   const parts: string[] = [];
@@ -126,7 +136,7 @@ function briefLine(s: SectionBrief, withTerm: boolean): string {
     `${s.number} CRN ${s.crn}${withTerm ? ` ${s.term}` : ''}`,
     s.meets,
     s.location,
-    s.instructors.map(i => instructor(i)).join('; '),
+    s.instructors.map(i => instructor(i, true)).join('; '),
     seats(s),
     ...exceptions(s),
   ]
@@ -427,6 +437,9 @@ export function renderSearch(result: CourseQueryResult): string {
       ? c.sections.some(s => isLow(s.seatsAvailable))
       : c.seatsByTerm.some(t => isLow(t.available)),
   );
+  if (result.courses.some(c => c.sections?.some(waitlistBesideSeats))) {
+    lines.push(WAITLIST_NOTE);
+  }
   if (result.total > 0) lines.push(seatDataLine(result, low));
   return lines.join('\n');
 }
@@ -710,6 +723,7 @@ export function renderCourse(
       ),
     );
   }
+  if (d.sections.some(waitlistBesideSeats)) lines.push(WAITLIST_NOTE);
   lines.push(
     seatDataLine(
       context,

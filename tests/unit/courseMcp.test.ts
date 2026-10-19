@@ -27,7 +27,7 @@ describe('MCP server', () => {
     expect(result.text).toContain('Seat data is under a day old (2026-09-02).');
     expect(result.text).toContain('1. PH 1110 General Physics | 3 cr | B');
     expect(result.text).toContain(
-      'BL01 CRN 20 B | MTRF 09:00-09:50 | Ada Lovelace RMP 4.5, diff 2.1 (12) | 10/30 open',
+      'BL01 CRN 20 B | MTRF 09:00-09:50 | Ada Lovelace RMP 4.5, diff 2.1, 91% again (12) | 10/30 open',
     );
     // Ada's 4.5 on 12 ratings outranks Alan's 4.9 on 3.
     expect(result.text).toContain(
@@ -140,6 +140,40 @@ describe('MCP server', () => {
       filters: { searchText: { query: 'Hop', professorOnly: true } },
     });
     expect(prefix.data.total).toBeGreaterThan(0);
+  });
+
+  it('leaves out unknown rooms and explains a waitlist beside open seats', async () => {
+    const async = await tool('get_course', { course: 'CS 500' });
+    expect(async.text).toContain('S01 CRN 7 | Async | Ada Lovelace');
+    expect(async.text).not.toContain('Unknown');
+    const waitlist = await tool('get_course', { course: 'CS 1101' });
+    expect(waitlist.text).toContain('10/30 open, waitlist 2');
+    expect(waitlist.text).toContain(
+      'A waitlist beside open seats is as Workday reports it: students on it may be waiting for a different section or time.',
+    );
+    const none = await tool('get_course', { course: 'CS 2102' });
+    expect(none.text).not.toContain('A waitlist beside');
+  });
+
+  it('says which delivery modes asked for have nothing', async () => {
+    const { text } = await tool('search_courses', {
+      filters: { deliveryMode: { modes: ['Online', 'Hybrid'] } },
+    });
+    expect(text).toContain(
+      'Hybrid: none in 2026-27 matching the other filters.',
+    );
+    expect(text).not.toContain('Online: none');
+  });
+
+  it('points to Workday only when the search asks to register', async () => {
+    const asked = await tool('search_courses', {
+      filters: { searchText: { query: 'register robotics' } },
+    });
+    expect(asked.text).toContain('Registration is in WPI Workday');
+    const topic = await tool('search_courses', {
+      filters: { searchText: { query: 'robotics' } },
+    });
+    expect(topic.text).not.toContain('Registration is in WPI Workday');
   });
 
   it('says what the MQP and IQP are rather than guess at courses', async () => {

@@ -128,7 +128,17 @@ export function catalogJson(extraName = '') {
           course(
             'CS-1101-2026',
             'Introduction to Program Design',
-            [section(3, 'F01', 'F', [period(['M', 'R'], '10:00', '11:20')])],
+            // Open seats beside a waitlist, as Workday can report them.
+            [
+              section(
+                3,
+                'F01',
+                'F',
+                [period(['M', 'R'], '10:00', '11:20')],
+                10,
+                { actualWaitlist: 2 },
+              ),
+            ],
             {
               description:
                 '<p>Procedural thinking from the first week. Later weeks cover many other topics, among them test generation. Recommended background: CS 2102.</p>',
@@ -139,7 +149,7 @@ export function catalogJson(extraName = '') {
             'Graduate Seminar',
             [
               section(7, 'S01', 'S', [
-                { ...period([], '', ''), isAsync: true },
+                { ...period([], '', ''), isAsync: true, location: 'Unknown' },
               ]),
             ],
             { isGraduate: true },

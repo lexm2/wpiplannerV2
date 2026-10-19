@@ -389,7 +389,7 @@ function toPeriodView(
     start: timed && hasTime ? hhmm(period.startTime) : null,
     end: timed && hasTime ? hhmm(period.endTime) : null,
     display,
-    location: period.location,
+    location: roomOf(period.location),
     isAsync: period.isAsync ?? false,
   };
 }
@@ -406,9 +406,15 @@ function meetingText(section: Section): string {
   return [...new Set(parts)].join('; ') || 'TBD';
 }
 
+/**
+ * A meeting's room; Workday's "Unknown" (async and online sections, rooms
+ * not yet assigned) is no room, so it is left out rather than printed.
+ */
+const roomOf = (location: string) => (location === 'Unknown' ? '' : location);
+
 function locationText(section: Section): string {
   return [
-    ...new Set(section.periods.map(p => p.location).filter(Boolean)),
+    ...new Set(section.periods.map(p => roomOf(p.location)).filter(Boolean)),
   ].join('; ');
 }
 
