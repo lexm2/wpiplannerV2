@@ -222,6 +222,8 @@ function matchNote(
   switch (c.match) {
     case 'mentions':
       return `mentions ${search.query.trim()}`;
+    case 'sectionTitle':
+      return 'matched a section title';
     case 'section':
       return 'matched an instructor or room';
     case 'description':

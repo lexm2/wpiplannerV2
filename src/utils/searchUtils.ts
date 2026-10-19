@@ -392,10 +392,26 @@ function wordInName(text: CourseText, word: string): boolean {
  * - description: some word only in the description, the words together
  *   (within a few words of each other);
  * - scattered: some word only in the description, the words far apart;
- * - section: only an instructor or room matched.
+ * - sectionTitle: a section's own title supplied the missing words
+ *   ("B01 - ST: AI and Economics" under ECON 2800 Special Topics);
+ * - section: an instructor or room matched.
  */
 export type SearchMatch =
-  'code' | 'mentions' | 'title' | 'description' | 'scattered' | 'section';
+  | 'code'
+  | 'mentions'
+  | 'title'
+  | 'description'
+  | 'scattered'
+  | 'sectionTitle'
+  | 'section';
+
+/** The titles some sections carry after their number: "ST: AI and Economics". */
+function sectionTitles(course: Course): string {
+  return getAllSections(course)
+    .map(s => s.number.split(' - ').slice(1).join(' - '))
+    .join(' ')
+    .toLowerCase();
+}
 
 export function describeMatch(course: Course, query: string): SearchMatch {
   const parsed = parseSearchQuery(query);
@@ -404,7 +420,14 @@ export function describeMatch(course: Course, query: string): SearchMatch {
   }
   const text = courseText(course);
   if (namesDepartment(text, parsed.words)) return 'title';
-  if (!matchCourseText(course, parsed).all) return 'section';
+  const { all, matched } = matchCourseText(course, parsed);
+  if (!all) {
+    const titles = sectionTitles(course);
+    const fromTitles = parsed.words.every(
+      (word, i) => matched[i] || textHasWord(titles, word),
+    );
+    return fromTitles ? 'sectionTitle' : 'section';
+  }
   const inTitle = (word: string) =>
     wordInName(text, word) ||
     text.codes.some(c => c.startsWith(word)) ||

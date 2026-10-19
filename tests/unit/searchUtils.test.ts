@@ -372,6 +372,28 @@ describe('short words, acronyms and numerals', () => {
     expect(describeMatch(list[0], 'MA 1022')).toBe('mentions');
   });
 
+  it('tells a section title match from an instructor or room match', () => {
+    const titled = (number: string, professor: string) =>
+      course({
+        ...make('ECON', '2800', 'Special Topics in Economics'),
+        lectures: [
+          {
+            section: {
+              crn: 1,
+              number,
+              periods: [{ professor, location: 'Atwater Kent 233' }],
+            },
+            compatibleDiscussions: [],
+            compatibleLabs: [],
+          },
+        ],
+      } as unknown as Partial<Course>);
+    expect(
+      describeMatch(titled('B01 - ST: AI and Economics', 'Ann Lee'), 'AI'),
+    ).toBe('sectionTitle');
+    expect(describeMatch(titled('B01', 'Ann Lee'), 'Lee')).toBe('section');
+  });
+
   it('reads "and" in a department name as the catalog\'s "&"', () => {
     const imgd = make(
       'IMGD',
