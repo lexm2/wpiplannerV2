@@ -53,13 +53,16 @@ Workflow:
 1. get_catalog_info once: today's date and term, which years are published, \
 term dates, degree attribute names.
 2. search_courses for candidates by topic, department, term, degree attribute, \
-open seats, times, ratings, or fit around CRNs already chosen \
+open seats, times (filters.times.earliestStart/latestEnd), ratings, or fit \
+around CRNs already chosen \
 (filters.periodConflict). Filtered searches list the matching sections with \
 CRNs.
 3. get_course for the description, prerequisites as stated, and this year's \
 sections, labs and discussions listed once per term. Take one lecture plus one \
 of each companion kind (lab, discussion) listed for it.
-4. check_conflicts with the chosen CRNs, to confirm they fit or show the overlap.
+4. check_conflicts with all the chosen CRNs, lectures, labs and discussions: it \
+reports time overlaps, labs or discussions that do not go with the chosen \
+lecture, missing companions, and full, closed or ended sections.
 list_departments gives department abbreviations.
 
 Out of scope; say so rather than guess:
