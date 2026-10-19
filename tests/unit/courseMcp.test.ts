@@ -34,6 +34,25 @@ describe('MCP server', () => {
     expect(plain.text).not.toContain('CRN');
   });
 
+  it('splits seats by term, totals every page, and warns of low counts', async () => {
+    const { text } = await tool('search_courses', {
+      filters: { department: { departments: ['MA', 'DS'] } },
+    });
+    expect(text).toContain(
+      '2. MA 1021 Calculus I | 3 cr | A,C | A FULL 30/30 · C 10/30 open',
+    );
+    expect(text).toContain(
+      'All 2 matching courses, every page: 20 open seats in 3 sections (cross-listed sections counted once).',
+    );
+    expect(text).not.toContain('low counts');
+    const low = await tool('search_courses', {
+      filters: { department: { departments: ['RBE'] } },
+    });
+    expect(low.text).toContain(
+      'Seat counts are from 2026-09-02; low counts (3 or fewer) may already be gone.',
+    );
+  });
+
   it('says when the offset runs past the end', async () => {
     const result = await tool('search_courses', { offset: 50 });
     expect(result.text).toContain(

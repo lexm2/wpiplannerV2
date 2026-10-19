@@ -62,6 +62,14 @@ export interface OfferingPatternFilterCriteria {
   includeUnknown?: boolean;
 }
 
+/**
+ * Interest-list placeholders (no times; joined before the real sections
+ * open) are dropped unless includeInterestLists is true.
+ */
+export interface InterestListFilterCriteria {
+  includeInterestLists: boolean;
+}
+
 export interface GraduateLevelFilterCriteria {
   level: 'all' | 'undergraduate' | 'graduate';
 }

@@ -33,6 +33,23 @@ export interface InstructorView {
   rmp: RatingView | null;
 }
 
+export interface SeatTotals {
+  capacity: number;
+  /** Open seats; an over-enrolled section adds nothing. */
+  available: number;
+  waitlisted: number;
+}
+
+/** Seat totals over sections. */
+export function seatTotals(sections: Section[]): SeatTotals {
+  return {
+    capacity: sections.reduce((n, s) => n + s.seats, 0),
+    // Over-enrolled sections report a negative count; they add nothing.
+    available: sections.reduce((n, s) => n + Math.max(0, s.seatsAvailable), 0),
+    waitlisted: sections.reduce((n, s) => n + s.actualWaitlist, 0),
+  };
+}
+
 export interface CourseSummary {
   id: string;
   /** "CS 2102" */
@@ -49,7 +66,9 @@ export interface CourseSummary {
    * courses), interest lists left out. In a search, only the sections that
    * matched every filter.
    */
-  seats: { capacity: number; available: number; waitlisted: number };
+  seats: SeatTotals;
+  /** The same totals per term, A-D then F/S, for courses in several terms. */
+  seatsByTerm: (SeatTotals & { term: string })[];
   sectionCount: number;
   isGraduate: boolean;
   professors: string[];
@@ -264,12 +283,11 @@ export function toCourseSummary(
     credits: { min: course.minCredits, max: course.maxCredits },
     year: course.academicYear ?? null,
     terms: termsOf(all),
-    seats: {
-      capacity: primary.reduce((n, s) => n + s.seats, 0),
-      // Over-enrolled sections report a negative count; they add nothing.
-      available: primary.reduce((n, s) => n + Math.max(0, s.seatsAvailable), 0),
-      waitlisted: primary.reduce((n, s) => n + s.actualWaitlist, 0),
-    },
+    seats: seatTotals(primary),
+    seatsByTerm: termsOf(primary).map(term => ({
+      term,
+      ...seatTotals(primary.filter(s => (s.computedTerm as string) === term)),
+    })),
     sectionCount: primary.length,
     isGraduate: course.isGraduate ?? false,
     professors: professorsOf(primary).slice(0, MAX_SUMMARY_PROFESSORS),

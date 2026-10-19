@@ -7,6 +7,7 @@ import type { CourseQueryResult, CourseRow } from '../api/query';
 import type {
   CourseDetail,
   CourseSummary,
+  SeatTotals,
   InstructorView,
   SectionBrief,
   SectionView,
@@ -34,6 +35,16 @@ function credits(c: CourseSummary): string {
 /** "2026-09-01" from the refresh timestamp. */
 function asOf(dataAsOf: string | null): string {
   return dataAsOf ? dataAsOf.slice(0, 10) : 'an unknown date';
+}
+
+/** At or below this many open seats, a count from the last refresh may be gone. */
+const LOW_SEATS = 3;
+
+const isLow = (available: number) => available > 0 && available <= LOW_SEATS;
+
+/** The once-per-response caveat for low seat counts. */
+function lowSeatsCaveat(dataAsOf: string | null): string {
+  return `Seat counts are from ${asOf(dataAsOf)}; low counts (${LOW_SEATS} or fewer) may already be gone.`;
 }
 
 function instructor(i: InstructorView): string {
@@ -111,16 +122,25 @@ function describe(c: {
 
 // --- search_courses ---------------------------------------------------------
 
+const totalSeats = (t: SeatTotals) =>
+  seats({
+    seats: t.capacity,
+    seatsAvailable: t.available,
+    waitlist: t.waitlisted,
+  });
+
+/** One total, or per term when the course spans several: "C FULL 90/90 · D 2/66 open". */
+function rowSeats(c: CourseRow): string {
+  if (c.seatsByTerm.length <= 1) return totalSeats(c.seats);
+  return c.seatsByTerm.map(t => `${t.term} ${totalSeats(t)}`).join(' · ');
+}
+
 function rowLine(c: CourseRow, index: number, showYear: boolean): string {
   const parts = [
     `${index}. ${c.code} ${c.name}`,
     credits(c),
     c.terms.length ? c.terms.join(',') : 'no sections',
-    seats({
-      seats: c.seats.capacity,
-      seatsAvailable: c.seats.available,
-      waitlist: c.seats.waitlisted,
-    }),
+    rowSeats(c),
   ];
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
@@ -174,6 +194,18 @@ export function renderSearch(result: CourseQueryResult): string {
       `More: offset ${result.offset + result.limit} for the next page.`,
     );
   }
+  if (result.total > 0) {
+    const { openSeats, sections, courses } = result.totals;
+    lines.push(
+      `All ${courses} matching course${courses === 1 ? '' : 's'}, every page: ${openSeats} open seat${openSeats === 1 ? '' : 's'} in ${sections} section${sections === 1 ? '' : 's'} (cross-listed sections counted once).`,
+    );
+  }
+  const low = result.courses.some(c =>
+    c.sections
+      ? c.sections.some(s => isLow(s.seatsAvailable))
+      : c.seatsByTerm.some(t => isLow(t.available)),
+  );
+  if (low) lines.push(lowSeatsCaveat(result.dataAsOf));
   return lines.join('\n');
 }
 
@@ -344,6 +376,9 @@ export function renderCourse(
         context.today,
       ),
     );
+  }
+  if (d.sections.some(s => isLow(s.seatsAvailable))) {
+    lines.push(lowSeatsCaveat(context.dataAsOf));
   }
   return lines.join('\n');
 }

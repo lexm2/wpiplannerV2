@@ -203,6 +203,43 @@ describe('new filters', () => {
     ).toEqual(['BL02']);
   });
 
+  it('leaves interest lists out before matching, so no row is a placeholder', async () => {
+    // MA 1021's C-term interest list is Online; its real C section is not.
+    const online = {
+      deliveryMode: { modes: ['Online'] },
+      term: { terms: ['C'] },
+    };
+    const hidden = await call('/courses/search', { filters: online });
+    expect(hidden.body.total).toBe(0);
+    expect(hidden.body.courses).toEqual([]);
+    expect(hidden.body.totals).toEqual({
+      openSeats: 0,
+      sections: 0,
+      courses: 0,
+    });
+    const shown = await call('/courses/search', {
+      filters: online,
+      includeInterestLists: true,
+    });
+    expect(codes(shown.body)).toEqual(['MA-1021-2026']);
+    expect(
+      shown.body.courses[0].sections.map((s: { crn: number }) => s.crn),
+    ).toEqual([9]);
+  });
+
+  it('totals every matching section once, and seats per term', async () => {
+    const { body } = await call('/courses?department=MA,DS');
+    // DS 502 and MA 543 are one F section of 10 open seats, counted once.
+    expect(body.totals).toEqual({ openSeats: 20, sections: 3, courses: 2 });
+    const ma = body.courses.find(
+      (c: { id: string }) => c.id === 'MA-1021-2026',
+    );
+    expect(ma.seatsByTerm).toEqual([
+      { term: 'A', capacity: 30, available: 0, waitlisted: 0 },
+      { term: 'C', capacity: 30, available: 10, waitlisted: 0 },
+    ]);
+  });
+
   it('filters by course level and offering pattern', async () => {
     expect(await search({ courseLevel: { min: 5 } })).toEqual([
       'CS-500-2026',

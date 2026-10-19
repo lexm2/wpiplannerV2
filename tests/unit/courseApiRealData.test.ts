@@ -84,3 +84,26 @@ describe('ranking on the real catalog', () => {
     expect(top('game design', 1)[0]).toMatch(/^IMGD /);
   });
 });
+
+describe('search results agree with themselves', () => {
+  it('keeps no course on an interest list alone', () => {
+    // WPI lists interest lists as Online, so these once matched placeholders.
+    for (const filters of [
+      { deliveryMode: { modes: ['Online'] }, term: { terms: ['C', 'D'] } },
+      {
+        deliveryMode: { modes: ['Online', 'Hybrid'] },
+        courseLevel: { min: 2, max: 4 },
+      },
+    ]) {
+      const result = runCourseQuery(
+        catalog,
+        CourseQuerySchema.parse({ filters, limit: 200 }),
+      );
+      expect(result.courses.length).toBe(result.total);
+      for (const row of result.courses) {
+        expect(row.sections?.length, row.code).toBeGreaterThan(0);
+        expect(row.terms.length, row.code).toBeGreaterThan(0);
+      }
+    }
+  });
+});

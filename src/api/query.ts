@@ -21,6 +21,7 @@ import type {
   DeliveryModeFilterCriteria,
   DepartmentFilterCriteria,
   GraduateLevelFilterCriteria,
+  InterestListFilterCriteria,
   OfferingPatternFilterCriteria,
   RMPRatingFilterCriteria,
   SearchTextFilterCriteria,
@@ -48,6 +49,7 @@ import {
 import {
   courseCode,
   primarySections,
+  seatTotals,
   toCourseSummary,
   toSectionBrief,
   type CourseSummary,
@@ -349,6 +351,12 @@ export const CourseQuerySchema = z
       .describe(
         'Default false: in the current year, sections of terms that have already ended are left out (the response says which). Terms named in filters.term are always kept.',
       ),
+    includeInterestLists: z
+      .boolean()
+      .default(false)
+      .describe(
+        'Default false: interest-list placeholders (no times; joined before real sections open) are left out before any filter is applied.',
+      ),
     includeSections: z
       .boolean()
       .optional()
@@ -386,6 +394,12 @@ export interface CourseQueryResult {
   offset: number;
   limit: number;
   courses: CourseRow[];
+  /**
+   * Over every matching course on every page: open seats and sections
+   * (lectures, or standalone labs for lab-only courses), each CRN once, so a
+   * cross-listed class counts once.
+   */
+  totals: { openSeats: number; sections: number; courses: number };
   /** Terms whose sections were left out for having ended. */
   excludedEndedTerms: string[];
   /** When the seat counts were read from WPI. */
@@ -442,6 +456,11 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     if (error) throw error;
   }
   set<AcademicYearFilterCriteria>('academicYear', { year });
+  // Before every other filter, so a placeholder (listed as Online, with a
+  // waitlist) can neither match nor be counted.
+  set<InterestListFilterCriteria>('interestList', {
+    includeInterestLists: query.includeInterestLists,
+  });
 
   if (filters.searchText)
     set<SearchTextFilterCriteria>('searchText', filters.searchText);
@@ -566,6 +585,18 @@ function filterCatalog(
   );
 }
 
+function totalsOf(courses: Course[]): CourseQueryResult['totals'] {
+  const sections = new Map<number, Section>();
+  for (const course of courses) {
+    for (const s of primarySections(course)) sections.set(s.crn, s);
+  }
+  return {
+    openSeats: seatTotals([...sections.values()]).available,
+    sections: sections.size,
+    courses: courses.length,
+  };
+}
+
 const crnsOf = (course: Course) =>
   new Set(primarySections(course).map(s => s.crn));
 
@@ -608,9 +639,7 @@ function rowSections(course: Course, catalog: Catalog): SectionBrief[] {
         s,
         kind: 'standaloneLab' as const,
       }));
-  return lectures
-    .filter(({ s }) => !s.isInterestList)
-    .map(({ s, kind }) => toSectionBrief(s, kind, catalog.rmp));
+  return lectures.map(({ s, kind }) => toSectionBrief(s, kind, catalog.rmp));
 }
 
 export function runCourseQuery(
@@ -649,6 +678,7 @@ export function runCourseQuery(
       if (includeSections) row.sections = rowSections(c, catalog);
       return row;
     }),
+    totals: totalsOf(matches),
     excludedEndedTerms: read.excludedEndedTerms,
     dataAsOf: catalog.lastUpdated,
     notices,

@@ -98,8 +98,11 @@ export function catalogJson(extraName = '') {
                 ],
                 0,
               ),
+              // As WPI lists them: Online, with a waitlist.
               section(9, 'Interest List-C Term', 'C', [], 0, {
                 isInterestList: true,
+                deliveryMode: 'Online',
+                status: 'Waitlist',
               }),
             ],
             { category: 1 },
@@ -226,9 +229,13 @@ export function catalogJson(extraName = '') {
             'RBE-1001-2026',
             'Introduction To Robotics',
             [
-              section(8, 'BL01', 'B', [
-                period(['T', 'F'], '13:00', '14:50', 'Grace Hopper'),
-              ]),
+              section(
+                8,
+                'BL01',
+                'B',
+                [period(['T', 'F'], '13:00', '14:50', 'Grace Hopper')],
+                2,
+              ),
             ],
             { description: '<p>Hands-on robot design.</p>' },
           ),
