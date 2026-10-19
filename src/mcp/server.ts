@@ -132,7 +132,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
             .int()
             .optional()
             .describe(
-              'Academic year (fall year) for a course code; defaults to the current year, then the newest year offering it.',
+              'Academic year (fall year) for a course code, matched exactly. Omitted: the current year, else the newest year offering it.',
             ),
         })
         .strict(),

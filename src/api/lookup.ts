@@ -13,8 +13,8 @@ const COURSE_ID_RE = /^[A-Za-z]+-[A-Za-z0-9]+-\d{4}$/;
 
 /**
  * A course by catalog id ("CS-2102-2026") or by code ("CS 2102", "CS2102",
- * "CS-2102"). A code resolves in `year`, else the current academic year,
- * else the newest year that has it.
+ * "CS-2102"). A code resolves in `year` when given; otherwise in the current
+ * academic year, else the newest year that has it.
  */
 export function findCourse(
   catalog: Catalog,
@@ -25,10 +25,12 @@ export function findCourse(
   if (COURSE_ID_RE.test(key)) {
     return findCourseById(key.toUpperCase(), catalog.departments);
   }
+  // An explicit year is a request for that year, never another one.
   return findCatalogCourse(
     key.replace(/-/g, ' '),
     year ?? currentAcademicYear(catalog),
     catalog.departments,
+    { fallbackToNewest: year === undefined },
   );
 }
 

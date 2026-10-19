@@ -293,6 +293,8 @@ describe('course detail', () => {
       'MA-1021-2027',
     );
     expect((await call('/courses/XX-1-2026')).status).toBe(404);
+    // CS 2102 has no 2027 offering; an explicit year does not fall back.
+    expect((await call('/courses/CS2102?year=2027')).status).toBe(404);
   });
 
   it('serializes days as arrays, times as HH:MM, and ratings', async () => {
@@ -377,8 +379,11 @@ describe('catalog', () => {
 
     // The check that spots the change still answers with the old catalog.
     expect(await source.get()).toBe(first);
-    await new Promise(resolve => setTimeout(resolve, 50));
-    const second = await source.get();
+    let second = first;
+    for (let i = 0; i < 100 && second === first; i++) {
+      await new Promise(resolve => setTimeout(resolve, 10));
+      second = await source.get();
+    }
     expect(second).not.toBe(first);
     expect(second.courses.find(c => c.id === 'MA-1021-2026')?.name).toBe(
       'Calculus I (new)',
