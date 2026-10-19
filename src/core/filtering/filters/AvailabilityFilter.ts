@@ -12,7 +12,11 @@ export class AvailabilityFilter implements SectionBasedFilter {
     sections: FilterableSection[],
     criteria: AvailabilityFilterCriteria,
   ): FilterableSection[] {
-    if (!criteria.availableOnly && !criteria.minAvailable) {
+    if (
+      !criteria.availableOnly &&
+      !criteria.minAvailable &&
+      criteria.maxWaitlisted === undefined
+    ) {
       return sections;
     }
 
@@ -24,6 +28,13 @@ export class AvailabilityFilter implements SectionBasedFilter {
       if (
         criteria.minAvailable &&
         fs.section.seatsAvailable < criteria.minAvailable
+      ) {
+        return false;
+      }
+
+      if (
+        criteria.maxWaitlisted !== undefined &&
+        fs.section.actualWaitlist > criteria.maxWaitlisted
       ) {
         return false;
       }
@@ -41,10 +52,20 @@ export class AvailabilityFilter implements SectionBasedFilter {
     if (c.minAvailable !== undefined && typeof c.minAvailable !== 'number') {
       return false;
     }
+    if (c.maxWaitlisted !== undefined && typeof c.maxWaitlisted !== 'number') {
+      return false;
+    }
     return true;
   }
 
   getDisplayValue(criteria: AvailabilityFilterCriteria): string {
+    const base = this.seatsDisplay(criteria);
+    if (criteria.maxWaitlisted === undefined) return base;
+    const waitlist = `Waitlist at most ${criteria.maxWaitlisted}`;
+    return base === 'All courses' ? waitlist : `${base}, ${waitlist}`;
+  }
+
+  private seatsDisplay(criteria: AvailabilityFilterCriteria): string {
     if (criteria.availableOnly && criteria.minAvailable) {
       return `Available seats (min ${criteria.minAvailable})`;
     }

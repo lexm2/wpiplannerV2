@@ -167,7 +167,7 @@ export function rankCoursesByRelevance(
 }
 
 /** The numeric part's first digit: 1-4 undergraduate, 5 and up graduate. */
-function courseLevel(course: Course): number | null {
+export function courseLevel(course: Course): number | null {
   const digits = /\d+/.exec(course.number)?.[0];
   return digits ? Number(digits[0]) : null;
 }

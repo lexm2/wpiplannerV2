@@ -26,12 +26,14 @@ export class RMPRatingFilter implements SectionBasedFilter {
       (criteria.minWouldTakeAgain ?? 0) === 0 &&
       (criteria.maxWouldTakeAgain ?? 100) === 100;
     const isDefaultInclude = (criteria.includeWithoutData ?? true) === true;
+    const minNumRatings = criteria.minNumRatings ?? 0;
 
     if (
       isDefaultRating &&
       isDefaultDifficulty &&
       isDefaultRetake &&
-      isDefaultInclude
+      isDefaultInclude &&
+      minNumRatings <= 0
     ) {
       return sections;
     }
@@ -56,7 +58,12 @@ export class RMPRatingFilter implements SectionBasedFilter {
           return criteria.includeWithoutData ?? true;
         }
 
-        const { rating, difficulty, wouldTakeAgain } = ratings;
+        const { rating, difficulty, wouldTakeAgain, numRatings } = ratings;
+
+        // Too few ratings to go on counts as no data.
+        if (numRatings < minNumRatings) {
+          return criteria.includeWithoutData ?? true;
+        }
 
         if (
           criteria.minRating !== undefined &&
@@ -164,6 +171,13 @@ export class RMPRatingFilter implements SectionBasedFilter {
       return false;
     }
 
+    if (
+      c.minNumRatings !== undefined &&
+      (typeof c.minNumRatings !== 'number' || c.minNumRatings < 0)
+    ) {
+      return false;
+    }
+
     return true;
   }
 
@@ -188,6 +202,10 @@ export class RMPRatingFilter implements SectionBasedFilter {
     const maxRetake = criteria.maxWouldTakeAgain ?? 100;
     if (minRetake > 0 || maxRetake < 100) {
       parts.push(`${minRetake}-${maxRetake}% retake`);
+    }
+
+    if ((criteria.minNumRatings ?? 0) > 0) {
+      parts.push(`${criteria.minNumRatings}+ ratings`);
     }
 
     return parts.length > 0 ? `RMP: ${parts.join(', ')}` : 'RMP filters';
