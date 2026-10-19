@@ -89,3 +89,51 @@ describe('lecture groups', () => {
     }
   });
 });
+
+describe('credits', () => {
+  const interestList = (courseSection: string) =>
+    row(courseSection, {
+      Credits: '0',
+      Course_Tags: 'Course Type :: Waitlist Section',
+      Section_Status: 'Waitlist',
+      Enrolled_Capacity: '0/0',
+    });
+
+  it('ignores interest lists listed at 0 credits', () => {
+    const course = convert([
+      interestList('CS 1101-AL-Interest List - Introduction To Program Design'),
+      row('CS 1101-AL01 - Introduction To Program Design'),
+    ]);
+    expect([course.minCredits, course.maxCredits]).toEqual([3, 3]);
+  });
+
+  it('spans the credits the sections offer', () => {
+    const course = convert([
+      row('MU 2401-F01 - Glee Club', { Credits: '1.5' }),
+      row('MU 2401-F02 - Glee Club', { Credits: '0' }),
+    ]);
+    expect([course.minCredits, course.maxCredits]).toEqual([0, 1.5]);
+  });
+
+  it('falls back to the interest lists when nothing else is offered', () => {
+    const course = convert([
+      { ...interestList('PH 1111-AL-Interest List - Mechanics'), Credits: '3' },
+    ]);
+    expect([course.minCredits, course.maxCredits]).toEqual([3, 3]);
+  });
+});
+
+describe('credits from the lecture', () => {
+  it('takes no notice of a mislabeled companion', () => {
+    const course = convert([
+      row('PH 1110-AL01 - General Physics'),
+      lab('PH 1110-AX01 - General Physics', { Credits: '0' }),
+    ]);
+    expect([course.minCredits, course.maxCredits]).toEqual([3, 3]);
+  });
+
+  it('uses the labs of a lab-only course', () => {
+    const course = convert([lab('CH 1010-AX01 - Chemistry', { Credits: '1' })]);
+    expect([course.minCredits, course.maxCredits]).toEqual([1, 1]);
+  });
+});

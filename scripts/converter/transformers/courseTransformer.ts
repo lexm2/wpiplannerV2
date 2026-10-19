@@ -13,6 +13,8 @@ import { buildLectureGroups } from './lectureGroupBuilder.js';
 import { sanitizeHTML, extractCategory } from '../utils/htmlSanitizer.js';
 import { ConverterConfig } from '../ConverterConfig.js';
 
+const COMPANION_FORMATS = new Set(['Laboratory', 'Discussion']);
+
 /**
  * Transforms a group of Workday sections (same course) into a PlannerCourse
  */
@@ -54,17 +56,33 @@ export function transformCourse(
   const { category, cleanedHtml } = extractCategory(descriptionRaw);
   const description = sanitizeHTML(cleanedHtml);
 
-  const credits = parseFloat(firstSection.Credits);
-
   const isGraduate = firstSection.Academic_Level === 'Graduate';
 
   // Parse fall year from "2025 - 2026 Academic Year"
   const academicYear = parseInt(firstSection.Academic_Year);
 
-  // Transform all sections (flatMap because graduate F/S terms expand to multiple sections)
-  const plannerSections = workdaySections.flatMap(ws =>
-    transformSection(ws, config),
+  const converted = workdaySections.map(ws => ({
+    ws,
+    sections: transformSection(ws, config),
+  }));
+  const plannerSections = converted.flatMap(c => c.sections);
+
+  // Interest lists are waitlist placeholders, mostly listed at 0 credits, so
+  // only sections a student can enroll in set the range, and of those the
+  // ones that head a lecture group: every section repeats the course's
+  // credits, and the odd companion is mislabeled (PH 1110's AD08 says 0).
+  // Lab-only courses use their labs, and a course with nothing but
+  // placeholders falls back to them.
+  const enrollable = converted
+    .filter(c => c.sections.some(s => !s.isInterestList))
+    .map(c => c.ws);
+  const heads = enrollable.filter(
+    ws => !COMPANION_FORMATS.has(ws.Instructional_Format),
   );
+  const credited = [heads, enrollable, workdaySections].find(
+    rows => rows.length > 0,
+  )!;
+  const credits = credited.map(ws => parseFloat(ws.Credits) || 0);
 
   const categorized = categorizeSections(plannerSections);
 
@@ -89,8 +107,8 @@ export function transformCourse(
     name: courseName,
     description,
     category,
-    minCredits: credits,
-    maxCredits: credits,
+    minCredits: Math.min(...credits),
+    maxCredits: Math.max(...credits),
     isGraduate,
     academicYear,
     lectures,
