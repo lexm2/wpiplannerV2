@@ -571,7 +571,9 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     );
   } else if (ended.length) {
     notices.push(
-      `Terms ${ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
+      ended.length === 1
+        ? `Term ${ended[0]} has ended: its sections are listed but can no longer be taken.`
+        : `Terms ${ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
     );
   }
 
