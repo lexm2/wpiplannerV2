@@ -54,6 +54,8 @@ export interface RawCourse {
   degreeAttributes?: string[];
   courseTypes?: string[];
   crossListedWith?: string[];
+  recommendedBackground?: string;
+  prerequisites?: string;
   lectures?: RawLectureGroup[];
   standaloneLabs?: RawSection[];
   minCredits?: number;

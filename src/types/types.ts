@@ -23,6 +23,13 @@ export interface Course {
    * class, register under either code.
    */
   crossListedWith: string[];
+  /**
+   * What the description recommends having taken, lifted from its
+   * "Recommended background: ..." prose. Still part of the description.
+   */
+  recommendedBackground?: string;
+  /** The description's "Prerequisite(s): ..." statement, likewise. */
+  prerequisites?: string;
   departmentAbbr: string;
   departmentName: string;
   lectures?: LectureGroup[];

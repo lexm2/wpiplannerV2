@@ -79,4 +79,76 @@ describe('parseCatalog', () => {
     );
     expect(() => parseCatalog('nope')).toThrow();
   });
+
+  it('carries the catalog fields, with defaults for older data', () => {
+    const db = parseCatalog({
+      departments: [
+        {
+          abbreviation: 'DS',
+          name: 'Data Science',
+          courses: [
+            {
+              id: 'DS-502-2026',
+              number: '502',
+              name: 'Statistical Methods',
+              degreeAttributes: ['Social Sciences'],
+              courseTypes: ['Special Topic'],
+              crossListedWith: ['MA 543'],
+              recommendedBackground: 'MA 2611.',
+              prerequisites: 'graduate standing.',
+              lectures: [
+                {
+                  section: {
+                    ...lecture.section,
+                    isOnlineGrad: true,
+                    meetsWith: ['MA 543-F01'],
+                    deliveryMode: 'Online',
+                    status: 'Waitlist',
+                    startDate: '2026-08-27',
+                    endDate: '2026-12-10',
+                  },
+                },
+              ],
+            },
+            {
+              id: 'DS-501-2026',
+              number: '501',
+              name: 'Old',
+              lectures: [lecture],
+            },
+          ],
+        },
+      ],
+    });
+
+    const [current, older] = db.departments[0].courses;
+    expect(current).toMatchObject({
+      degreeAttributes: ['Social Sciences'],
+      courseTypes: ['Special Topic'],
+      crossListedWith: ['MA 543'],
+      recommendedBackground: 'MA 2611.',
+      prerequisites: 'graduate standing.',
+    });
+    expect(current.lectures![0].section).toMatchObject({
+      isOnlineGrad: true,
+      meetsWith: ['MA 543-F01'],
+      deliveryMode: 'Online',
+      status: 'Waitlist',
+      startDate: '2026-08-27',
+      endDate: '2026-12-10',
+    });
+
+    expect(older).toMatchObject({
+      degreeAttributes: [],
+      courseTypes: [],
+      crossListedWith: [],
+    });
+    expect(older.recommendedBackground).toBeUndefined();
+    expect(older.lectures![0].section).toMatchObject({
+      isOnlineGrad: false,
+      meetsWith: [],
+      deliveryMode: '',
+      status: '',
+    });
+  });
 });

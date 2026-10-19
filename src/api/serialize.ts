@@ -106,6 +106,9 @@ export interface CourseDetail extends CourseSummary {
   courseTypes: string[];
   /** Other codes the same sections are listed under; one class. */
   crossListedWith: string[];
+  /** Lifted from the description's prose; still part of it. */
+  recommendedBackground: string | null;
+  prerequisites: string | null;
   lectureGroups: LectureGroupView[];
   standaloneLabs: SectionView[];
 }
@@ -244,6 +247,8 @@ export function toCourseDetail(
     degreeAttributes: course.degreeAttributes,
     courseTypes: course.courseTypes,
     crossListedWith: course.crossListedWith,
+    recommendedBackground: course.recommendedBackground ?? null,
+    prerequisites: course.prerequisites ?? null,
     lectureGroups: (course.lectures ?? []).map(g => ({
       lecture: view(g.section),
       discussions: g.compatibleDiscussions.map(view),

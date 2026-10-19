@@ -28,6 +28,10 @@ export interface PlannerCourse {
   courseTypes: string[];
   /** Other course codes listing the same sections under their own code. */
   crossListedWith: string[];
+  /** The description's "Recommended background: ..." statement. */
+  recommendedBackground?: string;
+  /** The description's "Prerequisite(s): ..." statement. */
+  prerequisites?: string;
   minCredits: number;
   maxCredits: number;
   isGraduate: boolean;

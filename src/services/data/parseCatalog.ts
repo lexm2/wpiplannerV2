@@ -163,6 +163,8 @@ export function parseCourse(
     degreeAttributes: courseData.degreeAttributes ?? [],
     courseTypes: courseData.courseTypes ?? [],
     crossListedWith: courseData.crossListedWith ?? [],
+    recommendedBackground: courseData.recommendedBackground,
+    prerequisites: courseData.prerequisites,
     departmentAbbr: department.abbreviation,
     departmentName: department.name,
     lectures: lectures.length > 0 ? lectures : undefined,

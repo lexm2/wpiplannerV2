@@ -10,7 +10,12 @@ import {
   isSpecialSection,
 } from './sectionTransformer.js';
 import { buildLectureGroups } from './lectureGroupBuilder.js';
-import { sanitizeHTML, extractCategory } from '../utils/htmlSanitizer.js';
+import {
+  sanitizeHTML,
+  extractCategory,
+  stripUnits,
+} from '../utils/htmlSanitizer.js';
+import { extractPrerequisites } from '../utils/prerequisites.js';
 import { ConverterConfig } from '../ConverterConfig.js';
 import { offeringCategory, unionTagValues } from '../utils/courseTags.js';
 
@@ -60,7 +65,9 @@ export function transformCourse(
 
   const { category: describedCategory, cleanedHtml } =
     extractCategory(descriptionRaw);
-  const description = sanitizeHTML(cleanedHtml);
+  const description = stripUnits(sanitizeHTML(cleanedHtml));
+  const { recommendedBackground, prerequisites } =
+    extractPrerequisites(description);
 
   const isGraduate = firstSection.Academic_Level === 'Graduate';
 
@@ -129,6 +136,8 @@ export function transformCourse(
     degreeAttributes,
     courseTypes,
     crossListedWith,
+    recommendedBackground,
+    prerequisites,
     minCredits: Math.min(...credits),
     maxCredits: Math.max(...credits),
     isGraduate,
