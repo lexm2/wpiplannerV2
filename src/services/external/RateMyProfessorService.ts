@@ -36,29 +36,39 @@ export class RateMyProfessorService {
         );
       }
 
-      // Parsed, not asserted: a scheduled job regenerates this file, so a
-      // shape change arrives at runtime with no rebuild.
-      this.data = RateMyProfessorDataSchema.parse(await response.json());
-      this.matchCache.clear();
-
-      if (this.data && this.data.professors) {
-        for (const professor of this.data.professors) {
-          const fullName = this.normalizeName(
-            `${professor.firstName} ${professor.lastName}`,
-          );
-          const lastName = this.normalizeName(professor.lastName);
-
-          this.professorsByFullName.set(fullName, professor);
-
-          if (!this.professorsByLastName.has(lastName)) {
-            this.professorsByLastName.set(lastName, []);
-          }
-          this.professorsByLastName.get(lastName)!.push(professor);
-        }
-      }
+      this.loadFromData(await response.json());
     } catch {
       // Ratings are optional: on a failed load every lookup returns null and
       // the next loadData() call tries again.
+    }
+  }
+
+  /**
+   * Replaces the ratings with already-fetched rateMyProfessor.json content,
+   * e.g. read from disk by the course API server. Throws if it does not
+   * match the schema, leaving the previous data in place.
+   */
+  loadFromData(json: unknown): void {
+    // Parsed, not asserted: a scheduled job regenerates this file, so a
+    // shape change arrives at runtime with no rebuild.
+    const data = RateMyProfessorDataSchema.parse(json);
+
+    this.data = data;
+    this.professorsByFullName = new Map();
+    this.professorsByLastName = new Map();
+    this.matchCache = new Map();
+
+    for (const professor of data.professors) {
+      const fullName = this.normalizeName(
+        `${professor.firstName} ${professor.lastName}`,
+      );
+      const lastName = this.normalizeName(professor.lastName);
+
+      this.professorsByFullName.set(fullName, professor);
+
+      const sameLastName = this.professorsByLastName.get(lastName);
+      if (sameLastName) sameLastName.push(professor);
+      else this.professorsByLastName.set(lastName, [professor]);
     }
   }
 

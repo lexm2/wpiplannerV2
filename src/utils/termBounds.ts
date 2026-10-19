@@ -71,8 +71,7 @@ export class TermBoundsService {
         return;
       }
 
-      const data: unknown = await response.json();
-      this.termBoundsCache = TermBoundsDataSchema.parse(data);
+      this.loadFromData(await response.json());
     } catch (error) {
       logger.warn(
         '[TermBoundsService] Error loading term-bounds.json, services will use fallback dates:',
@@ -80,6 +79,15 @@ export class TermBoundsService {
       );
       this.termBoundsCache = null;
     }
+  }
+
+  /**
+   * Replaces the bounds with already-fetched term-bounds.json content, e.g.
+   * read from disk by the course API server. Throws if it does not match the
+   * schema, leaving the previous bounds in place.
+   */
+  public loadFromData(json: unknown): void {
+    this.termBoundsCache = TermBoundsDataSchema.parse(json);
   }
 
   public getTermDates(
