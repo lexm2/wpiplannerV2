@@ -525,7 +525,35 @@ describe('conflicts', () => {
       { days: ['M'], start: '18:00', end: '20:50' },
     ]);
     const one = await call('/conflicts', { crns: [30] });
-    expect(one.body).toEqual({ checked: [30], duplicates: [], conflicts: [] });
+    expect(one.body).toEqual({
+      checked: [30],
+      duplicates: [],
+      conflicts: [],
+      issues: [],
+      dataAsOf: '2026-09-02T00:00:00Z',
+    });
+  });
+
+  it('checks the CRNs make a registrable set', async () => {
+    const kinds = async (crns: number[], today = BEFORE_A) => {
+      const { body } = await callOn(endpoints(today).api, '/conflicts', {
+        crns,
+      });
+      return body.issues.map((i: { kind: string }) => i.kind);
+    };
+    // BX02 goes with BL02 only, so BL01 is still without a lab of its own.
+    expect(await kinds([20, 23])).toEqual(['unpaired', 'missingCompanion']);
+    expect(await kinds([21, 23])).toEqual([]);
+    // A lab with no lecture, and a lecture with no lab.
+    expect(await kinds([22])).toEqual(['unpaired']);
+    expect(await kinds([20])).toEqual(['missingCompanion']);
+    // Two lectures of one course, each still missing nothing: BX01 fits both.
+    expect(await kinds([20, 21, 22])).toEqual(['sameCourse']);
+    expect(await kinds([9])).toEqual(['interestList']);
+    expect(await kinds([40])).toEqual(['full']);
+    expect(await kinds([8])).toEqual(['lowSeats']);
+    // MA 1021's AL01 is full, and in a term that has ended.
+    expect(await kinds([5], AFTER_A)).toEqual(['ended', 'full']);
   });
 
   it('rejects unknown CRNs', async () => {

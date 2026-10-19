@@ -494,18 +494,6 @@ export function renderConflicts(check: ConflictCheck): string {
       `CRN ${check.duplicates.join(', ')} given more than once; checked once.`,
     );
   }
-  if (check.checked.length < 2) {
-    lines.push(
-      `Only one section (CRN ${check.checked[0]}); nothing to compare. Pass two or more CRNs.`,
-    );
-    return lines.join('\n');
-  }
-  if (check.conflicts.length === 0) {
-    lines.push(
-      `No conflicts: these ${check.checked.length} sections fit together.`,
-    );
-    return lines.join('\n');
-  }
   const name = (s: ConflictCheck['conflicts'][number]['a']) =>
     `${s.courses.join('/')} ${s.section} (CRN ${s.crn}, ${s.term})`;
   for (const { a, b, overlaps } of check.conflicts) {
@@ -514,9 +502,26 @@ export function renderConflicts(check: ConflictCheck): string {
       : '';
     lines.push(`CONFLICT ${name(a)} and ${name(b)}${when}.`);
   }
-  lines.push(
-    `${check.conflicts.length} conflicting pair${check.conflicts.length === 1 ? '' : 's'} among ${check.checked.length} sections; other pairs fit.`,
-  );
+  for (const issue of check.issues) {
+    lines.push(
+      `${issue.severity === 'error' ? 'PROBLEM' : 'Note'}: ${issue.message}`,
+    );
+  }
+
+  const errors = check.issues.filter(i => i.severity === 'error').length;
+  const n = check.checked.length;
+  const times =
+    n < 2
+      ? 'One section, so no times to compare.'
+      : check.conflicts.length
+        ? `${check.conflicts.length} time conflict${check.conflicts.length === 1 ? '' : 's'} among ${n} sections; other pairs fit.`
+        : `No time conflicts among these ${n} sections.`;
+  const verdict = errors
+    ? `${errors} problem${errors === 1 ? '' : 's'} to fix before registering.`
+    : check.conflicts.length
+      ? ''
+      : 'They make a valid set to register in Workday.';
+  lines.push([times, verdict].filter(Boolean).join(' '));
   return lines.join('\n');
 }
 

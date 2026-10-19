@@ -235,7 +235,27 @@ describe('MCP server', () => {
     );
     const one = await tool('check_conflicts', { crns: [30] });
     expect(one.isError).toBe(false);
-    expect(one.text).toContain('nothing to compare');
+    expect(one.text).toContain(
+      'One section, so no times to compare. They make a valid set to register in Workday.',
+    );
+  });
+
+  it('says what keeps a set of CRNs from being registered', async () => {
+    const bad = await tool('check_conflicts', { crns: [20, 23, 40] });
+    expect(bad.text).toContain(
+      'PROBLEM: PH 1110 lab BX02 (CRN 23) does not go with lecture BL01 (CRN 20); it goes with BL02 (CRN 21).',
+    );
+    expect(bad.text).toContain(
+      'Note: PSY 1400 B01 (CRN 40) is FULL (30/30, 5 on the waitlist); registering means joining the waitlist.',
+    );
+    expect(bad.text).toContain('1 problem to fix before registering.');
+    const missing = await tool('check_conflicts', { crns: [20, 8] });
+    expect(missing.text).toContain(
+      'Note: PH 1110 BL01 (CRN 20) needs a lab: none chosen (1 goes with it; get_course "PH 1110").',
+    );
+    expect(missing.text).toContain(
+      'Note: RBE 1001 BL01 (CRN 8) had only 2 open seats as of 2026-09-02; they may already be gone.',
+    );
   });
 
   it('explains an empty or early year of departments', async () => {

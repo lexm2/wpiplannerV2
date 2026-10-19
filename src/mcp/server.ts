@@ -133,7 +133,8 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         'cross-listings, and its sections by term (CRN, days/times, room, instructor with rating, seats, waitlist), ' +
         'each lab and discussion listed once with the lectures it pairs with. By default shows terms not yet ended ' +
         'and hides interest-list placeholders, saying what it left out. With a year whose schedule is not published, ' +
-        'returns the outlook for that year instead (likely, possible, uncertain or unknown), from the offering pattern.',
+        'returns the outlook for that year instead (likely, possible, uncertain or unknown), from the offering pattern. ' +
+        'Read-only; registration is in Workday.',
       inputSchema: z
         .object({
           course: z
@@ -268,11 +269,13 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
   server.registerTool(
     'check_conflicts',
     {
-      title: 'Check time conflicts',
+      title: 'Check a schedule',
       description:
-        'Which of the given sections meet at overlapping times, with the shared days and times of each conflicting ' +
-        'pair. Only sections whose terms overlap can conflict; a semester section (F or S) overlaps both of its ' +
-        'quarters. Duplicated CRNs are checked once.',
+        'Checks chosen CRNs as a schedule. Time conflicts, with the days and times each conflicting pair shares (a ' +
+        'semester section, F or S, overlaps both of its quarters). Problems: a lab or discussion that does not go ' +
+        'with a chosen lecture, two lectures of one course, interest-list placeholders, ended terms, closed sections. ' +
+        'Notes: a lecture missing a lab or discussion it needs, full or waitlisted sections, 3 or fewer seats left. ' +
+        'Read-only; registration is in Workday.',
       inputSchema: z
         .object({
           crns: z
