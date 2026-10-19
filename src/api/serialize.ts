@@ -35,6 +35,8 @@ export interface CourseSummary {
 interface PeriodView {
   type: string;
   professor: string;
+  /** The professor field split per instructor ("A; B" is co-taught). */
+  instructors: InstructorView[];
   /** Weekday letters M T W R F S U, in week order. Empty when async. */
   days: string[];
   /** "HH:MM", 24-hour; null when the period has no set time. */
@@ -67,8 +69,13 @@ interface LectureGroupView {
   labs: SectionView[];
 }
 
-interface ProfessorView {
+interface InstructorView {
   name: string;
+  /** Rate My Professor ratings; null when RMP has none for them. */
+  rmp: RatingView | null;
+}
+
+interface RatingView {
   rating: number;
   difficulty: number;
   numRatings: number;
@@ -82,22 +89,23 @@ export interface CourseDetail extends CourseSummary {
   description: string;
   lectureGroups: LectureGroupView[];
   standaloneLabs: SectionView[];
-  /** Rate My Professor ratings, for the instructors that have them. */
-  ratings: ProfessorView[];
 }
 
 function isNamedProfessor(name: string): boolean {
   return !!name.trim() && name !== 'TBA' && name !== 'Not Assigned';
 }
 
-/** Instructor names in order of first appearance; co-taught "A; B" splits. */
+/** A period's named instructors; co-taught "A; B" splits. */
+function instructorNames(period: Period): string[] {
+  return period.professor.split(/\s*;\s*/).filter(isNamedProfessor);
+}
+
+/** Instructor names in order of first appearance. */
 function professorsOf(sections: Section[]): string[] {
   const names = new Set<string>();
   for (const section of sections) {
     for (const period of section.periods) {
-      for (const name of period.professor.split(/\s*;\s*/)) {
-        if (isNamedProfessor(name)) names.add(name);
-      }
+      for (const name of instructorNames(period)) names.add(name);
     }
   }
   return [...names];
@@ -146,7 +154,13 @@ function hhmm(time: Time): string {
   return `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
 }
 
-function toPeriodView(period: Period, timed: boolean): PeriodView {
+type RatingLookup = (name: string) => RatingView | null;
+
+function toPeriodView(
+  period: Period,
+  timed: boolean,
+  ratingOf: RatingLookup,
+): PeriodView {
   const days = DAY_ORDER.filter(d => period.days.has(d));
   const hasTime = period.startTime.displayTime !== 'TBD';
   let display: string;
@@ -158,6 +172,10 @@ function toPeriodView(period: Period, timed: boolean): PeriodView {
   return {
     type: period.type,
     professor: period.professor,
+    instructors: instructorNames(period).map(name => ({
+      name,
+      rmp: ratingOf(name),
+    })),
     days: period.isAsync ? [] : days,
     start: timed && hasTime ? hhmm(period.startTime) : null,
     end: timed && hasTime ? hhmm(period.endTime) : null,
@@ -167,7 +185,7 @@ function toPeriodView(period: Period, timed: boolean): PeriodView {
   };
 }
 
-function toSectionView(section: Section): SectionView {
+function toSectionView(section: Section, ratingOf: RatingLookup): SectionView {
   const timed = new Set(timedPeriods(section));
   return {
     crn: section.crn,
@@ -179,7 +197,7 @@ function toSectionView(section: Section): SectionView {
     maxWaitlist: section.maxWaitlist,
     seatsLabel: seatsLabel(section),
     isInterestList: section.isInterestList ?? false,
-    periods: section.periods.map(p => toPeriodView(p, timed.has(p))),
+    periods: section.periods.map(p => toPeriodView(p, timed.has(p), ratingOf)),
   };
 }
 
@@ -187,22 +205,21 @@ export function toCourseDetail(
   course: Course,
   rmp: RateMyProfessorService,
 ): CourseDetail {
-  const ratings: ProfessorView[] = [];
-  for (const name of professorsOf(getAllSections(course))) {
+  const ratingOf: RatingLookup = name => {
     const r = rmp.getRatings(name);
-    if (r) ratings.push({ name, ...r, url: rmp.getProfessorRMPUrl(name) });
-  }
+    return r ? { ...r, url: rmp.getProfessorRMPUrl(name) } : null;
+  };
+  const view = (section: Section) => toSectionView(section, ratingOf);
 
   return {
     ...toCourseSummary(course),
     departmentName: course.departmentName,
     description: course.description,
     lectureGroups: (course.lectures ?? []).map(g => ({
-      lecture: toSectionView(g.section),
-      discussions: g.compatibleDiscussions.map(toSectionView),
-      labs: g.compatibleLabs.map(toSectionView),
+      lecture: view(g.section),
+      discussions: g.compatibleDiscussions.map(view),
+      labs: g.compatibleLabs.map(view),
     })),
-    standaloneLabs: (course.standaloneLabs ?? []).map(toSectionView),
-    ratings,
+    standaloneLabs: (course.standaloneLabs ?? []).map(view),
   };
 }

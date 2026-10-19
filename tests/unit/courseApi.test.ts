@@ -297,7 +297,7 @@ describe('course detail', () => {
     expect((await call('/courses/CS2102?year=2027')).status).toBe(404);
   });
 
-  it('serializes days as arrays, times as HH:MM, and ratings', async () => {
+  it('serializes days as arrays, times as HH:MM, and ratings inline', async () => {
     const { body } = await call('/courses/CS-2102-2026');
     expect(body.description).toBe('Object-Oriented Design Concepts & more');
     const [p] = body.lectureGroups[0].lecture.periods;
@@ -307,15 +307,28 @@ describe('course detail', () => {
       end: '10:50',
       display: 'MTRF 10:00-10:50 AM',
     });
-    expect(body.ratings).toEqual([
+    expect(p.instructors).toEqual([
       {
         name: 'Ada Lovelace',
-        rating: 4.5,
-        difficulty: 2.1,
-        numRatings: 12,
-        wouldTakeAgain: 91,
-        url: 'https://example.test/ada',
+        rmp: {
+          rating: 4.5,
+          difficulty: 2.1,
+          numRatings: 12,
+          wouldTakeAgain: 91,
+          url: 'https://example.test/ada',
+        },
       },
+    ]);
+    expect(body).not.toHaveProperty('ratings');
+  });
+
+  it('gives an unrated instructor a null rating', async () => {
+    const { body } = await call('/courses/MA-1021-2026');
+    const al01 = body.lectureGroups.find(
+      (g: { lecture: { number: string } }) => g.lecture.number === 'AL01',
+    );
+    expect(al01.lecture.periods[0].instructors).toEqual([
+      { name: 'Grace Hopper', rmp: null },
     ]);
   });
 
