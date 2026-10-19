@@ -412,9 +412,9 @@ export interface CourseQueryResult {
   /** Things the caller should know about how the query was read. */
   notices: string[];
   /**
-   * With searchText: the query, and whether no matching course has it in
-   * its name, code or department, nor its words together in a
-   * description, so none is mainly about it.
+   * With searchText: the query, and whether every match only mentions it:
+   * none has it in its name, code or department, its words together in a
+   * description, or an instructor or room matching it.
    */
   search: { query: string; onlyMentions: boolean } | null;
 }
@@ -674,14 +674,13 @@ export function runCourseQuery(
   if (text && !text.professorOnly) {
     for (const c of matches) matchOf.set(c, describeMatch(c, text.query));
   }
-  const strong: SearchMatch[] = ['code', 'title', 'description'];
+  const weak: SearchMatch[] = ['mentions', 'scattered'];
   const search = text
     ? {
         query: text.query,
         onlyMentions:
-          matches.length > 0 &&
-          !text.professorOnly &&
-          [...matchOf.values()].every(m => !strong.includes(m)),
+          matchOf.size > 0 &&
+          [...matchOf.values()].every(m => weak.includes(m)),
       }
     : null;
 

@@ -6,6 +6,7 @@ import { keepMatchingGroups } from '../lectureGroupScope';
 import {
   matchCourseText,
   parseSearchQuery,
+  namesHaveWord,
   prepareSearch,
   textHasWord,
   type ParsedQuery,
@@ -52,7 +53,7 @@ export class SearchTextFilter implements SectionBasedFilter {
         const names = fs.section.periods
           .map(p => p.professor.toLowerCase())
           .join(' ');
-        return query.words.every(word => textHasWord(names, word));
+        return query.words.every(word => namesHaveWord(names, word));
       });
     }
 

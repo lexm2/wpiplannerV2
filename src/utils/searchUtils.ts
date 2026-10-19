@@ -295,6 +295,16 @@ export function textHasWord(text: string, word: string): boolean {
   return wordIn(word, text, isShort(word) ? tokenize(text) : []);
 }
 
+/**
+ * Whether `word` occurs in instructor names: a short word as the start of a
+ * name ("Li" finds Li and Lin, not Elizabeth), a longer one anywhere.
+ */
+export function namesHaveWord(names: string, word: string): boolean {
+  return isShort(word)
+    ? tokenize(names).some(t => t.startsWith(word))
+    : names.includes(word);
+}
+
 /** `word` matches description token `token`, as matchCourseText reads it. */
 function tokenMatches(word: string, token: string): boolean {
   if (isShort(word)) return shortWordIs(word, token);

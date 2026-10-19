@@ -69,6 +69,16 @@ describe('MCP server', () => {
       '2. CS 1101 Introduction to Program Design | (mentions CS 2102) |',
     );
     expect(code.text).not.toContain('mainly about');
+    // An instructor match is not a mere mention.
+    const person = await tool('search_courses', {
+      filters: { searchText: { query: 'Hopper' } },
+    });
+    expect(person.text).toContain('(matched an instructor or room)');
+    expect(person.text).not.toContain('mainly about');
+    const prefix = await tool('search_courses', {
+      filters: { searchText: { query: 'Hop', professorOnly: true } },
+    });
+    expect(prefix.data.total).toBeGreaterThan(0);
   });
 
   it('says when the offset runs past the end', async () => {
