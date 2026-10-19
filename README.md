@@ -3,6 +3,28 @@
 The app is a static SPA plus a small loop that refreshes course JSON from WPI
 every 15 minutes. Both live in `docker-compose.yml`.
 
+### One-command install
+
+`install.sh` sets up a fresh server and, re-run with the same options, updates it.
+
+- **Debian, Ubuntu, Arch:** installs Docker and nginx, runs the containers
+  bound to localhost with nginx in front, and with `--domain` gets a Let's
+  Encrypt certificate (the domain's DNS must already point at the server).
+- **RHEL, Rocky, Alma, Fedora:** no containers. Apache httpd serves the built
+  app directly and a systemd service runs the fetcher; HTTPS uses a
+  certificate you pass with `--tls-cert` and `--tls-key`. The same setup by
+  hand is in [deploy/rhel.md](deploy/rhel.md).
+
+```
+curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/master/install.sh \
+    | sudo bash -s -- --domain planner.example.com --email you@example.com
+```
+
+Leave out `--domain` to serve over plain HTTP on the server's IP. `--help`
+lists the other options.
+
+### Manual
+
 Requirements: Docker and Docker Compose on the host.
 
 ```
