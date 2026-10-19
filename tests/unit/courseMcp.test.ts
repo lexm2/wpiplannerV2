@@ -142,6 +142,26 @@ describe('MCP server', () => {
     expect(prefix.data.total).toBeGreaterThan(0);
   });
 
+  it('says what the MQP and IQP are rather than guess at courses', async () => {
+    const { text, data } = await tool('search_courses', {
+      filters: { searchText: { query: 'major qualifying project' } },
+    });
+    expect(data.total).toBe(0);
+    expect(text).toContain(
+      'The MQP (Major Qualifying Project) is a WPI degree project, arranged with a project advisor or department and registered separately, not a regular catalog section. No catalog course is named for it; any rows below only mention it.',
+    );
+    // Leaving out the only filter would find everything: not said.
+    expect(text).not.toContain('Most restrictive');
+    const iqp = await tool('search_courses', {
+      filters: { searchText: { query: 'IQP' } },
+    });
+    expect(iqp.text).toContain('The IQP (Interactive Qualifying Project)');
+    const plain = await tool('search_courses', {
+      filters: { searchText: { query: 'robotics' } },
+    });
+    expect(plain.text).not.toContain('degree project');
+  });
+
   it('suggests the instructor a misspelt name means', async () => {
     for (const query of ['Grace Hoper', 'Hoppr']) {
       const { text, data } = await tool('search_courses', {

@@ -50,6 +50,16 @@ async function toolResult(
   return { text: result.content[0].text, data: result.structuredContent };
 }
 
+const search = (query: string, limit = 25) =>
+  runCourseQuery(
+    catalog,
+    CourseQuerySchema.parse({
+      filters: { searchText: { query } },
+      includeEndedTerms: true,
+      limit,
+    }),
+  );
+
 const top = (query: string, n = 3) =>
   runCourseQuery(
     catalog,
@@ -107,16 +117,6 @@ describe('ranking on the real catalog', () => {
     expect(top('game design', 1)[0]).toMatch(/^IMGD /);
   });
 
-  const search = (query: string, limit = 25) =>
-    runCourseQuery(
-      catalog,
-      CourseQuerySchema.parse({
-        filters: { searchText: { query } },
-        includeEndedTerms: true,
-        limit,
-      }),
-    );
-
   it('reads AI as a word and as Artificial Intelligence, not inside words', () => {
     const ai = search('AI');
     const names = ai.courses.map(c => c.name);
@@ -168,6 +168,21 @@ describe('ranking on the real catalog', () => {
     expect(weak.total).toBeGreaterThan(0);
     expect(weak.search?.onlyMentions).toBe(true);
     expect(search('machine learning').search?.onlyMentions).toBe(false);
+  });
+});
+
+describe('known terms on the real catalog', () => {
+  it('names the catalog courses an IQP or HUA search means', () => {
+    const iqp = search('IQP', 5);
+    expect(iqp.notices[0]).toContain('Catalog courses named for it: ID 2050');
+    expect(iqp.courses[0].code).toBe('ID 2050');
+    const hua = search('HUA', 5);
+    expect(hua.notices[0]).toContain(
+      'HU 3900 Inquiry Seminar In Humanities And Arts',
+    );
+    expect(hua.notices[0]).toContain(
+      'HU 3910 Practicum In Humanities And Arts',
+    );
   });
 });
 

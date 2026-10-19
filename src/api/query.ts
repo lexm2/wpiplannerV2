@@ -53,6 +53,7 @@ import {
 import { blockedSlotsForCrns } from './conflicts';
 import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { suggestInstructors } from './instructors';
+import { knownTermNotes } from './knownTerms';
 import { ApiError } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
@@ -541,6 +542,8 @@ function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
   const ids = (Object.keys(query.filters) as (keyof CourseQuery['filters'])[])
     .filter(id => id !== 'academicYear' && query.filters[id] !== undefined)
     .slice(0, MAX_RELAXED);
+  // A lone search, left out, finds the whole year: nothing worth saying.
+  if (ids.length === 1 && ids[0] === 'searchText') return [];
   const text = query.filters.searchText;
   const namesCourse =
     !!text && !text.professorOnly && !!parseSearchQuery(text.query).code?.dept;
@@ -813,14 +816,7 @@ const byNumber = (a: Course, b: Course) =>
   a.number.localeCompare(b.number);
 
 /** "Did you mean Gillian Smith?" for a search that found nothing. */
-function instructorNotice(
-  catalog: Catalog,
-  year: number | 'all',
-  query: string,
-): string[] {
-  const inYear = catalog.courses.filter(
-    c => year === 'all' || c.academicYear === year,
-  );
+function instructorNotice(inYear: Course[], query: string): string[] {
   const names = suggestInstructors(inYear, query);
   if (!names.length) return [];
   return [
@@ -993,13 +989,17 @@ export function runCourseQuery(
       }
     : null;
 
+  const inYear = catalog.courses.filter(
+    c => read.year === 'all' || c.academicYear === read.year,
+  );
   const notices = [
+    ...(text && !text.professorOnly ? knownTermNotes(text.query, inYear) : []),
     ...read.notices,
     ...companionNotices(catalog, read.criteria, filtered),
   ];
   const relaxations = matches.length === 0 ? relax(catalog, query) : [];
   if (matches.length === 0 && text) {
-    notices.push(...instructorNotice(catalog, read.year, text.query));
+    notices.push(...instructorNotice(inYear, text.query));
   }
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
