@@ -154,4 +154,3 @@ audits/
 *.md
 !README.md
 !CHANGELOG.md
-!deploy/*.md
