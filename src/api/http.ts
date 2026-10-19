@@ -7,9 +7,8 @@ import * as z from 'zod';
 import type { Catalog } from './catalog';
 import { CourseQuerySchema, runCourseQuery } from './query';
 import { findConflicts } from './conflicts';
+import { catalogMeta, listDepartments, lookupCourse } from './lookup';
 import { ApiError } from './errors';
-import { catalogMeta, findCourse, listDepartments } from './lookup';
-import { toCourseDetail } from './serialize';
 import { logger } from '../utils/logger';
 
 export const CORS_HEADERS: Record<string, string> = {
@@ -40,7 +39,7 @@ class HttpError extends Error {
   }
 }
 
-const notFound = (what = 'Not found') => new HttpError(404, what);
+const notFound = () => new HttpError(404, 'Not found');
 
 function parseOrThrow<T extends z.ZodType>(
   schema: T,
@@ -68,6 +67,30 @@ const ConflictsBodySchema = z
   .object({ crns: z.array(z.number().int().positive()).min(1).max(100) })
   .strict();
 
+const BoolParamSchema = z
+  .enum(['true', 'false', '1', '0'])
+  .transform(v => v === 'true' || v === '1');
+
+// GET /courses/:id options; unset ones show everything.
+const DetailParamsSchema = z
+  .object({
+    year: YearParamSchema.optional(),
+    terms: z
+      .string()
+      .transform(v =>
+        v
+          .split(',')
+          .map(t => t.trim().toUpperCase())
+          .filter(Boolean),
+      )
+      .pipe(z.array(z.enum(['A', 'B', 'C', 'D', 'F', 'S'])).min(1))
+      .optional(),
+    includeEndedTerms: BoolParamSchema.optional(),
+    includeFull: BoolParamSchema.optional(),
+    includeInterestLists: BoolParamSchema.optional(),
+  })
+  .strict();
+
 // GET /api/courses parameter names, each mapped onto the query's shape.
 const COURSE_PARAMS = new Set([
   'q',
@@ -87,9 +110,20 @@ const COURSE_PARAMS = new Set([
   'maxDifficulty',
   'minWouldTakeAgain',
   'maxWouldTakeAgain',
+  'minNumRatings',
   'includeWithoutData',
   'avoidCrns',
   'semesterSpansQuarters',
+  'maxWaitlisted',
+  'minLevel',
+  'maxLevel',
+  'degreeAttribute',
+  'deliveryMode',
+  'offeringPattern',
+  'earliestStart',
+  'latestEnd',
+  'includeEndedTerms',
+  'includeSections',
   'offset',
   'limit',
 ]);
@@ -101,6 +135,7 @@ const RMP_PARAMS = [
   'maxDifficulty',
   'minWouldTakeAgain',
   'maxWouldTakeAgain',
+  'minNumRatings',
 ] as const;
 
 /**
@@ -149,10 +184,31 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     const year = str('year');
     filters.academicYear = { year: year === 'all' ? 'all' : Number(year) };
   }
-  if (params.has('availableOnly') || params.has('minAvailable')) {
+  if (
+    params.has('availableOnly') ||
+    params.has('minAvailable') ||
+    params.has('maxWaitlisted')
+  ) {
     filters.availability = {
-      availableOnly: bool('availableOnly') ?? false,
+      availableOnly: bool('availableOnly'),
       minAvailable: num('minAvailable'),
+      maxWaitlisted: num('maxWaitlisted'),
+    };
+  }
+  if (params.has('minLevel') || params.has('maxLevel')) {
+    filters.courseLevel = { min: num('minLevel'), max: num('maxLevel') };
+  }
+  if (params.has('degreeAttribute')) {
+    filters.degreeAttribute = { attributes: list('degreeAttribute') };
+  }
+  if (params.has('deliveryMode')) {
+    filters.deliveryMode = { modes: list('deliveryMode') };
+  }
+  if (params.has('offeringPattern')) {
+    const values = list('offeringPattern');
+    filters.offeringPattern = {
+      categories: values.filter(v => v !== 'unknown').map(Number),
+      includeUnknown: values.includes('unknown') || undefined,
     };
   }
   if (params.has('minCredits') || params.has('maxCredits')) {
@@ -184,7 +240,15 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     };
   }
 
-  return { filters, offset: num('offset'), limit: num('limit') };
+  return {
+    filters,
+    earliestStart: str('earliestStart'),
+    latestEnd: str('latestEnd'),
+    includeEndedTerms: bool('includeEndedTerms'),
+    includeSections: bool('includeSections'),
+    offset: num('offset'),
+    limit: num('limit'),
+  };
 }
 
 function searchCourses(catalog: Catalog, input: unknown) {
@@ -226,14 +290,18 @@ async function route(
 
   const courseMatch = /^\/courses\/([^/]+)$/.exec(path);
   if (courseMatch && method === 'GET') {
-    const year = url.searchParams.has('year')
-      ? parseOrThrow(YearParamSchema, url.searchParams.get('year'))
-      : undefined;
-    const catalog = await getCatalog();
+    const options = parseOrThrow(
+      DetailParamsSchema,
+      Object.fromEntries(url.searchParams),
+    );
     const id = decodeURIComponent(courseMatch[1]);
-    const course = findCourse(catalog, id, year);
-    if (!course) throw notFound(`No course ${id}`);
-    return json(toCourseDetail(course, catalog.rmp));
+    const found = lookupCourse(await getCatalog(), id, options);
+    // A year not yet published answers with the outlook instead.
+    return json(
+      found.kind === 'course'
+        ? { ...found.detail, notices: found.notices }
+        : { ...found.plan, notices: found.notices },
+    );
   }
 
   if (path === '/conflicts' && method === 'POST') {

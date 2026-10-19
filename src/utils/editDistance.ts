@@ -47,3 +47,23 @@ export function editDistance(
   const result = prefix ? Math.min(...previous) : previous[n];
   return Math.min(result, limit + 1);
 }
+/**
+ * The candidates closest to `input` (case-insensitive), at most `max`, each
+ * within `limit` edits, nearest first.
+ */
+export function closestMatches(
+  input: string,
+  candidates: Iterable<string>,
+  { limit = 2, max = 5 }: { limit?: number; max?: number } = {},
+): string[] {
+  const needle = input.toLowerCase();
+  const scored: [string, number][] = [];
+  for (const candidate of new Set(candidates)) {
+    const d = editDistance(needle, candidate.toLowerCase(), limit);
+    if (d <= limit) scored.push([candidate, d]);
+  }
+  return scored
+    .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
+    .slice(0, max)
+    .map(([candidate]) => candidate);
+}

@@ -1,221 +1,50 @@
 /**
- * The course API: catalog loading from disk, query-param mapping onto the
- * filter criteria, filtering/sort/paging through FilterService,
- * serialization, and conflict detection. Runs on a small fixture catalog
- * written to a temp dir, so the refreshed public/ data cannot move results.
+ * The course API over HTTP: catalog loading from disk, query-param mapping
+ * onto the filter criteria, filtering/sort/paging through FilterService,
+ * serialization, conflict detection and the year rule. The MCP tools'
+ * renderings are in courseMcp.test.ts.
  */
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { mkdtemp, rm, utimes, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { describe, expect, it } from 'vitest';
+import { utimes } from 'node:fs/promises';
 import { join } from 'node:path';
 import { CatalogSource } from '../../src/api/catalog';
-import { createApiHandler } from '../../src/api/http';
-import { createMcpEndpoint } from '../../src/mcp/server';
 import { canonicalWindows } from '../../src/utils/timeWindows';
 import { DayOfWeek } from '../../src/types/types';
-
-const BASE = '/wpiplannerV2';
-
-const period = (
-  days: string[],
-  startTime: string,
-  endTime: string,
-  professor = 'Ada Lovelace',
-) => ({ type: 'Lecture', professor, startTime, endTime, days });
-
-const section = (
-  crn: number,
-  number: string,
-  computedTerm: string,
-  periods: unknown[],
-  seatsAvailable = 10,
-) => ({ crn, number, computedTerm, seats: 30, seatsAvailable, periods });
-
-const course = (
-  id: string,
-  name: string,
-  lectures: unknown[],
-  extra: Record<string, unknown> = {},
-) => {
-  const [, number, year] = id.split('-');
-  return {
-    id,
-    number,
-    name,
-    description: `<p>${name} &amp; more</p>`,
-    minCredits: 3,
-    maxCredits: 3,
-    academicYear: Number(year),
-    lectures: lectures.map(s => ({ section: s })),
-    ...extra,
-  };
-};
-
-function catalogJson(extraName = '') {
-  return {
-    departments: [
-      {
-        abbreviation: 'MA',
-        name: 'Mathematical Sciences',
-        courses: [
-          course('MA-1021-2026', `Calculus I${extraName}`, [
-            section(4, 'CL01', 'C', [
-              period(['M', 'T', 'R', 'F'], '10:00', '10:50'),
-            ]),
-            section(
-              5,
-              'AL01',
-              'A',
-              [period(['M', 'T', 'R', 'F'], '13:00', '13:50', 'Grace Hopper')],
-              0,
-            ),
-          ]),
-          course('MA-1021-2027', 'Calculus I', [
-            section(6, 'AL01', 'A', [period(['M'], '09:00', '09:50')]),
-          ]),
-        ],
-      },
-      {
-        abbreviation: 'CS',
-        name: 'Computer Science',
-        courses: [
-          course('CS-2102-2026', 'Object-Oriented Design Concepts', [
-            section(1, 'AL01', 'A', [
-              period(['M', 'T', 'R', 'F'], '10:00', '10:50'),
-            ]),
-          ]),
-          course('CS-1101-2026', 'Introduction to Program Design', [
-            section(3, 'F01', 'F', [period(['M', 'R'], '10:00', '11:20')]),
-          ]),
-          course(
-            'CS-500-2026',
-            'Graduate Seminar',
-            [
-              section(7, 'S01', 'S', [
-                { ...period([], '', ''), isAsync: true },
-              ]),
-            ],
-            { isGraduate: true },
-          ),
-        ],
-      },
-      {
-        abbreviation: 'RBE',
-        name: 'Robotics Engineering',
-        courses: [
-          course(
-            'RBE-1001-2026',
-            'Introduction To Robotics',
-            [
-              section(8, 'BL01', 'B', [
-                period(['T', 'F'], '13:00', '14:50', 'Grace Hopper'),
-              ]),
-            ],
-            { description: '<p>Hands-on robot design.</p>' },
-          ),
-        ],
-      },
-    ],
-  };
-}
-
-const TERM_BOUNDS = {
-  generated: '2026-09-01T00:00:00.000Z',
-  years: {
-    '2026': Object.fromEntries(
-      ['A', 'B', 'C', 'D'].map((t, i) => [
-        t,
-        {
-          startDate: `2026-0${i + 1}-01`,
-          endDate: `2026-0${i + 1}-20`,
-          offeringPeriod: `2026 ${t} Term`,
-          sampleSize: 1,
-        },
-      ]),
-    ),
-  },
-};
-
-const RMP = {
-  lastUpdated: '2026-09-01',
-  school: { id: 'wpi', name: 'WPI' },
-  totalProfessors: 1,
-  professors: [
-    {
-      id: '1',
-      legacyId: 1,
-      firstName: 'Ada',
-      lastName: 'Lovelace',
-      department: 'CS',
-      avgRating: 4.54,
-      avgDifficulty: 2.1,
-      numRatings: 12,
-      wouldTakeAgainPercent: 91.2,
-      profileUrl: 'https://example.test/ada',
-    },
-  ],
-};
-
-let dir: string;
-let dataDir: string;
-let api: (request: Request) => Promise<Response | null>;
-let mcp: ReturnType<typeof createMcpEndpoint>;
-
-const write = (d: string, file: string, body: unknown) =>
-  writeFile(join(d, file), JSON.stringify(body));
-
-beforeAll(async () => {
-  dir = await mkdtemp(join(tmpdir(), 'course-api-'));
-  dataDir = await mkdtemp(join(tmpdir(), 'course-api-data-'));
-  // The catalog and bounds come from DATA_DIR; ratings only exist in public/.
-  await write(dataDir, 'course-data-constructed.json', catalogJson());
-  await write(dataDir, 'term-bounds.json', TERM_BOUNDS);
-  await write(dataDir, 'last-updated.json', {
-    timestamp: '2026-09-02T00:00:00Z',
-  });
-  await write(dir, 'course-data-constructed.json', { departments: [] });
-  await write(dir, 'rateMyProfessor.json', RMP);
-
-  const source = new CatalogSource({ dataDir, publicDir: dir });
-  api = createApiHandler({ basePath: BASE, getCatalog: () => source.get() });
-  mcp = createMcpEndpoint(() => source.get());
-});
-
-afterAll(async () => {
-  await rm(dir, { recursive: true, force: true });
-  await rm(dataDir, { recursive: true, force: true });
-});
-
-async function call(path: string, body?: unknown) {
-  const response = await api(
-    new Request(`http://localhost${BASE}/api${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
-      body: body === undefined ? undefined : JSON.stringify(body),
-    }),
-  );
-  expect(response).not.toBeNull();
-  return { status: response!.status, body: await response!.json() };
-}
-
-const codes = (body: { courses: { id: string }[] }) =>
-  body.courses.map(c => c.id);
+import {
+  AFTER_A,
+  BASE,
+  BEFORE_A,
+  IN_B,
+  call,
+  callOn,
+  catalogJson,
+  codes,
+  endpoints,
+  fixtureDirs,
+  write,
+} from './courseApiFixture';
 
 describe('course search', () => {
   it('defaults to the current year, sorted by department then number', async () => {
     const { body } = await call('/courses');
-    expect(body.total).toBe(5);
+    // MA 543 is DS 502 under another code, so it folds into DS 502's row.
     expect(codes(body)).toEqual([
       'CS-1101-2026',
       'CS-2102-2026',
       'CS-500-2026',
+      'DS-502-2026',
       'MA-1021-2026',
+      'PH-1110-2026',
+      'PSY-1400-2026',
       'RBE-1001-2026',
     ]);
+    expect(body.total).toBe(8);
+    expect(body.year).toBe(2026);
   });
 
   it('takes year=all and pages with offset and limit', async () => {
-    const { body } = await call('/courses?year=all&offset=3&limit=1');
-    expect(body).toMatchObject({ total: 6, offset: 3, limit: 1 });
+    const { body } = await call('/courses?year=all&offset=4&limit=1');
+    expect(body).toMatchObject({ total: 9, offset: 4, limit: 1 });
     expect(codes(body)).toEqual(['MA-1021-2026']);
   });
 
@@ -237,6 +66,13 @@ describe('course search', () => {
       'CS-2102-2026',
       'RBE-1001-2026',
     ]);
+  });
+
+  it('reads a spaced course code as a code', async () => {
+    const { body } = await call(`/courses?q=${encodeURIComponent('MA 1021')}`);
+    expect(codes(body)).toEqual(['MA-1021-2026']);
+    const robotics = await call('/courses?q=robtics');
+    expect(codes(robotics.body)[0]).toBe('RBE-1001-2026');
   });
 
   it('maps flat params onto the same criteria as the POST body', async () => {
@@ -262,6 +98,17 @@ describe('course search', () => {
     expect(get.body.courses[2].terms).toEqual(['C']);
   });
 
+  it('resolves full department names', async () => {
+    const { body } = await call(
+      `/courses?department=${encodeURIComponent('computer science')}`,
+    );
+    expect(codes(body)).toEqual([
+      'CS-1101-2026',
+      'CS-2102-2026',
+      'CS-500-2026',
+    ]);
+  });
+
   it('filters by time windows given as JSON', async () => {
     const times = {
       mode: 'only',
@@ -282,6 +129,26 @@ describe('course search', () => {
     expect(codes(body)).toEqual(['CS-2102-2026', 'MA-1021-2026']);
   });
 
+  it('expands earliestStart and latestEnd into windows on every day', async () => {
+    const { body } = await call('/courses?earliestStart=10:00&latestEnd=12:00');
+    // PH 1110's late-morning lecture needs a 14:00 lab, so it drops out.
+    expect(codes(body)).toEqual([
+      'CS-1101-2026',
+      'CS-2102-2026',
+      'MA-1021-2026',
+    ]);
+    const both = await call('/courses/search', {
+      earliestStart: '10:00',
+      filters: {
+        times: {
+          mode: 'avoid',
+          windows: [{ day: 'M', startMin: 0, endMin: 60 }],
+        },
+      },
+    });
+    expect(both.status).toBe(400);
+  });
+
   it('drops sections that clash with the CRNs the caller has', async () => {
     // CRN 3 is F term, M/R 10:00-11:20: it blocks CS 2102's A section and
     // not MA 1021's C one.
@@ -290,6 +157,7 @@ describe('course search', () => {
       'CS-1101-2026',
       'CS-500-2026',
       'MA-1021-2026',
+      'MA-543-2026',
     ]);
   });
 
@@ -303,25 +171,211 @@ describe('course search', () => {
       unknownCrns: [999],
     });
     expect((await call('/courses/search', { filter: {} })).status).toBe(400);
+    const empty = await call('/courses/search', {
+      filters: { times: { mode: 'only', windows: [] } },
+    });
+    expect(empty.status).toBe(400);
+    expect(JSON.stringify(empty.body.details)).toContain('earliestStart');
+  });
+});
+
+describe('new filters', () => {
+  const search = (filters: unknown) =>
+    call('/courses/search', { filters }).then(r => codes(r.body));
+
+  it('filters by degree attribute, loosely named', async () => {
+    expect(
+      await search({ degreeAttribute: { attributes: ['social science'] } }),
+    ).toEqual(['PSY-1400-2026']);
+    const bad = await call('/courses/search', {
+      filters: { degreeAttribute: { attributes: ['Basket Weaving'] } },
+    });
+    expect(bad.status).toBe(400);
+    expect(bad.body.error).toContain('Social Sciences');
+  });
+
+  it('filters by delivery mode per section', async () => {
+    const { body } = await call('/courses?deliveryMode=Online');
+    expect(codes(body)).toEqual(['PH-1110-2026']);
+    // Only BL02 has an online lab to go with it.
+    expect(
+      body.courses[0].sections.map((s: { number: string }) => s.number),
+    ).toEqual(['BL02']);
+  });
+
+  it('filters by course level and offering pattern', async () => {
+    expect(await search({ courseLevel: { min: 5 } })).toEqual([
+      'CS-500-2026',
+      'DS-502-2026',
+    ]);
+    expect(await search({ offeringPattern: { categories: [1] } })).toEqual([
+      'MA-1021-2026',
+      'PH-1110-2026',
+    ]);
+    const unknown = await call('/courses?offeringPattern=2,unknown');
+    expect(codes(unknown.body)).toContain('PSY-1400-2026');
+    expect(codes(unknown.body)).toContain('CS-2102-2026');
+  });
+
+  it('bounds the waitlist', async () => {
+    const { body } = await call('/courses?maxWaitlisted=0');
+    expect(codes(body)).not.toContain('PSY-1400-2026');
+    expect(body.total).toBe(7);
+  });
+
+  it('leaves unrated instructors out once a rating bound is given', async () => {
+    // Grace Hopper is unrated: RBE 1001 drops out unless asked for.
+    expect(await search({ rmpRating: { minRating: 4 } })).not.toContain(
+      'RBE-1001-2026',
+    );
+    expect(
+      await search({ rmpRating: { minRating: 4, includeWithoutData: true } }),
+    ).toContain('RBE-1001-2026');
+    // Ada's 12 ratings fall short of 20, which counts as no data.
+    expect(
+      await search({ rmpRating: { minRating: 4, minNumRatings: 20 } }),
+    ).toEqual([]);
+  });
+});
+
+describe('cross-listings', () => {
+  it('shows a shared class once, unless one code is asked for', async () => {
+    // Equal scores: MA 543 comes first in the catalog and takes the row.
+    const all = await call('/courses?q=statistical');
+    expect(codes(all.body)).toEqual(['MA-543-2026']);
+    expect(all.body.courses[0]).toMatchObject({
+      crossListedWith: ['DS 502'],
+      seats: { capacity: 30 },
+    });
+    const ds = await call('/courses?department=DS&q=statistical');
+    expect(codes(ds.body)).toEqual(['DS-502-2026']);
+  });
+});
+
+describe('term awareness', () => {
+  it('leaves out ended terms by default and says so', async () => {
+    const { api } = endpoints(AFTER_A);
+    const { body } = await callOn(api, '/courses');
+    expect(codes(body)).not.toContain('CS-2102-2026');
+    expect(body.excludedEndedTerms).toEqual(['A']);
+    expect(body.notices.join(' ')).toContain('includeEndedTerms');
+    const ma = body.courses.find(
+      (c: { id: string }) => c.id === 'MA-1021-2026',
+    );
+    expect(ma.terms).toEqual(['C']);
+
+    const included = await callOn(api, '/courses?includeEndedTerms=true');
+    expect(codes(included.body)).toContain('CS-2102-2026');
+    // Naming the ended term keeps it, with a warning.
+    const named = await callOn(api, '/courses?term=A');
+    expect(codes(named.body)).toEqual(['CS-2102-2026', 'MA-1021-2026']);
+    expect(named.body.notices[0]).toContain('A term ended 2026-01-20');
+  });
+
+  it('reports today, the term and the years', async () => {
+    const between = (await callOn(endpoints(AFTER_A).api, '/meta')).body;
+    expect(between).toMatchObject({
+      today: '2026-01-25',
+      dataAsOf: '2026-09-02T00:00:00Z',
+      currentAcademicYear: 2026,
+      currentTerm: {
+        term: null,
+        previous: { term: 'A', end: '2026-01-20' },
+        next: { term: 'B', start: '2026-02-01' },
+      },
+      years: [
+        { year: 2026, courseCount: 9, status: 'current' },
+        { year: 2027, courseCount: 1, status: 'not yet published' },
+      ],
+    });
+    expect(between.termDates['2026'].F).toEqual({
+      start: '2026-01-01',
+      end: '2026-02-20',
+    });
+    expect(between.degreeAttributes).toEqual([
+      { name: 'Social Sciences', courseCount: 1 },
+    ]);
+    const inB = (await callOn(endpoints(IN_B).api, '/meta')).body;
+    expect(inB.currentTerm.term).toBe('B');
+  });
+});
+
+describe('next year', () => {
+  it('refuses to search an unpublished year, pointing to planning', async () => {
+    const { status, body } = await call('/courses?year=2027');
+    expect(status).toBe(422);
+    expect(body.error).toContain('not published yet');
+    expect(body.error).toContain('get_course with year 2027');
+  });
+
+  it('forecasts from the offering pattern, never a term or time', async () => {
+    const { body } = await call('/courses/PH1110?year=2027');
+    expect(body.forecast).toMatchObject({
+      year: 2027,
+      basedOn: 2026,
+      category: 1,
+      outlook: 'likely',
+      termsInBaseYear: ['B'],
+    });
+    expect(body.forecast.summary).toBe(
+      'Likely offered in 2027-28 (Cat. I: offered every year). Terms and times for 2027-28 are not published yet; in 2026-27 it runs in B.',
+    );
+    expect(body).not.toHaveProperty('sections');
+  });
+
+  it("adds next year's outlook to this year's course", async () => {
+    const { body } = await call('/courses/PH-1110-2026');
+    expect(body.nextYear.outlook).toBe('likely');
+    // MA 1021 has an early 2027 entry, which is shown with a warning.
+    const early = await call('/courses/MA1021?year=2027');
+    expect(early.body.id).toBe('MA-1021-2027');
+    expect(early.body.notices[0]).toContain('not published yet');
   });
 });
 
 describe('course detail', () => {
-  it('finds a course by id or by code', async () => {
+  it('finds a course by id, by code or by CRN', async () => {
     expect((await call('/courses/MA-1021-2027')).body.id).toBe('MA-1021-2027');
     expect((await call('/courses/MA1021')).body.id).toBe('MA-1021-2026');
-    expect((await call('/courses/ma-1021?year=2027')).body.id).toBe(
-      'MA-1021-2027',
+    expect((await call('/courses/ma-1021?year=2026')).body.id).toBe(
+      'MA-1021-2026',
     );
-    expect((await call('/courses/XX-1-2026')).status).toBe(404);
-    // CS 2102 has no 2027 offering; an explicit year does not fall back.
-    expect((await call('/courses/CS2102?year=2027')).status).toBe(404);
+    const byCrn = await call('/courses/30');
+    expect(byCrn.body.id).toBe('MA-543-2026');
+    expect(byCrn.body.notices[0]).toContain('also listed as DS 502');
+  });
+
+  it('explains what it could not find', async () => {
+    const typo = await call('/courses/MA1022');
+    expect(typo.status).toBe(404);
+    expect(typo.body.error).toContain('Close codes: MA 1021');
+    const past = await call('/courses/CS2102?year=2025');
+    expect(past.body.error).toContain('it is in 2026-27');
+    const dept = await call('/courses/XQ1000');
+    expect(dept.body.error).toContain('no department XQ');
+    expect((await call('/courses/999')).body.error).toContain(
+      'No section has CRN 999',
+    );
+  });
+
+  it('lists each section once and references them by CRN', async () => {
+    const { body } = await call('/courses/PH-1110-2026');
+    const crns = body.sections.map((s: { crn: number }) => s.crn);
+    expect(crns).toEqual([20, 21, 22, 23]);
+    expect(body.sections[2]).toMatchObject({
+      kind: 'lab',
+      pairsWith: [20, 21],
+    });
+    expect(body.lectureGroups).toEqual([
+      { lecture: 20, discussions: [], labs: [22] },
+      { lecture: 21, discussions: [], labs: [22, 23] },
+    ]);
   });
 
   it('serializes days as arrays, times as HH:MM, and ratings inline', async () => {
     const { body } = await call('/courses/CS-2102-2026');
     expect(body.description).toBe('Object-Oriented Design Concepts & more');
-    const [p] = body.lectureGroups[0].lecture.periods;
+    const [p] = body.sections[0].periods;
     expect(p).toMatchObject({
       days: ['M', 'T', 'R', 'F'],
       start: '10:00',
@@ -340,22 +394,45 @@ describe('course detail', () => {
         },
       },
     ]);
-    expect(body).not.toHaveProperty('ratings');
+  });
+
+  it('keeps everything over HTTP and trims on request', async () => {
+    const all = (await callOn(endpoints(AFTER_A).api, '/courses/MA1021')).body;
+    expect(all.sections.map((s: { number: string }) => s.number)).toEqual([
+      'AL01',
+      'CL01',
+      'Interest List-C Term',
+    ]);
+    const trimmed = (
+      await callOn(
+        endpoints(AFTER_A).api,
+        '/courses/MA1021?includeEndedTerms=false&includeInterestLists=false&includeFull=false',
+      )
+    ).body;
+    expect(trimmed.sections.map((s: { number: string }) => s.number)).toEqual([
+      'CL01',
+    ]);
+    expect(trimmed.omitted).toEqual({
+      endedTerms: ['A'],
+      otherTerms: [],
+      interestLists: ['C'],
+      fullSections: 0,
+    });
   });
 
   it('gives an unrated instructor a null rating', async () => {
     const { body } = await call('/courses/MA-1021-2026');
-    const al01 = body.lectureGroups.find(
-      (g: { lecture: { number: string } }) => g.lecture.number === 'AL01',
+    const al01 = body.sections.find(
+      (s: { number: string }) => s.number === 'AL01',
     );
-    expect(al01.lecture.periods[0].instructors).toEqual([
+    expect(al01.periods[0].instructors).toEqual([
       { name: 'Grace Hopper', rmp: null },
     ]);
   });
 
   it('reports an async period with no days or times', async () => {
     const { body } = await call('/courses/CS-500-2026');
-    expect(body.lectureGroups[0].lecture.periods[0]).toMatchObject({
+    expect(body.sections[0].periods[0]).toMatchObject({
       days: [],
       start: null,
       display: 'Async',
@@ -375,11 +452,14 @@ describe('conflicts', () => {
     ]);
   });
 
-  it('dedupes CRNs and takes a single one', async () => {
-    const { body } = await call('/conflicts', { crns: [3, 1, 3] });
-    expect(body).toMatchObject({ checked: [3, 1], duplicates: [3] });
-    const one = await call('/conflicts', { crns: [3] });
-    expect(one.body).toEqual({ checked: [3], duplicates: [], conflicts: [] });
+  it('names the shared time, dedupes CRNs and takes a single one', async () => {
+    const pair = await call('/conflicts', { crns: [30, 40, 40] });
+    expect(pair.body).toMatchObject({ checked: [30, 40], duplicates: [40] });
+    expect(pair.body.conflicts[0].overlaps).toEqual([
+      { days: ['M'], start: '18:00', end: '20:50' },
+    ]);
+    const one = await call('/conflicts', { crns: [30] });
+    expect(one.body).toEqual({ checked: [30], duplicates: [], conflicts: [] });
   });
 
   it('rejects unknown CRNs', async () => {
@@ -390,23 +470,17 @@ describe('conflicts', () => {
 });
 
 describe('catalog', () => {
-  it('reports meta and departments', async () => {
-    const meta = (await call('/meta')).body;
-    expect(meta).toMatchObject({
-      lastUpdated: '2026-09-02T00:00:00Z',
-      currentAcademicYear: 2026,
-      availableYears: [2026, 2027],
-    });
-    expect(meta.termBounds['2026'].A).toEqual({
-      start: '2026-01-01',
-      end: '2026-01-20',
-    });
+  it('lists departments, and explains an empty year', async () => {
     expect((await call('/departments?year=2027')).body.departments).toEqual([
       { abbr: 'MA', name: 'Mathematical Sciences', courseCount: 1 },
     ]);
+    const none = await call('/departments?year=2030');
+    expect(none.status).toBe(422);
+    expect(none.body.error).toContain('not published yet');
   });
 
   it('reloads when the catalog file changes, serving the old data meanwhile', async () => {
+    const { dir, dataDir } = fixtureDirs();
     const source = new CatalogSource({
       dataDir,
       publicDir: dir,
@@ -430,61 +504,15 @@ describe('catalog', () => {
     expect(second.courses.find(c => c.id === 'MA-1021-2026')?.name).toBe(
       'Calculus I (new)',
     );
+    await write(dataDir, 'course-data-constructed.json', catalogJson());
   });
 
   it('answers 404 for unknown routes and ignores paths outside the API', async () => {
-    expect((await call('/nope')).status).toBe(404);
+    const { api } = endpoints(BEFORE_A);
+    expect((await callOn(api, '/nope')).status).toBe(404);
     expect(
       await api(new Request(`http://localhost${BASE}/index.html`)),
     ).toBeNull();
-  });
-});
-
-async function rpc(method: string, params: unknown) {
-  const response = await mcp.fetch(
-    new Request(`http://localhost${BASE}/mcp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json, text/event-stream',
-      },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
-    }),
-  );
-  const body = await response.text();
-  // Answered as one SSE message: "event: message\ndata: {...}".
-  const data = body.split('\n').find(line => line.startsWith('data: '));
-  return JSON.parse(data ? data.slice(6) : body).result;
-}
-
-describe('MCP server', () => {
-  it('lists the tools', async () => {
-    const { tools } = await rpc('tools/list', {});
-    expect(tools.map((t: { name: string }) => t.name)).toEqual([
-      'search_courses',
-      'get_course',
-      'list_departments',
-      'get_catalog_info',
-      'check_conflicts',
-    ]);
-  });
-
-  it('searches with the API query schema', async () => {
-    const result = await rpc('tools/call', {
-      name: 'search_courses',
-      arguments: { filters: { term: { terms: ['A'] } } },
-    });
-    expect(result.structuredContent.total).toBe(2);
-    expect(result.content[0].text).toContain('CS 2102');
-  });
-
-  it('reports unknown CRNs as a tool error', async () => {
-    const result = await rpc('tools/call', {
-      name: 'check_conflicts',
-      arguments: { crns: [1, 42] },
-    });
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Unknown CRN: 42');
   });
 });
 

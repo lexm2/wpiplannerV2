@@ -13,8 +13,8 @@ import type { Catalog } from '../api/catalog';
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { findConflicts, type ConflictCheck } from '../api/conflicts';
 import { ApiError } from '../api/errors';
-import { catalogMeta, findCourse, listDepartments } from '../api/lookup';
-import { toCourseDetail, type CourseSummary } from '../api/serialize';
+import { catalogMeta, listDepartments, lookupCourse } from '../api/lookup';
+import type { CourseSummary } from '../api/serialize';
 
 const INSTRUCTIONS = `\
 This server is the course catalog of WPI (Worcester Polytechnic Institute), \
@@ -165,21 +165,19 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ course, year }) => {
-      const catalog = await getCatalog();
-      const found = findCourse(catalog, course, year);
-      if (!found) {
+      try {
+        const found = lookupCourse(await getCatalog(), course, { year });
+        const result =
+          found.kind === 'course'
+            ? { ...found.detail, notices: found.notices }
+            : { ...found.plan, notices: found.notices };
         return {
-          content: text(
-            `No course ${course}. Try search_courses to find its id.`,
-          ),
-          isError: true,
+          content: text(JSON.stringify(result)),
+          structuredContent: result,
         };
+      } catch (error) {
+        return failure(error);
       }
-      const detail = toCourseDetail(found, catalog.rmp);
-      return {
-        content: text(JSON.stringify(detail)),
-        structuredContent: { ...detail },
-      };
     },
   );
 
@@ -202,15 +200,19 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ year }) => {
-      const departments = listDepartments(await getCatalog(), year);
-      return {
-        content: text(
-          departments
-            .map(d => `${d.abbr} ${d.name} (${d.courseCount})`)
-            .join('\n'),
-        ),
-        structuredContent: { departments },
-      };
+      try {
+        const departments = listDepartments(await getCatalog(), year);
+        return {
+          content: text(
+            departments
+              .map(d => `${d.abbr} ${d.name} (${d.courseCount})`)
+              .join('\n'),
+          ),
+          structuredContent: { departments },
+        };
+      } catch (error) {
+        return failure(error);
+      }
     },
   );
 
