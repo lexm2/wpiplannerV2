@@ -98,10 +98,13 @@ install_docker_nginx() {
     log "Installing packages"
     if [ "$FAMILY" = debian ]; then
         export DEBIAN_FRONTEND=noninteractive
+        # Keep config files changed here (an edited nginx.conf, a certbot cli.ini)
+        # instead of stopping at dpkg's prompt, which curl | bash can't answer.
+        APT=(apt-get install -y -q -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
         apt-get update -q
-        apt-get install -y -q ca-certificates curl git nginx iproute2
+        "${APT[@]}" ca-certificates curl git nginx iproute2
         if [ "$WANT_CERT" = true ]; then
-            apt-get install -y -q certbot python3-certbot-nginx
+            "${APT[@]}" certbot python3-certbot-nginx
         fi
         if ! command -v docker >/dev/null; then
             log "Installing Docker"
