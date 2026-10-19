@@ -1,8 +1,14 @@
+# Run from this directory (`docker compose up -d --build`) or with -f; the
+# build context is the repo root, so the images can see the app.
+# The name keeps the project, and its course-data volume, what it was when
+# this file sat at the repo root.
+name: wpiplannerv2
+
 services:
   web:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: hosting/docker/web.Dockerfile
     image: wpiplannerv2-web
     restart: unless-stopped
     ports:
@@ -14,8 +20,8 @@ services:
 
   fetcher:
     build:
-      context: .
-      dockerfile: Dockerfile.fetcher
+      context: ../..
+      dockerfile: hosting/docker/fetcher.Dockerfile
     image: wpiplannerv2-fetcher
     restart: unless-stopped
     environment:

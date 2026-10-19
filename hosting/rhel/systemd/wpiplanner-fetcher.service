@@ -11,7 +11,7 @@ Environment=APP_DIR=/opt/wpiplanner
 Environment=DATA_DIR=/var/www/wpiplanner-data
 Environment=REFRESH_INTERVAL_SECONDS=900
 # Through bash, since git keeps the script without its executable bit.
-ExecStart=/bin/bash /opt/wpiplanner/docker/refresh-loop.sh
+ExecStart=/bin/bash /opt/wpiplanner/hosting/scripts/refresh-loop.sh
 Restart=always
 RestartSec=30
 

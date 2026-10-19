@@ -48,20 +48,20 @@ runuser -u wpiplanner -- git clone --branch server https://github.com/lexm2/wpip
 
 # Build, then strip the build's copies of the live data and precompress it.
 runuser -u wpiplanner -- env HOME=/var/lib/wpiplanner PATH=/usr/local/bin:/usr/bin:/bin \
-    sh -c 'bun install --frozen-lockfile && bun run build && sh deploy/prepare-dist.sh dist'
+    sh -c 'bun install --frozen-lockfile && bun run build && sh hosting/scripts/prepare-dist.sh dist'
 install -d /var/www/wpiplanner
 rsync -a --delete --chown=root:root dist/ /var/www/wpiplanner/wpiplannerV2/
 restorecon -R /var/www/wpiplanner /var/www/wpiplanner-data
 
 # Fetcher. It seeds the data directory before its first fetch.
-cp deploy/systemd/wpiplanner-fetcher.service /etc/systemd/system/
+cp hosting/rhel/systemd/wpiplanner-fetcher.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now wpiplanner-fetcher
 
 # Apache. Edit the vhost's name and certificate paths first.
 install -d /etc/httpd/wpiplanner
-install -m 644 deploy/apache/wpiplanner-app.conf /etc/httpd/wpiplanner/app.conf
-install -m 644 deploy/apache/wpiplanner.conf /etc/httpd/conf.d/wpiplanner.conf
+install -m 644 hosting/rhel/apache/wpiplanner-app.conf /etc/httpd/wpiplanner/app.conf
+install -m 644 hosting/rhel/apache/wpiplanner-vhost.conf /etc/httpd/conf.d/wpiplanner.conf
 apachectl configtest
 systemctl enable --now httpd
 
@@ -73,7 +73,7 @@ The site is then at `https://<your name>/wpiplannerV2/`.
 
 ## HTTPS
 
-`deploy/apache/wpiplanner.conf` expects a PEM certificate, followed by its
+`hosting/rhel/apache/wpiplanner-vhost.conf` expects a PEM certificate, followed by its
 intermediate chain, and its key. Keep them under `/etc/pki/tls/` so they carry
 the `cert_t` label httpd is allowed to read; a certificate elsewhere fails
 with a permission error in `/var/log/httpd/error_log`.

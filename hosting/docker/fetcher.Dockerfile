@@ -14,7 +14,7 @@ COPY scripts ./scripts
 COPY public ./public
 COPY data ./data
 
-COPY docker/refresh-loop.sh /usr/local/bin/refresh-loop.sh
+COPY hosting/scripts/refresh-loop.sh /usr/local/bin/refresh-loop.sh
 RUN chmod +x /usr/local/bin/refresh-loop.sh
 
 ENV DATA_DIR=/data \

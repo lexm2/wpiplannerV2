@@ -4,7 +4,15 @@ This branch is the app plus everything to host it; the app branches carry
 none of it. To deploy app changes, merge them into `server`.
 
 The app is a static SPA plus a small loop that refreshes course JSON from WPI
-every 15 minutes. Both live in `docker-compose.yml`.
+every 15 minutes.
+
+```
+hosting/
+├── install.sh       one-command install and update, any supported distro
+├── scripts/         shared by both setups: build prep, data refresh loop
+├── docker/          Debian, Ubuntu, Arch: compose stack, nginx config
+└── rhel/            RHEL family: Apache config, systemd unit, manual steps
+```
 
 ## One-command install
 
@@ -16,23 +24,23 @@ every 15 minutes. Both live in `docker-compose.yml`.
 - **RHEL, Rocky, Alma, Fedora:** no containers. Apache httpd serves the built
   app directly and a systemd service runs the fetcher; HTTPS uses a
   certificate you pass with `--tls-cert` and `--tls-key`. The same setup by
-  hand is in [rhel.md](rhel.md).
+  hand is in [rhel/README.md](rhel/README.md).
 
 ```
-curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/server/install.sh \
+curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/server/hosting/install.sh \
     | sudo bash -s -- --domain planner.example.com --email you@example.com
 ```
 
 Leave out `--domain` to serve over plain HTTP on the server's IP. `--help`
 lists the other options.
 
-## Manual
+## Docker by hand
 
 Requirements: Docker and Docker Compose on the host.
 
 ```
 git clone --branch server https://github.com/lexm2/wpiplannerV2.git
-cd wpiplannerV2
+cd wpiplannerV2/hosting/docker
 docker compose up -d --build
 ```
 

@@ -7,10 +7,10 @@
 #   a domain.
 # RHEL and its rebuilds (Rocky, Alma, CentOS Stream, Fedora): no containers.
 #   Apache httpd serves the built app itself and a systemd service runs the
-#   fetcher, with HTTPS from a certificate you supply. deploy/rhel.md has the
+#   fetcher, with HTTPS from a certificate you supply. hosting/rhel/README.md has the
 #   same steps by hand.
 #
-#   curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/server/install.sh \
+#   curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/server/hosting/install.sh \
 #       | sudo bash -s -- --domain planner.example.com --email you@example.com
 
 set -euo pipefail
@@ -129,14 +129,15 @@ install_docker_nginx() {
     systemctl enable --now docker
 
     checkout
-    [ -f "$DIR/docker-compose.yml" ] || die "Branch $BRANCH has no docker-compose.yml; pass --branch."
+    COMPOSE_FILE="$DIR/hosting/docker/compose.yml"
+    [ -f "$COMPOSE_FILE" ] || die "Branch $BRANCH has no hosting/docker/compose.yml; pass --branch."
 
-    # Compose reads .env from the project directory, so later `docker compose`
-    # commands run there keep the app bound to localhost, where only nginx reaches it.
-    echo "WEB_PORT=127.0.0.1:$PORT" > "$DIR/.env"
+    # Compose reads .env from beside its file, so later `docker compose`
+    # commands keep the app bound to localhost, where only nginx reaches it.
+    echo "WEB_PORT=127.0.0.1:$PORT" > "$DIR/hosting/docker/.env"
 
     log "Building and starting the containers (the first build takes a few minutes)"
-    docker compose --project-directory "$DIR" up -d --build
+    docker compose -f "$COMPOSE_FILE" up -d --build
 
     log "Waiting for the app to answer"
     for _ in $(seq 60); do
@@ -144,7 +145,7 @@ install_docker_nginx() {
         sleep 1
     done
     curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/" ||
-        die "The app is not answering on 127.0.0.1:$PORT; see: docker compose --project-directory $DIR logs"
+        die "The app is not answering on 127.0.0.1:$PORT; see: docker compose -f $COMPOSE_FILE logs"
 
     log "Configuring nginx"
     if [ "$FAMILY" = debian ]; then
@@ -218,8 +219,8 @@ EOF
 WPI Planner is running at $URL
 
   Update:         re-run this script with the same options
-  Refresh logs:   docker compose --project-directory $DIR logs -f fetcher
-  Force refresh:  docker compose --project-directory $DIR restart fetcher
+  Refresh logs:   docker compose -f $COMPOSE_FILE logs -f fetcher
+  Force refresh:  docker compose -f $COMPOSE_FILE restart fetcher
 EOF
 }
 
@@ -271,12 +272,12 @@ install_rhel_apache() {
     install -d -o "$APP_USER" -g "$APP_USER" "$DIR"
     chown -R "$APP_USER:" "$DIR"
     checkout as_app
-    [ -f "$DIR/deploy/apache/wpiplanner-app.conf" ] ||
-        die "Branch $BRANCH has no deploy/apache/; pass --branch."
+    [ -f "$DIR/hosting/rhel/apache/wpiplanner-app.conf" ] ||
+        die "Branch $BRANCH has no hosting/rhel/; pass --branch."
 
     log "Building the app (the first build takes a few minutes)"
     (cd "$DIR" && as_app bun install --frozen-lockfile && as_app bun run build &&
-        as_app sh deploy/prepare-dist.sh dist)
+        as_app sh hosting/scripts/prepare-dist.sh dist)
 
     log "Publishing to $WEB_ROOT"
     install -d "$WEB_ROOT"
@@ -289,7 +290,7 @@ install_rhel_apache() {
     fi
 
     log "Starting the data fetcher"
-    sed "s#/opt/wpiplanner#$DIR#g" "$DIR/deploy/systemd/wpiplanner-fetcher.service" \
+    sed "s#/opt/wpiplanner#$DIR#g" "$DIR/hosting/rhel/systemd/wpiplanner-fetcher.service" \
         > /etc/systemd/system/wpiplanner-fetcher.service
     systemctl daemon-reload
     systemctl enable -q wpiplanner-fetcher
@@ -305,7 +306,7 @@ install_rhel_apache() {
 
     log "Configuring Apache"
     install -d /etc/httpd/wpiplanner
-    install -m 644 "$DIR/deploy/apache/wpiplanner-app.conf" /etc/httpd/wpiplanner/app.conf
+    install -m 644 "$DIR/hosting/rhel/apache/wpiplanner-app.conf" /etc/httpd/wpiplanner/app.conf
     {
         echo "# Written by install.sh; re-running it rewrites this file."
         echo "# The app's rules are in /etc/httpd/wpiplanner/app.conf."
