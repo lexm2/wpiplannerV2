@@ -21,7 +21,8 @@
     "generate-icons": "bun run scripts/generate-icon-paths.ts",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
     "fetch-rmp-data": "bun run scripts/rateMyProfessor/fetchRateMyProfessor.ts",
-    "merge-to-master": "bash scripts/merge-to-master.sh"
+    "merge-to-master": "bash scripts/merge-to-master.sh",
+    "serve:api": "bun server.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -53,10 +54,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@modelcontextprotocol/server": "2.3.1",
     "fflate": "^0.8.3",
     "ical-generator": "^10.0.0",
     "lz-string": "^1.5.0",
     "rrule": "^2.8.1",
-    "zod": "^4.1.13"
+    "zod": "^4.4.3"
   }
 }

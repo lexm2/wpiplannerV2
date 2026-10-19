@@ -111,6 +111,29 @@ describe('RateMyProfessorService.findProfessor', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(service.isLoaded()).toBe(true);
   });
+
+  it('forgets the old professors when loadFromData replaces the data', () => {
+    const service = new RateMyProfessorService();
+    const data = (professors: Professor[]) => ({
+      lastUpdated: '2026-01-01',
+      school: { id: 'wpi', name: 'WPI' },
+      professors,
+      totalProfessors: professors.length,
+    });
+    service.loadFromData(data([prof('Amy', 'Curran')]));
+    expect(service.findProfessor('Amy Curran')).not.toBeNull();
+
+    const susanin = prof('Laura', 'Susanin');
+    service.loadFromData(data([susanin]));
+    expect(service.findProfessor('Amy Curran')).toBeNull();
+    expect(service.findProfessor('Laura Susanin')?.id).toBe(susanin.id);
+  });
+
+  it('rejects data that does not match the schema', () => {
+    const service = new RateMyProfessorService();
+    expect(() => service.loadFromData({ professors: 'no' })).toThrow();
+    expect(service.isLoaded()).toBe(false);
+  });
 });
 
 describe('RateMyProfessorService.getRatings', () => {
