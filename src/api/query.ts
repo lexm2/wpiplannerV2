@@ -35,6 +35,7 @@ import {
   SearchTextFilter,
 } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
+import { describeMatch, type SearchMatch } from '../utils/searchUtils';
 import { TERM_ORDER } from '../utils/typeGuards';
 import { currentAcademicYear, type Catalog } from './catalog';
 import { endedTerms, termDates, yearLabel, type TermLetter } from './calendar';
@@ -126,9 +127,11 @@ const FiltersSchema = z
           .trim()
           .min(1)
           .describe(
-            'A course code ("MA 1022", "CS2102"; "CS 21" for every CS 21xx) finds that course first, then courses whose description names it. ' +
+            'A course code ("MA 1022", "CS2102"; "CS 21" for every CS 21xx) finds that course first, then courses whose description names it (marked "mentions"); words after a code narrow it ("MA 1022 calculus"). ' +
+              'A department name or abbreviation alone ("computer science", "CS") lists its courses by number. ' +
               'Otherwise words, ALL of which must match somewhere: code, name, description, department, degree attributes, instructor or room. ' +
-              'Words of 5+ letters tolerate a typo. Name matches rank above description matches. Use one or two topic words ("robotics", "game design"), not sentences.',
+              'Words of 3 letters or fewer match whole words only, and acronyms the catalog spells out ("AI" finds Artificial Intelligence); I-IV equal 1-4; words of 5+ letters tolerate a typo. ' +
+              'Name matches rank above description matches, and the response says when no course is mainly about the words. Use one or two topic words ("robotics", "game design"), not sentences.',
           ),
         professorOnly: z
           .boolean()
@@ -384,6 +387,8 @@ export type CourseQuery = z.infer<typeof CourseQuerySchema>;
 export interface CourseRow extends CourseSummary {
   /** The matching lecture (or standalone lab) sections, with includeSections. */
   sections?: SectionBrief[];
+  /** With searchText: how the course matched it (see SearchMatch). */
+  match?: SearchMatch;
 }
 
 export interface CourseQueryResult {
@@ -406,6 +411,12 @@ export interface CourseQueryResult {
   dataAsOf: string | null;
   /** Things the caller should know about how the query was read. */
   notices: string[];
+  /**
+   * With searchText: the query, and whether no matching course has it in
+   * its name, code or department, nor its words together in a
+   * description, so none is mainly about it.
+   */
+  search: { query: string; onlyMentions: boolean } | null;
 }
 
 const EVERY_DAY = Object.values(DayOfWeek);
@@ -656,6 +667,24 @@ export function runCourseQuery(
       !!query.earliestStart ||
       !!query.latestEnd);
 
+  // How each course matched a text search; instructor-only searches are
+  // about people, not topics.
+  const text = query.filters.searchText;
+  const matchOf = new Map<Course, SearchMatch>();
+  if (text && !text.professorOnly) {
+    for (const c of matches) matchOf.set(c, describeMatch(c, text.query));
+  }
+  const strong: SearchMatch[] = ['code', 'title', 'description'];
+  const search = text
+    ? {
+        query: text.query,
+        onlyMentions:
+          matches.length > 0 &&
+          !text.professorOnly &&
+          [...matchOf.values()].every(m => !strong.includes(m)),
+      }
+    : null;
+
   const notices = [...read.notices];
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
@@ -676,8 +705,11 @@ export function runCourseQuery(
     courses: matches.slice(query.offset, query.offset + query.limit).map(c => {
       const row: CourseRow = toCourseSummary(c, catalog.rmp);
       if (includeSections) row.sections = rowSections(c, catalog);
+      const match = matchOf.get(c);
+      if (match) row.match = match;
       return row;
     }),
+    search,
     totals: totalsOf(matches),
     excludedEndedTerms: read.excludedEndedTerms,
     dataAsOf: catalog.lastUpdated,

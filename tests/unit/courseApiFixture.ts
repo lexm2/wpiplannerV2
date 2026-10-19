@@ -125,9 +125,15 @@ export function catalogJson(extraName = '') {
               period(['M', 'T', 'R', 'F'], '10:00', '10:50'),
             ]),
           ]),
-          course('CS-1101-2026', 'Introduction to Program Design', [
-            section(3, 'F01', 'F', [period(['M', 'R'], '10:00', '11:20')]),
-          ]),
+          course(
+            'CS-1101-2026',
+            'Introduction to Program Design',
+            [section(3, 'F01', 'F', [period(['M', 'R'], '10:00', '11:20')])],
+            {
+              description:
+                '<p>Procedural thinking from the first week. Later weeks cover many other topics, among them test generation. Recommended background: CS 2102.</p>',
+            },
+          ),
           course(
             'CS-500-2026',
             'Graduate Seminar',

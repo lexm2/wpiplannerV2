@@ -53,6 +53,24 @@ describe('MCP server', () => {
     );
   });
 
+  it('flags matches that only mention the words or the code', async () => {
+    const weak = await tool('search_courses', {
+      filters: { searchText: { query: 'procedural generation' } },
+    });
+    expect(weak.text).toContain(
+      'No course is mainly about this; these only mention the words in their descriptions:',
+    );
+    expect(weak.text).toContain('1. CS 1101 Introduction to Program Design |');
+    const code = await tool('search_courses', {
+      filters: { searchText: { query: 'CS 2102' } },
+    });
+    expect(code.text).toContain('1. CS 2102 Object-Oriented Design Concepts |');
+    expect(code.text).toContain(
+      '2. CS 1101 Introduction to Program Design | (mentions CS 2102) |',
+    );
+    expect(code.text).not.toContain('mainly about');
+  });
+
   it('says when the offset runs past the end', async () => {
     const result = await tool('search_courses', { offset: 50 });
     expect(result.text).toContain(

@@ -135,13 +135,40 @@ function rowSeats(c: CourseRow): string {
   return c.seatsByTerm.map(t => `${t.term} ${totalSeats(t)}`).join(' · ');
 }
 
-function rowLine(c: CourseRow, index: number, showYear: boolean): string {
+/** Why a weaker match is listed; strong ones need no note. */
+function matchNote(
+  c: CourseRow,
+  search: CourseQueryResult['search'],
+): string | null {
+  if (!search) return null;
+  switch (c.match) {
+    case 'mentions':
+      return `mentions ${search.query.trim()}`;
+    case 'section':
+      return 'matched an instructor or room';
+    case 'description':
+      return search.onlyMentions ? null : 'in description only';
+    case 'scattered':
+      return search.onlyMentions ? null : 'words apart in description';
+    default:
+      return null;
+  }
+}
+
+function rowLine(
+  c: CourseRow,
+  index: number,
+  showYear: boolean,
+  search: CourseQueryResult['search'],
+): string {
   const parts = [
     `${index}. ${c.code} ${c.name}`,
     credits(c),
     c.terms.length ? c.terms.join(',') : 'no sections',
     rowSeats(c),
   ];
+  const note = matchNote(c, search);
+  if (note) parts.splice(1, 0, `(${note})`);
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
     const t = c.topInstructor;
@@ -171,6 +198,11 @@ export function renderSearch(result: CourseQueryResult): string {
     );
   }
   lines.push(...result.notices);
+  if (result.search?.onlyMentions) {
+    lines.push(
+      'No course is mainly about this; these only mention the words in their descriptions:',
+    );
+  }
   if (result.courses.some(c => c.sections)) {
     lines.push(
       'Sections: number, CRN, term | meetings | room | instructor | seats; status and mode shown only when not Open / In-Person.',
@@ -178,7 +210,9 @@ export function renderSearch(result: CourseQueryResult): string {
   }
 
   result.courses.forEach((c, i) => {
-    lines.push(rowLine(c, result.offset + i + 1, result.year === 'all'));
+    lines.push(
+      rowLine(c, result.offset + i + 1, result.year === 'all', result.search),
+    );
     if (!c.sections) return;
     for (const s of c.sections.slice(0, MAX_ROW_SECTIONS)) {
       lines.push(`   ${briefLine(s, true)}`);

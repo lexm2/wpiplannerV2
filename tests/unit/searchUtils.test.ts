@@ -9,6 +9,7 @@ import {
   getAvailableProfessors,
   matchCourseText,
   parseSearchQuery,
+  describeMatch,
 } from '../../src/utils/searchUtils';
 import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
@@ -223,6 +224,132 @@ describe('ranking', () => {
       make('MA', '1022', 'Calculus II'),
     ];
     expect(ids(list, 'MA 1022')[0]).toBe('MA-1022-2026');
+  });
+});
+
+describe('short words, acronyms and numerals', () => {
+  const make = (
+    departmentAbbr: string,
+    number: string,
+    name: string,
+    description = '',
+    departmentName = departmentAbbr,
+  ) =>
+    course({
+      id: `${departmentAbbr}-${number}-2026`,
+      departmentAbbr,
+      departmentName,
+      number,
+      name,
+      description,
+    });
+  const ids = (list: Course[], q: string) =>
+    rankCoursesByRelevance([...list], q).map(c => c.id);
+  const matches = (q: string, c: Course) =>
+    matchCourseText(c, parseSearchQuery(q)).all;
+
+  const aircraft = make('AE', '4510', 'Aircraft Design', 'Air breathing.');
+  const writing = make('IMGD', '2200', 'AI in Writing');
+  const intro = make(
+    'CS',
+    '4341',
+    'Introduction To Artificial Intelligence',
+    'Search and planning.',
+  );
+  // Defines the acronym for the whole catalog.
+  const definer = make(
+    'DS',
+    '1010',
+    'Data Science I',
+    'Covers artificial intelligence (AI) basics.',
+  );
+  const accelerated = make('CS', '1102', 'Accelerated Introduction');
+
+  it('matches a short word only as a whole word', () => {
+    expect(matches('AI', aircraft)).toBe(false);
+    expect(matches('AI', writing)).toBe(true);
+    expect(matches('art', make('HU', '1', 'Humanities and Arts'))).toBe(true);
+  });
+
+  it('reads an acronym as the name words the catalog defines it as', () => {
+    const list = [aircraft, accelerated, intro, definer, writing];
+    expect(
+      rankCoursesByRelevance([...list], 'AI')
+        .filter(c => matches('AI', c))
+        .map(c => c.id),
+      // DS 1010 only says AI in its description.
+    ).toEqual(['IMGD-2200-2026', 'CS-4341-2026', 'DS-1010-2026']);
+    // Initials alone are not enough: "Accelerated Introduction" is not AI.
+    expect(matches('AI', accelerated)).toBe(false);
+    expect(describeMatch(intro, 'AI')).toBe('title');
+  });
+
+  it('treats Roman numerals as digits and takes a prefix of a long word', () => {
+    const list = [
+      make('MA', '3475', 'Calculus Of Variations', 'Calculus 2 and more.'),
+      make('MA', '1022', 'Calculus II', 'Continues calculus 1.'),
+      make('MA', '1021', 'Calculus I'),
+    ];
+    for (const q of ['calc 1', 'calculus 1', 'calc I', 'calculus I']) {
+      expect(ids(list, q)[0], q).toBe('MA-1021-2026');
+    }
+    for (const q of ['calc 2', 'calculus 2', 'calculus II']) {
+      expect(ids(list, q)[0], q).toBe('MA-1022-2026');
+    }
+    // A description repeating a title word does not lift its course.
+    expect(ids(list, 'calculus')).toEqual([
+      'MA-1021-2026',
+      'MA-1022-2026',
+      'MA-3475-2026',
+    ]);
+  });
+
+  it('keeps the code tier when words follow the code, however it is written', () => {
+    const list = [
+      make('MA', '1033', 'Theoretical Calculus III', 'After MA 1022.'),
+      make('MA', '1022', 'Calculus II'),
+    ];
+    expect(ids(list, 'MA 1022 calculus')).toEqual([
+      'MA-1022-2026',
+      'MA-1033-2026',
+    ]);
+    for (const q of ['MA 1022', 'MA-1022', 'MA_1022', 'ma1o22']) {
+      expect(parseSearchQuery(q).code, q).toEqual({
+        dept: 'ma',
+        number: '1022',
+      });
+    }
+    expect(describeMatch(list[0], 'MA 1022')).toBe('mentions');
+  });
+
+  it('lists the courses of a department its name names, by number', () => {
+    const list = [
+      make('CS', '588', 'Computer Science Capstone', '', 'Computer Science'),
+      make('BCB', '4002', 'Computer Science for Biology', '', 'Biology'),
+      make('CS', '1101', 'Program Design', '', 'Computer Science'),
+    ];
+    expect(ids(list, 'computer science')).toEqual([
+      'CS-1101-2026',
+      'CS-588-2026',
+      'BCB-4002-2026',
+    ]);
+  });
+
+  it('tells words written together from words far apart', () => {
+    const near = make(
+      'CS',
+      '4732',
+      'Animation',
+      'procedural content generation',
+    );
+    const far = make(
+      'ECE',
+      '5522',
+      'Relaying',
+      'procedural rules for relays, with power generation',
+    );
+    expect(describeMatch(near, 'procedural generation')).toBe('description');
+    expect(describeMatch(far, 'procedural generation')).toBe('scattered');
   });
 });
 

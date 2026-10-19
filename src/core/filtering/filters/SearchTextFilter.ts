@@ -6,6 +6,8 @@ import { keepMatchingGroups } from '../lectureGroupScope';
 import {
   matchCourseText,
   parseSearchQuery,
+  prepareSearch,
+  textHasWord,
   type ParsedQuery,
 } from '../../../utils/searchUtils';
 
@@ -50,9 +52,11 @@ export class SearchTextFilter implements SectionBasedFilter {
         const names = fs.section.periods
           .map(p => p.professor.toLowerCase())
           .join(' ');
-        return query.words.every(word => names.includes(word));
+        return query.words.every(word => textHasWord(names, word));
       });
     }
+
+    prepareSearch(new Set(sections.map(fs => fs.course)));
 
     // The course-level verdict is the same for each of its sections.
     const byCourse = new Map<Course, ReturnType<typeof matchCourseText>>();
@@ -71,7 +75,9 @@ export class SearchTextFilter implements SectionBasedFilter {
       // A code query is about the course alone.
       if (query.code) return false;
       const own = sectionText(fs.section);
-      return query.words.every((word, i) => matched[i] || own.includes(word));
+      return query.words.every(
+        (word, i) => matched[i] || textHasWord(own, word),
+      );
     });
   }
 

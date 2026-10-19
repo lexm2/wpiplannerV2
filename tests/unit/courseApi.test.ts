@@ -277,15 +277,15 @@ describe('new filters', () => {
 
 describe('cross-listings', () => {
   it('shows a shared class once, unless one code is asked for', async () => {
-    // Equal scores: MA 543 comes first in the catalog and takes the row.
+    // Equal but for the number: DS 502 ranks first and takes the row.
     const all = await call('/courses?q=statistical');
-    expect(codes(all.body)).toEqual(['MA-543-2026']);
+    expect(codes(all.body)).toEqual(['DS-502-2026']);
     expect(all.body.courses[0]).toMatchObject({
-      crossListedWith: ['DS 502'],
+      crossListedWith: ['MA 543'],
       seats: { capacity: 30 },
     });
-    const ds = await call('/courses?department=DS&q=statistical');
-    expect(codes(ds.body)).toEqual(['DS-502-2026']);
+    const ma = await call('/courses?department=MA&q=statistical');
+    expect(codes(ma.body)).toEqual(['MA-543-2026']);
   });
 });
 

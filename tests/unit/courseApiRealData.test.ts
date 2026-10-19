@@ -83,6 +83,58 @@ describe('ranking on the real catalog', () => {
   it('puts game design courses above descriptions that mention it', () => {
     expect(top('game design', 1)[0]).toMatch(/^IMGD /);
   });
+
+  const search = (query: string, limit = 25) =>
+    runCourseQuery(
+      catalog,
+      CourseQuerySchema.parse({
+        filters: { searchText: { query } },
+        includeEndedTerms: true,
+        limit,
+      }),
+    );
+
+  it('reads AI as a word and as Artificial Intelligence, not inside words', () => {
+    const ai = search('AI');
+    const names = ai.courses.map(c => c.name);
+    expect(ai.total).toBeLessThan(100);
+    expect(ai.courses.map(c => c.code)).toContain('CS 4341');
+    expect(names.some(n => /aircraft|air breathing|aided/i.test(n))).toBe(
+      false,
+    );
+    expect(search('PE').total).toBeLessThan(50);
+  });
+
+  it('ranks calculus by number and numeral, whatever the spelling', () => {
+    for (const q of ['calculus', 'calc 1', 'calculus 1', 'calc I']) {
+      expect(top(q, 1), q).toEqual(['MA 1021']);
+    }
+    for (const q of ['calc 2', 'calculus 2', 'MA 1022 calculus']) {
+      expect(top(q, 1), q).toEqual(['MA 1022']);
+    }
+  });
+
+  it('reads every spelling of a code alike, and labels mere mentions', () => {
+    const totals = ['MA 1022', 'MA-1022', 'MA_1022', 'ma1o22'].map(
+      q => search(q).total,
+    );
+    expect(new Set(totals).size).toBe(1);
+    const rows = search('MA 1022').courses;
+    expect(rows[0]).toMatchObject({ code: 'MA 1022', match: 'code' });
+    expect(rows.slice(1).every(r => r.match === 'mentions')).toBe(true);
+  });
+
+  it('puts introductory courses first for a broad topic or a department', () => {
+    expect(top('computer science', 5)).toContain('CS 1101');
+    expect(top('statistics', 1)[0]).toMatch(/^MA [1-4]/);
+  });
+
+  it('says when no course is mainly about the words', () => {
+    const weak = search('procedural generation');
+    expect(weak.total).toBeGreaterThan(0);
+    expect(weak.search?.onlyMentions).toBe(true);
+    expect(search('machine learning').search?.onlyMentions).toBe(false);
+  });
 });
 
 describe('search results agree with themselves', () => {
