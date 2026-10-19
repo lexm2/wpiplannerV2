@@ -159,3 +159,30 @@ describe('search results agree with themselves', () => {
     }
   });
 });
+
+describe('alternating years on the real catalog', () => {
+  it('reads ME 3501 as off in 2027-28, citing its description', async () => {
+    const text = await toolText('get_course', {
+      course: 'ME 3501',
+      year: 2027,
+    });
+    expect(text).toContain(
+      'Alternating years; runs in 2026-27, so likely not offered in 2027-28 (the catalog description: "This course will be offered in 2020-21, and in alternating years thereafter.")',
+    );
+  });
+
+  it('reads every alternating-years statement in the descriptions', () => {
+    const mentions = catalog.courses.filter(c =>
+      /offered in \d{4}.{0,30}alternat\w* years thereafter/i.test(
+        c.description,
+      ),
+    );
+    expect(mentions.length).toBeGreaterThan(50);
+    for (const c of mentions) {
+      expect(
+        c.alternatingYears,
+        `${c.departmentAbbr} ${c.number}`,
+      ).toBeTruthy();
+    }
+  });
+});

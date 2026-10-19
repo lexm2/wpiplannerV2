@@ -7,6 +7,14 @@ export interface LectureGroup {
   compatibleLabs: Section[];
 }
 
+/** A course the catalog says runs every other academic year. */
+export interface AlternatingYears {
+  /** Fall year of the academic year it names: 2020 for 2020-21. */
+  firstYear: number;
+  /** The description's sentence, as written. */
+  statement: string;
+}
+
 export interface Course {
   id: string;
   number: string;
@@ -30,6 +38,11 @@ export interface Course {
   recommendedBackground?: string;
   /** The description's "Prerequisite(s): ..." statement, likewise. */
   prerequisites?: string;
+  /**
+   * The description's "offered in 2020-21, and in alternating years
+   * thereafter", read when the course loads.
+   */
+  alternatingYears?: AlternatingYears | null;
   departmentAbbr: string;
   departmentName: string;
   lectures?: LectureGroup[];

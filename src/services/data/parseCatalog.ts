@@ -22,6 +22,7 @@ import type {
   RawPeriod,
 } from '../../types/rawData';
 import { logger } from '../../utils/logger';
+import { readAlternatingYears } from '../../utils/alternatingYears';
 import * as z from 'zod';
 
 // Envelope only: the payload is ~1275 departments of nested records, and
@@ -154,17 +155,19 @@ export function parseCourse(
     ? parseSections(courseData.standaloneLabs)
     : undefined;
 
+  const description = stripHtml(courseData.description || '');
   return {
     id: courseId,
     number: courseData.number,
     name: courseData.name,
-    description: stripHtml(courseData.description || ''),
+    description,
     category: courseData.category ?? null,
     degreeAttributes: courseData.degreeAttributes ?? [],
     courseTypes: courseData.courseTypes ?? [],
     crossListedWith: courseData.crossListedWith ?? [],
     recommendedBackground: courseData.recommendedBackground,
     prerequisites: courseData.prerequisites,
+    alternatingYears: readAlternatingYears(description),
     departmentAbbr: department.abbreviation,
     departmentName: department.name,
     lectures: lectures.length > 0 ? lectures : undefined,

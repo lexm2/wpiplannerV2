@@ -13,6 +13,10 @@ import {
   yearLabel,
 } from '../../src/api/calendar';
 import { forecastCourse } from '../../src/api/forecast';
+import {
+  alternatesInto,
+  readAlternatingYears,
+} from '../../src/utils/alternatingYears';
 import { TermBoundsService } from '../../src/utils/termBounds';
 import type { Course } from '../../src/types/types';
 
@@ -150,6 +154,107 @@ describe('forecastCourse', () => {
     );
     expect(forecastCourse(course(2026), 2027, 2026, ['F']).outlook).toBe(
       'unknown',
+    );
+  });
+});
+
+describe('alternating years', () => {
+  it('reads the statement in its variants, and nothing looser', () => {
+    const cases: [string, number | null][] = [
+      [
+        'This course will be offered in 2020-21, and in alternating years thereafter.',
+        2020,
+      ],
+      [
+        'This course is offered in 2019-20, and in alternating years thereafter.',
+        2019,
+      ],
+      [
+        'This course will be first offered in 2024-2025 and alternate years thereafter.',
+        2024,
+      ],
+      [
+        'This course will be offered in 2022- 23, and in alternating years thereafter.',
+        2022,
+      ],
+      [
+        'This course will be taught in 2025-26, and in alternating years thereafter.',
+        2025,
+      ],
+      [
+        'This course will be offered in 2020-21, and in alternating years thereafter',
+        2020,
+      ],
+      ['Offered in 2018 and each year thereafter.', null],
+      [
+        'This course will be offered in 2020-22, and in alternating years thereafter.',
+        null,
+      ],
+      ['Topics alternate from year to year.', null],
+    ];
+    for (const [text, year] of cases) {
+      expect(
+        readAlternatingYears(`Intro. ${text} More.`)?.firstYear ?? null,
+        text,
+      ).toBe(year);
+    }
+    expect(
+      readAlternatingYears(
+        'This course will be offered in 2020-21, and in alternating years thereafter',
+      )?.statement,
+    ).toBe(
+      'This course will be offered in 2020-21, and in alternating years thereafter.',
+    );
+    const a = { firstYear: 2020, statement: '' };
+    expect([2020, 2021, 2026, 2027].map(y => alternatesInto(a, y))).toEqual([
+      true,
+      false,
+      true,
+      false,
+    ]);
+  });
+
+  const alternating = (
+    firstYear: number,
+    category: 1 | 2 | null = 2,
+  ): Course => ({
+    ...course(2026, category),
+    alternatingYears: {
+      firstYear,
+      statement: `This course will be offered in ${firstYear}-${String((firstYear + 1) % 100).padStart(2, '0')}, and in alternating years thereafter.`,
+    },
+  });
+
+  it('calls next year off when the statement fits this year, quoting it', () => {
+    const f = forecastCourse(alternating(2020), 2027, 2026, ['D']);
+    expect(f.outlook).toBe('unlikely');
+    expect(f.summary).toBe(
+      'Alternating years; runs in 2026-27, so likely not offered in 2027-28 (the catalog description: "This course will be offered in 2020-21, and in alternating years thereafter."). Terms and times for 2027-28 are not published yet; in 2026-27 it runs in D.',
+    );
+  });
+
+  it('distrusts a statement this year contradicts', () => {
+    const f = forecastCourse(alternating(2019), 2027, 2026, ['D']);
+    expect(f.outlook).toBe('possible');
+    expect(f.alternating).toEqual({
+      statement: expect.stringContaining('2019-20'),
+      fitsBaseYear: false,
+    });
+    expect(f.summary).toContain(
+      'That would skip 2026-27, yet it runs in 2026-27; the statement looks out of date',
+    );
+  });
+
+  it('keeps Cat. I and notes the disagreement; hedges Cat. II without one', () => {
+    const cat1 = forecastCourse(alternating(2020, 1), 2027, 2026, ['A']);
+    expect(cat1.outlook).toBe('likely');
+    expect(cat1.summary).toContain(
+      'The description, though, says it alternates years',
+    );
+    const plain = forecastCourse(course(2026, 2), 2027, 2026, ['C']);
+    expect(plain.outlook).toBe('possible');
+    expect(plain.summary).toContain(
+      'It runs in 2026-27, and a course offered every other year is less likely to run again in 2027-28.',
     );
   });
 });
