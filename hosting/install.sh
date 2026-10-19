@@ -387,7 +387,9 @@ EOF
 
     if [ "$TLS" = true ]; then
         URL="https://$DOMAIN/wpiplannerV2/"
-        CHECK=(--resolve "$DOMAIN:443:127.0.0.1")
+        # -k: this checks that Apache serves the app; a self-signed or
+        # internal-CA certificate is the admin's choice, not a failure.
+        CHECK=(-k --resolve "$DOMAIN:443:127.0.0.1")
         LOCAL_URL="$URL"
     else
         URL="http://${DOMAIN:-$(server_ip)}/wpiplannerV2/"
