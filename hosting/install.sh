@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
-# Installs WPI Planner on a fresh server. Re-running it updates the checkout
-# and rebuilds, so it doubles as the updater.
-#
-# Debian, Ubuntu, Arch: Docker runs the app and its data fetcher, and a host
-#   nginx sits in front of them, with a Let's Encrypt certificate when given
-#   a domain.
-# RHEL and its rebuilds (Rocky, Alma, CentOS Stream, Fedora): no containers.
-#   Apache httpd serves the built app itself and a systemd service runs the
-#   fetcher, with HTTPS from a certificate you supply. hosting/rhel/README.md has the
-#   same steps by hand.
+# Installs WPI Planner on a fresh server; re-run it to update.
+#   Debian, Ubuntu, Arch: Docker stack behind a host nginx, Let's Encrypt with --domain.
+#   RHEL family: Apache serves the build, systemd runs the fetcher (see rhel/README.md).
 #
 #   curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/server/hosting/install.sh \
 #       | sudo bash -s -- --domain planner.example.com --email you@example.com
@@ -80,15 +73,13 @@ server_ip() {
     ip -4 route get 1.1.1.1 | awk '{for (i = 1; i < NF; i++) if ($i == "src") print $(i + 1)}'
 }
 
-# Clones or fast-forwards $BRANCH into $DIR, running git through "$@" (empty,
-# or a command that runs it as another user).
+# Clones or fast-forwards $BRANCH into $DIR; "$@" prefixes git (e.g. as_app).
 checkout() {
     log "Fetching $BRANCH into $DIR"
     if [ -d "$DIR/.git" ]; then
         "$@" git -C "$DIR" fetch -q origin "$BRANCH"
         "$@" git -C "$DIR" checkout -q "$BRANCH"
-        # Fast-forward only, so edits made on the server stop the update
-        # instead of being thrown away.
+        # --ff-only: edits made on the server stop the update instead of being lost.
         "$@" git -C "$DIR" pull -q --ff-only origin "$BRANCH"
     elif [ -n "$(ls -A "$DIR" 2>/dev/null)" ]; then
         die "$DIR exists and is not a git checkout; pick another --dir."
@@ -116,8 +107,7 @@ install_docker_nginx() {
             curl -fsSL https://get.docker.com | sh
         fi
     else
-        # -Syu, since Arch does not support installing against a stale package
-        # database; this upgrades the rest of the system too.
+        # Arch doesn't support partial upgrades, so this upgrades the whole system.
         PKGS=(curl git nginx iproute2 docker docker-compose)
         if [ "$WANT_CERT" = true ]; then
             PKGS+=(certbot certbot-nginx)
@@ -132,8 +122,7 @@ install_docker_nginx() {
     COMPOSE_FILE="$DIR/hosting/docker/compose.yml"
     [ -f "$COMPOSE_FILE" ] || die "Branch $BRANCH has no hosting/docker/compose.yml; pass --branch."
 
-    # Compose reads .env from beside its file, so later `docker compose`
-    # commands keep the app bound to localhost, where only nginx reaches it.
+    # Compose reads .env beside its file: keeps the app on localhost, behind nginx.
     echo "WEB_PORT=127.0.0.1:$PORT" > "$DIR/hosting/docker/.env"
 
     log "Building and starting the containers (the first build takes a few minutes)"
@@ -163,9 +152,8 @@ install_docker_nginx() {
         LISTEN="listen 80;"
         NAME="$DOMAIN"
     else
-        # Without a domain this site has to win every request on port 80, which
-        # the stock default site would otherwise claim. Arch's stock server has
-        # no default_server, so marking this one is enough there.
+        # No domain: this site must win all of port 80. Arch's stock server isn't
+        # default_server, so marking this one is enough there.
         LISTEN="listen 80 default_server;"
         NAME="_"
         rm -f /etc/nginx/sites-enabled/default
@@ -189,7 +177,7 @@ EOF
         ln -sf "$SITE" /etc/nginx/sites-enabled/wpiplanner
     fi
     nginx -t -q
-    # Arch leaves nginx stopped after installing it; certbot needs it running.
+    # Arch leaves nginx stopped; certbot needs it running.
     systemctl enable -q --now nginx
 
     if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then
@@ -203,9 +191,8 @@ EOF
         else
             CONTACT=(--register-unsafely-without-email)
         fi
-        # The site file was just rewritten without TLS; --keep-until-expiring
-        # puts an existing certificate back instead of requesting a new one.
-        # Certbot reloads nginx itself.
+        # The site was rewritten without TLS; --keep-until-expiring reinstalls an
+        # existing certificate instead of requesting one. Certbot reloads nginx.
         certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --redirect \
             --keep-until-expiring "${CONTACT[@]}"
         URL="https://$DOMAIN/wpiplannerV2/"
@@ -228,7 +215,6 @@ APP_USER=wpiplanner
 WEB_ROOT=/var/www/wpiplanner
 DATA_DIR=/var/www/wpiplanner-data
 
-# Runs a command as the app's user, which owns the checkout and the live data.
 as_app() {
     runuser -u "$APP_USER" -- env HOME="/var/lib/$APP_USER" PATH=/usr/local/bin:/usr/bin:/bin "$@"
 }
@@ -244,8 +230,7 @@ install_rhel_apache() {
     fi
     [ -z "$EMAIL" ] || die "--email is for Let's Encrypt, which this install does not use on RHEL; pass --tls-cert and --tls-key."
 
-    # runuser keeps the working directory, which the app's user may not be
-    # able to read.
+    # runuser keeps the cwd, which the app user may not be able to read.
     cd /
 
     log "Installing packages"
@@ -253,13 +238,12 @@ install_rhel_apache() {
     if [ "$TLS" = true ]; then
         PKGS+=(mod_ssl)
     fi
-    # Minimal installs ship curl-minimal, which conflicts with the curl
-    # package but provides the same command.
+    # Minimal installs ship curl-minimal, which conflicts with curl but works the same.
     if ! command -v curl >/dev/null; then
         PKGS+=(curl)
     fi
     dnf install -y -q "${PKGS[@]}"
-    # Bun is not packaged for RHEL. It builds the app and runs the fetcher.
+    # Bun isn't packaged for RHEL; it builds the app and runs the fetcher.
     if [ ! -x /usr/local/bin/bun ]; then
         log "Installing Bun"
         curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash
@@ -283,8 +267,7 @@ install_rhel_apache() {
     install -d "$WEB_ROOT"
     rsync -a --delete --chown=root:root "$DIR/dist/" "$WEB_ROOT/wpiplannerV2/"
     install -d -o "$APP_USER" -g "$APP_USER" "$DATA_DIR"
-    # Both sit under /var/www, which SELinux labels for httpd to read; this
-    # puts back any label a copy carried over.
+    # /var/www is already labelled for httpd; reset any label a copy carried over.
     if command -v restorecon >/dev/null; then
         restorecon -R "$WEB_ROOT" "$DATA_DIR"
     fi
@@ -294,9 +277,7 @@ install_rhel_apache() {
         > /etc/systemd/system/wpiplanner-fetcher.service
     systemctl daemon-reload
     systemctl enable -q wpiplanner-fetcher
-    # A restart, so an update runs the new fetch scripts.
     systemctl restart wpiplanner-fetcher
-    # The fetcher seeds the data directory before its first fetch.
     for _ in $(seq 30); do
         [ -f "$DATA_DIR/last-updated.json" ] && break
         sleep 1

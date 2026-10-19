@@ -1,7 +1,5 @@
-# Run from this directory (`docker compose up -d --build`) or with -f; the
-# build context is the repo root, so the images can see the app.
-# The name keeps the project, and its course-data volume, what it was when
-# this file sat at the repo root.
+# Build context is the repo root. `name` keeps the project, and its volume,
+# from when this file sat at the root.
 name: wpiplannerv2
 
 services:

@@ -5,8 +5,7 @@ RUN apk add --no-cache bash coreutils
 
 WORKDIR /app
 
-# No bun install: the fetch and convert scripts only use Bun's built-in
-# modules, and package.json is here just for its `bun run` scripts.
+# No bun install: the fetch and convert scripts use only Bun built-ins.
 COPY package.json ./
 
 COPY tsconfig.json ./
