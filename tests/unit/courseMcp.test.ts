@@ -177,7 +177,9 @@ describe('MCP server', () => {
   });
 
   it('reports lookup and input errors as tool errors', async () => {
-    const crn = await tool('check_conflicts', { crns: [1, 42] });
+    const crn = await tool('search_courses', {
+      filters: { periodConflict: { crns: [1, 42] } },
+    });
     expect(crn.isError).toBe(true);
     expect(crn.text).toContain('Unknown CRN: 42');
     const dept = await tool('search_courses', {
@@ -255,6 +257,28 @@ describe('MCP server', () => {
     expect(one.text).toContain(
       'One section, so no times to compare. They make a valid set to register in Workday.',
     );
+  });
+
+  it('checks the CRNs it knows against each other and the busy times', async () => {
+    const { text, isError } = await tool('check_conflicts', {
+      crns: [8, 42, 40],
+      busy: [{ days: ['T', 'R'], start: '13:00', end: '17:00', label: 'work' }],
+    });
+    expect(isError).toBe(false);
+    expect(text).toContain(
+      'PROBLEM: CRN 42 is not a section in the catalog; get CRNs from get_course or search_courses.',
+    );
+    expect(text).toContain(
+      'BUSY RBE 1001 BL01 (CRN 8, B) meets during "work" (T,R 13:00-17:00): T 13:00-14:50.',
+    );
+    expect(text).toContain(
+      'No time conflicts among these 2 sections. 1 section meets during your busy times. 1 problem to fix before registering.',
+    );
+    const free = await tool('check_conflicts', {
+      crns: [40],
+      busy: [{ days: ['T'], start: '13:00', end: '17:00' }],
+    });
+    expect(free.text).toContain('None meets during your busy times.');
   });
 
   it('says what keeps a set of CRNs from being registered', async () => {

@@ -41,6 +41,7 @@ import { currentAcademicYear, type Catalog } from './catalog';
 import { endedTerms, termDates, yearLabel, type TermLetter } from './calendar';
 import { blockedSlotsForCrns } from './conflicts';
 import { ApiError } from './errors';
+import { ClockSchema, clockMinutes } from './clock';
 import { strictObject } from './schemaHints';
 import {
   DELIVERY_MODES,
@@ -105,10 +106,6 @@ const TimeWindowSchema = strictObject({
       'Window end in minutes after midnight, exclusive: 1:00 PM is 780.',
     ),
 });
-
-const ClockSchema = z
-  .string()
-  .regex(/^([01]?\d|2[0-3]):[0-5]\d$/, 'use 24-hour HH:MM, e.g. "09:30"');
 
 const RMP_BOUNDS = [
   'minRating',
@@ -503,18 +500,13 @@ function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
 
 const EVERY_DAY = Object.values(DayOfWeek);
 
-const minutes = (clock: string) => {
-  const [h, m] = clock.split(':').map(Number);
-  return h * 60 + m;
-};
-
 type TimesInput = NonNullable<CourseQuery['filters']['times']>;
 
 /** The times filter's windows: as given, or one per day from the shorthand. */
 function timeWindows(times: TimesInput): TimeWindow[] {
   if (times.windows) return times.windows;
-  const startMin = times.earliestStart ? minutes(times.earliestStart) : 0;
-  const endMin = times.latestEnd ? minutes(times.latestEnd) : 1440;
+  const startMin = times.earliestStart ? clockMinutes(times.earliestStart) : 0;
+  const endMin = times.latestEnd ? clockMinutes(times.latestEnd) : 1440;
   if (endMin <= startMin) {
     throw new ApiError('latestEnd must be after earliestStart.');
   }

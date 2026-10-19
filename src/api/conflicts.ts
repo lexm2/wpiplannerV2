@@ -1,11 +1,13 @@
 /**
  * A set of CRNs checked as a schedule: time conflicts between them, decided
  * by the app's own ConflictFilter so semester sections clash with the
- * quarters they span, and whether they make a registrable set: each lab or
- * discussion with a lecture it goes with, the companions each lecture
- * needs, one lecture per course, and sections that are full, closed, ended
- * or nearly full.
+ * quarters they span, overlaps with the student's busy blocks (a work
+ * shift), and whether they make a registrable set: each lab or discussion
+ * with a lecture it goes with, the companions each lecture needs, one
+ * lecture per course, CRNs the catalog lacks, and sections that are full,
+ * closed, ended or nearly full.
  */
+import * as z from 'zod';
 import type { WeeklyTimeSlot } from '../types/schedule';
 import { AcademicTerm } from '../types/schedule';
 import type { Course, LectureGroup, Section } from '../types/types';
@@ -15,7 +17,52 @@ import { sectionToWeeklySlots, slotsOverlap } from '../utils/timeSlotUtils';
 import { currentAcademicYear, type Catalog, type CrnEntry } from './catalog';
 import { endedTerms, termDates, yearLabel, type TermLetter } from './calendar';
 import { ApiError } from './errors';
+import { ClockSchema, clockMinutes, clockText } from './clock';
 import { courseCode } from './serialize';
+
+const BusyBlockSchema = z
+  .object({
+    days: z
+      .array(z.enum(DayOfWeek))
+      .min(1)
+      .describe('M, T, W, R (Thursday), F, S, U; ["T", "R"] for Tue/Thu.'),
+    start: ClockSchema.describe('24-hour start, "13:00".'),
+    end: ClockSchema.describe('24-hour end, exclusive, "17:00".'),
+    label: z
+      .string()
+      .trim()
+      .min(1)
+      .max(60)
+      .optional()
+      .describe('What it is, for the report: "work", "practice".'),
+  })
+  .strict()
+  .refine(
+    b => clockMinutes(b.end) > clockMinutes(b.start),
+    'end must be after start',
+  );
+
+/** check_conflicts' and POST /conflicts' input: one schema for both. */
+export const ConflictCheckInputSchema = z
+  .object({
+    crns: z
+      .array(z.number().int().positive())
+      .min(1)
+      .max(100)
+      .describe(
+        'CRNs of the sections to check together, lectures and labs alike.',
+      ),
+    busy: z
+      .array(BusyBlockSchema)
+      .max(20)
+      .optional()
+      .describe(
+        'Weekly times the student is busy (a job, practice), every term: each section meeting during one is reported.',
+      ),
+  })
+  .strict();
+
+export type BusyBlock = z.infer<typeof BusyBlockSchema>;
 
 /** Thrown for CRNs the catalog lacks. */
 class UnknownCrnError extends ApiError {
@@ -28,7 +75,10 @@ class UnknownCrnError extends ApiError {
   }
 }
 
-function lookup(catalog: Catalog, crns: number[]): Map<number, CrnEntry> {
+function lookup(
+  catalog: Catalog,
+  crns: number[],
+): { found: Map<number, CrnEntry>; missing: number[] } {
   const found = new Map<number, CrnEntry>();
   const missing: number[] = [];
   for (const crn of new Set(crns)) {
@@ -36,8 +86,7 @@ function lookup(catalog: Catalog, crns: number[]): Map<number, CrnEntry> {
     if (entry) found.set(crn, entry);
     else missing.push(crn);
   }
-  if (missing.length > 0) throw new UnknownCrnError(missing);
-  return found;
+  return { found, missing };
 }
 
 /**
@@ -49,9 +98,10 @@ export function blockedSlotsForCrns(
   catalog: Catalog,
   crns: number[],
 ): WeeklyTimeSlot[] {
-  return [...lookup(catalog, crns).values()].flatMap(e =>
-    sectionToWeeklySlots(e.section),
-  );
+  const { found, missing } = lookup(catalog, crns);
+  // A search fitted around a CRN that does not exist is bad input.
+  if (missing.length > 0) throw new UnknownCrnError(missing);
+  return [...found.values()].flatMap(e => sectionToWeeklySlots(e.section));
 }
 
 interface ConflictSide {
@@ -75,6 +125,13 @@ interface ConflictPair {
   overlaps: Overlap[];
 }
 
+/** A section meeting during one of the student's busy blocks. */
+interface BusyConflict {
+  section: ConflictSide;
+  busy: { label: string | null; days: string[]; start: string; end: string };
+  overlaps: Overlap[];
+}
+
 /**
  * Something that keeps the CRNs from being registered as given (error) or
  * that the student should know before trying (warning).
@@ -82,6 +139,7 @@ interface ConflictPair {
 interface ScheduleIssue {
   severity: 'error' | 'warning';
   kind:
+    | 'unknownCrn'
     | 'unpaired'
     | 'missingCompanion'
     | 'sameCourse'
@@ -102,6 +160,10 @@ export interface ConflictCheck {
   /** CRNs given more than once, compared once. */
   duplicates: number[];
   conflicts: ConflictPair[];
+  /** Sections meeting during a busy block, in any term. */
+  busyConflicts: BusyConflict[];
+  /** Busy blocks checked against. */
+  busyBlocks: number;
   /** Whether the sections make a registrable set; errors first. */
   issues: ScheduleIssue[];
   /** When the seat counts were read from WPI. */
@@ -127,9 +189,46 @@ const termsMeet = (a: AcademicTerm, b: AcademicTerm) =>
   b === AcademicTerm.ALL ||
   quarters(a).some(q => quarters(b).includes(q));
 
-const clock = (t: { hours: number; minutes: number }) =>
-  `${String(t.hours).padStart(2, '0')}:${String(t.minutes).padStart(2, '0')}`;
+const minutesOf = (t: { hours: number; minutes: number }) =>
+  t.hours * 60 + t.minutes;
 const DAY_ORDER: string[] = Object.values(DayOfWeek);
+
+const inWeekOrder = (days: Iterable<string>) =>
+  [...days].sort((x, y) => DAY_ORDER.indexOf(x) - DAY_ORDER.indexOf(y));
+
+/** Days grouped by shared time band: "T,R 14:00-14:50". */
+function bandsToOverlaps(bands: Map<string, Set<string>>): Overlap[] {
+  return [...bands].map(([band, days]) => {
+    const [start, end] = band.split('-');
+    return { days: inWeekOrder(days), start, end };
+  });
+}
+
+function addBand(
+  bands: Map<string, Set<string>>,
+  day: string,
+  start: number,
+  end: number,
+) {
+  const band = `${clockText(start)}-${clockText(end)}`;
+  if (!bands.has(band)) bands.set(band, new Set());
+  bands.get(band)!.add(day);
+}
+
+/** Where a section meets during a busy block, every term alike. */
+function busyOverlaps(entry: CrnEntry, block: BusyBlock): Overlap[] {
+  const start = clockMinutes(block.start);
+  const end = clockMinutes(block.end);
+  const days = new Set<string>(block.days);
+  const bands = new Map<string, Set<string>>();
+  for (const slot of sectionToWeeklySlots(entry.section)) {
+    if (!days.has(slot.day)) continue;
+    const from = Math.max(start, minutesOf(slot.startTime));
+    const to = Math.min(end, minutesOf(slot.endTime));
+    if (from < to) addBand(bands, slot.day, from, to);
+  }
+  return bandsToOverlaps(bands);
+}
 
 /** The shared meeting times of two sections, grouped by time band. */
 function overlapsOf(a: CrnEntry, b: CrnEntry): Overlap[] {
@@ -138,35 +237,27 @@ function overlapsOf(a: CrnEntry, b: CrnEntry): Overlap[] {
   for (const sa of sectionToWeeklySlots(a.section)) {
     for (const sb of sectionToWeeklySlots(b.section)) {
       if (!slotsOverlap(sa, sb)) continue;
-      const start =
-        sa.startTime.hours * 60 + sa.startTime.minutes >
-        sb.startTime.hours * 60 + sb.startTime.minutes
-          ? sa.startTime
-          : sb.startTime;
-      const end =
-        sa.endTime.hours * 60 + sa.endTime.minutes <
-        sb.endTime.hours * 60 + sb.endTime.minutes
-          ? sa.endTime
-          : sb.endTime;
-      const band = `${clock(start)}-${clock(end)}`;
-      if (!bands.has(band)) bands.set(band, new Set());
-      bands.get(band)!.add(sa.day);
+      addBand(
+        bands,
+        sa.day,
+        Math.max(minutesOf(sa.startTime), minutesOf(sb.startTime)),
+        Math.min(minutesOf(sa.endTime), minutesOf(sb.endTime)),
+      );
     }
   }
-  return [...bands].map(([band, days]) => {
-    const [start, end] = band.split('-');
-    return {
-      days: [...days].sort(
-        (x, y) => DAY_ORDER.indexOf(x) - DAY_ORDER.indexOf(y),
-      ),
-      start,
-      end,
-    };
-  });
+  return bandsToOverlaps(bands);
 }
 
-/** Every pair of the given sections that meets at the same time. */
-export function findConflicts(catalog: Catalog, crns: number[]): ConflictCheck {
+/**
+ * Every pair of the given sections that meets at the same time, every
+ * section meeting during a busy block, and what keeps the set from being
+ * registered. CRNs the catalog lacks are reported, and the rest checked.
+ */
+export function findConflicts(
+  catalog: Catalog,
+  crns: number[],
+  busy: BusyBlock[] = [],
+): ConflictCheck {
   const seen = new Set<number>();
   const duplicates = new Set<number>();
   for (const crn of crns) {
@@ -174,7 +265,8 @@ export function findConflicts(catalog: Catalog, crns: number[]): ConflictCheck {
     seen.add(crn);
   }
 
-  const entries = [...lookup(catalog, crns)];
+  const { found, missing } = lookup(catalog, crns);
+  const entries = [...found];
   const filter = new ConflictFilter();
   const conflicts: ConflictPair[] = [];
 
@@ -195,11 +287,38 @@ export function findConflicts(catalog: Catalog, crns: number[]): ConflictCheck {
       }
     }
   }
+
+  const busyConflicts: BusyConflict[] = [];
+  for (const [crn, entry] of entries) {
+    for (const block of busy) {
+      const overlaps = busyOverlaps(entry, block);
+      if (!overlaps.length) continue;
+      busyConflicts.push({
+        section: side(crn, entry),
+        busy: {
+          label: block.label ?? null,
+          days: inWeekOrder(block.days),
+          start: clockText(clockMinutes(block.start)),
+          end: clockText(clockMinutes(block.end)),
+        },
+        overlaps,
+      });
+    }
+  }
+
+  const unknown: ScheduleIssue[] = missing.map(crn => ({
+    severity: 'error',
+    kind: 'unknownCrn',
+    crns: [crn],
+    message: `CRN ${crn} is not a section in the catalog; get CRNs from get_course or search_courses.`,
+  }));
   return {
     checked: entries.map(([crn]) => crn),
     duplicates: [...duplicates],
     conflicts,
-    issues: scheduleIssues(catalog, new Map(entries)),
+    busyConflicts,
+    busyBlocks: busy.length,
+    issues: [...unknown, ...scheduleIssues(catalog, new Map(entries))],
     dataAsOf: catalog.lastUpdated,
   };
 }

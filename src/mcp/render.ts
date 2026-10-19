@@ -660,6 +660,14 @@ export function renderConflicts(check: ConflictCheck): string {
       : '';
     lines.push(`CONFLICT ${name(a)} and ${name(b)}${when}.`);
   }
+  const band = (o: { days: string[]; start: string; end: string }) =>
+    `${o.days.join(',')} ${o.start}-${o.end}`;
+  for (const { section, busy, overlaps } of check.busyConflicts) {
+    const what = busy.label ? `"${busy.label}" (${band(busy)})` : band(busy);
+    lines.push(
+      `BUSY ${name(section)} meets during ${what}: ${overlaps.map(band).join(', ')}.`,
+    );
+  }
   for (const issue of check.issues) {
     lines.push(
       `${issue.severity === 'error' ? 'PROBLEM' : 'Note'}: ${issue.message}`,
@@ -668,16 +676,27 @@ export function renderConflicts(check: ConflictCheck): string {
 
   const errors = check.issues.filter(i => i.severity === 'error').length;
   const n = check.checked.length;
-  const times =
-    n < 2
-      ? 'One section, so no times to compare.'
-      : check.conflicts.length
-        ? `${check.conflicts.length} time conflict${check.conflicts.length === 1 ? '' : 's'} among ${n} sections; other pairs fit.`
-        : `No time conflicts among these ${n} sections.`;
+  const pairs =
+    n === 0
+      ? 'No known sections to compare.'
+      : n < 2
+        ? 'One section, so no times to compare.'
+        : check.conflicts.length
+          ? `${check.conflicts.length} time conflict${check.conflicts.length === 1 ? '' : 's'} among ${n} sections; other pairs fit.`
+          : `No time conflicts among these ${n} sections.`;
+  const busySections = new Set(check.busyConflicts.map(b => b.section.crn))
+    .size;
+  const busy =
+    check.busyBlocks === 0 || n === 0
+      ? ''
+      : busySections
+        ? `${busySections === 1 ? '1 section meets' : `${busySections} sections meet`} during your busy times.`
+        : 'None meets during your busy times.';
+  const times = [pairs, busy].filter(Boolean).join(' ');
   const missing = check.issues.some(i => i.kind === 'missingCompanion');
   const verdict = errors
     ? `${errors} problem${errors === 1 ? '' : 's'} to fix before registering.`
-    : check.conflicts.length
+    : check.conflicts.length || check.busyConflicts.length
       ? ''
       : missing
         ? 'Not a complete set yet: add the labs or discussions noted.'

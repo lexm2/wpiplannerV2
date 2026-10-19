@@ -14,7 +14,7 @@ import {
 import { currentAcademicYear, type Catalog } from '../api/catalog';
 import { termDates, today, yearLabel, yearStatus } from '../api/calendar';
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
-import { findConflicts } from '../api/conflicts';
+import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
 import { catalogMeta, listDepartments, lookupCourse } from '../api/lookup';
 import {
@@ -283,23 +283,15 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         'semester section, F or S, overlaps both of its quarters). Problems: a lab or discussion that does not go ' +
         'with a chosen lecture, two lectures of one course, interest-list placeholders, ended terms, closed sections. ' +
         'Notes: a lecture missing a lab or discussion it needs, full or waitlisted sections, 3 or fewer seats left. ' +
+        'CRNs not in the catalog are listed as problems and the rest still checked. With busy blocks (a work shift: ' +
+        '{days: ["T", "R"], start: "13:00", end: "17:00", label: "work"}), every section meeting during one is reported. ' +
         'Read-only; registration is in Workday.',
-      inputSchema: z
-        .object({
-          crns: z
-            .array(z.number().int().positive())
-            .min(1)
-            .max(100)
-            .describe(
-              'CRNs of the sections to check together, lectures and labs alike.',
-            ),
-        })
-        .strict(),
+      inputSchema: ConflictCheckInputSchema,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ crns }) => {
+    async ({ crns, busy }) => {
       try {
-        const check = findConflicts(await getCatalog(), crns);
+        const check = findConflicts(await getCatalog(), crns, busy);
         return {
           content: text(renderConflicts(check)),
           structuredContent: { ...check },

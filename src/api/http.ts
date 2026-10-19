@@ -6,7 +6,7 @@
 import * as z from 'zod';
 import type { Catalog } from './catalog';
 import { CourseQuerySchema, runCourseQuery } from './query';
-import { findConflicts } from './conflicts';
+import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
 import { ApiError } from './errors';
 import { logger } from '../utils/logger';
@@ -62,10 +62,6 @@ async function readBody(request: Request): Promise<unknown> {
 
 const YearParamSchema = z.coerce.number().int().min(2000).max(2100);
 const YearOrAllParamSchema = z.union([z.literal('all'), YearParamSchema]);
-
-const ConflictsBodySchema = z
-  .object({ crns: z.array(z.number().int().positive()).min(1).max(100) })
-  .strict();
 
 const BoolParamSchema = z
   .enum(['true', 'false', '1', '0'])
@@ -318,8 +314,11 @@ async function route(
   }
 
   if (path === '/conflicts' && method === 'POST') {
-    const { crns } = parseOrThrow(ConflictsBodySchema, await readBody(request));
-    return json(findConflicts(await getCatalog(), crns));
+    const { crns, busy } = parseOrThrow(
+      ConflictCheckInputSchema,
+      await readBody(request),
+    );
+    return json(findConflicts(await getCatalog(), crns, busy));
   }
 
   throw notFound();

@@ -557,6 +557,8 @@ describe('conflicts', () => {
       checked: [30],
       duplicates: [],
       conflicts: [],
+      busyConflicts: [],
+      busyBlocks: 0,
       issues: [],
       dataAsOf: '2026-09-02T00:00:00Z',
     });
@@ -584,10 +586,36 @@ describe('conflicts', () => {
     expect(await kinds([5], AFTER_A)).toEqual(['ended', 'full']);
   });
 
-  it('rejects unknown CRNs', async () => {
-    const { status, body } = await call('/conflicts', { crns: [1, 42] });
-    expect(status).toBe(400);
-    expect(body.details).toEqual({ unknownCrns: [42] });
+  it('checks the known CRNs and lists unknown ones as problems', async () => {
+    const { status, body } = await call('/conflicts', { crns: [3, 42, 1] });
+    expect(status).toBe(200);
+    expect(body.checked).toEqual([3, 1]);
+    expect(body.conflicts).toHaveLength(1);
+    expect(body.issues[0]).toMatchObject({
+      severity: 'error',
+      kind: 'unknownCrn',
+      crns: [42],
+    });
+  });
+
+  it('reports sections meeting during a busy block, in any term', async () => {
+    const { body } = await call('/conflicts', {
+      crns: [8, 40],
+      busy: [{ days: ['T', 'R'], start: '13:00', end: '17:00', label: 'work' }],
+    });
+    // RBE 1001 BL01 meets T and F 13:00-14:50; PSY 1400 only Monday nights.
+    expect(body.busyConflicts).toEqual([
+      {
+        section: { crn: 8, section: 'BL01', term: 'B', courses: ['RBE 1001'] },
+        busy: { label: 'work', days: ['T', 'R'], start: '13:00', end: '17:00' },
+        overlaps: [{ days: ['T'], start: '13:00', end: '14:50' }],
+      },
+    ]);
+    const backwards = await call('/conflicts', {
+      crns: [8],
+      busy: [{ days: ['T'], start: '17:00', end: '13:00' }],
+    });
+    expect(backwards.status).toBe(400);
   });
 });
 
