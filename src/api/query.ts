@@ -52,6 +52,7 @@ import {
   courseCode,
   primarySections,
   seatTotals,
+  termsOf,
   toCourseSummary,
   toSectionBrief,
   type CourseSummary,
@@ -439,6 +440,50 @@ export interface CourseQueryResult {
    * description, or an instructor or room matching it.
    */
   search: { query: string; onlyMentions: boolean } | null;
+  /**
+   * When nothing matched: for each filter given (up to MAX_RELAXED), how
+   * many courses match without it, and in which terms, most first.
+   */
+  relaxations: Relaxation[];
+}
+
+interface Relaxation {
+  /** The filter left out, as keyed in `filters`. */
+  filter: string;
+  total: number;
+  /** Terms the courses found without it run in. */
+  terms: string[];
+}
+
+/** How many filters an empty search tries leaving out, one at a time. */
+const MAX_RELAXED = 6;
+
+/**
+ * The same search with each given filter left out in turn, so an empty
+ * result can say which filter emptied it. The year stays: it is a choice
+ * of what can be scheduled, not a narrowing. Bounded at MAX_RELAXED reruns.
+ */
+function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
+  const ids = (Object.keys(query.filters) as (keyof CourseQuery['filters'])[])
+    .filter(id => id !== 'academicYear' && query.filters[id] !== undefined)
+    .slice(0, MAX_RELAXED);
+  return ids
+    .map(filter => {
+      const filters = { ...query.filters };
+      delete filters[filter];
+      const found = collapseCrossListings(
+        filterCatalog(
+          catalog,
+          readQuery(catalog, { ...query, filters }).criteria,
+        ),
+      );
+      return {
+        filter,
+        total: found.length,
+        terms: termsOf(found.flatMap(primarySections)),
+      };
+    })
+    .sort((a, b) => b.total - a.total);
 }
 
 const EVERY_DAY = Object.values(DayOfWeek);
@@ -701,6 +746,7 @@ export function runCourseQuery(
     : null;
 
   const notices = [...read.notices];
+  const relaxations = matches.length === 0 ? relax(catalog, query) : [];
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
       `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
@@ -725,6 +771,7 @@ export function runCourseQuery(
       return row;
     }),
     search,
+    relaxations,
     totals: totalsOf(matches),
     excludedEndedTerms: read.excludedEndedTerms,
     dataAsOf: catalog.lastUpdated,

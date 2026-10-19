@@ -182,11 +182,40 @@ function rowLine(
   return parts.join(' | ');
 }
 
+/** Which filter emptied a search, and what leaving it out would find. */
+function relaxationLines(
+  relaxations: CourseQueryResult['relaxations'],
+): string[] {
+  if (!relaxations.length) return [];
+  const helps = relaxations.filter(r => r.total > 0);
+  const stuck = relaxations.filter(r => r.total === 0).map(r => r.filter);
+  const lines: string[] = [];
+  if (helps.length) {
+    lines.push(
+      `Most restrictive: filters.${helps[0].filter}. Leaving out one filter at a time: ${helps
+        .map(
+          r =>
+            `without ${r.filter}, ${r.total} course${r.total === 1 ? '' : 's'}${r.terms.length ? ` (in ${r.terms.join(', ')})` : ''}`,
+        )
+        .join('; ')}.`,
+    );
+  } else {
+    lines.push(
+      'No single filter is to blame: leaving out any one of them still finds nothing; loosen two or more.',
+    );
+  }
+  if (helps.length && stuck.length) {
+    lines.push(`Leaving out ${stuck.join(' or ')} alone still finds nothing.`);
+  }
+  return lines;
+}
+
 export function renderSearch(result: CourseQueryResult): string {
   const lines: string[] = [];
   const where = result.year === 'all' ? 'all years' : yearLabel(result.year);
   if (result.total === 0) {
     lines.push(`No matching courses in ${where}.`);
+    lines.push(...relaxationLines(result.relaxations));
   } else {
     const last = Math.min(result.offset + result.limit, result.total);
     const range =

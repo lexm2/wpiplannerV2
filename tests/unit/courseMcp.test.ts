@@ -89,6 +89,29 @@ describe('MCP server', () => {
     expect(text).toContain('it goes in filters.times.earliestStart');
   });
 
+  it('names the filter that emptied a search', async () => {
+    const { text, data } = await tool('search_courses', {
+      filters: {
+        department: { departments: ['PSY'] },
+        term: { terms: ['C'] },
+        times: { earliestStart: '17:00' },
+      },
+    });
+    expect(data.total).toBe(0);
+    // PSY 1400 meets Monday evenings, in B term.
+    expect(data.relaxations).toEqual([
+      { filter: 'term', total: 1, terms: ['B'] },
+      { filter: 'department', total: 0, terms: [] },
+      { filter: 'times', total: 0, terms: [] },
+    ]);
+    expect(text).toContain(
+      'Most restrictive: filters.term. Leaving out one filter at a time: without term, 1 course (in B).',
+    );
+    expect(text).toContain(
+      'Leaving out department or times alone still finds nothing.',
+    );
+  });
+
   it('says when the offset runs past the end', async () => {
     const result = await tool('search_courses', { offset: 50 });
     expect(result.text).toContain(
