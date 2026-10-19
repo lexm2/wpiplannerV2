@@ -100,6 +100,9 @@ with a permission error in `/var/log/httpd/error_log`.
 
 ```bash
 cd /opt/wpiplanner
+# The fetcher rewrites these in the checkout; the live copies are in the data directory.
+runuser -u wpiplanner -- git checkout -- data/course-data.json \
+    public/course-data-constructed.json public/term-bounds.json public/last-updated.json
 runuser -u wpiplanner -- git pull --ff-only
 # then the build and rsync lines above, and:
 systemctl restart wpiplanner-fetcher wpiplanner-api

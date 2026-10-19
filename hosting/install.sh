@@ -79,6 +79,11 @@ checkout() {
     log "Fetching $BRANCH into $DIR"
     if [ -d "$DIR/.git" ]; then
         "$@" git -C "$DIR" fetch -q origin "$BRANCH"
+        # The RHEL fetcher refreshes these tracked files in the checkout, and the
+        # data commits being pulled change them too; the live copies are in the
+        # data directory, so drop these rather than let them stop the update.
+        "$@" git -C "$DIR" checkout -q -- data/course-data.json \
+            public/course-data-constructed.json public/term-bounds.json public/last-updated.json
         "$@" git -C "$DIR" checkout -q "$BRANCH"
         # --ff-only: edits made on the server stop the update instead of being lost.
         "$@" git -C "$DIR" pull -q --ff-only origin "$BRANCH"
