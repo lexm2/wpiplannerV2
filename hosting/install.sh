@@ -112,7 +112,8 @@ install_docker_nginx() {
         fi
     else
         # Arch doesn't support partial upgrades, so this upgrades the whole system.
-        PKGS=(curl git nginx iproute2 docker docker-compose)
+        # Without docker-buildx, compose falls back to the deprecated classic builder.
+        PKGS=(curl git nginx iproute2 docker docker-compose docker-buildx)
         if [ "$WANT_CERT" = true ]; then
             PKGS+=(certbot certbot-nginx)
         fi
