@@ -471,6 +471,10 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     notices.push(
       `Sections in terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
     );
+  } else if (ended.length) {
+    notices.push(
+      `Terms ${ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
+    );
   }
 
   if (filters.availability)
