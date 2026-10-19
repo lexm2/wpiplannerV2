@@ -1,6 +1,8 @@
 import type { RMPRatingFilterCriteria } from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
+import { keepMatchingGroups } from '../lectureGroupScope';
+import { SectionType } from '../../../types/types';
 import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 
 export class RMPRatingFilter implements SectionBasedFilter {
@@ -34,7 +36,13 @@ export class RMPRatingFilter implements SectionBasedFilter {
       return sections;
     }
 
-    return sections.filter(fs => {
+    // Judged on who teaches the lecture, and the group rises or falls with
+    // it: labs and discussions are mostly TA-run or unassigned, and a
+    // well-rated TA should not qualify a lecture either.
+    return keepMatchingGroups(sections, fs => {
+      if (fs.sectionType !== SectionType.LECTURE && fs.lectureGroup) {
+        return false;
+      }
       const professors = fs.section.periods
         .map(period => period.professor)
         .filter(name => name && name !== 'Not Assigned');

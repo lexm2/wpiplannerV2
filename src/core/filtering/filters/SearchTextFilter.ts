@@ -1,7 +1,8 @@
 import { SearchTextFilterCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
-import type { Course } from '../../../types/types';
+import type { Course, Section } from '../../../types/types';
+import { keepMatchingGroups } from '../lectureGroupScope';
 
 // Lowercased course-level search text, built once per Course rather than once
 // per section per keystroke. Catalog Course objects are never mutated (a data
@@ -26,6 +27,19 @@ function courseHaystack(course: Course): string {
   return text;
 }
 
+function sectionMatches(section: Section, query: string): boolean {
+  if (section.number.toLowerCase().includes(query)) return true;
+
+  return section.periods.some(
+    period =>
+      period.professor.toLowerCase().includes(query) ||
+      period.type.toLowerCase().includes(query) ||
+      period.building.toLowerCase().includes(query) ||
+      period.room.toLowerCase().includes(query) ||
+      period.location.toLowerCase().includes(query),
+  );
+}
+
 export class SearchTextFilter implements SectionBasedFilter {
   readonly id = 'searchText';
   readonly name = 'Search Text';
@@ -42,31 +56,20 @@ export class SearchTextFilter implements SectionBasedFilter {
 
     const query = criteria.query.trim().toLowerCase();
 
+    // A match anywhere in a lecture group keeps the whole group: searching
+    // a lecturer's name has to bring their lecture's labs along with it.
     if (criteria.professorOnly) {
-      return sections.filter(fs =>
+      return keepMatchingGroups(sections, fs =>
         fs.section.periods.some(p => p.professor.toLowerCase().includes(query)),
       );
     }
 
-    return sections.filter(fs => {
+    return keepMatchingGroups(sections, fs => {
       const courseText = courseHaystack(fs.course);
-
-      if (courseText.includes(query) || this.fuzzyMatch(courseText, query)) {
-        return true;
-      }
-
-      const section = fs.section;
-      if (section.number.toLowerCase().includes(query)) {
-        return true;
-      }
-
-      return section.periods.some(
-        period =>
-          period.professor.toLowerCase().includes(query) ||
-          period.type.toLowerCase().includes(query) ||
-          period.building.toLowerCase().includes(query) ||
-          period.room.toLowerCase().includes(query) ||
-          period.location.toLowerCase().includes(query),
+      return (
+        courseText.includes(query) ||
+        this.fuzzyMatch(courseText, query) ||
+        sectionMatches(fs.section, query)
       );
     });
   }
