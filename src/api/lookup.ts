@@ -9,6 +9,11 @@ import { findCourseById } from '../types/ScheduleState';
 import { findCatalogCourse } from '../services/degree/catalogLookup';
 import { getAllSections } from '../utils/courseUtils';
 import { closestMatches, editDistance } from '../utils/editDistance';
+import {
+  matchCourseText,
+  parseSearchQuery,
+  rankCoursesByRelevance,
+} from '../utils/searchUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
@@ -132,6 +137,71 @@ function courseNotFound(
   );
 }
 
+/** A course title as compared: lowercase words, "&" read as "and". */
+const titleWords = (title: string) => normalName(title);
+
+/** Suggestions an unresolved course name lists. */
+const MAX_NAME_SUGGESTIONS = 3;
+
+/**
+ * The one course of `year` whose title is `name` or starts with it, or
+ * within two edits of it ("Critical AI Literacy" for IMGD 2002 Critical AI
+ * Literacy in the Designed World); cross-listed copies of one class count
+ * once. Null when no title is close; throws with the likeliest courses
+ * when several are.
+ */
+function courseByName(
+  catalog: Catalog,
+  name: string,
+  year: number,
+): Course | null {
+  const want = titleWords(name);
+  if (want.length < 4) return null;
+  const inYear = catalog.courses.filter(c => c.academicYear === year);
+  const exact = inYear.filter(c => titleWords(c.name) === want);
+  const close = exact.length
+    ? exact
+    : inYear.filter(c => {
+        const title = titleWords(c.name);
+        return (
+          title.startsWith(`${want} `) ||
+          (want.length >= 8 && editDistance(want, title, 2) <= 2)
+        );
+      });
+  const classes = distinctClasses(close);
+  if (classes.length === 1) return classes[0];
+
+  const query = parseSearchQuery(name);
+  const ranked = rankCoursesByRelevance(
+    classes.length
+      ? classes
+      : inYear.filter(c => matchCourseText(c, query).all),
+    name,
+  ).slice(0, MAX_NAME_SUGGESTIONS);
+  if (!ranked.length) return null;
+  const list = ranked.map(c => `${courseCode(c)} ${c.name}`);
+  throw new ApiError(
+    `${classes.length ? `"${name}" fits ${classes.length} course titles` : `"${name}" is not a course title, id, code or CRN`}. Closest: ${list.join('; ')}. Give a code like "CS 2102".`,
+    404,
+    { suggestions: ranked.map(courseCode) },
+  );
+}
+
+/** The courses with cross-listed copies of one class (same CRNs) dropped. */
+function distinctClasses(courses: Course[]): Course[] {
+  const seen = new Set<string>();
+  return courses.filter(c => {
+    const crns = getAllSections(c)
+      .map(s => s.crn)
+      .sort((a, b) => a - b)
+      .join(',');
+    const key = crns || courseCode(c);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function detailContext(catalog: Catalog, course: Course) {
   const year = course.academicYear ?? currentAcademicYear(catalog);
   return {
@@ -194,7 +264,8 @@ export function lookupCourse(
 ): CourseLookup {
   const { year, ...detailOptions } = options;
   const notices: string[] = [];
-  const key = input.trim();
+  // "CRN 349614" as well as "349614".
+  const key = input.trim().replace(/^crn[\s#:.-]*(?=\d+$)/i, '');
   const current = currentAcademicYear(catalog);
 
   let course: Course | null = null;
@@ -210,6 +281,18 @@ export function lookupCourse(
     }
   } else {
     course = findCourse(catalog, key, year);
+    if (!course && !COURSE_ID_RE.test(key) && !COURSE_CODE_RE.test(key)) {
+      // A name: in the year asked for, or this year's for a later one.
+      const named =
+        courseByName(catalog, key, year ?? current) ??
+        (year !== undefined && year > current
+          ? courseByName(catalog, key, current)
+          : null);
+      if (named) {
+        course = named;
+        notices.push(`"${key}" read as ${courseCode(named)} ${named.name}.`);
+      }
+    }
   }
 
   if (year !== undefined && year > current) {

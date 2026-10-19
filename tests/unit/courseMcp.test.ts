@@ -242,6 +242,30 @@ describe('MCP server', () => {
     expect(data.sections).toHaveLength(4);
   });
 
+  it('takes a "CRN" prefix and a course title', async () => {
+    const crn = await tool('get_course', { course: 'CRN 22' });
+    expect(crn.text).toContain('CRN 22 is PH 1110 section BX01 (B term).');
+    const title = await tool('get_course', {
+      course: 'introduction to robotics',
+    });
+    expect(title.text).toContain(
+      '"introduction to robotics" read as RBE 1001 Introduction To Robotics.',
+    );
+    // Half a word is not near enough to resolve, but is suggested.
+    const start = await tool('get_course', { course: 'General Phys' });
+    expect(start.text).toContain('Closest: PH 1110 General Physics.');
+    // DS 502 and MA 543 are one class: its title resolves, once.
+    const shared = await tool('get_course', { course: 'Statistical Methods' });
+    expect(shared.isError).toBe(false);
+    const several = await tool('get_course', { course: 'Calculus I' });
+    expect(several.isError).toBe(false);
+    const vague = await tool('get_course', { course: 'Introduction' });
+    expect(vague.isError).toBe(true);
+    expect(vague.text).toContain(
+      '"Introduction" fits 2 course titles. Closest:',
+    );
+  });
+
   it('hides interest lists unless asked', async () => {
     const hidden = await tool('get_course', { course: 'MA 1021' });
     expect(hidden.text).toContain('interest lists for C');

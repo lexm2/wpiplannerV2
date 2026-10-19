@@ -152,7 +152,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
             .string()
             .min(1)
             .describe(
-              'A course code ("CS 2102", "CS2102"), catalog id ("CS-2102-2026") or a section CRN ("350041").',
+              'A course code ("CS 2102", "CS2102"), catalog id ("CS-2102-2026"), a section CRN ("350041" or "CRN 350041"), or a course title ("Critical AI Literacy"; resolved when one title is or starts with it, else the closest are suggested).',
             ),
           year: YearInputSchema.optional().describe(
             'Academic year (fall year). Omitted: the current year. A future unpublished year (e.g. next year) returns the planning outlook.',
