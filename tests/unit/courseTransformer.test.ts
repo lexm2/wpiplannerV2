@@ -137,3 +137,20 @@ describe('credits from the lecture', () => {
     expect([course.minCredits, course.maxCredits]).toEqual([1, 1]);
   });
 });
+
+describe('section details', () => {
+  it('carries delivery mode, status and dates', () => {
+    const [group] = convert([
+      row('CS 1101-AL01 - Introduction To Program Design', {
+        Delivery_Mode: 'Hybrid',
+        Section_Status: 'Waitlist',
+      }),
+    ]).lectures;
+    expect(group.section).toMatchObject({
+      deliveryMode: 'Hybrid',
+      status: 'Waitlist',
+      startDate: '2026-08-27',
+      endDate: '2026-10-14',
+    });
+  });
+});

@@ -30,6 +30,10 @@ export interface RawSection {
   note?: string;
   computedTerm?: string;
   isInterestList?: boolean;
+  deliveryMode?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
   periods?: RawPeriod[];
 }
 

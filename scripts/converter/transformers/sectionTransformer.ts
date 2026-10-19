@@ -111,6 +111,10 @@ export function transformSection(
       computedTerm,
       isGps: isGPS,
       isInterestList: isInterestList,
+      deliveryMode: workdaySection.Delivery_Mode,
+      status: workdaySection.Section_Status,
+      startDate: workdaySection.Course_Section_Start_Date,
+      endDate: workdaySection.Course_Section_End_Date,
       periods,
     },
   ];

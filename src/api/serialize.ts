@@ -59,6 +59,13 @@ interface SectionView {
   /** "12/30 available" or "Full (32/30 enrolled)". */
   seatsLabel: string;
   isInterestList: boolean;
+  /** "In-Person", "Online" or "Hybrid". */
+  deliveryMode: string;
+  /** Registration status: "Open", "Waitlist" or "Closed". */
+  status: string;
+  /** First and last day the section meets, YYYY-MM-DD. */
+  startDate: string;
+  endDate: string;
   periods: PeriodView[];
 }
 
@@ -197,6 +204,10 @@ function toSectionView(section: Section, ratingOf: RatingLookup): SectionView {
     maxWaitlist: section.maxWaitlist,
     seatsLabel: seatsLabel(section),
     isInterestList: section.isInterestList ?? false,
+    deliveryMode: section.deliveryMode,
+    status: section.status,
+    startDate: section.startDate,
+    endDate: section.endDate,
     periods: section.periods.map(p => toPeriodView(p, timed.has(p), ratingOf)),
   };
 }

@@ -40,6 +40,13 @@ export interface Section {
   note?: string;
   computedTerm: AcademicTerm; // A, B, C, D, E, F
   isInterestList?: boolean; // placeholder section for an interest list
+  /** "In-Person", "Online" or "Hybrid"; empty when the catalog does not say. */
+  deliveryMode: string;
+  /** Registration status: "Open", "Waitlist" or "Closed"; empty when unknown. */
+  status: string;
+  /** First and last day the section meets, YYYY-MM-DD; empty when unknown. */
+  startDate: string;
+  endDate: string;
   periods: Period[];
 }
 

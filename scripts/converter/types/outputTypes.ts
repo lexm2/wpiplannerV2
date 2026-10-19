@@ -46,6 +46,13 @@ export interface PlannerSection {
   computedTerm: string;
   isGps: boolean;
   isInterestList: boolean;
+  /** Workday's Delivery_Mode: "In-Person", "Online" or "Hybrid". */
+  deliveryMode: string;
+  /** Workday's Section_Status: "Open", "Waitlist" or "Closed". */
+  status: string;
+  /** First and last day of the section, YYYY-MM-DD. */
+  startDate: string;
+  endDate: string;
   periods: PlannerPeriod[];
 }
 

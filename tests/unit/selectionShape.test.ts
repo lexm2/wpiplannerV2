@@ -28,6 +28,10 @@ function section(number: string, crn: number): Section {
     seatsAvailable: 10,
     actualWaitlist: 0,
     maxWaitlist: 0,
+    deliveryMode: 'In-Person',
+    status: 'Open',
+    startDate: '',
+    endDate: '',
     computedTerm: AcademicTerm.A,
     periods: [],
   };

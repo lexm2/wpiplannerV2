@@ -8,11 +8,7 @@ import type {
 import type { RawCourse } from '../../types/rawData';
 import { appState } from '../../core/state/appState.svelte';
 import { logger } from '../../utils/logger';
-import {
-  parseCatalog,
-  parseLectureGroups,
-  parseSections,
-} from './parseCatalog';
+import { parseCatalog, parseCourse } from './parseCatalog';
 
 /**
  * Fetches the WPI course catalog and parses it with parseCatalog.
@@ -142,34 +138,12 @@ export class CourseDataService {
       );
     }
     const json = (await response.json()) as { courses: RawCourse[] };
-    const parsedCourses = json.courses.map(raw => {
-      const lectures = parseLectureGroups(raw.lectures ?? []);
-      const standaloneLabs = raw.standaloneLabs
-        ? parseSections(raw.standaloneLabs)
-        : undefined;
-      const course: Course = {
-        id: raw.id,
-        number: raw.number,
-        name: raw.name,
-        description: raw.description ?? '',
-        category: raw.category ?? null,
-        departmentAbbr: 'TUT',
-        departmentName: 'Tutorial',
-        minCredits: raw.minCredits ?? 0,
-        maxCredits: raw.maxCredits ?? 0,
-        isGraduate: raw.isGraduate ?? false,
-        academicYear: raw.academicYear,
-        transient: true,
-        lectures: lectures.length > 0 ? lectures : undefined,
-        standaloneLabs,
-      };
-      return course;
-    });
-    const tutDept: Department = {
-      abbreviation: 'TUT',
-      name: 'Tutorial',
-      courses: parsedCourses,
-    };
+    const tutorial = { abbreviation: 'TUT', name: 'Tutorial' };
+    const parsedCourses = json.courses.map(raw => ({
+      ...parseCourse(raw, tutorial),
+      transient: true,
+    }));
+    const tutDept: Department = { ...tutorial, courses: parsedCourses };
     this.scheduleDB = {
       ...this.scheduleDB,
       departments: [
