@@ -437,7 +437,12 @@ export function renderSearch(result: CourseQueryResult): string {
       ? c.sections.some(s => isLow(s.seatsAvailable))
       : c.seatsByTerm.some(t => isLow(t.available)),
   );
-  if (result.courses.some(c => c.sections?.some(waitlistBesideSeats))) {
+  const waitlisted = result.courses.some(c =>
+    c.sections
+      ? c.sections.some(waitlistBesideSeats)
+      : c.seatsByTerm.some(t => t.available > 0 && t.waitlisted > 0),
+  );
+  if (waitlisted) {
     lines.push(WAITLIST_NOTE);
   }
   if (result.total > 0) lines.push(seatDataLine(result, low));

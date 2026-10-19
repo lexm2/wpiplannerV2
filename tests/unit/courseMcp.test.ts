@@ -153,6 +153,12 @@ describe('MCP server', () => {
     );
     const none = await tool('get_course', { course: 'CS 2102' });
     expect(none.text).not.toContain('A waitlist beside');
+    // A row without its sections shows the waitlist in its totals.
+    const row = await tool('search_courses', {
+      filters: { searchText: { query: 'CS 1101' } },
+    });
+    expect(row.text).toContain('10/30 open, waitlist 2');
+    expect(row.text).toContain('A waitlist beside open seats');
   });
 
   it('says which delivery modes asked for have nothing', async () => {
