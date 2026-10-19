@@ -142,6 +142,22 @@ describe('MCP server', () => {
     expect(prefix.data.total).toBeGreaterThan(0);
   });
 
+  it('suggests the instructor a misspelt name means', async () => {
+    for (const query of ['Grace Hoper', 'Hoppr']) {
+      const { text, data } = await tool('search_courses', {
+        filters: { searchText: { query, professorOnly: true } },
+      });
+      expect(data.total).toBe(0);
+      expect(text).toContain(
+        `No instructor is named "${query}"; did you mean Grace Hopper?`,
+      );
+    }
+    const found = await tool('search_courses', {
+      filters: { searchText: { query: 'Grace Hopper', professorOnly: true } },
+    });
+    expect(found.text).not.toContain('did you mean');
+  });
+
   it('names the right place for a key given in the wrong one', async () => {
     const { text, isError } = await tool('search_courses', {
       filters: { earliestStart: '17:00' },

@@ -52,6 +52,7 @@ import {
 } from './calendar';
 import { blockedSlotsForCrns } from './conflicts';
 import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
+import { suggestInstructors } from './instructors';
 import { ApiError } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
@@ -811,6 +812,22 @@ const byNumber = (a: Course, b: Course) =>
   a.departmentAbbr.localeCompare(b.departmentAbbr) ||
   a.number.localeCompare(b.number);
 
+/** "Did you mean Gillian Smith?" for a search that found nothing. */
+function instructorNotice(
+  catalog: Catalog,
+  year: number | 'all',
+  query: string,
+): string[] {
+  const inYear = catalog.courses.filter(
+    c => year === 'all' || c.academicYear === year,
+  );
+  const names = suggestInstructors(inYear, query);
+  if (!names.length) return [];
+  return [
+    `No instructor is named "${query.trim()}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
+  ];
+}
+
 /** '"AI" read as AI or artificial intelligence.', for each acronym in the query. */
 function acronymNotices(query: string): string[] {
   return parseSearchQuery(query).words.flatMap(word => {
@@ -981,6 +998,9 @@ export function runCourseQuery(
     ...companionNotices(catalog, read.criteria, filtered),
   ];
   const relaxations = matches.length === 0 ? relax(catalog, query) : [];
+  if (matches.length === 0 && text) {
+    notices.push(...instructorNotice(catalog, read.year, text.query));
+  }
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
       `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,

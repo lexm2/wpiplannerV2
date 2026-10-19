@@ -218,7 +218,7 @@ function isNamedProfessor(name: string): boolean {
 }
 
 /** A period's named instructors; co-taught "A; B" splits. */
-function instructorNames(period: Period): string[] {
+export function instructorNames(period: Period): string[] {
   return period.professor.split(/\s*;\s*/).filter(isNamedProfessor);
 }
 
