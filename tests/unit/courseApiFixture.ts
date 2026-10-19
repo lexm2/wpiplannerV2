@@ -247,7 +247,7 @@ export function catalogJson(extraName = '') {
                 10,
                 'BL02',
                 'B',
-                [period(['W'], '16:00', '17:50', 'Grace Hopper')],
+                [period(['T', 'F'], '16:00', '17:50', 'Grace Hopper')],
                 990,
                 { seats: 999 },
               ),

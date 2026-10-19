@@ -141,15 +141,55 @@ describe('course search', () => {
       filters: { times: { earliestStart: '10:00', latestEnd: '12:00' } },
     });
     expect(codes(post.body)).toEqual(codes(body));
+    // Windows given with the shorthand add to it.
     const both = await call('/courses/search', {
       filters: {
         times: {
           earliestStart: '10:00',
-          windows: [{ day: 'M', startMin: 0, endMin: 60 }],
+          latestEnd: '12:00',
+          windows: [{ day: 'M', startMin: 1080, endMin: 1260 }],
         },
       },
     });
-    expect(both.status).toBe(400);
+    expect(both.body.notices).toContain(
+      'Times read as: only within every day 10:00-12:00; M 18:00-21:00.',
+    );
+  });
+
+  it('applies the shorthand to the days given, and says how it read it', async () => {
+    const avoid = (times: object) =>
+      call('/courses/search', {
+        filters: { times: { mode: 'avoid', ...times } },
+      });
+    // Avoiding 13:00-17:00 every day takes PH 1110's W and R labs with it.
+    const everyDay = await avoid({
+      earliestStart: '13:00',
+      latestEnd: '17:00',
+    });
+    expect(codes(everyDay.body)).not.toContain('PH-1110-2026');
+    expect(everyDay.body.notices).toContain(
+      'Times read as: avoiding every day 13:00-17:00.',
+    );
+    // A Tue/Thu shift leaves PH 1110's Wednesday lab, and drops RBE 1001.
+    const shift = await avoid({
+      days: ['T', 'R'],
+      earliestStart: '13:00',
+      latestEnd: '17:00',
+    });
+    expect(codes(shift.body)).toContain('PH-1110-2026');
+    expect(codes(shift.body)).not.toContain('RBE-1001-2026');
+    expect(shift.body.notices).toContain(
+      'Times read as: avoiding T,R 13:00-17:00.',
+    );
+    const get = await call(
+      '/courses?earliestStart=13:00&latestEnd=17:00&days=T,R&times=' +
+        encodeURIComponent('{"mode":"avoid"}'),
+    );
+    expect(codes(get.body)).toEqual(codes(shift.body));
+    // Days alone: the whole day.
+    const friday = await avoid({ days: ['F'] });
+    expect(codes(friday.body)).not.toContain('RBE-1001-2026');
+    expect(friday.body.notices).toContain('Times read as: avoiding all of F.');
   });
 
   it('keeps async sections alongside the shorthand when asked', async () => {

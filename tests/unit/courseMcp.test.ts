@@ -71,7 +71,7 @@ describe('MCP server', () => {
     });
     // BL02's 999 seats are Workday's mark for no limit, not seats.
     expect(low.text).toContain('| B | 2/30 open + 1 with no seat cap\n');
-    expect(low.text).toContain('W 16:00-17:50 | Grace Hopper | no seat cap');
+    expect(low.text).toContain('TF 16:00-17:50 | Grace Hopper | no seat cap');
     expect(low.text).toContain('2 open in 1 section + 1 with no seat cap');
     expect(low.text).toContain(
       'Seat data is under a day old (2026-09-02); low counts (3 or fewer) may already be gone.',

@@ -59,7 +59,8 @@ Workflow:
 1. get_catalog_info once: today's date and term, which years are published, \
 term dates, degree attribute names.
 2. search_courses for candidates by topic, department, term, degree attribute, \
-open seats, times (filters.times.earliestStart/latestEnd), ratings, or fit \
+open seats, times (filters.times.earliestStart/latestEnd, on filters.times.days \
+for particular weekdays), ratings, or fit \
 around CRNs already chosen \
 (filters.periodConflict). Filtered searches list the matching sections with \
 CRNs.

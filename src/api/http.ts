@@ -118,6 +118,7 @@ const COURSE_PARAMS = new Set([
   'offeringPattern',
   'earliestStart',
   'latestEnd',
+  'days',
   'includeAsync',
   'includeInterestLists',
   'includeEndedTerms',
@@ -228,12 +229,16 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
   if (
     params.has('earliestStart') ||
     params.has('latestEnd') ||
+    params.has('days') ||
     params.has('includeAsync')
   ) {
     filters.times = {
       ...(filters.times as object | undefined),
       earliestStart: str('earliestStart'),
       latestEnd: str('latestEnd'),
+      days: params.has('days')
+        ? list('days').map(d => d.toUpperCase())
+        : undefined,
       includeAsync: bool('includeAsync'),
     };
   }

@@ -47,7 +47,7 @@ import {
 } from './calendar';
 import { blockedSlotsForCrns } from './conflicts';
 import { ApiError } from './errors';
-import { ClockSchema, clockMinutes } from './clock';
+import { ClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
 import {
   DELIVERY_MODES,
@@ -269,14 +269,24 @@ const FiltersSchema = strictObject(
           .enum(['only', 'avoid'])
           .default('only')
           .describe(
-            'Default "only": every meeting of a section must fall inside the times. "avoid": drop sections with any meeting overlapping them.',
+            'Default "only": every meeting of a section must fall inside the times. "avoid": drop sections with any meeting overlapping them. ' +
+              'Labs and discussions are judged too: a lecture whose labs (or discussions) all fail is dropped, and the response says so.',
           ),
         earliestStart: ClockSchema.optional().describe(
-          'Shorthand for windows on every day: meetings start at or after this ("17:00" for evening classes).',
+          'Shorthand, on `days` (default every day). "only": meetings start at or after this ("17:00" for evening classes). "avoid": the start of the band to avoid.',
         ),
         latestEnd: ClockSchema.optional().describe(
-          'Shorthand for windows on every day: meetings end by this ("12:00").',
+          'Shorthand, on `days` (default every day). "only": meetings end by this ("12:00"). "avoid": the end of the band to avoid.',
         ),
+        days: z
+          .array(z.enum(DayOfWeek))
+          .min(1)
+          .optional()
+          .describe(
+            'The days the earliestStart/latestEnd band applies to; default every day, so avoid 13:00-17:00 without days clears every weekday. ' +
+              'To avoid a Tue/Thu shift only: {mode: "avoid", days: ["T", "R"], earliestStart: "13:00", latestEnd: "17:00"}. ' +
+              'To keep all of Friday free: {mode: "avoid", days: ["F"]}. With "only", a day not listed has no allowed time, so sections meeting on it are dropped.',
+          ),
         windows: z
           .array(TimeWindowSchema)
           .min(
@@ -289,7 +299,7 @@ const FiltersSchema = strictObject(
           )
           .optional()
           .describe(
-            'Weekly time windows, one per day and band, each weekday its own entry. Give these or earliestStart/latestEnd.',
+            'Weekly time windows, one per day and band, each weekday its own entry. With the shorthand too, both apply (their union).',
           ),
         includeAsync: z
           .boolean()
@@ -301,12 +311,12 @@ const FiltersSchema = strictObject(
       querySchema,
     )
       .refine(
-        t => !!t.windows !== !!(t.earliestStart || t.latestEnd),
-        'give either windows or earliestStart/latestEnd',
+        t => !!(t.windows || t.earliestStart || t.latestEnd || t.days),
+        'give windows, or earliestStart/latestEnd (and optionally days)',
       )
       .optional()
       .describe(
-        'When sections meet: earliestStart/latestEnd for every day, or windows for particular days and bands.',
+        'When sections, their labs and their discussions meet: the earliestStart/latestEnd band on `days` (default every day), windows for particular bands, or both. The response echoes the times as read.',
       ),
     rmpRating: strictObject(
       {
@@ -510,15 +520,45 @@ const EVERY_DAY = Object.values(DayOfWeek);
 
 type TimesInput = NonNullable<CourseQuery['filters']['times']>;
 
-/** The times filter's windows: as given, or one per day from the shorthand. */
+/**
+ * The times filter's windows: those given, and the shorthand's band on
+ * each of its days (every day by default).
+ */
 function timeWindows(times: TimesInput): TimeWindow[] {
-  if (times.windows) return times.windows;
-  const startMin = times.earliestStart ? clockMinutes(times.earliestStart) : 0;
-  const endMin = times.latestEnd ? clockMinutes(times.latestEnd) : 1440;
-  if (endMin <= startMin) {
-    throw new ApiError('latestEnd must be after earliestStart.');
+  const windows = [...(times.windows ?? [])];
+  if (times.earliestStart || times.latestEnd || times.days) {
+    const startMin = times.earliestStart
+      ? clockMinutes(times.earliestStart)
+      : 0;
+    const endMin = times.latestEnd ? clockMinutes(times.latestEnd) : 1440;
+    if (endMin <= startMin) {
+      throw new ApiError('latestEnd must be after earliestStart.');
+    }
+    for (const day of times.days ?? EVERY_DAY) {
+      windows.push({ day, startMin, endMin });
+    }
   }
-  return EVERY_DAY.map(day => ({ day, startMin, endMin }));
+  return canonicalWindows(windows);
+}
+
+/** "Avoiding T,R 13:00-17:00", the windows as the filter reads them. */
+function describeTimes(times: TimesFilterCriteria): string {
+  const bands = new Map<string, DayOfWeek[]>();
+  for (const w of times.windows) {
+    const band = `${clockText(w.startMin)}-${clockText(w.endMin)}`;
+    bands.set(band, [...(bands.get(band) ?? []), w.day]);
+  }
+  const text = [...bands]
+    .map(([band, days]) => {
+      const which =
+        days.length === EVERY_DAY.length ? 'every day' : days.join(',');
+      return band === '00:00-24:00' ? `all of ${which}` : `${which} ${band}`;
+    })
+    .join('; ');
+  const async = times.includeAsync ? ', sections with no set time kept' : '';
+  return times.mode === 'avoid'
+    ? `Times read as: avoiding ${text}${async}.`
+    : `Times read as: only within ${text}${async}.`;
 }
 
 interface ReadQuery {
@@ -616,11 +656,13 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     );
 
   if (filters.times) {
-    set<TimesFilterCriteria>('times', {
+    const times: TimesFilterCriteria = {
       mode: filters.times.mode,
-      windows: canonicalWindows(timeWindows(filters.times)),
+      windows: timeWindows(filters.times),
       includeAsync: filters.times.includeAsync,
-    });
+    };
+    set<TimesFilterCriteria>('times', times);
+    notices.push(describeTimes(times));
   }
 
   if (filters.rmpRating) {
