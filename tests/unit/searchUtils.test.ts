@@ -18,6 +18,8 @@ function course(over: Partial<Course> = {}): Course {
     description: 'A first course in programming.',
     departmentAbbr: 'CS',
     departmentName: 'Computer Science',
+    degreeAttributes: [],
+    courseTypes: [],
     minCredits: 3,
     maxCredits: 3,
     ...over,

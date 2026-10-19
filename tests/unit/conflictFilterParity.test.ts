@@ -158,6 +158,8 @@ function scenario(seed: number): {
       description: '',
       departmentAbbr: 'C',
       departmentName: '',
+      degreeAttributes: [],
+      courseTypes: [],
       minCredits: 3,
       maxCredits: 3,
       lectures,

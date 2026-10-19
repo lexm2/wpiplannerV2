@@ -45,6 +45,8 @@ function course(name: string): Course {
     description: '',
     departmentAbbr: 'HUA',
     departmentName: 'Humanities',
+    degreeAttributes: [],
+    courseTypes: [],
     lectures: [],
     minCredits: 3,
     maxCredits: 3,

@@ -93,6 +93,8 @@ function course(dept: string, number: string): Course {
     description: '',
     departmentAbbr: dept,
     departmentName: dept,
+    degreeAttributes: [],
+    courseTypes: [],
     lectures: [],
     minCredits: 3,
     maxCredits: 3,

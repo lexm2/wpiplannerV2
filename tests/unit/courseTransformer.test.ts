@@ -154,3 +154,62 @@ describe('section details', () => {
     });
   });
 });
+
+describe('course tags', () => {
+  it('reads degree attributes and course types across the sections', () => {
+    const course = convert([
+      row('HU 3900-A01 - Inquiry Seminar', {
+        Course_Tags:
+          'Degree Attribute :: Humanities and Arts; Course Type :: Music; Offering Pattern :: Category II',
+      }),
+      row('HU 3900-A02 - Inquiry Seminar', {
+        Course_Tags:
+          'Degree Attribute :: Humanities and Arts; Course Type :: Art; Offering Pattern :: Category II',
+      }),
+    ]);
+    expect(course.degreeAttributes).toEqual(['Humanities and Arts']);
+    expect(course.courseTypes).toEqual(['Music', 'Art']);
+    expect(course.category).toBe(2);
+  });
+
+  it('leaves the interest-list marker out of the course types', () => {
+    const course = convert([
+      row('CS 1101-AL-Interest List - Intro', {
+        Course_Tags:
+          'Course Type :: Waitlist Section; Offering Pattern :: Category I',
+      }),
+      row('CS 1101-AL01 - Intro'),
+    ]);
+    expect(course.courseTypes).toEqual([]);
+  });
+
+  it('falls back to the description for the category', () => {
+    const course = convert([
+      row('MA 540-F01 - Probability', {
+        Course_Tags: '',
+        Course_Section_Description: '<p>Cat. III</p><p>Probability.</p>',
+      }),
+    ]);
+    expect(course.category).toBe(3);
+  });
+
+  it('prefers the tag when the description disagrees', () => {
+    const course = convert([
+      row('MA 540-F01 - Probability', {
+        Course_Section_Description: '<p>Cat. II</p><p>Probability.</p>',
+      }),
+    ]);
+    expect(course.category).toBe(1);
+  });
+
+  it('flags online graduate sections', () => {
+    const [online, campus] = convert([
+      row('AE 5131-F01 - Aerodynamics', {
+        Course_Tags: 'Graduate Studies Online :: Online Grad Course',
+      }),
+      row('AE 5131-F02 - Aerodynamics', { Course_Tags: '' }),
+    ]).lectures;
+    expect(online.section.isOnlineGrad).toBe(true);
+    expect(campus.section.isOnlineGrad).toBe(false);
+  });
+});

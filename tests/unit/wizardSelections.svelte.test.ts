@@ -24,6 +24,7 @@ function section(number: string, crn: number): Section {
     seatsAvailable: 10,
     actualWaitlist: 0,
     maxWaitlist: 0,
+    isOnlineGrad: false,
     deliveryMode: 'In-Person',
     status: 'Open',
     startDate: '',

@@ -12,7 +12,12 @@ export interface Course {
   number: string;
   name: string;
   description: string;
+  /** WPI offering category: I every year, II every other year, III occasionally. */
   category?: 1 | 2 | 3 | null;
+  /** Degree requirements its sections count toward, e.g. "Social Sciences". */
+  degreeAttributes: string[];
+  /** Kinds of course, e.g. "Special Topic", "Music", "Experimental". */
+  courseTypes: string[];
   departmentAbbr: string;
   departmentName: string;
   lectures?: LectureGroup[];
@@ -40,6 +45,8 @@ export interface Section {
   note?: string;
   computedTerm: AcademicTerm; // A, B, C, D, E, F
   isInterestList?: boolean; // placeholder section for an interest list
+  /** Part of WPI's online graduate offering. */
+  isOnlineGrad: boolean;
   /** "In-Person", "Online" or "Hybrid"; empty when the catalog does not say. */
   deliveryMode: string;
   /** Registration status: "Open", "Waitlist" or "Closed"; empty when unknown. */

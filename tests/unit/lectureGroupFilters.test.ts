@@ -27,6 +27,7 @@ function section(
     seatsAvailable,
     actualWaitlist: 0,
     maxWaitlist: 0,
+    isOnlineGrad: false,
     deliveryMode: 'In-Person',
     status: 'Open',
     startDate: '',
@@ -57,6 +58,8 @@ const calculus: Course = {
   description: '',
   departmentAbbr: 'MA',
   departmentName: 'Mathematical Sciences',
+  degreeAttributes: [],
+  courseTypes: [],
   minCredits: 3,
   maxCredits: 3,
   lectures: [

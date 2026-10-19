@@ -59,6 +59,8 @@ function course(id: string, section: Section): Course {
     description: '',
     departmentAbbr: id.replace(/\d+$/, ''),
     departmentName: '',
+    degreeAttributes: [],
+    courseTypes: [],
     minCredits: 3,
     maxCredits: 3,
     lectures: [{ section, compatibleDiscussions: [], compatibleLabs: [] }],

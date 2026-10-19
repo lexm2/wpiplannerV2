@@ -24,6 +24,8 @@ function course(id: string, sections: Section[]): Course {
     description: '',
     departmentAbbr: 'AE',
     departmentName: '',
+    degreeAttributes: [],
+    courseTypes: [],
     minCredits: 3,
     maxCredits: 3,
     lectures: sections.map(s => ({

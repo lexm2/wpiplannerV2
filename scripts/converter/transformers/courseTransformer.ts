@@ -12,8 +12,12 @@ import {
 import { buildLectureGroups } from './lectureGroupBuilder.js';
 import { sanitizeHTML, extractCategory } from '../utils/htmlSanitizer.js';
 import { ConverterConfig } from '../ConverterConfig.js';
+import { offeringCategory, unionTagValues } from '../utils/courseTags.js';
 
 const COMPANION_FORMATS = new Set(['Laboratory', 'Discussion']);
+
+// Workday's marker for an interest list, not a kind of course.
+const PLACEHOLDER_COURSE_TYPE = 'Waitlist Section';
 
 /**
  * Transforms a group of Workday sections (same course) into a PlannerCourse
@@ -53,7 +57,8 @@ export function transformCourse(
     ? firstSection.Course_Description
     : firstSection.Course_Section_Description;
 
-  const { category, cleanedHtml } = extractCategory(descriptionRaw);
+  const { category: describedCategory, cleanedHtml } =
+    extractCategory(descriptionRaw);
   const description = sanitizeHTML(cleanedHtml);
 
   const isGraduate = firstSection.Academic_Level === 'Graduate';
@@ -84,6 +89,19 @@ export function transformCourse(
   )!;
   const credits = credited.map(ws => parseFloat(ws.Credits) || 0);
 
+  // Tags sit on each section. Offering Pattern never varies within a
+  // course; attributes and types do in a few topic courses (FY 1101's
+  // sections count for different areas, HU 3900's are Art, Music or
+  // Theatre), so the course carries what any of its sections has.
+  const tags = (enrollable.length > 0 ? enrollable : workdaySections).map(
+    ws => ws.Course_Tags,
+  );
+  const category = offeringCategory(tags) ?? describedCategory;
+  const degreeAttributes = unionTagValues(tags, 'Degree Attribute');
+  const courseTypes = unionTagValues(tags, 'Course Type').filter(
+    type => type !== PLACEHOLDER_COURSE_TYPE,
+  );
+
   const categorized = categorizeSections(plannerSections);
 
   const lectures = buildLectureGroups(categorized);
@@ -107,6 +125,8 @@ export function transformCourse(
     name: courseName,
     description,
     category,
+    degreeAttributes,
+    courseTypes,
     minCredits: Math.min(...credits),
     maxCredits: Math.max(...credits),
     isGraduate,

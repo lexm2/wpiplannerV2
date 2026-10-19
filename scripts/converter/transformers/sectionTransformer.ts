@@ -6,6 +6,7 @@ import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerSection, PlannerPeriod } from '../types/outputTypes.js';
 import { parseSectionDetails } from '../utils/timeParser.js';
 import { ConverterConfig } from '../ConverterConfig.js';
+import { tagValues } from '../utils/courseTags.js';
 
 export interface CategorizedSections {
   lectures: PlannerSection[];
@@ -111,6 +112,10 @@ export function transformSection(
       computedTerm,
       isGps: isGPS,
       isInterestList: isInterestList,
+      isOnlineGrad: tagValues(
+        workdaySection.Course_Tags,
+        'Graduate Studies Online',
+      ).includes('Online Grad Course'),
       deliveryMode: workdaySection.Delivery_Mode,
       status: workdaySection.Section_Status,
       startDate: workdaySection.Course_Section_Start_Date,
