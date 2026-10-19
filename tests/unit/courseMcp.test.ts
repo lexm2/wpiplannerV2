@@ -27,8 +27,22 @@ describe('MCP server', () => {
     expect(result.text).toContain('Seats as of 2026-09-02');
     expect(result.text).toContain('1. PH 1110 General Physics | 3 cr | B');
     expect(result.text).toContain(
-      'BL01 CRN 20 B | MTRF 09:00-09:50 | Ada Lovelace RMP 4.5 (12) | 10/30 open',
+      'BL01 CRN 20 B | MTRF 09:00-09:50 | Ada Lovelace RMP 4.5, diff 2.1 (12) | 10/30 open',
     );
+    // Ada's 4.5 on 12 ratings outranks Alan's 4.9 on 3.
+    expect(result.text).toContain(
+      '| Cat. I | top Ada Lovelace RMP 4.5, diff 2.1 (12)\n',
+    );
+    expect(result.text).toContain(
+      'BL02 CRN 21 B | MTRF 11:00-11:50 | Alan Turing RMP 4.9, diff 3.2 (3, few ratings) | 10/30 open | Online',
+    );
+    expect(result.data.courses[0].topInstructor).toEqual({
+      name: 'Ada Lovelace',
+      rating: 4.5,
+      difficulty: 2.1,
+      wouldTakeAgain: 91,
+      numRatings: 12,
+    });
     // Without section-level filters, rows stay one line.
     const plain = await tool('search_courses', { filters: {} });
     expect(plain.text).not.toContain('CRN');
@@ -129,6 +143,7 @@ describe('MCP server', () => {
       'BX02 CRN 23 | R 14:00-14:50 | 10/30 open | Online | with BL02',
     );
     expect(text).toContain('Take one lecture plus one of each companion kind');
+    expect(text).toContain('Ada Lovelace RMP 4.5, diff 2.1, 91% again (12)');
     expect(text.length).toBeLessThan(1500);
     expect(data.sections).toHaveLength(4);
   });

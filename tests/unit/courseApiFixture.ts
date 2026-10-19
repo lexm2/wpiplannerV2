@@ -192,7 +192,7 @@ export function catalogJson(extraName = '') {
                         ['M', 'T', 'R', 'F'],
                         '11:00',
                         '11:50',
-                        'Grace Hopper',
+                        'Alan Turing',
                       ),
                     ],
                     10,
@@ -272,7 +272,7 @@ const TERM_BOUNDS = {
 const RMP = {
   lastUpdated: '2026-09-01',
   school: { id: 'wpi', name: 'WPI' },
-  totalProfessors: 1,
+  totalProfessors: 2,
   professors: [
     {
       id: '1',
@@ -285,6 +285,19 @@ const RMP = {
       numRatings: 12,
       wouldTakeAgainPercent: 91.2,
       profileUrl: 'https://example.test/ada',
+    },
+    // Rated higher than Ada, on too few ratings to outrank her.
+    {
+      id: '2',
+      legacyId: 2,
+      firstName: 'Alan',
+      lastName: 'Turing',
+      department: 'Physics',
+      avgRating: 4.9,
+      avgDifficulty: 3.2,
+      numRatings: 3,
+      wouldTakeAgainPercent: -1,
+      profileUrl: 'https://example.test/alan',
     },
   ],
 };

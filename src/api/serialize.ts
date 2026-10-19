@@ -79,10 +79,11 @@ export interface CourseSummary {
   /** Other codes the same sections are listed under; one class. */
   crossListedWith: string[];
   /**
-   * The best-rated lecture instructor with Rate My Professor data, those
-   * with three or more ratings first.
+   * The best-rated lecture instructor with Rate My Professor data. Those
+   * with SOLID_RATINGS (5) or more ratings rank above those with fewer,
+   * then by rating.
    */
-  topInstructor: { name: string; rating: number; numRatings: number } | null;
+  topInstructor: (Omit<RatingView, 'url'> & { name: string }) | null;
 }
 
 /** One section on one line: what a search row lists under its course. */
@@ -245,12 +246,25 @@ type RatingLookup = (name: string) => RatingView | null;
 function ratingLookup(rmp: RateMyProfessorService): RatingLookup {
   return name => {
     const r = rmp.getRatings(name);
-    return r ? { ...r, url: rmp.getProfessorRMPUrl(name) } : null;
+    if (!r) return null;
+    return {
+      ...r,
+      // RMP reports -1 when too few raters answered.
+      wouldTakeAgain:
+        r.wouldTakeAgain !== null && r.wouldTakeAgain >= 0
+          ? r.wouldTakeAgain
+          : null,
+      url: rmp.getProfessorRMPUrl(name),
+    };
   };
 }
 
-/** Below this many reviews an average says little; such ratings rank last. */
-const SOLID_RATINGS = 3;
+/**
+ * Instructors with at least this many ratings outrank those with fewer:
+ * 4.7 from 3 reviews says less than 3.9 from 24, and 5.0 from one review
+ * almost nothing.
+ */
+export const SOLID_RATINGS = 5;
 
 function topInstructor(sections: Section[], ratingOf: RatingLookup) {
   let best: CourseSummary['topInstructor'] = null;
@@ -262,8 +276,17 @@ function topInstructor(sections: Section[], ratingOf: RatingLookup) {
       !best ||
       (solid(r.numRatings) && !solid(best.numRatings)) ||
       (solid(r.numRatings) === solid(best.numRatings) &&
-        r.rating > best.rating);
-    if (better) best = { name, rating: r.rating, numRatings: r.numRatings };
+        (r.rating > best.rating ||
+          (r.rating === best.rating && r.numRatings > best.numRatings)));
+    if (better) {
+      best = {
+        name,
+        rating: r.rating,
+        difficulty: r.difficulty,
+        wouldTakeAgain: r.wouldTakeAgain,
+        numRatings: r.numRatings,
+      };
+    }
   }
   return best;
 }

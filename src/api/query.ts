@@ -324,7 +324,7 @@ const FiltersSchema = strictObject(
           .min(1)
           .optional()
           .describe(
-            'Ignore averages resting on fewer ratings (treated as no data).',
+            'Ignore averages resting on fewer ratings (treated as no data). Pair it with minRating: a 5.0 from one review passes minRating 4 on its own; minNumRatings 5 keeps averages that mean something.',
           ),
         includeWithoutData: z
           .boolean()
@@ -337,7 +337,7 @@ const FiltersSchema = strictObject(
     )
       .optional()
       .describe(
-        "Rate My Professor bounds on 0-5 scales, judged on the lecture's instructors; a lecture passes when any of them does.",
+        "Rate My Professor bounds on 0-5 scales (difficulty: 5 is hardest), judged on the lecture's instructors; a lecture passes when any of them does. Averages on few ratings are noisy: add minNumRatings.",
       ),
     periodConflict: strictObject(
       {

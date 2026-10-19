@@ -16,6 +16,7 @@ import type { ConflictCheck } from '../api/conflicts';
 import type { CoursePlan, catalogMeta } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
+import { SOLID_RATINGS } from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;
@@ -47,8 +48,28 @@ function lowSeatsCaveat(dataAsOf: string | null): string {
   return `Seat counts are from ${asOf(dataAsOf)}; low counts (${LOW_SEATS} or fewer) may already be gone.`;
 }
 
-function instructor(i: InstructorView): string {
-  return i.rmp ? `${i.name} RMP ${i.rmp.rating} (${i.rmp.numRatings})` : i.name;
+type Rating = NonNullable<InstructorView['rmp']>;
+
+/** How many ratings an average rests on, flagged when that is few. */
+function ratingCount(n: number): string {
+  if (n === 1) return '(1 rating)';
+  return n < SOLID_RATINGS ? `(${n}, few ratings)` : `(${n})`;
+}
+
+/**
+ * "RMP 4.2, diff 2.5 (6)"; with `again`, the share who would take the
+ * instructor again too: "RMP 4.2, diff 2.5, 80% again (6)".
+ */
+function ratingText(r: Omit<Rating, 'url'>, again: boolean): string {
+  const parts = [`RMP ${r.rating}`, `diff ${r.difficulty}`];
+  if (again && r.wouldTakeAgain !== null) {
+    parts.push(`${Math.round(r.wouldTakeAgain)}% again`);
+  }
+  return `${parts.join(', ')} ${ratingCount(r.numRatings)}`;
+}
+
+function instructor(i: InstructorView, again = false): string {
+  return i.rmp ? `${i.name} ${ratingText(i.rmp, again)}` : i.name;
 }
 
 function seats(s: {
@@ -77,7 +98,7 @@ function briefLine(s: SectionBrief, withTerm: boolean): string {
     `${s.number} CRN ${s.crn}${withTerm ? ` ${s.term}` : ''}`,
     s.meets,
     s.location,
-    s.instructors.map(instructor).join('; '),
+    s.instructors.map(i => instructor(i)).join('; '),
     seats(s),
     ...exceptions(s),
   ]
@@ -172,7 +193,7 @@ function rowLine(
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
     const t = c.topInstructor;
-    parts.push(`top RMP ${t.name} ${t.rating} (${t.numRatings})`);
+    parts.push(`top ${t.name} ${ratingText(t, false)}`);
   }
   if (c.degreeAttributes.length) parts.push(c.degreeAttributes.join(', '));
   if (c.crossListedWith.length)
@@ -296,7 +317,7 @@ function viewLine(s: SectionView): string {
     `${s.number} CRN ${s.crn}`,
     meets || 'TBD',
     rooms,
-    [...people.values()].map(instructor).join('; '),
+    [...people.values()].map(i => instructor(i, true)).join('; '),
     seats(s),
     ...exceptions(s),
     ...(s.meetsWith.length ? [`meets with ${s.meetsWith.join(', ')}`] : []),
