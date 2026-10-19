@@ -144,6 +144,12 @@ describe('MCP server', () => {
     );
     expect(text).toContain('Take one lecture plus one of each companion kind');
     expect(text).toContain('Ada Lovelace RMP 4.5, diff 2.1, 91% again (12)');
+    // Absent facts are said, not left out.
+    expect(text).toContain('Degree attributes: none | Cross-listed: none');
+    expect(text).toContain(
+      'Prerequisites: none stated in the catalog description.',
+    );
+    expect(text).toContain('Recommended background: none stated.');
     expect(text.length).toBeLessThan(1500);
     expect(data.sections).toHaveLength(4);
   });

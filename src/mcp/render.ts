@@ -134,10 +134,14 @@ function describe(c: {
   cut('prerequisites?:', c.prerequisites);
   const lines: string[] = [];
   if (description.trim()) lines.push(`Description: ${description.trim()}`);
-  if (c.prerequisites)
-    lines.push(`Prerequisites (as the description states): ${c.prerequisites}`);
-  if (c.recommendedBackground)
-    lines.push(`Recommended background: ${c.recommendedBackground}`);
+  // Said either way, so a missing line cannot read as "not shown".
+  lines.push(
+    c.prerequisites
+      ? `Prerequisites (as the description states): ${c.prerequisites}`
+      : 'Prerequisites: none stated in the catalog description.',
+  );
+  const background = c.recommendedBackground?.replace(/\.$/, '');
+  lines.push(`Recommended background: ${background ?? 'none stated'}.`);
   return lines;
 }
 
@@ -407,13 +411,13 @@ export function renderCourse(
   facts.push(
     `Offering: ${d.category ? CATEGORY_TEXT[d.category] : 'no category on record'}`,
   );
-  if (d.degreeAttributes.length)
-    facts.push(`Counts toward: ${d.degreeAttributes.join(', ')}`);
+  facts.push(attributesFact(d.degreeAttributes));
   if (d.courseTypes.length) facts.push(`Type: ${d.courseTypes.join(', ')}`);
-  if (d.crossListedWith.length)
-    facts.push(
-      `Also listed as ${d.crossListedWith.join(', ')} (same class, register under either)`,
-    );
+  facts.push(
+    d.crossListedWith.length
+      ? `Also listed as ${d.crossListedWith.join(', ')} (same class, register under either)`
+      : 'Cross-listed: none',
+  );
   lines.push(facts.join(' | '));
   if (d.nextYear) lines.push(`Next year: ${d.nextYear.summary}`);
   lines.push(...describe(d));
@@ -467,6 +471,12 @@ export function renderCourse(
   return lines.join('\n');
 }
 
+function attributesFact(attributes: string[]): string {
+  return attributes.length
+    ? `Counts toward: ${attributes.join(', ')}`
+    : 'Degree attributes: none';
+}
+
 export function renderPlan(plan: CoursePlan, notices: string[]): string {
   const c = plan.course;
   const lines = [
@@ -474,10 +484,14 @@ export function renderPlan(plan: CoursePlan, notices: string[]): string {
     ...notices,
     plan.forecast.summary,
   ];
-  if (c.degreeAttributes.length)
-    lines.push(`Counts toward: ${c.degreeAttributes.join(', ')}`);
-  if (c.crossListedWith.length)
-    lines.push(`Also listed as ${c.crossListedWith.join(', ')}`);
+  lines.push(
+    [
+      attributesFact(c.degreeAttributes),
+      c.crossListedWith.length
+        ? `Also listed as ${c.crossListedWith.join(', ')}`
+        : 'Cross-listed: none',
+    ].join(' | '),
+  );
   lines.push(...describe(c));
   lines.push(
     `For this year's sections and times, call get_course without a year.`,
