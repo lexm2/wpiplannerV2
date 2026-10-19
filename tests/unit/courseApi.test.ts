@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CatalogSource } from '../../src/api/catalog';
 import { createApiHandler } from '../../src/api/http';
+import { createMcpEndpoint } from '../../src/mcp/server';
 import { canonicalWindows } from '../../src/utils/timeWindows';
 import { DayOfWeek } from '../../src/types/types';
 
@@ -142,6 +143,7 @@ const RMP = {
 let dir: string;
 let dataDir: string;
 let api: (request: Request) => Promise<Response | null>;
+let mcp: ReturnType<typeof createMcpEndpoint>;
 
 const write = (d: string, file: string, body: unknown) =>
   writeFile(join(d, file), JSON.stringify(body));
@@ -160,6 +162,7 @@ beforeAll(async () => {
 
   const source = new CatalogSource({ dataDir, publicDir: dir });
   api = createApiHandler({ basePath: BASE, getCatalog: () => source.get() });
+  mcp = createMcpEndpoint(() => source.get());
 });
 
 afterAll(async () => {
@@ -387,6 +390,54 @@ describe('catalog', () => {
     expect(
       await api(new Request(`http://localhost${BASE}/index.html`)),
     ).toBeNull();
+  });
+});
+
+async function rpc(method: string, params: unknown) {
+  const response = await mcp.fetch(
+    new Request(`http://localhost${BASE}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+    }),
+  );
+  const body = await response.text();
+  // Answered as one SSE message: "event: message\ndata: {...}".
+  const data = body.split('\n').find(line => line.startsWith('data: '));
+  return JSON.parse(data ? data.slice(6) : body).result;
+}
+
+describe('MCP server', () => {
+  it('lists the tools', async () => {
+    const { tools } = await rpc('tools/list', {});
+    expect(tools.map((t: { name: string }) => t.name)).toEqual([
+      'search_courses',
+      'get_course',
+      'list_departments',
+      'get_catalog_info',
+      'check_conflicts',
+    ]);
+  });
+
+  it('searches with the API query schema', async () => {
+    const result = await rpc('tools/call', {
+      name: 'search_courses',
+      arguments: { filters: { term: { terms: ['A'] } } },
+    });
+    expect(result.structuredContent.total).toBe(2);
+    expect(result.content[0].text).toContain('CS 2102');
+  });
+
+  it('reports unknown CRNs as a tool error', async () => {
+    const result = await rpc('tools/call', {
+      name: 'check_conflicts',
+      arguments: { crns: [1, 42] },
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Unknown CRN: 42');
   });
 });
 
