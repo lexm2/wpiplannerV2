@@ -73,7 +73,23 @@ describe('MCP server', () => {
     const dept = await tool('search_courses', {
       filters: { department: { departments: ['Computr Science'] } },
     });
-    expect(dept.text).toContain('Close matches: CS (Computer Science)');
+    expect(dept.isError).toBe(false);
+    expect(dept.text).toContain(
+      'Department "Computr Science" read as CS (Computer Science).',
+    );
+    // "Science" is in several names: name them rather than guess.
+    const vague = await tool('search_courses', {
+      filters: { department: { departments: ['Science'] } },
+    });
+    expect(vague.isError).toBe(true);
+    expect(vague.text).toContain(
+      'could be MA (Mathematical Sciences), CS (Computer Science), DS (Data Science)',
+    );
+    const unknown = await tool('search_courses', {
+      filters: { department: { departments: ['Quux'] } },
+    });
+    expect(unknown.text).toContain('Unknown department "Quux"');
+    expect(unknown.text).toContain('list_departments');
     const course = await tool('get_course', { course: 'CS 2012' });
     expect(course.isError).toBe(true);
     expect(course.text).toContain('Close codes: CS 2102');

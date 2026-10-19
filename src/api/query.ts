@@ -445,10 +445,14 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
 
   if (filters.searchText)
     set<SearchTextFilterCriteria>('searchText', filters.searchText);
-  if (filters.department)
-    set<DepartmentFilterCriteria>('department', {
-      departments: resolveDepartments(catalog, filters.department.departments),
-    });
+  if (filters.department) {
+    const { abbrs, notes } = resolveDepartments(
+      catalog,
+      filters.department.departments,
+    );
+    set<DepartmentFilterCriteria>('department', { departments: abbrs });
+    notices.push(...notes);
+  }
 
   // Sections of ended terms can no longer be taken; leave them out unless
   // the caller asked for those terms by name.

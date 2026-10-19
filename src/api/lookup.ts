@@ -8,7 +8,7 @@ import type { Course, Department } from '../types/types';
 import { findCourseById } from '../types/ScheduleState';
 import { findCatalogCourse } from '../services/degree/catalogLookup';
 import { getAllSections } from '../utils/courseUtils';
-import { closestMatches } from '../utils/editDistance';
+import { closestMatches, editDistance } from '../utils/editDistance';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
@@ -316,48 +316,77 @@ export function listDepartments(
 
 /**
  * Department abbreviations for what a caller wrote: an abbreviation in any
- * case ("cs"), a full name ("Computer Science"), or a word only one
- * department's name has ("Robotics"). Throws with close matches otherwise.
+ * case ("cs"), a full name ("Computer Science"), or a name only one
+ * department comes close to ("Robotics"). A loose match is reported in
+ * `notes`; one that fits several departments, or none, throws with them.
  */
 export function resolveDepartments(
   catalog: Catalog,
   inputs: string[],
-): string[] {
+): { abbrs: string[]; notes: string[] } {
   const departments = uniqueDepartments(catalog.departments);
   const resolved = new Set<string>();
+  const notes: string[] = [];
+  const label = (d: Department) => `${d.abbreviation} (${d.name})`;
   for (const input of inputs) {
     const want = input.trim().toLowerCase();
-    const byAbbr = departments.find(d => d.abbreviation.toLowerCase() === want);
-    const byName = departments.find(d => d.name.toLowerCase() === want);
-    const partial = departments.filter(d =>
-      d.name.toLowerCase().includes(want),
-    );
-    const found =
-      byAbbr ?? byName ?? (partial.length === 1 ? partial[0] : undefined);
-    if (found) {
-      resolved.add(found.abbreviation);
+    const exact =
+      departments.find(d => d.abbreviation.toLowerCase() === want) ??
+      departments.find(d => d.name.toLowerCase() === want);
+    if (exact) {
+      resolved.add(exact.abbreviation);
       continue;
     }
-    const candidates =
-      partial.length > 1
-        ? partial.map(d => `${d.abbreviation} (${d.name})`)
-        : closestMatches(
-            input.trim(),
-            departments.flatMap(d => [d.abbreviation, d.name]),
-            { limit: 2 },
-          ).map(n => {
-            const d = departments.find(
-              x => x.abbreviation === n || x.name === n,
-            )!;
-            return `${d.abbreviation} (${d.name})`;
-          });
+    // Names containing the input, and names a word or two edits away.
+    const near = [
+      ...new Set([
+        ...departments.filter(d => d.name.toLowerCase().includes(want)),
+        ...closestDepartments(want, departments),
+      ]),
+    ];
+    if (near.length === 1) {
+      resolved.add(near[0].abbreviation);
+      notes.push(`Department "${input}" read as ${label(near[0])}.`);
+      continue;
+    }
     throw new ApiError(
-      `${partial.length > 1 ? 'Ambiguous' : 'Unknown'} department "${input}".${candidates.length ? ` ${partial.length > 1 ? 'It could be' : 'Close matches'}: ${[...new Set(candidates)].join(', ')}.` : ''} Use abbreviations from list_departments.`,
+      near.length
+        ? `Department "${input}" could be ${near.map(label).join(', ')}. Use an abbreviation (list_departments has them all).`
+        : `Unknown department "${input}". Use abbreviations from list_departments.`,
       400,
-      { department: input, candidates },
+      { department: input, candidates: near.map(d => d.abbreviation) },
     );
   }
-  return [...resolved];
+  return { abbrs: [...resolved], notes };
+}
+
+/**
+ * Departments whose abbreviation, name or any word of the name is within
+ * two edits of `input` (three or more letters; shorter inputs one edit),
+ * nearest first: "Robotcs" finds Robotics Engineering.
+ */
+function closestDepartments(
+  want: string,
+  departments: Department[],
+): Department[] {
+  const limit = want.length >= 5 ? 2 : 1;
+  return departments
+    .map(d => ({
+      d,
+      distance: Math.min(
+        ...[d.abbreviation, d.name, ...d.name.split(/[\s&,-]+/)]
+          .filter(Boolean)
+          .map(n => editDistance(want, n.toLowerCase(), limit)),
+      ),
+    }))
+    .filter(x => x.distance <= limit)
+    .sort(
+      (a, b) =>
+        a.distance - b.distance ||
+        a.d.abbreviation.localeCompare(b.d.abbreviation),
+    )
+    .slice(0, 6)
+    .map(({ d }) => d);
 }
 
 function uniqueDepartments(departments: Department[]): Department[] {
