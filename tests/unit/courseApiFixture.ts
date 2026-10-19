@@ -242,6 +242,15 @@ export function catalogJson(extraName = '') {
                 [period(['T', 'F'], '13:00', '14:50', 'Grace Hopper')],
                 2,
               ),
+              // Workday's 999 seats: a section with no enrollment limit.
+              section(
+                10,
+                'BL02',
+                'B',
+                [period(['W'], '16:00', '17:50', 'Grace Hopper')],
+                990,
+                { seats: 999 },
+              ),
             ],
             { description: '<p>Hands-on robot design.</p>' },
           ),

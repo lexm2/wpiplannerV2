@@ -244,7 +244,9 @@ describe('new filters', () => {
     expect(hidden.body.totals).toEqual({
       openSeats: 0,
       sections: 0,
+      uncapped: 0,
       courses: 0,
+      byTerm: [],
     });
     const shown = await call('/courses/search', {
       filters: online,
@@ -259,14 +261,40 @@ describe('new filters', () => {
   it('totals every matching section once, and seats per term', async () => {
     const { body } = await call('/courses?department=MA,DS');
     // DS 502 and MA 543 are one F section of 10 open seats, counted once.
-    expect(body.totals).toEqual({ openSeats: 20, sections: 3, courses: 2 });
+    expect(body.totals).toEqual({
+      openSeats: 20,
+      sections: 3,
+      uncapped: 0,
+      courses: 2,
+      byTerm: [
+        { term: 'A', openSeats: 0, sections: 1, uncapped: 0 },
+        { term: 'C', openSeats: 10, sections: 1, uncapped: 0 },
+        { term: 'F', openSeats: 10, sections: 1, uncapped: 0 },
+      ],
+    });
     const ma = body.courses.find(
       (c: { id: string }) => c.id === 'MA-1021-2026',
     );
     expect(ma.seatsByTerm).toEqual([
-      { term: 'A', capacity: 30, available: 0, waitlisted: 0 },
-      { term: 'C', capacity: 30, available: 10, waitlisted: 0 },
+      { term: 'A', capacity: 30, available: 0, waitlisted: 0, uncapped: 0 },
+      { term: 'C', capacity: 30, available: 10, waitlisted: 0, uncapped: 0 },
     ]);
+  });
+
+  it('counts no seats for a section without a seat cap', async () => {
+    // RBE 1001 BL02 is listed with Workday's 999 seats: no limit at all.
+    const { body } = await call('/courses?department=RBE');
+    expect(body.totals).toMatchObject({
+      openSeats: 2,
+      sections: 1,
+      uncapped: 1,
+    });
+    expect(body.courses[0].seats).toEqual({
+      capacity: 30,
+      available: 2,
+      waitlisted: 0,
+      uncapped: 1,
+    });
   });
 
   it('filters by course level and offering pattern', async () => {

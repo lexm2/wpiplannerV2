@@ -56,12 +56,23 @@ describe('MCP server', () => {
       '2. MA 1021 Calculus I | 3 cr | A,C | A FULL 30/30 · C 10/30 open',
     );
     expect(text).toContain(
-      'All 2 matching courses, every page: 20 open seats in 3 sections (cross-listed sections counted once).',
+      'All 2 matching courses, every page: A: 0 open in 1 section · C: 10 open in 1 section · F: 10 open in 1 section (cross-listed sections counted once).',
+    );
+    const one = await tool('search_courses', {
+      filters: { department: { departments: ['DS'] } },
+    });
+    expect(one.text).toContain(
+      'All 1 matching course, every page: 10 open in 1 section (cross-listed sections counted once).',
     );
     expect(text).not.toContain('low counts');
     const low = await tool('search_courses', {
       filters: { department: { departments: ['RBE'] } },
+      includeSections: true,
     });
+    // BL02's 999 seats are Workday's mark for no limit, not seats.
+    expect(low.text).toContain('| B | 2/30 open + 1 with no seat cap\n');
+    expect(low.text).toContain('W 16:00-17:50 | Grace Hopper | no seat cap');
+    expect(low.text).toContain('2 open in 1 section + 1 with no seat cap');
     expect(low.text).toContain(
       'Seat counts are from 2026-09-02; low counts (3 or fewer) may already be gone.',
     );

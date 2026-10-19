@@ -427,7 +427,7 @@ export interface CourseQueryResult {
    * (lectures, or standalone labs for lab-only courses), each CRN once, so a
    * cross-listed class counts once.
    */
-  totals: { openSeats: number; sections: number; courses: number };
+  totals: SearchTotals;
   /** Terms whose sections were left out for having ended. */
   excludedEndedTerms: string[];
   /** When the seat counts were read from WPI. */
@@ -445,6 +445,21 @@ export interface CourseQueryResult {
    * many courses match without it, and in which terms, most first.
    */
   relaxations: Relaxation[];
+}
+
+interface TermTotals {
+  /** Open seats in the capped sections. */
+  openSeats: number;
+  /** Sections with a seat cap. */
+  sections: number;
+  /** Sections without one (team and ensemble placeholders), not counted. */
+  uncapped: number;
+}
+
+interface SearchTotals extends TermTotals {
+  courses: number;
+  /** The same per term, A-D then F/S. */
+  byTerm: (TermTotals & { term: string })[];
 }
 
 interface Relaxation {
@@ -661,15 +676,28 @@ function filterCatalog(
   );
 }
 
-function totalsOf(courses: Course[]): CourseQueryResult['totals'] {
-  const sections = new Map<number, Section>();
-  for (const course of courses) {
-    for (const s of primarySections(course)) sections.set(s.crn, s);
-  }
+function termTotals(sections: Section[]): TermTotals {
+  const seats = seatTotals(sections);
   return {
-    openSeats: seatTotals([...sections.values()]).available,
-    sections: sections.size,
+    openSeats: seats.available,
+    sections: sections.length - seats.uncapped,
+    uncapped: seats.uncapped,
+  };
+}
+
+function totalsOf(courses: Course[]): SearchTotals {
+  const byCrn = new Map<number, Section>();
+  for (const course of courses) {
+    for (const s of primarySections(course)) byCrn.set(s.crn, s);
+  }
+  const sections = [...byCrn.values()];
+  return {
+    ...termTotals(sections),
     courses: courses.length,
+    byTerm: termsOf(sections).map(term => ({
+      term,
+      ...termTotals(sections.filter(s => (s.computedTerm as string) === term)),
+    })),
   };
 }
 

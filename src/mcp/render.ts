@@ -16,7 +16,7 @@ import type { ConflictCheck } from '../api/conflicts';
 import type { CoursePlan, catalogMeta } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
-import { SOLID_RATINGS } from '../api/serialize';
+import { isUncapped, SOLID_RATINGS } from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;
@@ -77,6 +77,7 @@ function seats(s: {
   seatsAvailable: number;
   waitlist: number;
 }): string {
+  if (isUncapped(s)) return 'no seat cap';
   const open =
     s.seatsAvailable > 0
       ? `${s.seatsAvailable}/${s.seats} open`
@@ -147,12 +148,37 @@ function describe(c: {
 
 // --- search_courses ---------------------------------------------------------
 
-const totalSeats = (t: SeatTotals) =>
-  seats({
+function totalSeats(t: SeatTotals): string {
+  if (t.uncapped > 0 && t.capacity === 0) return 'no seat cap';
+  const capped = seats({
     seats: t.capacity,
     seatsAvailable: t.available,
     waitlist: t.waitlisted,
   });
+  return t.uncapped > 0 ? `${capped} + ${t.uncapped} with no seat cap` : capped;
+}
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+/** "101 open in 13 sections", plus any without a seat cap. */
+function termTotalsText(t: {
+  openSeats: number;
+  sections: number;
+  uncapped: number;
+}): string {
+  const parts: string[] = [];
+  if (t.sections > 0 || t.uncapped === 0) {
+    parts.push(`${t.openSeats} open in ${plural(t.sections, 'section')}`);
+  }
+  if (t.uncapped > 0) {
+    parts.push(
+      parts.length
+        ? `${t.uncapped} with no seat cap`
+        : `${plural(t.uncapped, 'section')} with no seat cap`,
+    );
+  }
+  return parts.join(' + ');
+}
 
 /** One total, or per term when the course spans several: "C FULL 90/90 · D 2/66 open". */
 function rowSeats(c: CourseRow): string {
@@ -283,9 +309,14 @@ export function renderSearch(result: CourseQueryResult): string {
     );
   }
   if (result.total > 0) {
-    const { openSeats, sections, courses } = result.totals;
+    const { totals } = result;
+    // Seats of different terms cannot be taken together, so never one sum.
+    const seatsText =
+      totals.byTerm.length >= 2
+        ? totals.byTerm.map(t => `${t.term}: ${termTotalsText(t)}`).join(' · ')
+        : termTotalsText(totals);
     lines.push(
-      `All ${courses} matching course${courses === 1 ? '' : 's'}, every page: ${openSeats} open seat${openSeats === 1 ? '' : 's'} in ${sections} section${sections === 1 ? '' : 's'} (cross-listed sections counted once).`,
+      `All ${plural(totals.courses, 'matching course')}, every page: ${seatsText} (cross-listed sections counted once).`,
     );
   }
   const low = result.courses.some(c =>
