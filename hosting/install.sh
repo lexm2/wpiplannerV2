@@ -213,8 +213,15 @@ EOF
         fi
         # The site was rewritten without TLS; --keep-until-expiring reinstalls an
         # existing certificate instead of requesting one. Certbot reloads nginx.
-        certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --redirect \
-            --keep-until-expiring "${CONTACT[@]}"
+        if ! certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --redirect \
+            --keep-until-expiring "${CONTACT[@]}"; then
+            # Certbot asks the CA even to reinstall; if it couldn't, put the
+            # existing certificate back so the next reload keeps HTTPS.
+            if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+                certbot install --nginx --cert-name "$DOMAIN" --redirect --non-interactive || true
+            fi
+            die "certbot failed; see /var/log/letsencrypt/letsencrypt.log"
+        fi
         URL="https://$DOMAIN/wpiplannerV2/"
     else
         systemctl reload nginx
