@@ -3,6 +3,7 @@
 
 set -euo pipefail
 
+APP_DIR="${APP_DIR:-/app}"
 DATA_DIR="${DATA_DIR:-/data}"
 INTERVAL="${REFRESH_INTERVAL_SECONDS:-900}"
 
@@ -10,8 +11,8 @@ mkdir -p "$DATA_DIR"
 
 # Seed from the build's bundled data so nginx can serve before the first fetch.
 for f in course-data-constructed.json term-bounds.json last-updated.json; do
-    if [ ! -f "$DATA_DIR/$f" ] && [ -f "/app/public/$f" ]; then
-        cp "/app/public/$f" "$DATA_DIR/$f"
+    if [ ! -f "$DATA_DIR/$f" ] && [ -f "$APP_DIR/public/$f" ]; then
+        cp "$APP_DIR/public/$f" "$DATA_DIR/$f"
     fi
 done
 
@@ -21,8 +22,8 @@ refresh_once() {
     # Called from an `if`, which disables set -e inside the function, so every
     # step bails out explicitly; otherwise a failed fetch would still convert and
     # publish stale data under a fresh last-updated.json.
-    # The fetch/convert scripts write into /app/data/ and /app/public/.
-    cd /app || return 1
+    # The fetch/convert scripts write into $APP_DIR/data/ and $APP_DIR/public/.
+    cd "$APP_DIR" || return 1
 
     bun run fetch-data || return 1
 
