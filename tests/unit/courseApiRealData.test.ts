@@ -20,6 +20,13 @@ beforeAll(async () => {
 });
 
 async function toolText(name: string, args: unknown): Promise<string> {
+  return (await toolResult(name, args)).text;
+}
+
+async function toolResult(
+  name: string,
+  args: unknown,
+): Promise<{ text: string; data: unknown }> {
   const response = await mcp.fetch(
     new Request('http://localhost/mcp', {
       method: 'POST',
@@ -37,7 +44,8 @@ async function toolText(name: string, args: unknown): Promise<string> {
   );
   const body = await response.text();
   const data = body.split('\n').find(line => line.startsWith('data: '));
-  return JSON.parse(data ? data.slice(6) : body).result.content[0].text;
+  const result = JSON.parse(data ? data.slice(6) : body).result;
+  return { text: result.content[0].text, data: result.structuredContent };
 }
 
 const top = (query: string, n = 3) =>
@@ -57,6 +65,19 @@ describe('MCP output size', () => {
       expect(text.startsWith('{')).toBe(false);
       expect(text.length).toBeLessThan(10_000);
     }
+  });
+
+  it('sends get_course data no bigger than the view the text shows', async () => {
+    const { text, data } = await toolResult('get_course', {
+      course: 'MA 1022',
+    });
+    const json = JSON.stringify(data);
+    expect(json.length).toBeLessThan(Math.min(2.5 * text.length, 12_000));
+    // The same sections as the text: no ended A term, no interest lists.
+    const sections = (data as { sections: { crn: number; term: string }[] })
+      .sections;
+    expect(sections.some(s => s.term === 'A')).toBe(false);
+    for (const s of sections) expect(text).toContain(`CRN ${s.crn}`);
   });
 
   it('keeps a page of 25 search rows compact', async () => {

@@ -3,7 +3,7 @@
  * tool is a thin wrapper over the same src/api functions the HTTP routes
  * call; nothing here filters or looks anything up on its own. Text content
  * is a compact rendering (src/mcp/render.ts); structuredContent carries the
- * same result as data.
+ * same result as data, for get_course trimmed to what the text shows.
  */
 import * as z from 'zod';
 import {
@@ -18,6 +18,7 @@ import { findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
 import { catalogMeta, listDepartments, lookupCourse } from '../api/lookup';
 import {
+  courseDigest,
   renderCatalogInfo,
   renderConflicts,
   renderCourse,
@@ -191,7 +192,11 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
               today: today(catalog),
             }),
           ),
-          structuredContent: { ...detail, notices: found.notices },
+          structuredContent: courseDigest(
+            detail,
+            found.notices,
+            catalog.lastUpdated,
+          ),
         };
       } catch (error) {
         return failure(error);

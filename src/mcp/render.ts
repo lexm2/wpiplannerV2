@@ -299,7 +299,28 @@ export function renderSearch(result: CourseQueryResult): string {
 
 // --- get_course -------------------------------------------------------------
 
-function viewLine(s: SectionView): string {
+/** A course-detail section as the text shows it: one line's worth. */
+interface SectionDigest {
+  crn: number;
+  number: string;
+  term: string;
+  kind: SectionView['kind'];
+  /** For a lab or discussion: the lecture CRNs it goes with. */
+  pairsWith: number[];
+  /** "MTRF 10:00-10:50", "Async" or "TBD"; periods joined by "; ". */
+  meets: string;
+  location: string;
+  /** Names; their ratings are listed once, in the digest's `ratings`. */
+  instructors: string[];
+  seats: number;
+  seatsAvailable: number;
+  waitlist: number;
+  status: string;
+  deliveryMode: string;
+  meetsWith: string[];
+}
+
+function digestSection(s: SectionView): SectionDigest {
   const meets = [
     ...new Set(
       s.periods.map(p =>
@@ -311,23 +332,115 @@ function viewLine(s: SectionView): string {
       ),
     ),
   ].join('; ');
-  const rooms = [
-    ...new Set(s.periods.map(p => p.location).filter(Boolean)),
-  ].join('; ');
+  const people = new Map<string, InstructorView>();
+  for (const p of s.periods)
+    for (const i of p.instructors) people.set(i.name, i);
+  return {
+    crn: s.crn,
+    number: s.number,
+    term: s.term,
+    kind: s.kind,
+    pairsWith: s.pairsWith,
+    meets: meets || 'TBD',
+    location: [...new Set(s.periods.map(p => p.location).filter(Boolean))].join(
+      '; ',
+    ),
+    instructors: [...people.keys()],
+    seats: s.seats,
+    seatsAvailable: s.seatsAvailable,
+    waitlist: s.waitlist,
+    status: s.status,
+    deliveryMode: s.deliveryMode,
+    meetsWith: s.meetsWith,
+  };
+}
+
+function viewLine(s: SectionView): string {
+  const d = digestSection(s);
   const people = new Map<string, InstructorView>();
   for (const p of s.periods)
     for (const i of p.instructors) people.set(i.name, i);
   return [
-    `${s.number} CRN ${s.crn}`,
-    meets || 'TBD',
-    rooms,
+    `${d.number} CRN ${d.crn}`,
+    d.meets,
+    d.location,
     [...people.values()].map(i => instructor(i, true)).join('; '),
     seats(s),
     ...exceptions(s),
-    ...(s.meetsWith.length ? [`meets with ${s.meetsWith.join(', ')}`] : []),
+    ...(d.meetsWith.length ? [`meets with ${d.meetsWith.join(', ')}`] : []),
   ]
     .filter(Boolean)
     .join(' | ');
+}
+
+/**
+ * get_course's structuredContent: the same course the text shows, with
+ * the same sections (the same terms, interest lists and full sections
+ * left out) at the same detail, so the data costs about what the text
+ * does. HTTP sends the full CourseDetail.
+ */
+export function courseDigest(
+  d: CourseDetail,
+  notices: string[],
+  dataAsOf: string | null,
+) {
+  return {
+    id: d.id,
+    code: d.code,
+    name: d.name,
+    year: d.year,
+    credits: d.credits,
+    department: d.department,
+    departmentName: d.departmentName,
+    isGraduate: d.isGraduate,
+    category: d.category,
+    degreeAttributes: d.degreeAttributes,
+    crossListedWith: d.crossListedWith,
+    courseTypes: d.courseTypes,
+    description: d.description,
+    prerequisites: d.prerequisites,
+    recommendedBackground: d.recommendedBackground,
+    nextYear: d.nextYear,
+    omitted: d.omitted,
+    ratings: ratingsOf(d.sections),
+    dataAsOf,
+    notices,
+    // Fields left out at their common value, as the text leaves them out.
+    sectionDefaults: SECTION_DEFAULTS,
+    sections: d.sections.map(s => withoutDefaults(digestSection(s))),
+  };
+}
+
+/** Rate My Professor numbers per instructor shown, rated ones only. */
+function ratingsOf(sections: SectionView[]) {
+  const ratings: Record<string, Omit<Rating, 'url'>> = {};
+  for (const s of sections)
+    for (const p of s.periods)
+      for (const i of p.instructors) {
+        if (!i.rmp) continue;
+        const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
+        ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
+      }
+  return ratings;
+}
+
+const SECTION_DEFAULTS = {
+  status: 'Open',
+  deliveryMode: 'In-Person',
+  waitlist: 0,
+  location: '',
+  pairsWith: [] as number[],
+  meetsWith: [] as string[],
+};
+
+function withoutDefaults(s: SectionDigest): Partial<SectionDigest> {
+  const out: Partial<SectionDigest> = { ...s };
+  for (const [key, value] of Object.entries(SECTION_DEFAULTS)) {
+    const k = key as keyof typeof SECTION_DEFAULTS;
+    const v = s[k];
+    if (Array.isArray(v) ? v.length === 0 : v === value) delete out[k];
+  }
+  return out;
 }
 
 const KIND_HEADING = {
