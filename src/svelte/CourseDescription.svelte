@@ -92,6 +92,11 @@
     sections: Section[];
   }
 
+  // A lab or discussion open to several lectures is listed under each.
+  function uniqueByCrn(sections: Section[]): Section[] {
+    return [...new Map(sections.map(s => [s.crn, s])).values()];
+  }
+
   function sectionsForTab(c: Course, tabId: string): SectionGroup {
     if (tabId === 'lectures') {
       const lectureGroups = lectures.filter(lg => !lg.section.isInterestList);
@@ -102,7 +107,9 @@
       };
     }
     if (tabId === 'discussions') {
-      const discussions = lectures.flatMap(lg => lg.compatibleDiscussions);
+      const discussions = uniqueByCrn(
+        lectures.flatMap(lg => lg.compatibleDiscussions),
+      );
       return {
         heading: `Available Discussions (${discussions.length})`,
         type: 'Discussion',
@@ -118,7 +125,7 @@
           sections: labs,
         };
       }
-      const labs = lectures.flatMap(lg => lg.compatibleLabs);
+      const labs = uniqueByCrn(lectures.flatMap(lg => lg.compatibleLabs));
       return {
         heading: `Available Labs (${labs.length})`,
         type: 'Lab',
