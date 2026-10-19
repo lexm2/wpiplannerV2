@@ -26,6 +26,8 @@ export interface PlannerCourse {
   degreeAttributes: string[];
   /** "Course Type" tags across the sections, e.g. "Special Topic", "Music". */
   courseTypes: string[];
+  /** Other course codes listing the same sections under their own code. */
+  crossListedWith: string[];
   minCredits: number;
   maxCredits: number;
   isGraduate: boolean;
@@ -53,6 +55,8 @@ export interface PlannerSection {
   isInterestList: boolean;
   /** Part of WPI's online graduate offering ("Online Grad Course" tag). */
   isOnlineGrad: boolean;
+  /** Co-located sections that meet with this one, e.g. "BB 550-C01". */
+  meetsWith: string[];
   /** Workday's Delivery_Mode: "In-Person", "Online" or "Hybrid". */
   deliveryMode: string;
   /** Workday's Section_Status: "Open", "Waitlist" or "Closed". */

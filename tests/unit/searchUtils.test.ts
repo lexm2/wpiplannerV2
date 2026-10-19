@@ -20,6 +20,7 @@ function course(over: Partial<Course> = {}): Course {
     departmentName: 'Computer Science',
     degreeAttributes: [],
     courseTypes: [],
+    crossListedWith: [],
     minCredits: 3,
     maxCredits: 3,
     ...over,

@@ -16,6 +16,7 @@ function course(id: string, sections: number): Course {
     description: '',
     departmentAbbr: id.replace(/\d+$/, ''),
     departmentName: '',
+    crossListedWith: [],
     degreeAttributes: [],
     courseTypes: [],
     minCredits: 3,

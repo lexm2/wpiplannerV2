@@ -35,4 +35,6 @@ export interface WorkdaySection {
   Waitlist_Waitlist_Capacity: string;
   cour_sec_def_referenceID: string;
   CF_LRV_Cluster_Ref_ID?: string;
+  /** "AS 2001-AX01 - Title; AS 3001-AX01 - Title"; a pair can read "A-01/ B-01 - Title". */
+  'Co-Located_Course_Sections'?: string;
 }

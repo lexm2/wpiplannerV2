@@ -10,6 +10,7 @@ import {
   getDepartment,
 } from './transformers/departmentTransformer.js';
 import { TermBoundsOutput } from './types/termBoundsTypes.js';
+import { indexCrossListings } from './utils/crossListings.js';
 
 export class WorkdayConverter {
   constructor(private config: ConverterConfig) {}
@@ -41,6 +42,7 @@ export class WorkdayConverter {
     console.log(`Grouped into ${courseGroups.length} unique courses`);
 
     const departments = initializeDepartments();
+    const crossListedWith = indexCrossListings(validSections);
 
     let coursesProcessed = 0;
     for (const group of courseGroups) {
@@ -53,7 +55,12 @@ export class WorkdayConverter {
         subjectAndNumber.indexOf(' '),
       );
 
-      const course = transformCourse(group, departmentAbbrev, this.config);
+      const course = transformCourse(
+        group,
+        departmentAbbrev,
+        this.config,
+        crossListedWith(group),
+      );
 
       const department = getDepartment(departments, departmentAbbrev);
       department.courses.push(course);

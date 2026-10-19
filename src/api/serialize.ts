@@ -61,6 +61,8 @@ interface SectionView {
   isInterestList: boolean;
   /** Part of WPI's online graduate offering. */
   isOnlineGrad: boolean;
+  /** Other sections, often of another course, meeting with this one. */
+  meetsWith: string[];
   /** "In-Person", "Online" or "Hybrid". */
   deliveryMode: string;
   /** Registration status: "Open", "Waitlist" or "Closed". */
@@ -102,6 +104,8 @@ export interface CourseDetail extends CourseSummary {
   degreeAttributes: string[];
   /** e.g. "Special Topic", "Music", "Experimental (Undergrad Courses Only)". */
   courseTypes: string[];
+  /** Other codes the same sections are listed under; one class. */
+  crossListedWith: string[];
   lectureGroups: LectureGroupView[];
   standaloneLabs: SectionView[];
 }
@@ -213,6 +217,7 @@ function toSectionView(section: Section, ratingOf: RatingLookup): SectionView {
     seatsLabel: seatsLabel(section),
     isInterestList: section.isInterestList ?? false,
     isOnlineGrad: section.isOnlineGrad,
+    meetsWith: section.meetsWith,
     deliveryMode: section.deliveryMode,
     status: section.status,
     startDate: section.startDate,
@@ -238,6 +243,7 @@ export function toCourseDetail(
     category: course.category ?? null,
     degreeAttributes: course.degreeAttributes,
     courseTypes: course.courseTypes,
+    crossListedWith: course.crossListedWith,
     lectureGroups: (course.lectures ?? []).map(g => ({
       lecture: view(g.section),
       discussions: g.compatibleDiscussions.map(view),

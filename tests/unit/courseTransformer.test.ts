@@ -46,7 +46,7 @@ const lab = (courseSection: string, overrides: Partial<WorkdaySection> = {}) =>
   });
 
 const convert = (rows: WorkdaySection[]) =>
-  transformCourse(rows, 'MA', converterConfig);
+  transformCourse(rows, 'MA', converterConfig, []);
 
 describe('lecture groups', () => {
   it('lists only the companions from the lecture term', () => {

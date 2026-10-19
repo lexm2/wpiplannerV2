@@ -45,6 +45,7 @@ function course(name: string): Course {
     description: '',
     departmentAbbr: 'HUA',
     departmentName: 'Humanities',
+    crossListedWith: [],
     degreeAttributes: [],
     courseTypes: [],
     lectures: [],

@@ -12,6 +12,7 @@ function course(dept: string, number: string): Course {
     description: '',
     departmentAbbr: dept,
     departmentName: dept,
+    crossListedWith: [],
     degreeAttributes: [],
     courseTypes: [],
     lectures: [],

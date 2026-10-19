@@ -18,6 +18,11 @@ export interface Course {
   degreeAttributes: string[];
   /** Kinds of course, e.g. "Special Topic", "Music", "Experimental". */
   courseTypes: string[];
+  /**
+   * Other codes the same sections are listed under (DS 502 / MA 543): one
+   * class, register under either code.
+   */
+  crossListedWith: string[];
   departmentAbbr: string;
   departmentName: string;
   lectures?: LectureGroup[];
@@ -47,6 +52,11 @@ export interface Section {
   isInterestList?: boolean; // placeholder section for an interest list
   /** Part of WPI's online graduate offering. */
   isOnlineGrad: boolean;
+  /**
+   * Separate sections, often of another course or level, that meet in the
+   * same room at the same time, e.g. "BB 550-C01" for BB 4050-C01.
+   */
+  meetsWith: string[];
   /** "In-Person", "Online" or "Hybrid"; empty when the catalog does not say. */
   deliveryMode: string;
   /** Registration status: "Open", "Waitlist" or "Closed"; empty when unknown. */

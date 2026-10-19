@@ -51,6 +51,7 @@ function course(id: string, lectures: Section[]): Course {
     description: '',
     departmentAbbr: id.replace(/\d+$/, ''),
     departmentName: '',
+    crossListedWith: [],
     degreeAttributes: [],
     courseTypes: [],
     minCredits: 3,

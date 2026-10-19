@@ -26,8 +26,7 @@ export function transformSection(
   const courseSectionFull = workdaySection.Course_Section;
   const instructionalFormat = workdaySection.Instructional_Format;
 
-  // Skip cancelled sections (e.g. "X Cancel - 03/17/2026 - ...", "X-Cancel-Draft ...", "X-Canceled-...")
-  if (/\bX[\s-]+Cancel(l?ed)?\b/i.test(courseSectionFull)) {
+  if (isCanceledSection(courseSectionFull)) {
     return [];
   }
 
@@ -44,9 +43,7 @@ export function transformSection(
   const isGPS = isSpecialSection(courseSectionFull, subjectAndNumber, config);
   const isInterestList = courseSectionFull.includes('Interest List');
 
-  // Extract CRN from reference ID
-  const referenceID = workdaySection.cour_sec_def_referenceID;
-  const crn = parseInt(referenceID.substring(28, 34));
+  const crn = crnOf(workdaySection);
 
   const enrolledCapacity = workdaySection.Enrolled_Capacity;
   const [enrolled, capacity] = enrolledCapacity
@@ -116,6 +113,9 @@ export function transformSection(
         workdaySection.Course_Tags,
         'Graduate Studies Online',
       ).includes('Online Grad Course'),
+      meetsWith: coLocatedSections(
+        workdaySection['Co-Located_Course_Sections'],
+      ),
       deliveryMode: workdaySection.Delivery_Mode,
       status: workdaySection.Section_Status,
       startDate: workdaySection.Course_Section_Start_Date,
@@ -123,6 +123,33 @@ export function transformSection(
       periods,
     },
   ];
+}
+
+/**
+ * Sections Workday has canceled by renaming them rather than by status:
+ * "X Cancel - 03/17/2026 - ...", "X-Cancel-Draft ...", "X-Canceled-...".
+ */
+export function isCanceledSection(courseSectionFull: string): boolean {
+  return /\bX[\s-]+Cancel(l?ed)?\b/i.test(courseSectionFull);
+}
+
+/** The CRN, from "COURSE_SECTION_DEFINITION-3-348909". */
+export function crnOf(workdaySection: WorkdaySection): number {
+  return parseInt(workdaySection.cour_sec_def_referenceID.substring(28, 34));
+}
+
+/**
+ * The sections a section is co-located with, as "BB 550-C01". Each entry is
+ * "CODE-SECTION - Title", and a cross-listed pair is written
+ * "BB 4190-D01/ CH 4190-D01 - Title".
+ */
+function coLocatedSections(coLocated: string | undefined): string[] {
+  if (!coLocated) return [];
+  return coLocated
+    .split(/\s*;\s*/)
+    .flatMap(entry => entry.split(' - ')[0].split('/'))
+    .map(code => code.trim())
+    .filter(Boolean);
 }
 
 /**

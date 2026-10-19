@@ -160,6 +160,7 @@ function scenario(seed: number): {
       departmentName: '',
       degreeAttributes: [],
       courseTypes: [],
+      crossListedWith: [],
       minCredits: 3,
       maxCredits: 3,
       lectures,

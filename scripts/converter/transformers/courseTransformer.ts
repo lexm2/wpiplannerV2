@@ -26,6 +26,7 @@ export function transformCourse(
   workdaySections: WorkdaySection[],
   departmentAbbrev: string,
   config: ConverterConfig,
+  crossListedWith: string[],
 ): PlannerCourse {
   if (workdaySections.length === 0) {
     throw new Error('Cannot transform course with no sections');
@@ -127,6 +128,7 @@ export function transformCourse(
     category,
     degreeAttributes,
     courseTypes,
+    crossListedWith,
     minCredits: Math.min(...credits),
     maxCredits: Math.max(...credits),
     isGraduate,
