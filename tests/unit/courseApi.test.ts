@@ -370,8 +370,16 @@ describe('conflicts', () => {
       {
         a: { crn: 3, section: 'F01', term: 'F', courses: ['CS 1101'] },
         b: { crn: 1, section: 'AL01', term: 'A', courses: ['CS 2102'] },
+        overlaps: [{ days: ['M', 'R'], start: '10:00', end: '10:50' }],
       },
     ]);
+  });
+
+  it('dedupes CRNs and takes a single one', async () => {
+    const { body } = await call('/conflicts', { crns: [3, 1, 3] });
+    expect(body).toMatchObject({ checked: [3, 1], duplicates: [3] });
+    const one = await call('/conflicts', { crns: [3] });
+    expect(one.body).toEqual({ checked: [3], duplicates: [], conflicts: [] });
   });
 
   it('rejects unknown CRNs', async () => {

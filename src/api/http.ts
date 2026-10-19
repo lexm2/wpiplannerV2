@@ -6,7 +6,8 @@
 import * as z from 'zod';
 import type { Catalog } from './catalog';
 import { CourseQuerySchema, runCourseQuery } from './query';
-import { findConflicts, UnknownCrnError } from './conflicts';
+import { findConflicts } from './conflicts';
+import { ApiError } from './errors';
 import { catalogMeta, findCourse, listDepartments } from './lookup';
 import { toCourseDetail } from './serialize';
 import { logger } from '../utils/logger';
@@ -237,7 +238,7 @@ async function route(
 
   if (path === '/conflicts' && method === 'POST') {
     const { crns } = parseOrThrow(ConflictsBodySchema, await readBody(request));
-    return json({ conflicts: findConflicts(await getCatalog(), crns) });
+    return json(findConflicts(await getCatalog(), crns));
   }
 
   throw notFound();
@@ -272,10 +273,10 @@ export function createApiHandler(options: {
           error.status,
         );
       }
-      if (error instanceof UnknownCrnError) {
+      if (error instanceof ApiError) {
         return json(
-          { error: error.message, details: { unknownCrns: error.crns } },
-          400,
+          { error: error.message, details: error.details },
+          error.status,
         );
       }
       logger.error('[api] Request failed:', error);

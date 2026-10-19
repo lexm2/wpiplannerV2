@@ -11,7 +11,8 @@ import {
 } from '@modelcontextprotocol/server';
 import type { Catalog } from '../api/catalog';
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
-import { findConflicts, UnknownCrnError } from '../api/conflicts';
+import { findConflicts, type ConflictCheck } from '../api/conflicts';
+import { ApiError } from '../api/errors';
 import { catalogMeta, findCourse, listDepartments } from '../api/lookup';
 import { toCourseDetail, type CourseSummary } from '../api/serialize';
 
@@ -58,15 +59,40 @@ function summaryLine(c: CourseSummary): string {
 
 /** Tool errors go back to the model as text it can act on, not a protocol error. */
 function failure(error: unknown) {
-  if (error instanceof UnknownCrnError) {
-    return {
-      content: text(
-        `${error.message}. Get CRNs from get_course; they are the "crn" field of each section.`,
-      ),
-      isError: true,
-    };
+  if (error instanceof ApiError) {
+    return { content: text(error.message), isError: true };
   }
   throw error;
+}
+
+function conflictsText(check: ConflictCheck): string {
+  const lines: string[] = [];
+  if (check.duplicates.length) {
+    lines.push(
+      `CRN ${check.duplicates.join(', ')} given more than once; checked once.`,
+    );
+  }
+  if (check.checked.length < 2) {
+    lines.push(
+      `Only one section (CRN ${check.checked[0]}); nothing to compare. Pass two or more CRNs.`,
+    );
+    return lines.join('\n');
+  }
+  if (check.conflicts.length === 0) {
+    lines.push(
+      `No conflicts: these ${check.checked.length} sections fit together.`,
+    );
+    return lines.join('\n');
+  }
+  const name = (s: ConflictCheck['conflicts'][number]['a']) =>
+    `${s.courses.join('/')} ${s.section} (CRN ${s.crn}, ${s.term})`;
+  for (const { a, b, overlaps } of check.conflicts) {
+    const when = overlaps.length
+      ? `: both meet ${overlaps.map(o => `${o.days.join('')} ${o.start}-${o.end}`).join(', ')}`
+      : '';
+    lines.push(`CONFLICT ${name(a)} and ${name(b)}${when}.`);
+  }
+  return lines.join('\n');
 }
 
 function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
@@ -211,35 +237,29 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
     {
       title: 'Check time conflicts',
       description:
-        'Which of the given sections meet at overlapping times. Only ' +
-        'sections whose terms overlap can conflict; a semester section (F ' +
-        'or S) overlaps both of its quarters. Returns the conflicting pairs; ' +
-        'an empty list means the sections fit together.',
+        'Which of the given sections meet at overlapping times, with the ' +
+        'shared days and times of each conflicting pair. Only sections whose ' +
+        'terms overlap can conflict; a semester section (F or S) overlaps ' +
+        'both of its quarters. Duplicated CRNs are checked once.',
       inputSchema: z
         .object({
           crns: z
             .array(z.number().int().positive())
-            .min(2)
+            .min(1)
             .max(100)
-            .describe('CRNs of the sections to check, from get_course.'),
+            .describe(
+              'CRNs of the sections to check together, lectures and labs alike.',
+            ),
         })
         .strict(),
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ crns }) => {
       try {
-        const conflicts = findConflicts(await getCatalog(), crns);
-        const lines = conflicts.map(
-          ({ a, b }) =>
-            `${a.courses.join('/')} ${a.section} (CRN ${a.crn}, ${a.term}) conflicts with ${b.courses.join('/')} ${b.section} (CRN ${b.crn}, ${b.term})`,
-        );
+        const check = findConflicts(await getCatalog(), crns);
         return {
-          content: text(
-            lines.length
-              ? lines.join('\n')
-              : 'No conflicts: these sections fit together.',
-          ),
-          structuredContent: { conflicts },
+          content: text(conflictsText(check)),
+          structuredContent: { ...check },
         };
       } catch (error) {
         return failure(error);
