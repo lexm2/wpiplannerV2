@@ -68,6 +68,38 @@ describe('course search', () => {
     ]);
   });
 
+  it('sorts by rating, difficulty, open seats or number', async () => {
+    const sorted = async (sort: string, q = '') =>
+      (await call(`/courses?sort=${sort}${q}`)).body;
+    // Ada's 4.5 on 12 ratings outranks Alan's 4.9 on 3, so PH 1110's top
+    // is Ada and courses with no rated instructor come last.
+    const rating = await sorted('rating');
+    const tops = rating.courses.map(
+      (c: { topInstructor: { name: string } | null }) =>
+        c.topInstructor?.name ?? null,
+    );
+    expect(tops.indexOf(null)).toBeGreaterThan(0);
+    expect(
+      tops.slice(tops.indexOf(null)).every((t: unknown) => t === null),
+    ).toBe(true);
+    expect(rating.notices).toContain(
+      'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
+    );
+    const seats = await sorted('openSeats');
+    const open = seats.courses.map(
+      (c: { seats: { available: number } }) => c.seats.available,
+    );
+    expect(open).toEqual([...open].sort((a: number, b: number) => b - a));
+    // A text search ranks by relevance unless asked to sort by number.
+    const byNumber = await sorted('number', '&q=design');
+    expect(codes(byNumber)).toEqual([
+      'CS-1101-2026',
+      'CS-2102-2026',
+      'RBE-1001-2026',
+    ]);
+    expect((await call('/courses?sort=best')).status).toBe(400);
+  });
+
   it('reads a spaced course code as a code', async () => {
     const { body } = await call(`/courses?q=${encodeURIComponent('MA 1021')}`);
     expect(codes(body)).toEqual(['MA-1021-2026']);

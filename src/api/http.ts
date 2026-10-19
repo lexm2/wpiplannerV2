@@ -123,6 +123,7 @@ const COURSE_PARAMS = new Set([
   'includeInterestLists',
   'includeEndedTerms',
   'includeSections',
+  'sort',
   'offset',
   'limit',
 ]);
@@ -260,6 +261,7 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     includeEndedTerms: bool('includeEndedTerms'),
     includeInterestLists: bool('includeInterestLists'),
     includeSections: bool('includeSections'),
+    sort: str('sort'),
     offset: num('offset'),
     limit: num('limit'),
   };

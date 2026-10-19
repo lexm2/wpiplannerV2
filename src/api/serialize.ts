@@ -281,19 +281,36 @@ function ratingLookup(rmp: RateMyProfessorService): RatingLookup {
  */
 export const SOLID_RATINGS = 5;
 
-function topInstructor(sections: Section[], ratingOf: RatingLookup) {
+type RatingNumbers = Pick<RatingView, 'rating' | 'difficulty' | 'numRatings'>;
+
+/**
+ * Negative when `a` ranks ahead of `b` by `key`: averages on SOLID_RATINGS
+ * or more ratings first, then the better value (higher rating, lower
+ * difficulty), then more ratings. "Top" instructors and the rating and
+ * difficulty sorts all rank by this.
+ */
+export function ratingOrder(
+  a: RatingNumbers,
+  b: RatingNumbers,
+  key: 'rating' | 'difficulty',
+): number {
+  const solid = (r: RatingNumbers) => (r.numRatings >= SOLID_RATINGS ? 0 : 1);
+  const value =
+    key === 'rating' ? b.rating - a.rating : a.difficulty - b.difficulty;
+  return solid(a) - solid(b) || value || b.numRatings - a.numRatings;
+}
+
+/** The lecture instructor with RMP data who ranks first by `key`. */
+function bestInstructor(
+  sections: Section[],
+  ratingOf: RatingLookup,
+  key: 'rating' | 'difficulty',
+): CourseSummary['topInstructor'] {
   let best: CourseSummary['topInstructor'] = null;
-  const solid = (n: number) => n >= SOLID_RATINGS;
   for (const name of professorsOf(sections)) {
     const r = ratingOf(name);
     if (!r) continue;
-    const better =
-      !best ||
-      (solid(r.numRatings) && !solid(best.numRatings)) ||
-      (solid(r.numRatings) === solid(best.numRatings) &&
-        (r.rating > best.rating ||
-          (r.rating === best.rating && r.numRatings > best.numRatings)));
-    if (better) {
+    if (!best || ratingOrder(r, best, key) < 0) {
       best = {
         name,
         rating: r.rating,
@@ -304,6 +321,15 @@ function topInstructor(sections: Section[], ratingOf: RatingLookup) {
     }
   }
   return best;
+}
+
+/** The course's lecture instructor ranking first by `key`, for sorting. */
+export function instructorFor(
+  course: Course,
+  rmp: RateMyProfessorService,
+  key: 'rating' | 'difficulty',
+): CourseSummary['topInstructor'] {
+  return bestInstructor(primarySections(course), ratingLookup(rmp), key);
 }
 
 export function toCourseSummary(
@@ -332,7 +358,7 @@ export function toCourseSummary(
     category: course.category ?? null,
     degreeAttributes: course.degreeAttributes,
     crossListedWith: course.crossListedWith,
-    topInstructor: topInstructor(primary, ratingLookup(rmp)),
+    topInstructor: bestInstructor(primary, ratingLookup(rmp), 'rating'),
   };
 }
 

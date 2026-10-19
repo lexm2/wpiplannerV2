@@ -62,7 +62,9 @@ import {
 } from './lookup';
 import {
   courseCode,
+  instructorFor,
   primarySections,
+  ratingOrder,
   seatTotals,
   termsOf,
   toCourseSummary,
@@ -72,6 +74,13 @@ import {
 } from './serialize';
 
 const DEFAULT_LIMIT = 25;
+const SORTS = [
+  'relevance',
+  'rating',
+  'difficulty',
+  'openSeats',
+  'number',
+] as const;
 const MAX_LIMIT = 200;
 
 const TermSchema = z
@@ -402,6 +411,15 @@ export const CourseQuerySchema = strictObject(
       .optional()
       .describe(
         'List the matching lecture sections under each course (CRN, term, times, instructor, seats). Default: on when any filter beyond searchText, department and academicYear is given.',
+      ),
+    sort: z
+      .enum(SORTS)
+      .default('relevance')
+      .describe(
+        'Default "relevance": by relevance with searchText, else by department and number. ' +
+          '"rating": best-rated lecture instructor first, those with 5+ ratings above those with fewer (as "top"), unrated last. ' +
+          '"difficulty": easiest-rated instructor first, by the same rule. "openSeats": most open seats in the matching sections first. ' +
+          '"number": department, then course number. Ties keep the relevance order.',
       ),
     offset: z
       .number()
@@ -760,11 +778,7 @@ function filterCatalog(
   // As CourseList: a search keeps its relevance ranking, anything else
   // reads by department, then course number.
   if (service.hasFilter('searchText')) return matches;
-  return [...matches].sort(
-    (a, b) =>
-      a.departmentAbbr.localeCompare(b.departmentAbbr) ||
-      a.number.localeCompare(b.number),
-  );
+  return [...matches].sort(byNumber);
 }
 
 function termTotals(sections: Section[]): TermTotals {
@@ -790,6 +804,47 @@ function totalsOf(courses: Course[]): SearchTotals {
       ...termTotals(sections.filter(s => (s.computedTerm as string) === term)),
     })),
   };
+}
+
+const byNumber = (a: Course, b: Course) =>
+  a.departmentAbbr.localeCompare(b.departmentAbbr) ||
+  a.number.localeCompare(b.number);
+
+const SORT_NOTICE: Record<Exclude<CourseQuery['sort'], 'relevance'>, string> = {
+  rating:
+    'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
+  difficulty:
+    'Sorted by the easiest-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
+  openSeats: 'Sorted by open seats in the matching sections, most first.',
+  number: 'Sorted by department, then course number.',
+};
+
+/**
+ * The matches in the order asked for; a stable sort, so ties keep the
+ * relevance (or department and number) order.
+ */
+function sortCourses(
+  courses: Course[],
+  sort: CourseQuery['sort'],
+  catalog: Catalog,
+): Course[] {
+  if (sort === 'relevance') return courses;
+  if (sort === 'number') return [...courses].sort(byNumber);
+  if (sort === 'openSeats') {
+    const open = new Map(
+      courses.map(c => [c, seatTotals(primarySections(c)).available]),
+    );
+    return [...courses].sort((a, b) => open.get(b)! - open.get(a)!);
+  }
+  const best = new Map(
+    courses.map(c => [c, instructorFor(c, catalog.rmp, sort)]),
+  );
+  return [...courses].sort((a, b) => {
+    const ra = best.get(a);
+    const rb = best.get(b);
+    if (!ra || !rb) return (ra ? 0 : 1) - (rb ? 0 : 1);
+    return ratingOrder(ra, rb, sort);
+  });
 }
 
 const crnsOf = (course: Course) =>
@@ -881,7 +936,11 @@ export function runCourseQuery(
 ): CourseQueryResult {
   const read = readQuery(catalog, query);
   const filtered = filterCatalog(catalog, read.criteria);
-  const matches = collapseCrossListings(filtered);
+  const matches = sortCourses(
+    collapseCrossListings(filtered),
+    query.sort,
+    catalog,
+  );
 
   const includeSections =
     query.includeSections ??
@@ -915,6 +974,7 @@ export function runCourseQuery(
       `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
     );
   }
+  if (query.sort !== 'relevance') notices.push(SORT_NOTICE[query.sort]);
   if (read.year === 'all') {
     notices.push(
       `Searching every year; only ${yearLabel(currentAcademicYear(catalog))} can be scheduled.`,
