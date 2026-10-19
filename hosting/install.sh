@@ -222,6 +222,10 @@ EOF
             fi
             die "certbot failed; see /var/log/letsencrypt/letsencrypt.log"
         fi
+        if [ "$FAMILY" = arch ]; then
+            # Arch's certbot ships its renewal timer disabled; Debian's already runs.
+            systemctl enable -q --now certbot-renew.timer
+        fi
         URL="https://$DOMAIN/wpiplannerV2/"
     else
         systemctl reload nginx
