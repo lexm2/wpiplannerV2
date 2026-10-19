@@ -171,6 +171,31 @@ describe('ranking on the real catalog', () => {
   });
 });
 
+describe('loose searches on the real catalog', () => {
+  it('lists only the closest few when several words match only descriptions', () => {
+    const loose = runCourseQuery(
+      catalog,
+      CourseQuerySchema.parse({
+        filters: { searchText: { query: 'alternate years' } },
+      }),
+    );
+    expect(loose.total).toBeGreaterThan(20);
+    expect(loose.courses).toHaveLength(5);
+    expect(loose.search?.descriptionOnly).toBe(true);
+    expect(loose.notices.join(' ')).toContain('listing the closest 5 of');
+    // An explicit limit, and a search matching names, are not capped.
+    const asked = runCourseQuery(
+      catalog,
+      CourseQuerySchema.parse({
+        filters: { searchText: { query: 'alternate years' } },
+        limit: 25,
+      }),
+    );
+    expect(asked.courses).toHaveLength(25);
+    expect(search('game design').courses.length).toBe(25);
+  });
+});
+
 describe('known terms on the real catalog', () => {
   it('names the catalog courses an IQP or HUA search means', () => {
     const iqp = search('IQP', 5);

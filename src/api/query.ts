@@ -77,6 +77,12 @@ import {
 } from './serialize';
 
 const DEFAULT_LIMIT = 25;
+/**
+ * The default page when a search of several words matches only course
+ * descriptions ("alternate years": 79 rows of noise); the closest few say
+ * as much as the rest.
+ */
+const LOOSE_LIMIT = 5;
 const SORTS = [
   'relevance',
   'rating',
@@ -435,8 +441,10 @@ export const CourseQuerySchema = strictObject(
       .int()
       .min(1)
       .max(MAX_LIMIT)
-      .default(DEFAULT_LIMIT)
-      .describe(`Page size, 1-${MAX_LIMIT}; default ${DEFAULT_LIMIT}.`),
+      .optional()
+      .describe(
+        `Page size, 1-${MAX_LIMIT}; default ${DEFAULT_LIMIT}, or ${LOOSE_LIMIT} when a search of several words matches no course name, only descriptions.`,
+      ),
   },
   querySchema,
 );
@@ -485,9 +493,15 @@ export interface CourseQueryResult {
   /**
    * With searchText: the query, and whether every match only mentions it:
    * none has it in its name, code or department, its words together in a
-   * description, or an instructor or room matching it.
+   * description, or an instructor or room matching it; and whether a
+   * query of several words matched only descriptions, no course name, code
+   * or section (the page then defaults to LOOSE_LIMIT rows).
    */
-  search: { query: string; onlyMentions: boolean } | null;
+  search: {
+    query: string;
+    onlyMentions: boolean;
+    descriptionOnly: boolean;
+  } | null;
   /**
    * When nothing matched: for each filter given (up to MAX_RELAXED), how
    * many courses match without it, and in which terms, most first.
@@ -979,15 +993,19 @@ export function runCourseQuery(
   if (text && !text.professorOnly) {
     for (const c of matches) matchOf.set(c, describeMatch(c, text.query));
   }
-  const weak: SearchMatch[] = ['mentions', 'scattered'];
+  const every = (kinds: SearchMatch[]) =>
+    matchOf.size > 0 && [...matchOf.values()].every(m => kinds.includes(m));
   const search = text
     ? {
         query: text.query,
-        onlyMentions:
-          matchOf.size > 0 &&
-          [...matchOf.values()].every(m => weak.includes(m)),
+        onlyMentions: every(['mentions', 'scattered']),
+        descriptionOnly:
+          parseSearchQuery(text.query).words.length >= 2 &&
+          every(['description', 'scattered']),
       }
     : null;
+  const limit =
+    query.limit ?? (search?.descriptionOnly ? LOOSE_LIMIT : DEFAULT_LIMIT);
 
   const inYear = catalog.courses.filter(
     c => read.year === 'all' || c.academicYear === read.year,
@@ -1008,6 +1026,13 @@ export function runCourseQuery(
   }
   if (text && !text.professorOnly) notices.push(...acronymNotices(text.query));
   if (query.sort !== 'relevance') notices.push(SORT_NOTICE[query.sort]);
+  if (search?.descriptionOnly && query.limit === undefined) {
+    if (matches.length > LOOSE_LIMIT) {
+      notices.push(
+        `No course name has these words, only descriptions: listing the closest ${LOOSE_LIMIT} of ${matches.length}. Pass limit for more, or search one or two topic words.`,
+      );
+    }
+  }
   if (read.year === 'all') {
     notices.push(
       `Searching every year; only ${yearLabel(currentAcademicYear(catalog))} can be scheduled.`,
@@ -1018,8 +1043,8 @@ export function runCourseQuery(
     year: read.year,
     total: matches.length,
     offset: query.offset,
-    limit: query.limit,
-    courses: matches.slice(query.offset, query.offset + query.limit).map(c => {
+    limit,
+    courses: matches.slice(query.offset, query.offset + limit).map(c => {
       const row: CourseRow = toCourseSummary(c, catalog.rmp);
       if (includeSections) {
         row.sections = rowSections(c, catalog);
