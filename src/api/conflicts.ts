@@ -15,7 +15,13 @@ import { DayOfWeek, SectionType } from '../types/types';
 import { ConflictFilter } from '../core/filtering/filters/ConflictFilter';
 import { sectionToWeeklySlots, slotsOverlap } from '../utils/timeSlotUtils';
 import { currentAcademicYear, type Catalog, type CrnEntry } from './catalog';
-import { endedTerms, termDates, yearLabel, type TermLetter } from './calendar';
+import {
+  endedTerms,
+  seatDataAge,
+  termDates,
+  yearLabel,
+  type TermLetter,
+} from './calendar';
 import { ApiError } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { courseCode } from './serialize';
@@ -168,6 +174,8 @@ export interface ConflictCheck {
   issues: ScheduleIssue[];
   /** When the seat counts were read from WPI. */
   dataAsOf: string | null;
+  /** Whole days since then (see seatDataAge). */
+  dataAgeDays: number | null;
 }
 
 function side(crn: number, entry: CrnEntry): ConflictSide {
@@ -320,6 +328,7 @@ export function findConflicts(
     busyBlocks: busy.length,
     issues: [...unknown, ...scheduleIssues(catalog, new Map(entries))],
     dataAsOf: catalog.lastUpdated,
+    dataAgeDays: seatDataAge(catalog),
   };
 }
 

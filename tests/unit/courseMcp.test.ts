@@ -24,7 +24,7 @@ describe('MCP server', () => {
     });
     expect(result.data.total).toBe(1);
     expect(result.text).not.toContain('{');
-    expect(result.text).toContain('Seats as of 2026-09-02');
+    expect(result.text).toContain('Seat data is under a day old (2026-09-02).');
     expect(result.text).toContain('1. PH 1110 General Physics | 3 cr | B');
     expect(result.text).toContain(
       'BL01 CRN 20 B | MTRF 09:00-09:50 | Ada Lovelace RMP 4.5, diff 2.1 (12) | 10/30 open',
@@ -74,7 +74,7 @@ describe('MCP server', () => {
     expect(low.text).toContain('W 16:00-17:50 | Grace Hopper | no seat cap');
     expect(low.text).toContain('2 open in 1 section + 1 with no seat cap');
     expect(low.text).toContain(
-      'Seat counts are from 2026-09-02; low counts (3 or fewer) may already be gone.',
+      'Seat data is under a day old (2026-09-02); low counts (3 or fewer) may already be gone.',
     );
   });
 
@@ -279,6 +279,20 @@ describe('MCP server', () => {
       busy: [{ days: ['T'], start: '13:00', end: '17:00' }],
     });
     expect(free.text).toContain('None meets during your busy times.');
+  });
+
+  it('says how old the seat data is, and to check Workday when stale', async () => {
+    // 47 days after the 2026-09-02 refresh.
+    const late = new Date(2026, 9, 19);
+    const check = await tool('check_conflicts', { crns: [40] }, late);
+    expect(check.text).toContain(
+      'Seat data is 47 days old (2026-09-02): check live seats in Workday before registering.',
+    );
+    expect(check.data.dataAgeDays).toBe(47);
+    const info = await tool('get_catalog_info', {}, late);
+    expect(info.text).toContain(
+      'Data as of 2026-09-02T00:00:00Z (47 days old)',
+    );
   });
 
   it('says what keeps a set of CRNs from being registered', async () => {

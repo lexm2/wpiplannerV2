@@ -43,9 +43,36 @@ const LOW_SEATS = 3;
 
 const isLow = (available: number) => available > 0 && available <= LOW_SEATS;
 
-/** The once-per-response caveat for low seat counts. */
-function lowSeatsCaveat(dataAsOf: string | null): string {
-  return `Seat counts are from ${asOf(dataAsOf)}; low counts (${LOW_SEATS} or fewer) may already be gone.`;
+interface SeatData {
+  dataAsOf: string | null;
+  dataAgeDays: number | null;
+}
+
+/**
+ * Seat counts older than this are a stale copy (a deployed server
+ * refreshes every 15 minutes): any count may have moved, not just low ones.
+ */
+const STALE_DAYS = 7;
+
+/**
+ * The once-per-response line on how old the seat counts are: "Seat data is
+ * 48 days old (2026-09-01)", with what that means for low or any counts.
+ */
+function seatDataLine(data: SeatData, low: boolean): string {
+  const date = asOf(data.dataAsOf);
+  const days = data.dataAgeDays;
+  const age =
+    days === null
+      ? `Seat data is from ${date}`
+      : days === 0
+        ? `Seat data is under a day old (${date})`
+        : `Seat data is ${days === 1 ? '1 day' : `${days} days`} old (${date})`;
+  if (days !== null && days > STALE_DAYS) {
+    return `${age}: check live seats in Workday before registering.`;
+  }
+  return low
+    ? `${age}; low counts (${LOW_SEATS} or fewer) may already be gone.`
+    : `${age}.`;
 }
 
 type Rating = NonNullable<InstructorView['rmp']>;
@@ -274,7 +301,7 @@ export function renderSearch(result: CourseQueryResult): string {
         ? 'none on this page'
         : `${result.offset + 1}-${last}`;
     lines.push(
-      `Courses ${range} of ${result.total} in ${where}. Seats as of ${asOf(result.dataAsOf)}, counting only the sections that matched.`,
+      `Courses ${range} of ${result.total} in ${where}; seats count only the sections that matched.`,
     );
   }
   lines.push(...result.notices);
@@ -324,7 +351,7 @@ export function renderSearch(result: CourseQueryResult): string {
       ? c.sections.some(s => isLow(s.seatsAvailable))
       : c.seatsByTerm.some(t => isLow(t.available)),
   );
-  if (low) lines.push(lowSeatsCaveat(result.dataAsOf));
+  if (result.total > 0) lines.push(seatDataLine(result, low));
   return lines.join('\n');
 }
 
@@ -413,7 +440,7 @@ function viewLine(s: SectionView): string {
 export function courseDigest(
   d: CourseDetail,
   notices: string[],
-  dataAsOf: string | null,
+  { dataAsOf, dataAgeDays }: SeatData,
 ) {
   return {
     id: d.id,
@@ -435,6 +462,7 @@ export function courseDigest(
     omitted: d.omitted,
     ratings: ratingsOf(d.sections),
     dataAsOf,
+    dataAgeDays,
     notices,
     // Fields left out at their common value, as the text leaves them out.
     sectionDefaults: SECTION_DEFAULTS,
@@ -531,8 +559,7 @@ function termBlock(
 export function renderCourse(
   d: CourseDetail,
   notices: string[],
-  context: {
-    dataAsOf: string | null;
+  context: SeatData & {
     termDates: Partial<Record<TermLetter, DateSpan>> | null;
     today: string;
   },
@@ -589,9 +616,7 @@ export function renderCourse(
     return lines.join('\n');
   }
 
-  lines.push(
-    `Seats as of ${asOf(context.dataAsOf)}. Status and mode shown only when not Open / In-Person.`,
-  );
+  lines.push('Status and mode shown only when not Open / In-Person.');
   if (d.lectureGroups.some(g => g.labs.length || g.discussions.length)) {
     lines.push(
       'Take one lecture plus one of each companion kind (lab, discussion) listed for it.',
@@ -609,9 +634,12 @@ export function renderCourse(
       ),
     );
   }
-  if (d.sections.some(s => isLow(s.seatsAvailable))) {
-    lines.push(lowSeatsCaveat(context.dataAsOf));
-  }
+  lines.push(
+    seatDataLine(
+      context,
+      d.sections.some(s => isLow(s.seatsAvailable)),
+    ),
+  );
   return lines.join('\n');
 }
 
@@ -702,6 +730,14 @@ export function renderConflicts(check: ConflictCheck): string {
         ? 'Not a complete set yet: add the labs or discussions noted.'
         : 'They make a valid set to register in Workday.';
   lines.push([times, verdict].filter(Boolean).join(' '));
+  if (n > 0) {
+    lines.push(
+      seatDataLine(
+        check,
+        check.issues.some(i => i.kind === 'lowSeats'),
+      ),
+    );
+  }
   return lines.join('\n');
 }
 
@@ -722,7 +758,7 @@ export function renderCatalogInfo(
   const lines = [
     termNowText(meta.currentTerm, meta.today),
     `Current academic year: ${meta.currentAcademicYear} (${yearLabel(meta.currentAcademicYear)}), the only one with schedules (sections, times, CRNs).`,
-    `Data as of ${meta.dataAsOf ?? 'unknown'}; seat counts are from then.`,
+    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${meta.dataAgeDays} day${meta.dataAgeDays === 1 ? '' : 's'} old)`}; seat counts are from then.`,
     `Years: ${meta.years
       .map(
         y =>

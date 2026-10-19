@@ -561,6 +561,7 @@ describe('conflicts', () => {
       busyBlocks: 0,
       issues: [],
       dataAsOf: '2026-09-02T00:00:00Z',
+      dataAgeDays: 0,
     });
   });
 

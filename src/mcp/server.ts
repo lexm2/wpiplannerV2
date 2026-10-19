@@ -12,7 +12,13 @@ import {
   type McpHttpHandler,
 } from '@modelcontextprotocol/server';
 import { currentAcademicYear, type Catalog } from '../api/catalog';
-import { termDates, today, yearLabel, yearStatus } from '../api/calendar';
+import {
+  seatDataAge,
+  termDates,
+  today,
+  yearLabel,
+  yearStatus,
+} from '../api/calendar';
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
@@ -187,19 +193,19 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         }
         const { detail } = found;
         const year = detail.year ?? currentAcademicYear(catalog);
+        const seatData = {
+          dataAsOf: catalog.lastUpdated,
+          dataAgeDays: seatDataAge(catalog),
+        };
         return {
           content: text(
             renderCourse(detail, found.notices, {
-              dataAsOf: catalog.lastUpdated,
+              ...seatData,
               termDates: termDates(catalog, year),
               today: today(catalog),
             }),
           ),
-          structuredContent: courseDigest(
-            detail,
-            found.notices,
-            catalog.lastUpdated,
-          ),
+          structuredContent: courseDigest(detail, found.notices, seatData),
         };
       } catch (error) {
         return failure(error);

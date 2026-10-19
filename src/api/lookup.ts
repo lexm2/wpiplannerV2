@@ -12,6 +12,7 @@ import { closestMatches, editDistance } from '../utils/editDistance';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
+  seatDataAge,
   termDates,
   termNow,
   today,
@@ -447,6 +448,8 @@ interface CatalogMeta {
   today: string;
   /** When the refresh job last saw new data from WPI; seat counts are as of then. */
   dataAsOf: string | null;
+  /** Whole days since then (see seatDataAge). */
+  dataAgeDays: number | null;
   /** Fall year of the academic year in session: 2026 is 2026-27. */
   currentAcademicYear: number;
   /** The quarter in session, or the ones either side of today. */
@@ -477,6 +480,7 @@ export function catalogMeta(catalog: Catalog): CatalogMeta {
   return {
     today: today(catalog),
     dataAsOf: catalog.lastUpdated,
+    dataAgeDays: seatDataAge(catalog),
     currentAcademicYear: current,
     currentTerm: termNow(catalog),
     years: yearInfo(catalog),

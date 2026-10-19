@@ -31,6 +31,18 @@ export interface YearInfo {
   status: YearStatus;
 }
 
+/**
+ * Whole days since the seat counts were read from WPI, on the catalog's
+ * clock; null when the refresh time is unknown. A deployed server refreshes
+ * every 15 minutes, so a large age means the data is a stale copy.
+ */
+export function seatDataAge(catalog: Catalog): number | null {
+  const then = catalog.lastUpdated ? Date.parse(catalog.lastUpdated) : NaN;
+  if (Number.isNaN(then)) return null;
+  const days = Math.floor((catalog.now().getTime() - then) / 86_400_000);
+  return Math.max(0, days);
+}
+
 /** Today's date (YYYY-MM-DD) on the catalog's clock. */
 export function today(catalog: Catalog): string {
   return formatLocalDate(catalog.now());

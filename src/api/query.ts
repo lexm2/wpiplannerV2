@@ -38,7 +38,13 @@ import { canonicalWindows } from '../utils/timeWindows';
 import { describeMatch, type SearchMatch } from '../utils/searchUtils';
 import { TERM_ORDER } from '../utils/typeGuards';
 import { currentAcademicYear, type Catalog } from './catalog';
-import { endedTerms, termDates, yearLabel, type TermLetter } from './calendar';
+import {
+  endedTerms,
+  seatDataAge,
+  termDates,
+  yearLabel,
+  type TermLetter,
+} from './calendar';
 import { blockedSlotsForCrns } from './conflicts';
 import { ApiError } from './errors';
 import { ClockSchema, clockMinutes } from './clock';
@@ -429,6 +435,8 @@ export interface CourseQueryResult {
   excludedEndedTerms: string[];
   /** When the seat counts were read from WPI. */
   dataAsOf: string | null;
+  /** Whole days since then (see seatDataAge). */
+  dataAgeDays: number | null;
   /** Things the caller should know about how the query was read. */
   notices: string[];
   /**
@@ -797,6 +805,7 @@ export function runCourseQuery(
     totals: totalsOf(matches),
     excludedEndedTerms: read.excludedEndedTerms,
     dataAsOf: catalog.lastUpdated,
+    dataAgeDays: seatDataAge(catalog),
     notices,
   };
 }
