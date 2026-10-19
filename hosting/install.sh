@@ -249,6 +249,17 @@ install_rhel_apache() {
         [ -n "$DOMAIN" ] || die "HTTPS needs --domain."
         [ -r "$TLS_CERT" ] || die "Cannot read $TLS_CERT."
         [ -r "$TLS_KEY" ] || die "Cannot read $TLS_KEY."
+        # Root can read them anywhere, but SELinux lets httpd read only some
+        # labels: cert_t (/etc/pki/tls, /etc/letsencrypt), httpd_config_t
+        # (/etc/httpd) and plain etc_t. Elsewhere, as in /root, Apache fails to reload.
+        if command -v getenforce >/dev/null && [ "$(getenforce)" != Disabled ]; then
+            for f in "$TLS_CERT" "$TLS_KEY"; do
+                case "$(stat -L -c %C "$f" | cut -d: -f3)" in
+                    cert_t|httpd_config_t|etc_t) ;;
+                    *) die "SELinux keeps httpd from reading $f; put it under /etc/pki/tls/ and run restorecon on it." ;;
+                esac
+            done
+        fi
         TLS=true
     fi
     [ -z "$EMAIL" ] || die "--email is for Let's Encrypt, which this install does not use on RHEL; pass --tls-cert and --tls-key."
