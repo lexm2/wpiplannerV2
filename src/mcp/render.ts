@@ -643,11 +643,14 @@ export function renderConflicts(check: ConflictCheck): string {
       : check.conflicts.length
         ? `${check.conflicts.length} time conflict${check.conflicts.length === 1 ? '' : 's'} among ${n} sections; other pairs fit.`
         : `No time conflicts among these ${n} sections.`;
+  const missing = check.issues.some(i => i.kind === 'missingCompanion');
   const verdict = errors
     ? `${errors} problem${errors === 1 ? '' : 's'} to fix before registering.`
     : check.conflicts.length
       ? ''
-      : 'They make a valid set to register in Workday.';
+      : missing
+        ? 'Not a complete set yet: add the labs or discussions noted.'
+        : 'They make a valid set to register in Workday.';
   lines.push([times, verdict].filter(Boolean).join(' '));
   return lines.join('\n');
 }

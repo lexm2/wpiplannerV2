@@ -262,6 +262,9 @@ describe('MCP server', () => {
     expect(missing.text).toContain(
       'Note: RBE 1001 BL01 (CRN 8) had only 2 open seats as of 2026-09-02; they may already be gone.',
     );
+    expect(missing.text).toContain(
+      'Not a complete set yet: add the labs or discussions noted.',
+    );
   });
 
   it('explains an empty or early year of departments', async () => {

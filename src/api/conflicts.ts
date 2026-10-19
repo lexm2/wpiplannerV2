@@ -357,7 +357,7 @@ function statusIssues(
     add(
       'warning',
       'lowSeats',
-      `${who} had only ${section.seatsAvailable} open seat${section.seatsAvailable === 1 ? '' : 's'} as of ${catalog.lastUpdated?.slice(0, 10) ?? 'the last refresh'}; they may already be gone.`,
+      `${who} had only ${section.seatsAvailable === 1 ? '1 open seat' : `${section.seatsAvailable} open seats`} as of ${catalog.lastUpdated?.slice(0, 10) ?? 'the last refresh'}; ${section.seatsAvailable === 1 ? 'it' : 'they'} may already be gone.`,
     );
   }
   return issues;
