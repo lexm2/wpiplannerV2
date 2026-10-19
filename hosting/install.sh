@@ -357,6 +357,11 @@ EOF
             echo "</VirtualHost>"
         fi
     } > /etc/httpd/conf.d/wpiplanner.conf
+    if [ -f /etc/httpd/conf.d/ssl.conf ]; then
+        # mod_ssl's ssl.conf names a localhost certificate that httpd-init only
+        # makes when httpd next starts, so configtest fails on it until then.
+        systemctl start httpd-init.service
+    fi
     apachectl configtest
     systemctl enable -q --now httpd
     systemctl reload httpd
