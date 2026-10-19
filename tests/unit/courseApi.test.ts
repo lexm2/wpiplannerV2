@@ -99,6 +99,22 @@ function catalogJson(extraName = '') {
           ),
         ],
       },
+      {
+        abbreviation: 'RBE',
+        name: 'Robotics Engineering',
+        courses: [
+          course(
+            'RBE-1001-2026',
+            'Introduction To Robotics',
+            [
+              section(8, 'BL01', 'B', [
+                period(['T', 'F'], '13:00', '14:50', 'Grace Hopper'),
+              ]),
+            ],
+            { description: '<p>Hands-on robot design.</p>' },
+          ),
+        ],
+      },
     ],
   };
 }
@@ -187,18 +203,19 @@ const codes = (body: { courses: { id: string }[] }) =>
 describe('course search', () => {
   it('defaults to the current year, sorted by department then number', async () => {
     const { body } = await call('/courses');
-    expect(body.total).toBe(4);
+    expect(body.total).toBe(5);
     expect(codes(body)).toEqual([
       'CS-1101-2026',
       'CS-2102-2026',
       'CS-500-2026',
       'MA-1021-2026',
+      'RBE-1001-2026',
     ]);
   });
 
   it('takes year=all and pages with offset and limit', async () => {
     const { body } = await call('/courses?year=all&offset=3&limit=1');
-    expect(body).toMatchObject({ total: 5, offset: 3, limit: 1 });
+    expect(body).toMatchObject({ total: 6, offset: 3, limit: 1 });
     expect(codes(body)).toEqual(['MA-1021-2026']);
   });
 
@@ -213,9 +230,13 @@ describe('course search', () => {
     const { body } = await call('/courses/search', {
       filters: { searchText: { query: 'design' } },
     });
-    // Equal scores keep catalog order, where CS 2102 precedes CS 1101; the
-    // department-and-number sort would swap them.
-    expect(codes(body)).toEqual(['CS-2102-2026', 'CS-1101-2026']);
+    // Names before descriptions: RBE 1001 only mentions design in its
+    // description, so it comes last, where no sort by code would put it.
+    expect(codes(body)).toEqual([
+      'CS-1101-2026',
+      'CS-2102-2026',
+      'RBE-1001-2026',
+    ]);
   });
 
   it('maps flat params onto the same criteria as the POST body', async () => {

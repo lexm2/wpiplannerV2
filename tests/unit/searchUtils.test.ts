@@ -7,7 +7,10 @@ import {
   rankCoursesByRelevance,
   calculateRelevanceScore,
   getAvailableProfessors,
+  matchCourseText,
+  parseSearchQuery,
 } from '../../src/utils/searchUtils';
+import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
 
 function course(over: Partial<Course> = {}): Course {
@@ -96,6 +99,142 @@ describe('rankCoursesByRelevance', () => {
       course({ id: 'B', name: 'Apple' }),
     ];
     expect(rankCoursesByRelevance(list, 'apple')).toBe(list);
+  });
+});
+
+describe('parseSearchQuery', () => {
+  it('reads a course code with or without a space or hyphen', () => {
+    for (const q of ['MA 1022', 'ma1022', 'MA-1022', ' ma  1022 ']) {
+      expect(parseSearchQuery(q).code).toEqual({ dept: 'ma', number: '1022' });
+    }
+    expect(parseSearchQuery('cs 21').code).toEqual({
+      dept: 'cs',
+      number: '21',
+    });
+    expect(parseSearchQuery('1022').code).toEqual({ dept: '', number: '1022' });
+  });
+
+  it('reads anything else as words', () => {
+    expect(parseSearchQuery('Game  Design')).toMatchObject({
+      code: null,
+      words: ['game', 'design'],
+    });
+    expect(parseSearchQuery('21').code).toBeNull();
+  });
+});
+
+describe('matchCourseText', () => {
+  const robotics = course({
+    id: 'RBE-1001-2026',
+    departmentAbbr: 'RBE',
+    departmentName: 'Robotics Engineering',
+    number: '1001',
+    name: 'Introduction To Robotics',
+    description: 'Robots and their sensors.',
+  });
+  const match = (q: string, c = robotics) =>
+    matchCourseText(c, parseSearchQuery(q)).all;
+
+  it('needs every word, each anywhere in the course', () => {
+    expect(match('robotics sensors')).toBe(true);
+    expect(match('robotics cooking')).toBe(false);
+  });
+
+  it('forgives one typo in a word of five letters or more', () => {
+    expect(match('robtics')).toBe(true);
+    expect(match('robotcs')).toBe(true);
+    expect(match('rbootics')).toBe(true);
+    // Short words must match as typed.
+    expect(match('rbe')).toBe(true);
+    expect(match('reb')).toBe(false);
+  });
+
+  it('matches a code by prefix, and a description that names it', () => {
+    expect(match('RBE 1001')).toBe(true);
+    expect(match('rbe10')).toBe(true);
+    expect(match('RBE 1002')).toBe(false);
+    const after = course({ description: 'Recommended background: RBE 1001.' });
+    expect(match('RBE 1001', after)).toBe(true);
+  });
+
+  it('searches degree attributes and cross-listed codes', () => {
+    const ss = course({
+      degreeAttributes: ['Social Sciences'],
+      crossListedWith: ['MA 543'],
+    });
+    expect(match('social sciences', ss)).toBe(true);
+    expect(match('MA 543', ss)).toBe(true);
+  });
+});
+
+describe('ranking', () => {
+  const make = (
+    departmentAbbr: string,
+    number: string,
+    name: string,
+    departmentName = departmentAbbr,
+    description = '',
+  ) =>
+    course({
+      id: `${departmentAbbr}-${number}-2026`,
+      departmentAbbr,
+      departmentName,
+      number,
+      name,
+      description,
+    });
+  const ids = (list: Course[], q: string) =>
+    rankCoursesByRelevance([...list], q).map(c => c.id);
+
+  it('puts title matches above description matches', () => {
+    const list = [
+      make(
+        'CS',
+        '4801',
+        'Cryptography',
+        'Computer Science',
+        'game design of protocols',
+      ),
+      make('IMGD', '2900', 'Digital Game Design I'),
+    ];
+    expect(ids(list, 'game design')[0]).toBe('IMGD-2900-2026');
+  });
+
+  it('puts the introductory robotics course first', () => {
+    const list = [
+      make('BME', '520', 'Biomechanics And Robotics', 'Biomedical Engineering'),
+      make('RBE', '2001', 'Unified Robotics I', 'Robotics Engineering'),
+      make('RBE', '1001', 'Introduction To Robotics', 'Robotics Engineering'),
+      make('CS', '1005', 'Programming', 'Computer Science', 'robotics'),
+    ];
+    expect(ids(list, 'robotics')[0]).toBe('RBE-1001-2026');
+    expect(ids(list, 'robtics')[0]).toBe('RBE-1001-2026');
+  });
+
+  it('puts the course a code names first, ahead of courses mentioning it', () => {
+    const list = [
+      make(
+        'MA',
+        '1023',
+        'Calculus III',
+        'Math',
+        'Recommended background: MA 1022.',
+      ),
+      make('MA', '1022', 'Calculus II'),
+    ];
+    expect(ids(list, 'MA 1022')[0]).toBe('MA-1022-2026');
+  });
+});
+
+describe('editDistance', () => {
+  it('counts a swap as one edit', () => {
+    expect(editDistance('robtoics', 'robotics')).toBe(1);
+    expect(editDistance('kitten', 'sitting')).toBe(3);
+  });
+
+  it('measures against a prefix when asked', () => {
+    expect(editDistance('robtic', 'robotics', 1, true)).toBe(1);
+    expect(editDistance('robtic', 'robotics', 1)).toBe(2);
   });
 });
 
