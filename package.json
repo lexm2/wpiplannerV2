@@ -21,7 +21,8 @@
     "generate-icons": "bun run scripts/generate-icon-paths.ts",
     "fetch-data": "bun run scripts/fetch-course-data.ts",
     "fetch-rmp-data": "bun run scripts/rateMyProfessor/fetchRateMyProfessor.ts",
-    "merge-to-master": "bash scripts/merge-to-master.sh"
+    "merge-to-master": "bash scripts/merge-to-master.sh",
+    "serve:api": "bun server.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

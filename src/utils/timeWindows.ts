@@ -123,6 +123,31 @@ export function cellsFromWindows(
   return cells;
 }
 
+/**
+ * Windows from any source (e.g. an API caller) in the canonical form
+ * TimesFilter needs: sorted by weekday then start, with overlapping or
+ * touching bands on the same day merged into one.
+ */
+export function canonicalWindows(windows: readonly TimeWindow[]): TimeWindow[] {
+  const dayOrder = Object.values(DayOfWeek);
+  const sorted = [...windows].sort(
+    (a, b) =>
+      dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day) ||
+      a.startMin - b.startMin,
+  );
+
+  const merged: TimeWindow[] = [];
+  for (const w of sorted) {
+    const last = merged.at(-1);
+    if (last && last.day === w.day && w.startMin <= last.endMin) {
+      last.endMin = Math.max(last.endMin, w.endMin);
+    } else {
+      merged.push({ ...w });
+    }
+  }
+  return merged;
+}
+
 type DayWindows = Map<DayOfWeek, { startMin: number; endMin: number }[]>;
 
 export function windowsByDay(windows: readonly TimeWindow[]): DayWindows {

@@ -90,6 +90,11 @@ export class TermBoundsService {
     this.termBoundsCache = TermBoundsDataSchema.parse(json);
   }
 
+  /** Every loaded year's A-D bounds, keyed by fall year; null before a load. */
+  public getAllBounds(): TermBoundsData['years'] | null {
+    return this.termBoundsCache?.years ?? null;
+  }
+
   public getTermDates(
     termLetter: 'A' | 'B' | 'C' | 'D',
     year?: number,
