@@ -48,6 +48,42 @@ describe('MCP server', () => {
     expect(plain.text).not.toContain('CRN');
   });
 
+  it('lists the labs that passed under their lectures, and why a course went', async () => {
+    const { text, data } = await tool('search_courses', {
+      filters: { term: { terms: ['B'] }, department: { departments: ['PH'] } },
+    });
+    // BX02 goes with BL02 alone; BX01 with either lecture, so once.
+    expect(text).toContain(
+      '| 10/30 open | Online\n     + lab BX02 CRN 23 R 14:00-14:50 (10/30 open)\n     + lab (any B lecture) BX01 CRN 22 W 14:00-14:50 (10/30 open)\n',
+    );
+    expect(data.courses[0].companions).toHaveLength(2);
+    // Both labs meet in the avoided hour, so PH 1110 goes though its
+    // lectures fit: the notice says so.
+    const avoided = await tool('search_courses', {
+      filters: {
+        department: { departments: ['PH'] },
+        times: {
+          mode: 'avoid',
+          days: ['W', 'R'],
+          earliestStart: '14:00',
+          latestEnd: '15:00',
+        },
+      },
+    });
+    expect(avoided.data.total).toBe(0);
+    expect(avoided.text).toContain(
+      '1 course dropped because its labs fall in your avoided times (filters.times): PH 1110.',
+    );
+    // A lab with no open seat drops it the same way.
+    const full = await tool('search_courses', {
+      filters: {
+        department: { departments: ['PH'] },
+        availability: { minAvailable: 11 },
+      },
+    });
+    expect(full.text).not.toContain('dropped because');
+  });
+
   it('splits seats by term, totals every page, and warns of low counts', async () => {
     const { text } = await tool('search_courses', {
       filters: { department: { departments: ['MA', 'DS'] } },

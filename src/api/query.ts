@@ -46,6 +46,7 @@ import {
   type TermLetter,
 } from './calendar';
 import { blockedSlotsForCrns } from './conflicts';
+import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { ApiError } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
@@ -174,7 +175,9 @@ const FiltersSchema = strictObject(
         availableOnly: z
           .boolean()
           .default(false)
-          .describe('Keep only sections with an open seat.'),
+          .describe(
+            'Keep only sections with an open seat; labs and discussions too, so a lecture whose labs are all full is dropped.',
+          ),
         minAvailable: z
           .number()
           .int()
@@ -358,7 +361,7 @@ const FiltersSchema = strictObject(
           .array(z.number().int().positive())
           .min(1)
           .describe(
-            "CRNs of sections the student already has; sections that clash with any of them are dropped. A semester section clashes with both of its quarters' sections.",
+            "CRNs of sections the student already has; sections that clash with any of them are dropped, labs and discussions included. A semester section clashes with both of its quarters' sections.",
           ),
         semesterSpansQuarters: z
           .boolean()
@@ -420,9 +423,14 @@ function querySchema(): unknown {
   return CourseQuerySchema;
 }
 
+/** A lab or discussion under a search row, and the row's lectures it goes with. */
+type CompanionBrief = SectionBrief & { pairsWith: number[] };
+
 export interface CourseRow extends CourseSummary {
   /** The matching lecture (or standalone lab) sections, with includeSections. */
   sections?: SectionBrief[];
+  /** With sections: the labs and discussions that passed every filter. */
+  companions?: CompanionBrief[];
   /** With searchText: how the course matched it (see SearchMatch). */
   match?: SearchMatch;
 }
@@ -693,11 +701,10 @@ function createFilterService(catalog: Catalog): FilterService {
   return service;
 }
 
-/** The query's matches in course-list order, before paging. */
-function filterCatalog(
+function filterServiceFor(
   catalog: Catalog,
   criteria: Map<string, unknown>,
-): Course[] {
+): FilterService {
   // FilterService holds its filters as state, so each query gets its own.
   const service = createFilterService(catalog);
   for (const [id, value] of criteria) {
@@ -705,7 +712,15 @@ function filterCatalog(
       throw new Error(`Filter '${id}' rejected its criteria`);
     }
   }
+  return service;
+}
 
+/** The query's matches in course-list order, before paging. */
+function filterCatalog(
+  catalog: Catalog,
+  criteria: Map<string, unknown>,
+): Course[] {
+  const service = filterServiceFor(catalog, criteria);
   const matches = service.filterCourses(catalog.courses);
 
   // As CourseList: a search keeps its relevance ranking, anything else
@@ -788,12 +803,51 @@ function rowSections(course: Course, catalog: Catalog): SectionBrief[] {
   return lectures.map(({ s, kind }) => toSectionBrief(s, kind, catalog.rmp));
 }
 
+/**
+ * The labs and discussions that passed every filter, each once, with the
+ * matching lectures it goes with: the row's course is the filtered one, so
+ * its lecture groups hold only those.
+ */
+function rowCompanions(course: Course, catalog: Catalog): CompanionBrief[] {
+  const byCrn = new Map<number, CompanionBrief>();
+  for (const group of course.lectures ?? []) {
+    const companions = [
+      ...group.compatibleDiscussions.map(s => ({
+        s,
+        kind: 'discussion' as const,
+      })),
+      ...group.compatibleLabs.map(s => ({ s, kind: 'lab' as const })),
+    ];
+    for (const { s, kind } of companions) {
+      let brief = byCrn.get(s.crn);
+      if (!brief) {
+        brief = { ...toSectionBrief(s, kind, catalog.rmp), pairsWith: [] };
+        byCrn.set(s.crn, brief);
+      }
+      brief.pairsWith.push(group.section.crn);
+    }
+  }
+  return [...byCrn.values()];
+}
+
+/** Notices for courses lost through their labs and discussions alone. */
+function companionNotices(
+  catalog: Catalog,
+  criteria: Map<string, unknown>,
+  matches: Course[],
+): string[] {
+  if (!judgesCompanions(criteria)) return [];
+  const passed = filterServiceFor(catalog, criteria).apply(catalog.courses);
+  return companionDrops(passed, matches, criteria).map(dropNotice);
+}
+
 export function runCourseQuery(
   catalog: Catalog,
   query: CourseQuery,
 ): CourseQueryResult {
   const read = readQuery(catalog, query);
-  const matches = collapseCrossListings(filterCatalog(catalog, read.criteria));
+  const filtered = filterCatalog(catalog, read.criteria);
+  const matches = collapseCrossListings(filtered);
 
   const includeSections =
     query.includeSections ??
@@ -817,7 +871,10 @@ export function runCourseQuery(
       }
     : null;
 
-  const notices = [...read.notices];
+  const notices = [
+    ...read.notices,
+    ...companionNotices(catalog, read.criteria, filtered),
+  ];
   const relaxations = matches.length === 0 ? relax(catalog, query) : [];
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
@@ -837,7 +894,11 @@ export function runCourseQuery(
     limit: query.limit,
     courses: matches.slice(query.offset, query.offset + query.limit).map(c => {
       const row: CourseRow = toCourseSummary(c, catalog.rmp);
-      if (includeSections) row.sections = rowSections(c, catalog);
+      if (includeSections) {
+        row.sections = rowSections(c, catalog);
+        const companions = rowCompanions(c, catalog);
+        if (companions.length) row.companions = companions;
+      }
       const match = matchOf.get(c);
       if (match) row.match = match;
       return row;

@@ -260,6 +260,72 @@ function rowLine(
   return parts.join(' | ');
 }
 
+type Companion = NonNullable<CourseRow['companions']>[number];
+
+/** Examples a long companion list shows before the count. */
+const COMPANION_EXAMPLES = 2;
+
+const companionText = (s: Companion) =>
+  `${s.number} CRN ${s.crn} ${s.meets} (${seats(s)})`;
+
+/** "+ discussion CD01 CRN 1 W 10:00-10:50 (15/60 open)", or a count and examples. */
+function companionLine(
+  kind: Companion['kind'],
+  members: Companion[],
+  pairing: string,
+): string {
+  const noun = kind === 'lab' ? 'lab' : 'discussion';
+  if (members.length <= COMPANION_EXAMPLES) {
+    return `     + ${members.length === 1 ? noun : `${noun}s`}${pairing} ${members.map(companionText).join('; ')}`;
+  }
+  const examples = [
+    ...members.filter(m => m.seatsAvailable > 0),
+    ...members.filter(m => m.seatsAvailable <= 0),
+  ].slice(0, COMPANION_EXAMPLES);
+  return `     + ${members.length} ${noun}s${pairing}, e.g. ${examples.map(companionText).join('; ')}`;
+}
+
+/**
+ * The lines under one lecture of a search row: each kind of lab and
+ * discussion on one line. Those of this lecture alone come under it;
+ * those several lectures share come once, under the last lecture of the
+ * term shown, as "any C lecture" when they go with all of them. A long
+ * list is a count with a couple of examples, open ones first.
+ */
+function companionLines(
+  row: CourseRow,
+  lecture: SectionBrief,
+  shown: SectionBrief[],
+): string[] {
+  const lines: string[] = [];
+  const ofTerm = (row.sections ?? []).filter(l => l.term === lecture.term);
+  const lastOfTerm = shown.filter(l => l.term === lecture.term).at(-1);
+  for (const kind of ['discussion', 'lab'] as const) {
+    const companions = (row.companions ?? []).filter(
+      c => c.kind === kind && c.term === lecture.term,
+    );
+    const own = companions.filter(
+      c => c.pairsWith.length === 1 && c.pairsWith[0] === lecture.crn,
+    );
+    if (own.length) lines.push(companionLine(kind, own, ''));
+    const shared = companions.filter(c => c.pairsWith.length > 1);
+    if (!shared.length || lastOfTerm?.crn !== lecture.crn) continue;
+    const any = shared.every(c =>
+      ofTerm.every(l => c.pairsWith.includes(l.crn)),
+    );
+    lines.push(
+      companionLine(
+        kind,
+        shared,
+        any
+          ? ` (any ${lecture.term} lecture)`
+          : ` (each with some ${lecture.term} lectures; get_course "${row.code}" says which)`,
+      ),
+    );
+  }
+  return lines;
+}
+
 /** Which filter emptied a search, and what leaving it out would find. */
 function relaxationLines(
   relaxations: CourseQueryResult['relaxations'],
@@ -312,7 +378,7 @@ export function renderSearch(result: CourseQueryResult): string {
   }
   if (result.courses.some(c => c.sections)) {
     lines.push(
-      'Sections: number, CRN, term | meetings | room | instructor | seats; status and mode shown only when not Open / In-Person.',
+      'Sections: number, CRN, term | meetings | room | instructor | seats; status and mode shown only when not Open / In-Person. "+" lines are the labs and discussions that also passed the filters: take one of each kind with the lecture.',
     );
   }
 
@@ -321,8 +387,10 @@ export function renderSearch(result: CourseQueryResult): string {
       rowLine(c, result.offset + i + 1, result.year === 'all', result.search),
     );
     if (!c.sections) return;
-    for (const s of c.sections.slice(0, MAX_ROW_SECTIONS)) {
+    const shown = c.sections.slice(0, MAX_ROW_SECTIONS);
+    for (const s of shown) {
       lines.push(`   ${briefLine(s, true)}`);
+      lines.push(...companionLines(c, s, shown));
     }
     const more = c.sections.length - MAX_ROW_SECTIONS;
     if (more > 0) {
