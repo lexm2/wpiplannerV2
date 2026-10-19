@@ -1,0 +1,23 @@
+[Unit]
+Description=WPI Planner course API and MCP endpoint
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=wpiplanner
+# Runs from the checkout: server.ts needs its src/, public/ and node_modules,
+# which the build's bun install leaves there.
+WorkingDirectory=/opt/wpiplanner
+# Bun lives in /usr/local/bin, which systemd's default PATH may lack.
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=DATA_DIR=/var/www/wpiplanner-data
+Environment=HOST=127.0.0.1
+# 8008 is already http_port_t, so Apache may proxy to it with only the
+# httpd_can_network_relay boolean; 3001, the default, is labelled ntop_port_t.
+Environment=PORT=8008
+ExecStart=/usr/local/bin/bun server.ts
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Installs WPI Planner on a fresh server; re-run it to update.
 #   Debian, Ubuntu, Arch: Docker stack behind a host nginx, Let's Encrypt with --domain.
-#   RHEL family: Apache serves the build, systemd runs the fetcher (see rhel/README.md).
+#   RHEL family: Apache serves the build, systemd runs the fetcher and the course
+#   API (see rhel/README.md).
 #
 #   curl -fsSL https://raw.githubusercontent.com/lexm2/wpiplannerV2/server/hosting/install.sh \
 #       | sudo bash -s -- --domain planner.example.com --email you@example.com
@@ -130,11 +131,13 @@ install_docker_nginx() {
 
     log "Waiting for the app to answer"
     for _ in $(seq 60); do
-        curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/" && break
+        curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/api/health" && break
         sleep 1
     done
     curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/" ||
         die "The app is not answering on 127.0.0.1:$PORT; see: docker compose -f $COMPOSE_FILE logs"
+    curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/api/health" ||
+        die "The course API is not answering; see: docker compose -f $COMPOSE_FILE logs api"
 
     log "Configuring nginx"
     if [ "$FAMILY" = debian ]; then
@@ -166,6 +169,19 @@ server {
 
     location / {
         proxy_pass         http://127.0.0.1:$PORT;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+    }
+
+    # MCP replies can be SSE streams; pass each event on as it is written.
+    location = /wpiplannerV2/mcp {
+        proxy_pass         http://127.0.0.1:$PORT;
+        proxy_http_version 1.1;
+        proxy_buffering    off;
+        proxy_read_timeout 300s;
         proxy_set_header   Host              \$host;
         proxy_set_header   X-Real-IP         \$remote_addr;
         proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
@@ -204,16 +220,23 @@ EOF
     cat <<EOF
 
 WPI Planner is running at $URL
+  Course API:     ${URL}api/
+  MCP endpoint:   ${URL}mcp
 
   Update:         re-run this script with the same options
   Refresh logs:   docker compose -f $COMPOSE_FILE logs -f fetcher
   Force refresh:  docker compose -f $COMPOSE_FILE restart fetcher
+  API logs:       docker compose -f $COMPOSE_FILE logs -f api
+  Restart API:    docker compose -f $COMPOSE_FILE restart api
 EOF
 }
 
 APP_USER=wpiplanner
 WEB_ROOT=/var/www/wpiplanner
 DATA_DIR=/var/www/wpiplanner-data
+# Must match wpiplanner-api.service and the ProxyPass lines in app.conf. Stock
+# SELinux labels it http_port_t, the type httpd_can_network_relay opens.
+API_PORT=8008
 
 as_app() {
     runuser -u "$APP_USER" -- env HOME="/var/lib/$APP_USER" PATH=/usr/local/bin:/usr/bin:/bin "$@"
@@ -234,7 +257,7 @@ install_rhel_apache() {
     cd /
 
     log "Installing packages"
-    PKGS=(httpd git unzip rsync diffutils gzip findutils iproute)
+    PKGS=(httpd git unzip rsync diffutils gzip findutils iproute policycoreutils)
     if [ "$TLS" = true ]; then
         PKGS+=(mod_ssl)
     fi
@@ -243,7 +266,7 @@ install_rhel_apache() {
         PKGS+=(curl)
     fi
     dnf install -y -q "${PKGS[@]}"
-    # Bun isn't packaged for RHEL; it builds the app and runs the fetcher.
+    # Bun isn't packaged for RHEL; it builds the app and runs the fetcher and API.
     if [ ! -x /usr/local/bin/bun ]; then
         log "Installing Bun"
         curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash
@@ -284,6 +307,25 @@ install_rhel_apache() {
     done
     [ -f "$DATA_DIR/last-updated.json" ] ||
         die "The fetcher has not written $DATA_DIR yet; see: journalctl -u wpiplanner-fetcher"
+
+    log "Starting the course API"
+    sed "s#/opt/wpiplanner#$DIR#g" "$DIR/hosting/rhel/systemd/wpiplanner-api.service" \
+        > /etc/systemd/system/wpiplanner-api.service
+    systemctl daemon-reload
+    systemctl enable -q wpiplanner-api
+    # Restart, not start: an update must load the new code.
+    systemctl restart wpiplanner-api
+    for _ in $(seq 30); do
+        curl -fsS -o /dev/null "http://127.0.0.1:$API_PORT/wpiplannerV2/api/health" && break
+        sleep 1
+    done
+    curl -fsS -o /dev/null "http://127.0.0.1:$API_PORT/wpiplannerV2/api/health" ||
+        die "The course API is not answering on 127.0.0.1:$API_PORT; see: journalctl -u wpiplanner-api"
+    # httpd may not open connections at all by default; relay lets it reach
+    # http_port_t ports such as the API's, not every port.
+    if command -v getenforce >/dev/null && [ "$(getenforce)" != Disabled ]; then
+        setsebool -P httpd_can_network_relay 1
+    fi
 
     log "Configuring Apache"
     install -d /etc/httpd/wpiplanner
@@ -329,21 +371,29 @@ EOF
 
     if [ "$TLS" = true ]; then
         URL="https://$DOMAIN/wpiplannerV2/"
-        CHECK=(--resolve "$DOMAIN:443:127.0.0.1" "$URL")
+        CHECK=(--resolve "$DOMAIN:443:127.0.0.1")
+        LOCAL_URL="$URL"
     else
         URL="http://${DOMAIN:-$(server_ip)}/wpiplannerV2/"
-        CHECK=(-H "Host: ${DOMAIN:-localhost}" http://127.0.0.1/wpiplannerV2/)
+        CHECK=(-H "Host: ${DOMAIN:-localhost}")
+        LOCAL_URL=http://127.0.0.1/wpiplannerV2/
     fi
-    curl -fsS -o /dev/null "${CHECK[@]}" ||
+    curl -fsS -o /dev/null "${CHECK[@]}" "$LOCAL_URL" ||
         die "Apache is not serving the app; see: journalctl -u httpd and /var/log/httpd/error_log"
+    curl -fsS -o /dev/null "${CHECK[@]}" "${LOCAL_URL}api/health" ||
+        die "Apache is not reaching the course API; see /var/log/httpd/error_log (an SELinux denial shows in: ausearch -m avc -c httpd)"
 
     cat <<EOF
 
 WPI Planner is running at $URL
+  Course API:     ${URL}api/
+  MCP endpoint:   ${URL}mcp
 
   Update:         re-run this script with the same options
   Refresh logs:   journalctl -u wpiplanner-fetcher -f
   Force refresh:  systemctl restart wpiplanner-fetcher
+  API logs:       journalctl -u wpiplanner-api -f
+  Restart API:    systemctl restart wpiplanner-api
 EOF
 }
 

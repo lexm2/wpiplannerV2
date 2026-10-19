@@ -14,7 +14,22 @@ services:
     volumes:
       - course-data:/data:ro
     depends_on:
+      - api
       - fetcher
+
+  # The course API and MCP endpoint; reached only through web's nginx.
+  api:
+    build:
+      context: ../..
+      dockerfile: hosting/docker/api.Dockerfile
+    image: wpiplannerv2-api
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: '3001'
+      DATA_DIR: /data
+    volumes:
+      - course-data:/data:ro
 
   fetcher:
     build:
