@@ -315,11 +315,32 @@ export function listDepartments(
     .sort((a, b) => a.abbr.localeCompare(b.abbr));
 }
 
+/** A department name as compared: lowercase words, "&" read as "and". */
+function normalName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .join(' ');
+}
+
+// Not part of a department's initials: "Physics for Educators" is PE.
+const INITIALS_STOP = new Set(['and', 'of', 'for', 'the', 'in']);
+
+const initialsOf = (name: string) =>
+  normalName(name)
+    .split(' ')
+    .filter(w => !INITIALS_STOP.has(w))
+    .map(w => w[0])
+    .join('');
+
 /**
  * Department abbreviations for what a caller wrote: an abbreviation in any
- * case ("cs"), a full name ("Computer Science"), or a name only one
- * department comes close to ("Robotics"). A loose match is reported in
- * `notes`; one that fits several departments, or none, throws with them.
+ * case ("cs"), a full name ("Computer Science", "and" or "&" alike), or a
+ * name only one department comes close to ("Robotics"). A loose match is
+ * reported in `notes`; one that fits several departments, or none, throws
+ * with them, likeliest first.
  */
 export function resolveDepartments(
   catalog: Catalog,
@@ -330,21 +351,15 @@ export function resolveDepartments(
   const notes: string[] = [];
   const label = (d: Department) => `${d.abbreviation} (${d.name})`;
   for (const input of inputs) {
-    const want = input.trim().toLowerCase();
+    const want = normalName(input);
     const exact =
       departments.find(d => d.abbreviation.toLowerCase() === want) ??
-      departments.find(d => d.name.toLowerCase() === want);
+      departments.find(d => normalName(d.name) === want);
     if (exact) {
       resolved.add(exact.abbreviation);
       continue;
     }
-    // Names containing the input, and names a word or two edits away.
-    const near = [
-      ...new Set([
-        ...departments.filter(d => d.name.toLowerCase().includes(want)),
-        ...closestDepartments(want, departments),
-      ]),
-    ];
+    const near = closestDepartments(want, departments, catalog);
     if (near.length === 1) {
       resolved.add(near[0].abbreviation);
       notes.push(`Department "${input}" read as ${label(near[0])}.`);
@@ -361,32 +376,58 @@ export function resolveDepartments(
   return { abbrs: [...resolved], notes };
 }
 
+/** Departments a loose input suggests, at most this many. */
+const MAX_CANDIDATES = 6;
+
 /**
- * Departments whose abbreviation, name or any word of the name is within
- * two edits of `input` (three or more letters; shorter inputs one edit),
- * nearest first: "Robotcs" finds Robotics Engineering.
+ * Departments `want` could mean, likeliest first:
+ * 1. its letters inside a longer abbreviation, or in the name's initials
+ *    ("PE": WPE, Wellness & Physical Education; MPE, Physics for Educators);
+ * 2. a name word starting with it, or for 4+ letters anywhere in the name;
+ * 3. the abbreviation, name or a name word within an edit or two (two for
+ *    5+ letters): "Robotcs" finds Robotics Engineering.
+ * Ties go to the department with more courses in the current year, then
+ * A-Z.
  */
 function closestDepartments(
   want: string,
   departments: Department[],
+  catalog: Catalog,
 ): Department[] {
+  const compact = want.replace(/ /g, '');
   const limit = want.length >= 5 ? 2 : 1;
-  return departments
-    .map(d => ({
-      d,
-      distance: Math.min(
-        ...[d.abbreviation, d.name, ...d.name.split(/[\s&,-]+/)]
-          .filter(Boolean)
-          .map(n => editDistance(want, n.toLowerCase(), limit)),
+  const year = currentAcademicYear(catalog);
+  const size = (d: Department) =>
+    d.courses.filter(c => c.academicYear === year).length;
+  const tier = (d: Department): number | null => {
+    const abbr = d.abbreviation.toLowerCase();
+    const name = normalName(d.name);
+    if (
+      compact.length >= 2 &&
+      /^[a-z]+$/.test(compact) &&
+      (abbr.includes(compact) || initialsOf(d.name).includes(compact))
+    ) {
+      return 0;
+    }
+    if (name.split(' ').some(w => w.startsWith(want))) return 1;
+    if (want.length >= 4 && name.includes(want)) return 1;
+    const distance = Math.min(
+      ...[abbr, name, ...name.split(' ')].map(n =>
+        editDistance(want, n, limit),
       ),
-    }))
-    .filter(x => x.distance <= limit)
+    );
+    return distance <= limit ? 1 + distance : null;
+  };
+  return departments
+    .map(d => ({ d, tier: tier(d) }))
+    .filter((x): x is { d: Department; tier: number } => x.tier !== null)
     .sort(
       (a, b) =>
-        a.distance - b.distance ||
+        a.tier - b.tier ||
+        size(b.d) - size(a.d) ||
         a.d.abbreviation.localeCompare(b.d.abbreviation),
     )
-    .slice(0, 6)
+    .slice(0, MAX_CANDIDATES)
     .map(({ d }) => d);
 }
 

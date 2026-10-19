@@ -372,6 +372,23 @@ describe('short words, acronyms and numerals', () => {
     expect(describeMatch(list[0], 'MA 1022')).toBe('mentions');
   });
 
+  it('reads "and" in a department name as the catalog\'s "&"', () => {
+    const imgd = make(
+      'IMGD',
+      '1001',
+      'The Game Development Process',
+      'Teams build games.',
+      'Interactive Media & Game Development',
+    );
+    for (const q of [
+      'interactive media and game development',
+      'Interactive Media & Game Development',
+    ]) {
+      expect(matches(q, imgd)).toBe(true);
+      expect(describeMatch(imgd, q)).toBe('title');
+    }
+  });
+
   it('lists the courses of a department its name names, by number', () => {
     const list = [
       make('CS', '588', 'Computer Science Capstone', '', 'Computer Science'),

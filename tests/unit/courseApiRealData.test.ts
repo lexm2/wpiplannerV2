@@ -8,6 +8,8 @@ import { join } from 'node:path';
 import { CatalogSource, type Catalog } from '../../src/api/catalog';
 import { CourseQuerySchema, runCourseQuery } from '../../src/api/query';
 import { createMcpEndpoint } from '../../src/mcp/server';
+import { resolveDepartments } from '../../src/api/lookup';
+import type { ApiError } from '../../src/api/errors';
 
 const source = new CatalogSource({
   publicDir: join(import.meta.dirname, '../../public'),
@@ -166,6 +168,32 @@ describe('ranking on the real catalog', () => {
     expect(weak.total).toBeGreaterThan(0);
     expect(weak.search?.onlyMentions).toBe(true);
     expect(search('machine learning').search?.onlyMentions).toBe(false);
+  });
+});
+
+describe('department names on the real catalog', () => {
+  it('reads "and" as the catalog\'s "&", in a filter and in a search', () => {
+    expect(
+      resolveDepartments(catalog, ['Interactive Media and Game Development'])
+        .abbrs,
+    ).toEqual(['IMGD']);
+    const result = top('Interactive Media and Game Development', 5);
+    expect(result.every(code => code.startsWith('IMGD '))).toBe(true);
+  });
+
+  it('suggests the department whose abbreviation or initials hold the letters first', () => {
+    let error: unknown;
+    try {
+      resolveDepartments(catalog, ['PE']);
+    } catch (e) {
+      error = e;
+    }
+    const { candidates } = (error as ApiError).details as {
+      candidates: string[];
+    };
+    // WPE is Wellness & Physical Education; edit-distance neighbours after.
+    expect(candidates[0]).toBe('WPE');
+    expect(candidates).not.toContain('OIE');
   });
 });
 

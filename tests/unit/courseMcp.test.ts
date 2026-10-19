@@ -272,7 +272,7 @@ describe('MCP server', () => {
     });
     expect(vague.isError).toBe(true);
     expect(vague.text).toContain(
-      'could be MA (Mathematical Sciences), CS (Computer Science), DS (Data Science)',
+      'could be CS (Computer Science), MA (Mathematical Sciences), DS (Data Science)',
     );
     const unknown = await tool('search_courses', {
       filters: { department: { departments: ['Quux'] } },

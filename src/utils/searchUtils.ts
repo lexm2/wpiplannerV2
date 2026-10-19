@@ -72,6 +72,17 @@ function readCode(compact: string): ParsedQuery['code'] {
 
 const queryWords = (text: string) => tokenize(text).map(numeral);
 
+/**
+ * A department name as words, "and" left out, since the catalog writes
+ * "Interactive Media & Game Development" and students "... and Game ...".
+ */
+const departmentPhrase = (words: string[]) =>
+  words.filter(w => w !== 'and').join(' ');
+
+/** The query names the course's department, in full or by abbreviation. */
+const namesDepartment = (text: CourseText, words: string[]) =>
+  words.length > 0 && text.departmentNames.includes(departmentPhrase(words));
+
 export function parseSearchQuery(query: string): ParsedQuery {
   const text = query.trim().toLowerCase().replace(/\s+/g, ' ');
   const code = readCode(text.replace(/[\s_.-]/g, ''));
@@ -229,7 +240,7 @@ function courseText(course: Course): CourseText {
     name,
     nameTokens: tokenize(name).map(numeral),
     departmentNames: [
-      tokenize(course.departmentName.toLowerCase()).join(' '),
+      departmentPhrase(tokenize(course.departmentName.toLowerCase())),
       course.departmentAbbr.toLowerCase(),
     ],
     departmentTokens: tokenize(department),
@@ -296,6 +307,9 @@ export function matchCourseText(
       (codeMatches(course, query.code) || mentionsCode(course, query.code)) &&
       query.words.every(word => wordMatches(text, word));
     return { all: ok, matched: [ok] };
+  }
+  if (namesDepartment(text, query.words)) {
+    return { all: true, matched: query.words.map(() => true) };
   }
   const matched = query.words.map(word => wordMatches(text, word));
   return { all: matched.every(Boolean), matched };
@@ -389,6 +403,7 @@ export function describeMatch(course: Course, query: string): SearchMatch {
     return codeMatches(course, parsed.code) ? 'code' : 'mentions';
   }
   const text = courseText(course);
+  if (namesDepartment(text, parsed.words)) return 'title';
   if (!matchCourseText(course, parsed).all) return 'section';
   const inTitle = (word: string) =>
     wordInName(text, word) ||
@@ -559,7 +574,7 @@ export function calculateRelevanceScore(course: Course, query: string): number {
   if (parsed.code) {
     score = codeScore(course, parsed.code);
     if (score > 0) score += wordScore(text, parsed.words);
-  } else if (text.departmentNames.includes(parsed.words.join(' '))) {
+  } else if (namesDepartment(text, parsed.words)) {
     score = DEPARTMENT_SCORE;
   } else {
     score = wordScore(text, parsed.words);
