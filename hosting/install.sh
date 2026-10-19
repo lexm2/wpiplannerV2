@@ -79,6 +79,11 @@ checkout() {
     log "Fetching $BRANCH into $DIR"
     if [ -d "$DIR/.git" ]; then
         "$@" git -C "$DIR" fetch -q origin "$BRANCH"
+        # The RHEL fetcher refreshes these tracked files in the checkout, and the
+        # data commits being pulled change them too; the live copies are in the
+        # data directory, so drop these rather than let them stop the update.
+        "$@" git -C "$DIR" checkout -q -- data/course-data.json \
+            public/course-data-constructed.json public/term-bounds.json public/last-updated.json
         "$@" git -C "$DIR" checkout -q "$BRANCH"
         # --ff-only: edits made on the server stop the update instead of being lost.
         "$@" git -C "$DIR" pull -q --ff-only origin "$BRANCH"
@@ -264,6 +269,17 @@ install_rhel_apache() {
         [ -n "$DOMAIN" ] || die "HTTPS needs --domain."
         [ -r "$TLS_CERT" ] || die "Cannot read $TLS_CERT."
         [ -r "$TLS_KEY" ] || die "Cannot read $TLS_KEY."
+        # Root can read them anywhere, but SELinux lets httpd read only some
+        # labels: cert_t (/etc/pki/tls, /etc/letsencrypt), httpd_config_t
+        # (/etc/httpd) and plain etc_t. Elsewhere, as in /root, Apache fails to reload.
+        if command -v getenforce >/dev/null && [ "$(getenforce)" != Disabled ]; then
+            for f in "$TLS_CERT" "$TLS_KEY"; do
+                case "$(stat -L -c %C "$f" | cut -d: -f3)" in
+                    cert_t|httpd_config_t|etc_t) ;;
+                    *) die "SELinux keeps httpd from reading $f; put it under /etc/pki/tls/ and run restorecon on it." ;;
+                esac
+            done
+        fi
         TLS=true
     fi
     [ -z "$EMAIL" ] || die "--email is for Let's Encrypt, which this install does not use on RHEL; pass --tls-cert and --tls-key."
@@ -372,6 +388,11 @@ EOF
             echo "</VirtualHost>"
         fi
     } > /etc/httpd/conf.d/wpiplanner.conf
+    if [ -f /etc/httpd/conf.d/ssl.conf ]; then
+        # mod_ssl's ssl.conf names a localhost certificate that httpd-init only
+        # makes when httpd next starts, so configtest fails on it until then.
+        systemctl start httpd-init.service
+    fi
     apachectl configtest
     systemctl enable -q --now httpd
     systemctl reload httpd
@@ -386,7 +407,9 @@ EOF
 
     if [ "$TLS" = true ]; then
         URL="https://$DOMAIN/wpiplannerV2/"
-        CHECK=(--resolve "$DOMAIN:443:127.0.0.1")
+        # -k: this checks that Apache serves the app; a self-signed or
+        # internal-CA certificate is the admin's choice, not a failure.
+        CHECK=(-k --resolve "$DOMAIN:443:127.0.0.1")
         LOCAL_URL="$URL"
     else
         URL="http://${DOMAIN:-$(server_ip)}/wpiplannerV2/"

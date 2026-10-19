@@ -93,13 +93,18 @@ The site is then at `https://<your name>/wpiplannerV2/`, the API at
 
 `hosting/rhel/apache/wpiplanner-vhost.conf` expects a PEM certificate, followed by its
 intermediate chain, and its key. Keep them under `/etc/pki/tls/` so they carry
-the `cert_t` label httpd is allowed to read; a certificate elsewhere fails
-with a permission error in `/var/log/httpd/error_log`.
+the `cert_t` label httpd is allowed to read; a certificate elsewhere, or one
+moved there with `mv` and not `restorecon`ed, makes httpd fail to start or
+reload, saying in `journalctl -u httpd` that the file "does not exist or is
+empty". `install.sh` refuses such files up front.
 
 ## Updating
 
 ```bash
 cd /opt/wpiplanner
+# The fetcher rewrites these in the checkout; the live copies are in the data directory.
+runuser -u wpiplanner -- git checkout -- data/course-data.json \
+    public/course-data-constructed.json public/term-bounds.json public/last-updated.json
 runuser -u wpiplanner -- git pull --ff-only
 # then the build and rsync lines above, and:
 systemctl restart wpiplanner-fetcher wpiplanner-api
