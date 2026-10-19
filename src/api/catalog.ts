@@ -38,6 +38,8 @@ export interface Catalog {
   sectionsByCrn: Map<number, CrnEntry>;
   rmp: RateMyProfessorService;
   termBounds: TermBoundsService;
+  /** The clock every date-aware answer reads; injectable for tests. */
+  now: () => Date;
 }
 
 export interface CatalogSourceOptions {
@@ -47,6 +49,8 @@ export interface CatalogSourceOptions {
   publicDir: string;
   /** How long a loaded catalog is trusted before its mtime is checked again. */
   checkIntervalMs?: number;
+  /** Today, for the current year and term; tests pin it. */
+  now?: () => Date;
 }
 
 async function readJson(path: string): Promise<unknown> {
@@ -80,9 +84,9 @@ function indexSections(courses: Course[]): Map<number, CrnEntry> {
  */
 export function currentAcademicYear(catalog: Catalog): number {
   return (
-    catalog.termBounds.getCurrentAcademicYear() ??
+    catalog.termBounds.getCurrentAcademicYear(catalog.now()) ??
     catalog.years.at(-1) ??
-    new Date().getFullYear()
+    catalog.now().getFullYear()
   );
 }
 
@@ -95,6 +99,7 @@ export class CatalogSource {
   private readonly dataDir?: string;
   private readonly publicDir: string;
   private readonly checkIntervalMs: number;
+  private readonly now: () => Date;
 
   private current: Catalog | null = null;
   private currentMtime = 0;
@@ -105,6 +110,7 @@ export class CatalogSource {
     this.dataDir = options.dataDir;
     this.publicDir = options.publicDir;
     this.checkIntervalMs = options.checkIntervalMs ?? 30_000;
+    this.now = options.now ?? (() => new Date());
   }
 
   /** The current catalog; the first call waits for the initial load. */
@@ -199,6 +205,7 @@ export class CatalogSource {
       sectionsByCrn: indexSections(courses),
       rmp,
       termBounds,
+      now: this.now,
     };
 
     this.current = catalog;
