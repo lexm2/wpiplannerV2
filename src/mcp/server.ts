@@ -19,7 +19,11 @@ import {
   yearLabel,
   yearStatus,
 } from '../api/calendar';
-import { CourseQuerySchema, runCourseQuery } from '../api/query';
+import {
+  CourseQuerySchema,
+  FallYearSchema,
+  runCourseQuery,
+} from '../api/query';
 import { caseless } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
@@ -120,12 +124,9 @@ function failure(error: unknown, tool: string) {
   };
 }
 
-const YearInputSchema = z
-  .number()
-  .int()
-  .min(2000)
-  .max(2100)
-  .describe('Academic year by its fall year: 2026 means 2026-27.');
+const YearInputSchema = FallYearSchema.describe(
+  'Academic year by its fall year: 2026 means 2026-27.',
+);
 
 function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
   const server = new McpServer(

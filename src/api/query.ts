@@ -111,14 +111,12 @@ const TermSchema = caseless(TERMS).describe(
     'A does not match an F section.',
 );
 
-const YearSchema = z
-  .number()
-  .int()
-  .min(2000)
-  .max(2100)
-  .describe(
-    'Academic year by its fall year: 2026 means 2026-27 (fall 2026 through spring 2027).',
-  );
+/** An academic year by its fall year, within reason. */
+export const FallYearSchema = z.number().int().min(2000).max(2100);
+
+const YearSchema = FallYearSchema.describe(
+  'Academic year by its fall year: 2026 means 2026-27 (fall 2026 through spring 2027).',
+);
 
 const TimeWindowSchema = strictObject({
   day: DaySchema.describe(
@@ -140,7 +138,7 @@ const TimeWindowSchema = strictObject({
     ),
 });
 
-const RMP_BOUNDS = [
+export const RMP_BOUNDS = [
   'minRating',
   'maxRating',
   'minDifficulty',

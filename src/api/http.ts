@@ -5,7 +5,12 @@
  */
 import * as z from 'zod';
 import type { Catalog } from './catalog';
-import { CourseQuerySchema, runCourseQuery } from './query';
+import {
+  CourseQuerySchema,
+  FallYearSchema,
+  RMP_BOUNDS,
+  runCourseQuery,
+} from './query';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
 import { ApiError, echo } from './errors';
@@ -95,7 +100,7 @@ const YearParamSchema = z
   .string()
   .regex(/^\d{4}$/, 'year is a four-digit fall year, e.g. 2026')
   .transform(Number)
-  .pipe(z.number().int().min(2000).max(2100));
+  .pipe(FallYearSchema);
 const YearOrAllParamSchema = z.union([
   z
     .string()
@@ -141,13 +146,7 @@ const COURSE_PARAMS = new Set([
   'maxCredits',
   'level',
   'times',
-  'minRating',
-  'maxRating',
-  'minDifficulty',
-  'maxDifficulty',
-  'minWouldTakeAgain',
-  'maxWouldTakeAgain',
-  'minNumRatings',
+  ...RMP_BOUNDS,
   'includeWithoutData',
   'avoidCrns',
   'semesterSpansQuarters',
@@ -168,16 +167,6 @@ const COURSE_PARAMS = new Set([
   'offset',
   'limit',
 ]);
-
-const RMP_PARAMS = [
-  'minRating',
-  'maxRating',
-  'minDifficulty',
-  'maxDifficulty',
-  'minWouldTakeAgain',
-  'maxWouldTakeAgain',
-  'minNumRatings',
-] as const;
 
 /**
  * Query parameters turned into the POST body's shape, so both go through the
@@ -314,10 +303,10 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
       includeAsync: bool('includeAsync'),
     };
   }
-  if (RMP_PARAMS.some(k => params.has(k)) || params.has('includeWithoutData')) {
+  if (RMP_BOUNDS.some(k => params.has(k)) || params.has('includeWithoutData')) {
     filters.rmpRating = {
       ...Object.fromEntries(
-        RMP_PARAMS.map(k => [k, k === 'minNumRatings' ? int(k) : num(k)]),
+        RMP_BOUNDS.map(k => [k, k === 'minNumRatings' ? int(k) : num(k)]),
       ),
       includeWithoutData: bool('includeWithoutData'),
     };
