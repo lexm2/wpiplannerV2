@@ -180,9 +180,6 @@ function courseNotFound(
   );
 }
 
-/** A course title as compared: lowercase words, "&" read as "and". */
-const titleWords = (title: string) => normalName(title);
-
 /** Suggestions an unresolved course name lists. */
 const MAX_NAME_SUGGESTIONS = 3;
 
@@ -198,14 +195,14 @@ function courseByName(
   name: string,
   year: number,
 ): Course | null {
-  const want = titleWords(name);
+  const want = normalName(name);
   if (want.length < 4) return null;
   const inYear = catalog.courses.filter(c => c.academicYear === year);
-  const exact = inYear.filter(c => titleWords(c.name) === want);
+  const exact = inYear.filter(c => normalName(c.name) === want);
   const close = exact.length
     ? exact
     : inYear.filter(c => {
-        const title = titleWords(c.name);
+        const title = normalName(c.name);
         return (
           title.startsWith(`${want} `) ||
           (want.length >= 8 && editDistance(want, title, 2) <= 2)
@@ -376,8 +373,9 @@ export function lookupCourse(
 
   if (year !== undefined) {
     const status = yearStatus(catalog, year);
+    const unpublished = status.status === 'not yet published';
     // Only the year after this one can be read off this year's schedule.
-    if (year > current + 1 && status.status === 'not yet published') {
+    if (year > current + 1 && unpublished) {
       throw new ApiError(
         `Only next year (${current + 1}, ${yearLabel(current + 1)}) can be forecast, from this year's schedule; ${yearLabel(year)} is too far ahead. Call get_course with year ${current + 1}, or without a year for ${yearLabel(current)}.`,
         422,
@@ -387,11 +385,8 @@ export function lookupCourse(
     if (year < current && status.courseCount === 0) {
       throw yearNotInCatalog(catalog, year);
     }
-  }
-
-  if (year !== undefined && year > current) {
     // One of the year's early entries answers as itself, below.
-    if (isUnpublished(catalog, year) && course?.academicYear !== year) {
+    if (year > current && unpublished && course?.academicYear !== year) {
       const base = course ?? findCourse(catalog, key);
       if (!base) throw courseNotFound(catalog, key, current);
       const summary = toCourseSummary(base, catalog.rmp);
@@ -494,7 +489,7 @@ export function listDepartments(
     .sort((a, b) => a.abbr.localeCompare(b.abbr));
 }
 
-/** A department name as compared: lowercase words, "&" read as "and". */
+/** A department or course name as compared: lowercase words, "&" read as "and". */
 function normalName(name: string): string {
   return name
     .toLowerCase()
