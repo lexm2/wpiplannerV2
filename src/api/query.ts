@@ -578,48 +578,32 @@ interface Relaxation {
 type FilterId = keyof CourseQuery['filters'];
 
 /**
- * Filters given in a form that lets every course through: the full
- * credit range, every level, mode, term or offering category, an
- * availability or rating filter with no bound. Leaving one out changes
- * nothing, so an empty search never blames or reruns it.
+ * Filters given in a form that lets every course through: run alone on the
+ * year's sections, they keep every one (the full credit range, every level,
+ * mode, term or offering category, an availability or rating filter with
+ * no bound). Leaving one out changes nothing, so an empty search never
+ * blames or reruns it. Asking the filters themselves, rather than listing
+ * what "everything" means for each, keeps this true as they change: a
+ * level range of 1-9 drops a course number without digits.
  */
 function unrestrictiveFilters(
   catalog: Catalog,
   query: CourseQuery,
+  criteria: Map<string, unknown>,
 ): FilterId[] {
-  const f = query.filters;
-  const credits = catalog.courses.map(c => [c.minCredits, c.maxCredits]);
-  const noop: Partial<Record<FilterId, boolean>> = {
-    creditRange:
-      !!f.creditRange &&
-      credits.every(
-        ([lo, hi]) => lo <= f.creditRange!.max && hi >= f.creditRange!.min,
-      ),
-    graduateLevel: f.graduateLevel?.level === 'all',
-    courseLevel:
-      !!f.courseLevel &&
-      (f.courseLevel.min ?? 1) <= 1 &&
-      (f.courseLevel.max ?? 9) >= 9,
-    deliveryMode: DELIVERY_MODES.every(m => f.deliveryMode?.modes.includes(m)),
-    offeringPattern:
-      !!f.offeringPattern?.includeUnknown &&
-      ([1, 2, 3] as const).every(c =>
-        f.offeringPattern!.categories.includes(c),
-      ),
-    term: TERM_ORDER.every(t =>
-      (f.term?.terms as string[] | undefined)?.includes(t),
-    ),
-    availability:
-      !!f.availability &&
-      !f.availability.availableOnly &&
-      f.availability.minAvailable === undefined &&
-      f.availability.maxWaitlisted === undefined,
-    rmpRating:
-      !!f.rmpRating &&
-      RMP_BOUNDS.every(k => f.rmpRating![k] === undefined) &&
-      f.rmpRating.includeWithoutData !== false,
-  };
-  return (Object.keys(f) as FilterId[]).filter(id => noop[id]);
+  const always = ['academicYear', 'interestList'] as const;
+  const base = always.map(id => [id, criteria.get(id)] as const);
+  const kept = (...extra: (readonly [string, unknown])[]) =>
+    filterServiceFor(catalog, new Map([...base, ...extra])).apply(
+      catalog.courses,
+    ).length;
+  const all = kept();
+  return (Object.keys(query.filters) as FilterId[]).filter(
+    id =>
+      id !== 'academicYear' &&
+      criteria.has(id) &&
+      kept([id, criteria.get(id)]) === all,
+  );
 }
 
 /**
@@ -1257,7 +1241,9 @@ export function runCourseQuery(
     ...companionNotices(read.criteria, passed, filtered),
   ];
   const unrestrictive =
-    matches.length === 0 ? unrestrictiveFilters(catalog, query) : [];
+    matches.length === 0
+      ? unrestrictiveFilters(catalog, query, read.criteria)
+      : [];
   const relaxations =
     matches.length === 0
       ? relax(catalog, query, unrestrictive, codeSearch)

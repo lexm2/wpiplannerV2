@@ -1195,6 +1195,38 @@ describe('an empty search with many filters', () => {
   });
 });
 
+describe('a filter that looks unrestrictive', () => {
+  it('is tried when it drops a course the whole range would seem to keep', async () => {
+    // A level range of 1-9 reads as every level, but a course number
+    // without digits has no level and never passes it.
+    const { mcp } = await customEndpoints([
+      {
+        abbreviation: 'ID',
+        name: 'Interdisciplinary',
+        courses: [
+          course('ID-ISP-2026', 'Independent Study', [
+            section(70, 'A01', 'A', []),
+          ]),
+          course('ID-2050-2026', 'Seminar', [section(71, 'A01', 'A', [])]),
+        ],
+      },
+    ]);
+    const { data } = await toolOn(mcp, 'search_courses', {
+      filters: {
+        searchText: { query: 'independent study' },
+        courseLevel: { min: 1, max: 9 },
+        graduateLevel: { level: 'all' },
+      },
+    });
+    expect(data.total).toBe(0);
+    expect(data.unrestrictive).toEqual(['graduateLevel']);
+    expect(data.relaxations[0]).toMatchObject({
+      filter: 'courseLevel',
+      total: 1,
+    });
+  });
+});
+
 describe('courses lost through their labs', () => {
   const own = () =>
     customEndpoints([
