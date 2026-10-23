@@ -553,6 +553,27 @@ describe('acronyms of whole names', () => {
   });
 });
 
+describe('short forms', () => {
+  it('reads "stats" and "stat" as statistics, not static or statements', () => {
+    const statistics = course({ id: 'MA-2611', name: 'Applied Statistics I' });
+    const statistical = course({ id: 'PH-3206', name: 'Statistical Physics' });
+    const statics = course({
+      id: 'ES-2501',
+      name: 'Introduction To Static Systems',
+    });
+    const statements = course({
+      id: 'ACC-2060',
+      name: 'Financial Statements For Decision Making',
+    });
+    for (const q of ['stats', 'stat', 'Stats']) {
+      const found = [statistics, statistical, statics, statements].filter(
+        c => matchCourseText(c, parseSearchQuery(q)).all,
+      );
+      expect(found).toEqual([statistics, statistical]);
+    }
+  });
+});
+
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
     expect(parseSearchQuery('design game design GAME').words).toEqual([

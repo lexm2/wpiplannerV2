@@ -72,6 +72,16 @@ const NUMERALS = new Map([
 ]);
 const numeral = (token: string) => NUMERALS.get(token) ?? token;
 
+/**
+ * Short forms no prefix or typo rule reads right: "stats" is no prefix of
+ * "statistics", and one typo away from "static" and "statements". Mapped to
+ * the shared start of "statistics" and "statistical".
+ */
+const SHORT_FORMS = new Map([
+  ['stat', 'statistic'],
+  ['stats', 'statistic'],
+]);
+
 /** Accents as combining marks, once a string is decomposed (NFD). */
 const MARKS = /\p{M}+/gu;
 
@@ -115,7 +125,9 @@ function readCode(compact: string): ParsedQuery['code'] {
 
 /** The query's distinct words, in order, split from the cap's leftovers. */
 function queryWords(text: string): Pick<ParsedQuery, 'words' | 'ignored'> {
-  const distinct = [...new Set(tokenize(text).map(numeral))];
+  const distinct = [
+    ...new Set(tokenize(text).map(t => SHORT_FORMS.get(t) ?? numeral(t))),
+  ];
   if (distinct.length <= MAX_QUERY_WORDS) return { words: distinct };
   return {
     words: distinct.slice(0, MAX_QUERY_WORDS),
