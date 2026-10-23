@@ -14,14 +14,14 @@ import { createMcpEndpoint } from '../../src/mcp/server';
 
 export const BASE = '/wpiplannerV2';
 
-const period = (
+export const period = (
   days: string[],
   startTime: string,
   endTime: string,
   professor = 'Ada Lovelace',
 ) => ({ type: 'Lecture', professor, startTime, endTime, days });
 
-const section = (
+export const section = (
   crn: number,
   number: string,
   computedTerm: string,
@@ -44,7 +44,7 @@ const section = (
 type Lecture =
   ReturnType<typeof section> | { section: unknown; compatibleLabs: unknown[] };
 
-const course = (
+export const course = (
   id: string,
   name: string,
   lectures: Lecture[],
@@ -418,7 +418,15 @@ export async function rpcOn(
 }
 
 export async function tool(name: string, args: unknown, today = BEFORE_A) {
-  const result = await rpcOn(endpoints(today).mcp, 'tools/call', {
+  return toolOn(endpoints(today).mcp, name, args);
+}
+
+export async function toolOn(
+  mcp: ReturnType<typeof createMcpEndpoint>,
+  name: string,
+  args: unknown,
+) {
+  const result = await rpcOn(mcp, 'tools/call', {
     name,
     arguments: args,
   });
@@ -428,6 +436,34 @@ export async function tool(name: string, args: unknown, today = BEFORE_A) {
     data: result.structuredContent,
   };
 }
+
+/**
+ * The API and MCP endpoint over a catalog of the test's own (`departments`
+ * in the course data's shape), with the fixture's term bounds and ratings:
+ * for cases the shared fixture would have to grow for.
+ */
+export async function customEndpoints(
+  departments: unknown[],
+  today = BEFORE_A,
+) {
+  const own = await mkdtemp(join(tmpdir(), 'course-api-own-'));
+  extraDirs.push(own);
+  await write(own, 'course-data-constructed.json', { departments });
+  await write(own, 'term-bounds.json', TERM_BOUNDS);
+  await write(own, 'rateMyProfessor.json', RMP);
+  await write(own, 'last-updated.json', { timestamp: '2026-09-02T00:00:00Z' });
+  const source = new CatalogSource({ publicDir: own, now: () => today });
+  return {
+    api: createApiHandler({ basePath: BASE, getCatalog: () => source.get() }),
+    mcp: createMcpEndpoint(() => source.get()),
+  };
+}
+
+const extraDirs: string[] = [];
+
+afterAll(async () => {
+  for (const d of extraDirs) await rm(d, { recursive: true, force: true });
+});
 
 export const codes = (body: { courses: { id: string }[] }) =>
   body.courses.map(c => c.id);

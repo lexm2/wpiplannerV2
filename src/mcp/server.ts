@@ -208,15 +208,21 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
           dataAsOf: catalog.lastUpdated,
           dataAgeDays: seatDataAge(catalog),
         };
+        const dates = termDates(catalog, year);
         return {
           content: text(
             renderCourse(detail, found.notices, {
               ...seatData,
-              termDates: termDates(catalog, year),
+              termDates: dates,
               today: today(catalog),
             }),
           ),
-          structuredContent: courseDigest(detail, found.notices, seatData),
+          structuredContent: courseDigest(
+            detail,
+            found.notices,
+            seatData,
+            dates,
+          ),
         };
       } catch (error) {
         return failure(error);

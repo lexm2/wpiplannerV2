@@ -126,6 +126,16 @@ export function blockedSlotsForCrns(
   return { slots, otherYear };
 }
 
+/**
+ * Whether two sections' own date ranges share a day. Most run their whole
+ * term, but some run half of it (BB 3813 BX01 to Nov 12, BX02 from Nov 16)
+ * or half a semester. Unknown dates are taken to meet.
+ */
+function datesMeet(a: Section, b: Section): boolean {
+  if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return true;
+  return a.startDate <= b.endDate && b.startDate <= a.endDate;
+}
+
 /** The academic year a CRN's section belongs to. */
 const yearOf = (catalog: Catalog, entry: CrnEntry) =>
   entry.courses[0].academicYear ?? currentAcademicYear(catalog);
@@ -303,8 +313,10 @@ export function findConflicts(
     const [crnA, a] = entries[i];
     for (let j = i + 1; j < entries.length; j++) {
       const [crnB, b] = entries[j];
-      // Another year's B term is not this one's: never a clash.
+      // Another year's B term is not this one's, and a lab run in the
+      // first half of B never meets one run in the second: never a clash.
       if (yearOf(catalog, a) !== yearOf(catalog, b)) continue;
+      if (!datesMeet(a.section, b.section)) continue;
       const kept = filter.apply([a.filterable], {
         avoidConflicts: true,
         blockedSlots: sectionToWeeklySlots(b.section),

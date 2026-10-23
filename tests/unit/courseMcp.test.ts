@@ -4,7 +4,18 @@
  * tests.
  */
 import { describe, expect, it } from 'vitest';
-import { AFTER_A, BEFORE_A, endpoints, rpcOn, tool } from './courseApiFixture';
+import {
+  AFTER_A,
+  BEFORE_A,
+  course,
+  customEndpoints,
+  endpoints,
+  period,
+  rpcOn,
+  section,
+  tool,
+  toolOn,
+} from './courseApiFixture';
 
 describe('MCP server', () => {
   it('lists the tools', async () => {
@@ -694,5 +705,76 @@ describe('early entries of an unpublished year', () => {
     expect(text).toContain(
       '; seats in 2026-27 only, the year that can be scheduled:',
     );
+  });
+});
+
+describe('sections off their term dates', () => {
+  const lab = (crn: number, number: string, start: string, end: string) =>
+    section(crn, number, 'B', [period(['T', 'F'], '14:00', '16:50')], 5, {
+      seats: 5,
+      startDate: start,
+      endDate: end,
+    });
+  const own = () =>
+    customEndpoints([
+      {
+        abbreviation: 'BB',
+        name: 'Biology and Biotechnology',
+        courses: [
+          // Two runs of one half-unit lab, in each half of B term.
+          course('BB-3813-2026', 'Cell Culture Laboratory', [], {
+            standaloneLabs: [
+              lab(50, 'BX01', '2026-02-01', '2026-02-10'),
+              lab(51, 'BX02', '2026-02-11', '2026-02-20'),
+            ],
+          }),
+          // The first half of the F semester only (F runs Jan 1 to Feb 20).
+          course('BB-504-2026', 'Biomanufacturing', [
+            section(52, 'F01', 'F', [period(['M'], '09:00', '09:50')], 10, {
+              startDate: '2026-01-01',
+              endDate: '2026-01-30',
+            }),
+          ]),
+          course('BB-505-2026', 'Bioprocessing', [
+            section(53, 'B01', 'B', [period(['M'], '09:00', '09:50')], 10, {
+              startDate: '2026-02-01',
+              endDate: '2026-02-20',
+            }),
+          ]),
+        ],
+      },
+    ]);
+
+  it('shows a section its own dates when they are not its term', async () => {
+    const { mcp } = await own();
+    const course = await toolOn(mcp, 'get_course', { course: 'BB 504' });
+    expect(course.text).toContain(
+      'F01 CRN 52 | runs 2026-01-01 to 2026-01-30 | M 09:00-09:50',
+    );
+    expect(course.data.sections[0]).toMatchObject({
+      startDate: '2026-01-01',
+      endDate: '2026-01-30',
+    });
+    const whole = await toolOn(mcp, 'get_course', { course: 'BB 505' });
+    expect(whole.text).not.toContain('runs 2026');
+    expect(whole.data.sections[0].startDate).toBeUndefined();
+    const search = await toolOn(mcp, 'search_courses', {
+      filters: { department: { departments: ['BB'] } },
+      includeSections: true,
+    });
+    expect(search.text).toContain(
+      'BX01 CRN 50 B | runs 2026-02-01 to 2026-02-10 | TF 14:00-16:50',
+    );
+  });
+
+  it('finds no clash between sections whose dates never meet', async () => {
+    const { mcp } = await own();
+    const labs = await toolOn(mcp, 'check_conflicts', { crns: [50, 51] });
+    expect(labs.text).not.toContain('CONFLICT');
+    // Still two runs of one lab: take one.
+    expect(labs.text).toContain('PROBLEM: 2 BB 3813 labs chosen');
+    const halves = await toolOn(mcp, 'check_conflicts', { crns: [52, 53] });
+    expect(halves.text).not.toContain('CONFLICT');
+    expect(halves.data.conflicts).toEqual([]);
   });
 });

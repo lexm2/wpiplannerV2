@@ -17,7 +17,7 @@ import type { CoursePlan, catalogMeta } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
-import { isUncapped, SOLID_RATINGS } from '../api/serialize';
+import { isUncapped, ownDates, SOLID_RATINGS } from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;
@@ -132,9 +132,14 @@ function exceptions(s: { status: string; deliveryMode: string }): string[] {
   return parts;
 }
 
+/** "runs 2026-08-20 to 2026-11-06", for a section off its term's dates. */
+const runs = (dates: DateSpan | undefined) =>
+  dates ? `runs ${dates.start} to ${dates.end}` : '';
+
 function briefLine(s: SectionBrief, withTerm: boolean): string {
   return [
     `${s.number} CRN ${s.crn}${withTerm ? ` ${s.term}` : ''}`,
+    runs(s.dates),
     s.meets,
     s.location,
     s.instructors.map(i => instructor(i, true)).join('; '),
@@ -283,7 +288,7 @@ type Companion = NonNullable<CourseRow['companions']>[number];
 const COMPANION_EXAMPLES = 2;
 
 const companionText = (s: Companion) =>
-  `${s.number} CRN ${s.crn} ${s.meets} (${seats(s)})`;
+  `${s.number} CRN ${s.crn}${s.dates ? ` (${runs(s.dates)})` : ''} ${s.meets} (${seats(s)})`;
 
 /** "+ discussion CD01 CRN 1 W 10:00-10:50 (15/60 open)", or a count and examples. */
 function companionLine(
@@ -479,9 +484,16 @@ interface SectionDigest {
   status: string;
   deliveryMode: string;
   meetsWith: string[];
+  /** Only when the section starts or ends apart from its term. */
+  startDate?: string;
+  endDate?: string;
 }
 
-function digestSection(s: SectionView): SectionDigest {
+function digestSection(
+  s: SectionView,
+  term: DateSpan | undefined,
+): SectionDigest {
+  const dates = ownDates(s, term);
   const meets = [
     ...new Set(
       s.periods.map(p =>
@@ -513,16 +525,18 @@ function digestSection(s: SectionView): SectionDigest {
     status: s.status,
     deliveryMode: s.deliveryMode,
     meetsWith: s.meetsWith,
+    ...(dates && { startDate: dates.start, endDate: dates.end }),
   };
 }
 
-function viewLine(s: SectionView): string {
-  const d = digestSection(s);
+function viewLine(s: SectionView, term: DateSpan | undefined): string {
+  const d = digestSection(s, term);
   const people = new Map<string, InstructorView>();
   for (const p of s.periods)
     for (const i of p.instructors) people.set(i.name, i);
   return [
     `${d.number} CRN ${d.crn}`,
+    runs(ownDates(s, term)),
     d.meets,
     d.location,
     [...people.values()].map(i => instructor(i, true)).join('; '),
@@ -544,6 +558,7 @@ export function courseDigest(
   d: CourseDetail,
   notices: string[],
   { dataAsOf, dataAgeDays }: SeatData,
+  termDates: Partial<Record<TermLetter, DateSpan>> | null,
 ) {
   return {
     id: d.id,
@@ -570,7 +585,9 @@ export function courseDigest(
     notices,
     // Fields left out at their common value, as the text leaves them out.
     sectionDefaults: SECTION_DEFAULTS,
-    sections: d.sections.map(s => withoutDefaults(digestSection(s))),
+    sections: d.sections.map(s =>
+      withoutDefaults(digestSection(s, termDates?.[s.term as TermLetter])),
+    ),
   };
 }
 
@@ -658,7 +675,7 @@ function termBlock(
     );
     ofKind.forEach((s, i) => {
       const note = companion && !shared ? ` | ${notes[i]}` : '';
-      lines.push(`  ${viewLine(s)}${note}`);
+      lines.push(`  ${viewLine(s, dates)}${note}`);
     });
   }
   return lines;

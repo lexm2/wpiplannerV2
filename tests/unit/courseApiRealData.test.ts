@@ -9,6 +9,7 @@ import { CatalogSource, type Catalog } from '../../src/api/catalog';
 import { CourseQuerySchema, runCourseQuery } from '../../src/api/query';
 import { createMcpEndpoint } from '../../src/mcp/server';
 import { resolveDepartments } from '../../src/api/lookup';
+import { findConflicts } from '../../src/api/conflicts';
 import type { ApiError } from '../../src/api/errors';
 
 const source = new CatalogSource({
@@ -284,5 +285,47 @@ describe('alternating years on the real catalog', () => {
         `${c.departmentAbbr} ${c.number}`,
       ).toBeTruthy();
     }
+  });
+});
+
+describe('section dates on the real catalog', () => {
+  it('never calls sections whose dates do not meet a conflict', () => {
+    // BB 3813's half-term labs: BX01 to Nov 12, BX02 from Nov 16, same
+    // days and times.
+    const pairs: [number, number][] = [];
+    for (const course of catalog.courses) {
+      const sections = (course.standaloneLabs ?? []).filter(s => s.startDate);
+      for (const a of sections) {
+        for (const b of sections) {
+          if (a.crn < b.crn && a.computedTerm === b.computedTerm) {
+            if (a.endDate < b.startDate || b.endDate < a.startDate) {
+              pairs.push([a.crn, b.crn]);
+            }
+          }
+        }
+      }
+    }
+    expect(pairs.length).toBeGreaterThan(0);
+    for (const crns of pairs) {
+      expect(findConflicts(catalog, crns).conflicts, String(crns)).toEqual([]);
+    }
+  });
+
+  it("prints a half-semester section's own dates", async () => {
+    const section = [...catalog.sectionsByCrn.values()].find(
+      e =>
+        e.section.computedTerm === 'F' &&
+        e.courses[0].academicYear === 2026 &&
+        e.section.endDate &&
+        e.section.endDate < '2026-12-01',
+    );
+    expect(section).toBeDefined();
+    const course = section!.courses[0];
+    const text = await toolText('get_course', {
+      course: `${course.departmentAbbr} ${course.number}`,
+    });
+    expect(text).toContain(
+      `CRN ${section!.section.crn} | runs ${section!.section.startDate} to ${section!.section.endDate}`,
+    );
   });
 });

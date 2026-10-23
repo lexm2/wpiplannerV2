@@ -12,6 +12,7 @@ import { TimeUtils } from '../utils/timeUtils';
 import { timedPeriods } from '../utils/timeWindows';
 import type { RateMyProfessorService } from '../services/external/RateMyProfessorService';
 import type { Forecast } from './forecast';
+import type { DateSpan } from './calendar';
 
 const MAX_SUMMARY_PROFESSORS = 4;
 const DAY_ORDER = Object.values(DayOfWeek);
@@ -118,6 +119,11 @@ export interface SectionBrief {
   status: string;
   /** "In-Person", "Online" or "Hybrid". */
   deliveryMode: string;
+  /**
+   * The section's own first and last day (YYYY-MM-DD), only when they are
+   * not its term's: a half-semester F section, a lab run in half a term.
+   */
+  dates?: DateSpan;
 }
 
 interface PeriodView {
@@ -431,11 +437,28 @@ function instructorsOf(
   return professorsOf([section]).map(name => ({ name, rmp: ratingOf(name) }));
 }
 
+/**
+ * The section's own dates when it starts or ends apart from `term` (the
+ * dates of its term); undefined when they agree or are not known.
+ */
+export function ownDates(
+  section: Pick<Section, 'startDate' | 'endDate'>,
+  term: DateSpan | undefined,
+): DateSpan | undefined {
+  if (!term || !section.startDate || !section.endDate) return undefined;
+  if (section.startDate === term.start && section.endDate === term.end) {
+    return undefined;
+  }
+  return { start: section.startDate, end: section.endDate };
+}
+
 export function toSectionBrief(
   section: Section,
   kind: SectionKind,
   rmp: RateMyProfessorService,
+  term?: DateSpan,
 ): SectionBrief {
+  const dates = ownDates(section, term);
   return {
     crn: section.crn,
     number: section.number,
@@ -449,6 +472,7 @@ export function toSectionBrief(
     waitlist: section.actualWaitlist,
     status: section.status,
     deliveryMode: section.deliveryMode,
+    ...(dates && { dates }),
   };
 }
 

@@ -1016,6 +1016,10 @@ const SECTION_LIST_FILTERS = new Set([
   'academicYear',
 ]);
 
+/** The term dates of the course's year, for sections that keep their own. */
+const datesOf = (catalog: Catalog, course: Course) =>
+  termDates(catalog, course.academicYear ?? currentAcademicYear(catalog));
+
 function rowSections(course: Course, catalog: Catalog): SectionBrief[] {
   const lectures = course.lectures?.length
     ? course.lectures.map(g => ({ s: g.section, kind: 'lecture' as const }))
@@ -1023,7 +1027,10 @@ function rowSections(course: Course, catalog: Catalog): SectionBrief[] {
         s,
         kind: 'standaloneLab' as const,
       }));
-  return lectures.map(({ s, kind }) => toSectionBrief(s, kind, catalog.rmp));
+  const dates = datesOf(catalog, course);
+  return lectures.map(({ s, kind }) =>
+    toSectionBrief(s, kind, catalog.rmp, dates?.[s.computedTerm as TermLetter]),
+  );
 }
 
 /**
@@ -1032,6 +1039,7 @@ function rowSections(course: Course, catalog: Catalog): SectionBrief[] {
  * its lecture groups hold only those.
  */
 function rowCompanions(course: Course, catalog: Catalog): CompanionBrief[] {
+  const dates = datesOf(catalog, course);
   const byCrn = new Map<number, CompanionBrief>();
   for (const group of course.lectures ?? []) {
     const companions = [
@@ -1044,7 +1052,15 @@ function rowCompanions(course: Course, catalog: Catalog): CompanionBrief[] {
     for (const { s, kind } of companions) {
       let brief = byCrn.get(s.crn);
       if (!brief) {
-        brief = { ...toSectionBrief(s, kind, catalog.rmp), pairsWith: [] };
+        brief = {
+          ...toSectionBrief(
+            s,
+            kind,
+            catalog.rmp,
+            dates?.[s.computedTerm as TermLetter],
+          ),
+          pairsWith: [],
+        };
         byCrn.set(s.crn, brief);
       }
       brief.pairsWith.push(group.section.crn);
