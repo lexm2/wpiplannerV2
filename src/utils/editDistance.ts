@@ -4,6 +4,10 @@
  * typo there is.
  */
 
+// editDistance's rows, kept between calls and grown to the longest `b` yet:
+// search measures a query word against every word of the catalog.
+let rows: [number[], number[], number[]] = [[], [], []];
+
 /**
  * The fewest single-character insertions, deletions, substitutions and
  * adjacent swaps that turn `a` into `b`, or into a prefix of `b` when
@@ -22,10 +26,14 @@ export function editDistance(
   const n = b.length;
   if (!prefix && Math.abs(m - n) > limit) return limit + 1;
 
-  // Rows i-2, i-1 and i of the DP table over a[0..i) by b[0..j).
-  let before = new Array<number>(n + 1).fill(0);
-  let previous = Array.from({ length: n + 1 }, (_, j) => j);
-  let row = new Array<number>(n + 1).fill(0);
+  // Rows i-2, i-1 and i of the DP table over a[0..i) by b[0..j). Only the
+  // first n + 1 cells of each are read, and each before it is written.
+  if (rows[0].length < n + 1) {
+    const fresh = () => new Array<number>(n + 1).fill(0);
+    rows = [fresh(), fresh(), fresh()];
+  }
+  let [before, previous, row] = rows;
+  for (let j = 0; j <= n; j++) previous[j] = j;
 
   for (let i = 1; i <= m; i++) {
     row[0] = i;
@@ -40,11 +48,17 @@ export function editDistance(
       if (d < rowMin) rowMin = d;
     }
     if (rowMin > limit) return limit + 1;
-    [before, previous, row] = [previous, row, before];
+    const done = before;
+    before = previous;
+    previous = row;
+    row = done;
   }
 
   // `previous` now holds the last row: all of `a` against b[0..j).
-  const result = prefix ? Math.min(...previous) : previous[n];
+  let result = previous[n];
+  if (prefix) {
+    for (let j = 0; j < n; j++) result = Math.min(result, previous[j]);
+  }
   return Math.min(result, limit + 1);
 }
 /**

@@ -5,12 +5,14 @@ import type { Course, Section } from '../../../types/types';
 import { keepMatchingGroups } from '../lectureGroupScope';
 import {
   foldText,
+  foldWords,
   matchCourseWords,
   parseSearchQuery,
   namesHaveWord,
   prepareSearch,
   textHasWord,
   type CourseWordMatch,
+  type FoldedText,
 } from '../../../utils/searchUtils';
 
 /** The section's own searchable text: number, instructors, type. */
@@ -34,6 +36,34 @@ function placeText(section: Section): { buildings: string; all: string } {
   );
   const buildings = places.map(place => place.split(/\s+\S*\d/)[0]);
   return { buildings: buildings.join(' '), all: places.join(' ') };
+}
+
+/** A section's text as the filter reads it, folded and split into words. */
+interface SectionWords {
+  own: FoldedText;
+  buildings: FoldedText;
+  places: FoldedText;
+  instructors: FoldedText;
+}
+
+// Built once per Section. Sections, like the courses holding them, are never
+// mutated, and filtered course copies share their catalog course's.
+const wordsCache = new WeakMap<Section, SectionWords>();
+
+function sectionWords(section: Section): SectionWords {
+  let words = wordsCache.get(section);
+  if (words) return words;
+  const place = placeText(section);
+  words = {
+    own: foldWords(sectionText(section)),
+    buildings: foldWords(place.buildings),
+    places: foldWords(place.all),
+    instructors: foldWords(
+      section.periods.map(p => foldText(p.professor)).join(' '),
+    ),
+  };
+  wordsCache.set(section, words);
+  return words;
 }
 
 /** Words naming a kind of place, not one: no sign a query is about rooms. */
@@ -61,17 +91,17 @@ export class SearchTextFilter implements SectionBasedFilter {
   ): FilterableSection[] {
     if (!criteria.query?.trim()) return sections;
     // Before the query is read: a code like "CS2" needs the departments.
-    prepareSearch(new Set(sections.map(fs => fs.course)));
+    // CourseDataService has read the catalog's courses already; this reads
+    // any it has not.
+    prepareSearch(sections.map(fs => fs.course));
     const query = parseSearchQuery(criteria.query);
 
     // A match anywhere in a lecture group keeps the whole group: searching
     // a lecturer's name has to bring their lecture's labs along with it.
     if (criteria.professorOnly) {
       return keepMatchingGroups(sections, fs => {
-        const names = fs.section.periods
-          .map(p => foldText(p.professor))
-          .join(' ');
-        return query.words.every(word => namesHaveWord(names, word));
+        const { instructors } = sectionWords(fs.section);
+        return query.words.every(word => namesHaveWord(instructors, word));
       });
     }
 
@@ -93,14 +123,12 @@ export class SearchTextFilter implements SectionBasedFilter {
       if (query.code) return false;
       // Each word from the section or the course; the section's short text
       // first, so the course's words are read only when it lacks them.
-      const own = sectionText(fs.section);
-      const place = placeText(fs.section);
+      const { own, buildings, places } = sectionWords(fs.section);
       const namesBuilding = query.words.some(
-        word => !PLACE_WORDS.has(word) && textHasWord(place.buildings, word),
+        word => !PLACE_WORDS.has(word) && textHasWord(buildings, word),
       );
       const ownHas = (word: string) =>
-        textHasWord(own, word) ||
-        (namesBuilding && textHasWord(place.all, word));
+        textHasWord(own, word) || (namesBuilding && textHasWord(places, word));
       return query.words.every((word, i) => ownHas(word) || course.word(i));
     });
   }

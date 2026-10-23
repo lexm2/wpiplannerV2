@@ -10,7 +10,7 @@ import { findCatalogCourse } from '../services/degree/catalogLookup';
 import { getAllSections } from '../utils/courseUtils';
 import { closestMatches, editDistance } from '../utils/editDistance';
 import {
-  matchCourseText,
+  matchCourseWords,
   parseSearchQuery,
   rankCoursesByRelevance,
 } from '../utils/searchUtils';
@@ -218,7 +218,7 @@ function courseByName(
   const ranked = rankCoursesByRelevance(
     classes.length
       ? classes
-      : inYear.filter(c => matchCourseText(c, query).all),
+      : inYear.filter(c => matchCourseWords(c, query).all),
     name,
   ).slice(0, MAX_NAME_SUGGESTIONS);
   if (!ranked.length) return null;
