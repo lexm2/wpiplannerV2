@@ -195,14 +195,17 @@ describe('RateMyProfessorService.getRatings', () => {
     expect(service.getRatings('Laura Susanin')).toBeNull();
   });
 
-  it("keeps RMP's -1 retake share and a missing one as null", async () => {
+  it("reads RMP's -1 retake share, like a missing one, as no data", async () => {
     const service = await serviceWith([
       { ...prof('Amy', 'Curran'), wouldTakeAgainPercent: -1 },
       prof('Laura', 'Susanin'),
+      { ...prof('Ada', 'Lovelace'), wouldTakeAgainPercent: 0 },
     ]);
-    expect(service.getRatings('Amy Curran')?.wouldTakeAgain).toBe(-1);
-    expect(service.getRatingDisplay('Amy Curran')?.wouldTakeAgain).toBe('-1%');
+    expect(service.getRatings('Amy Curran')?.wouldTakeAgain).toBeNull();
+    expect(service.getRatingDisplay('Amy Curran')?.wouldTakeAgain).toBeNull();
     expect(service.getRatings('Laura Susanin')?.wouldTakeAgain).toBeNull();
+    // Nobody would take again is data.
+    expect(service.getRatings('Ada Lovelace')?.wouldTakeAgain).toBe(0);
   });
 });
 
@@ -252,18 +255,31 @@ describe('RMPRatingFilter', () => {
     expect(filter.apply([section], { minRating: 4 })).toEqual([section]);
   });
 
-  it('ignores a missing retake share but filters on -1', async () => {
+  it('skips a retake bound for a missing or -1 share, min and max alike', async () => {
     const service = await serviceWith([
       prof('Laura', 'Susanin'),
       { ...prof('Amy', 'Curran'), wouldTakeAgainPercent: -1 },
+      { ...prof('Ada', 'Lovelace'), wouldTakeAgainPercent: 20 },
     ]);
     const filter = new RMPRatingFilter(service);
     const missing = sectionTaughtBy('Laura Susanin');
     const negative = sectionTaughtBy('Amy Curran');
+    const low = sectionTaughtBy('Ada Lovelace');
+    const all = [missing, negative, low];
 
+    expect(filter.apply(all, { minWouldTakeAgain: 50 })).toEqual([
+      missing,
+      negative,
+    ]);
+    expect(filter.apply(all, { minWouldTakeAgain: 10 })).toEqual(all);
+    expect(filter.apply(all, { maxWouldTakeAgain: 10 })).toEqual([
+      missing,
+      negative,
+    ]);
+    // The other bounds still apply to them.
     expect(
-      filter.apply([missing, negative], { minWouldTakeAgain: 50 }),
-    ).toEqual([missing]);
+      filter.apply(all, { minWouldTakeAgain: 10, minRating: 4.5 }),
+    ).toEqual([]);
   });
 
   it('treats a professor with no ratings as having no data', async () => {

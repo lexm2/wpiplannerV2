@@ -233,8 +233,9 @@ export class RateMyProfessorService {
   /**
    * The matched professor's ratings as numbers, at the precision
    * getRatingDisplay shows: rating and difficulty to one decimal, the retake
-   * share to a whole percent (RMP's -1 for "not enough data" stays -1). Null
-   * when there is no match or the professor has no ratings.
+   * share to a whole percent, null when RMP has none (it reports -1 when too
+   * few raters answered). Null when there is no match or the professor has
+   * no ratings.
    */
   getRatings(professorName: string): {
     rating: number;
@@ -251,7 +252,8 @@ export class RateMyProfessorService {
       difficulty: Number(professor.avgDifficulty.toFixed(1)),
       numRatings: professor.numRatings,
       wouldTakeAgain:
-        professor.wouldTakeAgainPercent !== null
+        professor.wouldTakeAgainPercent !== null &&
+        professor.wouldTakeAgainPercent >= 0
           ? Math.round(professor.wouldTakeAgainPercent)
           : null,
     };
