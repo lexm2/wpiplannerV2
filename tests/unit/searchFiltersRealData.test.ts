@@ -4,6 +4,7 @@
  * catalog and ratings rather than of one refresh.
  */
 import { beforeAll, describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CatalogSource, type Catalog } from '../../src/api/catalog';
 import { CourseQuerySchema, runCourseQuery } from '../../src/api/query';
@@ -11,10 +12,12 @@ import { RMPRatingFilter } from '../../src/core/filtering/filters/RMPRatingFilte
 import type { RMPRatingFilterCriteria } from '../../src/types/filters';
 import type { FilterableSection } from '../../src/types/filterableUnit';
 import { SectionType } from '../../src/types/types';
+import type { Professor } from '../../src/types/rateMyProfessor';
+import { getAllSections } from '../../src/utils/courseUtils';
+import { foldText } from '../../src/utils/searchUtils';
 
-const source = new CatalogSource({
-  publicDir: join(import.meta.dirname, '../../public'),
-});
+const publicDir = join(import.meta.dirname, '../../public');
+const source = new CatalogSource({ publicDir });
 let catalog: Catalog;
 
 beforeAll(async () => {
@@ -40,10 +43,18 @@ describe('search on the real catalog', () => {
   it('finds accented instructors typed without accents', () => {
     const professorOnly = (query: string) =>
       run({ searchText: { query, professorOnly: true } }).total;
-    expect(professorOnly('Neel')).toBe(professorOnly('Néel'));
-    expect(professorOnly('Neel')).toBeGreaterThan(0);
-    expect(professorOnly('San Martin')).toBe(professorOnly('San Martín'));
-    expect(professorOnly('San Martin')).toBeGreaterThan(0);
+    const accented = new Set(
+      catalog.courses.flatMap(c =>
+        getAllSections(c).flatMap(sec =>
+          sec.periods.flatMap(p => p.professor.split(/\s*;\s*/)),
+        ),
+      ),
+    );
+    for (const name of [...accented].filter(n => /[^\p{ASCII}]/u.test(n))) {
+      const plain = foldText(name);
+      expect(professorOnly(plain), name).toBe(professorOnly(name));
+      expect(professorOnly(plain), name).toBeGreaterThan(0);
+    }
   });
 
   it('answers a query of thousands of words quickly', () => {
@@ -122,9 +133,22 @@ describe('times on the real catalog', () => {
 
 describe('ratings on the real catalog', () => {
   it('rates a professor listed twice by the profile with most ratings', () => {
-    expect(catalog.rmp.getRatings('Richard Quimby')?.numRatings).toBe(52);
-    expect(catalog.rmp.getRatings('Makhlouf Makhlouf')?.numRatings).toBe(67);
-    expect(catalog.rmp.getRatings('Aarti Madan')?.numRatings).toBe(18);
+    const { professors } = JSON.parse(
+      readFileSync(join(publicDir, 'rateMyProfessor.json'), 'utf8'),
+    ) as { professors: Professor[] };
+    const byName = new Map<string, Professor[]>();
+    for (const p of professors) {
+      const name = foldText(`${p.firstName} ${p.lastName}`).replace(
+        /\s+/g,
+        ' ',
+      );
+      byName.set(name, [...(byName.get(name) ?? []), p]);
+    }
+    const twice = [...byName].filter(([, ps]) => ps.length > 1);
+    for (const [name, ps] of twice) {
+      const most = Math.max(...ps.map(p => p.numRatings));
+      expect(catalog.rmp.getRatings(name)?.numRatings ?? 0, name).toBe(most);
+    }
   });
 
   it('reads an unknown would-take-again share as no data', () => {
