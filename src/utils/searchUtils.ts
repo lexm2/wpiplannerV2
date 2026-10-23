@@ -299,7 +299,24 @@ interface CourseText {
 // refresh builds new ones), so entries cannot go stale.
 const textCache = new WeakMap<Course, CourseText>();
 
-function courseText(course: Course): CourseText {
+/**
+ * Filtered copies of catalog courses to the course each copies. A copy
+ * differs only in its sections, and course text reads none of them, so it
+ * shares the original's entry in the text cache.
+ */
+const originals = new WeakMap<Course, Course>();
+
+/**
+ * Records `copy` as `original` with some of its sections left out (see
+ * SectionFilterPipeline.reconstructCourses), so search reads the text it
+ * already built for the original rather than building it again.
+ */
+export function noteCourseCopy(copy: Course, original: Course): void {
+  originals.set(copy, originals.get(original) ?? original);
+}
+
+function courseText(given: Course): CourseText {
+  const course = originals.get(given) ?? given;
   let text = textCache.get(course);
   if (text) return text;
 

@@ -2,6 +2,7 @@ import type { Course, Section, LectureGroup } from '../../types/types';
 import { SectionType } from '../../types/types';
 import type { FilterableSection } from '../../types/filterableUnit';
 import { FilterPriorityQueue } from './FilterPriorityQueue';
+import { noteCourseCopy } from '../../utils/searchUtils';
 
 export interface SectionBasedFilter {
   readonly id: string;
@@ -211,14 +212,16 @@ export class SectionFilterPipeline {
         compatibleLabs: lg.labs,
       }));
 
-      reconstructedCourses.push({
+      const copy: Course = {
         ...courseData.course,
         lectures: lectures.length > 0 ? lectures : undefined,
         standaloneLabs:
           courseData.standaloneLabs.length > 0
             ? courseData.standaloneLabs
             : undefined,
-      });
+      };
+      noteCourseCopy(copy, courseData.course);
+      reconstructedCourses.push(copy);
     }
 
     return reconstructedCourses;
