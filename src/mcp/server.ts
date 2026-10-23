@@ -23,6 +23,7 @@ import { CourseQuerySchema, runCourseQuery, TERMS } from '../api/query';
 import { caseless } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
+import { plural } from '../api/text';
 import { logger } from '../utils/logger';
 import {
   catalogMeta,
@@ -279,7 +280,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
           lines.push(`Departments with courses in ${yearLabel(y)}:`);
           if (status.status === 'not yet published') {
             lines.push(
-              `${yearLabel(y)} is not published yet; these are only early entries (${status.courseCount} course${status.courseCount === 1 ? '' : 's'}).`,
+              `${yearLabel(y)} is not published yet; these are only early entries (${plural(status.courseCount, 'course')}).`,
             );
           }
         }

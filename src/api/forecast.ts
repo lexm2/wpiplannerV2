@@ -7,6 +7,7 @@
 import type { Course } from '../types/types';
 import { alternatesInto } from '../utils/alternatingYears';
 import { yearLabel } from './calendar';
+import { andList } from './text';
 
 type Outlook = 'likely' | 'possible' | 'unlikely' | 'uncertain' | 'unknown';
 
@@ -44,11 +45,6 @@ const PATTERN: Record<1 | 2 | 3, { outlook: Outlook; lead: string }> = {
     lead: 'Uncertain for {year} (Cat. III: offered occasionally or on demand).',
   },
 };
-
-function listTerms(terms: string[]): string {
-  if (terms.length <= 1) return terms.join('');
-  return `${terms.slice(0, -1).join(', ')} and ${terms.at(-1)}`;
-}
 
 /**
  * What the description's alternating-years statement says of `year`, when
@@ -120,7 +116,7 @@ export function forecastCourse(
   }
 
   const ran = runsInBase
-    ? `in ${base} it runs in ${listTerms(termsInBaseYear)}`
+    ? `in ${base} it runs in ${andList(termsInBaseYear)}`
     : `it has no sections in ${base}`;
   const alternating = course.alternatingYears
     ? {

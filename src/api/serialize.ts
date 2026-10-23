@@ -44,6 +44,9 @@ const UNCAPPED_SEATS = 999;
 /** A section without a real seat cap; see UNCAPPED_SEATS. */
 export const isUncapped = (s: { seats: number }) => s.seats >= UNCAPPED_SEATS;
 
+/** At or below this many open seats, a count from the last refresh may be gone. */
+export const LOW_SEATS = 3;
+
 export interface SeatTotals {
   /** Over the capped sections only. */
   capacity: number;

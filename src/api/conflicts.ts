@@ -26,7 +26,8 @@ import {
 } from './calendar';
 import { ApiError, listSome, withoutControls } from './errors';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
-import { courseCode, isUncapped } from './serialize';
+import { courseCode, isUncapped, LOW_SEATS } from './serialize';
+import { listFirst, one, plural } from './text';
 import { DaySchema } from './schemaHints';
 
 /** CRNs a schedule check, or a search fitted around CRNs, takes at most. */
@@ -82,7 +83,7 @@ export type BusyBlock = z.infer<typeof BusyBlockSchema>;
 class UnknownCrnError extends ApiError {
   constructor(readonly crns: number[]) {
     super(
-      `Unknown CRN${crns.length === 1 ? '' : 's'}: ${listSome(crns)}. Get CRNs from get_course or search_courses.`,
+      `Unknown ${one(crns.length, 'CRN', 'CRNs')}: ${listSome(crns)}. Get CRNs from get_course or search_courses.`,
       400,
       { unknownCrns: crns },
     );
@@ -384,18 +385,12 @@ export function findConflicts(
   };
 }
 
-/** At or below this many open seats, the count may be gone by now. */
-const LOW_SEATS = 3;
 /** Sections named in a message before "+N more". */
 const MAX_NAMED = 4;
 
 const named = (s: Section) => `${s.number} (CRN ${s.crn})`;
 
-function list(sections: Section[]): string {
-  const shown = sections.slice(0, MAX_NAMED).map(named).join(', ');
-  const more = sections.length - MAX_NAMED;
-  return more > 0 ? `${shown} +${more} more` : shown;
-}
+const list = (sections: Section[]) => listFirst(sections.map(named), MAX_NAMED);
 
 const KIND_NAME: Partial<Record<SectionType, string>> = {
   [SectionType.LAB]: 'lab',
@@ -465,7 +460,7 @@ function pairingIssues(
           severity: 'warning',
           kind: 'missingCompanion',
           crns: [lecture.crn],
-          message: `${code} ${named(lecture)} needs a ${kind}: none chosen (${options.length} go${options.length === 1 ? 'es' : ''} with it; get_course "${code}").`,
+          message: `${code} ${named(lecture)} needs a ${kind}: none chosen (${options.length} ${one(options.length, 'goes', 'go')} with it; get_course "${code}").`,
         });
       } else if (picked.length > 1) {
         issues.push({
@@ -561,7 +556,7 @@ function statusIssues(
     add(
       'warning',
       'lowSeats',
-      `${who} had only ${section.seatsAvailable === 1 ? '1 open seat' : `${section.seatsAvailable} open seats`} as of ${catalog.lastUpdated?.slice(0, 10) ?? 'the last refresh'}; ${section.seatsAvailable === 1 ? 'it' : 'they'} may already be gone.`,
+      `${who} had only ${plural(section.seatsAvailable, 'open seat')} as of ${catalog.lastUpdated?.slice(0, 10) ?? 'the last refresh'}; ${one(section.seatsAvailable, 'it', 'they')} may already be gone.`,
     );
   }
   return issues;
@@ -594,10 +589,7 @@ function inProgressIssues(
     const names = chosen.map(
       e => `${courseCode(e.courses[0])} ${e.section.number}`,
     );
-    const shown =
-      names.length > MAX_NAMED
-        ? `${names.slice(0, MAX_NAMED).join(', ')} +${names.length - MAX_NAMED} more`
-        : names.join(', ');
+    const shown = listFirst(names, MAX_NAMED);
     return {
       severity: 'warning',
       kind: 'inProgress',

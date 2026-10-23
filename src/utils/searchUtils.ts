@@ -841,7 +841,7 @@ function numberOrder(course: Course): number {
   return digits ? 1 - Number(digits.slice(0, 4).padEnd(4, '0')) / 10000 : 0;
 }
 
-function escapeRegExp(text: string): string {
+export function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 

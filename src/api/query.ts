@@ -58,6 +58,7 @@ import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
 import { ApiError, echo, listSome } from './errors';
+import { one } from './text';
 import { EndedTermsFilter, type EndedTermsCriteria } from './endedTermsFilter';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
 import { caseless, DaySchema, strictObject } from './schemaHints';
@@ -1322,7 +1323,7 @@ export function runCourseQuery(
     notices.push(
       SORT_NOTICE[query.sort] +
         (codeFirst
-          ? ` The ${named.length === 1 ? 'course' : 'courses'} the code names come${named.length === 1 ? 's' : ''} first, then the rest in that order.`
+          ? ` The ${one(named.length, 'course', 'courses')} the code names ${one(named.length, 'comes', 'come')} first, then the rest in that order.`
           : ''),
     );
   }

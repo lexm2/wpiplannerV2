@@ -17,9 +17,12 @@ import type { CoursePlan, catalogMeta } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
+import { one, plural } from '../api/text';
+import { escapeRegExp } from '../utils/searchUtils';
 import {
   asyncText,
   isUncapped,
+  LOW_SEATS,
   meetingsAndRoom,
   ownDates,
   SOLID_RATINGS,
@@ -44,9 +47,6 @@ function credits(c: CourseSummary): string {
 function asOf(dataAsOf: string | null): string {
   return dataAsOf ? dataAsOf.slice(0, 10) : 'an unknown date';
 }
-
-/** At or below this many open seats, a count from the last refresh may be gone. */
-const LOW_SEATS = 3;
 
 const isLow = (available: number) => available > 0 && available <= LOW_SEATS;
 
@@ -73,7 +73,7 @@ function seatDataLine(data: SeatData, low: boolean): string {
       ? `Seat data is from ${date}`
       : days === 0
         ? `Seat data is under a day old (${date})`
-        : `Seat data is ${days === 1 ? '1 day' : `${days} days`} old (${date})`;
+        : `Seat data is ${plural(days, 'day')} old (${date})`;
   if (days !== null && days > STALE_DAYS) {
     return `${age}: check live seats in Workday before registering.`;
   }
@@ -169,10 +169,6 @@ function briefLine(s: SectionBrief, withTerm: boolean): string {
     .join(' | ');
 }
 
-function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 /**
  * The description, then its prerequisite and background statements on lines
  * of their own, cut from the description so they are not read twice.
@@ -227,8 +223,6 @@ function totalSeats(t: SeatTotals): string {
   });
   return t.uncapped > 0 ? `${capped} + ${t.uncapped} with no seat cap` : capped;
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 /** "101 open in 13 sections", plus any without a seat cap. */
 function termTotalsText(t: {
@@ -328,7 +322,7 @@ function companionLine(
 ): string {
   const noun = kind === 'lab' ? 'lab' : 'discussion';
   if (members.length <= COMPANION_EXAMPLES) {
-    return `     + ${members.length === 1 ? noun : `${noun}s`}${pairing} ${members.map(companionText).join('; ')}`;
+    return `     + ${one(members.length, noun, `${noun}s`)}${pairing} ${members.map(companionText).join('; ')}`;
   }
   const examples = [
     ...members.filter(m => m.seatsAvailable > 0),
@@ -380,11 +374,11 @@ function companionLines(
 
 /** "BME 4023 ran only in A term (ended); includeEndedTerms: true shows it." */
 function leftOutLine(l: CourseQueryResult['leftOut'][number]): string {
-  const terms = `${l.terms.join(', ')} term${l.terms.length === 1 ? '' : 's'}`;
+  const terms = `${l.terms.join(', ')} ${one(l.terms.length, 'term', 'terms')}`;
   const codes = l.codes.join(', ');
   return l.reason === 'endedTerms'
-    ? `${codes} ran only in ${terms}, which ${l.terms.length === 1 ? 'has' : 'have'} ended; includeEndedTerms: true shows ${l.codes.length === 1 ? 'it' : 'them'}.`
-    : `${codes} ${l.codes.length === 1 ? 'has' : 'have'} only an interest list so far (${terms}: a placeholder to join before sections open); includeInterestLists: true shows ${l.codes.length === 1 ? 'it' : 'them'}.`;
+    ? `${codes} ran only in ${terms}, which ${one(l.terms.length, 'has', 'have')} ended; includeEndedTerms: true shows ${one(l.codes.length, 'it', 'them')}.`
+    : `${codes} ${one(l.codes.length, 'has', 'have')} only an interest list so far (${terms}: a placeholder to join before sections open); includeInterestLists: true shows ${one(l.codes.length, 'it', 'them')}.`;
 }
 
 /** Which filter emptied a search, and what leaving it out would find. */
@@ -394,7 +388,7 @@ function relaxationLines(
 ): string[] {
   const allowAll = unrestrictive.length
     ? [
-        `${unrestrictive.map(f => `filters.${f}`).join(', ')} ${unrestrictive.length === 1 ? 'lets' : 'let'} every course through as given, so ${unrestrictive.length === 1 ? 'it is' : 'they are'} not to blame.`,
+        `${unrestrictive.map(f => `filters.${f}`).join(', ')} ${one(unrestrictive.length, 'lets', 'let')} every course through as given, so ${one(unrestrictive.length, 'it is', 'they are')} not to blame.`,
       ]
     : [];
   if (!relaxations.length) return allowAll;
@@ -404,7 +398,7 @@ function relaxationLines(
   const first = helps[0];
   if (first?.restores.length) {
     lines.push(
-      `Most restrictive: filters.${first.filter}; without it, ${first.restores.join(', ')} ${first.restores.length === 1 ? 'is' : 'are'} back.`,
+      `Most restrictive: filters.${first.filter}; without it, ${first.restores.join(', ')} ${one(first.restores.length, 'is', 'are')} back.`,
     );
   }
   if (helps.length) {
@@ -412,7 +406,7 @@ function relaxationLines(
       `${first.restores.length ? '' : `Most restrictive: filters.${first.filter}. `}Leaving out one filter at a time: ${helps
         .map(
           r =>
-            `without ${r.filter}, ${r.total} course${r.total === 1 ? '' : 's'}${r.terms.length ? ` (in ${r.terms.join(', ')})` : ''}`,
+            `without ${r.filter}, ${plural(r.total, 'course')}${r.terms.length ? ` (in ${r.terms.join(', ')})` : ''}`,
         )
         .join('; ')}.`,
     );
@@ -797,7 +791,7 @@ export function renderCourse(
     );
   if (omitted.fullSections)
     hidden.push(
-      `${omitted.fullSections} full section${omitted.fullSections === 1 ? '' : 's'} (includeFull: true)`,
+      `${plural(omitted.fullSections, 'full section')} (includeFull: true)`,
     );
   if (hidden.length) lines.push(`Not shown: ${hidden.join('; ')}.`);
 
@@ -913,7 +907,7 @@ export function renderConflicts(check: ConflictCheck): string {
   const moreConflicts = check.conflicts.length - MAX_CONFLICT_LINES;
   if (moreConflicts > 0) {
     lines.push(
-      `+${moreConflicts} more conflicting pair${moreConflicts === 1 ? '' : 's'} not listed; check fewer CRNs at a time to see them.`,
+      `+${plural(moreConflicts, 'more conflicting pair')} not listed; check fewer CRNs at a time to see them.`,
     );
   }
   const band = (o: { days: string[]; start: string; end: string }) =>
@@ -930,7 +924,7 @@ export function renderConflicts(check: ConflictCheck): string {
   const moreBusy = check.busyConflicts.length - MAX_CONFLICT_LINES;
   if (moreBusy > 0) {
     lines.push(
-      `+${moreBusy} more section and busy-time overlap${moreBusy === 1 ? '' : 's'} not listed.`,
+      `+${plural(moreBusy, 'more section and busy-time overlap')} not listed.`,
     );
   }
   for (const issue of check.issues) {
@@ -947,7 +941,7 @@ export function renderConflicts(check: ConflictCheck): string {
       : n < 2
         ? 'One section, so no times to compare.'
         : check.conflicts.length
-          ? `${check.conflicts.length} time conflict${check.conflicts.length === 1 ? '' : 's'} among ${n} sections; other pairs fit.`
+          ? `${plural(check.conflicts.length, 'time conflict')} among ${n} sections; other pairs fit.`
           : `No time conflicts among these ${n} sections.`;
   const busySections = new Set(check.busyConflicts.map(b => b.section.crn))
     .size;
@@ -955,12 +949,12 @@ export function renderConflicts(check: ConflictCheck): string {
     check.busyBlocks === 0 || n === 0
       ? ''
       : busySections
-        ? `${busySections === 1 ? '1 section meets' : `${busySections} sections meet`} during your busy times.`
+        ? `${plural(busySections, 'section')} ${one(busySections, 'meets', 'meet')} during your busy times.`
         : 'None meets during your busy times.';
   const times = [pairs, busy].filter(Boolean).join(' ');
   const missing = check.issues.some(i => i.kind === 'missingCompanion');
   const verdict = errors
-    ? `${errors} problem${errors === 1 ? '' : 's'} to fix before registering.`
+    ? `${plural(errors, 'problem')} to fix before registering.`
     : check.conflicts.length || check.busyConflicts.length
       ? ''
       : missing
@@ -995,11 +989,11 @@ export function renderCatalogInfo(
   const lines = [
     termNowText(meta.currentTerm, meta.today),
     `Current academic year: ${meta.currentAcademicYear} (${yearLabel(meta.currentAcademicYear)}), the only one with schedules (sections, times, CRNs).`,
-    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${meta.dataAgeDays} day${meta.dataAgeDays === 1 ? '' : 's'} old)`}; seat counts are from then.`,
+    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${plural(meta.dataAgeDays, 'day')} old)`}; seat counts are from then.`,
     `Years: ${meta.years
       .map(
         y =>
-          `${y.year} = ${yearLabel(y.year)} ${y.status}, ${y.courseCount} course${y.courseCount === 1 ? '' : 's'}`,
+          `${y.year} = ${yearLabel(y.year)} ${y.status}, ${plural(y.courseCount, 'course')}`,
       )
       .join('; ')}.`,
   ];
@@ -1020,7 +1014,7 @@ export function renderCatalogInfo(
     );
     if (running.length) {
       lines.push(
-        `${running.join(' and ')} ${running.length === 1 ? 'is' : 'are'} in progress: adding a section late may need instructor or registrar approval.`,
+        `${running.join(' and ')} ${one(running.length, 'is', 'are')} in progress: adding a section late may need instructor or registrar approval.`,
       );
     }
   }

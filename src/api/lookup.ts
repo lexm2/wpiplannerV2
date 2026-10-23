@@ -30,6 +30,7 @@ import {
   type YearInfo,
 } from './calendar';
 import { ApiError, echo } from './errors';
+import { andList, plural } from './text';
 import { forecastCourse, type Forecast } from './forecast';
 import {
   courseCode,
@@ -92,9 +93,7 @@ function coverage(catalog: Catalog): string {
         ? `early ${yearLabel(y.year)} entries`
         : yearLabel(y.year),
     );
-  return years.length <= 1
-    ? (years[0] ?? 'no year')
-    : `${years.slice(0, -1).join(', ')} and ${years.at(-1)}`;
+  return andList(years) || 'no year';
 }
 
 /**
@@ -430,7 +429,7 @@ export function lookupCourse(
   if (isEarlyEntry(catalog, course)) {
     const { courseCount } = yearStatus(catalog, course.academicYear!);
     notices.push(
-      `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${courseCount} early entr${courseCount === 1 ? 'y' : 'ies'}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${plural(courseCount, 'early entry', 'early entries')}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
     );
   }
   if (course.academicYear !== undefined && course.academicYear < current) {
@@ -472,7 +471,7 @@ export function unpublishedYearError(
   const current = currentAcademicYear(catalog);
   if (info.status === 'not yet published') {
     return new ApiError(
-      `The ${yearLabel(year)} schedule is not published yet: the catalog has ${info.courseCount ? `${info.courseCount} early entr${info.courseCount === 1 ? 'y' : 'ies'}` : 'nothing'} for it, against ${yearStatus(catalog, current).courseCount} courses in ${yearLabel(current)}. WPI sets each year's terms and times when it publishes, so they cannot be searched yet. To plan ahead, search the current year (${current}) and narrow with filters.offeringPattern (categories [1] = offered every year), then call get_course with year ${year} for a course's outlook.`,
+      `The ${yearLabel(year)} schedule is not published yet: the catalog has ${info.courseCount ? plural(info.courseCount, 'early entry', 'early entries') : 'nothing'} for it, against ${yearStatus(catalog, current).courseCount} courses in ${yearLabel(current)}. WPI sets each year's terms and times when it publishes, so they cannot be searched yet. To plan ahead, search the current year (${current}) and narrow with filters.offeringPattern (categories [1] = offered every year), then call get_course with year ${year} for a course's outlook.`,
       422,
       { year, status: info.status, courseCount: info.courseCount },
     );
