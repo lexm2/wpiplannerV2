@@ -348,9 +348,11 @@ function courseText(given: Course): CourseText {
   const nameTokens = tokenize(name).map(numeral);
   learnSubject(nameTokens, code);
   const tokens = tokenize(haystack);
+  const distinct = [...new Set([...tokens, ...tokens.map(numeral)])];
+  learnTokens(distinct);
   text = {
     haystack,
-    tokens: [...new Set([...tokens, ...tokens.map(numeral)])],
+    tokens: distinct,
     name,
     nameTokens,
     departmentNames: [
@@ -380,6 +382,52 @@ function nearPrefix(word: string, token: string): boolean {
   const limit = typoAllowance(word);
   if (limit === 0 || token.length < word.length - limit) return false;
   return editDistance(word, token, limit, true) <= limit;
+}
+
+/**
+ * Every token of every course text built, so a query word's typo matches
+ * are worked out once per distinct token (nearTokens) rather than once per
+ * token of every course. Never forgotten, not even by resetSearchVocabulary:
+ * texts built before a reset stay cached and may still be searched.
+ */
+const vocabulary = new Set<string>();
+
+/**
+ * Query words to the vocabulary tokens each is a typo of (nearPrefix),
+ * kept up to date as the vocabulary grows. Forgotten past a few dozen
+ * words, as a session of searches would otherwise pile them up.
+ */
+const nearCache = new Map<string, Set<string>>();
+const NEAR_CACHE_WORDS = 32;
+
+function learnTokens(tokens: string[]): void {
+  for (const token of tokens) {
+    if (vocabulary.has(token)) continue;
+    vocabulary.add(token);
+    for (const [word, near] of nearCache) {
+      if (nearPrefix(word, token)) near.add(token);
+    }
+  }
+}
+
+/** The tokens of any course text that `word` is a typo of. */
+function nearTokens(word: string): Set<string> {
+  let near = nearCache.get(word);
+  if (near) return near;
+  if (nearCache.size >= NEAR_CACHE_WORDS) nearCache.clear();
+  near = new Set();
+  for (const token of vocabulary) {
+    if (nearPrefix(word, token)) near.add(token);
+  }
+  nearCache.set(word, near);
+  return near;
+}
+
+/** Some token is one `word` is a typo of; nearPrefix over each, but faster. */
+function hasNearToken(word: string, tokens: string[]): boolean {
+  if (typoAllowance(word) === 0) return false;
+  const near = nearTokens(word);
+  return near.size > 0 && tokens.some(t => near.has(t));
 }
 
 /** Endings a word may drop and still be the same word, for shortenedTo. */
@@ -427,7 +475,7 @@ function mentionsCode(course: Course, code: { dept: string; number: string }) {
 function wordMatches(text: CourseText, word: string): boolean {
   return (
     wordIn(word, text.haystack, text.tokens) ||
-    text.tokens.some(t => nearPrefix(word, t)) ||
+    hasNearToken(word, text.tokens) ||
     text.nameTokens.some(t => shortenedTo(word, t)) ||
     acronymIn(word, text)
   );
@@ -486,14 +534,28 @@ export function matchCourseText(
   };
 }
 
+/** A free text folded (foldText) and split into words, once for many words. */
+export interface FoldedText {
+  text: string;
+  tokens: string[];
+}
+
+export function foldWords(text: string): FoldedText {
+  const folded = foldText(text);
+  return { text: folded, tokens: tokenize(folded) };
+}
+
+const asFolded = (text: string | FoldedText) =>
+  typeof text === 'string' ? foldWords(text) : text;
+
 /**
  * Whether `word` (a query word, already folded) occurs in a free text such
  * as a section's instructors and rooms, by the same rule as course text:
  * whole words only when short. The text is folded here if it is not yet.
  */
-export function textHasWord(text: string, word: string): boolean {
-  const folded = foldText(text);
-  return wordIn(word, folded, isShort(word) ? tokenize(folded) : []);
+export function textHasWord(text: string | FoldedText, word: string): boolean {
+  const folded = asFolded(text);
+  return wordIn(word, folded.text, folded.tokens);
 }
 
 /**
@@ -501,11 +563,14 @@ export function textHasWord(text: string, word: string): boolean {
  * name ("Li" finds Li and Lin, not Elizabeth), a longer one anywhere.
  * Accents aside: "Neel" finds "EJ Néel".
  */
-export function namesHaveWord(names: string, word: string): boolean {
-  const folded = foldText(names);
+export function namesHaveWord(
+  names: string | FoldedText,
+  word: string,
+): boolean {
+  const folded = asFolded(names);
   return isShort(word)
-    ? tokenize(folded).some(t => t.startsWith(word))
-    : folded.includes(word);
+    ? folded.tokens.some(t => t.startsWith(word))
+    : folded.text.includes(word);
 }
 
 /** `word` matches description token `token`, as matchCourseText reads it. */
@@ -621,7 +686,7 @@ export function describeMatch(course: Course, query: string): SearchMatch {
   if (namesDepartment(text, parsed.words)) return 'title';
   const { all, matched } = matchCourseText(course, parsed);
   if (!all) {
-    const titles = sectionTitles(course);
+    const titles = foldWords(sectionTitles(course));
     const fromTitles = parsed.words.every(
       (word, i) => matched[i] || textHasWord(titles, word),
     );
