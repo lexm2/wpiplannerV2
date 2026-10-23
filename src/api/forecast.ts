@@ -101,7 +101,7 @@ export function forecastCourse(
   let outlook: Outlook = category ? PATTERN[category].outlook : 'unknown';
   let lead = category
     ? PATTERN[category].lead.replace('{year}', target)
-    : `No offering pattern on record (usual for graduate courses), so whether it runs in ${target} is unknown.`;
+    : `No offering pattern on record${course.isGraduate ? ' (usual for graduate courses)' : ''}, so whether it runs in ${target} is unknown.`;
 
   const parity =
     year === basedOn + 1

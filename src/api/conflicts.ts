@@ -19,13 +19,14 @@ import {
   endedTerms,
   seatDataAge,
   termDates,
+  today,
   yearLabel,
   yearStatus,
   type TermLetter,
 } from './calendar';
 import { ApiError, listSome, withoutControls } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
-import { courseCode } from './serialize';
+import { courseCode, isUncapped } from './serialize';
 
 /** CRNs a schedule check, or a search fitted around CRNs, takes at most. */
 export const MAX_CRNS = 100;
@@ -185,7 +186,9 @@ interface ScheduleIssue {
     | 'otherYear'
     | 'closed'
     | 'full'
-    | 'lowSeats';
+    | 'lowSeats'
+    | 'inProgress'
+    | 'membership';
   /** The CRNs the issue is about. */
   crns: number[];
   message: string;
@@ -409,10 +412,12 @@ function pairingIssues(
 ): ScheduleIssue[] {
   const issues: ScheduleIssue[] = [];
   const code = courseCode(course);
+  // Interest lists are reported on their own, never as a second lecture.
   const ofType = (type: SectionType) =>
     [...chosen.values()]
       .filter(e => e.filterable.sectionType === type)
-      .map(e => e.section);
+      .map(e => e.section)
+      .filter(s => !s.isInterestList);
   const lectures = ofType(SectionType.LECTURE);
   const groups = course.lectures ?? [];
   const groupOf = (lecture: Section) =>
@@ -521,6 +526,13 @@ function statusIssues(
     );
   }
 
+  if (isUncapped(section)) {
+    add(
+      'warning',
+      'membership',
+      `${who} enrolls by team or ensemble membership; its seat count (${section.seats}) is a placeholder, not open seats.`,
+    );
+  }
   const waitlist = section.actualWaitlist
     ? `, ${section.actualWaitlist} on the waitlist`
     : '';
@@ -529,6 +541,12 @@ function statusIssues(
       'error',
       'closed',
       `${who} is Closed for registration${section.seatsAvailable <= 0 ? ` and full (${section.seats - section.seatsAvailable}/${section.seats})` : ''}${waitlist}.`,
+    );
+  } else if (section.seats === 0) {
+    add(
+      'warning',
+      'full',
+      `${who} lists a capacity of 0${section.seatsAvailable < 0 ? ` with ${-section.seatsAvailable} enrolled` : ''}, though Open; ask the department whether it can be joined.`,
     );
   } else if (section.seatsAvailable <= 0) {
     add(
@@ -544,6 +562,37 @@ function statusIssues(
     );
   }
   return issues;
+}
+
+/**
+ * One note per term already under way (B, and F, from 10-19): adding a
+ * section of it now is late and may need approval. Ended terms, other
+ * years and placeholders have their own issues.
+ */
+function inProgressIssues(
+  catalog: Catalog,
+  entries: Map<number, CrnEntry>,
+): ScheduleIssue[] {
+  const current = currentAcademicYear(catalog);
+  const dates = termDates(catalog, current);
+  const now = today(catalog);
+  if (!dates) return [];
+  const byTerm = new Map<TermLetter, Section[]>();
+  for (const [, entry] of entries) {
+    const term = entry.section.computedTerm as TermLetter;
+    const span = dates[term];
+    if (yearOf(catalog, entry) !== current || entry.section.isInterestList) {
+      continue;
+    }
+    if (!span || span.start > now || span.end < now) continue;
+    byTerm.set(term, [...(byTerm.get(term) ?? []), entry.section]);
+  }
+  return [...byTerm].map(([term, sections]) => ({
+    severity: 'warning',
+    kind: 'inProgress',
+    crns: sections.map(s => s.crn),
+    message: `${term} term is in progress (started ${dates[term].start}): adding ${list(sections)} now is late and may need instructor or registrar approval.`,
+  }));
 }
 
 function scheduleIssues(
@@ -563,6 +612,7 @@ function scheduleIssues(
     ...[...entries].flatMap(([crn, entry]) =>
       statusIssues(catalog, crn, entry),
     ),
+    ...inProgressIssues(catalog, entries),
   ];
   return [
     ...issues.filter(i => i.severity === 'error'),

@@ -11,6 +11,7 @@ import {
   course,
   customEndpoints,
   endpoints,
+  IN_B,
   period,
   rpcOn,
   section,
@@ -321,7 +322,9 @@ describe('MCP server', () => {
     expect(text).toContain('Take one lecture plus one of each companion kind');
     expect(text).toContain('Ada Lovelace RMP 4.5, diff 2.1, 91% again (12)');
     // Absent facts are said, not left out.
-    expect(text).toContain('Degree attributes: none | Cross-listed: none');
+    expect(text).toContain(
+      'Degree attributes: none on record (tags are incomplete; see the degree audit) | Cross-listed: none',
+    );
     expect(text).toContain(
       'Prerequisites: none stated in the catalog description.',
     );
@@ -444,7 +447,7 @@ describe('MCP server', () => {
     const one = await tool('check_conflicts', { crns: [30] });
     expect(one.isError).toBe(false);
     expect(one.text).toContain(
-      'One section, so no times to compare. They make a valid set to register in Workday.',
+      'One section, so no times to compare. No time conflicts or section problems found; prerequisites and eligibility are not checked.',
     );
   });
 
@@ -828,6 +831,151 @@ describe('full sections left out', () => {
     expect(http.body.omitted.fullSections).toBe(3);
     expect(http.body.sections.map((s: { crn: number }) => s.crn)).toEqual([
       62, 65, 64,
+    ]);
+  });
+});
+
+describe('sections that read as something else', () => {
+  const at = (p: ReturnType<typeof period>, location: string) => ({
+    ...p,
+    location,
+  });
+  const own = () =>
+    customEndpoints([
+      {
+        abbreviation: 'WPE',
+        name: 'Wellness and Physical Education',
+        courses: [
+          // A varsity team: Workday's 999 seats, no practice times listed.
+          course('WPE-2001-2026', 'Varsity Basketball', [
+            section(
+              70,
+              'B01',
+              'B',
+              [{ ...period([], '', ''), isAsync: true, location: 'Unknown' }],
+              990,
+              { seats: 999 },
+            ),
+          ]),
+        ],
+      },
+      {
+        abbreviation: 'HU',
+        name: 'Humanities and Arts',
+        courses: [
+          course('HU-3900-2026', 'Inquiry Seminar', [
+            section(71, 'B01', 'B', [
+              at(period(['M'], '10:00', '10:50'), 'Daniels Hall 102E'),
+              at(period(['T'], '10:00', '11:50'), 'Salisbury Labs 226'),
+              at(period(['R'], '10:00', '10:50'), 'Daniels Hall 102E'),
+            ]),
+          ]),
+        ],
+      },
+      {
+        abbreviation: 'CS',
+        name: 'Computer Science',
+        courses: [
+          course('CS-3733-2026', 'Software Engineering', [
+            section(72, 'BL01', 'B', [period(['M'], '12:00', '12:50')], -7),
+          ]),
+        ],
+      },
+      {
+        abbreviation: 'CP',
+        name: 'Career Preparation',
+        courses: [
+          course('CP-1001-2026', 'Career Preparation', [
+            section(73, 'B101', 'B', [period(['W'], '12:00', '12:50')], -1, {
+              seats: 0,
+            }),
+          ]),
+        ],
+      },
+    ]);
+
+  it('says a team enrolls by membership, and has no listed practice times', async () => {
+    const { mcp } = await own();
+    const team = await toolOn(mcp, 'get_course', { course: 'WPE 2001' });
+    expect(team.text).toContain(
+      'B01 CRN 70 | no set meeting times listed | Ada Lovelace',
+    );
+    expect(team.text).toContain(
+      '"No seat cap" sections (varsity and club teams, ensembles) enroll by team or ensemble membership; the seat count is a placeholder, not open seats.',
+    );
+    expect(team.text).toContain(
+      'Degree attributes: none on record (tags are incomplete; see the degree audit)',
+    );
+    const search = await toolOn(mcp, 'search_courses', {
+      filters: { department: { departments: ['WPE'] } },
+    });
+    expect(search.text).toContain('enroll by team or ensemble membership');
+    const check = await toolOn(mcp, 'check_conflicts', { crns: [70] });
+    expect(check.text).toContain(
+      'Note: WPE 2001 B01 (CRN 70) enrolls by team or ensemble membership; its seat count (999) is a placeholder, not open seats.',
+    );
+    // Undergraduate: no "usual for graduate courses".
+    const plan = await toolOn(mcp, 'get_course', {
+      course: 'WPE 2001',
+      year: 2027,
+    });
+    expect(plan.text).toContain(
+      'No offering pattern on record, so whether it runs in 2027-28 is unknown.',
+    );
+  });
+
+  it('gives each meeting its room when the rooms differ', async () => {
+    const { mcp } = await own();
+    const { text, data } = await toolOn(mcp, 'get_course', {
+      course: 'HU 3900',
+    });
+    expect(text).toContain(
+      'B01 CRN 71 | M 10:00-10:50 (Daniels Hall 102E); T 10:00-11:50 (Salisbury Labs 226); R 10:00-10:50 (Daniels Hall 102E) | Ada Lovelace',
+    );
+    expect(data.sections[0].location).toBeUndefined();
+  });
+
+  it('never sends negative open seats, and reads a capacity of 0 as listed', async () => {
+    const { mcp, api } = await own();
+    const over = await toolOn(mcp, 'get_course', { course: 'CS 3733' });
+    expect(over.text).toContain('FULL 37/30');
+    expect(over.data.sections[0]).toMatchObject({
+      seatsAvailable: 0,
+      overEnrolled: 7,
+    });
+    const http = await callOn(api, '/courses/CS3733');
+    expect(http.body.sections[0]).toMatchObject({
+      seatsAvailable: 0,
+      overEnrolled: 7,
+    });
+    const zero = await toolOn(mcp, 'get_course', { course: 'CP 1001' });
+    expect(zero.text).toContain('capacity 0 listed');
+    expect(zero.text).not.toContain('FULL 1/0');
+  });
+});
+
+describe('terms in progress', () => {
+  it('says adding late may need approval, in each tool', async () => {
+    const course = await tool('get_course', { course: 'PH 1110' }, IN_B);
+    expect(course.text).toContain(
+      'B term (2026-02-01 to 2026-02-20), in progress (started 2026-02-01): adding late may need instructor or registrar approval:',
+    );
+    const check = await tool('check_conflicts', { crns: [20, 22] }, IN_B);
+    expect(check.text).toContain(
+      'Note: B term is in progress (started 2026-02-01): adding BL01 (CRN 20), BX01 (CRN 22) now is late and may need instructor or registrar approval.',
+    );
+    const info = await tool('get_catalog_info', {}, IN_B);
+    expect(info.text).toContain('B 2026-02-01 to 2026-02-20 (in progress)');
+    expect(info.text).toContain(
+      'B and F are in progress: adding a section late may need instructor or registrar approval.',
+    );
+    expect(info.text).toContain('Degree attribute tags are incomplete');
+  });
+
+  it('never counts an interest list as a second lecture', async () => {
+    const { data } = await tool('check_conflicts', { crns: [9, 4] });
+    expect(data.issues.map((i: { kind: string }) => i.kind)).toEqual([
+      'interestList',
     ]);
   });
 });

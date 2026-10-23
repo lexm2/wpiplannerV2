@@ -17,7 +17,13 @@ import type { CoursePlan, catalogMeta } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
-import { isUncapped, ownDates, SOLID_RATINGS } from '../api/serialize';
+import {
+  asyncText,
+  isUncapped,
+  meetingsAndRoom,
+  ownDates,
+  SOLID_RATINGS,
+} from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;
@@ -103,13 +109,18 @@ function instructor(i: InstructorView, again = false): string {
 function seats(s: {
   seats: number;
   seatsAvailable: number;
+  overEnrolled?: number;
   waitlist: number;
 }): string {
   if (isUncapped(s)) return 'no seat cap';
+  // Workday lists some sections Open with a cap of 0 (CP 1001 A101):
+  // "FULL 1/0" read as a real section filled.
   const open =
-    s.seatsAvailable > 0
-      ? `${s.seatsAvailable}/${s.seats} open`
-      : `FULL ${s.seats - s.seatsAvailable}/${s.seats}`;
+    s.seats === 0
+      ? 'capacity 0 listed'
+      : s.seatsAvailable > 0
+        ? `${s.seatsAvailable}/${s.seats} open`
+        : `FULL ${s.seats - s.seatsAvailable + (s.overEnrolled ?? 0)}/${s.seats}`;
   return s.waitlist > 0 ? `${open}, waitlist ${s.waitlist}` : open;
 }
 
@@ -119,6 +130,14 @@ function seats(s: {
  */
 const WAITLIST_NOTE =
   'A waitlist beside open seats is as Workday reports it: students on it may be waiting for a different section or time.';
+
+/**
+ * The once-per-response note for sections Workday lists with 999 seats:
+ * varsity and club teams, music ensembles. "No seat cap" read as open to
+ * anyone.
+ */
+const MEMBERSHIP_NOTE =
+  '"No seat cap" sections (varsity and club teams, ensembles) enroll by team or ensemble membership; the seat count is a placeholder, not open seats.';
 
 const waitlistBesideSeats = (s: { seatsAvailable: number; waitlist: number }) =>
   s.seatsAvailable > 0 && s.waitlist > 0;
@@ -459,6 +478,9 @@ export function renderSearch(result: CourseQueryResult): string {
   if (waitlisted) {
     lines.push(WAITLIST_NOTE);
   }
+  if (result.courses.some(c => c.seats.uncapped > 0)) {
+    lines.push(MEMBERSHIP_NOTE);
+  }
   if (result.total > 0) lines.push(seatDataLine(result, low));
   return lines.join('\n');
 }
@@ -480,6 +502,7 @@ interface SectionDigest {
   instructors: string[];
   seats: number;
   seatsAvailable: number;
+  overEnrolled?: number;
   waitlist: number;
   status: string;
   deliveryMode: string;
@@ -494,17 +517,16 @@ function digestSection(
   term: DateSpan | undefined,
 ): SectionDigest {
   const dates = ownDates(s, term);
-  const meets = [
-    ...new Set(
-      s.periods.map(p =>
-        p.isAsync
-          ? 'Async'
-          : p.start && p.end
-            ? `${p.days.join('')} ${p.start}-${p.end}`
-            : 'TBD',
-      ),
-    ),
-  ].join('; ');
+  const { meets, location } = meetingsAndRoom(
+    s.periods.map(p => ({
+      when: p.isAsync
+        ? asyncText(s)
+        : p.start && p.end
+          ? `${p.days.join('')} ${p.start}-${p.end}`
+          : 'TBD',
+      room: p.location,
+    })),
+  );
   const people = new Map<string, InstructorView>();
   for (const p of s.periods)
     for (const i of p.instructors) people.set(i.name, i);
@@ -514,13 +536,12 @@ function digestSection(
     term: s.term,
     kind: s.kind,
     pairsWith: s.pairsWith,
-    meets: meets || 'TBD',
-    location: [...new Set(s.periods.map(p => p.location).filter(Boolean))].join(
-      '; ',
-    ),
+    meets,
+    location,
     instructors: [...people.keys()],
     seats: s.seats,
     seatsAvailable: s.seatsAvailable,
+    ...(s.overEnrolled && { overEnrolled: s.overEnrolled }),
     waitlist: s.waitlist,
     status: s.status,
     deliveryMode: s.deliveryMode,
@@ -644,6 +665,10 @@ function pairing(s: SectionView, lectures: SectionView[]): string {
   return `with ${names(s.pairsWith).join(', ')}`;
 }
 
+/** A term under way: late adds need approval. */
+const inProgress = (dates: DateSpan) =>
+  `in progress (started ${dates.start}): adding late may need instructor or registrar approval`;
+
 function termBlock(
   term: string,
   sections: SectionView[],
@@ -657,7 +682,11 @@ function termBlock(
   const early = tentative
     ? ', TENTATIVE: early entry, not yet published or registrable'
     : '';
-  const lines = [`${term} term${span}${ended}${early}:`];
+  const running =
+    !tentative && dates && dates.start <= today && today <= dates.end
+      ? `, ${inProgress(dates)}`
+      : '';
+  const lines = [`${term} term${span}${ended}${running}${early}:`];
   const lectures = sections.filter(s => s.kind === 'lecture');
   for (const kind of [
     'lecture',
@@ -761,6 +790,7 @@ export function renderCourse(
     );
   }
   if (d.sections.some(waitlistBesideSeats)) lines.push(WAITLIST_NOTE);
+  if (d.sections.some(isUncapped)) lines.push(MEMBERSHIP_NOTE);
   lines.push(
     seatDataLine(
       context,
@@ -773,7 +803,7 @@ export function renderCourse(
 function attributesFact(attributes: string[]): string {
   return attributes.length
     ? `Counts toward: ${attributes.join(', ')}`
-    : 'Degree attributes: none';
+    : 'Degree attributes: none on record (tags are incomplete; see the degree audit)';
 }
 
 export function renderPlan(plan: CoursePlan, notices: string[]): string {
@@ -899,7 +929,7 @@ export function renderConflicts(check: ConflictCheck): string {
       ? ''
       : missing
         ? 'Not a complete set yet: add the labs or discussions noted.'
-        : 'They make a valid set to register in Workday.';
+        : 'No time conflicts or section problems found; prerequisites and eligibility are not checked.';
   lines.push([times, verdict].filter(Boolean).join(' '));
   if (n > 0) {
     lines.push(
@@ -938,16 +968,31 @@ export function renderCatalogInfo(
       .join('; ')}.`,
   ];
   for (const [year, dates] of Object.entries(meta.termDates)) {
+    const state = (k: TermLetter) =>
+      dates[k].end < meta.today
+        ? ' (ended)'
+        : dates[k].start <= meta.today
+          ? ' (in progress)'
+          : '';
     const t = (k: TermLetter) =>
-      `${k} ${dates[k].start} to ${dates[k].end}${dates[k].end < meta.today ? ' (ended)' : ''}`;
+      `${k} ${dates[k].start} to ${dates[k].end}${state(k)}`;
     lines.push(
-      `${yearLabel(Number(year))} terms: ${(['A', 'B', 'C', 'D'] as const).map(t).join(', ')}. Semesters: F (fall, A+B) ${dates.F.start} to ${dates.F.end}; S (spring, C+D) ${dates.S.start} to ${dates.S.end}.`,
+      `${yearLabel(Number(year))} terms: ${(['A', 'B', 'C', 'D'] as const).map(t).join(', ')}. Semesters: F (fall, A+B) ${dates.F.start} to ${dates.F.end}${state('F')}; S (spring, C+D) ${dates.S.start} to ${dates.S.end}${state('S')}.`,
     );
+    const running = (['A', 'B', 'C', 'D', 'F', 'S'] as const).filter(
+      k => state(k) === ' (in progress)',
+    );
+    if (running.length) {
+      lines.push(
+        `${running.join(' and ')} ${running.length === 1 ? 'is' : 'are'} in progress: adding a section late may need instructor or registrar approval.`,
+      );
+    }
   }
   lines.push(
     `Degree attributes in ${yearLabel(meta.currentAcademicYear)} (course counts), for filters.degreeAttribute: ${meta.degreeAttributes
       .map(a => `${a.name} (${a.courseCount})`)
       .join('; ')}.`,
+    'Degree attribute tags are incomplete in the catalog data: a course without one may still count toward a requirement. Check the degree audit or an academic advisor.',
     `Delivery modes, for filters.deliveryMode: ${meta.deliveryModes.join(', ')}.`,
   );
   return lines.join('\n');

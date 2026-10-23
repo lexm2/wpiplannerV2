@@ -84,7 +84,9 @@ Out of scope; say so rather than guess:
 - Prerequisites are not structured or checked: there is only the description's \
 own text. Quote it and hedge ("the catalog says...").
 - No degree audit: degree attributes (e.g. Social Sciences) say what a course \
-can count toward, not what a student still needs.
+can count toward, not what a student still needs. The tags are incomplete in \
+the data: a course without one may still count, so refer the student to their \
+degree audit or advisor rather than ruling a course out.
 - No registration: students register in WPI Workday with the CRNs.
 - Policy (graduate credit, overloads, transfer credit, double counting): refer \
 the student to the Registrar or their academic advisor.

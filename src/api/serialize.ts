@@ -113,7 +113,10 @@ export interface SectionBrief {
   location: string;
   instructors: InstructorView[];
   seats: number;
+  /** Never below 0; see overEnrolled. */
   seatsAvailable: number;
+  /** Enrolled past the cap, when Workday reports a negative count. */
+  overEnrolled?: number;
   waitlist: number;
   /** Registration status: "Open", "Waitlist" or "Closed". */
   status: string;
@@ -149,7 +152,10 @@ export interface SectionView {
   /** For a lab or discussion: the CRNs of the lectures it can go with. */
   pairsWith: number[];
   seats: number;
+  /** Never below 0; see overEnrolled. */
   seatsAvailable: number;
+  /** Enrolled past the cap, when Workday reports a negative count. */
+  overEnrolled?: number;
   waitlist: number;
   maxWaitlist: number;
   /** "12/30 available" or "Full (32/30 enrolled)". */
@@ -406,16 +412,50 @@ function toPeriodView(
   };
 }
 
+/**
+ * What an async meeting is called: "Async", but for a team or ensemble
+ * (no seat cap), whose practice times Workday leaves out, "no set meeting
+ * times listed": "Async" there read as no meetings at all.
+ */
+export const asyncText = (s: { seats: number }) =>
+  isUncapped(s) ? 'no set meeting times listed' : 'Async';
+
+/**
+ * A section's meetings and room as one line shows them: "MTRF
+ * 10:00-10:50" and "Salisbury Labs 105". When its meetings are in
+ * different rooms (HU 3900 B01: M and R in Daniels 102E, T in Salisbury
+ * 226), each meeting carries its own room and `location` is empty, so no
+ * room is read against the wrong day.
+ */
+export function meetingsAndRoom(parts: { when: string; room: string }[]): {
+  meets: string;
+  location: string;
+} {
+  const rooms = [...new Set(parts.map(p => p.room).filter(Boolean))];
+  if (rooms.length <= 1) {
+    return {
+      meets: [...new Set(parts.map(p => p.when))].join('; ') || 'TBD',
+      location: rooms[0] ?? '',
+    };
+  }
+  const each = parts.map(p => (p.room ? `${p.when} (${p.room})` : p.when));
+  return { meets: [...new Set(each)].join('; '), location: '' };
+}
+
 /** "MTRF 10:00-10:50", one entry per period, "Async" or "TBD" untimed. */
-function meetingText(section: Section): string {
+function meetings(section: Section): { meets: string; location: string } {
   const timed = new Set(timedPeriods(section));
-  const parts = section.periods.map(p => {
-    if (p.isAsync) return 'Async';
-    if (!timed.has(p) || p.startTime.displayTime === 'TBD') return 'TBD';
-    const days = DAY_ORDER.filter(d => p.days.has(d)).join('');
-    return `${days} ${hhmm(p.startTime)}-${hhmm(p.endTime)}`;
-  });
-  return [...new Set(parts)].join('; ') || 'TBD';
+  return meetingsAndRoom(
+    section.periods.map(p => {
+      const room = roomOf(p.location);
+      if (p.isAsync) return { when: asyncText(section), room };
+      if (!timed.has(p) || p.startTime.displayTime === 'TBD') {
+        return { when: 'TBD', room };
+      }
+      const days = DAY_ORDER.filter(d => p.days.has(d)).join('');
+      return { when: `${days} ${hhmm(p.startTime)}-${hhmm(p.endTime)}`, room };
+    }),
+  );
 }
 
 /**
@@ -424,10 +464,17 @@ function meetingText(section: Section): string {
  */
 const roomOf = (location: string) => (location === 'Unknown' ? '' : location);
 
-function locationText(section: Section): string {
-  return [
-    ...new Set(section.periods.map(p => roomOf(p.location)).filter(Boolean)),
-  ].join('; ');
+/**
+ * Open seats as sent: never below 0, with `overEnrolled` the excess when
+ * Workday reports more enrolled than the cap (CS 3733 BL01: -7).
+ */
+function openSeats(section: Section): {
+  seatsAvailable: number;
+  overEnrolled?: number;
+} {
+  return section.seatsAvailable < 0
+    ? { seatsAvailable: 0, overEnrolled: -section.seatsAvailable }
+    : { seatsAvailable: section.seatsAvailable };
 }
 
 function instructorsOf(
@@ -464,11 +511,10 @@ export function toSectionBrief(
     number: section.number,
     term: section.computedTerm,
     kind,
-    meets: meetingText(section),
-    location: locationText(section),
+    ...meetings(section),
     instructors: instructorsOf(section, ratingLookup(rmp)),
     seats: section.seats,
-    seatsAvailable: section.seatsAvailable,
+    ...openSeats(section),
     waitlist: section.actualWaitlist,
     status: section.status,
     deliveryMode: section.deliveryMode,
@@ -490,7 +536,7 @@ function toSectionView(
     kind,
     pairsWith,
     seats: section.seats,
-    seatsAvailable: section.seatsAvailable,
+    ...openSeats(section),
     waitlist: section.actualWaitlist,
     maxWaitlist: section.maxWaitlist,
     seatsLabel: seatsLabel(section),
