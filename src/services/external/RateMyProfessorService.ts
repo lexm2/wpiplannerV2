@@ -58,17 +58,23 @@ export class RateMyProfessorService {
     this.professorsByLastName = new Map();
     this.matchCache = new Map();
 
+    // RMP lists some people twice (a department rename, a stray empty
+    // profile): keep the profile with the most ratings, the first on a tie,
+    // so an empty duplicate never hides the real one.
     for (const professor of data.professors) {
       const fullName = this.normalizeName(
         `${professor.firstName} ${professor.lastName}`,
       );
-      const lastName = this.normalizeName(professor.lastName);
-
+      const kept = this.professorsByFullName.get(fullName);
+      if (kept && kept.numRatings >= professor.numRatings) continue;
       this.professorsByFullName.set(fullName, professor);
 
-      const sameLastName = this.professorsByLastName.get(lastName);
-      if (sameLastName) sameLastName.push(professor);
-      else this.professorsByLastName.set(lastName, [professor]);
+      const lastName = this.normalizeName(professor.lastName);
+      const sameLastName = this.professorsByLastName.get(lastName) ?? [];
+      const at = kept ? sameLastName.indexOf(kept) : -1;
+      if (at !== -1) sameLastName[at] = professor;
+      else sameLastName.push(professor);
+      this.professorsByLastName.set(lastName, sameLastName);
     }
   }
 
@@ -212,7 +218,11 @@ export class RateMyProfessorService {
         queryFirstName,
         firstName,
       );
-      if (score > bestScore) {
+      // Equally good names: the profile with more ratings says more.
+      const better =
+        score > bestScore ||
+        (score === bestScore && prof.numRatings > best!.numRatings);
+      if (better) {
         best = prof;
         bestScore = score;
       }

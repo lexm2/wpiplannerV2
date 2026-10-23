@@ -129,6 +129,37 @@ describe('RateMyProfessorService.findProfessor', () => {
     expect(service.findProfessor('Laura Susanin')?.id).toBe(susanin.id);
   });
 
+  it('keeps the duplicate profile with the most ratings, whatever the order', async () => {
+    const real = { ...prof('Richard', 'Quimby', 2.2), numRatings: 52 };
+    const empty = { ...prof('Richard', 'Quimby', 0), numRatings: 0 };
+    for (const order of [
+      [real, empty],
+      [empty, real],
+    ]) {
+      const service = await serviceWith(order);
+      expect(service.findProfessor('Richard Quimby')?.id).toBe(real.id);
+      // The last-name index holds the same profile.
+      expect(service.findProfessor('R. Quimby')?.id).toBe(real.id);
+      expect(service.findProfessor('Quimby')?.id).toBe(real.id);
+      expect(service.getRatings('Richard Quimby')?.numRatings).toBe(52);
+    }
+  });
+
+  it('keeps the first of two duplicates with as many ratings', async () => {
+    const first = prof('Taimoor', 'Afzal');
+    const second = prof('Taimoor', 'Afzal');
+    const service = await serviceWith([first, second]);
+    expect(service.findProfessor('Taimoor Afzal')?.id).toBe(first.id);
+  });
+
+  it('breaks a first-name tie by the number of ratings', async () => {
+    const few = { ...prof('Jane', 'Doe'), numRatings: 2 };
+    const many = { ...prof('John', 'Doe'), numRatings: 30 };
+    const service = await serviceWith([few, many]);
+    // "J." fits both equally; the better-documented profile wins.
+    expect(service.findProfessor('J. Doe')?.id).toBe(many.id);
+  });
+
   it('rejects data that does not match the schema', () => {
     const service = new RateMyProfessorService();
     expect(() => service.loadFromData({ professors: 'no' })).toThrow();
