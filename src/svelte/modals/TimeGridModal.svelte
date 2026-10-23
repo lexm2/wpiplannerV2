@@ -37,7 +37,7 @@
     gridRangeOf(initialWindows, appState.catalogRange),
   );
 
-  let mode = initialMode;
+  let mode = $state(initialMode);
   let windows = initialWindows;
   let includeAsync = $state(seed?.includeAsync ?? lastIncludeAsync);
 
@@ -46,7 +46,8 @@
     lastIncludeAsync = includeAsync;
     // An empty grid drops the filter so it stops counting toward the badge.
     if (windows.length === 0) filterService.removeFilter('times');
-    else if (includeAsync)
+    // Avoid mode keeps sections with no set times anyway.
+    else if (includeAsync && mode === 'only')
       filterService.addFilter('times', { mode, windows, includeAsync });
     else filterService.addFilter('times', { mode, windows });
   }
@@ -80,12 +81,14 @@
       />
     </div>
     <div class="modal-footer">
-      <FilterToggle
-        id="include-async-filter"
-        label="Include async classes"
-        checked={includeAsync}
-        onchange={onAsyncChange}
-      />
+      {#if mode === 'only'}
+        <FilterToggle
+          id="include-async-filter"
+          label="Include async classes"
+          checked={includeAsync}
+          onchange={onAsyncChange}
+        />
+      {/if}
       <button class="modal-btn btn-primary" onclick={close}>Done</button>
     </div>
   {/snippet}

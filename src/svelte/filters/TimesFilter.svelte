@@ -17,7 +17,10 @@
       criteria?.windows?.length
         ? describeWindows(criteria.windows, criteria.mode)
         : 'Any time',
-      criteria?.includeAsync ? 'async included' : null,
+      // Avoid mode keeps sections with no set times anyway.
+      criteria?.includeAsync && criteria.mode !== 'avoid'
+        ? 'async included'
+        : null,
     ]
       .filter(Boolean)
       .join(' • '),
