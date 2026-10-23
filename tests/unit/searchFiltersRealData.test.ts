@@ -63,8 +63,14 @@ describe('search on the real catalog', () => {
       words.join(' '),
       Array(3000).fill('design').join(' '),
     ]) {
+      // The API refuses a query this long (200 characters at most); the
+      // search under it must still cope with one, from the web app.
+      expect(() => search(query)).toThrow();
       const start = performance.now();
-      search(query);
+      runCourseQuery(catalog, {
+        ...CourseQuerySchema.parse({ includeEndedTerms: true }),
+        filters: { searchText: { query } },
+      });
       expect(performance.now() - start).toBeLessThan(1000);
     }
   });

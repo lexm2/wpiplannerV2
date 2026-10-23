@@ -13,6 +13,7 @@ import { TermBoundsService } from '../utils/termBounds';
 import type { FilterableSection } from '../types/filterableUnit';
 import { SectionFilterPipeline } from '../core/filtering/SectionFilterPipeline';
 import { logger } from '../utils/logger';
+import { prepareSearch } from '../utils/searchUtils';
 
 const CATALOG_FILE = 'course-data-constructed.json';
 const TERM_BOUNDS_FILE = 'term-bounds.json';
@@ -196,6 +197,13 @@ export class CatalogSource {
           .filter((y): y is number => y !== undefined),
       ),
     ].sort((a, b) => a - b);
+
+    // Code reading ("CS2" as every CS 2xxx) and acronyms depend on the
+    // departments and definitions search learns from course text, so learn
+    // them before the first lookup parses a query, not on the first search.
+    // searchUtils has no way to forget them, so a refresh adds to what the
+    // old data taught; departments and acronyms rarely leave the catalog.
+    prepareSearch(courses);
 
     const catalog: Catalog = {
       departments: db.departments,

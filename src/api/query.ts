@@ -39,6 +39,7 @@ import { getAllSections } from '../utils/courseUtils';
 import {
   acronymExpansions,
   describeMatch,
+  MAX_QUERY_WORDS,
   parseSearchQuery,
   type SearchMatch,
 } from '../utils/searchUtils';
@@ -364,7 +365,7 @@ const FiltersSchema = strictObject(
           .boolean()
           .optional()
           .describe(
-            'Also keep sections with no scheduled meetings (async, TBD): "evening or online" is earliestStart "17:00" with includeAsync true. Default false.',
+            'Mode "only": also keep sections with no scheduled meetings (async, TBD): "evening or online" is earliestStart "17:00" with includeAsync true. Default false. Mode "avoid" always keeps them: they meet at no time to avoid.',
           ),
       },
       querySchema,
@@ -816,7 +817,10 @@ function describeTimes(times: TimesFilterCriteria): string {
       return band === '00:00-24:00' ? `all of ${which}` : `${which} ${band}`;
     })
     .join('; ');
-  const async = times.includeAsync ? ', sections with no set time kept' : '';
+  const async =
+    times.includeAsync || times.mode === 'avoid'
+      ? ', sections with no set time kept'
+      : '';
   return times.mode === 'avoid'
     ? `Times read as: avoiding ${text}${async}.`
     : `Times read as: only within ${text}${async}.`;
@@ -1308,6 +1312,12 @@ export function runCourseQuery(
     );
   }
   if (text && !text.professorOnly) notices.push(...acronymNotices(text.query));
+  const ignored = text ? (parseSearchQuery(text.query).ignored ?? []) : [];
+  if (ignored.length) {
+    notices.push(
+      `Searched by the first ${MAX_QUERY_WORDS} distinct words; ignored: ${echo(ignored.join(' '))}. Use one or two topic words.`,
+    );
+  }
   if (query.sort !== 'relevance') {
     notices.push(
       SORT_NOTICE[query.sort] +

@@ -1363,3 +1363,35 @@ describe('schema messages', () => {
     );
   });
 });
+
+describe('search words', () => {
+  it('suggests an accented instructor for a name typed without accents', async () => {
+    const { mcp } = await customEndpoints([
+      {
+        abbreviation: 'PH',
+        name: 'Physics',
+        courses: [
+          course('PH-2201-2026', 'Optics', [
+            section(110, 'B01', 'B', [
+              period(['M'], '09:00', '09:50', 'EJ Néel'),
+            ]),
+          ]),
+        ],
+      },
+    ]);
+    const { text } = await toolOn(mcp, 'search_courses', {
+      filters: { searchText: { query: 'Neeel', professorOnly: true } },
+    });
+    expect(text).toContain('did you mean EJ Néel?');
+  });
+
+  it('says which words past the cap were ignored', async () => {
+    const words = Array.from({ length: 14 }, (_, i) => `topic${i}`);
+    const { text } = await tool('search_courses', {
+      filters: { searchText: { query: words.join(' ') } },
+    });
+    expect(text).toContain(
+      'Searched by the first 12 distinct words; ignored: topic12 topic13.',
+    );
+  });
+});

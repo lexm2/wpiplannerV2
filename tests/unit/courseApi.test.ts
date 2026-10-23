@@ -200,7 +200,7 @@ describe('course search', () => {
     });
     expect(codes(everyDay.body)).not.toContain('PH-1110-2026');
     expect(everyDay.body.notices).toContain(
-      'Times read as: avoiding every day 13:00-17:00.',
+      'Times read as: avoiding every day 13:00-17:00, sections with no set time kept.',
     );
     // A Tue/Thu shift leaves PH 1110's Wednesday lab, and drops RBE 1001.
     const shift = await avoid({
@@ -211,7 +211,7 @@ describe('course search', () => {
     expect(codes(shift.body)).toContain('PH-1110-2026');
     expect(codes(shift.body)).not.toContain('RBE-1001-2026');
     expect(shift.body.notices).toContain(
-      'Times read as: avoiding T,R 13:00-17:00.',
+      'Times read as: avoiding T,R 13:00-17:00, sections with no set time kept.',
     );
     const get = await call(
       '/courses?earliestStart=13:00&latestEnd=17:00&days=T,R&times=' +
@@ -221,7 +221,9 @@ describe('course search', () => {
     // Days alone: the whole day.
     const friday = await avoid({ days: ['F'] });
     expect(codes(friday.body)).not.toContain('RBE-1001-2026');
-    expect(friday.body.notices).toContain('Times read as: avoiding all of F.');
+    expect(friday.body.notices).toContain(
+      'Times read as: avoiding all of F, sections with no set time kept.',
+    );
   });
 
   it('keeps async sections alongside the shorthand when asked', async () => {

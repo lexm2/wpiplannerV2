@@ -7,14 +7,15 @@
 import type { Course } from '../types/types';
 import { getAllSections } from '../utils/courseUtils';
 import { editDistance } from '../utils/editDistance';
+import { foldText } from '../utils/searchUtils';
 import { instructorNames } from './serialize';
 
 /** Names suggested at most. */
 const MAX_SUGGESTIONS = 3;
 
+// Accents folded, as the search folds them: "Neel" is near "EJ Néel".
 const words = (text: string) =>
-  text
-    .toLowerCase()
+  foldText(text)
     .split(/[^a-z]+/)
     .filter(Boolean);
 
