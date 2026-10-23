@@ -55,27 +55,22 @@ function alternatingLead(
   year: number,
   basedOn: number,
   runsInBase: boolean,
-): { outlook: Outlook; lead: string; fitsBaseYear: boolean } | null {
+): { outlook: Outlook; lead: string } | null {
   const a = course.alternatingYears;
   if (!a) return null;
   const target = yearLabel(year);
   const base = yearLabel(basedOn);
   const quote = `(the catalog description: "${a.statement}")`;
-  const fitsBaseYear = alternatesInto(a, basedOn) === runsInBase;
-  if (!fitsBaseYear) {
+  if (alternatesInto(a, basedOn) !== runsInBase) {
     return {
       outlook: 'possible',
-      fitsBaseYear,
       lead: `The catalog description says "${a.statement}" That would ${runsInBase ? `skip ${base}, yet it runs in ${base}` : `put it in ${base}, yet it has no sections then`}; the statement looks out of date, so whether it runs in ${target} is uncertain.`,
     };
   }
   const runs = alternatesInto(a, year);
   return {
     outlook: runs ? 'likely' : 'unlikely',
-    fitsBaseYear,
-    lead: runs
-      ? `Alternating years; ${runsInBase ? `runs in ${base}` : `not offered in ${base}`}, so likely offered in ${target} ${quote}.`
-      : `Alternating years; ${runsInBase ? `runs in ${base}` : `not offered in ${base}`}, so likely not offered in ${target} ${quote}.`,
+    lead: `Alternating years; ${runsInBase ? `runs in ${base}` : `not offered in ${base}`}, so likely ${runs ? '' : 'not '}offered in ${target} ${quote}.`,
   };
 }
 

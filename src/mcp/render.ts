@@ -13,20 +13,19 @@ import type {
   SectionView,
 } from '../api/serialize';
 import type { ConflictCheck } from '../api/conflicts';
-import type { CoursePlan, catalogMeta } from '../api/lookup';
-import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
+import type { CoursePlan, catalogMeta, listDepartments } from '../api/lookup';
+import type { DateSpan, TermLetter, TermNow, YearInfo } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
 import { one, plural } from '../api/text';
 import { escapeRegExp } from '../utils/searchUtils';
 import { QUARTERS, TERMS } from '../utils/typeGuards';
 import {
-  asyncText,
   isUncapped,
   LOW_SEATS,
-  meetingsAndRoom,
   ownDates,
   SOLID_RATINGS,
+  STATEMENT_HEADING,
 } from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
@@ -103,8 +102,8 @@ function ratingText(r: Omit<Rating, 'url'>, again: boolean): string {
   return `${parts.join(', ')} ${ratingCount(r.numRatings)}`;
 }
 
-function instructor(i: InstructorView, again = false): string {
-  return i.rmp ? `${i.name} ${ratingText(i.rmp, again)}` : i.name;
+function instructor(i: InstructorView): string {
+  return i.rmp ? `${i.name} ${ratingText(i.rmp, true)}` : i.name;
 }
 
 function seats(s: {
@@ -162,7 +161,7 @@ function briefLine(s: SectionBrief, withTerm: boolean): string {
     runs(s.dates),
     s.meets,
     s.location,
-    s.instructors.map(i => instructor(i, true)).join('; '),
+    s.instructors.map(instructor).join('; '),
     seats(s),
     ...exceptions(s),
   ]
@@ -189,11 +188,8 @@ function describe(c: {
       ' ',
     );
   };
-  cut(
-    '(?:the\\s+)?(?:recommended|suggested|required)\\s+backgrounds?(?:\\s+for\\s+this\\s+course)?(?:\\s+(?:is|includes|consists\\s+of))?\\s*[:;]?',
-    c.recommendedBackground,
-  );
-  cut('prerequisites?\\s*[:;]?', c.prerequisites);
+  cut(STATEMENT_HEADING.recommendedBackground, c.recommendedBackground);
+  cut(STATEMENT_HEADING.prerequisites, c.prerequisites);
   const lines: string[] = [];
   description = description.replace(/\s{2,}/g, ' ').trim();
   if (description) lines.push(`Description: ${description}`);
@@ -280,8 +276,10 @@ function rowLine(
   search: CourseQueryResult['search'],
   easiest: boolean,
 ): string {
+  const note = matchNote(c, search);
   const parts = [
     `${index}. ${c.code} ${c.name}`,
+    ...(note ? [`(${note})`] : []),
     credits(c),
     c.terms.length
       ? `${c.terms.join(',')}${c.earlyEntry ? ' (tentative)' : ''}`
@@ -290,8 +288,6 @@ function rowLine(
       ? `${yearLabel(c.year)} early entry: not published, cannot be scheduled yet`
       : rowSeats(c),
   ];
-  const note = matchNote(c, search);
-  if (note) parts.splice(1, 0, `(${note})`);
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
     const t = c.topInstructor;
@@ -543,33 +539,28 @@ interface SectionDigest {
   endDate?: string;
 }
 
+/** The section's instructors over all its periods, each once. */
+function instructorsOf(s: SectionView): InstructorView[] {
+  const people = new Map<string, InstructorView>();
+  for (const p of s.periods)
+    for (const i of p.instructors) people.set(i.name, i);
+  return [...people.values()];
+}
+
 function digestSection(
   s: SectionView,
   term: DateSpan | undefined,
 ): SectionDigest {
   const dates = ownDates(s, term);
-  const { meets, location } = meetingsAndRoom(
-    s.periods.map(p => ({
-      when: p.isAsync
-        ? asyncText(s)
-        : p.start && p.end
-          ? `${p.days.join('')} ${p.start}-${p.end}`
-          : 'TBD',
-      room: p.location,
-    })),
-  );
-  const people = new Map<string, InstructorView>();
-  for (const p of s.periods)
-    for (const i of p.instructors) people.set(i.name, i);
   return {
     crn: s.crn,
     number: s.number,
     term: s.term,
     kind: s.kind,
     pairsWith: s.pairsWith,
-    meets,
-    location,
-    instructors: [...people.keys()],
+    meets: s.meets,
+    location: s.location,
+    instructors: instructorsOf(s).map(i => i.name),
     seats: s.seats,
     seatsAvailable: s.seatsAvailable,
     ...(s.overEnrolled && { overEnrolled: s.overEnrolled }),
@@ -582,22 +573,13 @@ function digestSection(
 }
 
 function viewLine(s: SectionView, term: DateSpan | undefined): string {
-  const d = digestSection(s, term);
-  const people = new Map<string, InstructorView>();
-  for (const p of s.periods)
-    for (const i of p.instructors) people.set(i.name, i);
-  return [
-    `${d.number} CRN ${d.crn}`,
-    runs(ownDates(s, term)),
-    d.meets,
-    d.location,
-    [...people.values()].map(i => instructor(i, true)).join('; '),
-    seats(s),
-    ...exceptions(s),
-    ...(d.meetsWith.length ? [`meets with ${d.meetsWith.join(', ')}`] : []),
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  const line = briefLine(
+    { ...s, instructors: instructorsOf(s), dates: ownDates(s, term) },
+    false,
+  );
+  return s.meetsWith.length
+    ? `${line} | meets with ${s.meetsWith.join(', ')}`
+    : line;
 }
 
 /**
@@ -646,13 +628,11 @@ export function courseDigest(
 /** Rate My Professor numbers per instructor shown, rated ones only. */
 function ratingsOf(sections: SectionView[]) {
   const ratings: Record<string, Omit<Rating, 'url'>> = {};
-  for (const s of sections)
-    for (const p of s.periods)
-      for (const i of p.instructors) {
-        if (!i.rmp) continue;
-        const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
-        ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
-      }
+  for (const i of sections.flatMap(instructorsOf)) {
+    if (!i.rmp) continue;
+    const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
+    ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
+  }
   return ratings;
 }
 
@@ -719,12 +699,7 @@ function termBlock(
       : '';
   const lines = [`${term} term${span}${ended}${running}${early}:`];
   const lectures = sections.filter(s => s.kind === 'lecture');
-  for (const kind of [
-    'lecture',
-    'standaloneLab',
-    'discussion',
-    'lab',
-  ] as const) {
+  for (const kind of Object.keys(KIND_HEADING) as SectionView['kind'][]) {
     const ofKind = sections.filter(s => s.kind === kind);
     if (!ofKind.length) continue;
     const companion = kind === 'discussion' || kind === 'lab';
@@ -1024,5 +999,26 @@ export function renderCatalogInfo(
     'Degree attribute tags are incomplete in the catalog data: a course without one may still count toward a requirement. Check the degree audit or an academic advisor.',
     `Delivery modes, for filters.deliveryMode: ${meta.deliveryModes.join(', ')}.`,
   );
+  return lines.join('\n');
+}
+
+// --- list_departments -------------------------------------------------------
+
+/** The departments of one year (its status given), or of every year (null). */
+export function renderDepartments(
+  departments: ReturnType<typeof listDepartments>,
+  year: YearInfo | null,
+): string {
+  const lines: string[] = [];
+  if (!year) lines.push('Departments in any year:');
+  else {
+    lines.push(`Departments with courses in ${yearLabel(year.year)}:`);
+    if (year.status === 'not yet published') {
+      lines.push(
+        `${yearLabel(year.year)} is not published yet; these are only early entries (${plural(year.courseCount, 'course')}).`,
+      );
+    }
+  }
+  lines.push(...departments.map(d => `${d.abbr} ${d.name} (${d.courseCount})`));
   return lines.join('\n');
 }

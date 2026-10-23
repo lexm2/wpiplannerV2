@@ -153,6 +153,9 @@ export interface SectionView {
   kind: SectionKind;
   /** For a lab or discussion: the CRNs of the lectures it can go with. */
   pairsWith: number[];
+  /** "MTRF 10:00-10:50", "Async" or "TBD"; periods joined by "; ". */
+  meets: string;
+  location: string;
   seats: number;
   /** Never below 0; see overEnrolled. */
   seatsAvailable: number;
@@ -264,18 +267,40 @@ export function termsOf(sections: Section[]): string[] {
   return [...terms].sort((a, b) => termRank(a) - termRank(b));
 }
 
+/** `f` of each term's sections, with the term first, A-D then F/S. */
+export function byTerm<T extends object>(
+  sections: Section[],
+  f: (ofTerm: Section[]) => T,
+): (T & { term: string })[] {
+  return termsOf(sections).map(term => ({
+    term,
+    ...f(sections.filter(s => (s.computedTerm as string) === term)),
+  }));
+}
+
 /**
- * Where a description's own heading for a statement starts: at a sentence
- * start, with or without a colon ("Recommended Background Working
- * knowledge of...", "The recommended background for this course is...",
- * "Prerequisites Completion of 24 credits..."). The catalog parser lifts
- * only the colon form, so 27 courses (PH 1110, DS 2010, CS 594...) had
- * the statement in their description and none in the field.
+ * A description's own heading for a statement, as a pattern source, with
+ * or without a colon ("Recommended Background Working knowledge of...",
+ * "The recommended background for this course is...", "Prerequisites
+ * Completion of 24 credits..."). The catalog parser lifts only the colon
+ * form, so 27 courses (PH 1110, DS 2010, CS 594...) had the statement in
+ * their description and none in the field. The MCP text cuts the same
+ * headings, in any case, from the description it shows.
  */
+export const STATEMENT_HEADING = {
+  recommendedBackground: String.raw`(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?`,
+  prerequisites: String.raw`Prerequisites?\s*[:;]?`,
+};
+
+/** A heading as statementOf looks for it: starting a sentence. */
+const atSentenceStart = (heading: string) =>
+  new RegExp(String.raw`(?:^|[.!?)]\s+)${heading}\s*`);
+
 const STATEMENT_HEADINGS = {
-  recommendedBackground:
-    /(?:^|[.!?)]\s+)(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?\s*/,
-  prerequisites: /(?:^|[.!?)]\s+)Prerequisites?\s*[:;]?\s*/,
+  recommendedBackground: atSentenceStart(
+    STATEMENT_HEADING.recommendedBackground,
+  ),
+  prerequisites: atSentenceStart(STATEMENT_HEADING.prerequisites),
 };
 
 /**
@@ -318,16 +343,7 @@ type RatingLookup = (name: string) => RatingView | null;
 function ratingLookup(rmp: RateMyProfessorService): RatingLookup {
   return name => {
     const r = rmp.getRatings(name);
-    if (!r) return null;
-    return {
-      ...r,
-      // RMP reports -1 when too few raters answered.
-      wouldTakeAgain:
-        r.wouldTakeAgain !== null && r.wouldTakeAgain >= 0
-          ? r.wouldTakeAgain
-          : null,
-      url: rmp.getProfessorRMPUrl(name),
-    };
+    return r && { ...r, url: rmp.getProfessorRMPUrl(name) };
   };
 }
 
@@ -406,10 +422,7 @@ export function toCourseSummary(
     year: course.academicYear ?? null,
     terms: termsOf(all),
     seats: seatTotals(primary),
-    seatsByTerm: termsOf(primary).map(term => ({
-      term,
-      ...seatTotals(primary.filter(s => (s.computedTerm as string) === term)),
-    })),
+    seatsByTerm: byTerm(primary, seatTotals),
     sectionCount: primary.length,
     isGraduate: course.isGraduate ?? false,
     professors: professorsOf(primary).slice(0, MAX_SUMMARY_PROFESSORS),
@@ -455,7 +468,7 @@ function toPeriodView(
  * (no seat cap), whose practice times Workday leaves out, "no set meeting
  * times listed": "Async" there read as no meetings at all.
  */
-export const asyncText = (s: { seats: number }) =>
+const asyncText = (s: { seats: number }) =>
   isUncapped(s) ? 'no set meeting times listed' : 'Async';
 
 /**
@@ -465,7 +478,7 @@ export const asyncText = (s: { seats: number }) =>
  * 226), each meeting carries its own room and `location` is empty, so no
  * room is read against the wrong day.
  */
-export function meetingsAndRoom(parts: { when: string; room: string }[]): {
+function meetingsAndRoom(parts: { when: string; room: string }[]): {
   meets: string;
   location: string;
 } {
@@ -573,6 +586,7 @@ function toSectionView(
     term: section.computedTerm,
     kind,
     pairsWith,
+    ...meetings(section),
     seats: section.seats,
     ...openSeats(section),
     waitlist: section.actualWaitlist,
