@@ -5,11 +5,12 @@
  */
 import * as z from 'zod';
 import type { Catalog } from './catalog';
-import { CourseQuerySchema, runCourseQuery, TERMS } from './query';
+import { CourseQuerySchema, runCourseQuery } from './query';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
 import { ApiError, echo } from './errors';
 import { logger } from '../utils/logger';
+import { TERMS } from '../utils/typeGuards';
 
 export const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',

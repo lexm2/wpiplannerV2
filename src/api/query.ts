@@ -43,7 +43,8 @@ import {
   parseSearchQuery,
   type SearchMatch,
 } from '../utils/searchUtils';
-import { TERM_ORDER } from '../utils/typeGuards';
+import { TERM_ORDER, TERMS } from '../utils/typeGuards';
+import { TimeUtils } from '../utils/timeUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
@@ -103,15 +104,6 @@ const MAX_NAME_CHARS = 100;
 const MAX_NAMES = 30;
 /** Time windows a times filter takes: a few bands on each of seven days. */
 const MAX_WINDOWS = 70;
-
-export const TERMS = [
-  AcademicTerm.A,
-  AcademicTerm.B,
-  AcademicTerm.C,
-  AcademicTerm.D,
-  AcademicTerm.F,
-  AcademicTerm.S,
-] as const;
 
 const TermSchema = caseless(TERMS).describe(
   'A, B, C, D are the 7-week quarters (A and B in fall, C and D in spring). ' +
@@ -775,8 +767,6 @@ function leftOutByDefaults(catalog: Catalog, query: CourseQuery): LeftOut[] {
   });
 }
 
-const EVERY_DAY = Object.values(DayOfWeek);
-
 type TimesInput = NonNullable<CourseQuery['filters']['times']>;
 
 /**
@@ -797,7 +787,7 @@ function timeWindows(times: TimesInput): TimeWindow[] {
           : `latestEnd "${times.latestEnd}" leaves no time in the day; give a later time ("12:00"), or "24:00" for the end of the day.`,
       );
     }
-    for (const day of times.days ?? EVERY_DAY) {
+    for (const day of times.days ?? TimeUtils.DAYS_ORDER) {
       windows.push({ day, startMin, endMin });
     }
   }
@@ -814,7 +804,9 @@ function describeTimes(times: TimesFilterCriteria): string {
   const text = [...bands]
     .map(([band, days]) => {
       const which =
-        days.length === EVERY_DAY.length ? 'every day' : days.join(',');
+        days.length === TimeUtils.DAYS_ORDER.length
+          ? 'every day'
+          : days.join(',');
       return band === '00:00-24:00' ? `all of ${which}` : `${which} ${band}`;
     })
     .join('; ');

@@ -5,7 +5,6 @@
  * single-course lookups the CourseDetail, which lists each section once.
  */
 import type { Course, Period, Section, Time } from '../types/types';
-import { DayOfWeek } from '../types/types';
 import { getAllSections, seatsLabel } from '../utils/courseUtils';
 import { TERM_ORDER } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
@@ -15,7 +14,6 @@ import type { Forecast } from './forecast';
 import type { DateSpan } from './calendar';
 
 const MAX_SUMMARY_PROFESSORS = 4;
-const DAY_ORDER = Object.values(DayOfWeek);
 
 export type SectionKind = 'lecture' | 'discussion' | 'lab' | 'standaloneLab';
 
@@ -430,7 +428,7 @@ function toPeriodView(
   timed: boolean,
   ratingOf: RatingLookup,
 ): PeriodView {
-  const days = DAY_ORDER.filter(d => period.days.has(d));
+  const days = TimeUtils.DAYS_ORDER.filter(d => period.days.has(d));
   const hasTime = period.startTime.displayTime !== 'TBD';
   let display: string;
   if (period.isAsync) display = 'Async';
@@ -493,7 +491,7 @@ function meetings(section: Section): { meets: string; location: string } {
       if (!timed.has(p) || p.startTime.displayTime === 'TBD') {
         return { when: 'TBD', room };
       }
-      const days = DAY_ORDER.filter(d => p.days.has(d)).join('');
+      const days = TimeUtils.DAYS_ORDER.filter(d => p.days.has(d)).join('');
       return { when: `${days} ${hhmm(p.startTime)}-${hhmm(p.endTime)}`, room };
     }),
   );

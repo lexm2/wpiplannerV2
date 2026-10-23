@@ -1,4 +1,4 @@
-import { SelectedCourse } from '../types/schedule';
+import { AcademicTerm, SelectedCourse } from '../types/schedule';
 import { sectionsOf } from './courseUtils';
 
 /** Type guards and validation utilities for runtime data integrity checks. */
@@ -14,14 +14,21 @@ export function getComputedTerm(sc: SelectedCourse): string | null {
 }
 
 /** The four quarter terms, in academic-year order. */
-export const QUARTER_TERMS: readonly string[] = ['A', 'B', 'C', 'D'];
+export const QUARTERS = [
+  AcademicTerm.A,
+  AcademicTerm.B,
+  AcademicTerm.C,
+  AcademicTerm.D,
+] as const;
+/** Every term a section can have, quarters first. */
+export const TERMS = [...QUARTERS, AcademicTerm.F, AcademicTerm.S] as const;
+
+/** QUARTERS as strings, to look up any term in. */
+export const QUARTER_TERMS: readonly string[] = [...QUARTERS];
 /** Semester terms: F runs through A and B, S through C and D. */
 export const SEMESTER_TERMS: readonly string[] = ['F', 'S'];
-/** Every term a section can have, quarters first. */
-export const TERM_ORDER: readonly string[] = [
-  ...QUARTER_TERMS,
-  ...SEMESTER_TERMS,
-];
+/** TERMS as strings, to look up any term in. */
+export const TERM_ORDER: readonly string[] = [...TERMS];
 
 /** A tooltip for a semester term's badge, which a single letter undersells. */
 export function semesterTermLabel(term: string): string | undefined {

@@ -19,12 +19,13 @@ import {
   yearLabel,
   yearStatus,
 } from '../api/calendar';
-import { CourseQuerySchema, runCourseQuery, TERMS } from '../api/query';
+import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { caseless } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
 import { plural } from '../api/text';
 import { logger } from '../utils/logger';
+import { TERMS } from '../utils/typeGuards';
 import {
   catalogMeta,
   listDepartments,

@@ -19,6 +19,7 @@ import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
 import { one, plural } from '../api/text';
 import { escapeRegExp } from '../utils/searchUtils';
+import { QUARTERS, TERMS } from '../utils/typeGuards';
 import {
   asyncText,
   isUncapped,
@@ -1007,11 +1008,9 @@ export function renderCatalogInfo(
     const t = (k: TermLetter) =>
       `${k} ${dates[k].start} to ${dates[k].end}${state(k)}`;
     lines.push(
-      `${yearLabel(Number(year))} terms: ${(['A', 'B', 'C', 'D'] as const).map(t).join(', ')}. Semesters: F (fall, A+B) ${dates.F.start} to ${dates.F.end}${state('F')}; S (spring, C+D) ${dates.S.start} to ${dates.S.end}${state('S')}.`,
+      `${yearLabel(Number(year))} terms: ${QUARTERS.map(t).join(', ')}. Semesters: F (fall, A+B) ${dates.F.start} to ${dates.F.end}${state('F')}; S (spring, C+D) ${dates.S.start} to ${dates.S.end}${state('S')}.`,
     );
-    const running = (['A', 'B', 'C', 'D', 'F', 'S'] as const).filter(
-      k => state(k) === ' (in progress)',
-    );
+    const running = TERMS.filter(k => state(k) === ' (in progress)');
     if (running.length) {
       lines.push(
         `${running.join(' and ')} ${one(running.length, 'is', 'are')} in progress: adding a section late may need instructor or registrar approval.`,

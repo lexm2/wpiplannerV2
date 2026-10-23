@@ -4,10 +4,10 @@
  * of it reads the catalog's clock, so tests can pin "today".
  */
 import { formatLocalDate } from '../utils/localDate';
+import { QUARTERS } from '../utils/typeGuards';
 import { currentAcademicYear, type Catalog } from './catalog';
 
-const QUARTERS = ['A', 'B', 'C', 'D'] as const;
-type Quarter = (typeof QUARTERS)[number];
+type Quarter = 'A' | 'B' | 'C' | 'D';
 export type TermLetter = Quarter | 'F' | 'S';
 
 export interface DateSpan {

@@ -11,7 +11,8 @@ import * as z from 'zod';
 import type { WeeklyTimeSlot } from '../types/schedule';
 import { AcademicTerm } from '../types/schedule';
 import type { Course, LectureGroup, Section } from '../types/types';
-import { DayOfWeek, SectionType } from '../types/types';
+import { SectionType } from '../types/types';
+import { TimeUtils } from '../utils/timeUtils';
 import { ConflictFilter } from '../core/filtering/filters/ConflictFilter';
 import { sectionToWeeklySlots, slotsOverlap } from '../utils/timeSlotUtils';
 import { currentAcademicYear, type Catalog, type CrnEntry } from './catalog';
@@ -237,7 +238,7 @@ const termsMeet = (a: AcademicTerm, b: AcademicTerm) =>
 
 const minutesOf = (t: { hours: number; minutes: number }) =>
   t.hours * 60 + t.minutes;
-const DAY_ORDER: string[] = Object.values(DayOfWeek);
+const DAY_ORDER: readonly string[] = TimeUtils.DAYS_ORDER;
 
 const inWeekOrder = (days: Iterable<string>) =>
   [...days].sort((x, y) => DAY_ORDER.indexOf(x) - DAY_ORDER.indexOf(y));
