@@ -390,8 +390,14 @@ function leftOutLine(l: CourseQueryResult['leftOut'][number]): string {
 /** Which filter emptied a search, and what leaving it out would find. */
 function relaxationLines(
   relaxations: CourseQueryResult['relaxations'],
+  unrestrictive: string[],
 ): string[] {
-  if (!relaxations.length) return [];
+  const allowAll = unrestrictive.length
+    ? [
+        `${unrestrictive.map(f => `filters.${f}`).join(', ')} ${unrestrictive.length === 1 ? 'lets' : 'let'} every course through as given, so ${unrestrictive.length === 1 ? 'it is' : 'they are'} not to blame.`,
+      ]
+    : [];
+  if (!relaxations.length) return allowAll;
   const helps = relaxations.filter(r => r.total > 0);
   const stuck = relaxations.filter(r => r.total === 0).map(r => r.filter);
   const lines: string[] = [];
@@ -418,7 +424,7 @@ function relaxationLines(
   if (helps.length && stuck.length) {
     lines.push(`Leaving out ${stuck.join(' or ')} alone still finds nothing.`);
   }
-  return lines;
+  return [...lines, ...allowAll];
 }
 
 export function renderSearch(result: CourseQueryResult): string {
@@ -429,7 +435,7 @@ export function renderSearch(result: CourseQueryResult): string {
     lines.push(
       ...(leftOut.length ? leftOut : [`No matching courses in ${where}.`]),
     );
-    lines.push(...relaxationLines(result.relaxations));
+    lines.push(...relaxationLines(result.relaxations, result.unrestrictive));
   } else {
     const last = Math.min(result.offset + result.limit, result.total);
     const range =

@@ -529,10 +529,17 @@ export interface CourseQueryResult {
     descriptionOnly: boolean;
   } | null;
   /**
-   * When nothing matched: for each filter given (up to MAX_RELAXED), how
-   * many courses match without it, and in which terms, most first.
+   * When nothing matched: for each filter given that can narrow anything,
+   * how many courses match without it, and in which terms, most to blame
+   * first. Every such filter is tried.
    */
   relaxations: Relaxation[];
+  /**
+   * When nothing matched: filters given that allow every course as given
+   * (the whole credit range, every level or mode), so cannot be to blame
+   * and are not tried.
+   */
+  unrestrictive: string[];
   /**
    * When a code search did not find the course it names: the ones a default
    * left out, because they run only in terms that have ended or are only
@@ -582,13 +589,59 @@ interface Relaxation {
   restores: string[];
 }
 
-/** How many filters an empty search tries leaving out, one at a time. */
-const MAX_RELAXED = 6;
+type FilterId = keyof CourseQuery['filters'];
+
+/**
+ * Filters given in a form that lets every course through: the full
+ * credit range, every level, mode, term or offering category, an
+ * availability or rating filter with no bound. Leaving one out changes
+ * nothing, so an empty search never blames or reruns it.
+ */
+function unrestrictiveFilters(
+  catalog: Catalog,
+  query: CourseQuery,
+): FilterId[] {
+  const f = query.filters;
+  const credits = catalog.courses.map(c => [c.minCredits, c.maxCredits]);
+  const noop: Partial<Record<FilterId, boolean>> = {
+    creditRange:
+      !!f.creditRange &&
+      credits.every(
+        ([lo, hi]) => lo <= f.creditRange!.max && hi >= f.creditRange!.min,
+      ),
+    graduateLevel: f.graduateLevel?.level === 'all',
+    courseLevel:
+      !!f.courseLevel &&
+      (f.courseLevel.min ?? 1) <= 1 &&
+      (f.courseLevel.max ?? 9) >= 9,
+    deliveryMode: DELIVERY_MODES.every(m => f.deliveryMode?.modes.includes(m)),
+    offeringPattern:
+      !!f.offeringPattern?.includeUnknown &&
+      ([1, 2, 3] as const).every(c =>
+        f.offeringPattern!.categories.includes(c),
+      ),
+    term: TERM_ORDER.every(t =>
+      (f.term?.terms as string[] | undefined)?.includes(t),
+    ),
+    availability:
+      !!f.availability &&
+      !f.availability.availableOnly &&
+      f.availability.minAvailable === undefined &&
+      f.availability.maxWaitlisted === undefined,
+    rmpRating:
+      !!f.rmpRating &&
+      RMP_BOUNDS.every(k => f.rmpRating![k] === undefined) &&
+      f.rmpRating.includeWithoutData !== false,
+  };
+  return (Object.keys(f) as FilterId[]).filter(id => noop[id]);
+}
 
 /**
  * The same search with each given filter left out in turn, so an empty
  * result can say which filter emptied it. The year stays: it is a choice
- * of what can be scheduled, not a narrowing. Bounded at MAX_RELAXED reruns.
+ * of what can be scheduled, not a narrowing. Filters that let everything
+ * through are skipped; every other one is tried (at most 13 reruns, each a
+ * few milliseconds, and only for an empty search).
  *
  * Ordered by blame, most to blame first. The text search says what the
  * student is looking for, and the other filters narrow it, so a filter
@@ -597,10 +650,17 @@ const MAX_RELAXED = 6;
  * and the search itself comes after every other filter that finds
  * anything; the rest by how many courses come back.
  */
-function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
-  const ids = (Object.keys(query.filters) as (keyof CourseQuery['filters'])[])
-    .filter(id => id !== 'academicYear' && query.filters[id] !== undefined)
-    .slice(0, MAX_RELAXED);
+function relax(
+  catalog: Catalog,
+  query: CourseQuery,
+  skip: FilterId[],
+): Relaxation[] {
+  const ids = (Object.keys(query.filters) as FilterId[]).filter(
+    id =>
+      id !== 'academicYear' &&
+      query.filters[id] !== undefined &&
+      !skip.includes(id),
+  );
   // A lone search, left out, finds the whole year: nothing worth saying.
   if (ids.length === 1 && ids[0] === 'searchText') return [];
   const text = query.filters.searchText;
@@ -1195,7 +1255,10 @@ export function runCourseQuery(
     ...read.notices,
     ...companionNotices(catalog, read.criteria, filtered),
   ];
-  const relaxations = matches.length === 0 ? relax(catalog, query) : [];
+  const unrestrictive =
+    matches.length === 0 ? unrestrictiveFilters(catalog, query) : [];
+  const relaxations =
+    matches.length === 0 ? relax(catalog, query, unrestrictive) : [];
   // The named course itself missing, even with mentions of it listed.
   const leftOut = named.length === 0 ? leftOutByDefaults(catalog, query) : [];
   if (matches.length === 0 && text) {
@@ -1259,6 +1322,7 @@ export function runCourseQuery(
     }),
     search,
     relaxations,
+    unrestrictive,
     leftOut,
     totals: totalsOf(
       matches,

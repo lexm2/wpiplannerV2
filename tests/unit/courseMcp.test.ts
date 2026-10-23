@@ -1160,3 +1160,34 @@ describe('a code search the defaults empty', () => {
     );
   });
 });
+
+describe('an empty search with many filters', () => {
+  it('tries every filter that can narrow, and names those that cannot', async () => {
+    const { text, data } = await tool('search_courses', {
+      filters: {
+        department: { departments: ['CS'] },
+        creditRange: { min: 0, max: 100 },
+        graduateLevel: { level: 'all' },
+        courseLevel: { min: 1, max: 9 },
+        deliveryMode: { modes: ['In-Person', 'Online', 'Hybrid'] },
+        offeringPattern: { categories: [1, 2, 3], includeUnknown: true },
+        term: { terms: ['A'] },
+        times: { mode: 'only', earliestStart: '22:00' },
+      },
+    });
+    expect(data.total).toBe(0);
+    expect(data.relaxations[0]).toMatchObject({ filter: 'times', total: 1 });
+    expect(data.unrestrictive).toEqual([
+      'creditRange',
+      'graduateLevel',
+      'courseLevel',
+      'deliveryMode',
+      'offeringPattern',
+    ]);
+    expect(text).toContain('Most restrictive: filters.times.');
+    expect(text).toContain(
+      'filters.creditRange, filters.graduateLevel, filters.courseLevel, filters.deliveryMode, filters.offeringPattern let every course through as given, so they are not to blame.',
+    );
+    expect(text).not.toContain('No single filter');
+  });
+});
