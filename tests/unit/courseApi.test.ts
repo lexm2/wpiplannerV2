@@ -522,7 +522,9 @@ describe('course detail', () => {
     expect(typo.status).toBe(404);
     expect(typo.body.error).toContain('Close codes: MA 1021');
     const past = await call('/courses/CS2102?year=2025');
-    expect(past.body.error).toContain('it is in 2026-27');
+    expect(past.body.error).toBe(
+      '2025-26 is not in this catalog (it covers 2026-27 and early 2027-28 entries), so nothing can be said about it here.',
+    );
     const dept = await call('/courses/XQ1000');
     expect(dept.body.error).toContain('no department XQ');
     expect((await call('/courses/999')).body.error).toContain(

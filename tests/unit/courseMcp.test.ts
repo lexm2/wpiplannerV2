@@ -1260,3 +1260,106 @@ describe('courses lost through their labs', () => {
     );
   });
 });
+
+describe('years a course lookup cannot answer', () => {
+  it('says which year a CRN is from when another is asked for', async () => {
+    const past = await tool('get_course', { course: '1', year: 2025 });
+    expect(past.isError).toBe(true);
+    expect(past.text).toContain(
+      'CRN 1 is CS 2102 section AL01 of 2026-27, not 2025-26.',
+    );
+    const early = await tool('get_course', { course: '6', year: 2026 });
+    expect(early.text).toContain(
+      'CRN 6 is MA 1021 section AL01 of 2027-28, not 2026-27.',
+    );
+  });
+
+  it('forecasts only next year', async () => {
+    for (const args of [
+      { course: 'CS 2102', year: 2100 },
+      { course: '1', year: 2030 },
+    ]) {
+      const far = await tool('get_course', args);
+      expect(far.isError).toBe(true);
+      expect(far.text).toContain(
+        'Only next year (2027, 2027-28) can be forecast',
+      );
+    }
+    const next = await tool('get_course', { course: 'CS 2102', year: 2027 });
+    expect(next.isError).toBe(false);
+  });
+
+  it('says a year with no data is not in the catalog, rather than not offered', async () => {
+    const code = await tool('get_course', { course: 'CS 2102', year: 2025 });
+    expect(code.text).toBe(
+      '2025-26 is not in this catalog (it covers 2026-27 and early 2027-28 entries), so nothing can be said about it here.',
+    );
+    const id = await tool('get_course', { course: 'CS-2102-1999' });
+    expect(id.text).toContain('1999-00 is not in this catalog');
+    // A year the catalog has, without the course: the usual answer.
+    const missing = await tool('get_course', { course: 'CS-9999-2026' });
+    expect(missing.text).toContain('No course CS 9999 in 2026-27.');
+  });
+
+  it('reads a CRN with leading zeros as the CRN', async () => {
+    const { text } = await tool('get_course', { course: 'CRN0000001' });
+    expect(text).toContain('CRN 1 is CS 2102 section AL01');
+  });
+});
+
+describe('schema messages', () => {
+  it('refuses a minimum above its maximum', async () => {
+    for (const [min, max] of [
+      ['minRating', 'maxRating'],
+      ['minDifficulty', 'maxDifficulty'],
+      ['minWouldTakeAgain', 'maxWouldTakeAgain'],
+    ]) {
+      const result = await tool('search_courses', {
+        filters: { rmpRating: { [min]: 4, [max]: 2 } },
+      });
+      expect(result.isError).toBe(true);
+      expect(result.text).toContain(`${max} must be at least ${min}`);
+    }
+  });
+
+  it('explains a latestEnd that leaves no time, and takes 24:00 as an end', async () => {
+    const early = await tool('search_courses', {
+      filters: { times: { latestEnd: '00:00' } },
+    });
+    expect(early.isError).toBe(true);
+    expect(early.text).toContain('latestEnd "00:00" leaves no time in the day');
+    const late = await tool('search_courses', {
+      filters: { times: { earliestStart: '17:00', latestEnd: '24:00' } },
+    });
+    expect(late.isError).toBe(false);
+    expect(late.text).toContain(
+      'Times read as: only within every day 17:00-24:00.',
+    );
+    const busy = await tool('check_conflicts', {
+      crns: [40],
+      busy: [{ days: ['M'], start: '18:00', end: '24:00' }],
+    });
+    expect(busy.isError).toBe(false);
+    expect(busy.text).toContain('BUSY PSY 1400 B01');
+  });
+
+  it('takes "ALL" for every year, and names what a year or category must be', async () => {
+    const all = await tool('search_courses', {
+      filters: { academicYear: { year: 'ALL' } },
+    });
+    expect(all.isError).toBe(false);
+    expect(all.data.year).toBe('all');
+    const bad = await tool('search_courses', {
+      filters: { academicYear: { year: 'next' } },
+    });
+    expect(bad.text).toContain(
+      'year is a fall year as a number (2026 for 2026-27) or "all"',
+    );
+    const category = await tool('search_courses', {
+      filters: { offeringPattern: { categories: [4] } },
+    });
+    expect(category.text).toContain(
+      'offering categories are 1 (every year), 2 (every other year) or 3 (occasionally)',
+    );
+  });
+});

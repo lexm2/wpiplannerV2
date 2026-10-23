@@ -83,6 +83,32 @@ function coursesWithCode(catalog: Catalog, code: string): Course[] {
     .sort((a, b) => (a.academicYear ?? 0) - (b.academicYear ?? 0));
 }
 
+/** "2026-27 and early 2027-28 entries": the years the catalog has courses in. */
+function coverage(catalog: Catalog): string {
+  const years = yearInfo(catalog)
+    .filter(y => y.courseCount > 0)
+    .map(y =>
+      y.status === 'not yet published'
+        ? `early ${yearLabel(y.year)} entries`
+        : yearLabel(y.year),
+    );
+  return years.length <= 1
+    ? (years[0] ?? 'no year')
+    : `${years.slice(0, -1).join(', ')} and ${years.at(-1)}`;
+}
+
+/**
+ * For a year the catalog has nothing for at all: "not offered" would be a
+ * guess; the year is simply not in the data.
+ */
+function yearNotInCatalog(catalog: Catalog, year: number): ApiError {
+  return new ApiError(
+    `${yearLabel(year)} is not in this catalog (it covers ${coverage(catalog)}), so nothing can be said about it here.`,
+    404,
+    { year, years: catalog.years },
+  );
+}
+
 /** An error naming the years a code exists in, or the codes it is close to. */
 function courseNotFound(
   catalog: Catalog,
@@ -91,6 +117,18 @@ function courseNotFound(
 ): ApiError {
   const key = input.trim();
   const inYear = `in ${yearLabel(year)}`;
+
+  // A well-formed id of a year the catalog lacks: "CS-2102-1999".
+  const id = COURSE_ID_RE.test(key) ? Number(key.slice(-4)) : null;
+  if (id !== null && yearStatus(catalog, id).courseCount === 0) {
+    return yearNotInCatalog(catalog, id);
+  }
+  if (id !== null) {
+    return courseNotFound(catalog, key.slice(0, -5), id);
+  }
+  if (year < currentAcademicYear(catalog) && !catalog.years.includes(year)) {
+    return yearNotInCatalog(catalog, year);
+  }
 
   if (CRN_RE.test(key)) {
     return new ApiError(
@@ -275,8 +313,11 @@ export function lookupCourse(
 ): CourseLookup {
   const { year, ...detailOptions } = options;
   const notices: string[] = [];
-  // "CRN 349614" as well as "349614".
-  const key = input.trim().replace(/^crn[\s#:.-]*(?=\d+$)/i, '');
+  // "CRN 349614" as well as "349614"; "CRN0350041" is CRN 350041.
+  const key = input
+    .trim()
+    .replace(/^crn[\s#:.-]*(?=\d+$)/i, '')
+    .replace(/^0+(?=\d+$)/, '');
   const current = currentAcademicYear(catalog);
   if (!key) {
     throw new ApiError(
@@ -292,6 +333,25 @@ export function lookupCourse(
   let course: Course | null = null;
   if (CRN_RE.test(key)) {
     const entry = catalog.sectionsByCrn.get(Number(key));
+    const own = entry?.courses[0].academicYear;
+    // A CRN names one year's section; another year asked for is not it,
+    // save an unpublished year, which is answered with the outlook below.
+    if (
+      entry &&
+      year !== undefined &&
+      own !== undefined &&
+      own !== year &&
+      !(
+        year > current &&
+        yearStatus(catalog, year).status === 'not yet published'
+      )
+    ) {
+      throw new ApiError(
+        `CRN ${key} is ${courseCode(entry.courses[0])} section ${entry.section.number} of ${yearLabel(own)}, not ${yearLabel(year)}. Leave out year to see it, or give the course code with year ${year}.`,
+        404,
+        { crn: Number(key), year: own },
+      );
+    }
     if (entry) {
       course = entry.courses[0];
       const s = entry.section;
@@ -319,6 +379,21 @@ export function lookupCourse(
           `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
         );
       }
+    }
+  }
+
+  if (year !== undefined) {
+    const status = yearStatus(catalog, year);
+    // Only the year after this one can be read off this year's schedule.
+    if (year > current + 1 && status.status === 'not yet published') {
+      throw new ApiError(
+        `Only next year (${current + 1}, ${yearLabel(current + 1)}) can be forecast, from this year's schedule; ${yearLabel(year)} is too far ahead. Call get_course with year ${current + 1}, or without a year for ${yearLabel(current)}.`,
+        422,
+        { year, forecastYear: current + 1 },
+      );
+    }
+    if (year < current && status.courseCount === 0) {
+      throw yearNotInCatalog(catalog, year);
     }
   }
 

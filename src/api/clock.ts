@@ -5,6 +5,14 @@ export const ClockSchema = z
   .string()
   .regex(/^([01]?\d|2[0-3]):[0-5]\d$/, 'use 24-hour HH:MM, e.g. "09:30"');
 
+/** An end time: any clock time, or "24:00" for the end of the day. */
+export const EndClockSchema = z
+  .string()
+  .regex(
+    /^(([01]?\d|2[0-3]):[0-5]\d|24:00)$/,
+    'use 24-hour HH:MM, e.g. "17:00"; "24:00" is the end of the day',
+  );
+
 /** Minutes after midnight: "13:30" is 810. */
 export function clockMinutes(clock: string): number {
   const [h, m] = clock.split(':').map(Number);

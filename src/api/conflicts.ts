@@ -25,7 +25,7 @@ import {
   type TermLetter,
 } from './calendar';
 import { ApiError, listSome, withoutControls } from './errors';
-import { ClockSchema, clockMinutes, clockText } from './clock';
+import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
 import { courseCode, isUncapped } from './serialize';
 
 /** CRNs a schedule check, or a search fitted around CRNs, takes at most. */
@@ -38,7 +38,9 @@ const BusyBlockSchema = z
       .min(1)
       .describe('M, T, W, R (Thursday), F, S, U; ["T", "R"] for Tue/Thu.'),
     start: ClockSchema.describe('24-hour start, "13:00".'),
-    end: ClockSchema.describe('24-hour end, exclusive, "17:00".'),
+    end: EndClockSchema.describe(
+      '24-hour end, exclusive, "17:00"; "24:00" for the end of the day.',
+    ),
     label: z
       .string()
       .trim()

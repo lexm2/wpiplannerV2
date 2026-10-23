@@ -58,7 +58,7 @@ import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
 import { ApiError, echo, listSome } from './errors';
 import { EndedTermsFilter, type EndedTermsCriteria } from './endedTermsFilter';
-import { ClockSchema, clockMinutes, clockText } from './clock';
+import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
 import {
   DELIVERY_MODES,
@@ -200,7 +200,15 @@ const FiltersSchema = strictObject(
         'Keep sections in any of these terms. For everything running during A term, ask for ["A", "F"]. Naming a term that has ended keeps its sections.',
       ),
     academicYear: strictObject(
-      { year: z.union([YearSchema, z.literal('all')]) },
+      {
+        year: z.preprocess(
+          v => (typeof v === 'string' ? v.toLowerCase() : v),
+          z.union([YearSchema, z.literal('all')], {
+            error:
+              'year is a fall year as a number (2026 for 2026-27) or "all"',
+          }),
+        ),
+      },
       querySchema,
     )
       .optional()
@@ -286,10 +294,15 @@ const FiltersSchema = strictObject(
     offeringPattern: strictObject(
       {
         categories: z
-          .array(z.union([z.literal(1), z.literal(2), z.literal(3)]))
-          .min(1)
+          .array(
+            z.union([z.literal(1), z.literal(2), z.literal(3)], {
+              error:
+                'offering categories are 1 (every year), 2 (every other year) or 3 (occasionally)',
+            }),
+          )
+          .max(3)
           .describe(
-            'WPI offering category: 1 = every year, 2 = at least every other year, 3 = occasionally or on demand.',
+            'WPI offering category: 1 = every year, 2 = at least every other year, 3 = occasionally or on demand. Empty with includeUnknown true: only courses with no category.',
           ),
         includeUnknown: z
           .boolean()
@@ -300,6 +313,10 @@ const FiltersSchema = strictObject(
       },
       querySchema,
     )
+      .refine(
+        o => o.categories.length > 0 || o.includeUnknown === true,
+        'give at least one category, or includeUnknown: true for courses with none',
+      )
       .optional()
       .describe(
         'The only signal of what a later year will offer: Cat. I courses are likely to run again next year.',
@@ -316,7 +333,7 @@ const FiltersSchema = strictObject(
         earliestStart: ClockSchema.optional().describe(
           'Shorthand, on `days` (default every day). "only": meetings start at or after this ("17:00" for evening classes). "avoid": the start of the band to avoid.',
         ),
-        latestEnd: ClockSchema.optional().describe(
+        latestEnd: EndClockSchema.optional().describe(
           'Shorthand, on `days` (default every day). "only": meetings end by this ("12:00"). "avoid": the end of the band to avoid.',
         ),
         days: z
@@ -390,6 +407,23 @@ const FiltersSchema = strictObject(
       },
       querySchema,
     )
+      .superRefine((r, ctx) => {
+        for (const [min, max] of [
+          ['minRating', 'maxRating'],
+          ['minDifficulty', 'maxDifficulty'],
+          ['minWouldTakeAgain', 'maxWouldTakeAgain'],
+        ] as const) {
+          const lo = r[min];
+          const hi = r[max];
+          if (lo !== undefined && hi !== undefined && lo > hi) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [max],
+              message: `${max} must be at least ${min}`,
+            });
+          }
+        }
+      })
       .optional()
       .describe(
         "Rate My Professor bounds on 0-5 scales (difficulty: 5 is hardest), judged on the lecture's instructors; a lecture passes when any of them does. Averages on few ratings are noisy: add minNumRatings.",
@@ -755,7 +789,11 @@ function timeWindows(times: TimesInput): TimeWindow[] {
       : 0;
     const endMin = times.latestEnd ? clockMinutes(times.latestEnd) : 1440;
     if (endMin <= startMin) {
-      throw new ApiError('latestEnd must be after earliestStart.');
+      throw new ApiError(
+        times.earliestStart
+          ? 'latestEnd must be after earliestStart.'
+          : `latestEnd "${times.latestEnd}" leaves no time in the day; give a later time ("12:00"), or "24:00" for the end of the day.`,
+      );
     }
     for (const day of times.days ?? EVERY_DAY) {
       windows.push({ day, startMin, endMin });
