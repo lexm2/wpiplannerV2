@@ -22,8 +22,14 @@ import {
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
-import { catalogMeta, listDepartments, lookupCourse } from '../api/lookup';
 import {
+  catalogMeta,
+  listDepartments,
+  lookupCourse,
+  MAX_COURSE_INPUT,
+} from '../api/lookup';
+import {
+  conflictData,
   courseDigest,
   renderCatalogInfo,
   renderConflicts,
@@ -150,7 +156,9 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         .object({
           course: z
             .string()
+            .trim()
             .min(1)
+            .max(MAX_COURSE_INPUT)
             .describe(
               'A course code ("CS 2102", "CS2102"), catalog id ("CS-2102-2026"), a section CRN ("350041" or "CRN 350041"), or a course title ("Critical AI Literacy"; resolved when one title is or starts with it, else the closest are suggested).',
             ),
@@ -301,7 +309,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         const check = findConflicts(await getCatalog(), crns, busy);
         return {
           content: text(renderConflicts(check)),
-          structuredContent: { ...check },
+          structuredContent: conflictData(check),
         };
       } catch (error) {
         return failure(error);

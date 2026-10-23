@@ -16,6 +16,7 @@ import type { ConflictCheck } from '../api/conflicts';
 import type { CoursePlan, catalogMeta } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
+import { echo } from '../api/errors';
 import { isUncapped, SOLID_RATINGS } from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
@@ -231,7 +232,7 @@ function matchNote(
   if (!search) return null;
   switch (c.match) {
     case 'mentions':
-      return `mentions ${search.query.trim()}`;
+      return `mentions ${echo(search.query)}`;
     case 'sectionTitle':
       return 'matched a section title';
     case 'section':
@@ -768,6 +769,32 @@ export function renderPlan(plan: CoursePlan, notices: string[]): string {
 
 // --- check_conflicts --------------------------------------------------------
 
+/**
+ * Conflict and busy lines check_conflicts lists, each, before a count: 100
+ * CRNs against 20 all-day busy blocks would otherwise list thousands.
+ */
+const MAX_CONFLICT_LINES = 25;
+
+/**
+ * check_conflicts' structuredContent: the check, with its conflict and busy
+ * lists cut where the text cuts them and the counts left out in `notListed`.
+ * HTTP sends them all.
+ */
+export function conflictData(check: ConflictCheck) {
+  return {
+    ...check,
+    conflicts: check.conflicts.slice(0, MAX_CONFLICT_LINES),
+    busyConflicts: check.busyConflicts.slice(0, MAX_CONFLICT_LINES),
+    notListed: {
+      conflicts: Math.max(0, check.conflicts.length - MAX_CONFLICT_LINES),
+      busyConflicts: Math.max(
+        0,
+        check.busyConflicts.length - MAX_CONFLICT_LINES,
+      ),
+    },
+  };
+}
+
 export function renderConflicts(check: ConflictCheck): string {
   const lines: string[] = [];
   if (check.duplicates.length) {
@@ -777,18 +804,36 @@ export function renderConflicts(check: ConflictCheck): string {
   }
   const name = (s: ConflictCheck['conflicts'][number]['a']) =>
     `${s.courses.join('/')} ${s.section} (CRN ${s.crn}, ${s.term})`;
-  for (const { a, b, overlaps } of check.conflicts) {
+  for (const { a, b, overlaps } of check.conflicts.slice(
+    0,
+    MAX_CONFLICT_LINES,
+  )) {
     const when = overlaps.length
       ? `: both meet ${overlaps.map(o => `${o.days.join('')} ${o.start}-${o.end}`).join(', ')}`
       : '';
     lines.push(`CONFLICT ${name(a)} and ${name(b)}${when}.`);
   }
+  const moreConflicts = check.conflicts.length - MAX_CONFLICT_LINES;
+  if (moreConflicts > 0) {
+    lines.push(
+      `+${moreConflicts} more conflicting pair${moreConflicts === 1 ? '' : 's'} not listed; check fewer CRNs at a time to see them.`,
+    );
+  }
   const band = (o: { days: string[]; start: string; end: string }) =>
     `${o.days.join(',')} ${o.start}-${o.end}`;
-  for (const { section, busy, overlaps } of check.busyConflicts) {
+  for (const { section, busy, overlaps } of check.busyConflicts.slice(
+    0,
+    MAX_CONFLICT_LINES,
+  )) {
     const what = busy.label ? `"${busy.label}" (${band(busy)})` : band(busy);
     lines.push(
       `BUSY ${name(section)} meets during ${what}: ${overlaps.map(band).join(', ')}.`,
+    );
+  }
+  const moreBusy = check.busyConflicts.length - MAX_CONFLICT_LINES;
+  if (moreBusy > 0) {
+    lines.push(
+      `+${moreBusy} more section and busy-time overlap${moreBusy === 1 ? '' : 's'} not listed.`,
     );
   }
   for (const issue of check.issues) {

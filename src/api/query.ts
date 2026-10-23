@@ -51,11 +51,11 @@ import {
   yearLabel,
   type TermLetter,
 } from './calendar';
-import { blockedSlotsForCrns } from './conflicts';
+import { blockedSlotsForCrns, MAX_CRNS } from './conflicts';
 import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
-import { ApiError } from './errors';
+import { ApiError, echo } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
 import {
@@ -92,6 +92,13 @@ const SORTS = [
   'number',
 ] as const;
 const MAX_LIMIT = 200;
+/** Longest searchText.query: a code and a few words fit many times over. */
+const MAX_QUERY_CHARS = 200;
+/** Longest department or degree-attribute name, and how many of them. */
+const MAX_NAME_CHARS = 100;
+const MAX_NAMES = 30;
+/** Time windows a times filter takes: a few bands on each of seven days. */
+const MAX_WINDOWS = 70;
 
 const TermSchema = z
   .enum([
@@ -155,6 +162,7 @@ const FiltersSchema = strictObject(
           .string()
           .trim()
           .min(1)
+          .max(MAX_QUERY_CHARS)
           .describe(
             'A course code ("MA 1022", "CS2102"; "CS 21" for every CS 21xx) finds that course first, then courses whose description names it (marked "mentions"); words after a code narrow it ("MA 1022 calculus"). ' +
               'A department name or abbreviation alone ("computer science", "CS") lists its courses by number. ' +
@@ -172,15 +180,19 @@ const FiltersSchema = strictObject(
     department: strictObject(
       {
         departments: z
-          .array(z.string().min(1))
+          .array(z.string().trim().min(1).max(MAX_NAME_CHARS))
           .min(1)
+          .max(MAX_NAMES)
           .describe(
             'Abbreviations ("CS", "MA") or full names ("Computer Science"), any case.',
           ),
       },
       querySchema,
     ).optional(),
-    term: strictObject({ terms: z.array(TermSchema).min(1) }, querySchema)
+    term: strictObject(
+      { terms: z.array(TermSchema).min(1).max(12) },
+      querySchema,
+    )
       .optional()
       .describe(
         'Keep sections in any of these terms. For everything running during A term, ask for ["A", "F"]. Naming a term that has ended keeps its sections.',
@@ -252,8 +264,9 @@ const FiltersSchema = strictObject(
     degreeAttribute: strictObject(
       {
         attributes: z
-          .array(z.string().min(1))
+          .array(z.string().trim().min(1).max(MAX_NAME_CHARS))
           .min(1)
+          .max(MAX_NAMES)
           .describe(
             'Degree requirements a course counts toward, any of them: "Humanities and Arts", "Social Sciences", "Capstone Design Experience"... (get_catalog_info lists all, with counts). Case-insensitive; a unique start like "social science" works.',
           ),
@@ -261,7 +274,7 @@ const FiltersSchema = strictObject(
       querySchema,
     ).optional(),
     deliveryMode: strictObject(
-      { modes: z.array(z.enum(DELIVERY_MODES)).min(1) },
+      { modes: z.array(z.enum(DELIVERY_MODES)).min(1).max(12) },
       querySchema,
     )
       .optional()
@@ -315,6 +328,7 @@ const FiltersSchema = strictObject(
           ),
         windows: z
           .array(TimeWindowSchema)
+          .max(MAX_WINDOWS)
           .min(
             1,
             'give at least one window; to bound start and end times on every day, use earliestStart/latestEnd instead',
@@ -383,6 +397,7 @@ const FiltersSchema = strictObject(
         crns: z
           .array(z.number().int().positive())
           .min(1)
+          .max(MAX_CRNS)
           .describe(
             "CRNs of sections the student already has; sections that clash with any of them are dropped, labs and discussions included. A semester section clashes with both of its quarters' sections.",
           ),
@@ -672,8 +687,17 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     includeInterestLists: query.includeInterestLists,
   });
 
-  if (filters.searchText)
+  if (filters.searchText) {
+    // No letter or digit survives tokenizing: as a filter it would match
+    // every course, which reads as a search that found them all.
+    const parsed = parseSearchQuery(filters.searchText.query);
+    if (!parsed.code && parsed.words.length === 0) {
+      throw new ApiError(
+        `"${echo(filters.searchText.query)}" has no searchable words; the catalog is searched in English (letters and digits).`,
+      );
+    }
     set<SearchTextFilterCriteria>('searchText', filters.searchText);
+  }
   if (filters.department) {
     const { abbrs, notes } = resolveDepartments(
       catalog,
@@ -864,7 +888,7 @@ function instructorNotice(inYear: Course[], query: string): string[] {
   const names = suggestInstructors(inYear, query);
   if (!names.length) return [];
   return [
-    `No instructor is named "${query.trim()}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
+    `No instructor is named "${echo(query)}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
   ];
 }
 

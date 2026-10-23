@@ -29,7 +29,7 @@ import {
   type TermNow,
   type YearInfo,
 } from './calendar';
-import { ApiError } from './errors';
+import { ApiError, echo } from './errors';
 import { forecastCourse, type Forecast } from './forecast';
 import {
   courseCode,
@@ -47,6 +47,9 @@ const COURSE_ID_RE = /^[A-Za-z]+-[A-Za-z0-9]+-\d{4}$/;
 const COURSE_CODE_RE = /^([A-Za-z]{2,5})[\s-]*(\d{2,4}[A-Za-z]?)$/;
 // Codes always have letters, so a bare number is a CRN.
 const CRN_RE = /^\d+$/;
+
+/** Longest course input looked up: a title fits, an essay does not. */
+export const MAX_COURSE_INPUT = 200;
 
 /**
  * A course by catalog id ("CS-2102-2026") or by code ("CS 2102", "CS2102",
@@ -131,7 +134,7 @@ function courseNotFound(
     { limit: 2 },
   );
   return new ApiError(
-    `"${key}" is not a course id, code or CRN.${close.length ? ` Close codes: ${close.join(', ')}.` : ''} Give a code like "CS 2102", or find the course by name with search_courses.`,
+    `"${echo(key)}" is not a course id, code or CRN.${close.length ? ` Close codes: ${close.join(', ')}.` : ''} Give a code like "CS 2102", or find the course by name with search_courses.`,
     404,
     { suggestions: close },
   );
@@ -181,7 +184,7 @@ function courseByName(
   if (!ranked.length) return null;
   const list = ranked.map(c => `${courseCode(c)} ${c.name}`);
   throw new ApiError(
-    `${classes.length ? `"${name}" fits ${classes.length} course titles` : `"${name}" is not a course title, id, code or CRN`}. Closest: ${list.join('; ')}. Give a code like "CS 2102".`,
+    `${classes.length ? `"${echo(name)}" fits ${classes.length} course titles` : `"${echo(name)}" is not a course title, id, code or CRN`}. Closest: ${list.join('; ')}. Give a code like "CS 2102".`,
     404,
     { suggestions: ranked.map(courseCode) },
   );
@@ -267,6 +270,16 @@ export function lookupCourse(
   // "CRN 349614" as well as "349614".
   const key = input.trim().replace(/^crn[\s#:.-]*(?=\d+$)/i, '');
   const current = currentAcademicYear(catalog);
+  if (!key) {
+    throw new ApiError(
+      'Give a course code ("CS 2102"), catalog id, CRN or title.',
+    );
+  }
+  if (key.length > MAX_COURSE_INPUT) {
+    throw new ApiError(
+      `"${echo(key)}" is too long for a course (${MAX_COURSE_INPUT} characters at most); give a code like "CS 2102", or find the course by name with search_courses.`,
+    );
+  }
 
   let course: Course | null = null;
   if (CRN_RE.test(key)) {
@@ -290,7 +303,9 @@ export function lookupCourse(
           : null);
       if (named) {
         course = named;
-        notices.push(`"${key}" read as ${courseCode(named)} ${named.name}.`);
+        notices.push(
+          `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+        );
       }
     }
   }
@@ -445,13 +460,13 @@ export function resolveDepartments(
     const near = closestDepartments(want, departments, catalog);
     if (near.length === 1) {
       resolved.add(near[0].abbreviation);
-      notes.push(`Department "${input}" read as ${label(near[0])}.`);
+      notes.push(`Department "${echo(input)}" read as ${label(near[0])}.`);
       continue;
     }
     throw new ApiError(
       near.length
-        ? `Department "${input}" could be ${near.map(label).join(', ')}. Use an abbreviation (list_departments has them all).`
-        : `Unknown department "${input}". Use abbreviations from list_departments.`,
+        ? `Department "${echo(input)}" could be ${near.map(label).join(', ')}. Use an abbreviation (list_departments has them all).`
+        : `Unknown department "${echo(input)}". Use abbreviations from list_departments.`,
       400,
       { department: input, candidates: near.map(d => d.abbreviation) },
     );
@@ -558,7 +573,7 @@ export function resolveDegreeAttributes(
     const partial = known.filter(a => a.toLowerCase().startsWith(want));
     if (partial.length === 1) return partial[0];
     throw new ApiError(
-      `Unknown degree attribute "${input}". The catalog's attributes: ${known.sort().join('; ')}.`,
+      `Unknown degree attribute "${echo(input)}". The catalog's attributes: ${known.sort().join('; ')}.`,
       400,
       { attribute: input, known },
     );

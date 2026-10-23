@@ -22,9 +22,12 @@ import {
   yearLabel,
   type TermLetter,
 } from './calendar';
-import { ApiError } from './errors';
+import { ApiError, listSome, withoutControls } from './errors';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { courseCode } from './serialize';
+
+/** CRNs a schedule check, or a search fitted around CRNs, takes at most. */
+export const MAX_CRNS = 100;
 
 const BusyBlockSchema = z
   .object({
@@ -54,7 +57,7 @@ export const ConflictCheckInputSchema = z
     crns: z
       .array(z.number().int().positive())
       .min(1)
-      .max(100)
+      .max(MAX_CRNS)
       .describe(
         'CRNs of the sections to check together, lectures and labs alike.',
       ),
@@ -74,7 +77,7 @@ export type BusyBlock = z.infer<typeof BusyBlockSchema>;
 class UnknownCrnError extends ApiError {
   constructor(readonly crns: number[]) {
     super(
-      `Unknown CRN${crns.length === 1 ? '' : 's'}: ${crns.join(', ')}. Get CRNs from get_course or search_courses.`,
+      `Unknown CRN${crns.length === 1 ? '' : 's'}: ${listSome(crns)}. Get CRNs from get_course or search_courses.`,
       400,
       { unknownCrns: crns },
     );
@@ -304,7 +307,7 @@ export function findConflicts(
       busyConflicts.push({
         section: side(crn, entry),
         busy: {
-          label: block.label ?? null,
+          label: (block.label && withoutControls(block.label)) || null,
           days: inWeekOrder(block.days),
           start: clockText(clockMinutes(block.start)),
           end: clockText(clockMinutes(block.end)),
@@ -314,12 +317,23 @@ export function findConflicts(
     }
   }
 
-  const unknown: ScheduleIssue[] = missing.map(crn => ({
-    severity: 'error',
-    kind: 'unknownCrn',
-    crns: [crn],
-    message: `CRN ${crn} is not a section in the catalog; get CRNs from get_course or search_courses.`,
-  }));
+  // One issue per unknown CRN, or one for them all when there are many.
+  const unknown: ScheduleIssue[] =
+    missing.length > MAX_NAMED
+      ? [
+          {
+            severity: 'error',
+            kind: 'unknownCrn',
+            crns: missing,
+            message: `${missing.length} CRNs are not sections in the catalog: ${listSome(missing)}; get CRNs from get_course or search_courses.`,
+          },
+        ]
+      : missing.map(crn => ({
+          severity: 'error',
+          kind: 'unknownCrn',
+          crns: [crn],
+          message: `CRN ${crn} is not a section in the catalog; get CRNs from get_course or search_courses.`,
+        }));
   return {
     checked: entries.map(([crn]) => crn),
     duplicates: [...duplicates],
