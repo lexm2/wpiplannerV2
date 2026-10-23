@@ -107,8 +107,10 @@ export function catalogJson(extraName = '') {
             ],
             { category: 1 },
           ),
+          // An early entry of the unpublished 2027-28, meeting when CS 2102
+          // AL01 does this year.
           course('MA-1021-2027', 'Calculus I', [
-            section(6, 'AL01', 'A', [period(['M'], '09:00', '09:50')]),
+            section(6, 'AL01', 'A', [period(['M'], '10:00', '10:50')]),
           ]),
           course('MA-543-2026', 'Statistical Methods', [crossListed], {
             isGraduate: true,
@@ -164,6 +166,14 @@ export function catalogJson(extraName = '') {
             isGraduate: true,
             crossListedWith: ['MA 543'],
           }),
+          // Next year's early entry of the class, under its own CRN: it must
+          // not stand in for this year's when cross-listings fold.
+          course(
+            'DS-502-2027',
+            'Statistical Methods',
+            [section(31, 'F01', 'F', [period(['T'], '18:00', '20:50')])],
+            { isGraduate: true, crossListedWith: ['MA 543'] },
+          ),
         ],
       },
       {

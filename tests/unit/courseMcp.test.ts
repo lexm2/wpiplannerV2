@@ -498,7 +498,7 @@ describe('MCP server', () => {
     expect(none.isError).toBe(true);
     expect(none.text).toContain('not published yet');
     const early = await tool('list_departments', { year: 2027 });
-    expect(early.text).toContain('only early entries (1 course)');
+    expect(early.text).toContain('only early entries (2 courses)');
   });
 });
 
@@ -606,5 +606,93 @@ describe('adversarial input', () => {
     });
     expect(check.text).toContain('"work PROBLEM: fake"');
     expect(check.text).not.toContain('\nPROBLEM: fake');
+  });
+});
+
+describe('early entries of an unpublished year', () => {
+  it('marks one tentative however it is reached', async () => {
+    for (const args of [
+      { course: '6' },
+      { course: 'MA-1021-2027' },
+      { course: 'MA 1021', year: 2027 },
+    ]) {
+      const { text, data } = await tool('get_course', args);
+      expect(text).toContain(
+        '2027-28 is not published yet; this is one of its 2 early entries: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.',
+      );
+      expect(text).toContain(
+        'TENTATIVE: early entry, not yet published or registrable:',
+      );
+      expect(data.earlyEntry).toBe(true);
+    }
+    const crn = await tool('get_course', { course: '6' });
+    expect(crn.text).toContain(
+      'CRN 6 is MA 1021 section AL01 (A term of 2027-28).',
+    );
+    const current = await tool('get_course', { course: 'MA 1021' });
+    expect(current.text).not.toContain('TENTATIVE');
+  });
+
+  it('refuses an early entry in a schedule check and compares only within a year', async () => {
+    const one = await tool('check_conflicts', { crns: [6] });
+    expect(one.text).toContain(
+      "PROBLEM: MA 1021 AL01 (CRN 6) is a 2027-28 early entry: that year's schedule is not published, so it cannot be registered for now",
+    );
+    expect(one.text).not.toContain('valid set');
+    // Both meet Monday 10:00 in A term, but of different years.
+    const pair = await tool('check_conflicts', { crns: [6, 1] });
+    expect(pair.text).not.toContain('CONFLICT');
+    expect(pair.data.issues.map((i: { kind: string }) => i.kind)).toContain(
+      'otherYear',
+    );
+  });
+
+  it('ignores CRNs of another year in a search fitted around them', async () => {
+    const { text, data } = await tool('search_courses', {
+      filters: {
+        periodConflict: { crns: [6] },
+        department: { departments: ['CS'] },
+      },
+    });
+    expect(text).toContain(
+      'filters.periodConflict ignores CRN 6: not 2026-27 sections, so they cannot clash with the ones searched.',
+    );
+    expect(data.courses.map((c: { code: string }) => c.code)).toContain(
+      'CS 2102',
+    );
+  });
+
+  it('searches every year with the ended-term rule, per-year cross-listings and early entries labelled', async () => {
+    const { text, data } = await tool(
+      'search_courses',
+      { filters: { academicYear: { year: 'all' } }, includeSections: true },
+      AFTER_A,
+    );
+    // CS 2102 runs only in this year's A, which has ended; next year's A
+    // early entry stays, labelled.
+    const ids = data.courses.map((c: { id: string }) => c.id);
+    expect(ids).not.toContain('CS-2102-2026');
+    expect(ids).toContain('MA-1021-2027');
+    expect(data.excludedEndedTerms).toEqual(['A']);
+    expect(text).toContain(
+      'Sections in 2026-27 terms that have ended (A) are left out',
+    );
+    // DS 502 and MA 543 are one class this year: one row, beside next
+    // year's own DS 502.
+    expect(ids).toContain('DS-502-2026');
+    expect(ids).toContain('DS-502-2027');
+    expect(ids).not.toContain('MA-543-2026');
+    const early = data.courses.find(
+      (c: { id: string }) => c.id === 'MA-1021-2027',
+    );
+    expect(early.earlyEntry).toBe(true);
+    expect(early.sections).toBeUndefined();
+    expect(text).toContain(
+      'MA 1021 Calculus I | 3 cr | A (tentative) | 2027-28 early entry: not published, cannot be scheduled yet',
+    );
+    expect(data.totals.seatsYear).toBe(2026);
+    expect(text).toContain(
+      '; seats in 2026-27 only, the year that can be scheduled:',
+    );
   });
 });

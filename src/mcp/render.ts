@@ -255,8 +255,12 @@ function rowLine(
   const parts = [
     `${index}. ${c.code} ${c.name}`,
     credits(c),
-    c.terms.length ? c.terms.join(',') : 'no sections',
-    rowSeats(c),
+    c.terms.length
+      ? `${c.terms.join(',')}${c.earlyEntry ? ' (tentative)' : ''}`
+      : 'no sections',
+    c.earlyEntry && c.year !== null
+      ? `${yearLabel(c.year)} early entry: not published, cannot be scheduled yet`
+      : rowSeats(c),
   ];
   const note = matchNote(c, search);
   if (note) parts.splice(1, 0, `(${note})`);
@@ -429,8 +433,12 @@ export function renderSearch(result: CourseQueryResult): string {
       totals.byTerm.length >= 2
         ? totals.byTerm.map(t => `${t.term}: ${termTotalsText(t)}`).join(' · ')
         : termTotalsText(totals);
+    const which =
+      totals.seatsYear === null
+        ? ''
+        : `; seats in ${yearLabel(totals.seatsYear)} only, the year that can be scheduled`;
     lines.push(
-      `All ${plural(totals.courses, 'matching course')}, every page: ${seatsText} (cross-listed sections counted once).`,
+      `All ${plural(totals.courses, 'matching course')}, every page${which}: ${seatsText} (cross-listed sections counted once).`,
     );
   }
   const low = result.courses.some(c =>
@@ -554,6 +562,7 @@ export function courseDigest(
     prerequisites: d.prerequisites,
     recommendedBackground: d.recommendedBackground,
     nextYear: d.nextYear,
+    earlyEntry: d.earlyEntry,
     omitted: d.omitted,
     ratings: ratingsOf(d.sections),
     dataAsOf,
@@ -623,11 +632,15 @@ function termBlock(
   sections: SectionView[],
   dates: DateSpan | undefined,
   today: string,
+  tentative: boolean,
 ): string[] {
   const span = dates ? ` (${dates.start} to ${dates.end})` : '';
   const ended =
     dates && dates.end < today ? ', ENDED: can no longer be taken' : '';
-  const lines = [`${term} term${span}${ended}:`];
+  const early = tentative
+    ? ', TENTATIVE: early entry, not yet published or registrable'
+    : '';
+  const lines = [`${term} term${span}${ended}${early}:`];
   const lectures = sections.filter(s => s.kind === 'lecture');
   for (const kind of [
     'lecture',
@@ -726,6 +739,7 @@ export function renderCourse(
         d.sections.filter(s => s.term === term),
         context.termDates?.[term as TermLetter],
         context.today,
+        d.earlyEntry,
       ),
     );
   }

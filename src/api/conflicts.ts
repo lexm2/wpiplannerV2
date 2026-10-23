@@ -20,6 +20,7 @@ import {
   seatDataAge,
   termDates,
   yearLabel,
+  yearStatus,
   type TermLetter,
 } from './calendar';
 import { ApiError, listSome, withoutControls } from './errors';
@@ -100,18 +101,34 @@ function lookup(
 
 /**
  * The weekly slots the given sections occupy, as ConflictFilter's
- * blockedSlots. Each slot id starts with its CRN, which is how the filter
- * keeps a section from conflicting with itself.
+ * blockedSlots, for a search of `year`. Each slot id starts with its CRN,
+ * which is how the filter keeps a section from conflicting with itself.
+ * Slots carry a term but no year, so CRNs of another year (2027-28's B03
+ * against this year's B) are left out and returned in `otherYear`.
  */
 export function blockedSlotsForCrns(
   catalog: Catalog,
   crns: number[],
-): WeeklyTimeSlot[] {
+  year: number | 'all',
+): { slots: WeeklyTimeSlot[]; otherYear: number[] } {
   const { found, missing } = lookup(catalog, crns);
   // A search fitted around a CRN that does not exist is bad input.
   if (missing.length > 0) throw new UnknownCrnError(missing);
-  return [...found.values()].flatMap(e => sectionToWeeklySlots(e.section));
+  const otherYear: number[] = [];
+  const slots: WeeklyTimeSlot[] = [];
+  for (const [crn, entry] of found) {
+    if (year !== 'all' && yearOf(catalog, entry) !== year) {
+      otherYear.push(crn);
+    } else {
+      slots.push(...sectionToWeeklySlots(entry.section));
+    }
+  }
+  return { slots, otherYear };
 }
+
+/** The academic year a CRN's section belongs to. */
+const yearOf = (catalog: Catalog, entry: CrnEntry) =>
+  entry.courses[0].academicYear ?? currentAcademicYear(catalog);
 
 interface ConflictSide {
   crn: number;
@@ -155,6 +172,7 @@ interface ScheduleIssue {
     | 'interestList'
     | 'ended'
     | 'pastYear'
+    | 'otherYear'
     | 'closed'
     | 'full'
     | 'lowSeats';
@@ -285,6 +303,8 @@ export function findConflicts(
     const [crnA, a] = entries[i];
     for (let j = i + 1; j < entries.length; j++) {
       const [crnB, b] = entries[j];
+      // Another year's B term is not this one's: never a clash.
+      if (yearOf(catalog, a) !== yearOf(catalog, b)) continue;
       const kept = filter.apply([a.filterable], {
         avoidConflicts: true,
         blockedSlots: sectionToWeeklySlots(b.section),
@@ -468,6 +488,15 @@ function statusIssues(
   const year = course.academicYear ?? current;
   if (year < current) {
     add('error', 'pastYear', `${who} is from ${yearLabel(year)}, a past year.`);
+  } else if (year > current) {
+    const early = yearStatus(catalog, year).status === 'not yet published';
+    add(
+      'error',
+      'otherYear',
+      early
+        ? `${who} is a ${yearLabel(year)} early entry: that year's schedule is not published, so it cannot be registered for now, and its term and time may change.`
+        : `${who} is from ${yearLabel(year)}, not the current year (${yearLabel(current)}); it is compared only with sections of its own year.`,
+    );
   } else if (
     endedTerms(catalog, year).includes(section.computedTerm as TermLetter)
   ) {

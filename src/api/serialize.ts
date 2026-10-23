@@ -196,6 +196,11 @@ export interface CourseDetail extends CourseSummary {
   };
   /** What can be said of next year, while its schedule is unpublished. */
   nextYear: Forecast | null;
+  /**
+   * One of an unpublished year's early entries: its sections are WPI's
+   * first listing, tentative, and cannot be registered for yet.
+   */
+  earlyEntry: boolean;
 }
 
 export interface DetailOptions {
@@ -211,6 +216,7 @@ export interface DetailContext {
   /** Terms of the course's year that have ended. */
   endedTerms: string[];
   nextYear: Forecast | null;
+  earlyEntry: boolean;
 }
 
 function isNamedProfessor(name: string): boolean {
@@ -584,5 +590,6 @@ export function toCourseDetail(
     standaloneLabs: standaloneLabs.map(l => l.crn),
     omitted,
     nextYear: context.nextYear,
+    earlyEntry: context.earlyEntry,
   };
 }

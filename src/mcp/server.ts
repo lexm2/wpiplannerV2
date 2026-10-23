@@ -56,7 +56,9 @@ times when it publishes the schedule, so a later year can only be planned \
 roughly, from a course's offering pattern: Cat. I = offered every year, \
 Cat. II = at least every other year, Cat. III = occasionally, none on record = \
 unknown (most graduate courses). get_course with a future year gives that \
-outlook. Never state a term, time or instructor for an unpublished year.
+outlook. Never state a term, time or instructor for an unpublished year as \
+settled: the few early entries the catalog already lists for one are shown \
+marked tentative, and cannot be registered for yet.
 
 Credits: a standard WPI course is 1/3 unit, shown as 3 credits. A full-time \
 undergraduate load is 3 courses (1 unit) per term.

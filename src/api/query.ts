@@ -49,13 +49,15 @@ import {
   seatDataAge,
   termDates,
   yearLabel,
+  yearStatus,
   type TermLetter,
 } from './calendar';
 import { blockedSlotsForCrns, MAX_CRNS } from './conflicts';
 import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
-import { ApiError, echo } from './errors';
+import { ApiError, echo, listSome } from './errors';
+import { EndedTermsFilter, type EndedTermsCriteria } from './endedTermsFilter';
 import { ClockSchema, clockMinutes, clockText } from './clock';
 import { strictObject } from './schemaHints';
 import {
@@ -482,6 +484,12 @@ export interface CourseRow extends CourseSummary {
   companions?: CompanionBrief[];
   /** With searchText: how the course matched it (see SearchMatch). */
   match?: SearchMatch;
+  /**
+   * Searching every year: the course is one of an unpublished year's early
+   * entries, its term and time tentative and nothing schedulable, so it
+   * lists no sections.
+   */
+  earlyEntry?: true;
 }
 
 export interface CourseQueryResult {
@@ -538,6 +546,11 @@ interface SearchTotals extends TermTotals {
   courses: number;
   /** The same per term, A-D then F/S. */
   byTerm: (TermTotals & { term: string })[];
+  /**
+   * Searching every year: the one year whose sections the seats count (the
+   * current one), since another year's B seats are not this B's. Else null.
+   */
+  seatsYear: number | null;
 }
 
 interface Relaxation {
@@ -708,9 +721,12 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
   }
 
   // Sections of ended terms can no longer be taken; leave them out unless
-  // the caller asked for those terms by name.
+  // the caller asked for those terms by name. Searching every year, only
+  // the current year's are left out (EndedTermsFilter): another year's A
+  // is not this year's.
   let excludedEndedTerms: string[] = [];
-  const ended: string[] = year === current ? endedTerms(catalog, current) : [];
+  const ended: string[] =
+    year === current || year === 'all' ? endedTerms(catalog, current) : [];
   if (filters.term) {
     set<TermFilterCriteria>('term', filters.term);
     const named = filters.term.terms.filter(t => ended.includes(t));
@@ -722,11 +738,15 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     }
   } else if (ended.length && !query.includeEndedTerms) {
     excludedEndedTerms = ended;
-    set<TermFilterCriteria>('term', {
-      terms: TERM_ORDER.filter(t => !ended.includes(t)) as AcademicTerm[],
-    });
+    if (year === 'all') {
+      set<EndedTermsCriteria>('endedTerms', { year: current, terms: ended });
+    } else {
+      set<TermFilterCriteria>('term', {
+        terms: TERM_ORDER.filter(t => !ended.includes(t)) as AcademicTerm[],
+      });
+    }
     notices.push(
-      `Sections in terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
+      `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
     );
   } else if (ended.length) {
     notices.push(
@@ -776,12 +796,27 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
       includeWithoutData: filters.rmpRating.includeWithoutData ?? !bounded,
     });
   }
-  if (filters.periodConflict)
+  if (filters.periodConflict) {
+    const { slots, otherYear } = blockedSlotsForCrns(
+      catalog,
+      filters.periodConflict.crns,
+      year,
+    );
+    if (otherYear.length) {
+      notices.push(
+        `filters.periodConflict ignores CRN ${listSome(otherYear)}: not ${yearLabel(year as number)} sections, so they cannot clash with the ones searched.`,
+      );
+    } else if (year === 'all') {
+      notices.push(
+        'filters.periodConflict compares weekdays and terms, not years: with academicYear "all", other years\' sections are compared with these CRNs too.',
+      );
+    }
     set<ConflictCriteria>('periodConflict', {
       avoidConflicts: true,
-      blockedSlots: blockedSlotsForCrns(catalog, filters.periodConflict.crns),
+      blockedSlots: slots,
       semesterSpansQuarters: filters.periodConflict.semesterSpansQuarters,
     });
+  }
 
   return { criteria, year, excludedEndedTerms, notices };
 }
@@ -793,6 +828,7 @@ function createFilterService(catalog: Catalog): FilterService {
     service.registerFilter(filter);
   }
   service.registerFilter(new SearchTextFilter());
+  service.registerFilter(new EndedTermsFilter());
   service.setConflictDetector();
   return service;
 }
@@ -834,14 +870,16 @@ function termTotals(sections: Section[]): TermTotals {
   };
 }
 
-function totalsOf(courses: Course[]): SearchTotals {
+function totalsOf(courses: Course[], seatsYear: number | null): SearchTotals {
   const byCrn = new Map<number, Section>();
   for (const course of courses) {
+    if (seatsYear !== null && course.academicYear !== seatsYear) continue;
     for (const s of primarySections(course)) byCrn.set(s.crn, s);
   }
   const sections = [...byCrn.values()];
   return {
     ...termTotals(sections),
+    seatsYear,
     courses: courses.length,
     byTerm: termsOf(sections).map(term => ({
       term,
@@ -951,18 +989,21 @@ const crnsOf = (course: Course) =>
  */
 function collapseCrossListings(courses: Course[]): Course[] {
   const kept: Course[] = [];
+  // By code and year: searching every year, PY 1731 of 2027-28 is not the
+  // row RE 1731 of 2026-27 folds into.
+  const key = (code: string, year: number | undefined) => `${code}@${year}`;
   const byCode = new Map<string, Course>();
   for (const course of courses) {
     const own = crnsOf(course);
     const duplicate = course.crossListedWith.some(code => {
-      const prior = byCode.get(code);
-      if (!prior || prior.academicYear !== course.academicYear) return false;
+      const prior = byCode.get(key(code, course.academicYear));
+      if (!prior) return false;
       const priorCrns = crnsOf(prior);
       return own.size > 0 && [...own].every(crn => priorCrns.has(crn));
     });
     if (duplicate) continue;
     kept.push(course);
-    byCode.set(courseCode(course), course);
+    byCode.set(key(courseCode(course), course.academicYear), course);
   }
   return kept;
 }
@@ -1102,7 +1143,11 @@ export function runCourseQuery(
     limit,
     courses: matches.slice(query.offset, query.offset + limit).map(c => {
       const row: CourseRow = toCourseSummary(c, catalog.rmp);
-      if (includeSections) {
+      const early =
+        c.academicYear !== undefined &&
+        yearStatus(catalog, c.academicYear).status === 'not yet published';
+      if (early) row.earlyEntry = true;
+      if (includeSections && !early) {
         row.sections = rowSections(c, catalog);
         const companions = rowCompanions(c, catalog);
         if (companions.length) row.companions = companions;
@@ -1113,7 +1158,10 @@ export function runCourseQuery(
     }),
     search,
     relaxations,
-    totals: totalsOf(matches),
+    totals: totalsOf(
+      matches,
+      read.year === 'all' ? currentAcademicYear(catalog) : null,
+    ),
     excludedEndedTerms: read.excludedEndedTerms,
     dataAsOf: catalog.lastUpdated,
     dataAgeDays: seatDataAge(catalog),

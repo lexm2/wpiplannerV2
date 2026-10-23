@@ -43,8 +43,8 @@ describe('course search', () => {
   });
 
   it('takes year=all and pages with offset and limit', async () => {
-    const { body } = await call('/courses?year=all&offset=4&limit=1');
-    expect(body).toMatchObject({ total: 9, offset: 4, limit: 1 });
+    const { body } = await call('/courses?year=all&offset=5&limit=1');
+    expect(body).toMatchObject({ total: 10, offset: 5, limit: 1 });
     expect(codes(body)).toEqual(['MA-1021-2026']);
   });
 
@@ -319,6 +319,7 @@ describe('new filters', () => {
       uncapped: 0,
       courses: 0,
       byTerm: [],
+      seatsYear: null,
     });
     const shown = await call('/courses/search', {
       filters: online,
@@ -343,6 +344,7 @@ describe('new filters', () => {
         { term: 'C', openSeats: 10, sections: 1, uncapped: 0 },
         { term: 'F', openSeats: 10, sections: 1, uncapped: 0 },
       ],
+      seatsYear: null,
     });
     const ma = body.courses.find(
       (c: { id: string }) => c.id === 'MA-1021-2026',
@@ -455,7 +457,7 @@ describe('term awareness', () => {
       },
       years: [
         { year: 2026, courseCount: 9, status: 'current' },
-        { year: 2027, courseCount: 1, status: 'not yet published' },
+        { year: 2027, courseCount: 2, status: 'not yet published' },
       ],
     });
     expect(between.termDates['2026'].F).toEqual({
@@ -699,6 +701,7 @@ describe('conflicts', () => {
 describe('catalog', () => {
   it('lists departments, and explains an empty year', async () => {
     expect((await call('/departments?year=2027')).body.departments).toEqual([
+      { abbr: 'DS', name: 'Data Science', courseCount: 1 },
       { abbr: 'MA', name: 'Mathematical Sciences', courseCount: 1 },
     ]);
     const none = await call('/departments?year=2030');

@@ -211,8 +211,15 @@ function detailContext(catalog: Catalog, course: Course) {
     rmp: catalog.rmp,
     endedTerms: endedTerms(catalog, year),
     nextYear: nextYearForecast(catalog, course),
+    earlyEntry: isEarlyEntry(catalog, course),
   };
 }
+
+/** One of an unpublished year's few early entries. */
+const isEarlyEntry = (catalog: Catalog, course: Course) =>
+  course.academicYear !== undefined &&
+  course.academicYear > currentAcademicYear(catalog) &&
+  yearStatus(catalog, course.academicYear).status === 'not yet published';
 
 /**
  * The course's outlook for the year after its own, when that year has not
@@ -288,8 +295,12 @@ export function lookupCourse(
       course = entry.courses[0];
       const s = entry.section;
       const also = entry.courses.slice(1).map(courseCode);
+      const of =
+        course.academicYear !== undefined && course.academicYear !== current
+          ? ` of ${yearLabel(course.academicYear)}`
+          : '';
       notices.push(
-        `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term)${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
       );
     }
   } else {
@@ -312,34 +323,40 @@ export function lookupCourse(
 
   if (year !== undefined && year > current) {
     const status = yearStatus(catalog, year);
-    if (status.status === 'not yet published') {
-      if (course?.academicYear === year) {
-        notices.push(
-          `${yearLabel(year)} is not published yet; this is one of its ${status.courseCount} early entries and may change.`,
-        );
-      } else {
-        const base = course ?? findCourse(catalog, key);
-        if (!base) throw courseNotFound(catalog, key, current);
-        const summary = toCourseSummary(base, catalog.rmp);
-        return {
-          kind: 'plan',
-          notices,
-          plan: {
-            forecast: forecastFor(catalog, base, year),
-            course: {
-              ...summary,
-              description: base.description,
-              recommendedBackground: base.recommendedBackground ?? null,
-              prerequisites: base.prerequisites ?? null,
-              courseTypes: base.courseTypes,
-            },
+    // One of the year's early entries answers as itself, below.
+    if (
+      status.status === 'not yet published' &&
+      course?.academicYear !== year
+    ) {
+      const base = course ?? findCourse(catalog, key);
+      if (!base) throw courseNotFound(catalog, key, current);
+      const summary = toCourseSummary(base, catalog.rmp);
+      return {
+        kind: 'plan',
+        notices,
+        plan: {
+          forecast: forecastFor(catalog, base, year),
+          course: {
+            ...summary,
+            description: base.description,
+            recommendedBackground: base.recommendedBackground ?? null,
+            prerequisites: base.prerequisites ?? null,
+            courseTypes: base.courseTypes,
           },
-        };
-      }
+        },
+      };
     }
   }
 
   if (!course) throw courseNotFound(catalog, key, year ?? current);
+  // However it was reached (code and year, id or CRN), an early entry says
+  // so: its sections are WPI's first listing, not a published schedule.
+  if (isEarlyEntry(catalog, course)) {
+    const { courseCount } = yearStatus(catalog, course.academicYear!);
+    notices.push(
+      `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${courseCount} early entr${courseCount === 1 ? 'y' : 'ies'}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+    );
+  }
   if (course.academicYear !== undefined && course.academicYear < current) {
     notices.push(
       `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
