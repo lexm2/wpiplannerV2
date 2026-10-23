@@ -1,7 +1,66 @@
 import type { RMPRatingFilterCriteria } from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
+import { keepMatchingGroups } from '../lectureGroupScope';
+import { SectionType } from '../../../types/types';
 import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
+
+type RatingNumbers = NonNullable<
+  ReturnType<RateMyProfessorService['getRatings']>
+>;
+
+/** Every named instructor of the section's periods, co-instructors split. */
+function instructorsOf(fs: FilterableSection): string[] {
+  const names = fs.section.periods.flatMap(period =>
+    (period.professor ?? '').split(/\s*;\s*/),
+  );
+  return [...new Set(names.filter(name => name && name !== 'Not Assigned'))];
+}
+
+/**
+ * The ratings fall within every bound set. A bound at its default is no
+ * bound, and a retake bound is skipped when RMP has no retake share.
+ */
+function withinBounds(
+  { rating, difficulty, wouldTakeAgain }: RatingNumbers,
+  criteria: RMPRatingFilterCriteria,
+): boolean {
+  const { minRating, maxRating, minDifficulty, maxDifficulty } = criteria;
+  if (minRating !== undefined && minRating > 0 && rating < minRating) {
+    return false;
+  }
+  if (maxRating !== undefined && maxRating < 5 && rating > maxRating) {
+    return false;
+  }
+  if (
+    minDifficulty !== undefined &&
+    minDifficulty > 0 &&
+    difficulty < minDifficulty
+  ) {
+    return false;
+  }
+  if (
+    maxDifficulty !== undefined &&
+    maxDifficulty < 5 &&
+    difficulty > maxDifficulty
+  ) {
+    return false;
+  }
+  if (wouldTakeAgain === null) return true;
+  const { minWouldTakeAgain, maxWouldTakeAgain } = criteria;
+  if (
+    minWouldTakeAgain !== undefined &&
+    minWouldTakeAgain > 0 &&
+    wouldTakeAgain < minWouldTakeAgain
+  ) {
+    return false;
+  }
+  return !(
+    maxWouldTakeAgain !== undefined &&
+    maxWouldTakeAgain < 100 &&
+    wouldTakeAgain > maxWouldTakeAgain
+  );
+}
 
 export class RMPRatingFilter implements SectionBasedFilter {
   readonly id = 'rmpRating';
@@ -24,81 +83,38 @@ export class RMPRatingFilter implements SectionBasedFilter {
       (criteria.minWouldTakeAgain ?? 0) === 0 &&
       (criteria.maxWouldTakeAgain ?? 100) === 100;
     const isDefaultInclude = (criteria.includeWithoutData ?? true) === true;
+    const minNumRatings = criteria.minNumRatings ?? 0;
 
     if (
       isDefaultRating &&
       isDefaultDifficulty &&
       isDefaultRetake &&
-      isDefaultInclude
+      isDefaultInclude &&
+      minNumRatings <= 0
     ) {
       return sections;
     }
 
-    return sections.filter(fs => {
-      const professors = fs.section.periods
-        .map(period => period.professor)
-        .filter(name => name && name !== 'Not Assigned');
-      // No instructor listed at all means no rating to judge by.
-      if (professors.length === 0) return criteria.includeWithoutData ?? true;
-
-      return professors.some(professor => {
-        const ratings = this.rmpService.getRatings(professor);
-
-        if (!ratings) {
-          return criteria.includeWithoutData ?? true;
-        }
-
-        const { rating, difficulty, wouldTakeAgain } = ratings;
-
-        if (
-          criteria.minRating !== undefined &&
-          criteria.minRating > 0 &&
-          rating < criteria.minRating
-        ) {
-          return false;
-        }
-        if (
-          criteria.maxRating !== undefined &&
-          criteria.maxRating < 5 &&
-          rating > criteria.maxRating
-        ) {
-          return false;
-        }
-
-        if (
-          criteria.minDifficulty !== undefined &&
-          criteria.minDifficulty > 0 &&
-          difficulty < criteria.minDifficulty
-        ) {
-          return false;
-        }
-        if (
-          criteria.maxDifficulty !== undefined &&
-          criteria.maxDifficulty < 5 &&
-          difficulty > criteria.maxDifficulty
-        ) {
-          return false;
-        }
-
-        if (wouldTakeAgain !== null) {
-          if (
-            criteria.minWouldTakeAgain !== undefined &&
-            criteria.minWouldTakeAgain > 0 &&
-            wouldTakeAgain < criteria.minWouldTakeAgain
-          ) {
-            return false;
-          }
-          if (
-            criteria.maxWouldTakeAgain !== undefined &&
-            criteria.maxWouldTakeAgain < 100 &&
-            wouldTakeAgain > criteria.maxWouldTakeAgain
-          ) {
-            return false;
-          }
-        }
-
-        return true;
-      });
+    const includeWithoutData = criteria.includeWithoutData ?? true;
+    // Judged on who teaches the lecture, and the group rises or falls with
+    // it: labs and discussions are mostly TA-run or unassigned, and a
+    // well-rated TA should not qualify a lecture either.
+    return keepMatchingGroups(sections, fs => {
+      if (fs.sectionType !== SectionType.LECTURE && fs.lectureGroup) {
+        return false;
+      }
+      // Each co-instructor on their own ("Amy Curran; Laura Susanin"): the
+      // lecture passes when any instructor with ratings passes, and counts
+      // as without data only when none has ratings (or enough of them), so
+      // an unrated co-instructor neither hides nor rescues a rated one.
+      const rated = instructorsOf(fs)
+        .map(name => this.rmpService.getRatings(name))
+        .filter(
+          (r): r is RatingNumbers =>
+            r !== null && r.numRatings >= minNumRatings,
+        );
+      if (rated.length === 0) return includeWithoutData;
+      return rated.some(ratings => withinBounds(ratings, criteria));
     });
   }
 
@@ -156,6 +172,13 @@ export class RMPRatingFilter implements SectionBasedFilter {
       return false;
     }
 
+    if (
+      c.minNumRatings !== undefined &&
+      (typeof c.minNumRatings !== 'number' || c.minNumRatings < 0)
+    ) {
+      return false;
+    }
+
     return true;
   }
 
@@ -180,6 +203,10 @@ export class RMPRatingFilter implements SectionBasedFilter {
     const maxRetake = criteria.maxWouldTakeAgain ?? 100;
     if (minRetake > 0 || maxRetake < 100) {
       parts.push(`${minRetake}-${maxRetake}% retake`);
+    }
+
+    if ((criteria.minNumRatings ?? 0) > 0) {
+      parts.push(`${criteria.minNumRatings}+ ratings`);
     }
 
     return parts.length > 0 ? `RMP: ${parts.join(', ')}` : 'RMP filters';

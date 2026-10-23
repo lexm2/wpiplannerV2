@@ -16,6 +16,9 @@ function course(id: string, sections: number): Course {
     description: '',
     departmentAbbr: id.replace(/\d+$/, ''),
     departmentName: '',
+    crossListedWith: [],
+    degreeAttributes: [],
+    courseTypes: [],
     minCredits: 3,
     maxCredits: 3,
     lectures: Array.from({ length: sections }, (_, i) => ({

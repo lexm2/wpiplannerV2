@@ -58,6 +58,12 @@ function section(
     seatsAvailable: 10,
     actualWaitlist: 0,
     maxWaitlist: 0,
+    meetsWith: [],
+    isOnlineGrad: false,
+    deliveryMode: 'In-Person',
+    status: 'Open',
+    startDate: '',
+    endDate: '',
     computedTerm: term,
     periods: [period(days, start, end)],
   };
@@ -71,6 +77,9 @@ function course(code: string, lectures: Section[]): Course {
     description: '',
     departmentAbbr: code.replace(/\d+$/, ''),
     departmentName: '',
+    crossListedWith: [],
+    degreeAttributes: [],
+    courseTypes: [],
     minCredits: 3,
     maxCredits: 3,
     lectures: lectures.map(s => ({

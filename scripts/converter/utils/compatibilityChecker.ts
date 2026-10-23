@@ -9,13 +9,19 @@ import { timeRangesOverlap } from './timeParser.js';
 /**
  * Checks if two sections are compatible (can be taken together)
  * Compatibility requires:
- * 1. Cluster constraints satisfied (GPS courses, cluster matching)
- * 2. No time conflicts between meeting periods
+ * 1. The same term: a course groups a whole academic year, and a lab with no
+ *    cluster would otherwise pair with every lecture in it
+ * 2. Cluster constraints satisfied (GPS courses, cluster matching)
+ * 3. No time conflicts between meeting periods
  */
 export function areCompatible(
   section1: PlannerSection,
   section2: PlannerSection,
 ): boolean {
+  if (section1.computedTerm !== section2.computedTerm) {
+    return false;
+  }
+
   if (!checkClusterCompatibility(section1, section2)) {
     return false;
   }

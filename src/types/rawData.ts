@@ -30,6 +30,12 @@ export interface RawSection {
   note?: string;
   computedTerm?: string;
   isInterestList?: boolean;
+  isOnlineGrad?: boolean;
+  meetsWith?: string[];
+  deliveryMode?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
   periods?: RawPeriod[];
 }
 
@@ -45,6 +51,11 @@ export interface RawCourse {
   name: string;
   description?: string;
   category?: 1 | 2 | 3 | null;
+  degreeAttributes?: string[];
+  courseTypes?: string[];
+  crossListedWith?: string[];
+  recommendedBackground?: string;
+  prerequisites?: string;
   lectures?: RawLectureGroup[];
   standaloneLabs?: RawSection[];
   minCredits?: number;

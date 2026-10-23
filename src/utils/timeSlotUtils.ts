@@ -56,6 +56,12 @@ export function sectionToWeeklySlots(
   for (const period of section.periods) {
     slots.push(...periodToWeeklySlots(period, term, String(section.crn)));
   }
+  if (section.startDate && section.endDate) {
+    for (const slot of slots) {
+      slot.startDate = section.startDate;
+      slot.endDate = section.endDate;
+    }
+  }
 
   return slots;
 }

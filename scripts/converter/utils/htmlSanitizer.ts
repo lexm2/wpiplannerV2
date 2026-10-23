@@ -12,9 +12,9 @@ export function extractCategory(html: string | null): {
   // Matches "Cat. I", "Cat I", "Cat.II", "CAT II", "Category I". Case-sensitive with a leading \b
   // so words like "application" / "communication" don't match. (?![a-z0-9]) still allows
   // "Cat. IAn intensive..." where text immediately follows the numeral; \.? makes the period
-  // after "Cat" optional to also match "Cat II." format
+  // after "Cat" optional to also match "Cat II." format, and :? takes "Category: II"
   const match = html.match(
-    /\b(?:Cat|CAT)(?:egory)?\.?\s*(III|II|I|[123])(?![a-z0-9])\.?/,
+    /\b(?:Cat|CAT)(?:egory)?\.?:?\s*(III|II|I|[123])(?![a-z0-9])\.?/,
   );
   if (!match) return { category: null, cleanedHtml: html };
 
@@ -31,12 +31,24 @@ export function extractCategory(html: string | null): {
       '',
     )
     .replace(
-      /\b(?:Category:\s*)?(?:Cat|CAT)(?:egory)?\.?\s*(?:III|II|I|[123])(?![a-z0-9])\.?(?:<br\s*\/?>\s*)*/g,
+      /\b(?:Category:\s*)?(?:Cat|CAT)(?:egory)?\.?:?\s*(?:III|II|I|[123])(?![a-z0-9])\.?(?:<br\s*\/?>\s*)*/g,
       '',
     )
     .replace(/;\s*\)/g, ')');
 
   return { category, cleanedHtml };
+}
+
+/**
+ * Removes the "Units: 1/3" marker some descriptions carry, bare or in
+ * parentheses ("(Units: 1/3, )"). It restates the credits the course already
+ * has.
+ */
+export function stripUnits(text: string): string {
+  return text
+    .replace(/\(\s*Units:?\s*\d+\/\d+\s*,?\s*\)|\bUnits:?\s*\d+\/\d+\.?/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /**

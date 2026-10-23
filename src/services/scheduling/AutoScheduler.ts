@@ -37,6 +37,9 @@ const NON_SECTION_FILTER_IDS = [
   'degreeBucket',
   'graduateLevel',
   'creditRange',
+  'degreeAttribute',
+  'courseLevel',
+  'offeringPattern',
 ];
 
 export interface MaskedCandidate {

@@ -22,6 +22,7 @@ import type {
   RawPeriod,
 } from '../../types/rawData';
 import { logger } from '../../utils/logger';
+import { readAlternatingYears } from '../../utils/alternatingYears';
 import * as z from 'zod';
 
 // Envelope only: the payload is ~1275 departments of nested records, and
@@ -125,27 +126,7 @@ function parseDepartments(departments: RawDepartment[]): Department[] {
 
       seenIds.add(courseId);
 
-      const lectures = parseLectureGroups(courseData.lectures || []);
-      const standaloneLabs = courseData.standaloneLabs
-        ? parseSections(courseData.standaloneLabs)
-        : undefined;
-
-      const course: Course = {
-        id: courseId,
-        number: courseData.number,
-        name: courseData.name,
-        description: stripHtml(courseData.description || ''),
-        category: courseData.category ?? null,
-        departmentAbbr: department.abbreviation,
-        departmentName: department.name,
-        lectures: lectures.length > 0 ? lectures : undefined,
-        standaloneLabs: standaloneLabs,
-        minCredits: courseData.minCredits || 0,
-        maxCredits: courseData.maxCredits || 0,
-        isGraduate: courseData.isGraduate || false,
-        academicYear: courseData.academicYear,
-      };
-      return course;
+      return parseCourse(courseData, department, courseId);
     });
 
     return department;
@@ -160,7 +141,45 @@ function parseDepartments(departments: RawDepartment[]): Department[] {
   return result;
 }
 
-export function parseSections(sections: RawSection[]): Section[] {
+/**
+ * One catalog course. The tutorial's hand-made courses come through here too,
+ * so a field the catalog carries cannot be dropped on one path only.
+ */
+export function parseCourse(
+  courseData: RawCourse,
+  department: Pick<Department, 'abbreviation' | 'name'>,
+  courseId = courseData.id,
+): Course {
+  const lectures = parseLectureGroups(courseData.lectures || []);
+  const standaloneLabs = courseData.standaloneLabs
+    ? parseSections(courseData.standaloneLabs)
+    : undefined;
+
+  const description = stripHtml(courseData.description || '');
+  return {
+    id: courseId,
+    number: courseData.number,
+    name: courseData.name,
+    description,
+    category: courseData.category ?? null,
+    degreeAttributes: courseData.degreeAttributes ?? [],
+    courseTypes: courseData.courseTypes ?? [],
+    crossListedWith: courseData.crossListedWith ?? [],
+    recommendedBackground: courseData.recommendedBackground,
+    prerequisites: courseData.prerequisites,
+    alternatingYears: readAlternatingYears(description),
+    departmentAbbr: department.abbreviation,
+    departmentName: department.name,
+    lectures: lectures.length > 0 ? lectures : undefined,
+    standaloneLabs: standaloneLabs,
+    minCredits: courseData.minCredits || 0,
+    maxCredits: courseData.maxCredits || 0,
+    isGraduate: courseData.isGraduate || false,
+    academicYear: courseData.academicYear,
+  };
+}
+
+function parseSections(sections: RawSection[]): Section[] {
   return sections.map(sectionData => {
     const section: Section = {
       crn: sectionData.crn || 0,
@@ -172,6 +191,12 @@ export function parseSections(sections: RawSection[]): Section[] {
       note: sectionData.note,
       computedTerm: sectionData.computedTerm as AcademicTerm,
       isInterestList: sectionData.isInterestList,
+      isOnlineGrad: sectionData.isOnlineGrad ?? false,
+      meetsWith: sectionData.meetsWith ?? [],
+      deliveryMode: sectionData.deliveryMode ?? '',
+      status: sectionData.status ?? '',
+      startDate: sectionData.startDate ?? '',
+      endDate: sectionData.endDate ?? '',
       periods: parsePeriods(sectionData.periods || []),
     };
 
@@ -179,9 +204,7 @@ export function parseSections(sections: RawSection[]): Section[] {
   });
 }
 
-export function parseLectureGroups(
-  lectureGroups: RawLectureGroup[],
-): LectureGroup[] {
+function parseLectureGroups(lectureGroups: RawLectureGroup[]): LectureGroup[] {
   return lectureGroups.map(groupData => {
     const lectureSection = parseSections([groupData.section])[0];
     const compatibleDiscussions = parseSections(

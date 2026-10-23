@@ -15,6 +15,8 @@ export interface DepartmentFilterCriteria {
 export interface AvailabilityFilterCriteria {
   availableOnly: boolean;
   minAvailable?: number;
+  /** Keep sections with at most this many students on the waitlist. */
+  maxWaitlisted?: number;
 }
 
 export interface CreditRangeFilterCriteria {
@@ -29,6 +31,43 @@ export interface TermFilterCriteria {
 export interface SearchTextFilterCriteria {
   query: string;
   professorOnly?: boolean;
+}
+
+/** Courses counting toward any of these degree attributes ("Social Sciences"). */
+export interface DegreeAttributeFilterCriteria {
+  attributes: string[];
+}
+
+/** Sections taught in any of these modes: "In-Person", "Online", "Hybrid". */
+export interface DeliveryModeFilterCriteria {
+  modes: string[];
+}
+
+/**
+ * Courses whose number's first digit (1-4 undergraduate, 5 and up graduate:
+ * MA 1022 is 1, DS 502 is 5) lies in [min, max]; either bound may be unset.
+ */
+export interface CourseLevelFilterCriteria {
+  min?: number;
+  max?: number;
+}
+
+/**
+ * Courses with any of these offering categories: 1 every year, 2 at least
+ * every other year, 3 occasionally. includeUnknown also keeps courses with
+ * no category on record, most graduate courses among them.
+ */
+export interface OfferingPatternFilterCriteria {
+  categories: (1 | 2 | 3)[];
+  includeUnknown?: boolean;
+}
+
+/**
+ * Interest-list placeholders (no times; joined before the real sections
+ * open) are dropped unless includeInterestLists is true.
+ */
+export interface InterestListFilterCriteria {
+  includeInterestLists: boolean;
 }
 
 export interface GraduateLevelFilterCriteria {
@@ -76,6 +115,7 @@ export interface RMPRatingFilterCriteria {
   minWouldTakeAgain?: number; // Minimum "would take again" percentage (0-100)
   maxWouldTakeAgain?: number; // Maximum "would take again" percentage (0-100)
   includeWithoutData?: boolean; // Include professors without RMP data (default: true)
+  minNumRatings?: number; // Fewest ratings a professor's numbers may rest on
 }
 
 export interface BookmarkFilterCriteria {

@@ -51,6 +51,9 @@ function course(id: string, lectures: Section[]): Course {
     description: '',
     departmentAbbr: id.replace(/\d+$/, ''),
     departmentName: '',
+    crossListedWith: [],
+    degreeAttributes: [],
+    courseTypes: [],
     minCredits: 3,
     maxCredits: 3,
     lectures: lectures.map(section => ({

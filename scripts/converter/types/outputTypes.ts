@@ -20,7 +20,18 @@ export interface PlannerCourse {
   number: string;
   name: string;
   description: string;
+  /** Offering Pattern tag first, then a "Cat. I" marker in the description. */
   category: 1 | 2 | 3 | null;
+  /** "Degree Attribute" tags across the sections, e.g. "Social Sciences". */
+  degreeAttributes: string[];
+  /** "Course Type" tags across the sections, e.g. "Special Topic", "Music". */
+  courseTypes: string[];
+  /** Other course codes listing the same sections under their own code. */
+  crossListedWith: string[];
+  /** The description's "Recommended background: ..." statement. */
+  recommendedBackground?: string;
+  /** The description's "Prerequisite(s): ..." statement. */
+  prerequisites?: string;
   minCredits: number;
   maxCredits: number;
   isGraduate: boolean;
@@ -46,6 +57,17 @@ export interface PlannerSection {
   computedTerm: string;
   isGps: boolean;
   isInterestList: boolean;
+  /** Part of WPI's online graduate offering ("Online Grad Course" tag). */
+  isOnlineGrad: boolean;
+  /** Co-located sections that meet with this one, e.g. "BB 550-C01". */
+  meetsWith: string[];
+  /** Workday's Delivery_Mode: "In-Person", "Online" or "Hybrid". */
+  deliveryMode: string;
+  /** Workday's Section_Status: "Open", "Waitlist" or "Closed". */
+  status: string;
+  /** First and last day of the section, YYYY-MM-DD. */
+  startDate: string;
+  endDate: string;
   periods: PlannerPeriod[];
 }
 

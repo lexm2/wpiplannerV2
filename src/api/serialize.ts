@@ -1,7 +1,8 @@
 /**
  * JSON shapes the course API and MCP server return. Catalog objects hold Sets
  * and nested parse artifacts, so nothing is sent as-is: lists get the compact
- * CourseSummary, single-course lookups the full CourseDetail.
+ * CourseSummary (with SectionBriefs of the matching sections on request),
+ * single-course lookups the CourseDetail, which lists each section once.
  */
 import type { Course, Period, Section, Time } from '../types/types';
 import { DayOfWeek } from '../types/types';
@@ -10,9 +11,60 @@ import { TERM_ORDER } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
 import { timedPeriods } from '../utils/timeWindows';
 import type { RateMyProfessorService } from '../services/external/RateMyProfessorService';
+import type { Forecast } from './forecast';
+import type { DateSpan } from './calendar';
 
 const MAX_SUMMARY_PROFESSORS = 4;
 const DAY_ORDER = Object.values(DayOfWeek);
+
+export type SectionKind = 'lecture' | 'discussion' | 'lab' | 'standaloneLab';
+
+interface RatingView {
+  rating: number;
+  difficulty: number;
+  numRatings: number;
+  /** Percent; null when RMP lacks enough data. */
+  wouldTakeAgain: number | null;
+  url: string | null;
+}
+
+export interface InstructorView {
+  name: string;
+  /** Rate My Professor ratings; null when RMP has none for them. */
+  rmp: RatingView | null;
+}
+
+/**
+ * The capacity Workday gives a section with no enrollment limit: varsity
+ * and club teams (WPE 2001, WPE 1211 S06) and music ensembles (MU 2401).
+ * Their "999 seats" are not seats, so no total counts them.
+ */
+const UNCAPPED_SEATS = 999;
+
+/** A section without a real seat cap; see UNCAPPED_SEATS. */
+export const isUncapped = (s: { seats: number }) => s.seats >= UNCAPPED_SEATS;
+
+export interface SeatTotals {
+  /** Over the capped sections only. */
+  capacity: number;
+  /** Open seats; an over-enrolled section adds nothing. */
+  available: number;
+  waitlisted: number;
+  /** Sections with no seat cap, left out of capacity and available. */
+  uncapped: number;
+}
+
+/** Seat totals over sections, uncapped ones counted apart. */
+export function seatTotals(sections: Section[]): SeatTotals {
+  const capped = sections.filter(s => !isUncapped(s));
+  return {
+    capacity: capped.reduce((n, s) => n + s.seats, 0),
+    // Over-enrolled sections report a negative count; they add nothing.
+    available: capped.reduce((n, s) => n + Math.max(0, s.seatsAvailable), 0),
+    waitlisted: sections.reduce((n, s) => n + s.actualWaitlist, 0),
+    uncapped: sections.length - capped.length,
+  };
+}
 
 export interface CourseSummary {
   id: string;
@@ -25,16 +77,62 @@ export interface CourseSummary {
   year: number | null;
   /** Terms with at least one section, A-D quarters then F/S semesters. */
   terms: string[];
-  /** Totals over the lecture sections (standalone labs for lab-only courses). */
-  seats: { capacity: number; available: number; waitlisted: number };
+  /**
+   * Totals over the lecture sections (standalone labs for lab-only
+   * courses), interest lists left out. In a search, only the sections that
+   * matched every filter.
+   */
+  seats: SeatTotals;
+  /** The same totals per term, A-D then F/S, for courses in several terms. */
+  seatsByTerm: (SeatTotals & { term: string })[];
   sectionCount: number;
   isGraduate: boolean;
   professors: string[];
+  /** WPI offering category: 1 every year, 2 every other year, 3 occasionally. */
+  category: 1 | 2 | 3 | null;
+  /** Degree requirements its sections count toward, e.g. "Social Sciences". */
+  degreeAttributes: string[];
+  /** Other codes the same sections are listed under; one class. */
+  crossListedWith: string[];
+  /**
+   * The best-rated lecture instructor with Rate My Professor data. Those
+   * with SOLID_RATINGS (5) or more ratings rank above those with fewer,
+   * then by rating.
+   */
+  topInstructor: (Omit<RatingView, 'url'> & { name: string }) | null;
+}
+
+/** One section on one line: what a search row lists under its course. */
+export interface SectionBrief {
+  crn: number;
+  number: string;
+  term: string;
+  kind: SectionKind;
+  /** "MTRF 10:00-10:50", "Async" or "TBD"; periods joined by "; ". */
+  meets: string;
+  location: string;
+  instructors: InstructorView[];
+  seats: number;
+  /** Never below 0; see overEnrolled. */
+  seatsAvailable: number;
+  /** Enrolled past the cap, when Workday reports a negative count. */
+  overEnrolled?: number;
+  waitlist: number;
+  /** Registration status: "Open", "Waitlist" or "Closed". */
+  status: string;
+  /** "In-Person", "Online" or "Hybrid". */
+  deliveryMode: string;
+  /**
+   * The section's own first and last day (YYYY-MM-DD), only when they are
+   * not its term's: a half-semester F section, a lab run in half a term.
+   */
+  dates?: DateSpan;
 }
 
 interface PeriodView {
   type: string;
-  professor: string;
+  /** The period's instructors; co-taught periods list several. */
+  instructors: InstructorView[];
   /** Weekday letters M T W R F S U, in week order. Empty when async. */
   days: string[];
   /** "HH:MM", 24-hour; null when the period has no set time. */
@@ -46,81 +144,256 @@ interface PeriodView {
   isAsync: boolean;
 }
 
-interface SectionView {
+export interface SectionView {
   crn: number;
   number: string;
   term: string;
+  kind: SectionKind;
+  /** For a lab or discussion: the CRNs of the lectures it can go with. */
+  pairsWith: number[];
   seats: number;
+  /** Never below 0; see overEnrolled. */
   seatsAvailable: number;
+  /** Enrolled past the cap, when Workday reports a negative count. */
+  overEnrolled?: number;
   waitlist: number;
   maxWaitlist: number;
   /** "12/30 available" or "Full (32/30 enrolled)". */
   seatsLabel: string;
   isInterestList: boolean;
+  /** Part of WPI's online graduate offering. */
+  isOnlineGrad: boolean;
+  /** Other sections, often of another course, meeting with this one. */
+  meetsWith: string[];
+  /** "In-Person", "Online" or "Hybrid". */
+  deliveryMode: string;
+  /** Registration status: "Open", "Waitlist" or "Closed". */
+  status: string;
+  /** First and last day the section meets, YYYY-MM-DD. */
+  startDate: string;
+  endDate: string;
   periods: PeriodView[];
 }
 
-interface LectureGroupView {
-  lecture: SectionView;
+/** A lecture and the companions it can be taken with, by CRN. */
+interface LectureGroupRef {
+  lecture: number;
   /** Pick one of these alongside the lecture, when any are listed. */
-  discussions: SectionView[];
-  labs: SectionView[];
-}
-
-interface ProfessorView {
-  name: string;
-  rating: number;
-  difficulty: number;
-  numRatings: number;
-  /** Percent; null when RMP lacks enough data. */
-  wouldTakeAgain: number | null;
-  url: string | null;
+  discussions: number[];
+  labs: number[];
 }
 
 export interface CourseDetail extends CourseSummary {
   departmentName: string;
   description: string;
-  lectureGroups: LectureGroupView[];
-  standaloneLabs: SectionView[];
-  /** Rate My Professor ratings, for the instructors that have them. */
-  ratings: ProfessorView[];
+  /** e.g. "Special Topic", "Music", "Experimental (Undergrad Courses Only)". */
+  courseTypes: string[];
+  /** Lifted from the description's prose; still part of it. */
+  recommendedBackground: string | null;
+  prerequisites: string | null;
+  /** Every section shown, once each: per term, lectures first. */
+  sections: SectionView[];
+  lectureGroups: LectureGroupRef[];
+  standaloneLabs: number[];
+  /** What the options left out of `sections`. */
+  omitted: {
+    /** Terms left out because they have ended. */
+    endedTerms: string[];
+    /** Terms left out because `terms` did not ask for them. */
+    otherTerms: string[];
+    /** Terms with an interest-list placeholder left out. */
+    interestLists: string[];
+    /** Sections left out for having no open seat. */
+    fullSections: number;
+  };
+  /** What can be said of next year, while its schedule is unpublished. */
+  nextYear: Forecast | null;
+  /**
+   * One of an unpublished year's early entries: its sections are WPI's
+   * first listing, tentative, and cannot be registered for yet.
+   */
+  earlyEntry: boolean;
+}
+
+export interface DetailOptions {
+  /** Only these terms; overrides includeEndedTerms. */
+  terms?: string[];
+  includeEndedTerms?: boolean;
+  includeFull?: boolean;
+  includeInterestLists?: boolean;
+}
+
+export interface DetailContext {
+  rmp: RateMyProfessorService;
+  /** Terms of the course's year that have ended. */
+  endedTerms: string[];
+  nextYear: Forecast | null;
+  earlyEntry: boolean;
 }
 
 function isNamedProfessor(name: string): boolean {
   return !!name.trim() && name !== 'TBA' && name !== 'Not Assigned';
 }
 
-/** Instructor names in order of first appearance; co-taught "A; B" splits. */
+/** A period's named instructors; co-taught "A; B" splits. */
+export function instructorNames(period: Period): string[] {
+  return period.professor.split(/\s*;\s*/).filter(isNamedProfessor);
+}
+
+/** Instructor names in order of first appearance. */
 function professorsOf(sections: Section[]): string[] {
   const names = new Set<string>();
   for (const section of sections) {
     for (const period of section.periods) {
-      for (const name of period.professor.split(/\s*;\s*/)) {
-        if (isNamedProfessor(name)) names.add(name);
-      }
+      for (const name of instructorNames(period)) names.add(name);
     }
   }
   return [...names];
 }
 
-function termsOf(sections: Section[]): string[] {
+const termRank = (t: string) => {
+  const i = TERM_ORDER.indexOf(t);
+  return i === -1 ? TERM_ORDER.length : i;
+};
+
+/** The sections' terms, A-D quarters then F/S semesters. */
+export function termsOf(sections: Section[]): string[] {
   const terms = new Set(sections.map(s => s.computedTerm).filter(Boolean));
-  const rank = (t: string) => {
-    const i = TERM_ORDER.indexOf(t);
-    return i === -1 ? TERM_ORDER.length : i;
-  };
-  return [...terms].sort((a, b) => rank(a) - rank(b));
+  return [...terms].sort((a, b) => termRank(a) - termRank(b));
+}
+
+/**
+ * Where a description's own heading for a statement starts: at a sentence
+ * start, with or without a colon ("Recommended Background Working
+ * knowledge of...", "The recommended background for this course is...",
+ * "Prerequisites Completion of 24 credits..."). The catalog parser lifts
+ * only the colon form, so 27 courses (PH 1110, DS 2010, CS 594...) had
+ * the statement in their description and none in the field.
+ */
+const STATEMENT_HEADINGS = {
+  recommendedBackground:
+    /(?:^|[.!?)]\s+)(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?\s*/,
+  prerequisites: /(?:^|[.!?)]\s+)Prerequisites?\s*[:;]?\s*/,
+};
+
+/**
+ * The course's prerequisite or background statement: the parsed field, or
+ * else the sentence its heading starts in the description, up to the
+ * sentence's end. Null when the description has neither.
+ */
+export function statementOf(
+  course: Pick<
+    Course,
+    'description' | 'prerequisites' | 'recommendedBackground'
+  >,
+  kind: keyof typeof STATEMENT_HEADINGS,
+): string | null {
+  const parsed = course[kind];
+  if (parsed) return parsed;
+  const heading = STATEMENT_HEADINGS[kind].exec(course.description);
+  if (!heading) return null;
+  const rest = course.description.slice(heading.index + heading[0].length);
+  // To the first full stop ending a sentence: before a capital or the end.
+  const end = /\.(?=\s+[A-Z(]|\s*$)/.exec(rest);
+  const statement = (end ? rest.slice(0, end.index) : rest).trim();
+  return statement || null;
 }
 
 export function courseCode(course: Course): string {
   return `${course.departmentAbbr} ${course.number}`;
 }
 
-export function toCourseSummary(course: Course): CourseSummary {
-  const all = getAllSections(course);
+/** The sections a student enrolls in first: lectures, else standalone labs. */
+export function primarySections(course: Course): Section[] {
   const primary = course.lectures?.length
     ? course.lectures.map(g => g.section)
     : (course.standaloneLabs ?? []);
+  return primary.filter(s => !s.isInterestList);
+}
+
+type RatingLookup = (name: string) => RatingView | null;
+
+function ratingLookup(rmp: RateMyProfessorService): RatingLookup {
+  return name => {
+    const r = rmp.getRatings(name);
+    if (!r) return null;
+    return {
+      ...r,
+      // RMP reports -1 when too few raters answered.
+      wouldTakeAgain:
+        r.wouldTakeAgain !== null && r.wouldTakeAgain >= 0
+          ? r.wouldTakeAgain
+          : null,
+      url: rmp.getProfessorRMPUrl(name),
+    };
+  };
+}
+
+/**
+ * Instructors with at least this many ratings outrank those with fewer:
+ * 4.7 from 3 reviews says less than 3.9 from 24, and 5.0 from one review
+ * almost nothing.
+ */
+export const SOLID_RATINGS = 5;
+
+type RatingNumbers = Pick<RatingView, 'rating' | 'difficulty' | 'numRatings'>;
+
+/**
+ * Negative when `a` ranks ahead of `b` by `key`: averages on SOLID_RATINGS
+ * or more ratings first, then the better value (higher rating, lower
+ * difficulty), then more ratings. "Top" instructors and the rating and
+ * difficulty sorts all rank by this.
+ */
+export function ratingOrder(
+  a: RatingNumbers,
+  b: RatingNumbers,
+  key: 'rating' | 'difficulty',
+): number {
+  const solid = (r: RatingNumbers) => (r.numRatings >= SOLID_RATINGS ? 0 : 1);
+  const value =
+    key === 'rating' ? b.rating - a.rating : a.difficulty - b.difficulty;
+  return solid(a) - solid(b) || value || b.numRatings - a.numRatings;
+}
+
+/** The lecture instructor with RMP data who ranks first by `key`. */
+function bestInstructor(
+  sections: Section[],
+  ratingOf: RatingLookup,
+  key: 'rating' | 'difficulty',
+): CourseSummary['topInstructor'] {
+  let best: CourseSummary['topInstructor'] = null;
+  for (const name of professorsOf(sections)) {
+    const r = ratingOf(name);
+    if (!r) continue;
+    if (!best || ratingOrder(r, best, key) < 0) {
+      best = {
+        name,
+        rating: r.rating,
+        difficulty: r.difficulty,
+        wouldTakeAgain: r.wouldTakeAgain,
+        numRatings: r.numRatings,
+      };
+    }
+  }
+  return best;
+}
+
+/** The course's lecture instructor ranking first by `key`, for sorting. */
+export function instructorFor(
+  course: Course,
+  rmp: RateMyProfessorService,
+  key: 'rating' | 'difficulty',
+): CourseSummary['topInstructor'] {
+  return bestInstructor(primarySections(course), ratingLookup(rmp), key);
+}
+
+export function toCourseSummary(
+  course: Course,
+  rmp: RateMyProfessorService,
+  topBy: 'rating' | 'difficulty' = 'rating',
+): CourseSummary {
+  const primary = primarySections(course);
+  const all = getAllSections(course).filter(s => !s.isInterestList);
 
   return {
     id: course.id,
@@ -130,15 +403,18 @@ export function toCourseSummary(course: Course): CourseSummary {
     credits: { min: course.minCredits, max: course.maxCredits },
     year: course.academicYear ?? null,
     terms: termsOf(all),
-    seats: {
-      capacity: primary.reduce((n, s) => n + s.seats, 0),
-      // Over-enrolled sections report a negative count; they add nothing.
-      available: primary.reduce((n, s) => n + Math.max(0, s.seatsAvailable), 0),
-      waitlisted: primary.reduce((n, s) => n + s.actualWaitlist, 0),
-    },
+    seats: seatTotals(primary),
+    seatsByTerm: termsOf(primary).map(term => ({
+      term,
+      ...seatTotals(primary.filter(s => (s.computedTerm as string) === term)),
+    })),
     sectionCount: primary.length,
     isGraduate: course.isGraduate ?? false,
     professors: professorsOf(primary).slice(0, MAX_SUMMARY_PROFESSORS),
+    category: course.category ?? null,
+    degreeAttributes: course.degreeAttributes,
+    crossListedWith: course.crossListedWith,
+    topInstructor: bestInstructor(primary, ratingLookup(rmp), topBy),
   };
 }
 
@@ -146,7 +422,11 @@ function hhmm(time: Time): string {
   return `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
 }
 
-function toPeriodView(period: Period, timed: boolean): PeriodView {
+function toPeriodView(
+  period: Period,
+  timed: boolean,
+  ratingOf: RatingLookup,
+): PeriodView {
   const days = DAY_ORDER.filter(d => period.days.has(d));
   const hasTime = period.startTime.displayTime !== 'TBD';
   let display: string;
@@ -157,52 +437,273 @@ function toPeriodView(period: Period, timed: boolean): PeriodView {
 
   return {
     type: period.type,
-    professor: period.professor,
+    instructors: instructorNames(period).map(name => ({
+      name,
+      rmp: ratingOf(name),
+    })),
     days: period.isAsync ? [] : days,
     start: timed && hasTime ? hhmm(period.startTime) : null,
     end: timed && hasTime ? hhmm(period.endTime) : null,
     display,
-    location: period.location,
+    location: roomOf(period.location),
     isAsync: period.isAsync ?? false,
   };
 }
 
-function toSectionView(section: Section): SectionView {
+/**
+ * What an async meeting is called: "Async", but for a team or ensemble
+ * (no seat cap), whose practice times Workday leaves out, "no set meeting
+ * times listed": "Async" there read as no meetings at all.
+ */
+export const asyncText = (s: { seats: number }) =>
+  isUncapped(s) ? 'no set meeting times listed' : 'Async';
+
+/**
+ * A section's meetings and room as one line shows them: "MTRF
+ * 10:00-10:50" and "Salisbury Labs 105". When its meetings are in
+ * different rooms (HU 3900 B01: M and R in Daniels 102E, T in Salisbury
+ * 226), each meeting carries its own room and `location` is empty, so no
+ * room is read against the wrong day.
+ */
+export function meetingsAndRoom(parts: { when: string; room: string }[]): {
+  meets: string;
+  location: string;
+} {
+  const rooms = [...new Set(parts.map(p => p.room).filter(Boolean))];
+  if (rooms.length <= 1) {
+    return {
+      meets: [...new Set(parts.map(p => p.when))].join('; ') || 'TBD',
+      location: rooms[0] ?? '',
+    };
+  }
+  const each = parts.map(p => (p.room ? `${p.when} (${p.room})` : p.when));
+  return { meets: [...new Set(each)].join('; '), location: '' };
+}
+
+/** "MTRF 10:00-10:50", one entry per period, "Async" or "TBD" untimed. */
+function meetings(section: Section): { meets: string; location: string } {
+  const timed = new Set(timedPeriods(section));
+  return meetingsAndRoom(
+    section.periods.map(p => {
+      const room = roomOf(p.location);
+      if (p.isAsync) return { when: asyncText(section), room };
+      if (!timed.has(p) || p.startTime.displayTime === 'TBD') {
+        return { when: 'TBD', room };
+      }
+      const days = DAY_ORDER.filter(d => p.days.has(d)).join('');
+      return { when: `${days} ${hhmm(p.startTime)}-${hhmm(p.endTime)}`, room };
+    }),
+  );
+}
+
+/**
+ * A meeting's room; Workday's "Unknown" (async and online sections, rooms
+ * not yet assigned) is no room, so it is left out rather than printed.
+ */
+const roomOf = (location: string) => (location === 'Unknown' ? '' : location);
+
+/**
+ * Open seats as sent: never below 0, with `overEnrolled` the excess when
+ * Workday reports more enrolled than the cap (CS 3733 BL01: -7).
+ */
+function openSeats(section: Section): {
+  seatsAvailable: number;
+  overEnrolled?: number;
+} {
+  return section.seatsAvailable < 0
+    ? { seatsAvailable: 0, overEnrolled: -section.seatsAvailable }
+    : { seatsAvailable: section.seatsAvailable };
+}
+
+function instructorsOf(
+  section: Section,
+  ratingOf: RatingLookup,
+): InstructorView[] {
+  return professorsOf([section]).map(name => ({ name, rmp: ratingOf(name) }));
+}
+
+/**
+ * The section's own dates when it starts or ends apart from `term` (the
+ * dates of its term); undefined when they agree or are not known.
+ */
+export function ownDates(
+  section: Pick<Section, 'startDate' | 'endDate'>,
+  term: DateSpan | undefined,
+): DateSpan | undefined {
+  if (!term || !section.startDate || !section.endDate) return undefined;
+  if (section.startDate === term.start && section.endDate === term.end) {
+    return undefined;
+  }
+  return { start: section.startDate, end: section.endDate };
+}
+
+export function toSectionBrief(
+  section: Section,
+  kind: SectionKind,
+  rmp: RateMyProfessorService,
+  term?: DateSpan,
+): SectionBrief {
+  const dates = ownDates(section, term);
+  return {
+    crn: section.crn,
+    number: section.number,
+    term: section.computedTerm,
+    kind,
+    ...meetings(section),
+    instructors: instructorsOf(section, ratingLookup(rmp)),
+    seats: section.seats,
+    ...openSeats(section),
+    waitlist: section.actualWaitlist,
+    status: section.status,
+    deliveryMode: section.deliveryMode,
+    ...(dates && { dates }),
+  };
+}
+
+function toSectionView(
+  section: Section,
+  kind: SectionKind,
+  pairsWith: number[],
+  ratingOf: RatingLookup,
+): SectionView {
   const timed = new Set(timedPeriods(section));
   return {
     crn: section.crn,
     number: section.number,
     term: section.computedTerm,
+    kind,
+    pairsWith,
     seats: section.seats,
-    seatsAvailable: section.seatsAvailable,
+    ...openSeats(section),
     waitlist: section.actualWaitlist,
     maxWaitlist: section.maxWaitlist,
     seatsLabel: seatsLabel(section),
     isInterestList: section.isInterestList ?? false,
-    periods: section.periods.map(p => toPeriodView(p, timed.has(p))),
+    isOnlineGrad: section.isOnlineGrad,
+    meetsWith: section.meetsWith,
+    deliveryMode: section.deliveryMode,
+    status: section.status,
+    startDate: section.startDate,
+    endDate: section.endDate,
+    periods: section.periods.map(p => toPeriodView(p, timed.has(p), ratingOf)),
   };
 }
 
+const KIND_RANK: Record<SectionKind, number> = {
+  lecture: 0,
+  standaloneLab: 1,
+  discussion: 2,
+  lab: 3,
+};
+
+/**
+ * The course with each section once, trimmed by `options`: a lab open to
+ * five lectures is one entry that lists the five, where the catalog repeats
+ * it under each.
+ */
 export function toCourseDetail(
   course: Course,
-  rmp: RateMyProfessorService,
+  context: DetailContext,
+  options: DetailOptions = {},
 ): CourseDetail {
-  const ratings: ProfessorView[] = [];
-  for (const name of professorsOf(getAllSections(course))) {
-    const r = rmp.getRatings(name);
-    if (r) ratings.push({ name, ...r, url: rmp.getProfessorRMPUrl(name) });
+  const ratingOf = ratingLookup(context.rmp);
+  const ended = new Set(context.endedTerms);
+  const allTerms = termsOf(getAllSections(course));
+  const omitted: CourseDetail['omitted'] = {
+    endedTerms: [],
+    otherTerms: [],
+    interestLists: [],
+    fullSections: 0,
+  };
+
+  const termShown = (term: string) =>
+    options.terms
+      ? options.terms.includes(term)
+      : (options.includeEndedTerms ?? true) || !ended.has(term);
+  for (const term of allTerms) {
+    if (termShown(term)) continue;
+    if (options.terms) omitted.otherTerms.push(term);
+    else omitted.endedTerms.push(term);
   }
 
+  // CRNs hidden for having no open seat, each once.
+  const full = new Set<number>();
+  const shown = (section: Section) => {
+    if (!termShown(section.computedTerm)) return false;
+    // A placeholder is shown or hidden as one; it has no seats to be full.
+    if (section.isInterestList) {
+      if (options.includeInterestLists ?? true) return true;
+      if (!omitted.interestLists.includes(section.computedTerm)) {
+        omitted.interestLists.push(section.computedTerm);
+      }
+      return false;
+    }
+    if (section.seatsAvailable <= 0 && !(options.includeFull ?? true)) {
+      full.add(section.crn);
+      return false;
+    }
+    return true;
+  };
+
+  // CRN -> section, its kind, and the lectures a companion pairs with.
+  const entries = new Map<
+    number,
+    { section: Section; kind: SectionKind; pairs: number[] }
+  >();
+  const add = (section: Section, kind: SectionKind, lecture?: number) => {
+    let entry = entries.get(section.crn);
+    if (!entry) {
+      entry = { section, kind, pairs: [] };
+      entries.set(section.crn, entry);
+    }
+    if (lecture !== undefined && !entry.pairs.includes(lecture)) {
+      entry.pairs.push(lecture);
+    }
+  };
+
+  const lectureGroups: LectureGroupRef[] = [];
+  for (const group of course.lectures ?? []) {
+    // Companions are judged even under a hidden lecture, so a full lab that
+    // goes only with a full lecture is counted too.
+    const lectureShown = shown(group.section);
+    const discussions = group.compatibleDiscussions.filter(shown);
+    const labs = group.compatibleLabs.filter(shown);
+    if (!lectureShown) continue;
+    const lecture = group.section.crn;
+    add(group.section, 'lecture');
+    for (const d of discussions) add(d, 'discussion', lecture);
+    for (const l of labs) add(l, 'lab', lecture);
+    lectureGroups.push({
+      lecture,
+      discussions: discussions.map(d => d.crn),
+      labs: labs.map(l => l.crn),
+    });
+  }
+  const standaloneLabs = (course.standaloneLabs ?? []).filter(shown);
+  for (const lab of standaloneLabs) add(lab, 'standaloneLab');
+  omitted.fullSections = full.size;
+
+  const sections = [...entries.values()]
+    .sort(
+      (a, b) =>
+        termRank(a.section.computedTerm) - termRank(b.section.computedTerm) ||
+        KIND_RANK[a.kind] - KIND_RANK[b.kind] ||
+        a.section.number.localeCompare(b.section.number),
+    )
+    .map(e => toSectionView(e.section, e.kind, e.pairs, ratingOf));
+
   return {
-    ...toCourseSummary(course),
+    ...toCourseSummary(course, context.rmp),
     departmentName: course.departmentName,
     description: course.description,
-    lectureGroups: (course.lectures ?? []).map(g => ({
-      lecture: toSectionView(g.section),
-      discussions: g.compatibleDiscussions.map(toSectionView),
-      labs: g.compatibleLabs.map(toSectionView),
-    })),
-    standaloneLabs: (course.standaloneLabs ?? []).map(toSectionView),
-    ratings,
+    courseTypes: course.courseTypes,
+    recommendedBackground: statementOf(course, 'recommendedBackground'),
+    prerequisites: statementOf(course, 'prerequisites'),
+    sections,
+    lectureGroups,
+    standaloneLabs: standaloneLabs.map(l => l.crn),
+    omitted,
+    nextYear: context.nextYear,
+    earlyEntry: context.earlyEntry,
   };
 }
