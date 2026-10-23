@@ -13,26 +13,41 @@ import {
   type CourseWordMatch,
 } from '../../../utils/searchUtils';
 
-/** The section's own searchable text: number, instructors, type, rooms. */
+/** The section's own searchable text: number, instructors, type. */
 function sectionText(section: Section): string {
   return foldText(
     [
       section.number,
-      ...section.periods.flatMap(p => [
-        p.professor,
-        p.type,
-        p.building,
-        p.room,
-        p.location,
-      ]),
+      ...section.periods.flatMap(p => [p.professor, p.type]),
     ].join(' '),
   );
 }
 
 /**
+ * Where the section meets: the building names alone ("fuller labs", the
+ * words before a room number), and everything with rooms and their names
+ * ("fuller labs 222 imgd computer lab").
+ */
+function placeText(section: Section): { buildings: string; all: string } {
+  const places = section.periods.map(p =>
+    foldText([p.building, p.room, p.location].filter(Boolean).join(' ')),
+  );
+  const buildings = places.map(place => place.split(/\s+\S*\d/)[0]);
+  return { buildings: buildings.join(' '), all: places.join(' ') };
+}
+
+/** Words naming a kind of place, not one: no sign a query is about rooms. */
+const PLACE_WORDS = new Set(['lab', 'labs', 'hall', 'center', 'room']);
+
+/**
  * Matches the query against each lecture group as searchUtils describes:
  * a code query by course code, a word query word by word, where each word
  * may match the course or the section.
+ *
+ * Rooms count only when the query names a building ("fuller labs",
+ * "higgins labs 116"): room names are full of common words ("Computer Lab", "Music
+ * Technology Lab"), and "physics with lab" should find physics with a lab
+ * section, not a course meeting in Higgins Labs.
  */
 export class SearchTextFilter implements SectionBasedFilter {
   readonly id = 'searchText';
@@ -79,9 +94,14 @@ export class SearchTextFilter implements SectionBasedFilter {
       // Each word from the section or the course; the section's short text
       // first, so the course's words are read only when it lacks them.
       const own = sectionText(fs.section);
-      return query.words.every(
-        (word, i) => textHasWord(own, word) || course.word(i),
+      const place = placeText(fs.section);
+      const namesBuilding = query.words.some(
+        word => !PLACE_WORDS.has(word) && textHasWord(place.buildings, word),
       );
+      const ownHas = (word: string) =>
+        textHasWord(own, word) ||
+        (namesBuilding && textHasWord(place.all, word));
+      return query.words.every((word, i) => ownHas(word) || course.word(i));
     });
   }
 

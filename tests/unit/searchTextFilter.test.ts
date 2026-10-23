@@ -89,4 +89,35 @@ describe('SearchTextFilter', () => {
     ];
     expect(filter.apply(sections, { query: 'QX2' })).toEqual([sections[0]]);
   });
+
+  describe('rooms', () => {
+    const physics = course({
+      id: 'AE-3010',
+      name: 'Experimentation',
+      description: 'Applied physics.',
+    });
+    const inLabs = taught(physics, 'Ann Lee', {
+      location: 'Higgins Labs 216 AE Undergraduate Lab',
+    });
+    const labSection = taught(physics, 'Ann Lee', {
+      type: 'Lab',
+      location: 'Olin Hall 107',
+    });
+
+    it('ignores common words in room names unless a building is named', () => {
+      expect(kept([inLabs], 'physics lab')).toBe(0);
+      expect(kept([inLabs], 'physics hall')).toBe(0);
+      expect(kept([inLabs], 'physics undergraduate')).toBe(0);
+      // A lab section is a lab whatever room it meets in.
+      expect(kept([labSection], 'physics lab')).toBe(1);
+    });
+
+    it('matches rooms once the query names a building', () => {
+      expect(kept([inLabs], 'higgins')).toBe(1);
+      expect(kept([inLabs], 'higgins labs')).toBe(1);
+      expect(kept([inLabs], 'higgins labs 216')).toBe(1);
+      expect(kept([inLabs], 'higgins undergraduate lab')).toBe(1);
+      expect(kept([inLabs], 'olin hall')).toBe(0);
+    });
+  });
 });
