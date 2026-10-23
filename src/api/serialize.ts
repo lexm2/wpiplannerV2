@@ -268,17 +268,28 @@ export function termsOf(sections: Section[]): string[] {
 }
 
 /**
- * Where a description's own heading for a statement starts: at a sentence
- * start, with or without a colon ("Recommended Background Working
- * knowledge of...", "The recommended background for this course is...",
- * "Prerequisites Completion of 24 credits..."). The catalog parser lifts
- * only the colon form, so 27 courses (PH 1110, DS 2010, CS 594...) had
- * the statement in their description and none in the field.
+ * A description's own heading for a statement, as a pattern source, with
+ * or without a colon ("Recommended Background Working knowledge of...",
+ * "The recommended background for this course is...", "Prerequisites
+ * Completion of 24 credits..."). The catalog parser lifts only the colon
+ * form, so 27 courses (PH 1110, DS 2010, CS 594...) had the statement in
+ * their description and none in the field. The MCP text cuts the same
+ * headings, in any case, from the description it shows.
  */
+export const STATEMENT_HEADING = {
+  recommendedBackground: String.raw`(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?`,
+  prerequisites: String.raw`Prerequisites?\s*[:;]?`,
+};
+
+/** A heading as statementOf looks for it: starting a sentence. */
+const atSentenceStart = (heading: string) =>
+  new RegExp(String.raw`(?:^|[.!?)]\s+)${heading}\s*`);
+
 const STATEMENT_HEADINGS = {
-  recommendedBackground:
-    /(?:^|[.!?)]\s+)(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?\s*/,
-  prerequisites: /(?:^|[.!?)]\s+)Prerequisites?\s*[:;]?\s*/,
+  recommendedBackground: atSentenceStart(
+    STATEMENT_HEADING.recommendedBackground,
+  ),
+  prerequisites: atSentenceStart(STATEMENT_HEADING.prerequisites),
 };
 
 /**

@@ -25,6 +25,7 @@ import {
   LOW_SEATS,
   ownDates,
   SOLID_RATINGS,
+  STATEMENT_HEADING,
 } from '../api/serialize';
 
 /** How many matching sections a search row lists before "+N more". */
@@ -187,11 +188,8 @@ function describe(c: {
       ' ',
     );
   };
-  cut(
-    '(?:the\\s+)?(?:recommended|suggested|required)\\s+backgrounds?(?:\\s+for\\s+this\\s+course)?(?:\\s+(?:is|includes|consists\\s+of))?\\s*[:;]?',
-    c.recommendedBackground,
-  );
-  cut('prerequisites?\\s*[:;]?', c.prerequisites);
+  cut(STATEMENT_HEADING.recommendedBackground, c.recommendedBackground);
+  cut(STATEMENT_HEADING.prerequisites, c.prerequisites);
   const lines: string[] = [];
   description = description.replace(/\s{2,}/g, ' ').trim();
   if (description) lines.push(`Description: ${description}`);
