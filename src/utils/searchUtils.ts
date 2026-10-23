@@ -365,6 +365,33 @@ function nearPrefix(word: string, token: string): boolean {
   return editDistance(word, token, limit, true) <= limit;
 }
 
+/** Endings a word may drop and still be the same word, for shortenedTo. */
+const ENDINGS = new Set(['s', 'es', 'ed', 'er', 'ers', 'al', 'ion', 'ions']);
+const ING = /^(?:[a-z])?ing$/;
+
+/**
+ * `token` is `word` without a common ending, and five letters or more:
+ * "program" for "programming", "network" for "networking", "material" for
+ * "materials". Not "robot" for "robotcs", a typo of "robotics". Only name
+ * words are read this way; descriptions say "program" of degree programs
+ * too often.
+ */
+function shortenedTo(word: string, token: string): boolean {
+  if (token.length < 5 || !word.startsWith(token)) return false;
+  const ending = word.slice(token.length);
+  return ENDINGS.has(ending) || ING.test(ending);
+}
+
+/** How a word matches one name word, best first; null when it doesn't. */
+type NameHit = 'exact' | 'prefix' | 'typo';
+
+function nameHit(word: string, token: string): NameHit | null {
+  if (isShort(word)) return shortWordIs(word, token) ? 'exact' : null;
+  if (token === word) return 'exact';
+  if (token.startsWith(word) || shortenedTo(word, token)) return 'prefix';
+  return nearPrefix(word, token) ? 'typo' : null;
+}
+
 function codeMatches(course: Course, code: { dept: string; number: string }) {
   const { codes } = courseText(course);
   if (code.dept) return codes.some(c => c.startsWith(code.dept + code.number));
@@ -384,6 +411,7 @@ function wordMatches(text: CourseText, word: string): boolean {
   return (
     wordIn(word, text.haystack, text.tokens) ||
     text.tokens.some(t => nearPrefix(word, t)) ||
+    text.nameTokens.some(t => shortenedTo(word, t)) ||
     acronymIn(word, text)
   );
 }
@@ -508,9 +536,34 @@ const isNear = (span: number | null, words: number) =>
 function wordInName(text: CourseText, word: string): boolean {
   return (
     wordIn(word, text.name, text.nameTokens) ||
-    text.nameTokens.some(t => nearPrefix(word, t)) ||
+    text.nameTokens.some(t => nameHit(word, t) !== null) ||
     acronymIn(word, text)
   );
+}
+
+/**
+ * Where the words run through the name in order, one name word each: the
+ * index of the first, and whether any was a typo. Each word may be the
+ * whole name word, its start, a shorter form or a typo of it, so "intro to
+ * programming" runs through "Introduction To Program Design" and "machine
+ * lerning" through "Machine Learning". Null when the words are not there
+ * together.
+ */
+function phraseInName(
+  text: CourseText,
+  words: string[],
+): { at: number; typo: boolean } | null {
+  const tokens = text.nameTokens;
+  for (let at = 0; at + words.length <= tokens.length; at++) {
+    let typo = false;
+    const runs = words.every((word, k) => {
+      const hit = nameHit(word, tokens[at + k]);
+      if (hit === 'typo') typo = true;
+      return hit !== null;
+    });
+    if (runs) return { at, typo };
+  }
+  return null;
 }
 
 /**
@@ -630,15 +683,21 @@ function codeScore(course: Course, code: { dept: string; number: string }) {
 function wordScore(text: CourseText, words: string[]): number {
   if (!words.length) return 0;
   let score = 0;
-  // The whole query against the name, word for word; the last word may be
-  // the start of a name word unless it is short ("calc" for "calculus").
-  const name = text.nameTokens.join(' ');
-  const joined = words.map(escapeRegExp).join(' ');
-  const tail = isShort(words.at(-1)!) ? '(?:e?s)?(?= |$)' : '';
-  const phrase = new RegExp(`(?:^| )${joined}${tail}`).exec(name);
-  if (name === words.join(' ')) score += 850;
-  if (phrase?.index === 0) score += 20;
-  if (phrase) score += 400;
+  // The whole query against the name, word for word ("calc" for
+  // "calculus", "intro to programming" for "Introduction To Program
+  // Design"); a run with a typo in it counts for less.
+  const phrase = phraseInName(text, words);
+  if (text.nameTokens.join(' ') === words.join(' ')) score += 850;
+  else if (
+    phrase?.at === 0 &&
+    words.length > 1 &&
+    words.length === text.nameTokens.length
+  ) {
+    // The whole name, misspelt or shortened: "machine lerning".
+    score += 450;
+  }
+  if (phrase?.at === 0) score += 20;
+  if (phrase) score += phrase.typo ? 300 : 400;
   // An acronym spelled out in the name is the same phrase: "AI" for
   // "Artificial Intelligence" ranks with "AI in Writing", not below it.
   if (!phrase && words.length === 1) {
@@ -657,6 +716,8 @@ function wordScore(text: CourseText, words: string[]): number {
       inName = 100;
     else if (!short && text.nameTokens.some(t => t.startsWith(word)))
       inName = 90;
+    else if (!short && text.nameTokens.some(t => shortenedTo(word, t)))
+      inName = 80;
     else if (!short && text.name.includes(word)) inName = 60;
     else if (text.nameTokens.some(t => nearPrefix(word, t))) inName = 50;
     if (inName > 0) wordsInName++;

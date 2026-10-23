@@ -574,6 +574,47 @@ describe('short forms', () => {
   });
 });
 
+describe('phrases in names', () => {
+  const named = (id: string, name: string, description = '') =>
+    course({ id, number: id.split('-')[1], name, description });
+
+  it('ranks a name whose words are shortened forms with the phrase', () => {
+    const list = [
+      named('RBE-1001', 'Introduction To Robotics', 'Programming robots.'),
+      named('ME-2312', 'Computational Solutions', 'Intro to programming.'),
+      named('CS-1101', 'Introduction To Program Design', 'Programming.'),
+      named('CS-1004', 'Introduction To Programming For Non-Majors'),
+    ];
+    const ranked = rankCoursesByRelevance([...list], 'intro to programming');
+    expect(ranked.slice(0, 2).map(c => c.id)).toEqual(['CS-1004', 'CS-1101']);
+    expect(describeMatch(list[2], 'intro to programming')).toBe('title');
+  });
+
+  it('does not read a typo as a shortened form', () => {
+    expect(
+      matchCourseText(
+        named('RBE-502', 'Robot Control'),
+        parseSearchQuery('robotcs'),
+      ).all,
+    ).toBe(false);
+  });
+
+  it('puts a misspelt whole name above longer names with the phrase', () => {
+    const list = [
+      named('MIS-3787', 'Business Applications Of Machine Learning'),
+      named('ECE-4803', 'Machine Learning in Cybersecurity'),
+      named('CS-4342', 'Machine Learning'),
+    ];
+    expect(rankCoursesByRelevance([...list], 'machine lerning')[0].id).toBe(
+      'CS-4342',
+    );
+    // Spelt right, it still leads by more.
+    expect(
+      calculateRelevanceScore(list[2], 'machine learning'),
+    ).toBeGreaterThan(calculateRelevanceScore(list[2], 'machine lerning'));
+  });
+});
+
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
     expect(parseSearchQuery('design game design GAME').words).toEqual([
