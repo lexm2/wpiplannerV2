@@ -38,14 +38,17 @@ const CODE_RE = /^([a-z]{2,5})?(\d{2,4}[a-z]?)$/;
 // A code followed by words: "ma 1022 calculus", "cs-2102 java".
 const LEADING_CODE_RE = /^([a-z]{2,5})[\s_.-]*(\d{2,4}[a-z]?)\s+(.+)$/;
 
-/** I-IV as course names number their sequels. */
-const NUMERALS: Record<string, string> = {
-  i: '1',
-  ii: '2',
-  iii: '3',
-  iv: '4',
-};
-const numeral = (token: string) => NUMERALS[token] ?? token;
+/**
+ * I-IV as course names number their sequels. A Map, not an object literal:
+ * the keys are user text, and "constructor" must not find Object's.
+ */
+const NUMERALS = new Map([
+  ['i', '1'],
+  ['ii', '2'],
+  ['iii', '3'],
+  ['iv', '4'],
+]);
+const numeral = (token: string) => NUMERALS.get(token) ?? token;
 
 const TOKEN_SPLIT = /[^a-z0-9+#]+/;
 const tokenize = (text: string) => text.split(TOKEN_SPLIT).filter(Boolean);

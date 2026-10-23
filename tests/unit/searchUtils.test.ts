@@ -442,6 +442,28 @@ describe('short words, acronyms and numerals', () => {
   });
 });
 
+describe('query words that name object members', () => {
+  it('reads "constructor" and "toString" as plain words', () => {
+    const oop = course({
+      name: 'Object-Oriented Design',
+      description: 'Classes, a constructor for each, and toString methods.',
+    });
+    for (const q of ['constructor', 'toString', '__proto__', 'valueOf']) {
+      expect(parseSearchQuery(q).words.every(w => typeof w === 'string')).toBe(
+        true,
+      );
+      expect(() => calculateRelevanceScore(oop, q)).not.toThrow();
+      expect(() => describeMatch(oop, q)).not.toThrow();
+    }
+    expect(matchCourseText(oop, parseSearchQuery('constructor')).all).toBe(
+      true,
+    );
+    expect(matchCourseText(course(), parseSearchQuery('constructor')).all).toBe(
+      false,
+    );
+  });
+});
+
 describe('editDistance', () => {
   it('counts a swap as one edit', () => {
     expect(editDistance('robtoics', 'robotics')).toBe(1);
