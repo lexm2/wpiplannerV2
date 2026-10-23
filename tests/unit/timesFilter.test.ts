@@ -198,12 +198,22 @@ describe('TimesFilter', () => {
       ['zero length', fs('zero-length', [period([T], 10, 0, 10, 0)])],
     ];
 
-    // Painting times is a statement about when classes meet, so classes
-    // that never meet are left out unless the user asks for them.
+    // Painting times to meet in is a statement about when classes meet, so
+    // classes that never meet are left out unless the user asks for them.
+    // Avoiding times is not: a class with no meetings overlaps none of them.
     for (const [label, section] of untimed) {
-      it(`hides a ${label} section in both modes by default`, () => {
+      it(`hides a ${label} section from only by default`, () => {
         expect(filter.apply([section], only(tueThu10to12))).toEqual([]);
-        expect(filter.apply([section], avoid(tueThu10to12))).toEqual([]);
+      });
+
+      it(`keeps a ${label} section in avoid mode, async included or not`, () => {
+        expect(filter.apply([section], avoid(tueThu10to12))).toHaveLength(1);
+        expect(
+          filter.apply([section], {
+            ...avoid(tueThu10to12),
+            includeAsync: false,
+          }),
+        ).toHaveLength(1);
       });
 
       it(`keeps a ${label} section in both modes when async is included`, () => {
@@ -219,6 +229,14 @@ describe('TimesFilter', () => {
         ).toHaveLength(1);
       });
     }
+
+    it('keeps every untimed section when avoiding a day nothing meets on', () => {
+      const sunday = avoid([
+        { day: DayOfWeek.SUNDAY, startMin: 0, endMin: 1440 },
+      ]);
+      const sections = untimed.map(([, s]) => s);
+      expect(filter.apply(sections, sunday)).toHaveLength(sections.length);
+    });
 
     it('leaves every section alone when nothing is painted', () => {
       const [, section] = untimed[0];
@@ -275,6 +293,15 @@ describe('TimesFilter', () => {
       expect(filter.getDisplayValue(only(tueThu10to12))).toBe(
         'Only Tue, Thu 10:00 AM-12:00 PM',
       );
+    });
+
+    it('notes included async sections only where they change the result', () => {
+      expect(
+        filter.getDisplayValue({ ...only(tueThu10to12), includeAsync: true }),
+      ).toBe('Only Tue, Thu 10:00 AM-12:00 PM • async included');
+      expect(
+        filter.getDisplayValue({ ...avoid(tueThu10to12), includeAsync: true }),
+      ).not.toContain('async');
     });
 
     it('summarises many bands by count', () => {
