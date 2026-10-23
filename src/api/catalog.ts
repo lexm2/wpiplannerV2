@@ -13,7 +13,7 @@ import { TermBoundsService } from '../utils/termBounds';
 import type { FilterableSection } from '../types/filterableUnit';
 import { SectionFilterPipeline } from '../core/filtering/SectionFilterPipeline';
 import { logger } from '../utils/logger';
-import { prepareSearch } from '../utils/searchUtils';
+import { prepareSearch, resetSearchVocabulary } from '../utils/searchUtils';
 
 const CATALOG_FILE = 'course-data-constructed.json';
 const TERM_BOUNDS_FILE = 'term-bounds.json';
@@ -201,8 +201,9 @@ export class CatalogSource {
     // Code reading ("CS2" as every CS 2xxx) and acronyms depend on the
     // departments and definitions search learns from course text, so learn
     // them before the first lookup parses a query, not on the first search.
-    // searchUtils has no way to forget them, so a refresh adds to what the
-    // old data taught; departments and acronyms rarely leave the catalog.
+    // A refresh forgets what the old data taught first. Both run in one
+    // synchronous stretch, so no request sees the vocabulary half-built.
+    resetSearchVocabulary();
     prepareSearch(courses);
 
     const catalog: Catalog = {

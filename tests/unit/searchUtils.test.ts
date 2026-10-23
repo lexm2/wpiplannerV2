@@ -15,6 +15,8 @@ import {
   MAX_QUERY_WORDS,
   namesHaveWord,
   textHasWord,
+  prepareSearch,
+  resetSearchVocabulary,
 } from '../../src/utils/searchUtils';
 import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
@@ -750,5 +752,27 @@ describe('getAvailableProfessors', () => {
 
   it('handles an empty course list', () => {
     expect(getAvailableProfessors([])).toEqual([]);
+  });
+});
+
+// Last in the file: it clears what earlier tests' courses taught, and those
+// course objects are cached, so they would not teach it again.
+describe('a catalog that replaces another', () => {
+  it('forgets departments only the old catalog had', () => {
+    const dept = (abbr: string) =>
+      course({
+        id: `${abbr}-2001`,
+        departmentAbbr: abbr,
+        departmentName: abbr,
+        number: '2001',
+        name: 'Topics',
+      });
+    prepareSearch([dept('QQ')]);
+    expect(parseSearchQuery('QQ2').code).toEqual({ dept: 'qq', number: '2' });
+
+    resetSearchVocabulary();
+    prepareSearch([dept('ZZ')]);
+    expect(parseSearchQuery('QQ2').code).toBeNull();
+    expect(parseSearchQuery('ZZ2').code).toEqual({ dept: 'zz', number: '2' });
   });
 });

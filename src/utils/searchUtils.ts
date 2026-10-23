@@ -632,6 +632,18 @@ export function prepareSearch(courses: Iterable<Course>): void {
 }
 
 /**
+ * Forgets the departments, acronyms and subjects learned so far, for a
+ * catalog that replaces the old one: call prepareSearch with the new courses
+ * right after. The new catalog's course objects are not in the text cache,
+ * so preparing them learns everything again.
+ */
+export function resetSearchVocabulary(): void {
+  knownDepartments.clear();
+  definedAcronyms.clear();
+  subjectCodes.clear();
+}
+
+/**
  * Ranks courses by relevance to a search query, best first. Sorts in place,
  * as callers expect the same array back.
  */
