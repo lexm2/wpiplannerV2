@@ -27,6 +27,7 @@ import {
 import { ApiError, listSome, withoutControls } from './errors';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
 import { courseCode, isUncapped } from './serialize';
+import { DaySchema } from './schemaHints';
 
 /** CRNs a schedule check, or a search fitted around CRNs, takes at most. */
 export const MAX_CRNS = 100;
@@ -34,7 +35,7 @@ export const MAX_CRNS = 100;
 const BusyBlockSchema = z
   .object({
     days: z
-      .array(z.enum(DayOfWeek))
+      .array(DaySchema)
       .min(1)
       .describe('M, T, W, R (Thursday), F, S, U; ["T", "R"] for Tue/Thu.'),
     start: ClockSchema.describe('24-hour start, "13:00".'),

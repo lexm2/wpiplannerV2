@@ -19,7 +19,8 @@ import {
   yearLabel,
   yearStatus,
 } from '../api/calendar';
-import { CourseQuerySchema, runCourseQuery } from '../api/query';
+import { CourseQuerySchema, runCourseQuery, TERMS } from '../api/query';
+import { caseless } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
 import { logger } from '../utils/logger';
@@ -188,7 +189,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
             'Academic year (fall year). Omitted: the current year. A future unpublished year (e.g. next year) returns the planning outlook.',
           ),
           terms: z
-            .array(z.enum(['A', 'B', 'C', 'D', 'F', 'S']))
+            .array(caseless(TERMS))
             .min(1)
             .optional()
             .describe(

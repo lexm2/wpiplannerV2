@@ -1432,3 +1432,28 @@ describe('internal errors', () => {
     expect(init.capabilities.tools.listChanged).toBe(false);
   });
 });
+
+describe('tool schemas', () => {
+  it('still lists the terms and modes a caller may give, in any case', async () => {
+    const { tools } = await rpcOn(endpoints(BEFORE_A).mcp, 'tools/list', {});
+    const search = tools.find(
+      (t: { name: string }) => t.name === 'search_courses',
+    );
+    const filters = search.inputSchema.properties.filters.properties;
+    expect(filters.term.properties.terms.items.enum).toEqual([
+      'A',
+      'B',
+      'C',
+      'D',
+      'F',
+      'S',
+    ]);
+    expect(filters.deliveryMode.properties.modes.items.enum).toEqual([
+      'In-Person',
+      'Online',
+      'Hybrid',
+    ]);
+    const lower = await tool('get_course', { course: 'PH 1110', terms: ['b'] });
+    expect(lower.isError).toBe(false);
+  });
+});

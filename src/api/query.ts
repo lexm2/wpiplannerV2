@@ -60,7 +60,7 @@ import { knownTermNotes } from './knownTerms';
 import { ApiError, echo, listSome } from './errors';
 import { EndedTermsFilter, type EndedTermsCriteria } from './endedTermsFilter';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
-import { strictObject } from './schemaHints';
+import { caseless, DaySchema, strictObject } from './schemaHints';
 import {
   DELIVERY_MODES,
   resolveDegreeAttributes,
@@ -103,20 +103,20 @@ const MAX_NAMES = 30;
 /** Time windows a times filter takes: a few bands on each of seven days. */
 const MAX_WINDOWS = 70;
 
-const TermSchema = z
-  .enum([
-    AcademicTerm.A,
-    AcademicTerm.B,
-    AcademicTerm.C,
-    AcademicTerm.D,
-    AcademicTerm.F,
-    AcademicTerm.S,
-  ])
-  .describe(
-    'A, B, C, D are the 7-week quarters (A and B in fall, C and D in spring). ' +
-      'F and S are full fall and spring semester sections. Matching is exact: ' +
-      'A does not match an F section.',
-  );
+export const TERMS = [
+  AcademicTerm.A,
+  AcademicTerm.B,
+  AcademicTerm.C,
+  AcademicTerm.D,
+  AcademicTerm.F,
+  AcademicTerm.S,
+] as const;
+
+const TermSchema = caseless(TERMS).describe(
+  'A, B, C, D are the 7-week quarters (A and B in fall, C and D in spring). ' +
+    'F and S are full fall and spring semester sections. Matching is exact: ' +
+    'A does not match an F section.',
+);
 
 const YearSchema = z
   .number()
@@ -128,9 +128,9 @@ const YearSchema = z
   );
 
 const TimeWindowSchema = strictObject({
-  day: z
-    .enum(DayOfWeek)
-    .describe('M, T, W, R (Thursday), F, S (Saturday) or U (Sunday)'),
+  day: DaySchema.describe(
+    'M, T, W, R (Thursday), F, S (Saturday) or U (Sunday)',
+  ),
   startMin: z
     .number()
     .int()
@@ -285,7 +285,7 @@ const FiltersSchema = strictObject(
       querySchema,
     ).optional(),
     deliveryMode: strictObject(
-      { modes: z.array(z.enum(DELIVERY_MODES)).min(1).max(12) },
+      { modes: z.array(caseless(DELIVERY_MODES)).min(1).max(12) },
       querySchema,
     )
       .optional()
@@ -338,7 +338,7 @@ const FiltersSchema = strictObject(
           'Shorthand, on `days` (default every day). "only": meetings end by this ("12:00"). "avoid": the end of the band to avoid.',
         ),
         days: z
-          .array(z.enum(DayOfWeek))
+          .array(DaySchema)
           .min(1)
           .optional()
           .describe(

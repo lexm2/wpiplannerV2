@@ -6,6 +6,7 @@
  */
 import * as z from 'zod';
 import { closestMatches } from '../utils/editDistance';
+import { DayOfWeek } from '../types/types';
 
 interface SchemaInternals {
   _zod?: {
@@ -17,6 +18,25 @@ interface SchemaInternals {
     };
   };
 }
+
+/**
+ * `values` taken in any case ("b" for B, "online" for Online), as the
+ * filters themselves compare them; the JSON Schema still lists the enum.
+ */
+export function caseless<const T extends readonly [string, ...string[]]>(
+  values: T,
+) {
+  return z.preprocess(v => {
+    if (typeof v !== 'string') return v;
+    const want = v.trim().toLowerCase();
+    return values.find(x => x.toLowerCase() === want) ?? v;
+  }, z.enum(values));
+}
+
+/** Weekday letters in any case: "t" is Tuesday. */
+export const DaySchema = caseless(
+  Object.values(DayOfWeek) as [DayOfWeek, ...DayOfWeek[]],
+);
 
 /** The object shape under optional, default, pipe and array wrappers. */
 function shapeOf(schema: unknown): Record<string, unknown> | null {

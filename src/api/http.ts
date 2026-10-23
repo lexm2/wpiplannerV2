@@ -5,10 +5,10 @@
  */
 import * as z from 'zod';
 import type { Catalog } from './catalog';
-import { CourseQuerySchema, runCourseQuery } from './query';
+import { CourseQuerySchema, runCourseQuery, TERMS } from './query';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
-import { ApiError } from './errors';
+import { ApiError, echo } from './errors';
 import { logger } from '../utils/logger';
 
 export const CORS_HEADERS: Record<string, string> = {
@@ -18,13 +18,18 @@ export const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Expose-Headers': '*',
 };
 
-function json(body: unknown, status = 200): Response {
+function json(
+  body: unknown,
+  status = 200,
+  headers: Record<string, string> = {},
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-cache',
       ...CORS_HEADERS,
+      ...headers,
     },
   });
 }
@@ -34,10 +39,35 @@ class HttpError extends Error {
     readonly status: number,
     message: string,
     readonly details?: unknown,
+    readonly headers: Record<string, string> = {},
   ) {
     super(message);
   }
 }
+
+/** The method each route answers, for 405s on the others. */
+function allowedMethod(path: string): 'GET' | 'POST' | null {
+  if (path === '/courses/search' || path === '/conflicts') return 'POST';
+  if (['/health', '/meta', '/departments', '/courses'].includes(path)) {
+    return 'GET';
+  }
+  return /^\/courses\/[^/]+$/.test(path) ? 'GET' : null;
+}
+
+/** Refuses any query parameter but `allowed`, as GET /courses does. */
+function onlyParams(params: URLSearchParams, allowed: string[]): void {
+  const unknown = [...new Set(params.keys())].filter(k => !allowed.includes(k));
+  if (unknown.length > 0) {
+    throw new HttpError(
+      400,
+      `Unknown parameter: ${unknown.map(echo).join(', ')}${allowed.length ? `. Accepted: ${allowed.join(', ')}` : '; this route takes none'}.`,
+    );
+  }
+}
+
+/** Plain decimal digits: no hex, exponent, sign or blank ("0x7EA", "1e1", ""). */
+const INTEGER_RE = /^\d+$/;
+const DECIMAL_RE = /^\d+(\.\d+)?$/;
 
 const notFound = () => new HttpError(404, 'Not found');
 
@@ -60,8 +90,18 @@ async function readBody(request: Request): Promise<unknown> {
   }
 }
 
-const YearParamSchema = z.coerce.number().int().min(2000).max(2100);
-const YearOrAllParamSchema = z.union([z.literal('all'), YearParamSchema]);
+const YearParamSchema = z
+  .string()
+  .regex(/^\d{4}$/, 'year is a four-digit fall year, e.g. 2026')
+  .transform(Number)
+  .pipe(z.number().int().min(2000).max(2100));
+const YearOrAllParamSchema = z.union([
+  z
+    .string()
+    .regex(/^all$/i)
+    .transform(() => 'all' as const),
+  YearParamSchema,
+]);
 
 const BoolParamSchema = z
   .enum(['true', 'false', '1', '0'])
@@ -79,7 +119,7 @@ const DetailParamsSchema = z
           .map(t => t.trim().toUpperCase())
           .filter(Boolean),
       )
-      .pipe(z.array(z.enum(['A', 'B', 'C', 'D', 'F', 'S'])).min(1))
+      .pipe(z.array(z.enum(TERMS)).min(1))
       .optional(),
     includeEndedTerms: BoolParamSchema.optional(),
     includeFull: BoolParamSchema.optional(),
@@ -150,8 +190,25 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
   }
 
   const str = (k: string) => params.get(k) ?? undefined;
+  // Number() would take "0x7EA", "1e1" and "" (as 0); only digits count.
+  const parse = (k: string, re: RegExp, what: string) => {
+    const v = params.get(k);
+    if (v === null) return undefined;
+    if (!re.test(v.trim())) {
+      throw new HttpError(400, `${k} must be ${what}, got "${echo(v)}".`);
+    }
+    return Number(v);
+  };
+  const int = (k: string) => parse(k, INTEGER_RE, 'a whole number in digits');
   const num = (k: string) =>
-    params.has(k) ? Number(params.get(k)) : undefined;
+    parse(k, DECIMAL_RE, 'a number in digits, e.g. 3 or 3.5');
+  const needs = (k: string, parent: string) => {
+    if (params.has(k) && !params.has(parent)) {
+      throw new HttpError(400, `${k} needs ${parent}: it qualifies it.`);
+    }
+  };
+  needs('professorOnly', 'q');
+  needs('semesterSpansQuarters', 'avoidCrns');
   const bool = (k: string) => {
     const v = params.get(k);
     if (v === null) return undefined;
@@ -181,8 +238,10 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     filters.term = { terms: list('term').map(t => t.toUpperCase()) };
   }
   if (params.has('year')) {
-    const year = str('year');
-    filters.academicYear = { year: year === 'all' ? 'all' : Number(year) };
+    const year = str('year')!;
+    filters.academicYear = {
+      year: /^all$/i.test(year) ? 'all' : int('year'),
+    };
   }
   if (
     params.has('availableOnly') ||
@@ -191,12 +250,12 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
   ) {
     filters.availability = {
       availableOnly: bool('availableOnly'),
-      minAvailable: num('minAvailable'),
-      maxWaitlisted: num('maxWaitlisted'),
+      minAvailable: int('minAvailable'),
+      maxWaitlisted: int('maxWaitlisted'),
     };
   }
   if (params.has('minLevel') || params.has('maxLevel')) {
-    filters.courseLevel = { min: num('minLevel'), max: num('maxLevel') };
+    filters.courseLevel = { min: int('minLevel'), max: int('maxLevel') };
   }
   if (params.has('degreeAttribute')) {
     filters.degreeAttribute = { attributes: list('degreeAttribute') };
@@ -206,26 +265,37 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
   }
   if (params.has('offeringPattern')) {
     const values = list('offeringPattern');
+    // "unknown" alone: only the courses with no category on record.
     filters.offeringPattern = {
-      categories: values.filter(v => v !== 'unknown').map(Number),
-      includeUnknown: values.includes('unknown') || undefined,
+      categories: values
+        .filter(v => v.toLowerCase() !== 'unknown')
+        .map(v => (INTEGER_RE.test(v) ? Number(v) : v)),
+      includeUnknown:
+        values.some(v => v.toLowerCase() === 'unknown') || undefined,
     };
   }
   if (params.has('minCredits') || params.has('maxCredits')) {
-    filters.creditRange = {
-      min: num('minCredits') ?? 0,
-      max: num('maxCredits') ?? 100,
-    };
+    // An open end is no bound: minCredits=200 alone is 200 and up.
+    const min = num('minCredits') ?? 0;
+    filters.creditRange = { min, max: num('maxCredits') ?? Math.max(100, min) };
   }
   if (params.has('level')) {
     filters.graduateLevel = { level: str('level') };
   }
   if (params.has('times')) {
+    let times: unknown;
     try {
-      filters.times = JSON.parse(params.get('times')!) as unknown;
+      times = JSON.parse(params.get('times')!) as unknown;
     } catch {
       throw new HttpError(400, 'times must be JSON');
     }
+    if (!times || typeof times !== 'object' || Array.isArray(times)) {
+      throw new HttpError(
+        400,
+        'times must be a JSON object, e.g. {"mode":"avoid","earliestStart":"13:00"}',
+      );
+    }
+    filters.times = times;
   }
   if (
     params.has('earliestStart') ||
@@ -245,13 +315,23 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
   }
   if (RMP_PARAMS.some(k => params.has(k)) || params.has('includeWithoutData')) {
     filters.rmpRating = {
-      ...Object.fromEntries(RMP_PARAMS.map(k => [k, num(k)])),
+      ...Object.fromEntries(
+        RMP_PARAMS.map(k => [k, k === 'minNumRatings' ? int(k) : num(k)]),
+      ),
       includeWithoutData: bool('includeWithoutData'),
     };
   }
   if (params.has('avoidCrns')) {
     filters.periodConflict = {
-      crns: list('avoidCrns').map(Number),
+      crns: list('avoidCrns').map(v => {
+        if (!INTEGER_RE.test(v)) {
+          throw new HttpError(
+            400,
+            `avoidCrns takes CRNs in digits, got "${echo(v)}".`,
+          );
+        }
+        return Number(v);
+      }),
       semesterSpansQuarters: bool('semesterSpansQuarters'),
     };
   }
@@ -262,8 +342,8 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     includeInterestLists: bool('includeInterestLists'),
     includeSections: bool('includeSections'),
     sort: str('sort'),
-    offset: num('offset'),
-    limit: num('limit'),
+    offset: int('offset'),
+    limit: int('limit'),
   };
 }
 
@@ -279,15 +359,28 @@ async function route(
 ): Promise<Response> {
   const { method } = request;
 
+  const allowed = allowedMethod(path);
+  if (allowed && method !== allowed) {
+    throw new HttpError(
+      405,
+      `${path} takes ${allowed}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
+      undefined,
+      { Allow: `${allowed}, OPTIONS` },
+    );
+  }
+
   if (path === '/health' && method === 'GET') {
+    onlyParams(url.searchParams, []);
     return json({ ok: true });
   }
 
   if (path === '/meta' && method === 'GET') {
+    onlyParams(url.searchParams, []);
     return json(catalogMeta(await getCatalog()));
   }
 
   if (path === '/departments' && method === 'GET') {
+    onlyParams(url.searchParams, ['year']);
     const year = url.searchParams.has('year')
       ? parseOrThrow(YearOrAllParamSchema, url.searchParams.get('year'))
       : undefined;
@@ -310,7 +403,15 @@ async function route(
       DetailParamsSchema,
       Object.fromEntries(url.searchParams),
     );
-    const id = decodeURIComponent(courseMatch[1]);
+    let id: string;
+    try {
+      id = decodeURIComponent(courseMatch[1]);
+    } catch {
+      throw new HttpError(
+        400,
+        'The course in the path is not valid URL encoding.',
+      );
+    }
     const found = lookupCourse(await getCatalog(), id, options);
     // A year not yet published answers with the outlook instead.
     return json(
@@ -358,6 +459,7 @@ export function createApiHandler(options: {
         return json(
           { error: error.message, details: error.details },
           error.status,
+          error.headers,
         );
       }
       if (error instanceof ApiError) {

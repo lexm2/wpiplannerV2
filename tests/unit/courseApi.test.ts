@@ -765,3 +765,125 @@ describe('canonicalWindows', () => {
     ]);
   });
 });
+
+describe('HTTP edge cases', () => {
+  const send = async (method: string, path: string, body?: unknown) => {
+    const response = await endpoints(BEFORE_A).api(
+      new Request(`http://localhost${BASE}/api${path}`, {
+        method,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      }),
+    );
+    return {
+      status: response!.status,
+      allow: response!.headers.get('Allow'),
+      body: await response!.json(),
+    };
+  };
+
+  it('answers a malformed percent-escape with 400, not 500', async () => {
+    const { status, body } = await call('/courses/%ZZ');
+    expect(status).toBe(400);
+    expect(body.error).toContain('not valid URL encoding');
+  });
+
+  it('takes offeringPattern=unknown alone as the courses with no category', async () => {
+    const { status, body } = await call('/courses?offeringPattern=unknown');
+    expect(status).toBe(200);
+    expect(body.total).toBeGreaterThan(0);
+    for (const c of body.courses) expect(c.category).toBeNull();
+    const none = await call('/courses/search', {
+      filters: { offeringPattern: { categories: [] } },
+    });
+    expect(none.status).toBe(400);
+  });
+
+  it('reads terms, days and delivery modes in any case', async () => {
+    const lower = await call('/courses/search', {
+      filters: {
+        term: { terms: ['b'] },
+        deliveryMode: { modes: ['online'] },
+        times: { days: ['m', 't', 'w', 'r', 'f'], earliestStart: '08:00' },
+      },
+    });
+    expect(lower.status).toBe(200);
+    const get = await call('/courses?term=b&deliveryMode=online');
+    expect(get.status).toBe(200);
+    expect(codes(get.body)).toEqual(['PH-1110-2026']);
+    const busy = await call('/conflicts', {
+      crns: [8],
+      busy: [{ days: ['t'], start: '13:00', end: '17:00' }],
+    });
+    expect(busy.body.busyConflicts).toHaveLength(1);
+  });
+
+  it('takes numbers only as plain digits', async () => {
+    for (const q of [
+      'year=0x7EA',
+      'year=2.026e3',
+      'limit=1e1',
+      'avoidCrns=0x55F79',
+      'offset=',
+      'offset=%20',
+      'minAvailable=-1',
+    ]) {
+      const { status } = await call(`/courses?${q}`);
+      expect(status, q).toBe(400);
+    }
+    expect((await call('/courses?minRating=3.5')).status).toBe(200);
+    expect((await call('/courses?year=ALL')).body.year).toBe('all');
+  });
+
+  it('leaves an open credit bound open', async () => {
+    const { status, body } = await call('/courses?minCredits=200');
+    expect(status).toBe(200);
+    expect(body.total).toBe(0);
+  });
+
+  it('refuses a qualifier without the parameter it qualifies', async () => {
+    const prof = await call('/courses?professorOnly=true');
+    expect(prof.status).toBe(400);
+    expect(prof.body.error).toBe('professorOnly needs q: it qualifies it.');
+    const spans = await call('/courses?semesterSpansQuarters=false');
+    expect(spans.body.error).toBe(
+      'semesterSpansQuarters needs avoidCrns: it qualifies it.',
+    );
+  });
+
+  it('needs times to be a JSON object', async () => {
+    const { status, body } = await call('/courses?times=%22x%22');
+    expect(status).toBe(400);
+    expect(body.error).toContain('times must be a JSON object');
+  });
+
+  it('refuses unknown parameters on every route', async () => {
+    for (const path of ['/departments?foo=1', '/meta?foo=1', '/health?x=1']) {
+      const { status, body } = await call(path);
+      expect(status, path).toBe(400);
+      expect(body.error).toContain('Unknown parameter');
+    }
+    expect((await call('/departments?year=2026')).status).toBe(200);
+    expect((await call('/departments?year=0x7EA')).status).toBe(400);
+  });
+
+  it('answers a route asked with the wrong method with 405 and Allow', async () => {
+    const search = await send('GET', '/courses/search');
+    expect(search).toMatchObject({ status: 405, allow: 'POST, OPTIONS' });
+    expect(search.body.error).toContain('GET /courses takes the search');
+    expect(await send('POST', '/health', {})).toMatchObject({
+      status: 405,
+      allow: 'GET, OPTIONS',
+    });
+    expect(await send('GET', '/conflicts')).toMatchObject({
+      status: 405,
+      allow: 'POST, OPTIONS',
+    });
+    expect((await send('DELETE', '/courses/CS2102')).status).toBe(405);
+  });
+
+  it('refuses a course id too long to be one', async () => {
+    const { status, body } = await call(`/courses/${'x'.repeat(300)}`);
+    expect(status).toBe(400);
+    expect(body.error.length).toBeLessThan(250);
+  });
+});
