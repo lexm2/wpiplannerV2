@@ -321,12 +321,11 @@ test('avoiding the hours before 8 AM hides sections that start then', async ({
   expect(earliest).toBeGreaterThanOrEqual(480);
 });
 
-test('async classes are left out once times are painted, unless included', async ({
+test('async classes are left out of "only" times unless included, and kept when avoiding', async ({
   page,
 }) => {
   await openPicker(page);
   const toggle = page.locator('#include-async-filter');
-  await expect(toggle).not.toBeChecked();
   const asyncShown = () =>
     page.evaluate(() => {
       const svc: any = (window as any).services;
@@ -339,30 +338,46 @@ test('async classes are left out once times are painted, unless included', async
         .apply(courses)
         .some((fs: any) => isAsync(fs.section));
     });
+  const storedIncludeAsync = () =>
+    page.evaluate(
+      () =>
+        (window as any).services.filterService.getCriteria('times')
+          ?.includeAsync,
+    );
 
   // Nothing painted: no constraint, async classes stay.
   expect(await asyncShown()).toBe(true);
 
-  // Painting times (here: avoid the first hour) leaves async classes out.
+  // Painting times to keep (here: the first hour) leaves async classes out.
   const { startMin } = await pickerRange(page);
   await drag(page, { day: 0, at: startMin }, { day: 4, at: startMin + 30 });
   await page
     .locator(GRID)
-    .getByRole('button', { name: 'Avoid these times' })
+    .getByRole('button', { name: 'Only these times' })
     .click();
+  await expect(toggle).not.toBeChecked();
   expect(await asyncShown()).toBe(false);
 
   await toggle.check();
   expect(await asyncShown()).toBe(true);
-  expect(
-    await page.evaluate(
-      () =>
-        (window as any).services.filterService.getCriteria('times')
-          .includeAsync,
-    ),
-  ).toBe(true);
+  expect(await storedIncludeAsync()).toBe(true);
 
-  // The choice survives reopening.
+  // Avoiding times keeps classes with no set times anyway, so the toggle
+  // goes away and nothing is stored for it.
+  await page
+    .locator(GRID)
+    .getByRole('button', { name: 'Avoid these times' })
+    .click();
+  await expect(toggle).toHaveCount(0);
+  expect(await asyncShown()).toBe(true);
+  expect(await storedIncludeAsync()).toBeUndefined();
+
+  // Back to "only", the choice is still there and survives reopening.
+  await page
+    .locator(GRID)
+    .getByRole('button', { name: 'Only these times' })
+    .click();
+  await expect(toggle).toBeChecked();
   await page.locator(GRID).getByRole('button', { name: 'Done' }).click();
   await page.waitForTimeout(SETTLE_MS);
   await expect(page.locator('#edit-times-btn').locator('..')).toContainText(
