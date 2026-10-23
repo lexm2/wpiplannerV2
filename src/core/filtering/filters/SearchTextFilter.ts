@@ -44,8 +44,10 @@ export class SearchTextFilter implements SectionBasedFilter {
     sections: FilterableSection[],
     criteria: SearchTextFilterCriteria,
   ): FilterableSection[] {
-    const query = parseSearchQuery(criteria.query ?? '');
-    if (!query.text) return sections;
+    if (!criteria.query?.trim()) return sections;
+    // Before the query is read: a code like "CS2" needs the departments.
+    prepareSearch(new Set(sections.map(fs => fs.course)));
+    const query = parseSearchQuery(criteria.query);
 
     // A match anywhere in a lecture group keeps the whole group: searching
     // a lecturer's name has to bring their lecture's labs along with it.
@@ -57,8 +59,6 @@ export class SearchTextFilter implements SectionBasedFilter {
         return query.words.every(word => namesHaveWord(names, word));
       });
     }
-
-    prepareSearch(new Set(sections.map(fs => fs.course)));
 
     // The course-level verdict is the same for each of its sections.
     const byCourse = new Map<Course, CourseWordMatch>();

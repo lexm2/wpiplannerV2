@@ -7,7 +7,8 @@ import { editDistance } from './editDistance';
  * the relevance ranking (in what order), so the two always agree.
  *
  * A query is either a course code, matched by prefix ("MA 1022", "ma1022",
- * "MA_1022", "CS 21" for every CS 21xx, or a bare number "1022") and
+ * "MA_1022", "CS 21" for every CS 21xx, "CS2" for every CS 2xxx of a
+ * department the catalog has, or a bare number "1022") and
  * optionally followed by words that must match too ("MA 1022 calculus"),
  * or words. Roman numerals I-IV and digits 1-4 are the same word. Every word
  * must match somewhere in the course (its code, name, description,
@@ -46,10 +47,18 @@ export interface ParsedQuery {
  */
 export const MAX_QUERY_WORDS = 12;
 
-// "ma1022", "cs21", "ds502", "1022"; 2-5 letter departments (IMGD, BCB...).
-const CODE_RE = /^([a-z]{2,5})?(\d{2,4}[a-z]?)$/;
+// "ma1022", "cs21", "cs2", "ds502", "1022"; 2-5 letter departments (IMGD,
+// BCB...).
+const CODE_RE = /^([a-z]{2,5})?(\d{1,4}[a-z]?)$/;
 // A code followed by words: "ma 1022 calculus", "cs-2102 java".
-const LEADING_CODE_RE = /^([a-z]{2,5})[\s_.-]*(\d{2,4}[a-z]?)\s+(.+)$/;
+const LEADING_CODE_RE = /^([a-z]{2,5})[\s_.-]*(\d{1,4}[a-z]?)\s+(.+)$/;
+
+/**
+ * Department codes the catalog has, lowercased, learned as course text is
+ * built (see prepareSearch). A single digit makes a code only after one of
+ * these: "CS 2" is every CS 2xxx, while "calc 2" is two words.
+ */
+const knownDepartments = new Set<string>();
 
 /**
  * I-IV as course names number their sequels. A Map, not an object literal:
@@ -95,10 +104,13 @@ function readCode(compact: string): ParsedQuery['code'] {
         : whole,
   );
   const m = CODE_RE.exec(fixed);
+  if (!m) return null;
+  const [, dept, number] = m;
+  const digits = number.replace(/\D/g, '').length;
   // A bare number needs three digits; "21" alone is too vague to be a code.
-  return m && (m[1] || m[2].length >= 3)
-    ? { dept: m[1] ?? '', number: m[2] }
-    : null;
+  if (!dept) return digits >= 3 ? { dept: '', number } : null;
+  if (digits === 1 && !knownDepartments.has(dept)) return null;
+  return { dept, number };
 }
 
 /** The query's distinct words, in order, split from the cap's leftovers. */
@@ -273,6 +285,7 @@ function courseText(course: Course): CourseText {
   ].join(' ');
 
   learnAcronyms(stripMarks(`${course.name} ${course.description}`));
+  for (const c of codes) knownDepartments.add(c.replace(/[^a-z].*$/, ''));
   const tokens = tokenize(haystack);
   text = {
     haystack,

@@ -79,4 +79,14 @@ describe('SearchTextFilter', () => {
     expect(kept([section], 'lee robotics cooking')).toBe(0);
     expect(kept([taught(robotics, 'Bo Chen')], 'lee robotics')).toBe(0);
   });
+
+  it('reads "QX2" as a code on the first search of a new department', () => {
+    const qx = (number: string) =>
+      course({ id: `QX-${number}`, departmentAbbr: 'QX', number });
+    const sections = [
+      taught(qx('2001'), 'Ann Lee'),
+      taught(qx('3001'), 'Ann Lee'),
+    ];
+    expect(filter.apply(sections, { query: 'QX2' })).toEqual([sections[0]]);
+  });
 });

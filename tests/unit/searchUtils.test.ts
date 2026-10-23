@@ -481,6 +481,43 @@ describe('department queries', () => {
   });
 });
 
+describe('a department and one digit', () => {
+  const cs = (number: string, name: string) =>
+    course({ id: `CS-${number}`, number, name });
+  const list = [
+    cs('2102', 'Object-Oriented Design Concepts'),
+    cs('4432', 'Database Systems II'),
+    cs('2223', 'Algorithms'),
+    course({
+      id: 'MA-1022',
+      departmentAbbr: 'MA',
+      departmentName: 'Mathematical Sciences',
+      number: '1022',
+      name: 'Calculus II',
+    }),
+  ];
+
+  it('reads "CS2" and "CS 2" as every CS 2xxx', () => {
+    rankCoursesByRelevance([...list], 'warm up');
+    for (const q of ['CS2', 'CS 2', 'cs-2']) {
+      expect(parseSearchQuery(q).code).toEqual({ dept: 'cs', number: '2' });
+      const found = list.filter(
+        c => matchCourseText(c, parseSearchQuery(q)).all,
+      );
+      expect(found.map(c => c.number).sort()).toEqual(['2102', '2223']);
+    }
+  });
+
+  it('leaves a word and a digit as words when the word is no department', () => {
+    rankCoursesByRelevance([...list], 'warm up');
+    expect(parseSearchQuery('calc 2')).toMatchObject({
+      code: null,
+      words: ['calc', '2'],
+    });
+    expect(matchCourseText(list[3], parseSearchQuery('calc 2')).all).toBe(true);
+  });
+});
+
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
     expect(parseSearchQuery('design game design GAME').words).toEqual([
