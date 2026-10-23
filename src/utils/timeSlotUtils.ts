@@ -2,10 +2,48 @@
 import type { WeeklyTimeSlot } from '../types/schedule';
 import { AcademicTerm } from '../types/schedule';
 
+const QUARTERS = [
+  AcademicTerm.A,
+  AcademicTerm.B,
+  AcademicTerm.C,
+  AcademicTerm.D,
+];
+
+/**
+ * The terms a slot occupies, for overlap tests and mask keys. With `spans`
+ * a semester term is its two quarters, so F meets A and B. Without it terms
+ * stand alone, and only ALL reaches every other term.
+ */
+export function termsCovered(term: AcademicTerm, spans = true): AcademicTerm[] {
+  if (spans) {
+    if (term === AcademicTerm.ALL) return QUARTERS;
+    if (term === AcademicTerm.F) return [AcademicTerm.A, AcademicTerm.B];
+    if (term === AcademicTerm.S) return [AcademicTerm.C, AcademicTerm.D];
+    return [term];
+  }
+  if (term === AcademicTerm.ALL)
+    return [...QUARTERS, AcademicTerm.F, AcademicTerm.S];
+  return [term];
+}
+
+/**
+ * Whether two date ranges share a day. Most sections run their whole term,
+ * but some run half of it (BB 3813 BX01 to Nov 12, BX02 from Nov 16) or half
+ * a semester, and those never meet. Unknown dates are taken to meet.
+ */
+export function datesMeet(
+  aStart: string | undefined,
+  aEnd: string | undefined,
+  bStart: string | undefined,
+  bEnd: string | undefined,
+): boolean {
+  if (!aStart || !aEnd || !bStart || !bEnd) return true;
+  return aStart <= bEnd && bStart <= aEnd;
+}
+
 /**
  * Whether two slots overlap on the same day. Terms are not compared: whether
- * two terms can clash depends on the caller (see ConflictFilter's
- * semesterSpansQuarters).
+ * two terms can clash depends on the caller (see termsCovered's `spans`).
  */
 export function slotsOverlap(
   slot1: WeeklyTimeSlot,

@@ -14,7 +14,11 @@ import type { Course, LectureGroup, Section } from '../types/types';
 import { SectionType } from '../types/types';
 import { TimeUtils } from '../utils/timeUtils';
 import { ConflictFilter } from '../core/filtering/filters/ConflictFilter';
-import { sectionToWeeklySlots, slotsOverlap } from '../utils/timeSlotUtils';
+import {
+  sectionToWeeklySlots,
+  slotsOverlap,
+  termsCovered,
+} from '../utils/timeSlotUtils';
 import { currentAcademicYear, type Catalog, type CrnEntry } from './catalog';
 import {
   endedTerms,
@@ -80,17 +84,6 @@ export const ConflictCheckInputSchema = z
 
 export type BusyBlock = z.infer<typeof BusyBlockSchema>;
 
-/** Thrown for CRNs the catalog lacks. */
-class UnknownCrnError extends ApiError {
-  constructor(readonly crns: number[]) {
-    super(
-      `Unknown ${one(crns.length, 'CRN', 'CRNs')}: ${listSome(crns)}. Get CRNs from get_course or search_courses.`,
-      400,
-      { unknownCrns: crns },
-    );
-  }
-}
-
 function lookup(
   catalog: Catalog,
   crns: number[],
@@ -119,7 +112,13 @@ export function blockedSlotsForCrns(
 ): { slots: WeeklyTimeSlot[]; otherYear: number[] } {
   const { found, missing } = lookup(catalog, crns);
   // A search fitted around a CRN that does not exist is bad input.
-  if (missing.length > 0) throw new UnknownCrnError(missing);
+  if (missing.length > 0) {
+    throw new ApiError(
+      `Unknown ${one(missing.length, 'CRN', 'CRNs')}: ${listSome(missing)}. Get CRNs from get_course or search_courses.`,
+      400,
+      { unknownCrns: missing },
+    );
+  }
   const otherYear: number[] = [];
   const slots: WeeklyTimeSlot[] = [];
   for (const [crn, entry] of found) {
@@ -130,16 +129,6 @@ export function blockedSlotsForCrns(
     }
   }
   return { slots, otherYear };
-}
-
-/**
- * Whether two sections' own date ranges share a day. Most run their whole
- * term, but some run half of it (BB 3813 BX01 to Nov 12, BX02 from Nov 16)
- * or half a semester. Unknown dates are taken to meet.
- */
-function datesMeet(a: Section, b: Section): boolean {
-  if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return true;
-  return a.startDate <= b.endDate && b.startDate <= a.endDate;
 }
 
 /** The academic year a CRN's section belongs to. */
@@ -226,15 +215,8 @@ function side(crn: number, entry: CrnEntry): ConflictSide {
   };
 }
 
-const SPANS: Partial<Record<string, string[]>> = {
-  [AcademicTerm.F]: [AcademicTerm.A, AcademicTerm.B],
-  [AcademicTerm.S]: [AcademicTerm.C, AcademicTerm.D],
-};
-const quarters = (term: AcademicTerm): string[] => SPANS[term] ?? [term];
 const termsMeet = (a: AcademicTerm, b: AcademicTerm) =>
-  a === AcademicTerm.ALL ||
-  b === AcademicTerm.ALL ||
-  quarters(a).some(q => quarters(b).includes(q));
+  termsCovered(a).some(t => termsCovered(b).includes(t));
 
 const minutesOf = (t: { hours: number; minutes: number }) =>
   t.hours * 60 + t.minutes;
@@ -263,12 +245,12 @@ function addBand(
 }
 
 /** Where a section meets during a busy block, every term alike. */
-function busyOverlaps(entry: CrnEntry, block: BusyBlock): Overlap[] {
+function busyOverlaps(slots: WeeklyTimeSlot[], block: BusyBlock): Overlap[] {
   const start = clockMinutes(block.start);
   const end = clockMinutes(block.end);
   const days = new Set<string>(block.days);
   const bands = new Map<string, Set<string>>();
-  for (const slot of sectionToWeeklySlots(entry.section)) {
+  for (const slot of slots) {
     if (!days.has(slot.day)) continue;
     const from = Math.max(start, minutesOf(slot.startTime));
     const to = Math.min(end, minutesOf(slot.endTime));
@@ -277,12 +259,20 @@ function busyOverlaps(entry: CrnEntry, block: BusyBlock): Overlap[] {
   return bandsToOverlaps(bands);
 }
 
-/** The shared meeting times of two sections, grouped by time band. */
-function overlapsOf(a: CrnEntry, b: CrnEntry): Overlap[] {
+/**
+ * The shared meeting times of two sections, given with their weekly slots,
+ * grouped by time band.
+ */
+function overlapsOf(
+  a: CrnEntry,
+  aSlots: WeeklyTimeSlot[],
+  b: CrnEntry,
+  bSlots: WeeklyTimeSlot[],
+): Overlap[] {
   if (!termsMeet(a.section.computedTerm, b.section.computedTerm)) return [];
   const bands = new Map<string, Set<string>>();
-  for (const sa of sectionToWeeklySlots(a.section)) {
-    for (const sb of sectionToWeeklySlots(b.section)) {
+  for (const sa of aSlots) {
+    for (const sb of bSlots) {
       if (!slotsOverlap(sa, sb)) continue;
       addBand(
         bands,
@@ -314,6 +304,8 @@ export function findConflicts(
 
   const { found, missing } = lookup(catalog, crns);
   const entries = [...found];
+  // Each section's slots, worked out once rather than once per pair.
+  const slots = entries.map(([, entry]) => sectionToWeeklySlots(entry.section));
   const filter = new ConflictFilter();
   const conflicts: ConflictPair[] = [];
 
@@ -321,28 +313,27 @@ export function findConflicts(
     const [crnA, a] = entries[i];
     for (let j = i + 1; j < entries.length; j++) {
       const [crnB, b] = entries[j];
-      // Another year's B term is not this one's, and a lab run in the
-      // first half of B never meets one run in the second: never a clash.
+      // Another year's B term is not this one's: never a clash. The filter
+      // compares the sections' own dates, so halves of a term never meet.
       if (yearOf(catalog, a) !== yearOf(catalog, b)) continue;
-      if (!datesMeet(a.section, b.section)) continue;
       const kept = filter.apply([a.filterable], {
         avoidConflicts: true,
-        blockedSlots: sectionToWeeklySlots(b.section),
+        blockedSlots: slots[j],
       });
       if (kept.length === 0) {
         conflicts.push({
           a: side(crnA, a),
           b: side(crnB, b),
-          overlaps: overlapsOf(a, b),
+          overlaps: overlapsOf(a, slots[i], b, slots[j]),
         });
       }
     }
   }
 
   const busyConflicts: BusyConflict[] = [];
-  for (const [crn, entry] of entries) {
+  for (const [i, [crn, entry]] of entries.entries()) {
     for (const block of busy) {
-      const overlaps = busyOverlaps(entry, block);
+      const overlaps = busyOverlaps(slots[i], block);
       if (!overlaps.length) continue;
       busyConflicts.push({
         section: side(crn, entry),
