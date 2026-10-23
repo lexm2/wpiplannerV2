@@ -40,24 +40,16 @@ function json(
   });
 }
 
-class HttpError extends Error {
+/** An ApiError raised by the routes themselves, with headers to send. */
+class HttpError extends ApiError {
   constructor(
-    readonly status: number,
+    status: number,
     message: string,
-    readonly details?: unknown,
+    details?: unknown,
     readonly headers: Record<string, string> = {},
   ) {
-    super(message);
+    super(message, status, details);
   }
-}
-
-/** The method each route answers, for 405s on the others. */
-function allowedMethod(path: string): 'GET' | 'POST' | null {
-  if (path === '/courses/search' || path === '/conflicts') return 'POST';
-  if (['/health', '/meta', '/departments', '/courses'].includes(path)) {
-    return 'GET';
-  }
-  return /^\/courses\/[^/]+$/.test(path) ? 'GET' : null;
 }
 
 /** Refuses any query parameter but `allowed`, as GET /courses does. */
@@ -74,8 +66,6 @@ function onlyParams(params: URLSearchParams, allowed: string[]): void {
 /** Plain decimal digits: no hex, exponent, sign or blank ("0x7EA", "1e1", ""). */
 const INTEGER_RE = /^\d+$/;
 const DECIMAL_RE = /^\d+(\.\d+)?$/;
-
-const notFound = () => new HttpError(404, 'Not found');
 
 function parseOrThrow<T extends z.ZodType>(
   schema: T,
@@ -341,85 +331,124 @@ function searchCourses(catalog: Catalog, input: unknown) {
   return runCourseQuery(catalog, parseOrThrow(CourseQuerySchema, input));
 }
 
+interface RouteContext {
+  request: Request;
+  url: URL;
+  /** The path's regex match, for a route keyed by one. */
+  match: RegExpExecArray | null;
+  getCatalog: () => Promise<Catalog>;
+}
+
+interface Route {
+  path: string | RegExp;
+  method: 'GET' | 'POST';
+  handle: (context: RouteContext) => Promise<Response> | Response;
+}
+
+// Tried in order: /courses/search before the /courses/:id pattern.
+const ROUTES: Route[] = [
+  {
+    path: '/health',
+    method: 'GET',
+    handle: ({ url }) => {
+      onlyParams(url.searchParams, []);
+      return json({ ok: true });
+    },
+  },
+  {
+    path: '/meta',
+    method: 'GET',
+    handle: async ({ url, getCatalog }) => {
+      onlyParams(url.searchParams, []);
+      return json(catalogMeta(await getCatalog()));
+    },
+  },
+  {
+    path: '/departments',
+    method: 'GET',
+    handle: async ({ url, getCatalog }) => {
+      onlyParams(url.searchParams, ['year']);
+      const year = url.searchParams.has('year')
+        ? parseOrThrow(YearOrAllParamSchema, url.searchParams.get('year'))
+        : undefined;
+      return json({ departments: listDepartments(await getCatalog(), year) });
+    },
+  },
+  {
+    path: '/courses',
+    method: 'GET',
+    handle: async ({ url, getCatalog }) => {
+      const input = courseQueryFromParams(url.searchParams);
+      return json(searchCourses(await getCatalog(), input));
+    },
+  },
+  {
+    path: '/courses/search',
+    method: 'POST',
+    handle: async ({ request, getCatalog }) => {
+      const input = await readBody(request);
+      return json(searchCourses(await getCatalog(), input));
+    },
+  },
+  {
+    path: /^\/courses\/([^/]+)$/,
+    method: 'GET',
+    handle: async ({ url, match, getCatalog }) => {
+      const options = parseOrThrow(
+        DetailParamsSchema,
+        Object.fromEntries(url.searchParams),
+      );
+      let id: string;
+      try {
+        id = decodeURIComponent(match![1]);
+      } catch {
+        throw new HttpError(
+          400,
+          'The course in the path is not valid URL encoding.',
+        );
+      }
+      const found = lookupCourse(await getCatalog(), id, options);
+      // A year not yet published answers with the outlook instead.
+      return json(
+        found.kind === 'course'
+          ? { ...found.detail, notices: found.notices }
+          : { ...found.plan, notices: found.notices },
+      );
+    },
+  },
+  {
+    path: '/conflicts',
+    method: 'POST',
+    handle: async ({ request, getCatalog }) => {
+      const { crns, busy } = parseOrThrow(
+        ConflictCheckInputSchema,
+        await readBody(request),
+      );
+      return json(findConflicts(await getCatalog(), crns, busy));
+    },
+  },
+];
+
 async function route(
   request: Request,
   path: string,
   url: URL,
   getCatalog: () => Promise<Catalog>,
 ): Promise<Response> {
-  const { method } = request;
-
-  const allowed = allowedMethod(path);
-  if (allowed && method !== allowed) {
-    throw new HttpError(
-      405,
-      `${path} takes ${allowed}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
-      undefined,
-      { Allow: `${allowed}, OPTIONS` },
-    );
-  }
-
-  if (path === '/health' && method === 'GET') {
-    onlyParams(url.searchParams, []);
-    return json({ ok: true });
-  }
-
-  if (path === '/meta' && method === 'GET') {
-    onlyParams(url.searchParams, []);
-    return json(catalogMeta(await getCatalog()));
-  }
-
-  if (path === '/departments' && method === 'GET') {
-    onlyParams(url.searchParams, ['year']);
-    const year = url.searchParams.has('year')
-      ? parseOrThrow(YearOrAllParamSchema, url.searchParams.get('year'))
-      : undefined;
-    return json({ departments: listDepartments(await getCatalog(), year) });
-  }
-
-  if (path === '/courses' && method === 'GET') {
-    const input = courseQueryFromParams(url.searchParams);
-    return json(searchCourses(await getCatalog(), input));
-  }
-
-  if (path === '/courses/search' && method === 'POST') {
-    const input = await readBody(request);
-    return json(searchCourses(await getCatalog(), input));
-  }
-
-  const courseMatch = /^\/courses\/([^/]+)$/.exec(path);
-  if (courseMatch && method === 'GET') {
-    const options = parseOrThrow(
-      DetailParamsSchema,
-      Object.fromEntries(url.searchParams),
-    );
-    let id: string;
-    try {
-      id = decodeURIComponent(courseMatch[1]);
-    } catch {
+  for (const { path: key, method, handle } of ROUTES) {
+    const match = typeof key === 'string' ? null : key.exec(path);
+    if (key !== path && !match) continue;
+    if (request.method !== method) {
       throw new HttpError(
-        400,
-        'The course in the path is not valid URL encoding.',
+        405,
+        `${path} takes ${method}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
+        undefined,
+        { Allow: `${method}, OPTIONS` },
       );
     }
-    const found = lookupCourse(await getCatalog(), id, options);
-    // A year not yet published answers with the outlook instead.
-    return json(
-      found.kind === 'course'
-        ? { ...found.detail, notices: found.notices }
-        : { ...found.plan, notices: found.notices },
-    );
+    return handle({ request, url, match, getCatalog });
   }
-
-  if (path === '/conflicts' && method === 'POST') {
-    const { crns, busy } = parseOrThrow(
-      ConflictCheckInputSchema,
-      await readBody(request),
-    );
-    return json(findConflicts(await getCatalog(), crns, busy));
-  }
-
-  throw notFound();
+  throw new HttpError(404, 'Not found');
 }
 
 /**
@@ -445,17 +474,11 @@ export function createApiHandler(options: {
     try {
       return await route(request, path, url, options.getCatalog);
     } catch (error) {
-      if (error instanceof HttpError) {
-        return json(
-          { error: error.message, details: error.details },
-          error.status,
-          error.headers,
-        );
-      }
       if (error instanceof ApiError) {
         return json(
           { error: error.message, details: error.details },
           error.status,
+          error instanceof HttpError ? error.headers : {},
         );
       }
       logger.error('[api] Request failed:', error);
