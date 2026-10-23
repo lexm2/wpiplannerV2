@@ -514,26 +514,6 @@ export function matchCourseWords(
   return { all: query.words.every((_, i) => word(i)), word };
 }
 
-/**
- * Whether the course's own text matches the query; for a word query, the
- * words it matches. `matched` is worked out when read, so a caller wanting
- * only `all` stops at the first word the course lacks.
- */
-export function matchCourseText(
-  course: Course,
-  query: ParsedQuery,
-): { all: boolean; matched: boolean[] } {
-  const { all, word } = matchCourseWords(course, query);
-  let matched: boolean[] | undefined;
-  return {
-    all,
-    get matched() {
-      matched ??= query.code ? [all] : query.words.map((_, i) => word(i));
-      return matched;
-    },
-  };
-}
-
 /** A free text folded (foldText) and split into words, once for many words. */
 export interface FoldedText {
   text: string;
@@ -573,7 +553,7 @@ export function namesHaveWord(
     : folded.text.includes(word);
 }
 
-/** `word` matches description token `token`, as matchCourseText reads it. */
+/** `word` matches description token `token`, as matchCourseWords reads it. */
 function tokenMatches(word: string, token: string): boolean {
   if (isShort(word)) return shortWordIs(word, token);
   return token.includes(word) || nearPrefix(word, token);
@@ -684,11 +664,11 @@ export function describeMatch(course: Course, query: string): SearchMatch {
   }
   const text = courseText(course);
   if (namesDepartment(text, parsed.words)) return 'title';
-  const { all, matched } = matchCourseText(course, parsed);
+  const { all, word } = matchCourseWords(course, parsed);
   if (!all) {
     const titles = foldWords(sectionTitles(course));
     const fromTitles = parsed.words.every(
-      (word, i) => matched[i] || textHasWord(titles, word),
+      (w, i) => word(i) || textHasWord(titles, w),
     );
     return fromTitles ? 'sectionTitle' : 'section';
   }
