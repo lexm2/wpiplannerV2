@@ -177,6 +177,8 @@ function escapeRegExp(text: string): string {
  * The description, then its prerequisite and background statements on lines
  * of their own, cut from the description so they are not read twice.
  */
+const NO_STATEMENT = 'none in a separate field; see the description.';
+
 function describe(c: {
   description: string;
   prerequisites: string | null;
@@ -186,25 +188,31 @@ function describe(c: {
   const cut = (marker: string, statement: string | null) => {
     if (!statement) return;
     description = description.replace(
-      new RegExp(`\\s*${marker}\\s*${escapeRegExp(statement)}`, 'i'),
+      new RegExp(`\\s*${marker}\\s*${escapeRegExp(statement)}\\.?`, 'i'),
       ' ',
     );
   };
   cut(
-    '(?:recommended|suggested|required) background:',
+    '(?:the\\s+)?(?:recommended|suggested|required)\\s+backgrounds?(?:\\s+for\\s+this\\s+course)?(?:\\s+(?:is|includes|consists\\s+of))?\\s*[:;]?',
     c.recommendedBackground,
   );
-  cut('prerequisites?:', c.prerequisites);
+  cut('prerequisites?\\s*[:;]?', c.prerequisites);
   const lines: string[] = [];
-  if (description.trim()) lines.push(`Description: ${description.trim()}`);
-  // Said either way, so a missing line cannot read as "not shown".
+  description = description.replace(/\s{2,}/g, ' ').trim();
+  if (description) lines.push(`Description: ${description}`);
+  // Said either way, so a missing line cannot read as "not shown". Neither
+  // says "none": a statement the parser missed may still be in the prose.
   lines.push(
     c.prerequisites
       ? `Prerequisites (as the description states): ${c.prerequisites}`
-      : 'Prerequisites: none stated in the catalog description.',
+      : `Prerequisites: ${NO_STATEMENT}`,
   );
   const background = c.recommendedBackground?.replace(/\.$/, '');
-  lines.push(`Recommended background: ${background ?? 'none stated'}.`);
+  lines.push(
+    background
+      ? `Recommended background: ${background}.`
+      : `Recommended background: ${NO_STATEMENT}`,
+  );
   return lines;
 }
 

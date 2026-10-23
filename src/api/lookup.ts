@@ -33,6 +33,7 @@ import { ApiError, echo } from './errors';
 import { forecastCourse, type Forecast } from './forecast';
 import {
   courseCode,
+  statementOf,
   termsOf,
   toCourseDetail,
   toCourseSummary,
@@ -339,8 +340,8 @@ export function lookupCourse(
           course: {
             ...summary,
             description: base.description,
-            recommendedBackground: base.recommendedBackground ?? null,
-            prerequisites: base.prerequisites ?? null,
+            recommendedBackground: statementOf(base, 'recommendedBackground'),
+            prerequisites: statementOf(base, 'prerequisites'),
             courseTypes: base.courseTypes,
           },
         },

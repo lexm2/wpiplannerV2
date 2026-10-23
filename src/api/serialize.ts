@@ -262,6 +262,43 @@ export function termsOf(sections: Section[]): string[] {
   return [...terms].sort((a, b) => termRank(a) - termRank(b));
 }
 
+/**
+ * Where a description's own heading for a statement starts: at a sentence
+ * start, with or without a colon ("Recommended Background Working
+ * knowledge of...", "The recommended background for this course is...",
+ * "Prerequisites Completion of 24 credits..."). The catalog parser lifts
+ * only the colon form, so 27 courses (PH 1110, DS 2010, CS 594...) had
+ * the statement in their description and none in the field.
+ */
+const STATEMENT_HEADINGS = {
+  recommendedBackground:
+    /(?:^|[.!?)]\s+)(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?\s*/,
+  prerequisites: /(?:^|[.!?)]\s+)Prerequisites?\s*[:;]?\s*/,
+};
+
+/**
+ * The course's prerequisite or background statement: the parsed field, or
+ * else the sentence its heading starts in the description, up to the
+ * sentence's end. Null when the description has neither.
+ */
+export function statementOf(
+  course: Pick<
+    Course,
+    'description' | 'prerequisites' | 'recommendedBackground'
+  >,
+  kind: keyof typeof STATEMENT_HEADINGS,
+): string | null {
+  const parsed = course[kind];
+  if (parsed) return parsed;
+  const heading = STATEMENT_HEADINGS[kind].exec(course.description);
+  if (!heading) return null;
+  const rest = course.description.slice(heading.index + heading[0].length);
+  // To the first full stop ending a sentence: before a capital or the end.
+  const end = /\.(?=\s+[A-Z(]|\s*$)/.exec(rest);
+  const statement = (end ? rest.slice(0, end.index) : rest).trim();
+  return statement || null;
+}
+
 export function courseCode(course: Course): string {
   return `${course.departmentAbbr} ${course.number}`;
 }
@@ -659,8 +696,8 @@ export function toCourseDetail(
     departmentName: course.departmentName,
     description: course.description,
     courseTypes: course.courseTypes,
-    recommendedBackground: course.recommendedBackground ?? null,
-    prerequisites: course.prerequisites ?? null,
+    recommendedBackground: statementOf(course, 'recommendedBackground'),
+    prerequisites: statementOf(course, 'prerequisites'),
     sections,
     lectureGroups,
     standaloneLabs: standaloneLabs.map(l => l.crn),

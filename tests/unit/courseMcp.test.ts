@@ -326,9 +326,11 @@ describe('MCP server', () => {
       'Degree attributes: none on record (tags are incomplete; see the degree audit) | Cross-listed: none',
     );
     expect(text).toContain(
-      'Prerequisites: none stated in the catalog description.',
+      'Prerequisites: none in a separate field; see the description.',
     );
-    expect(text).toContain('Recommended background: none stated.');
+    expect(text).toContain(
+      'Recommended background: none in a separate field; see the description.',
+    );
     expect(text.length).toBeLessThan(1500);
     expect(data.sections).toHaveLength(4);
   });
@@ -977,5 +979,66 @@ describe('terms in progress', () => {
     expect(data.issues.map((i: { kind: string }) => i.kind)).toEqual([
       'interestList',
     ]);
+  });
+});
+
+describe('statements without a colon', () => {
+  it('lifts the background and prerequisites a description heads without a colon', async () => {
+    const { mcp, api } = await customEndpoints([
+      {
+        abbreviation: 'PH',
+        name: 'Physics',
+        courses: [
+          course(
+            'PH-1110-2026',
+            'General Physics',
+            [section(80, 'BL01', 'B', [period(['M'], '09:00', '09:50')])],
+            {
+              description:
+                '<p>Mechanics for engineers. Recommended Background Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022. Students may not receive credit for both PH 1110 and PH 1111.</p>',
+            },
+          ),
+          course(
+            'PH-594-2026',
+            'Graduate Project',
+            [section(81, 'F01', 'F', [period(['T'], '09:00', '09:50')])],
+            {
+              isGraduate: true,
+              description:
+                '<p>A capstone project. Prerequisites Completion of at least 24 credits, or consent of the instructor. It may be repeated.</p>',
+            },
+          ),
+        ],
+      },
+    ]);
+    const ph = await toolOn(mcp, 'get_course', { course: 'PH 1110' });
+    expect(ph.text).toContain(
+      'Recommended background: Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022.',
+    );
+    // Cut from the description so it is not read twice, the rest kept.
+    expect(ph.text).toContain(
+      'Description: Mechanics for engineers. Students may not receive credit for both PH 1110 and PH 1111.',
+    );
+    expect(ph.text).toContain(
+      'Prerequisites: none in a separate field; see the description.',
+    );
+    const project = await toolOn(mcp, 'get_course', { course: 'PH 594' });
+    expect(project.text).toContain(
+      'Prerequisites (as the description states): Completion of at least 24 credits, or consent of the instructor',
+    );
+    expect(project.data.prerequisites).toBe(
+      'Completion of at least 24 credits, or consent of the instructor',
+    );
+    const http = await callOn(api, '/courses/PH1110');
+    expect(http.body.recommendedBackground).toBe(
+      'Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022',
+    );
+    const plan = await toolOn(mcp, 'get_course', {
+      course: 'PH 1110',
+      year: 2027,
+    });
+    expect(plan.text).toContain(
+      'Recommended background: Working knowledge of differential calculus',
+    );
   });
 });

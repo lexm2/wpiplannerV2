@@ -366,3 +366,46 @@ describe('omitted full sections on the real catalog', () => {
     }
   });
 });
+
+describe('prerequisite statements on the real catalog', () => {
+  // Courses whose description heads the statement without a colon, which
+  // the catalog parser leaves out of the field.
+  const background = [
+    'PH 1110',
+    'PH 1111',
+    'PH 1120',
+    'DS 2010',
+    'DS 3010',
+    'ES 2502',
+    'MA 4235',
+    'ID 3526',
+    'SP 3526',
+    'IMGD 4700',
+  ];
+  const prerequisites = ['CS 594', 'DS 594', 'BCB 590'];
+
+  it('never says none is stated when the description states one', async () => {
+    for (const course of background) {
+      const text = await toolText('get_course', { course });
+      expect(text, course).toMatch(/\nRecommended background: (?!none)\S/);
+      expect(text, course).not.toContain('none stated');
+    }
+    for (const course of prerequisites) {
+      const text = await toolText('get_course', { course });
+      expect(text, course).toContain(
+        'Prerequisites (as the description states): ',
+      );
+    }
+  });
+
+  it('quotes PH 1110 to the end of its sentence, and leaves it out of the description', async () => {
+    const text = await toolText('get_course', { course: 'PH 1110' });
+    expect(text).toContain(
+      'Recommended background: Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022 (integral calculus) or higher.',
+    );
+    const description = text
+      .split('\n')
+      .find(l => l.startsWith('Description: '))!;
+    expect(description).not.toMatch(/recommended background/i);
+  });
+});
