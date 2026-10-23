@@ -445,12 +445,16 @@ export async function toolOn(
 export async function customEndpoints(
   departments: unknown[],
   today = BEFORE_A,
+  professors: unknown[] = [],
 ) {
   const own = await mkdtemp(join(tmpdir(), 'course-api-own-'));
   extraDirs.push(own);
   await write(own, 'course-data-constructed.json', { departments });
   await write(own, 'term-bounds.json', TERM_BOUNDS);
-  await write(own, 'rateMyProfessor.json', RMP);
+  await write(own, 'rateMyProfessor.json', {
+    ...RMP,
+    professors: [...RMP.professors, ...professors],
+  });
   await write(own, 'last-updated.json', { timestamp: '2026-09-02T00:00:00Z' });
   const source = new CatalogSource({ publicDir: own, now: () => today });
   return {

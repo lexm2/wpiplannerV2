@@ -390,6 +390,7 @@ export function instructorFor(
 export function toCourseSummary(
   course: Course,
   rmp: RateMyProfessorService,
+  topBy: 'rating' | 'difficulty' = 'rating',
 ): CourseSummary {
   const primary = primarySections(course);
   const all = getAllSections(course).filter(s => !s.isInterestList);
@@ -413,7 +414,7 @@ export function toCourseSummary(
     category: course.category ?? null,
     degreeAttributes: course.degreeAttributes,
     crossListedWith: course.crossListedWith,
-    topInstructor: bestInstructor(primary, ratingLookup(rmp), 'rating'),
+    topInstructor: bestInstructor(primary, ratingLookup(rmp), topBy),
   };
 }
 

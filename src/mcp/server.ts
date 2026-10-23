@@ -127,7 +127,8 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         'one lecture group passes all of them, and its seat counts and listed sections are then only the matching ones. ' +
         'Defaults to the current academic year, without sections of terms that have ended. Ranked by relevance with ' +
         'searchText, else by department and number. Cross-listed duplicates (same CRNs under two codes) show once, ' +
-        'with "also listed as". Each row\'s "top" instructor ranks those with 5+ ratings above those with fewer, then by rating. ' +
+        'with "also listed as". Each row\'s "top" instructor ranks those with 5+ ratings above those with fewer, then by rating ' +
+        '(under sort "difficulty", the "easiest rated" instead, by difficulty). ' +
         'Returns a page (default 25), the total, and the open seats over every match.',
       inputSchema: CourseQuerySchema,
       annotations: { readOnlyHint: true, openWorldHint: false },

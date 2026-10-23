@@ -283,6 +283,7 @@ function rowLine(
   index: number,
   showYear: boolean,
   search: CourseQueryResult['search'],
+  easiest: boolean,
 ): string {
   const parts = [
     `${index}. ${c.code} ${c.name}`,
@@ -299,7 +300,9 @@ function rowLine(
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
     const t = c.topInstructor;
-    parts.push(`top ${t.name} ${ratingText(t, false)}`);
+    parts.push(
+      `${easiest ? 'easiest rated' : 'top'} ${t.name} ${ratingText(t, false)}`,
+    );
   }
   if (c.degreeAttributes.length) parts.push(c.degreeAttributes.join(', '));
   if (c.crossListedWith.length)
@@ -439,7 +442,13 @@ export function renderSearch(result: CourseQueryResult): string {
 
   result.courses.forEach((c, i) => {
     lines.push(
-      rowLine(c, result.offset + i + 1, result.year === 'all', result.search),
+      rowLine(
+        c,
+        result.offset + i + 1,
+        result.year === 'all',
+        result.search,
+        result.sort === 'difficulty',
+      ),
     );
     if (!c.sections) return;
     const shown = c.sections.slice(0, MAX_ROW_SECTIONS);

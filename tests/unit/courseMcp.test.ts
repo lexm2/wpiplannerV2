@@ -1042,3 +1042,82 @@ describe('statements without a colon', () => {
     );
   });
 });
+
+describe('sorted searches', () => {
+  const liskov = {
+    id: '3',
+    legacyId: 3,
+    firstName: 'Barbara',
+    lastName: 'Liskov',
+    department: 'Mathematics',
+    avgRating: 3.0,
+    avgDifficulty: 1.5,
+    numRatings: 20,
+    wouldTakeAgainPercent: 60,
+    profileUrl: 'https://example.test/barbara',
+  };
+  const own = () =>
+    customEndpoints(
+      [
+        {
+          abbreviation: 'MA',
+          name: 'Mathematical Sciences',
+          courses: [
+            // Best rated: Ada; easiest: Barbara.
+            course('MA-1022-2026', 'Calculus II', [
+              section(90, 'BL01', 'B', [
+                period(['M'], '09:00', '09:50', 'Ada Lovelace'),
+              ]),
+              section(91, 'BL02', 'B', [
+                period(['M'], '11:00', '11:50', 'Barbara Liskov'),
+              ]),
+            ]),
+            // Names MA 1022 in its description, taught by a better-rated
+            // instructor than anyone teaching MA 1022... and an easier one.
+            course(
+              'MA-1023-2026',
+              'Calculus III',
+              [section(92, 'CL01', 'C', [period(['M'], '09:00', '09:50')])],
+              { description: '<p>Follows MA 1022.</p>' },
+            ),
+          ],
+        },
+      ],
+      BEFORE_A,
+      [liskov],
+    );
+
+  it('shows the easiest-rated instructor under the difficulty sort', async () => {
+    const { mcp } = await own();
+    const easy = await toolOn(mcp, 'search_courses', {
+      filters: { department: { departments: ['MA'] } },
+      sort: 'difficulty',
+    });
+    expect(easy.text).toContain(
+      'MA 1022 Calculus II | 3 cr | B | 20/60 open | easiest rated Barbara Liskov RMP 3, diff 1.5 (20)',
+    );
+    expect(easy.data.courses[0].topInstructor.name).toBe('Barbara Liskov');
+    const best = await toolOn(mcp, 'search_courses', {
+      filters: { department: { departments: ['MA'] } },
+      sort: 'rating',
+    });
+    expect(best.text).toContain('| top Ada Lovelace RMP 4.5');
+  });
+
+  it("keeps a code search's own course first whatever the sort", async () => {
+    const { mcp } = await own();
+    for (const sort of ['rating', 'openSeats', 'difficulty']) {
+      const { text, data } = await toolOn(mcp, 'search_courses', {
+        filters: { searchText: { query: 'MA 1022' } },
+        sort,
+      });
+      expect(
+        data.courses.map((c: { code: string }) => c.code),
+        sort,
+      ).toEqual(['MA 1022', 'MA 1023']);
+      expect(text).toContain(
+        'The course the code names comes first, then the rest in that order.',
+      );
+    }
+  });
+});

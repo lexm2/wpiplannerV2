@@ -495,6 +495,8 @@ export interface CourseRow extends CourseSummary {
 export interface CourseQueryResult {
   /** The year searched. */
   year: number | 'all';
+  /** The order asked for; under "difficulty", topInstructor is the easiest rated. */
+  sort: CourseQuery['sort'];
   /** Matching courses across all pages, cross-listings counted once. */
   total: number;
   offset: number;
@@ -945,7 +947,7 @@ const SORT_NOTICE: Record<Exclude<CourseQuery['sort'], 'relevance'>, string> = {
   rating:
     'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
   difficulty:
-    'Sorted by the easiest-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
+    'Sorted by the easiest-rated lecture instructor (shown as "easiest rated"); averages on 5+ ratings rank above those on fewer, unrated last.',
   openSeats: 'Sorted by open seats in the matching sections, most first.',
   number: 'Sorted by department, then course number.',
 };
@@ -1086,24 +1088,38 @@ export function runCourseQuery(
 ): CourseQueryResult {
   const read = readQuery(catalog, query);
   const filtered = filterCatalog(catalog, read.criteria);
-  const matches = sortCourses(
-    collapseCrossListings(filtered),
-    query.sort,
-    catalog,
-  );
-
-  const includeSections =
-    query.includeSections ??
-    (Object.keys(query.filters).some(id => !SECTION_LIST_FILTERS.has(id)) ||
-      !!query.filters.searchText?.professorOnly);
+  const collapsed = collapseCrossListings(filtered);
 
   // How each course matched a text search; instructor-only searches are
   // about people, not topics.
   const text = query.filters.searchText;
   const matchOf = new Map<Course, SearchMatch>();
   if (text && !text.professorOnly) {
-    for (const c of matches) matchOf.set(c, describeMatch(c, text.query));
+    for (const c of collapsed) matchOf.set(c, describeMatch(c, text.query));
   }
+  // A code search's own course stays ahead of the courses that only name
+  // it, whatever the sort: sorted by rating, MA 1022 sank below courses
+  // mentioning it. Each part is sorted as asked.
+  const named = collapsed.filter(c => matchOf.get(c) === 'code');
+  const codeFirst =
+    query.sort !== 'relevance' &&
+    named.length > 0 &&
+    named.length < collapsed.length;
+  const matches = codeFirst
+    ? [
+        ...sortCourses(named, query.sort, catalog),
+        ...sortCourses(
+          collapsed.filter(c => matchOf.get(c) !== 'code'),
+          query.sort,
+          catalog,
+        ),
+      ]
+    : sortCourses(collapsed, query.sort, catalog);
+
+  const includeSections =
+    query.includeSections ??
+    (Object.keys(query.filters).some(id => !SECTION_LIST_FILTERS.has(id)) ||
+      !!query.filters.searchText?.professorOnly);
   const every = (kinds: SearchMatch[]) =>
     matchOf.size > 0 && [...matchOf.values()].every(m => kinds.includes(m));
   const search = text
@@ -1136,7 +1152,14 @@ export function runCourseQuery(
     );
   }
   if (text && !text.professorOnly) notices.push(...acronymNotices(text.query));
-  if (query.sort !== 'relevance') notices.push(SORT_NOTICE[query.sort]);
+  if (query.sort !== 'relevance') {
+    notices.push(
+      SORT_NOTICE[query.sort] +
+        (codeFirst
+          ? ` The ${named.length === 1 ? 'course' : 'courses'} the code names come${named.length === 1 ? 's' : ''} first, then the rest in that order.`
+          : ''),
+    );
+  }
   notices.push(...missingModes(query, matches, read.year));
   if (text && REGISTRATION_RE.test(text.query)) notices.push(REGISTRATION_NOTE);
   if (search?.descriptionOnly && query.limit === undefined) {
@@ -1154,11 +1177,18 @@ export function runCourseQuery(
 
   return {
     year: read.year,
+    sort: query.sort,
     total: matches.length,
     offset: query.offset,
     limit,
     courses: matches.slice(query.offset, query.offset + limit).map(c => {
-      const row: CourseRow = toCourseSummary(c, catalog.rmp);
+      // Under the difficulty sort, the row's top instructor is the easiest
+      // rated, the one the order went by.
+      const row: CourseRow = toCourseSummary(
+        c,
+        catalog.rmp,
+        query.sort === 'difficulty' ? 'difficulty' : 'rating',
+      );
       const early =
         c.academicYear !== undefined &&
         yearStatus(catalog, c.academicYear).status === 'not yet published';
