@@ -22,6 +22,7 @@ import {
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
+import { logger } from '../utils/logger';
 import {
   catalogMeta,
   listDepartments,
@@ -97,12 +98,23 @@ lag. Quote CRNs and section numbers exactly.`;
 
 const text = (value: string) => [{ type: 'text' as const, text: value }];
 
-/** Input errors go back to the model as text it can act on, not a protocol error. */
-function failure(error: unknown) {
+/**
+ * Input errors go back to the model as text it can act on, not a protocol
+ * error. Anything else is a bug: logged here in full, and the model gets a
+ * generic line, never the internal message ("word.toLowerCase is not a
+ * function") the SDK would otherwise put in the tool text.
+ */
+function failure(error: unknown, tool: string) {
   if (error instanceof ApiError) {
     return { content: text(error.message), isError: true };
   }
-  throw error;
+  logger.error(`[mcp] ${tool} failed:`, error);
+  return {
+    content: text(
+      `Internal error while running ${tool}; try a simpler query, or try again later.`,
+    ),
+    isError: true,
+  };
 }
 
 const YearInputSchema = z
@@ -115,7 +127,12 @@ const YearInputSchema = z
 function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
   const server = new McpServer(
     { name: 'wpi-courses', version: '2.0.0' },
-    { instructions: INSTRUCTIONS },
+    {
+      instructions: INSTRUCTIONS,
+      // One fresh server per request: there is no session to tell of a
+      // changed tool list.
+      capabilities: { tools: { listChanged: false } },
+    },
   );
 
   server.registerTool(
@@ -141,7 +158,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
           structuredContent: { ...result },
         };
       } catch (error) {
-        return failure(error);
+        return failure(error, 'search_courses');
       }
     },
   );
@@ -228,7 +245,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
           ),
         };
       } catch (error) {
-        return failure(error);
+        return failure(error, 'get_course');
       }
     },
   );
@@ -273,7 +290,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
           structuredContent: { departments },
         };
       } catch (error) {
-        return failure(error);
+        return failure(error, 'list_departments');
       }
     },
   );
@@ -292,11 +309,15 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async () => {
-      const meta = catalogMeta(await getCatalog());
-      return {
-        content: text(renderCatalogInfo(meta)),
-        structuredContent: { ...meta },
-      };
+      try {
+        const meta = catalogMeta(await getCatalog());
+        return {
+          content: text(renderCatalogInfo(meta)),
+          structuredContent: { ...meta },
+        };
+      } catch (error) {
+        return failure(error, 'get_catalog_info');
+      }
     },
   );
 
@@ -323,7 +344,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
           structuredContent: conflictData(check),
         };
       } catch (error) {
-        return failure(error);
+        return failure(error, 'check_conflicts');
       }
     },
   );

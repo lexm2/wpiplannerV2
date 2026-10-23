@@ -3,9 +3,12 @@
  * model to read (src/mcp/render.ts), over the same fixture as the HTTP
  * tests.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { createApiHandler } from '../../src/api/http';
+import { createMcpEndpoint } from '../../src/mcp/server';
 import {
   AFTER_A,
+  BASE,
   BEFORE_A,
   callOn,
   course,
@@ -1393,5 +1396,39 @@ describe('search words', () => {
     expect(text).toContain(
       'Searched by the first 12 distinct words; ignored: topic12 topic13.',
     );
+  });
+});
+
+describe('internal errors', () => {
+  it('logs the real error and tells the model only that one happened', async () => {
+    const quiet = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const broken = () =>
+      Promise.reject(new TypeError('word.toLowerCase is not a function'));
+    const mcp = createMcpEndpoint(broken);
+    for (const name of ['search_courses', 'get_catalog_info']) {
+      const args = name === 'search_courses' ? { filters: {} } : {};
+      const result = await toolOn(mcp, name, args);
+      expect(result.isError).toBe(true);
+      expect(result.text).toBe(
+        `Internal error while running ${name}; try a simpler query, or try again later.`,
+      );
+    }
+    const api = createApiHandler({ basePath: BASE, getCatalog: broken });
+    const http = await callOn(api, '/meta');
+    expect(http).toEqual({
+      status: 500,
+      body: { error: 'Internal server error' },
+    });
+    expect(String(quiet.mock.calls[0][1])).toContain('word.toLowerCase');
+    quiet.mockRestore();
+  });
+
+  it('does not advertise tool list changes it can never send', async () => {
+    const init = await rpcOn(endpoints(BEFORE_A).mcp, 'initialize', {
+      protocolVersion: '2025-06-18',
+      capabilities: {},
+      clientInfo: { name: 'test', version: '1' },
+    });
+    expect(init.capabilities.tools.listChanged).toBe(false);
   });
 });
