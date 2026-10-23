@@ -580,7 +580,7 @@ function inProgressIssues(
   const dates = termDates(catalog, current);
   const now = today(catalog);
   if (!dates) return [];
-  const byTerm = new Map<TermLetter, Section[]>();
+  const byTerm = new Map<TermLetter, CrnEntry[]>();
   for (const [, entry] of entries) {
     const term = entry.section.computedTerm as TermLetter;
     const span = dates[term];
@@ -588,14 +588,23 @@ function inProgressIssues(
       continue;
     }
     if (!span || span.start > now || span.end < now) continue;
-    byTerm.set(term, [...(byTerm.get(term) ?? []), entry.section]);
+    byTerm.set(term, [...(byTerm.get(term) ?? []), entry]);
   }
-  return [...byTerm].map(([term, sections]) => ({
-    severity: 'warning',
-    kind: 'inProgress',
-    crns: sections.map(s => s.crn),
-    message: `${term} term is in progress (started ${dates[term].start}): adding ${list(sections)} now is late and may need instructor or registrar approval.`,
-  }));
+  return [...byTerm].map(([term, chosen]) => {
+    const names = chosen.map(
+      e => `${courseCode(e.courses[0])} ${e.section.number}`,
+    );
+    const shown =
+      names.length > MAX_NAMED
+        ? `${names.slice(0, MAX_NAMED).join(', ')} +${names.length - MAX_NAMED} more`
+        : names.join(', ');
+    return {
+      severity: 'warning',
+      kind: 'inProgress',
+      crns: chosen.map(e => e.section.crn),
+      message: `${term} term is in progress (started ${dates[term].start}): adding ${shown} now is late and may need instructor or registrar approval.`,
+    };
+  });
 }
 
 function scheduleIssues(

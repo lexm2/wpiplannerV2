@@ -967,7 +967,7 @@ describe('terms in progress', () => {
     );
     const check = await tool('check_conflicts', { crns: [20, 22] }, IN_B);
     expect(check.text).toContain(
-      'Note: B term is in progress (started 2026-02-01): adding BL01 (CRN 20), BX01 (CRN 22) now is late and may need instructor or registrar approval.',
+      'Note: B term is in progress (started 2026-02-01): adding PH 1110 BL01, PH 1110 BX01 now is late and may need instructor or registrar approval.',
     );
     const info = await tool('get_catalog_info', {}, IN_B);
     expect(info.text).toContain('B 2026-02-01 to 2026-02-20 (in progress)');
