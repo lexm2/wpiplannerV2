@@ -77,6 +77,18 @@ describe('RateMyProfessorService.findProfessor', () => {
     );
   });
 
+  it('prefers the co-instructor with the most ratings', async () => {
+    const farzin = { ...prof('Shahin', 'Farzin', 0), numRatings: 0 };
+    const elKorchi = { ...prof('Tahar', 'El-Korchi', 3.1), numRatings: 21 };
+    const service = await serviceWith([farzin, elKorchi]);
+    expect(service.findProfessor('Shahin Farzin; Tahar El-Korchi')?.id).toBe(
+      elKorchi.id,
+    );
+    expect(
+      service.getRatingDisplay('Shahin Farzin; Tahar El-Korchi')?.rating,
+    ).toBe('3.1');
+  });
+
   it('rejects a lone last-name match with a different first name', async () => {
     const service = await serviceWith([prof('Alice', 'Smith')]);
     expect(service.findProfessor('John Smith')).toBeNull();
@@ -295,5 +307,83 @@ describe('RMPRatingFilter', () => {
     expect(
       filter.apply([section], { minRating: 4, includeWithoutData: false }),
     ).toEqual([]);
+  });
+
+  describe('co-taught lectures', () => {
+    const rated = (first: string, last: string, rating: number, n: number) => ({
+      ...prof(first, last, rating),
+      numRatings: n,
+    });
+
+    it('passes a lecture when any co-instructor passes', async () => {
+      const service = await serviceWith([
+        rated('Amity', 'Manning', 2, 6),
+        rated('Scarlet', 'Shell', 4.1, 15),
+      ]);
+      const filter = new RMPRatingFilter(service);
+      const bb552 = sectionTaughtBy('Amity Manning; Scarlet Shell');
+      expect(filter.apply([bb552], { minRating: 4 })).toEqual([bb552]);
+      expect(filter.apply([bb552], { maxRating: 2.5 })).toEqual([bb552]);
+      expect(filter.apply([bb552], { minRating: 4.5 })).toEqual([]);
+    });
+
+    it('counts the co-instructor who has enough ratings', async () => {
+      const service = await serviceWith([
+        rated('Marja', 'Bakermans', 4.8, 5),
+        rated('Kristin', 'Pfeifer', 4.5, 13),
+      ]);
+      const filter = new RMPRatingFilter(service);
+      const fy1101 = sectionTaughtBy('Marja Bakermans; Kristin Pfeifer');
+      expect(
+        filter.apply([fy1101], {
+          minNumRatings: 10,
+          includeWithoutData: false,
+        }),
+      ).toEqual([fy1101]);
+      expect(
+        filter.apply([fy1101], {
+          minNumRatings: 20,
+          includeWithoutData: false,
+        }),
+      ).toEqual([]);
+    });
+
+    it('is without data only when no co-instructor has ratings', async () => {
+      const service = await serviceWith([
+        rated('Shahin', 'Farzin', 0, 0),
+        rated('Tahar', 'El-Korchi', 3.1, 21),
+      ]);
+      const filter = new RMPRatingFilter(service);
+      const aren = sectionTaughtBy('Shahin Farzin; Tahar El-Korchi');
+      const unrated = sectionTaughtBy('Shahin Farzin; Nobody Known');
+      expect(
+        filter.apply([aren, unrated], { includeWithoutData: false }),
+      ).toEqual([aren]);
+      expect(
+        filter.apply([aren, unrated], {
+          minRating: 3,
+          includeWithoutData: true,
+        }),
+      ).toEqual([aren, unrated]);
+    });
+
+    it('does not let an unrated co-instructor rescue a failing one', async () => {
+      const service = await serviceWith([rated('Amy', 'Curran', 2, 10)]);
+      const filter = new RMPRatingFilter(service);
+      const section = sectionTaughtBy('Amy Curran; Nobody Known');
+      expect(
+        filter.apply([section], { minRating: 4, includeWithoutData: true }),
+      ).toEqual([]);
+    });
+
+    it('judges instructors listed on separate periods the same way', async () => {
+      const service = await serviceWith([
+        rated('Amy', 'Curran', 2, 10),
+        rated('Laura', 'Susanin', 4.5, 10),
+      ]);
+      const filter = new RMPRatingFilter(service);
+      const section = sectionTaughtBy('Amy Curran', 'Laura Susanin');
+      expect(filter.apply([section], { minRating: 4 })).toEqual([section]);
+    });
   });
 });

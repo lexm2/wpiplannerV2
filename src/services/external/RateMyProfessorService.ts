@@ -177,7 +177,10 @@ export class RateMyProfessorService {
    * 3. If several fit, disambiguate via first name fuzzy matching
    *
    * Co-taught sections list several names ("Amy Curran; Laura Susanin");
-   * the first instructor that matches is used.
+   * of the instructors that match, the one with the most ratings is used
+   * (the first on a tie), so a co-instructor's empty profile never stands
+   * in for the other's ratings. A filter judging each instructor on their
+   * own should look each name up separately.
    */
   findProfessor(professorName: string): Professor | null {
     if (!this.data || !professorName) return null;
@@ -188,8 +191,10 @@ export class RateMyProfessorService {
     let match: Professor | null = null;
     for (const name of professorName.split(/\s*;\s*/)) {
       if (!name) continue;
-      match = this.findSingleProfessor(name);
-      if (match) break;
+      const found = this.findSingleProfessor(name);
+      if (found && (!match || found.numRatings > match.numRatings)) {
+        match = found;
+      }
     }
 
     this.matchCache.set(professorName, match);
