@@ -36,6 +36,23 @@ interface PreparedSlot {
   terms: AcademicTerm[];
   start: number;
   end: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+/**
+ * Whether two date ranges share a day. Most sections run their whole term,
+ * but some run half of it (BB 3813 BX01 to Nov 12, BX02 from Nov 16), and
+ * those never meet. Unknown dates are taken to meet.
+ */
+function datesMeet(
+  aStart: string | undefined,
+  aEnd: string | undefined,
+  bStart: string | undefined,
+  bEnd: string | undefined,
+): boolean {
+  if (!aStart || !aEnd || !bStart || !bEnd) return true;
+  return aStart <= bEnd && bStart <= aEnd;
 }
 
 export class ConflictFilter implements SectionBasedFilter {
@@ -90,6 +107,8 @@ export class ConflictFilter implements SectionBasedFilter {
         terms: termsCovered(slot.term, spans),
         start: slot.startTime.hours * 60 + slot.startTime.minutes,
         end: slot.endTime.hours * 60 + slot.endTime.minutes,
+        startDate: slot.startDate,
+        endDate: slot.endDate,
       };
       const forDay = blockedByDay.get(slot.day);
       if (forDay) forDay.push(prepared);
@@ -122,7 +141,13 @@ export class ConflictFilter implements SectionBasedFilter {
             if (
               start < blocked.end &&
               blocked.start < end &&
-              blocked.terms.some(t => sectionTerms.includes(t))
+              blocked.terms.some(t => sectionTerms.includes(t)) &&
+              datesMeet(
+                fs.section.startDate,
+                fs.section.endDate,
+                blocked.startDate,
+                blocked.endDate,
+              )
             ) {
               return false;
             }

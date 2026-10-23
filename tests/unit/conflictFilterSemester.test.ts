@@ -165,3 +165,52 @@ describe('ConflictFilter blocked masks, semester sections spanning quarters', ()
     expect([...masks.keys()].sort()).toEqual(['A', 'B']);
   });
 });
+
+describe('ConflictFilter course list, sections running part of a term', () => {
+  /** Whether a same-time B section dated `candidate` survives one dated `picked`. */
+  function datedShown(
+    picked: [string, string] | null,
+    candidate: [string, string] | null,
+  ): boolean {
+    const pickedSection = mondayAt10('BX01', AcademicTerm.B);
+    const candidateSection = mondayAt10('BX02', AcademicTerm.B);
+    if (picked) [pickedSection.startDate, pickedSection.endDate] = picked;
+    if (candidate)
+      [candidateSection.startDate, candidateSection.endDate] = candidate;
+    const criteria: ConflictCriteria = {
+      avoidConflicts: true,
+      blockedSlots: [],
+      selectedCourses: [
+        {
+          course: course('BB3813', pickedSection),
+          selected: { lecture: pickedSection },
+          isRequired: false,
+          lockedSections: new Set(),
+        },
+      ],
+    };
+    const other = course('BB3814', candidateSection);
+    const units: FilterableSection[] = [
+      {
+        course: other,
+        section: candidateSection,
+        sectionType: SectionType.LECTURE,
+      },
+    ];
+    return new ConflictFilter().apply(units, criteria).length === 1;
+  }
+
+  it('keeps a section whose dates never meet the picked one', () => {
+    // BB 3813 BX01 runs to Nov 12, BX02 from Nov 16: same times, no clash.
+    expect(
+      datedShown(['2026-10-19', '2026-11-12'], ['2026-11-16', '2026-12-11']),
+    ).toBe(true);
+  });
+
+  it('hides one whose dates overlap, or when either has no dates', () => {
+    expect(
+      datedShown(['2026-10-19', '2026-11-16'], ['2026-11-16', '2026-12-11']),
+    ).toBe(false);
+    expect(datedShown(null, ['2026-11-16', '2026-12-11'])).toBe(false);
+  });
+});

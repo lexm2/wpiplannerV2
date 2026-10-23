@@ -97,4 +97,7 @@ export interface WeeklyTimeSlot {
   startTime: SimpleTime;
   endTime: SimpleTime;
   term: AcademicTerm;
+  /** The owning section's own dates (YYYY-MM-DD), when it has them. */
+  startDate?: string;
+  endDate?: string;
 }
