@@ -533,6 +533,20 @@ export interface CourseQueryResult {
    * many courses match without it, and in which terms, most first.
    */
   relaxations: Relaxation[];
+  /**
+   * When a code search did not find the course it names: the ones a default
+   * left out, because they run only in terms that have ended or are only
+   * interest lists so far, with the terms. Empty otherwise.
+   */
+  leftOut: LeftOut[];
+}
+
+interface LeftOut {
+  reason: 'endedTerms' | 'interestLists';
+  /** The courses the code names that the option would bring back. */
+  codes: string[];
+  /** Their terms: the ended ones, or those with an interest list. */
+  terms: string[];
 }
 
 interface TermTotals {
@@ -624,6 +638,45 @@ function relax(catalog: Catalog, query: CourseQuery): Relaxation[] {
       const order = rank(a) === 0 ? a.total - b.total : b.total - a.total;
       return helps(a) - helps(b) || rank(a) - rank(b) || order;
     });
+}
+
+/**
+ * For a code search that found nothing, the named courses the ended-term
+ * and interest-list defaults left out: "BME 4023" ran only in A, which has
+ * ended, and "No matching courses" read as no such course. One rerun per
+ * default in force.
+ */
+function leftOutByDefaults(catalog: Catalog, query: CourseQuery): LeftOut[] {
+  const text = query.filters.searchText;
+  if (!text || text.professorOnly || !parseSearchQuery(text.query).code?.dept) {
+    return [];
+  }
+  const options = [
+    { reason: 'endedTerms', key: 'includeEndedTerms' },
+    { reason: 'interestLists', key: 'includeInterestLists' },
+  ] as const;
+  return options.flatMap(({ reason, key }) => {
+    if (query[key]) return [];
+    const found = collapseCrossListings(
+      filterCatalog(
+        catalog,
+        readQuery(catalog, { ...query, [key]: true }).criteria,
+      ),
+    ).filter(c => describeMatch(c, text.query) === 'code');
+    if (!found.length) return [];
+    const sections = found.flatMap(c => getAllSections(c));
+    return [
+      {
+        reason,
+        codes: found.map(courseCode),
+        terms: termsOf(
+          reason === 'interestLists'
+            ? sections.filter(s => s.isInterestList)
+            : sections,
+        ),
+      },
+    ];
+  });
 }
 
 const EVERY_DAY = Object.values(DayOfWeek);
@@ -1143,6 +1196,8 @@ export function runCourseQuery(
     ...companionNotices(catalog, read.criteria, filtered),
   ];
   const relaxations = matches.length === 0 ? relax(catalog, query) : [];
+  // The named course itself missing, even with mentions of it listed.
+  const leftOut = named.length === 0 ? leftOutByDefaults(catalog, query) : [];
   if (matches.length === 0 && text) {
     notices.push(...instructorNotice(inYear, text.query));
   }
@@ -1204,6 +1259,7 @@ export function runCourseQuery(
     }),
     search,
     relaxations,
+    leftOut,
     totals: totalsOf(
       matches,
       read.year === 'all' ? currentAcademicYear(catalog) : null,

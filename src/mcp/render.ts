@@ -378,6 +378,15 @@ function companionLines(
   return lines;
 }
 
+/** "BME 4023 ran only in A term (ended); includeEndedTerms: true shows it." */
+function leftOutLine(l: CourseQueryResult['leftOut'][number]): string {
+  const terms = `${l.terms.join(', ')} term${l.terms.length === 1 ? '' : 's'}`;
+  const codes = l.codes.join(', ');
+  return l.reason === 'endedTerms'
+    ? `${codes} ran only in ${terms}, which ${l.terms.length === 1 ? 'has' : 'have'} ended; includeEndedTerms: true shows ${l.codes.length === 1 ? 'it' : 'them'}.`
+    : `${codes} ${l.codes.length === 1 ? 'has' : 'have'} only an interest list so far (${terms}: a placeholder to join before sections open); includeInterestLists: true shows ${l.codes.length === 1 ? 'it' : 'them'}.`;
+}
+
 /** Which filter emptied a search, and what leaving it out would find. */
 function relaxationLines(
   relaxations: CourseQueryResult['relaxations'],
@@ -416,7 +425,10 @@ export function renderSearch(result: CourseQueryResult): string {
   const lines: string[] = [];
   const where = result.year === 'all' ? 'all years' : yearLabel(result.year);
   if (result.total === 0) {
-    lines.push(`No matching courses in ${where}.`);
+    const leftOut = result.leftOut.map(leftOutLine);
+    lines.push(
+      ...(leftOut.length ? leftOut : [`No matching courses in ${where}.`]),
+    );
     lines.push(...relaxationLines(result.relaxations));
   } else {
     const last = Math.min(result.offset + result.limit, result.total);
@@ -426,6 +438,7 @@ export function renderSearch(result: CourseQueryResult): string {
         : `${result.offset + 1}-${last}`;
     lines.push(
       `Courses ${range} of ${result.total} in ${where}; seats count only the sections that matched.`,
+      ...result.leftOut.map(leftOutLine),
     );
   }
   lines.push(...result.notices);

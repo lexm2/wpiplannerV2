@@ -1121,3 +1121,42 @@ describe('sorted searches', () => {
     }
   });
 });
+
+describe('a code search the defaults empty', () => {
+  it('says the course ran only in an ended term', async () => {
+    const { text, data } = await tool(
+      'search_courses',
+      { filters: { searchText: { query: 'CS 2102' } } },
+      AFTER_A,
+    );
+    expect(text).toContain(
+      'CS 2102 ran only in A term, which has ended; includeEndedTerms: true shows it.',
+    );
+    expect(text).not.toContain('No matching courses');
+    expect(data.leftOut).toEqual([
+      { reason: 'endedTerms', codes: ['CS 2102'], terms: ['A'] },
+    ]);
+  });
+
+  it('says the course is only an interest list so far', async () => {
+    const { mcp } = await customEndpoints([
+      {
+        abbreviation: 'MA',
+        name: 'Mathematical Sciences',
+        courses: [
+          course('MA-1024-2026', 'Calculus IV', [
+            section(95, 'Interest List-D Term', 'D', [], 0, {
+              isInterestList: true,
+            }),
+          ]),
+        ],
+      },
+    ]);
+    const { text } = await toolOn(mcp, 'search_courses', {
+      filters: { searchText: { query: 'MA 1024' } },
+    });
+    expect(text).toContain(
+      'MA 1024 has only an interest list so far (D term: a placeholder to join before sections open); includeInterestLists: true shows it.',
+    );
+  });
+});
