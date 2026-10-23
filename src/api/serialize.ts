@@ -332,16 +332,7 @@ type RatingLookup = (name: string) => RatingView | null;
 function ratingLookup(rmp: RateMyProfessorService): RatingLookup {
   return name => {
     const r = rmp.getRatings(name);
-    if (!r) return null;
-    return {
-      ...r,
-      // RMP reports -1 when too few raters answered.
-      wouldTakeAgain:
-        r.wouldTakeAgain !== null && r.wouldTakeAgain >= 0
-          ? r.wouldTakeAgain
-          : null,
-      url: rmp.getProfessorRMPUrl(name),
-    };
+    return r && { ...r, url: rmp.getProfessorRMPUrl(name) };
   };
 }
 
