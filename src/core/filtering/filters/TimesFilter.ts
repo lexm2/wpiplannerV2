@@ -22,8 +22,10 @@ const VALID_DAYS = new Set<string>(Object.values(DayOfWeek));
  * The two are mirror images: a section passes `only` exactly when none of its
  * meetings fall outside the selection.
  *
- * A section with nothing on the grid (async) has no meetings to test, so it
- * is kept only when the criteria ask for it with `includeAsync`.
+ * A section with nothing on the grid (async, no set times) has no meetings
+ * to test. Under `avoid` it overlaps nothing, so it always passes; under
+ * `only` it is kept only when the criteria ask for it with `includeAsync`,
+ * since painting the times to meet in says when classes should meet.
  */
 export class TimesFilter implements SectionBasedFilter {
   readonly id = 'times';
@@ -43,7 +45,9 @@ export class TimesFilter implements SectionBasedFilter {
     const whitelist = criteria.mode === 'only';
 
     return sections.filter(fs => {
-      if (isAsyncSection(fs.section)) return criteria.includeAsync === true;
+      if (isAsyncSection(fs.section)) {
+        return !whitelist || criteria.includeAsync === true;
+      }
       const periods = timedPeriods(fs.section);
 
       return whitelist
@@ -79,6 +83,9 @@ export class TimesFilter implements SectionBasedFilter {
       criteria?.windows ?? [],
       criteria?.mode ?? 'only',
     );
-    return criteria?.includeAsync ? `${times} • async included` : times;
+    // Avoiding times keeps async sections anyway, so saying so adds nothing.
+    return criteria?.includeAsync && criteria.mode === 'only'
+      ? `${times} • async included`
+      : times;
   }
 }

@@ -4,34 +4,50 @@ import type { FilterableSection } from '../../../types/filterableUnit';
 import type { Course, Section } from '../../../types/types';
 import { keepMatchingGroups } from '../lectureGroupScope';
 import {
-  matchCourseText,
+  foldText,
+  matchCourseWords,
   parseSearchQuery,
   namesHaveWord,
   prepareSearch,
   textHasWord,
-  type ParsedQuery,
+  type CourseWordMatch,
 } from '../../../utils/searchUtils';
 
-/** The section's own searchable text: number, instructors, type, rooms. */
+/** The section's own searchable text: number, instructors, type. */
 function sectionText(section: Section): string {
-  return [
-    section.number,
-    ...section.periods.flatMap(p => [
-      p.professor,
-      p.type,
-      p.building,
-      p.room,
-      p.location,
-    ]),
-  ]
-    .join(' ')
-    .toLowerCase();
+  return foldText(
+    [
+      section.number,
+      ...section.periods.flatMap(p => [p.professor, p.type]),
+    ].join(' '),
+  );
 }
+
+/**
+ * Where the section meets: the building names alone ("fuller labs", the
+ * words before a room number), and everything with rooms and their names
+ * ("fuller labs 222 imgd computer lab").
+ */
+function placeText(section: Section): { buildings: string; all: string } {
+  const places = section.periods.map(p =>
+    foldText([p.building, p.room, p.location].filter(Boolean).join(' ')),
+  );
+  const buildings = places.map(place => place.split(/\s+\S*\d/)[0]);
+  return { buildings: buildings.join(' '), all: places.join(' ') };
+}
+
+/** Words naming a kind of place, not one: no sign a query is about rooms. */
+const PLACE_WORDS = new Set(['lab', 'labs', 'hall', 'center', 'room']);
 
 /**
  * Matches the query against each lecture group as searchUtils describes:
  * a code query by course code, a word query word by word, where each word
  * may match the course or the section.
+ *
+ * Rooms count only when the query names a building ("fuller labs",
+ * "higgins labs 116"): room names are full of common words ("Computer Lab", "Music
+ * Technology Lab"), and "physics with lab" should find physics with a lab
+ * section, not a course meeting in Higgins Labs.
  */
 export class SearchTextFilter implements SectionBasedFilter {
   readonly id = 'searchText';
@@ -43,42 +59,49 @@ export class SearchTextFilter implements SectionBasedFilter {
     sections: FilterableSection[],
     criteria: SearchTextFilterCriteria,
   ): FilterableSection[] {
-    const query = parseSearchQuery(criteria.query ?? '');
-    if (!query.text) return sections;
+    if (!criteria.query?.trim()) return sections;
+    // Before the query is read: a code like "CS2" needs the departments.
+    prepareSearch(new Set(sections.map(fs => fs.course)));
+    const query = parseSearchQuery(criteria.query);
 
     // A match anywhere in a lecture group keeps the whole group: searching
     // a lecturer's name has to bring their lecture's labs along with it.
     if (criteria.professorOnly) {
       return keepMatchingGroups(sections, fs => {
         const names = fs.section.periods
-          .map(p => p.professor.toLowerCase())
+          .map(p => foldText(p.professor))
           .join(' ');
         return query.words.every(word => namesHaveWord(names, word));
       });
     }
 
-    prepareSearch(new Set(sections.map(fs => fs.course)));
-
     // The course-level verdict is the same for each of its sections.
-    const byCourse = new Map<Course, ReturnType<typeof matchCourseText>>();
-    const courseMatch = (course: Course, q: ParsedQuery) => {
+    const byCourse = new Map<Course, CourseWordMatch>();
+    const courseMatch = (course: Course) => {
       let result = byCourse.get(course);
       if (!result) {
-        result = matchCourseText(course, q);
+        result = matchCourseWords(course, query);
         byCourse.set(course, result);
       }
       return result;
     };
 
     return keepMatchingGroups(sections, fs => {
-      const { all, matched } = courseMatch(fs.course, query);
-      if (all) return true;
+      const course = courseMatch(fs.course);
+      if (course.all) return true;
       // A code query is about the course alone.
       if (query.code) return false;
+      // Each word from the section or the course; the section's short text
+      // first, so the course's words are read only when it lacks them.
       const own = sectionText(fs.section);
-      return query.words.every(
-        (word, i) => matched[i] || textHasWord(own, word),
+      const place = placeText(fs.section);
+      const namesBuilding = query.words.some(
+        word => !PLACE_WORDS.has(word) && textHasWord(place.buildings, word),
       );
+      const ownHas = (word: string) =>
+        textHasWord(own, word) ||
+        (namesBuilding && textHasWord(place.all, word));
+      return query.words.every((word, i) => ownHas(word) || course.word(i));
     });
   }
 

@@ -7,7 +7,8 @@ import { editDistance } from './editDistance';
  * the relevance ranking (in what order), so the two always agree.
  *
  * A query is either a course code, matched by prefix ("MA 1022", "ma1022",
- * "MA_1022", "CS 21" for every CS 21xx, or a bare number "1022") and
+ * "MA_1022", "CS 21" for every CS 21xx, "CS2" for every CS 2xxx of a
+ * department the catalog has, or a bare number "1022") and
  * optionally followed by words that must match too ("MA 1022 calculus"),
  * or words. Roman numerals I-IV and digits 1-4 are the same word. Every word
  * must match somewhere in the course (its code, name, description,
@@ -18,6 +19,7 @@ import { editDistance } from './editDistance';
  * matches only a whole word (or its plural), so "AI" finds "AI in Writing"
  * but not "Aircraft"; it also matches the initials of consecutive words of
  * the name ("AI": "Artificial Intelligence", "CAD": "Computer Aided Design").
+ * Accents are ignored on both sides: "Neel" finds "Néel", "Martín" "Martin".
  */
 
 export interface ParsedQuery {
@@ -31,21 +33,69 @@ export interface ParsedQuery {
   words: string[];
   /** Set when the query reads as a course code or number, alone or first. */
   code: { dept: string; number: string } | null;
+  /**
+   * Distinct words past the first MAX_QUERY_WORDS, left out of the search;
+   * absent when none were.
+   */
+  ignored?: string[];
 }
 
-// "ma1022", "cs21", "ds502", "1022"; 2-5 letter departments (IMGD, BCB...).
-const CODE_RE = /^([a-z]{2,5})?(\d{2,4}[a-z]?)$/;
-// A code followed by words: "ma 1022 calculus", "cs-2102 java".
-const LEADING_CODE_RE = /^([a-z]{2,5})[\s_.-]*(\d{2,4}[a-z]?)\s+(.+)$/;
+/**
+ * Distinct words a query is searched by; any more are ignored. Matching
+ * costs a pass over the catalog per word, and no course is about a dozen
+ * different things.
+ */
+export const MAX_QUERY_WORDS = 12;
 
-/** I-IV as course names number their sequels. */
-const NUMERALS: Record<string, string> = {
-  i: '1',
-  ii: '2',
-  iii: '3',
-  iv: '4',
-};
-const numeral = (token: string) => NUMERALS[token] ?? token;
+// "ma1022", "cs21", "cs2", "ds502", "1022"; 2-5 letter departments (IMGD,
+// BCB...).
+const CODE_RE = /^([a-z]{2,5})?(\d{1,4}[a-z]?)$/;
+// A code followed by words: "ma 1022 calculus", "cs-2102 java".
+const LEADING_CODE_RE = /^([a-z]{2,5})[\s_.-]*(\d{1,4}[a-z]?)\s+(.+)$/;
+
+/**
+ * Department codes the catalog has, lowercased, learned as course text is
+ * built (see prepareSearch). A single digit makes a code only after one of
+ * these: "CS 2" is every CS 2xxx, while "calc 2" is two words.
+ */
+const knownDepartments = new Set<string>();
+
+/**
+ * I-IV as course names number their sequels. A Map, not an object literal:
+ * the keys are user text, and "constructor" must not find Object's.
+ */
+const NUMERALS = new Map([
+  ['i', '1'],
+  ['ii', '2'],
+  ['iii', '3'],
+  ['iv', '4'],
+]);
+const numeral = (token: string) => NUMERALS.get(token) ?? token;
+
+/**
+ * Short forms no prefix or typo rule reads right: "stats" is no prefix of
+ * "statistics", and one typo away from "static" and "statements". Mapped to
+ * the shared start of "statistics" and "statistical".
+ */
+const SHORT_FORMS = new Map([
+  ['stat', 'statistic'],
+  ['stats', 'statistic'],
+]);
+
+/** Accents as combining marks, once a string is decomposed (NFD). */
+const MARKS = /\p{M}+/gu;
+
+/** The text without its accents: "Néel" to "Neel". Case is kept. */
+const stripMarks = (text: string) =>
+  // Plain ASCII, nearly all of the catalog, skips the normalization.
+  /[^\p{ASCII}]/u.test(text) ? text.normalize('NFD').replace(MARKS, '') : text;
+
+/**
+ * Text as search compares it: lowercased and without accents, so "Néel",
+ * "NEEL" and "neel" are one word. Course text, section text and queries all
+ * pass through it; so should anything else matched against them.
+ */
+export const foldText = (text: string) => stripMarks(text.toLowerCase());
 
 const TOKEN_SPLIT = /[^a-z0-9+#]+/;
 const tokenize = (text: string) => text.split(TOKEN_SPLIT).filter(Boolean);
@@ -64,13 +114,26 @@ function readCode(compact: string): ParsedQuery['code'] {
         : whole,
   );
   const m = CODE_RE.exec(fixed);
+  if (!m) return null;
+  const [, dept, number] = m;
+  const digits = number.replace(/\D/g, '').length;
   // A bare number needs three digits; "21" alone is too vague to be a code.
-  return m && (m[1] || m[2].length >= 3)
-    ? { dept: m[1] ?? '', number: m[2] }
-    : null;
+  if (!dept) return digits >= 3 ? { dept: '', number } : null;
+  if (digits === 1 && !knownDepartments.has(dept)) return null;
+  return { dept, number };
 }
 
-const queryWords = (text: string) => tokenize(text).map(numeral);
+/** The query's distinct words, in order, split from the cap's leftovers. */
+function queryWords(text: string): Pick<ParsedQuery, 'words' | 'ignored'> {
+  const distinct = [
+    ...new Set(tokenize(text).map(t => SHORT_FORMS.get(t) ?? numeral(t))),
+  ];
+  if (distinct.length <= MAX_QUERY_WORDS) return { words: distinct };
+  return {
+    words: distinct.slice(0, MAX_QUERY_WORDS),
+    ignored: distinct.slice(MAX_QUERY_WORDS),
+  };
+}
 
 /**
  * A department name as words, "and" left out, since the catalog writes
@@ -84,15 +147,15 @@ const namesDepartment = (text: CourseText, words: string[]) =>
   words.length > 0 && text.departmentNames.includes(departmentPhrase(words));
 
 export function parseSearchQuery(query: string): ParsedQuery {
-  const text = query.trim().toLowerCase().replace(/\s+/g, ' ');
+  const text = foldText(query).trim().replace(/\s+/g, ' ');
   const code = readCode(text.replace(/[\s_.-]/g, ''));
   if (code) return { text, words: [], code };
   const lead = LEADING_CODE_RE.exec(text);
   const leadCode = lead ? readCode(lead[1] + lead[2]) : null;
   if (lead && leadCode) {
-    return { text, words: queryWords(lead[3]), code: leadCode };
+    return { text, ...queryWords(lead[3]), code: leadCode };
   }
-  return { text, words: queryWords(text), code: null };
+  return { text, ...queryWords(text), code: null };
 }
 
 /** Words this short match only whole words, never inside one. */
@@ -150,10 +213,34 @@ function sameExpansion(run: string[], expansion: string): boolean {
  * "ai" in "Introduction To Artificial Intelligence". Initials alone spell
  * too much ("Accelerated Introduction"), so the words must be what the
  * catalog defines the acronym as somewhere, or the course's own text must
- * use the acronym.
+ * use the acronym, or they must be the whole name, numbering aside, of a
+ * subject the catalog offers under two codes or more ("os": CS 3013 and
+ * CS 502 "Operating Systems"; "dl": "Deep Learning" four times over). A
+ * one-off name is too often a chance spelling ("pe": "Project
+ * Evaluation"), where a subject taught at both levels is a field with a
+ * name of its own.
  */
 function acronymIn(word: string, text: CourseText): boolean {
   return acronymStart(word, text) !== -1;
+}
+
+/** A name's words without the number ending a sequel's: "deep learning". */
+function subjectOf(nameTokens: string[]): string[] {
+  let end = nameTokens.length;
+  while (end > 0 && /^\d+$/.test(nameTokens[end - 1])) end--;
+  return nameTokens.slice(0, end);
+}
+
+/**
+ * Each course name, numbering aside, to the codes offering it: "operating
+ * systems" to CS3013 and CS502. Learned as course text is built.
+ */
+const subjectCodes = new Map<string, Set<string>>();
+
+function learnSubject(nameTokens: string[], code: string): void {
+  const subject = subjectOf(nameTokens).join(' ');
+  if (!subjectCodes.has(subject)) subjectCodes.set(subject, new Set());
+  subjectCodes.get(subject)!.add(code);
 }
 
 /** Where in the name the words `word` stands for start; -1 when they don't. */
@@ -163,13 +250,19 @@ function acronymStart(word: string, text: CourseText): number {
   }
   const defined = definedAcronyms.get(word);
   const usedHere = text.descriptionTokens.includes(word);
-  if (!defined && !usedHere) return -1;
   const tokens = text.nameTokens;
+  const spells = (run: string[]) =>
+    run.length === word.length &&
+    run.every(t => t.length >= 3 && !ACRONYM_STOP.has(t)) &&
+    run.map(t => t[0]).join('') === word;
+  if (!defined && !usedHere) {
+    const subject = subjectOf(tokens);
+    const codes = subjectCodes.get(subject.join(' '))?.size ?? 0;
+    return codes >= 2 && spells(subject) ? 0 : -1;
+  }
   return tokens.findIndex((_, i) => {
     const run = tokens.slice(i, i + word.length);
-    if (run.length < word.length) return false;
-    if (run.some(t => t.length < 3 || ACRONYM_STOP.has(t))) return false;
-    if (run.map(t => t[0]).join('') !== word) return false;
+    if (!spells(run)) return false;
     return usedHere || [...defined!].some(e => sameExpansion(run, e));
   });
 }
@@ -210,38 +303,42 @@ function courseText(course: Course): CourseText {
   let text = textCache.get(course);
   if (text) return text;
 
-  const code = `${course.departmentAbbr}${course.number}`.toLowerCase();
+  const code = foldText(`${course.departmentAbbr}${course.number}`);
   const codes = [
     code,
-    ...course.crossListedWith.map(c => c.toLowerCase().replace(/[\s-]/g, '')),
+    ...course.crossListedWith.map(c => foldText(c).replace(/[\s-]/g, '')),
   ];
-  const name = course.name.toLowerCase();
-  const description = course.description.toLowerCase();
-  const department =
-    `${course.departmentAbbr} ${course.departmentName}`.toLowerCase();
-  const tagText = [...course.degreeAttributes, ...course.courseTypes]
-    .join(' ')
-    .toLowerCase();
+  const name = foldText(course.name);
+  const description = foldText(course.description);
+  const department = foldText(
+    `${course.departmentAbbr} ${course.departmentName}`,
+  );
+  const tagText = foldText(
+    [...course.degreeAttributes, ...course.courseTypes].join(' '),
+  );
   const haystack = [
-    `${course.departmentAbbr} ${course.number}`.toLowerCase(),
+    foldText(`${course.departmentAbbr} ${course.number}`),
     ...codes,
-    ...course.crossListedWith.map(c => c.toLowerCase()),
+    ...course.crossListedWith.map(foldText),
     name,
     description,
     department,
     tagText,
   ].join(' ');
 
-  learnAcronyms(`${course.name} ${course.description}`);
+  learnAcronyms(stripMarks(`${course.name} ${course.description}`));
+  for (const c of codes) knownDepartments.add(c.replace(/[^a-z].*$/, ''));
+  const nameTokens = tokenize(name).map(numeral);
+  learnSubject(nameTokens, code);
   const tokens = tokenize(haystack);
   text = {
     haystack,
     tokens: [...new Set([...tokens, ...tokens.map(numeral)])],
     name,
-    nameTokens: tokenize(name).map(numeral),
+    nameTokens,
     departmentNames: [
-      departmentPhrase(tokenize(course.departmentName.toLowerCase())),
-      course.departmentAbbr.toLowerCase(),
+      departmentPhrase(tokenize(foldText(course.departmentName))),
+      foldText(course.departmentAbbr),
     ],
     departmentTokens: tokenize(department),
     tagText,
@@ -268,6 +365,33 @@ function nearPrefix(word: string, token: string): boolean {
   return editDistance(word, token, limit, true) <= limit;
 }
 
+/** Endings a word may drop and still be the same word, for shortenedTo. */
+const ENDINGS = new Set(['s', 'es', 'ed', 'er', 'ers', 'al', 'ion', 'ions']);
+const ING = /^(?:[a-z])?ing$/;
+
+/**
+ * `token` is `word` without a common ending, and five letters or more:
+ * "program" for "programming", "network" for "networking", "material" for
+ * "materials". Not "robot" for "robotcs", a typo of "robotics". Only name
+ * words are read this way; descriptions say "program" of degree programs
+ * too often.
+ */
+function shortenedTo(word: string, token: string): boolean {
+  if (token.length < 5 || !word.startsWith(token)) return false;
+  const ending = word.slice(token.length);
+  return ENDINGS.has(ending) || ING.test(ending);
+}
+
+/** How a word matches one name word, best first; null when it doesn't. */
+type NameHit = 'exact' | 'prefix' | 'typo';
+
+function nameHit(word: string, token: string): NameHit | null {
+  if (isShort(word)) return shortWordIs(word, token) ? 'exact' : null;
+  if (token === word) return 'exact';
+  if (token.startsWith(word) || shortenedTo(word, token)) return 'prefix';
+  return nearPrefix(word, token) ? 'typo' : null;
+}
+
 function codeMatches(course: Course, code: { dept: string; number: string }) {
   const { codes } = courseText(course);
   if (code.dept) return codes.some(c => c.startsWith(code.dept + code.number));
@@ -287,50 +411,84 @@ function wordMatches(text: CourseText, word: string): boolean {
   return (
     wordIn(word, text.haystack, text.tokens) ||
     text.tokens.some(t => nearPrefix(word, t)) ||
+    text.nameTokens.some(t => shortenedTo(word, t)) ||
     acronymIn(word, text)
   );
 }
 
 /**
- * Whether the course's own text matches the query; for a word query, the
- * words it matches. Section text (instructors, rooms) is checked separately
- * by SearchTextFilter, since it differs per section. A code query with words
- * after the code needs both.
+ * The course's own text against the query: `all` when it matches, and
+ * `word(i)` for whether it matches the query's i-th word, each worked out
+ * once and only when asked. Section text (instructors, rooms) is checked
+ * separately by SearchTextFilter, since it differs per section. A code query
+ * with words after the code needs both.
  */
-export function matchCourseText(
+export interface CourseWordMatch {
+  all: boolean;
+  word: (index: number) => boolean;
+}
+
+export function matchCourseWords(
   course: Course,
   query: ParsedQuery,
-): { all: boolean; matched: boolean[] } {
+): CourseWordMatch {
   const text = courseText(course);
   if (query.code) {
     const ok =
       (codeMatches(course, query.code) || mentionsCode(course, query.code)) &&
       query.words.every(word => wordMatches(text, word));
-    return { all: ok, matched: [ok] };
+    return { all: ok, word: () => ok };
   }
   if (namesDepartment(text, query.words)) {
-    return { all: true, matched: query.words.map(() => true) };
+    return { all: true, word: () => true };
   }
-  const matched = query.words.map(word => wordMatches(text, word));
-  return { all: matched.every(Boolean), matched };
+  const known: boolean[] = [];
+  const word = (i: number) => (known[i] ??= wordMatches(text, query.words[i]));
+  // Stops at the first word the course lacks: most of the catalog lacks the
+  // first word of any query, and the rest need not be looked at.
+  return { all: query.words.every((_, i) => word(i)), word };
 }
 
 /**
- * Whether `word` occurs in a free text such as a section's instructors and
- * rooms, by the same rule as course text: whole words only when short.
+ * Whether the course's own text matches the query; for a word query, the
+ * words it matches. `matched` is worked out when read, so a caller wanting
+ * only `all` stops at the first word the course lacks.
+ */
+export function matchCourseText(
+  course: Course,
+  query: ParsedQuery,
+): { all: boolean; matched: boolean[] } {
+  const { all, word } = matchCourseWords(course, query);
+  let matched: boolean[] | undefined;
+  return {
+    all,
+    get matched() {
+      matched ??= query.code ? [all] : query.words.map((_, i) => word(i));
+      return matched;
+    },
+  };
+}
+
+/**
+ * Whether `word` (a query word, already folded) occurs in a free text such
+ * as a section's instructors and rooms, by the same rule as course text:
+ * whole words only when short. The text is folded here if it is not yet.
  */
 export function textHasWord(text: string, word: string): boolean {
-  return wordIn(word, text, isShort(word) ? tokenize(text) : []);
+  const folded = foldText(text);
+  return wordIn(word, folded, isShort(word) ? tokenize(folded) : []);
 }
 
 /**
  * Whether `word` occurs in instructor names: a short word as the start of a
  * name ("Li" finds Li and Lin, not Elizabeth), a longer one anywhere.
+ * Accents aside: "Neel" finds "EJ Néel".
  */
 export function namesHaveWord(names: string, word: string): boolean {
+  const folded = foldText(names);
   return isShort(word)
-    ? tokenize(names).some(t => t.startsWith(word))
-    : names.includes(word);
+    ? tokenize(folded).some(t => t.startsWith(word))
+    : folded.includes(word);
 }
 
 /** `word` matches description token `token`, as matchCourseText reads it. */
@@ -378,9 +536,34 @@ const isNear = (span: number | null, words: number) =>
 function wordInName(text: CourseText, word: string): boolean {
   return (
     wordIn(word, text.name, text.nameTokens) ||
-    text.nameTokens.some(t => nearPrefix(word, t)) ||
+    text.nameTokens.some(t => nameHit(word, t) !== null) ||
     acronymIn(word, text)
   );
+}
+
+/**
+ * Where the words run through the name in order, one name word each: the
+ * index of the first, and whether any was a typo. Each word may be the
+ * whole name word, its start, a shorter form or a typo of it, so "intro to
+ * programming" runs through "Introduction To Program Design" and "machine
+ * lerning" through "Machine Learning". Null when the words are not there
+ * together.
+ */
+function phraseInName(
+  text: CourseText,
+  words: string[],
+): { at: number; typo: boolean } | null {
+  const tokens = text.nameTokens;
+  for (let at = 0; at + words.length <= tokens.length; at++) {
+    let typo = false;
+    const runs = words.every((word, k) => {
+      const hit = nameHit(word, tokens[at + k]);
+      if (hit === 'typo') typo = true;
+      return hit !== null;
+    });
+    if (runs) return { at, typo };
+  }
+  return null;
 }
 
 /**
@@ -408,9 +591,8 @@ export type SearchMatch =
 /** The titles some sections carry after their number: "ST: AI and Economics". */
 function sectionTitles(course: Course): string {
   return getAllSections(course)
-    .map(s => s.number.split(' - ').slice(1).join(' - '))
-    .join(' ')
-    .toLowerCase();
+    .map(s => foldText(s.number.split(' - ').slice(1).join(' - ')))
+    .join(' ');
 }
 
 export function describeMatch(course: Course, query: string): SearchMatch {
@@ -432,6 +614,7 @@ export function describeMatch(course: Course, query: string): SearchMatch {
     wordInName(text, word) ||
     text.codes.some(c => c.startsWith(word)) ||
     wordIn(word, text.departmentTokens.join(' '), text.departmentTokens) ||
+    text.departmentTokens.some(t => nearPrefix(word, t)) ||
     wordIn(word, text.tagText, text.tagTokens);
   if (parsed.words.every(inTitle)) return 'title';
   if (parsed.words.length === 1) return 'description';
@@ -459,10 +642,12 @@ export function rankCoursesByRelevance(
   if (!query.trim()) return courses;
   prepareSearch(courses);
 
-  // Score each course once rather than on every comparison.
+  // Score each course once rather than on every comparison, reading the
+  // query once for them all.
+  const parsed = parseSearchQuery(query);
   const scores = new Map<Course, number>();
   for (const course of courses) {
-    scores.set(course, calculateRelevanceScore(course, query));
+    scores.set(course, relevanceScore(course, parsed));
   }
   return courses.sort((a, b) => scores.get(b)! - scores.get(a)!);
 }
@@ -499,15 +684,21 @@ function codeScore(course: Course, code: { dept: string; number: string }) {
 function wordScore(text: CourseText, words: string[]): number {
   if (!words.length) return 0;
   let score = 0;
-  // The whole query against the name, word for word; the last word may be
-  // the start of a name word unless it is short ("calc" for "calculus").
-  const name = text.nameTokens.join(' ');
-  const joined = words.map(escapeRegExp).join(' ');
-  const tail = isShort(words.at(-1)!) ? '(?:e?s)?(?= |$)' : '';
-  const phrase = new RegExp(`(?:^| )${joined}${tail}`).exec(name);
-  if (name === words.join(' ')) score += 850;
-  if (phrase?.index === 0) score += 20;
-  if (phrase) score += 400;
+  // The whole query against the name, word for word ("calc" for
+  // "calculus", "intro to programming" for "Introduction To Program
+  // Design"); a run with a typo in it counts for less.
+  const phrase = phraseInName(text, words);
+  if (text.nameTokens.join(' ') === words.join(' ')) score += 850;
+  else if (
+    phrase?.at === 0 &&
+    words.length > 1 &&
+    words.length === text.nameTokens.length
+  ) {
+    // The whole name, misspelt or shortened: "machine lerning".
+    score += 450;
+  }
+  if (phrase?.at === 0) score += 20;
+  if (phrase) score += phrase.typo ? 300 : 400;
   // An acronym spelled out in the name is the same phrase: "AI" for
   // "Artificial Intelligence" ranks with "AI in Writing", not below it.
   if (!phrase && words.length === 1) {
@@ -526,6 +717,8 @@ function wordScore(text: CourseText, words: string[]): number {
       inName = 100;
     else if (!short && text.nameTokens.some(t => t.startsWith(word)))
       inName = 90;
+    else if (!short && text.nameTokens.some(t => shortenedTo(word, t)))
+      inName = 80;
     else if (!short && text.name.includes(word)) inName = 60;
     else if (text.nameTokens.some(t => nearPrefix(word, t))) inName = 50;
     if (inName > 0) wordsInName++;
@@ -534,6 +727,9 @@ function wordScore(text: CourseText, words: string[]): number {
     if (text.departmentTokens.includes(word)) department = 60;
     else if (!short && text.departmentTokens.some(t => t.startsWith(word)))
       department = 40;
+    // Misspelt as names are: "acounting" for ACC, Accounting.
+    else if (text.departmentTokens.some(t => nearPrefix(word, t)))
+      department = 20;
 
     const tags = wordIn(word, text.tagText, text.tagTokens) ? 30 : 0;
 
@@ -589,7 +785,10 @@ const DEPARTMENT_SCORE = 2200;
  * only through an instructor or room scores just its tie-breaks.
  */
 export function calculateRelevanceScore(course: Course, query: string): number {
-  const parsed = parseSearchQuery(query);
+  return relevanceScore(course, parseSearchQuery(query));
+}
+
+function relevanceScore(course: Course, parsed: ParsedQuery): number {
   if (!parsed.text) return 0;
   const text = courseText(course);
   let score: number;
@@ -598,11 +797,13 @@ export function calculateRelevanceScore(course: Course, query: string): number {
     score = codeScore(course, parsed.code);
     if (score > 0) score += wordScore(text, parsed.words);
   } else if (namesDepartment(text, parsed.words)) {
-    score = DEPARTMENT_SCORE;
+    // Its courses in number order, and nothing else: seats or a short name
+    // would scatter the list.
+    return DEPARTMENT_SCORE + numberOrder(course);
   } else {
     score = wordScore(text, parsed.words);
     if (score > 0) score += likelyFit(course);
-    if (score === 0 && matchCourseText(course, parsed).all) score = 1;
+    if (score === 0 && matchCourseWords(course, parsed).all) score = 1;
   }
 
   if (score === 0) return 0;
@@ -614,10 +815,18 @@ export function calculateRelevanceScore(course: Course, query: string): number {
   if (sections.some(s => s.seatsAvailable > 0)) score += 0.5;
   const level = courseLevel(course);
   if (level !== null) score += (9 - Math.min(level, 9)) * 0.05;
-  const digits = /\d+/.exec(course.number)?.[0];
-  if (digits) score += (1 - Number(digits.padEnd(4, '0')) / 10000) * 0.04;
+  score += numberOrder(course) * 0.04;
   score += 0.2 / (1 + text.name.length / 20);
   return score;
+}
+
+/**
+ * Below 1, higher for a lower course number, reading the number as four
+ * digits so 588 (a graduate 5xx) sorts after 1101.
+ */
+function numberOrder(course: Course): number {
+  const digits = /\d+/.exec(course.number)?.[0];
+  return digits ? 1 - Number(digits.slice(0, 4).padEnd(4, '0')) / 10000 : 0;
 }
 
 function escapeRegExp(text: string): string {

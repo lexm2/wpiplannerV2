@@ -11,6 +11,10 @@ import {
   parseSearchQuery,
   describeMatch,
   acronymExpansions,
+  foldText,
+  MAX_QUERY_WORDS,
+  namesHaveWord,
+  textHasWord,
 } from '../../src/utils/searchUtils';
 import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
@@ -439,6 +443,291 @@ describe('short words, acronyms and numerals', () => {
     );
     expect(describeMatch(near, 'procedural generation')).toBe('description');
     expect(describeMatch(far, 'procedural generation')).toBe('scattered');
+  });
+});
+
+describe('department queries', () => {
+  const inDept = (number: string, name: string, open: boolean) =>
+    course({
+      id: `CS-${number}`,
+      number,
+      name,
+      lectures: [
+        {
+          section: { crn: Number(number), seatsAvailable: open ? 5 : 0 },
+          compatibleDiscussions: [],
+          compatibleLabs: [],
+        },
+      ],
+    } as unknown as Partial<Course>);
+
+  it('lists a department by number, whatever the seats or name length', () => {
+    const list = [
+      inDept('2223', 'Algorithms', true),
+      inDept('1101', 'Introduction To Program Design', false),
+      inDept('1005', 'Programming for Engineers', true),
+      inDept('1004', 'Introduction To Programming For Non-Majors', false),
+      inDept('502', 'Graduate Seminar', true),
+    ];
+    for (const q of ['CS', 'computer science']) {
+      expect(rankCoursesByRelevance([...list], q).map(c => c.number)).toEqual([
+        '1004',
+        '1005',
+        '1101',
+        '2223',
+        '502',
+      ]);
+    }
+  });
+});
+
+describe('a department and one digit', () => {
+  const cs = (number: string, name: string) =>
+    course({ id: `CS-${number}`, number, name });
+  const list = [
+    cs('2102', 'Object-Oriented Design Concepts'),
+    cs('4432', 'Database Systems II'),
+    cs('2223', 'Algorithms'),
+    course({
+      id: 'MA-1022',
+      departmentAbbr: 'MA',
+      departmentName: 'Mathematical Sciences',
+      number: '1022',
+      name: 'Calculus II',
+    }),
+  ];
+
+  it('reads "CS2" and "CS 2" as every CS 2xxx', () => {
+    rankCoursesByRelevance([...list], 'warm up');
+    for (const q of ['CS2', 'CS 2', 'cs-2']) {
+      expect(parseSearchQuery(q).code).toEqual({ dept: 'cs', number: '2' });
+      const found = list.filter(
+        c => matchCourseText(c, parseSearchQuery(q)).all,
+      );
+      expect(found.map(c => c.number).sort()).toEqual(['2102', '2223']);
+    }
+  });
+
+  it('leaves a word and a digit as words when the word is no department', () => {
+    rankCoursesByRelevance([...list], 'warm up');
+    expect(parseSearchQuery('calc 2')).toMatchObject({
+      code: null,
+      words: ['calc', '2'],
+    });
+    expect(matchCourseText(list[3], parseSearchQuery('calc 2')).all).toBe(true);
+  });
+});
+
+describe('acronyms of whole names', () => {
+  const named = (dept: string, number: string, name: string) =>
+    course({
+      id: `${dept}-${number}`,
+      departmentAbbr: dept,
+      number,
+      name,
+      description: 'Nothing defined here.',
+    });
+  const undergrad = named('CS', '3013', 'Operating Widgets');
+  const graduate = named('CS', '502', 'Operating Widgets II');
+  const oneOff = named('CE', '3025', 'Project Wrangling');
+  const longer = named('CS', '4801', 'Operating Widgets For Engineers');
+  const all = [undergrad, graduate, oneOff, longer];
+  const finds = (q: string, c: Course) =>
+    matchCourseText(c, parseSearchQuery(q)).all;
+
+  it('reads the initials of a subject offered under two codes', () => {
+    rankCoursesByRelevance([...all], 'warm up');
+    expect(finds('OW', undergrad)).toBe(true);
+    // A sequel's number is no initial.
+    expect(finds('OW', graduate)).toBe(true);
+    expect(rankCoursesByRelevance([...all], 'OW').slice(0, 2)).toEqual([
+      undergrad,
+      graduate,
+    ]);
+  });
+
+  it('ignores the initials of a one-off name, or of part of one', () => {
+    rankCoursesByRelevance([...all], 'warm up');
+    expect(finds('PW', oneOff)).toBe(false);
+    expect(finds('OW', longer)).toBe(false);
+  });
+});
+
+describe('short forms', () => {
+  it('reads "stats" and "stat" as statistics, not static or statements', () => {
+    const statistics = course({ id: 'MA-2611', name: 'Applied Statistics I' });
+    const statistical = course({ id: 'PH-3206', name: 'Statistical Physics' });
+    const statics = course({
+      id: 'ES-2501',
+      name: 'Introduction To Static Systems',
+    });
+    const statements = course({
+      id: 'ACC-2060',
+      name: 'Financial Statements For Decision Making',
+    });
+    for (const q of ['stats', 'stat', 'Stats']) {
+      const found = [statistics, statistical, statics, statements].filter(
+        c => matchCourseText(c, parseSearchQuery(q)).all,
+      );
+      expect(found).toEqual([statistics, statistical]);
+    }
+  });
+});
+
+describe('phrases in names', () => {
+  const named = (id: string, name: string, description = '') =>
+    course({ id, number: id.split('-')[1], name, description });
+
+  it('ranks a name whose words are shortened forms with the phrase', () => {
+    const list = [
+      named('RBE-1001', 'Introduction To Robotics', 'Programming robots.'),
+      named('ME-2312', 'Computational Solutions', 'Intro to programming.'),
+      named('CS-1101', 'Introduction To Program Design', 'Programming.'),
+      named('CS-1004', 'Introduction To Programming For Non-Majors'),
+    ];
+    const ranked = rankCoursesByRelevance([...list], 'intro to programming');
+    expect(ranked.slice(0, 2).map(c => c.id)).toEqual(['CS-1004', 'CS-1101']);
+    expect(describeMatch(list[2], 'intro to programming')).toBe('title');
+  });
+
+  it('does not read a typo as a shortened form', () => {
+    expect(
+      matchCourseText(
+        named('RBE-502', 'Robot Control'),
+        parseSearchQuery('robotcs'),
+      ).all,
+    ).toBe(false);
+  });
+
+  it('puts a misspelt whole name above longer names with the phrase', () => {
+    const list = [
+      named('MIS-3787', 'Business Applications Of Machine Learning'),
+      named('ECE-4803', 'Machine Learning in Cybersecurity'),
+      named('CS-4342', 'Machine Learning'),
+    ];
+    expect(rankCoursesByRelevance([...list], 'machine lerning')[0].id).toBe(
+      'CS-4342',
+    );
+    // Spelt right, it still leads by more.
+    expect(
+      calculateRelevanceScore(list[2], 'machine learning'),
+    ).toBeGreaterThan(calculateRelevanceScore(list[2], 'machine lerning'));
+  });
+});
+
+describe('misspelt departments', () => {
+  it('ranks the department a typo names above typos in descriptions', () => {
+    const accounting = course({
+      id: 'ACC-2060',
+      departmentAbbr: 'ACC',
+      departmentName: 'Accounting',
+      number: '2060',
+      name: 'Financial Statements For Decision Making',
+      description: 'Reading accounting statements.',
+    });
+    const counting = course({
+      id: 'MA-1273',
+      departmentAbbr: 'MA',
+      departmentName: 'Mathematical Sciences',
+      number: '1273',
+      name: 'Combinatorics',
+      description: 'Counting and graphs.',
+    });
+    expect(rankCoursesByRelevance([counting, accounting], 'acounting')[0]).toBe(
+      accounting,
+    );
+    expect(describeMatch(accounting, 'acounting')).toBe('title');
+  });
+});
+
+describe('long queries', () => {
+  it('searches each distinct word once, in order', () => {
+    expect(parseSearchQuery('design game design GAME').words).toEqual([
+      'design',
+      'game',
+    ]);
+    expect(parseSearchQuery('calculus i calculus 1').words).toEqual([
+      'calculus',
+      '1',
+    ]);
+    expect(parseSearchQuery('design game').ignored).toBeUndefined();
+  });
+
+  it(`searches the first ${MAX_QUERY_WORDS} distinct words and reports the rest`, () => {
+    const words = Array.from({ length: 30 }, (_, i) => `word${i}`);
+    const parsed = parseSearchQuery([...words, ...words].join(' '));
+    expect(parsed.words).toEqual(words.slice(0, MAX_QUERY_WORDS));
+    expect(parsed.ignored).toEqual(words.slice(MAX_QUERY_WORDS));
+    // After a code too.
+    const coded = parseSearchQuery(`MA 1022 ${words.join(' ')}`);
+    expect(coded.words).toHaveLength(MAX_QUERY_WORDS);
+  });
+
+  it('answers a query of thousands of words quickly', () => {
+    const c = course();
+    const many = Array.from({ length: 3000 }, (_, i) => `zz${i}`).join(' ');
+    const start = performance.now();
+    for (let i = 0; i < 50; i++) {
+      calculateRelevanceScore(c, many);
+      matchCourseText(c, parseSearchQuery(many));
+    }
+    expect(performance.now() - start).toBeLessThan(500);
+  });
+
+  it('still reports every word a course matches when asked', () => {
+    const c = course({ name: 'Robotics', description: 'Sensors.' });
+    const result = matchCourseText(c, parseSearchQuery('lee robotics sensors'));
+    expect(result.all).toBe(false);
+    expect(result.matched).toEqual([false, true, true]);
+  });
+});
+
+describe('accents', () => {
+  it('folds case and accents alike', () => {
+    expect(foldText('EJ Néel')).toBe('ej neel');
+    expect(foldText('San Martín')).toBe('san martin');
+    expect(foldText('Karl-Frédéric')).toBe('karl-frederic');
+    expect(foldText('Plain')).toBe('plain');
+  });
+
+  it('matches queries and course text with or without accents', () => {
+    const french = course({
+      name: 'Études Françaises',
+      description: 'Le cinéma et la société.',
+    });
+    for (const q of ['etudes', 'études', 'francaises', 'cinema societe']) {
+      expect(matchCourseText(french, parseSearchQuery(q)).all).toBe(true);
+      expect(calculateRelevanceScore(french, q)).toBeGreaterThan(0);
+    }
+    expect(parseSearchQuery('Frédéric').words).toEqual(['frederic']);
+  });
+
+  it('finds names in section text either way', () => {
+    expect(namesHaveWord('ej néel', 'neel')).toBe(true);
+    expect(namesHaveWord('William San Martín', 'martin')).toBe(true);
+    expect(textHasWord('Frédéric Vieux', 'frederic')).toBe(true);
+  });
+});
+
+describe('query words that name object members', () => {
+  it('reads "constructor" and "toString" as plain words', () => {
+    const oop = course({
+      name: 'Object-Oriented Design',
+      description: 'Classes, a constructor for each, and toString methods.',
+    });
+    for (const q of ['constructor', 'toString', '__proto__', 'valueOf']) {
+      expect(parseSearchQuery(q).words.every(w => typeof w === 'string')).toBe(
+        true,
+      );
+      expect(() => calculateRelevanceScore(oop, q)).not.toThrow();
+      expect(() => describeMatch(oop, q)).not.toThrow();
+    }
+    expect(matchCourseText(oop, parseSearchQuery('constructor')).all).toBe(
+      true,
+    );
+    expect(matchCourseText(course(), parseSearchQuery('constructor')).all).toBe(
+      false,
+    );
   });
 });
 

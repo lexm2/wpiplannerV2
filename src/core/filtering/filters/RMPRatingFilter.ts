@@ -5,6 +5,63 @@ import { keepMatchingGroups } from '../lectureGroupScope';
 import { SectionType } from '../../../types/types';
 import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 
+type RatingNumbers = NonNullable<
+  ReturnType<RateMyProfessorService['getRatings']>
+>;
+
+/** Every named instructor of the section's periods, co-instructors split. */
+function instructorsOf(fs: FilterableSection): string[] {
+  const names = fs.section.periods.flatMap(period =>
+    (period.professor ?? '').split(/\s*;\s*/),
+  );
+  return [...new Set(names.filter(name => name && name !== 'Not Assigned'))];
+}
+
+/**
+ * The ratings fall within every bound set. A bound at its default is no
+ * bound, and a retake bound is skipped when RMP has no retake share.
+ */
+function withinBounds(
+  { rating, difficulty, wouldTakeAgain }: RatingNumbers,
+  criteria: RMPRatingFilterCriteria,
+): boolean {
+  const { minRating, maxRating, minDifficulty, maxDifficulty } = criteria;
+  if (minRating !== undefined && minRating > 0 && rating < minRating) {
+    return false;
+  }
+  if (maxRating !== undefined && maxRating < 5 && rating > maxRating) {
+    return false;
+  }
+  if (
+    minDifficulty !== undefined &&
+    minDifficulty > 0 &&
+    difficulty < minDifficulty
+  ) {
+    return false;
+  }
+  if (
+    maxDifficulty !== undefined &&
+    maxDifficulty < 5 &&
+    difficulty > maxDifficulty
+  ) {
+    return false;
+  }
+  if (wouldTakeAgain === null) return true;
+  const { minWouldTakeAgain, maxWouldTakeAgain } = criteria;
+  if (
+    minWouldTakeAgain !== undefined &&
+    minWouldTakeAgain > 0 &&
+    wouldTakeAgain < minWouldTakeAgain
+  ) {
+    return false;
+  }
+  return !(
+    maxWouldTakeAgain !== undefined &&
+    maxWouldTakeAgain < 100 &&
+    wouldTakeAgain > maxWouldTakeAgain
+  );
+}
+
 export class RMPRatingFilter implements SectionBasedFilter {
   readonly id = 'rmpRating';
   readonly name = 'Rate My Professor';
@@ -38,6 +95,7 @@ export class RMPRatingFilter implements SectionBasedFilter {
       return sections;
     }
 
+    const includeWithoutData = criteria.includeWithoutData ?? true;
     // Judged on who teaches the lecture, and the group rises or falls with
     // it: labs and discussions are mostly TA-run or unassigned, and a
     // well-rated TA should not qualify a lecture either.
@@ -45,75 +103,18 @@ export class RMPRatingFilter implements SectionBasedFilter {
       if (fs.sectionType !== SectionType.LECTURE && fs.lectureGroup) {
         return false;
       }
-      const professors = fs.section.periods
-        .map(period => period.professor)
-        .filter(name => name && name !== 'Not Assigned');
-      // No instructor listed at all means no rating to judge by.
-      if (professors.length === 0) return criteria.includeWithoutData ?? true;
-
-      return professors.some(professor => {
-        const ratings = this.rmpService.getRatings(professor);
-
-        if (!ratings) {
-          return criteria.includeWithoutData ?? true;
-        }
-
-        const { rating, difficulty, wouldTakeAgain, numRatings } = ratings;
-
-        // Too few ratings to go on counts as no data.
-        if (numRatings < minNumRatings) {
-          return criteria.includeWithoutData ?? true;
-        }
-
-        if (
-          criteria.minRating !== undefined &&
-          criteria.minRating > 0 &&
-          rating < criteria.minRating
-        ) {
-          return false;
-        }
-        if (
-          criteria.maxRating !== undefined &&
-          criteria.maxRating < 5 &&
-          rating > criteria.maxRating
-        ) {
-          return false;
-        }
-
-        if (
-          criteria.minDifficulty !== undefined &&
-          criteria.minDifficulty > 0 &&
-          difficulty < criteria.minDifficulty
-        ) {
-          return false;
-        }
-        if (
-          criteria.maxDifficulty !== undefined &&
-          criteria.maxDifficulty < 5 &&
-          difficulty > criteria.maxDifficulty
-        ) {
-          return false;
-        }
-
-        if (wouldTakeAgain !== null) {
-          if (
-            criteria.minWouldTakeAgain !== undefined &&
-            criteria.minWouldTakeAgain > 0 &&
-            wouldTakeAgain < criteria.minWouldTakeAgain
-          ) {
-            return false;
-          }
-          if (
-            criteria.maxWouldTakeAgain !== undefined &&
-            criteria.maxWouldTakeAgain < 100 &&
-            wouldTakeAgain > criteria.maxWouldTakeAgain
-          ) {
-            return false;
-          }
-        }
-
-        return true;
-      });
+      // Each co-instructor on their own ("Amy Curran; Laura Susanin"): the
+      // lecture passes when any instructor with ratings passes, and counts
+      // as without data only when none has ratings (or enough of them), so
+      // an unrated co-instructor neither hides nor rescues a rated one.
+      const rated = instructorsOf(fs)
+        .map(name => this.rmpService.getRatings(name))
+        .filter(
+          (r): r is RatingNumbers =>
+            r !== null && r.numRatings >= minNumRatings,
+        );
+      if (rated.length === 0) return includeWithoutData;
+      return rated.some(ratings => withinBounds(ratings, criteria));
     });
   }
 

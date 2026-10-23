@@ -3,6 +3,7 @@ import {
   type Professor,
   type RateMyProfessorData,
 } from '../../types/rateMyProfessor';
+import { foldText } from '../../utils/searchUtils';
 
 // calculateFirstNameSimilarity's floor for a fuzzy first-name match: any
 // prefix or containment passes, and a plain edit-distance match needs about
@@ -58,22 +59,29 @@ export class RateMyProfessorService {
     this.professorsByLastName = new Map();
     this.matchCache = new Map();
 
+    // RMP lists some people twice (a department rename, a stray empty
+    // profile): keep the profile with the most ratings, the first on a tie,
+    // so an empty duplicate never hides the real one.
     for (const professor of data.professors) {
       const fullName = this.normalizeName(
         `${professor.firstName} ${professor.lastName}`,
       );
-      const lastName = this.normalizeName(professor.lastName);
-
+      const kept = this.professorsByFullName.get(fullName);
+      if (kept && kept.numRatings >= professor.numRatings) continue;
       this.professorsByFullName.set(fullName, professor);
 
-      const sameLastName = this.professorsByLastName.get(lastName);
-      if (sameLastName) sameLastName.push(professor);
-      else this.professorsByLastName.set(lastName, [professor]);
+      const lastName = this.normalizeName(professor.lastName);
+      const sameLastName = this.professorsByLastName.get(lastName) ?? [];
+      const at = kept ? sameLastName.indexOf(kept) : -1;
+      if (at !== -1) sameLastName[at] = professor;
+      else sameLastName.push(professor);
+      this.professorsByLastName.set(lastName, sameLastName);
     }
   }
 
+  /** Lowercased, accents dropped ("Néel" is "neel"), spaces collapsed. */
   private normalizeName(name: string): string {
-    return name.toLowerCase().trim().replace(/\s+/g, ' ');
+    return foldText(name).trim().replace(/\s+/g, ' ');
   }
 
   private extractLastName(professorName: string): string {
@@ -171,7 +179,10 @@ export class RateMyProfessorService {
    * 3. If several fit, disambiguate via first name fuzzy matching
    *
    * Co-taught sections list several names ("Amy Curran; Laura Susanin");
-   * the first instructor that matches is used.
+   * of the instructors that match, the one with the most ratings is used
+   * (the first on a tie), so a co-instructor's empty profile never stands
+   * in for the other's ratings. A filter judging each instructor on their
+   * own should look each name up separately.
    */
   findProfessor(professorName: string): Professor | null {
     if (!this.data || !professorName) return null;
@@ -182,8 +193,10 @@ export class RateMyProfessorService {
     let match: Professor | null = null;
     for (const name of professorName.split(/\s*;\s*/)) {
       if (!name) continue;
-      match = this.findSingleProfessor(name);
-      if (match) break;
+      const found = this.findSingleProfessor(name);
+      if (found && (!match || found.numRatings > match.numRatings)) {
+        match = found;
+      }
     }
 
     this.matchCache.set(professorName, match);
@@ -212,7 +225,11 @@ export class RateMyProfessorService {
         queryFirstName,
         firstName,
       );
-      if (score > bestScore) {
+      // Equally good names: the profile with more ratings says more.
+      const better =
+        score > bestScore ||
+        (score === bestScore && prof.numRatings > best!.numRatings);
+      if (better) {
         best = prof;
         bestScore = score;
       }
@@ -223,8 +240,9 @@ export class RateMyProfessorService {
   /**
    * The matched professor's ratings as numbers, at the precision
    * getRatingDisplay shows: rating and difficulty to one decimal, the retake
-   * share to a whole percent (RMP's -1 for "not enough data" stays -1). Null
-   * when there is no match or the professor has no ratings.
+   * share to a whole percent, null when RMP has none (it reports -1 when too
+   * few raters answered). Null when there is no match or the professor has
+   * no ratings.
    */
   getRatings(professorName: string): {
     rating: number;
@@ -241,7 +259,8 @@ export class RateMyProfessorService {
       difficulty: Number(professor.avgDifficulty.toFixed(1)),
       numRatings: professor.numRatings,
       wouldTakeAgain:
-        professor.wouldTakeAgainPercent !== null
+        professor.wouldTakeAgainPercent !== null &&
+        professor.wouldTakeAgainPercent >= 0
           ? Math.round(professor.wouldTakeAgainPercent)
           : null,
     };
