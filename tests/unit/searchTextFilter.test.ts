@@ -5,7 +5,12 @@
 import { describe, it, expect } from 'vitest';
 import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
 import type { FilterableSection } from '../../src/types/filterableUnit';
-import type { Course, Period, Section } from '../../src/types/types';
+import {
+  PeriodType,
+  type Course,
+  type Period,
+  type Section,
+} from '../../src/types/types';
 
 function course(over: Partial<Course> = {}): Course {
   return {
@@ -100,7 +105,7 @@ describe('SearchTextFilter', () => {
       location: 'Higgins Labs 216 AE Undergraduate Lab',
     });
     const labSection = taught(physics, 'Ann Lee', {
-      type: 'Lab',
+      type: PeriodType.LAB,
       location: 'Olin Hall 107',
     });
 
