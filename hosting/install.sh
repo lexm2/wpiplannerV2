@@ -186,7 +186,7 @@ server {
     }
 
     # MCP replies can be SSE streams; pass each event on as it is written.
-    location = /wpiplannerV2/mcp {
+    location ~ ^/wpiplannerV2/mcp/?\$ {
         proxy_pass         http://127.0.0.1:$PORT;
         proxy_http_version 1.1;
         proxy_buffering    off;
