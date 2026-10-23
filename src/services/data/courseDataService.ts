@@ -8,7 +8,11 @@ import type {
 import type { RawCourse } from '../../types/rawData';
 import { appState } from '../../core/state/appState.svelte';
 import { logger } from '../../utils/logger';
+import { prepareSearch, resetSearchVocabulary } from '../../utils/searchUtils';
 import { parseCatalog, parseCourse } from './parseCatalog';
+
+const courseList = (departments: Department[]) =>
+  departments.flatMap(d => d.courses);
 
 /**
  * Fetches the WPI course catalog and parses it with parseCatalog.
@@ -44,6 +48,11 @@ export class CourseDataService {
       const freshData = await pending;
       this.scheduleDB = freshData;
 
+      // Learn the search vocabulary now rather than on the first keystroke,
+      // which would otherwise pause to read every course. The courses are
+      // freshly parsed, so a reload forgets what the old ones taught.
+      resetSearchVocabulary();
+      prepareSearch(courseList(freshData.departments));
       appState.loadedDepartments = freshData.departments;
 
       return freshData;
@@ -160,6 +169,9 @@ export class CourseDataService {
       return;
     }
 
+    // The same course objects plus any added (the tutorial's): nothing to
+    // forget, and only the new courses are read.
+    prepareSearch(courseList(this.scheduleDB.departments));
     appState.loadedDepartments = this.scheduleDB.departments;
   }
 }

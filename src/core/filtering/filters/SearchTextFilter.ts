@@ -91,7 +91,9 @@ export class SearchTextFilter implements SectionBasedFilter {
   ): FilterableSection[] {
     if (!criteria.query?.trim()) return sections;
     // Before the query is read: a code like "CS2" needs the departments.
-    prepareSearch(new Set(sections.map(fs => fs.course)));
+    // CourseDataService has read the catalog's courses already; this reads
+    // any it has not.
+    prepareSearch(sections.map(fs => fs.course));
     const query = parseSearchQuery(criteria.query);
 
     // A match anywhere in a lecture group keeps the whole group: searching
