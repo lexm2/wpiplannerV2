@@ -1191,3 +1191,72 @@ describe('an empty search with many filters', () => {
     expect(text).not.toContain('No single filter');
   });
 });
+
+describe('courses lost through their labs', () => {
+  const own = () =>
+    customEndpoints([
+      {
+        abbreviation: 'ECE',
+        name: 'Electrical and Computer Engineering',
+        courses: [
+          course('ECE-3849-2026', 'Real-Time Systems', [
+            {
+              section: section(100, 'BL01', 'B', [
+                period(['M'], '09:00', '09:50'),
+              ]),
+              compatibleLabs: [
+                // Clashes with CRN 102; the other has too few seats.
+                section(103, 'BX01', 'B', [period(['T'], '14:00', '14:50')]),
+                section(104, 'BX02', 'B', [period(['W'], '14:00', '14:50')], 1),
+              ],
+            },
+          ]),
+          course('ECE-2010-2026', 'Circuits', [
+            {
+              section: section(105, 'BL01', 'B', [
+                period(['M'], '11:00', '11:50'),
+              ]),
+              compatibleLabs: [
+                section(106, 'BX01', 'B', [
+                  { ...period([], '', ''), isAsync: true },
+                ]),
+              ],
+            },
+          ]),
+          course('ECE-1000-2026', 'Seminar', [
+            section(102, 'B01', 'B', [period(['T'], '14:00', '14:50')]),
+          ]),
+        ],
+      },
+    ]);
+
+  it('says when each lab fails a different filter', async () => {
+    const { mcp } = await own();
+    const { text, data } = await toolOn(mcp, 'search_courses', {
+      filters: {
+        availability: { minAvailable: 5 },
+        periodConflict: { crns: [102] },
+        department: { departments: ['ECE'] },
+      },
+    });
+    expect(data.courses.map((c: { code: string }) => c.code)).not.toContain(
+      'ECE 3849',
+    );
+    expect(text).toContain(
+      '1 course dropped because none of its labs passes all of these filters together (filters.availability, filters.periodConflict): ECE 3849.',
+    );
+  });
+
+  it('says a lab with no set times failed for having none', async () => {
+    const { mcp } = await own();
+    const { text } = await toolOn(mcp, 'search_courses', {
+      filters: {
+        times: { earliestStart: '08:00' },
+        department: { departments: ['ECE'] },
+      },
+    });
+    expect(text).toContain(
+      '1 course dropped because its labs have no set meeting times (filters.times.includeAsync: true keeps them) (filters.times): ECE 2010.',
+    );
+  });
+});
