@@ -12,6 +12,7 @@ import { timedPeriods } from '../utils/timeWindows';
 import type { RateMyProfessorService } from '../services/external/RateMyProfessorService';
 import type { Forecast } from './forecast';
 import type { DateSpan } from './calendar';
+import { clockText } from './clock';
 
 const MAX_SUMMARY_PROFESSORS = 4;
 
@@ -419,9 +420,7 @@ export function toCourseSummary(
   };
 }
 
-function hhmm(time: Time): string {
-  return `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
-}
+const hhmm = (time: Time) => clockText(time.hours * 60 + time.minutes);
 
 function toPeriodView(
   period: Period,

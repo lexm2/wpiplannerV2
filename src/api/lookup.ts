@@ -17,6 +17,8 @@ import {
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
+  isEarlyEntry,
+  isUnpublished,
   seatDataAge,
   termDates,
   termNow,
@@ -253,12 +255,6 @@ function detailContext(catalog: Catalog, course: Course) {
   };
 }
 
-/** One of an unpublished year's few early entries. */
-const isEarlyEntry = (catalog: Catalog, course: Course) =>
-  course.academicYear !== undefined &&
-  course.academicYear > currentAcademicYear(catalog) &&
-  yearStatus(catalog, course.academicYear).status === 'not yet published';
-
 /**
  * The course's outlook for the year after its own, when that year has not
  * been published; null once it has (its real schedule answers instead).
@@ -267,7 +263,7 @@ function nextYearForecast(catalog: Catalog, course: Course): Forecast | null {
   // Only the current year's schedule is a sound base to read on from.
   if (course.academicYear !== currentAcademicYear(catalog)) return null;
   const next = course.academicYear + 1;
-  if (yearStatus(catalog, next).status !== 'not yet published') return null;
+  if (!isUnpublished(catalog, next)) return null;
   return forecastFor(catalog, course, next);
 }
 
@@ -340,10 +336,7 @@ export function lookupCourse(
       year !== undefined &&
       own !== undefined &&
       own !== year &&
-      !(
-        year > current &&
-        yearStatus(catalog, year).status === 'not yet published'
-      )
+      !(year > current && isUnpublished(catalog, year))
     ) {
       throw new ApiError(
         `CRN ${key} is ${courseCode(entry.courses[0])} section ${entry.section.number} of ${yearLabel(own)}, not ${yearLabel(year)}. Leave out year to see it, or give the course code with year ${year}.`,
@@ -397,12 +390,8 @@ export function lookupCourse(
   }
 
   if (year !== undefined && year > current) {
-    const status = yearStatus(catalog, year);
     // One of the year's early entries answers as itself, below.
-    if (
-      status.status === 'not yet published' &&
-      course?.academicYear !== year
-    ) {
+    if (isUnpublished(catalog, year) && course?.academicYear !== year) {
       const base = course ?? findCourse(catalog, key);
       if (!base) throw courseNotFound(catalog, key, current);
       const summary = toCourseSummary(base, catalog.rmp);
@@ -702,8 +691,7 @@ export function catalogMeta(catalog: Catalog): CatalogMeta {
   const dates: CatalogMeta['termDates'] = {};
   for (const year of Object.keys(catalog.termBounds.getAllBounds() ?? {})) {
     const d = termDates(catalog, Number(year));
-    const published =
-      yearStatus(catalog, Number(year)).status !== 'not yet published';
+    const published = !isUnpublished(catalog, Number(year));
     if (d && published) dates[year] = d;
   }
   const current = currentAcademicYear(catalog);

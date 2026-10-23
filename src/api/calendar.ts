@@ -3,6 +3,7 @@
  * terms have ended, and how complete each academic year's schedule is. All
  * of it reads the catalog's clock, so tests can pin "today".
  */
+import type { Course } from '../types/types';
 import { formatLocalDate } from '../utils/localDate';
 import { QUARTERS } from '../utils/typeGuards';
 import { currentAcademicYear, type Catalog } from './catalog';
@@ -160,6 +161,16 @@ export function yearStatus(catalog: Catalog, year: number): YearInfo {
     }
   );
 }
+
+/** A year WPI has not published yet: the catalog has at most early entries. */
+export const isUnpublished = (catalog: Catalog, year: number) =>
+  yearStatus(catalog, year).status === 'not yet published';
+
+/** One of an unpublished year's few early entries. */
+export const isEarlyEntry = (catalog: Catalog, course: Course) =>
+  course.academicYear !== undefined &&
+  course.academicYear > currentAcademicYear(catalog) &&
+  isUnpublished(catalog, course.academicYear);
 
 /** "2026-27" for 2026. */
 export function yearLabel(year: number): string {

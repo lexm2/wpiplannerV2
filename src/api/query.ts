@@ -48,10 +48,10 @@ import { TimeUtils } from '../utils/timeUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
+  isUnpublished,
   seatDataAge,
   termDates,
   yearLabel,
-  yearStatus,
   type TermLetter,
 } from './calendar';
 import { blockedSlotsForCrns, MAX_CRNS } from './conflicts';
@@ -1347,8 +1347,7 @@ export function runCourseQuery(
         query.sort === 'difficulty' ? 'difficulty' : 'rating',
       );
       const early =
-        c.academicYear !== undefined &&
-        yearStatus(catalog, c.academicYear).status === 'not yet published';
+        c.academicYear !== undefined && isUnpublished(catalog, c.academicYear);
       if (early) row.earlyEntry = true;
       if (includeSections && !early) {
         row.sections = rowSections(c, catalog);

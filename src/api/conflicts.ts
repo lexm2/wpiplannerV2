@@ -18,11 +18,11 @@ import { sectionToWeeklySlots, slotsOverlap } from '../utils/timeSlotUtils';
 import { currentAcademicYear, type Catalog, type CrnEntry } from './catalog';
 import {
   endedTerms,
+  isUnpublished,
   seatDataAge,
   termDates,
   today,
   yearLabel,
-  yearStatus,
   type TermLetter,
 } from './calendar';
 import { ApiError, listSome, withoutControls } from './errors';
@@ -505,7 +505,7 @@ function statusIssues(
   if (year < current) {
     add('error', 'pastYear', `${who} is from ${yearLabel(year)}, a past year.`);
   } else if (year > current) {
-    const early = yearStatus(catalog, year).status === 'not yet published';
+    const early = isUnpublished(catalog, year);
     add(
       'error',
       'otherYear',
