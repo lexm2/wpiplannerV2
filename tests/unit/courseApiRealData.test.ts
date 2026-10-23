@@ -329,3 +329,40 @@ describe('section dates on the real catalog', () => {
     );
   });
 });
+
+describe('omitted full sections on the real catalog', () => {
+  it('counts every full MA 1022 section of a term once, placeholders aside', async () => {
+    const course = catalog.courses.find(
+      c => c.id === `MA-1022-${catalog.years[0]}`,
+    )!;
+    const terms = [
+      ...new Set(
+        [...catalog.sectionsByCrn.values()]
+          .filter(e => e.courses.includes(course))
+          .map(e => e.section.computedTerm as string),
+      ),
+    ];
+    for (const term of terms) {
+      const full = new Set(
+        [...catalog.sectionsByCrn.values()]
+          .filter(
+            e =>
+              e.courses.includes(course) &&
+              e.section.computedTerm === term &&
+              !e.section.isInterestList &&
+              e.section.seatsAvailable <= 0,
+          )
+          .map(e => e.section.crn),
+      );
+      const { data } = await toolResult('get_course', {
+        course: 'MA 1022',
+        includeFull: false,
+        terms: [term],
+      });
+      expect(
+        (data as { omitted: { fullSections: number } }).omitted.fullSections,
+        term,
+      ).toBe(full.size);
+    }
+  });
+});

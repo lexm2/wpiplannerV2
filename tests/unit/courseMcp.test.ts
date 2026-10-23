@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import {
   AFTER_A,
   BEFORE_A,
+  callOn,
   course,
   customEndpoints,
   endpoints,
@@ -776,5 +777,57 @@ describe('sections off their term dates', () => {
     const halves = await toolOn(mcp, 'check_conflicts', { crns: [52, 53] });
     expect(halves.text).not.toContain('CONFLICT');
     expect(halves.data.conflicts).toEqual([]);
+  });
+});
+
+describe('full sections left out', () => {
+  it('counts each hidden full section once, under a hidden lecture too, and no placeholder', async () => {
+    const { mcp, api } = await customEndpoints([
+      {
+        abbreviation: 'MA',
+        name: 'Mathematical Sciences',
+        courses: [
+          course('MA-1022-2026', 'Calculus II', [
+            {
+              section: section(
+                60,
+                'BL01',
+                'B',
+                [period(['M'], '09:00', '09:50')],
+                0,
+              ),
+              compatibleLabs: [
+                section(61, 'BD01', 'B', [period(['T'], '09:00', '09:50')], 0),
+              ],
+            },
+            {
+              section: section(62, 'BL02', 'B', [
+                period(['M'], '11:00', '11:50'),
+              ]),
+              compatibleLabs: [
+                section(63, 'BD02', 'B', [period(['T'], '11:00', '11:50')], 0),
+                section(64, 'BD03', 'B', [period(['T'], '12:00', '12:50')]),
+              ],
+            },
+            section(65, 'Interest List-B Term', 'B', [], 0, {
+              isInterestList: true,
+            }),
+          ]),
+        ],
+      },
+    ]);
+    const args = { course: 'MA 1022', includeFull: false, terms: ['B'] };
+    const tool = await toolOn(mcp, 'get_course', args);
+    // BL01, its lab BD01, and BD02; never the interest list.
+    expect(tool.data.omitted.fullSections).toBe(3);
+    expect(tool.text).toContain('3 full sections (includeFull: true)');
+    const http = await callOn(
+      api,
+      '/courses/MA1022?includeFull=false&terms=B&includeInterestLists=true',
+    );
+    expect(http.body.omitted.fullSections).toBe(3);
+    expect(http.body.sections.map((s: { crn: number }) => s.crn)).toEqual([
+      62, 65, 64,
+    ]);
   });
 });

@@ -542,18 +542,20 @@ export function toCourseDetail(
     else omitted.endedTerms.push(term);
   }
 
-  const counted = new Set<number>();
+  // CRNs hidden for having no open seat, each once.
+  const full = new Set<number>();
   const shown = (section: Section) => {
     if (!termShown(section.computedTerm)) return false;
-    if (section.isInterestList && !(options.includeInterestLists ?? true)) {
+    // A placeholder is shown or hidden as one; it has no seats to be full.
+    if (section.isInterestList) {
+      if (options.includeInterestLists ?? true) return true;
       if (!omitted.interestLists.includes(section.computedTerm)) {
         omitted.interestLists.push(section.computedTerm);
       }
       return false;
     }
     if (section.seatsAvailable <= 0 && !(options.includeFull ?? true)) {
-      if (!counted.has(section.crn)) omitted.fullSections++;
-      counted.add(section.crn);
+      full.add(section.crn);
       return false;
     }
     return true;
@@ -577,11 +579,14 @@ export function toCourseDetail(
 
   const lectureGroups: LectureGroupRef[] = [];
   for (const group of course.lectures ?? []) {
-    if (!shown(group.section)) continue;
-    const lecture = group.section.crn;
-    add(group.section, 'lecture');
+    // Companions are judged even under a hidden lecture, so a full lab that
+    // goes only with a full lecture is counted too.
+    const lectureShown = shown(group.section);
     const discussions = group.compatibleDiscussions.filter(shown);
     const labs = group.compatibleLabs.filter(shown);
+    if (!lectureShown) continue;
+    const lecture = group.section.crn;
+    add(group.section, 'lecture');
     for (const d of discussions) add(d, 'discussion', lecture);
     for (const l of labs) add(l, 'lab', lecture);
     lectureGroups.push({
@@ -592,6 +597,7 @@ export function toCourseDetail(
   }
   const standaloneLabs = (course.standaloneLabs ?? []).filter(shown);
   for (const lab of standaloneLabs) add(lab, 'standaloneLab');
+  omitted.fullSections = full.size;
 
   const sections = [...entries.values()]
     .sort(
