@@ -615,6 +615,31 @@ describe('phrases in names', () => {
   });
 });
 
+describe('misspelt departments', () => {
+  it('ranks the department a typo names above typos in descriptions', () => {
+    const accounting = course({
+      id: 'ACC-2060',
+      departmentAbbr: 'ACC',
+      departmentName: 'Accounting',
+      number: '2060',
+      name: 'Financial Statements For Decision Making',
+      description: 'Reading accounting statements.',
+    });
+    const counting = course({
+      id: 'MA-1273',
+      departmentAbbr: 'MA',
+      departmentName: 'Mathematical Sciences',
+      number: '1273',
+      name: 'Combinatorics',
+      description: 'Counting and graphs.',
+    });
+    expect(rankCoursesByRelevance([counting, accounting], 'acounting')[0]).toBe(
+      accounting,
+    );
+    expect(describeMatch(accounting, 'acounting')).toBe('title');
+  });
+});
+
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
     expect(parseSearchQuery('design game design GAME').words).toEqual([

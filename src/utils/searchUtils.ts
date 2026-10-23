@@ -614,6 +614,7 @@ export function describeMatch(course: Course, query: string): SearchMatch {
     wordInName(text, word) ||
     text.codes.some(c => c.startsWith(word)) ||
     wordIn(word, text.departmentTokens.join(' '), text.departmentTokens) ||
+    text.departmentTokens.some(t => nearPrefix(word, t)) ||
     wordIn(word, text.tagText, text.tagTokens);
   if (parsed.words.every(inTitle)) return 'title';
   if (parsed.words.length === 1) return 'description';
@@ -726,6 +727,9 @@ function wordScore(text: CourseText, words: string[]): number {
     if (text.departmentTokens.includes(word)) department = 60;
     else if (!short && text.departmentTokens.some(t => t.startsWith(word)))
       department = 40;
+    // Misspelt as names are: "acounting" for ACC, Accounting.
+    else if (text.departmentTokens.some(t => nearPrefix(word, t)))
+      department = 20;
 
     const tags = wordIn(word, text.tagText, text.tagTokens) ? 30 : 0;
 
