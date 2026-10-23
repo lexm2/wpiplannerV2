@@ -149,350 +149,307 @@ export const RMP_BOUNDS = [
   'minNumRatings',
 ] as const;
 
-const FiltersSchema = strictObject(
-  {
-    searchText: strictObject(
-      {
-        query: z
-          .string()
-          .trim()
-          .min(1)
-          .max(MAX_QUERY_CHARS)
-          .describe(
-            'A course code ("MA 1022", "CS2102"; "CS 21" for every CS 21xx) finds that course first, then courses whose description names it (marked "mentions"); words after a code narrow it ("MA 1022 calculus"). ' +
-              'A department name or abbreviation alone ("computer science", "CS") lists its courses by number. ' +
-              'Otherwise words, ALL of which must match somewhere: code, name, description, department, degree attributes, instructor or room. ' +
-              'Words of 3 letters or fewer match whole words only, and acronyms the catalog spells out ("AI" finds Artificial Intelligence); I-IV equal 1-4; words of 5+ letters tolerate a typo. ' +
-              'Name matches rank above description matches, and the response says when no course is mainly about the words. Use one or two topic words ("robotics", "game design"), not sentences.',
-          ),
-        professorOnly: z
-          .boolean()
-          .optional()
-          .describe('Match the words against instructor names only.'),
-      },
-      querySchema,
-    ).optional(),
-    department: strictObject(
-      {
-        departments: z
-          .array(z.string().trim().min(1).max(MAX_NAME_CHARS))
-          .min(1)
-          .max(MAX_NAMES)
-          .describe(
-            'Abbreviations ("CS", "MA") or full names ("Computer Science"), any case.',
-          ),
-      },
-      querySchema,
-    ).optional(),
-    term: strictObject(
-      { terms: z.array(TermSchema).min(1).max(12) },
-      querySchema,
-    )
-      .optional()
-      .describe(
-        'Keep sections in any of these terms. For everything running during A term, ask for ["A", "F"]. Naming a term that has ended keeps its sections.',
-      ),
-    academicYear: strictObject(
-      {
-        year: z.preprocess(
-          v => (typeof v === 'string' ? v.toLowerCase() : v),
-          z.union([YearSchema, z.literal('all')], {
-            error:
-              'year is a fall year as a number (2026 for 2026-27) or "all"',
-          }),
-        ),
-      },
-      querySchema,
-    )
-      .optional()
-      .describe(
-        'Defaults to the current academic year, the only one students can schedule. A year whose schedule is not published yet is refused with a pointer to planning instead. "all" searches every year.',
-      ),
-    availability: strictObject(
-      {
-        availableOnly: z
-          .boolean()
-          .default(false)
-          .describe(
-            'Keep only sections with an open seat; labs and discussions too, so a lecture whose labs are all full is dropped.',
-          ),
-        minAvailable: z
-          .number()
-          .int()
-          .positive()
-          .optional()
-          .describe('Keep only sections with at least this many open seats.'),
-        maxWaitlisted: z
-          .number()
-          .int()
-          .min(0)
-          .optional()
-          .describe(
-            'Keep only sections with at most this many students waitlisted; 0 for no waitlist.',
-          ),
-      },
-      querySchema,
-    ).optional(),
-    creditRange: strictObject(
-      {
-        min: z.number().min(0),
-        max: z.number().min(0),
-      },
-      querySchema,
-    )
-      .refine(c => c.max >= c.min, 'max must be at least min')
-      .optional()
-      .describe(
-        'Keep courses whose credit range overlaps [min, max]. A standard WPI course is 1/3 unit = 3 credits.',
-      ),
-    graduateLevel: strictObject(
-      { level: z.enum(['all', 'undergraduate', 'graduate']) },
-      querySchema,
-    ).optional(),
-    courseLevel: strictObject(
-      {
-        min: z.number().int().min(1).max(9).optional(),
-        max: z.number().int().min(1).max(9).optional(),
-      },
-      querySchema,
-    )
-      .refine(
-        c => c.min === undefined || c.max === undefined || c.max >= c.min,
-        'max must be at least min',
-      )
-      .optional()
-      .describe(
-        'Bounds on the first digit of the course number: 1 = 1000-level (MA 1022), 4 = 4000-level; 1-4 undergraduate, 5+ graduate (DS 502 and CS 5007 are both 5). {min: 3, max: 4} for upper-level undergraduate.',
-      ),
-    degreeAttribute: strictObject(
-      {
-        attributes: z
-          .array(z.string().trim().min(1).max(MAX_NAME_CHARS))
-          .min(1)
-          .max(MAX_NAMES)
-          .describe(
-            'Degree requirements a course counts toward, any of them: "Humanities and Arts", "Social Sciences", "Capstone Design Experience"... (get_catalog_info lists all, with counts). Case-insensitive; a unique start like "social science" works.',
-          ),
-      },
-      querySchema,
-    ).optional(),
-    deliveryMode: strictObject(
-      { modes: z.array(caseless(DELIVERY_MODES)).min(1).max(12) },
-      querySchema,
-    )
-      .optional()
-      .describe(
-        'Keep sections taught In-Person, Online or Hybrid. Asynchronous is different: it describes a meeting with no set time and shows as "Async"; an Online section may still meet live.',
-      ),
-    offeringPattern: strictObject(
-      {
-        categories: z
-          .array(
-            z.union([z.literal(1), z.literal(2), z.literal(3)], {
-              error:
-                'offering categories are 1 (every year), 2 (every other year) or 3 (occasionally)',
-            }),
-          )
-          .max(3)
-          .describe(
-            'WPI offering category: 1 = every year, 2 = at least every other year, 3 = occasionally or on demand. Empty with includeUnknown true: only courses with no category.',
-          ),
-        includeUnknown: z
-          .boolean()
-          .optional()
-          .describe(
-            'Also keep courses with no category on record (most graduate courses). Default false.',
-          ),
-      },
-      querySchema,
-    )
-      .refine(
-        o => o.categories.length > 0 || o.includeUnknown === true,
-        'give at least one category, or includeUnknown: true for courses with none',
-      )
-      .optional()
-      .describe(
-        'The only signal of what a later year will offer: Cat. I courses are likely to run again next year.',
-      ),
-    times: strictObject(
-      {
-        mode: z
-          .enum(['only', 'avoid'])
-          .default('only')
-          .describe(
-            'Default "only": every meeting of a section must fall inside the times. "avoid": drop sections with any meeting overlapping them. ' +
-              'Labs and discussions are judged too: a lecture whose labs (or discussions) all fail is dropped, and the response says so.',
-          ),
-        earliestStart: ClockSchema.optional().describe(
-          'Shorthand, on `days` (default every day). "only": meetings start at or after this ("17:00" for evening classes). "avoid": the start of the band to avoid.',
-        ),
-        latestEnd: EndClockSchema.optional().describe(
-          'Shorthand, on `days` (default every day). "only": meetings end by this ("12:00"). "avoid": the end of the band to avoid.',
-        ),
-        days: z
-          .array(DaySchema)
-          .min(1)
-          .optional()
-          .describe(
-            'The days the earliestStart/latestEnd band applies to; default every day, so avoid 13:00-17:00 without days clears every weekday. ' +
-              'To avoid a Tue/Thu shift only: {mode: "avoid", days: ["T", "R"], earliestStart: "13:00", latestEnd: "17:00"}. ' +
-              'To keep all of Friday free: {mode: "avoid", days: ["F"]}. With "only", a day not listed has no allowed time, so sections meeting on it are dropped.',
-          ),
-        windows: z
-          .array(TimeWindowSchema)
-          .max(MAX_WINDOWS)
-          .min(
-            1,
-            'give at least one window; to bound start and end times on every day, use earliestStart/latestEnd instead',
-          )
-          .refine(
-            ws => ws.every(w => w.startMin < w.endMin),
-            'each window must end after it starts',
-          )
-          .optional()
-          .describe(
-            'Weekly time windows, one per day and band, each weekday its own entry. With the shorthand too, both apply (their union).',
-          ),
-        includeAsync: z
-          .boolean()
-          .optional()
-          .describe(
-            'Mode "only": also keep sections with no scheduled meetings (async, TBD): "evening or online" is earliestStart "17:00" with includeAsync true. Default false. Mode "avoid" always keeps them: they meet at no time to avoid.',
-          ),
-      },
-      querySchema,
-    )
-      .refine(
-        t => !!(t.windows || t.earliestStart || t.latestEnd || t.days),
-        'give windows, or earliestStart/latestEnd (and optionally days)',
-      )
-      .optional()
-      .describe(
-        'When sections, their labs and their discussions meet: the earliestStart/latestEnd band on `days` (default every day), windows for particular bands, or both. The response echoes the times as read.',
-      ),
-    rmpRating: strictObject(
-      {
-        minRating: z.number().min(0).max(5).optional(),
-        maxRating: z.number().min(0).max(5).optional(),
-        minDifficulty: z.number().min(0).max(5).optional(),
-        maxDifficulty: z.number().min(0).max(5).optional(),
-        minWouldTakeAgain: z
-          .number()
-          .min(0)
-          .max(100)
-          .optional()
-          .describe('Percent of raters who would take the instructor again.'),
-        maxWouldTakeAgain: z.number().min(0).max(100).optional(),
-        minNumRatings: z
-          .number()
-          .int()
-          .min(1)
-          .optional()
-          .describe(
-            'Ignore averages resting on fewer ratings (treated as no data). Pair it with minRating: a 5.0 from one review passes minRating 4 on its own; minNumRatings 5 keeps averages that mean something.',
-          ),
-        includeWithoutData: z
-          .boolean()
-          .optional()
-          .describe(
-            'Keep lectures whose instructors have no Rate My Professor data. DEFAULT: false when any bound above is given (so minRating 4 means rated 4+), true otherwise.',
-          ),
-      },
-      querySchema,
-    )
-      .superRefine((r, ctx) => {
-        for (const [min, max] of [
-          ['minRating', 'maxRating'],
-          ['minDifficulty', 'maxDifficulty'],
-          ['minWouldTakeAgain', 'maxWouldTakeAgain'],
-        ] as const) {
-          const lo = r[min];
-          const hi = r[max];
-          if (lo !== undefined && hi !== undefined && lo > hi) {
-            ctx.addIssue({
-              code: 'custom',
-              path: [max],
-              message: `${max} must be at least ${min}`,
-            });
-          }
-        }
-      })
-      .optional()
-      .describe(
-        "Rate My Professor bounds on 0-5 scales (difficulty: 5 is hardest), judged on the lecture's instructors; a lecture passes when any of them does. Averages on few ratings are noisy: add minNumRatings.",
-      ),
-    periodConflict: strictObject(
-      {
-        crns: z
-          .array(z.number().int().positive())
-          .min(1)
-          .max(MAX_CRNS)
-          .describe(
-            "CRNs of sections the student already has; sections that clash with any of them are dropped, labs and discussions included. A semester section clashes with both of its quarters' sections.",
-          ),
-        semesterSpansQuarters: z
-          .boolean()
-          .optional()
-          .describe(
-            'Default true: an F section conflicts with A and B, S with C and D. False compares terms exactly.',
-          ),
-      },
-      querySchema,
-    ).optional(),
-  },
-  querySchema,
-);
+/** A strict object whose unknown-key errors point into the whole query. */
+const obj = <S extends z.core.$ZodLooseShape>(shape: S) =>
+  strictObject(shape, querySchema);
 
-export const CourseQuerySchema = strictObject(
-  {
-    filters: FiltersSchema.default({}).describe(
-      'Filters by id; every one given must match. Omit a filter to not restrict on it.',
-    ),
-    includeEndedTerms: z
-      .boolean()
-      .default(false)
+const FiltersSchema = obj({
+  searchText: obj({
+    query: z
+      .string()
+      .trim()
+      .min(1)
+      .max(MAX_QUERY_CHARS)
       .describe(
-        'Default false: in the current year, sections of terms that have already ended are left out (the response says which). Terms named in filters.term are always kept.',
+        'A course code ("MA 1022", "CS2102"; "CS 21" for every CS 21xx) finds that course first, then courses whose description names it (marked "mentions"); words after a code narrow it ("MA 1022 calculus"). ' +
+          'A department name or abbreviation alone ("computer science", "CS") lists its courses by number. ' +
+          'Otherwise words, ALL of which must match somewhere: code, name, description, department, degree attributes, instructor or room. ' +
+          'Words of 3 letters or fewer match whole words only, and acronyms the catalog spells out ("AI" finds Artificial Intelligence); I-IV equal 1-4; words of 5+ letters tolerate a typo. ' +
+          'Name matches rank above description matches, and the response says when no course is mainly about the words. Use one or two topic words ("robotics", "game design"), not sentences.',
       ),
-    includeInterestLists: z
-      .boolean()
-      .default(false)
-      .describe(
-        'Default false: interest-list placeholders (no times; joined before real sections open) are left out before any filter is applied.',
-      ),
-    includeSections: z
+    professorOnly: z
       .boolean()
       .optional()
+      .describe('Match the words against instructor names only.'),
+  }).optional(),
+  department: obj({
+    departments: z
+      .array(z.string().trim().min(1).max(MAX_NAME_CHARS))
+      .min(1)
+      .max(MAX_NAMES)
       .describe(
-        'List the matching lecture sections under each course (CRN, term, times, instructor, seats). Default: on when any filter beyond searchText, department and academicYear is given.',
+        'Abbreviations ("CS", "MA") or full names ("Computer Science"), any case.',
       ),
-    sort: z
-      .enum(SORTS)
-      .default('relevance')
+  }).optional(),
+  term: obj({ terms: z.array(TermSchema).min(1).max(12) })
+    .optional()
+    .describe(
+      'Keep sections in any of these terms. For everything running during A term, ask for ["A", "F"]. Naming a term that has ended keeps its sections.',
+    ),
+  academicYear: obj({
+    year: z.preprocess(
+      v => (typeof v === 'string' ? v.toLowerCase() : v),
+      z.union([YearSchema, z.literal('all')], {
+        error: 'year is a fall year as a number (2026 for 2026-27) or "all"',
+      }),
+    ),
+  })
+    .optional()
+    .describe(
+      'Defaults to the current academic year, the only one students can schedule. A year whose schedule is not published yet is refused with a pointer to planning instead. "all" searches every year.',
+    ),
+  availability: obj({
+    availableOnly: z
+      .boolean()
+      .default(false)
       .describe(
-        'Default "relevance": by relevance with searchText, else by department and number. ' +
-          '"rating": best-rated lecture instructor first, those with 5+ ratings above those with fewer (as "top"), unrated last. ' +
-          '"difficulty": easiest-rated instructor first, by the same rule. "openSeats": most open seats in the matching sections first. ' +
-          '"number": department, then course number. Ties keep the relevance order.',
+        'Keep only sections with an open seat; labs and discussions too, so a lecture whose labs are all full is dropped.',
       ),
-    offset: z
+    minAvailable: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe('Keep only sections with at least this many open seats.'),
+    maxWaitlisted: z
       .number()
       .int()
       .min(0)
-      .default(0)
-      .describe('Results to skip, for paging.'),
-    limit: z
+      .optional()
+      .describe(
+        'Keep only sections with at most this many students waitlisted; 0 for no waitlist.',
+      ),
+  }).optional(),
+  creditRange: obj({
+    min: z.number().min(0),
+    max: z.number().min(0),
+  })
+    .refine(c => c.max >= c.min, 'max must be at least min')
+    .optional()
+    .describe(
+      'Keep courses whose credit range overlaps [min, max]. A standard WPI course is 1/3 unit = 3 credits.',
+    ),
+  graduateLevel: obj({
+    level: z.enum(['all', 'undergraduate', 'graduate']),
+  }).optional(),
+  courseLevel: obj({
+    min: z.number().int().min(1).max(9).optional(),
+    max: z.number().int().min(1).max(9).optional(),
+  })
+    .refine(
+      c => c.min === undefined || c.max === undefined || c.max >= c.min,
+      'max must be at least min',
+    )
+    .optional()
+    .describe(
+      'Bounds on the first digit of the course number: 1 = 1000-level (MA 1022), 4 = 4000-level; 1-4 undergraduate, 5+ graduate (DS 502 and CS 5007 are both 5). {min: 3, max: 4} for upper-level undergraduate.',
+    ),
+  degreeAttribute: obj({
+    attributes: z
+      .array(z.string().trim().min(1).max(MAX_NAME_CHARS))
+      .min(1)
+      .max(MAX_NAMES)
+      .describe(
+        'Degree requirements a course counts toward, any of them: "Humanities and Arts", "Social Sciences", "Capstone Design Experience"... (get_catalog_info lists all, with counts). Case-insensitive; a unique start like "social science" works.',
+      ),
+  }).optional(),
+  deliveryMode: obj({ modes: z.array(caseless(DELIVERY_MODES)).min(1).max(12) })
+    .optional()
+    .describe(
+      'Keep sections taught In-Person, Online or Hybrid. Asynchronous is different: it describes a meeting with no set time and shows as "Async"; an Online section may still meet live.',
+    ),
+  offeringPattern: obj({
+    categories: z
+      .array(
+        z.union([z.literal(1), z.literal(2), z.literal(3)], {
+          error:
+            'offering categories are 1 (every year), 2 (every other year) or 3 (occasionally)',
+        }),
+      )
+      .max(3)
+      .describe(
+        'WPI offering category: 1 = every year, 2 = at least every other year, 3 = occasionally or on demand. Empty with includeUnknown true: only courses with no category.',
+      ),
+    includeUnknown: z
+      .boolean()
+      .optional()
+      .describe(
+        'Also keep courses with no category on record (most graduate courses). Default false.',
+      ),
+  })
+    .refine(
+      o => o.categories.length > 0 || o.includeUnknown === true,
+      'give at least one category, or includeUnknown: true for courses with none',
+    )
+    .optional()
+    .describe(
+      'The only signal of what a later year will offer: Cat. I courses are likely to run again next year.',
+    ),
+  times: obj({
+    mode: z
+      .enum(['only', 'avoid'])
+      .default('only')
+      .describe(
+        'Default "only": every meeting of a section must fall inside the times. "avoid": drop sections with any meeting overlapping them. ' +
+          'Labs and discussions are judged too: a lecture whose labs (or discussions) all fail is dropped, and the response says so.',
+      ),
+    earliestStart: ClockSchema.optional().describe(
+      'Shorthand, on `days` (default every day). "only": meetings start at or after this ("17:00" for evening classes). "avoid": the start of the band to avoid.',
+    ),
+    latestEnd: EndClockSchema.optional().describe(
+      'Shorthand, on `days` (default every day). "only": meetings end by this ("12:00"). "avoid": the end of the band to avoid.',
+    ),
+    days: z
+      .array(DaySchema)
+      .min(1)
+      .optional()
+      .describe(
+        'The days the earliestStart/latestEnd band applies to; default every day, so avoid 13:00-17:00 without days clears every weekday. ' +
+          'To avoid a Tue/Thu shift only: {mode: "avoid", days: ["T", "R"], earliestStart: "13:00", latestEnd: "17:00"}. ' +
+          'To keep all of Friday free: {mode: "avoid", days: ["F"]}. With "only", a day not listed has no allowed time, so sections meeting on it are dropped.',
+      ),
+    windows: z
+      .array(TimeWindowSchema)
+      .max(MAX_WINDOWS)
+      .min(
+        1,
+        'give at least one window; to bound start and end times on every day, use earliestStart/latestEnd instead',
+      )
+      .refine(
+        ws => ws.every(w => w.startMin < w.endMin),
+        'each window must end after it starts',
+      )
+      .optional()
+      .describe(
+        'Weekly time windows, one per day and band, each weekday its own entry. With the shorthand too, both apply (their union).',
+      ),
+    includeAsync: z
+      .boolean()
+      .optional()
+      .describe(
+        'Mode "only": also keep sections with no scheduled meetings (async, TBD): "evening or online" is earliestStart "17:00" with includeAsync true. Default false. Mode "avoid" always keeps them: they meet at no time to avoid.',
+      ),
+  })
+    .refine(
+      t => !!(t.windows || t.earliestStart || t.latestEnd || t.days),
+      'give windows, or earliestStart/latestEnd (and optionally days)',
+    )
+    .optional()
+    .describe(
+      'When sections, their labs and their discussions meet: the earliestStart/latestEnd band on `days` (default every day), windows for particular bands, or both. The response echoes the times as read.',
+    ),
+  rmpRating: obj({
+    minRating: z.number().min(0).max(5).optional(),
+    maxRating: z.number().min(0).max(5).optional(),
+    minDifficulty: z.number().min(0).max(5).optional(),
+    maxDifficulty: z.number().min(0).max(5).optional(),
+    minWouldTakeAgain: z
+      .number()
+      .min(0)
+      .max(100)
+      .optional()
+      .describe('Percent of raters who would take the instructor again.'),
+    maxWouldTakeAgain: z.number().min(0).max(100).optional(),
+    minNumRatings: z
       .number()
       .int()
       .min(1)
-      .max(MAX_LIMIT)
       .optional()
       .describe(
-        `Page size, 1-${MAX_LIMIT}; default ${DEFAULT_LIMIT}, or ${LOOSE_LIMIT} when a search of several words matches no course name, only descriptions.`,
+        'Ignore averages resting on fewer ratings (treated as no data). Pair it with minRating: a 5.0 from one review passes minRating 4 on its own; minNumRatings 5 keeps averages that mean something.',
       ),
-  },
-  querySchema,
-);
+    includeWithoutData: z
+      .boolean()
+      .optional()
+      .describe(
+        'Keep lectures whose instructors have no Rate My Professor data. DEFAULT: false when any bound above is given (so minRating 4 means rated 4+), true otherwise.',
+      ),
+  })
+    .superRefine((r, ctx) => {
+      for (const [min, max] of [
+        ['minRating', 'maxRating'],
+        ['minDifficulty', 'maxDifficulty'],
+        ['minWouldTakeAgain', 'maxWouldTakeAgain'],
+      ] as const) {
+        const lo = r[min];
+        const hi = r[max];
+        if (lo !== undefined && hi !== undefined && lo > hi) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [max],
+            message: `${max} must be at least ${min}`,
+          });
+        }
+      }
+    })
+    .optional()
+    .describe(
+      "Rate My Professor bounds on 0-5 scales (difficulty: 5 is hardest), judged on the lecture's instructors; a lecture passes when any of them does. Averages on few ratings are noisy: add minNumRatings.",
+    ),
+  periodConflict: obj({
+    crns: z
+      .array(z.number().int().positive())
+      .min(1)
+      .max(MAX_CRNS)
+      .describe(
+        "CRNs of sections the student already has; sections that clash with any of them are dropped, labs and discussions included. A semester section clashes with both of its quarters' sections.",
+      ),
+    semesterSpansQuarters: z
+      .boolean()
+      .optional()
+      .describe(
+        'Default true: an F section conflicts with A and B, S with C and D. False compares terms exactly.',
+      ),
+  }).optional(),
+});
+
+export const CourseQuerySchema = obj({
+  filters: FiltersSchema.default({}).describe(
+    'Filters by id; every one given must match. Omit a filter to not restrict on it.',
+  ),
+  includeEndedTerms: z
+    .boolean()
+    .default(false)
+    .describe(
+      'Default false: in the current year, sections of terms that have already ended are left out (the response says which). Terms named in filters.term are always kept.',
+    ),
+  includeInterestLists: z
+    .boolean()
+    .default(false)
+    .describe(
+      'Default false: interest-list placeholders (no times; joined before real sections open) are left out before any filter is applied.',
+    ),
+  includeSections: z
+    .boolean()
+    .optional()
+    .describe(
+      'List the matching lecture sections under each course (CRN, term, times, instructor, seats). Default: on when any filter beyond searchText, department and academicYear is given.',
+    ),
+  sort: z
+    .enum(SORTS)
+    .default('relevance')
+    .describe(
+      'Default "relevance": by relevance with searchText, else by department and number. ' +
+        '"rating": best-rated lecture instructor first, those with 5+ ratings above those with fewer (as "top"), unrated last. ' +
+        '"difficulty": easiest-rated instructor first, by the same rule. "openSeats": most open seats in the matching sections first. ' +
+        '"number": department, then course number. Ties keep the relevance order.',
+    ),
+  offset: z
+    .number()
+    .int()
+    .min(0)
+    .default(0)
+    .describe('Results to skip, for paging.'),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(MAX_LIMIT)
+    .optional()
+    .describe(
+      `Page size, 1-${MAX_LIMIT}; default ${DEFAULT_LIMIT}, or ${LOOSE_LIMIT} when a search of several words matches no course name, only descriptions.`,
+    ),
+});
 
 export type CourseQuery = z.infer<typeof CourseQuerySchema>;
 
