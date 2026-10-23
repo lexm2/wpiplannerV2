@@ -675,7 +675,9 @@ function relevanceScore(course: Course, parsed: ParsedQuery): number {
     score = codeScore(course, parsed.code);
     if (score > 0) score += wordScore(text, parsed.words);
   } else if (namesDepartment(text, parsed.words)) {
-    score = DEPARTMENT_SCORE;
+    // Its courses in number order, and nothing else: seats or a short name
+    // would scatter the list.
+    return DEPARTMENT_SCORE + numberOrder(course);
   } else {
     score = wordScore(text, parsed.words);
     if (score > 0) score += likelyFit(course);
@@ -691,10 +693,18 @@ function relevanceScore(course: Course, parsed: ParsedQuery): number {
   if (sections.some(s => s.seatsAvailable > 0)) score += 0.5;
   const level = courseLevel(course);
   if (level !== null) score += (9 - Math.min(level, 9)) * 0.05;
-  const digits = /\d+/.exec(course.number)?.[0];
-  if (digits) score += (1 - Number(digits.padEnd(4, '0')) / 10000) * 0.04;
+  score += numberOrder(course) * 0.04;
   score += 0.2 / (1 + text.name.length / 20);
   return score;
+}
+
+/**
+ * Below 1, higher for a lower course number, reading the number as four
+ * digits so 588 (a graduate 5xx) sorts after 1101.
+ */
+function numberOrder(course: Course): number {
+  const digits = /\d+/.exec(course.number)?.[0];
+  return digits ? 1 - Number(digits.slice(0, 4).padEnd(4, '0')) / 10000 : 0;
 }
 
 function escapeRegExp(text: string): string {

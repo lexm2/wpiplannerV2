@@ -446,6 +446,41 @@ describe('short words, acronyms and numerals', () => {
   });
 });
 
+describe('department queries', () => {
+  const inDept = (number: string, name: string, open: boolean) =>
+    course({
+      id: `CS-${number}`,
+      number,
+      name,
+      lectures: [
+        {
+          section: { crn: Number(number), seatsAvailable: open ? 5 : 0 },
+          compatibleDiscussions: [],
+          compatibleLabs: [],
+        },
+      ],
+    } as unknown as Partial<Course>);
+
+  it('lists a department by number, whatever the seats or name length', () => {
+    const list = [
+      inDept('2223', 'Algorithms', true),
+      inDept('1101', 'Introduction To Program Design', false),
+      inDept('1005', 'Programming for Engineers', true),
+      inDept('1004', 'Introduction To Programming For Non-Majors', false),
+      inDept('502', 'Graduate Seminar', true),
+    ];
+    for (const q of ['CS', 'computer science']) {
+      expect(rankCoursesByRelevance([...list], q).map(c => c.number)).toEqual([
+        '1004',
+        '1005',
+        '1101',
+        '2223',
+        '502',
+      ]);
+    }
+  });
+});
+
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
     expect(parseSearchQuery('design game design GAME').words).toEqual([
