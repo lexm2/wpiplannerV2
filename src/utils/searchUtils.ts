@@ -18,6 +18,7 @@ import { editDistance } from './editDistance';
  * matches only a whole word (or its plural), so "AI" finds "AI in Writing"
  * but not "Aircraft"; it also matches the initials of consecutive words of
  * the name ("AI": "Artificial Intelligence", "CAD": "Computer Aided Design").
+ * Accents are ignored on both sides: "Neel" finds "Néel", "Martín" "Martin".
  */
 
 export interface ParsedQuery {
@@ -49,6 +50,21 @@ const NUMERALS = new Map([
   ['iv', '4'],
 ]);
 const numeral = (token: string) => NUMERALS.get(token) ?? token;
+
+/** Accents as combining marks, once a string is decomposed (NFD). */
+const MARKS = /\p{M}+/gu;
+
+/** The text without its accents: "Néel" to "Neel". Case is kept. */
+const stripMarks = (text: string) =>
+  // Plain ASCII, nearly all of the catalog, skips the normalization.
+  /[^\p{ASCII}]/u.test(text) ? text.normalize('NFD').replace(MARKS, '') : text;
+
+/**
+ * Text as search compares it: lowercased and without accents, so "Néel",
+ * "NEEL" and "neel" are one word. Course text, section text and queries all
+ * pass through it; so should anything else matched against them.
+ */
+export const foldText = (text: string) => stripMarks(text.toLowerCase());
 
 const TOKEN_SPLIT = /[^a-z0-9+#]+/;
 const tokenize = (text: string) => text.split(TOKEN_SPLIT).filter(Boolean);
@@ -87,7 +103,7 @@ const namesDepartment = (text: CourseText, words: string[]) =>
   words.length > 0 && text.departmentNames.includes(departmentPhrase(words));
 
 export function parseSearchQuery(query: string): ParsedQuery {
-  const text = query.trim().toLowerCase().replace(/\s+/g, ' ');
+  const text = foldText(query).trim().replace(/\s+/g, ' ');
   const code = readCode(text.replace(/[\s_.-]/g, ''));
   if (code) return { text, words: [], code };
   const lead = LEADING_CODE_RE.exec(text);
@@ -213,29 +229,30 @@ function courseText(course: Course): CourseText {
   let text = textCache.get(course);
   if (text) return text;
 
-  const code = `${course.departmentAbbr}${course.number}`.toLowerCase();
+  const code = foldText(`${course.departmentAbbr}${course.number}`);
   const codes = [
     code,
-    ...course.crossListedWith.map(c => c.toLowerCase().replace(/[\s-]/g, '')),
+    ...course.crossListedWith.map(c => foldText(c).replace(/[\s-]/g, '')),
   ];
-  const name = course.name.toLowerCase();
-  const description = course.description.toLowerCase();
-  const department =
-    `${course.departmentAbbr} ${course.departmentName}`.toLowerCase();
-  const tagText = [...course.degreeAttributes, ...course.courseTypes]
-    .join(' ')
-    .toLowerCase();
+  const name = foldText(course.name);
+  const description = foldText(course.description);
+  const department = foldText(
+    `${course.departmentAbbr} ${course.departmentName}`,
+  );
+  const tagText = foldText(
+    [...course.degreeAttributes, ...course.courseTypes].join(' '),
+  );
   const haystack = [
-    `${course.departmentAbbr} ${course.number}`.toLowerCase(),
+    foldText(`${course.departmentAbbr} ${course.number}`),
     ...codes,
-    ...course.crossListedWith.map(c => c.toLowerCase()),
+    ...course.crossListedWith.map(foldText),
     name,
     description,
     department,
     tagText,
   ].join(' ');
 
-  learnAcronyms(`${course.name} ${course.description}`);
+  learnAcronyms(stripMarks(`${course.name} ${course.description}`));
   const tokens = tokenize(haystack);
   text = {
     haystack,
@@ -243,8 +260,8 @@ function courseText(course: Course): CourseText {
     name,
     nameTokens: tokenize(name).map(numeral),
     departmentNames: [
-      departmentPhrase(tokenize(course.departmentName.toLowerCase())),
-      course.departmentAbbr.toLowerCase(),
+      departmentPhrase(tokenize(foldText(course.departmentName))),
+      foldText(course.departmentAbbr),
     ],
     departmentTokens: tokenize(department),
     tagText,
@@ -319,21 +336,25 @@ export function matchCourseText(
 }
 
 /**
- * Whether `word` occurs in a free text such as a section's instructors and
- * rooms, by the same rule as course text: whole words only when short.
+ * Whether `word` (a query word, already folded) occurs in a free text such
+ * as a section's instructors and rooms, by the same rule as course text:
+ * whole words only when short. The text is folded here if it is not yet.
  */
 export function textHasWord(text: string, word: string): boolean {
-  return wordIn(word, text, isShort(word) ? tokenize(text) : []);
+  const folded = foldText(text);
+  return wordIn(word, folded, isShort(word) ? tokenize(folded) : []);
 }
 
 /**
  * Whether `word` occurs in instructor names: a short word as the start of a
  * name ("Li" finds Li and Lin, not Elizabeth), a longer one anywhere.
+ * Accents aside: "Neel" finds "EJ Néel".
  */
 export function namesHaveWord(names: string, word: string): boolean {
+  const folded = foldText(names);
   return isShort(word)
-    ? tokenize(names).some(t => t.startsWith(word))
-    : names.includes(word);
+    ? tokenize(folded).some(t => t.startsWith(word))
+    : folded.includes(word);
 }
 
 /** `word` matches description token `token`, as matchCourseText reads it. */
@@ -411,9 +432,8 @@ export type SearchMatch =
 /** The titles some sections carry after their number: "ST: AI and Economics". */
 function sectionTitles(course: Course): string {
   return getAllSections(course)
-    .map(s => s.number.split(' - ').slice(1).join(' - '))
-    .join(' ')
-    .toLowerCase();
+    .map(s => foldText(s.number.split(' - ').slice(1).join(' - ')))
+    .join(' ');
 }
 
 export function describeMatch(course: Course, query: string): SearchMatch {

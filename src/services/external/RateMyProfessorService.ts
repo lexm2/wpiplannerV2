@@ -3,6 +3,7 @@ import {
   type Professor,
   type RateMyProfessorData,
 } from '../../types/rateMyProfessor';
+import { foldText } from '../../utils/searchUtils';
 
 // calculateFirstNameSimilarity's floor for a fuzzy first-name match: any
 // prefix or containment passes, and a plain edit-distance match needs about
@@ -78,8 +79,9 @@ export class RateMyProfessorService {
     }
   }
 
+  /** Lowercased, accents dropped ("Néel" is "neel"), spaces collapsed. */
   private normalizeName(name: string): string {
-    return name.toLowerCase().trim().replace(/\s+/g, ' ');
+    return foldText(name).trim().replace(/\s+/g, ' ');
   }
 
   private extractLastName(professorName: string): string {

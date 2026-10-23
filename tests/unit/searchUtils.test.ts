@@ -11,6 +11,9 @@ import {
   parseSearchQuery,
   describeMatch,
   acronymExpansions,
+  foldText,
+  namesHaveWord,
+  textHasWord,
 } from '../../src/utils/searchUtils';
 import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
@@ -439,6 +442,33 @@ describe('short words, acronyms and numerals', () => {
     );
     expect(describeMatch(near, 'procedural generation')).toBe('description');
     expect(describeMatch(far, 'procedural generation')).toBe('scattered');
+  });
+});
+
+describe('accents', () => {
+  it('folds case and accents alike', () => {
+    expect(foldText('EJ Néel')).toBe('ej neel');
+    expect(foldText('San Martín')).toBe('san martin');
+    expect(foldText('Karl-Frédéric')).toBe('karl-frederic');
+    expect(foldText('Plain')).toBe('plain');
+  });
+
+  it('matches queries and course text with or without accents', () => {
+    const french = course({
+      name: 'Études Françaises',
+      description: 'Le cinéma et la société.',
+    });
+    for (const q of ['etudes', 'études', 'francaises', 'cinema societe']) {
+      expect(matchCourseText(french, parseSearchQuery(q)).all).toBe(true);
+      expect(calculateRelevanceScore(french, q)).toBeGreaterThan(0);
+    }
+    expect(parseSearchQuery('Frédéric').words).toEqual(['frederic']);
+  });
+
+  it('finds names in section text either way', () => {
+    expect(namesHaveWord('ej néel', 'neel')).toBe(true);
+    expect(namesHaveWord('William San Martín', 'martin')).toBe(true);
+    expect(textHasWord('Frédéric Vieux', 'frederic')).toBe(true);
   });
 });
 

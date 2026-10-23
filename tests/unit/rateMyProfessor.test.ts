@@ -141,6 +141,15 @@ describe('RateMyProfessorService.findProfessor', () => {
     expect(service.findProfessor('Laura Susanin')?.id).toBe(susanin.id);
   });
 
+  it('matches names whatever their accents', async () => {
+    const munoz = prof('Lina', 'Muñoz-Márquez');
+    const vieux = prof('Karl-Frederic', 'Vieux');
+    const service = await serviceWith([munoz, vieux]);
+    expect(service.findProfessor('Lina Munoz-Marquez')?.id).toBe(munoz.id);
+    expect(service.findProfessor('L. Munoz-Marquez')?.id).toBe(munoz.id);
+    expect(service.findProfessor('Karl-Frédéric Vieux')?.id).toBe(vieux.id);
+  });
+
   it('keeps the duplicate profile with the most ratings, whatever the order', async () => {
     const real = { ...prof('Richard', 'Quimby', 2.2), numRatings: 52 };
     const empty = { ...prof('Richard', 'Quimby', 0), numRatings: 0 };

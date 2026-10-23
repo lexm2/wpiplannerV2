@@ -4,6 +4,7 @@ import type { FilterableSection } from '../../../types/filterableUnit';
 import type { Course, Section } from '../../../types/types';
 import { keepMatchingGroups } from '../lectureGroupScope';
 import {
+  foldText,
   matchCourseText,
   parseSearchQuery,
   namesHaveWord,
@@ -14,18 +15,18 @@ import {
 
 /** The section's own searchable text: number, instructors, type, rooms. */
 function sectionText(section: Section): string {
-  return [
-    section.number,
-    ...section.periods.flatMap(p => [
-      p.professor,
-      p.type,
-      p.building,
-      p.room,
-      p.location,
-    ]),
-  ]
-    .join(' ')
-    .toLowerCase();
+  return foldText(
+    [
+      section.number,
+      ...section.periods.flatMap(p => [
+        p.professor,
+        p.type,
+        p.building,
+        p.room,
+        p.location,
+      ]),
+    ].join(' '),
+  );
 }
 
 /**
@@ -51,7 +52,7 @@ export class SearchTextFilter implements SectionBasedFilter {
     if (criteria.professorOnly) {
       return keepMatchingGroups(sections, fs => {
         const names = fs.section.periods
-          .map(p => p.professor.toLowerCase())
+          .map(p => foldText(p.professor))
           .join(' ');
         return query.words.every(word => namesHaveWord(names, word));
       });
