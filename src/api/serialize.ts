@@ -267,6 +267,17 @@ export function termsOf(sections: Section[]): string[] {
   return [...terms].sort((a, b) => termRank(a) - termRank(b));
 }
 
+/** `f` of each term's sections, with the term first, A-D then F/S. */
+export function byTerm<T extends object>(
+  sections: Section[],
+  f: (ofTerm: Section[]) => T,
+): (T & { term: string })[] {
+  return termsOf(sections).map(term => ({
+    term,
+    ...f(sections.filter(s => (s.computedTerm as string) === term)),
+  }));
+}
+
 /**
  * A description's own heading for a statement, as a pattern source, with
  * or without a colon ("Recommended Background Working knowledge of...",
@@ -411,10 +422,7 @@ export function toCourseSummary(
     year: course.academicYear ?? null,
     terms: termsOf(all),
     seats: seatTotals(primary),
-    seatsByTerm: termsOf(primary).map(term => ({
-      term,
-      ...seatTotals(primary.filter(s => (s.computedTerm as string) === term)),
-    })),
+    seatsByTerm: byTerm(primary, seatTotals),
     sectionCount: primary.length,
     isGraduate: course.isGraduate ?? false,
     professors: professorsOf(primary).slice(0, MAX_SUMMARY_PROFESSORS),

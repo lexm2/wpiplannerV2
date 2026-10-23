@@ -70,6 +70,7 @@ import {
   unpublishedYearError,
 } from './lookup';
 import {
+  byTerm,
   courseCode,
   instructorFor,
   primarySections,
@@ -1029,10 +1030,7 @@ function totalsOf(courses: Course[], seatsYear: number | null): SearchTotals {
     ...termTotals(sections),
     seatsYear,
     courses: courses.length,
-    byTerm: termsOf(sections).map(term => ({
-      term,
-      ...termTotals(sections.filter(s => (s.computedTerm as string) === term)),
-    })),
+    byTerm: byTerm(sections, termTotals),
   };
 }
 

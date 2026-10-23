@@ -102,8 +102,8 @@ function ratingText(r: Omit<Rating, 'url'>, again: boolean): string {
   return `${parts.join(', ')} ${ratingCount(r.numRatings)}`;
 }
 
-function instructor(i: InstructorView, again = false): string {
-  return i.rmp ? `${i.name} ${ratingText(i.rmp, again)}` : i.name;
+function instructor(i: InstructorView): string {
+  return i.rmp ? `${i.name} ${ratingText(i.rmp, true)}` : i.name;
 }
 
 function seats(s: {
@@ -161,7 +161,7 @@ function briefLine(s: SectionBrief, withTerm: boolean): string {
     runs(s.dates),
     s.meets,
     s.location,
-    s.instructors.map(i => instructor(i, true)).join('; '),
+    s.instructors.map(instructor).join('; '),
     seats(s),
     ...exceptions(s),
   ]
@@ -276,8 +276,10 @@ function rowLine(
   search: CourseQueryResult['search'],
   easiest: boolean,
 ): string {
+  const note = matchNote(c, search);
   const parts = [
     `${index}. ${c.code} ${c.name}`,
+    ...(note ? [`(${note})`] : []),
     credits(c),
     c.terms.length
       ? `${c.terms.join(',')}${c.earlyEntry ? ' (tentative)' : ''}`
@@ -286,8 +288,6 @@ function rowLine(
       ? `${yearLabel(c.year)} early entry: not published, cannot be scheduled yet`
       : rowSeats(c),
   ];
-  const note = matchNote(c, search);
-  if (note) parts.splice(1, 0, `(${note})`);
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
     const t = c.topInstructor;
@@ -699,12 +699,7 @@ function termBlock(
       : '';
   const lines = [`${term} term${span}${ended}${running}${early}:`];
   const lectures = sections.filter(s => s.kind === 'lecture');
-  for (const kind of [
-    'lecture',
-    'standaloneLab',
-    'discussion',
-    'lab',
-  ] as const) {
+  for (const kind of Object.keys(KIND_HEADING) as SectionView['kind'][]) {
     const ofKind = sections.filter(s => s.kind === kind);
     if (!ofKind.length) continue;
     const companion = kind === 'discussion' || kind === 'lab';
