@@ -13,8 +13,8 @@ import type {
   SectionView,
 } from '../api/serialize';
 import type { ConflictCheck } from '../api/conflicts';
-import type { CoursePlan, catalogMeta } from '../api/lookup';
-import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
+import type { CoursePlan, catalogMeta, listDepartments } from '../api/lookup';
+import type { DateSpan, TermLetter, TermNow, YearInfo } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
 import { one, plural } from '../api/text';
@@ -1004,5 +1004,26 @@ export function renderCatalogInfo(
     'Degree attribute tags are incomplete in the catalog data: a course without one may still count toward a requirement. Check the degree audit or an academic advisor.',
     `Delivery modes, for filters.deliveryMode: ${meta.deliveryModes.join(', ')}.`,
   );
+  return lines.join('\n');
+}
+
+// --- list_departments -------------------------------------------------------
+
+/** The departments of one year (its status given), or of every year (null). */
+export function renderDepartments(
+  departments: ReturnType<typeof listDepartments>,
+  year: YearInfo | null,
+): string {
+  const lines: string[] = [];
+  if (!year) lines.push('Departments in any year:');
+  else {
+    lines.push(`Departments with courses in ${yearLabel(year.year)}:`);
+    if (year.status === 'not yet published') {
+      lines.push(
+        `${yearLabel(year.year)} is not published yet; these are only early entries (${plural(year.courseCount, 'course')}).`,
+      );
+    }
+  }
+  lines.push(...departments.map(d => `${d.abbr} ${d.name} (${d.courseCount})`));
   return lines.join('\n');
 }
