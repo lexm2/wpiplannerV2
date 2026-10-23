@@ -201,10 +201,34 @@ function sameExpansion(run: string[], expansion: string): boolean {
  * "ai" in "Introduction To Artificial Intelligence". Initials alone spell
  * too much ("Accelerated Introduction"), so the words must be what the
  * catalog defines the acronym as somewhere, or the course's own text must
- * use the acronym.
+ * use the acronym, or they must be the whole name, numbering aside, of a
+ * subject the catalog offers under two codes or more ("os": CS 3013 and
+ * CS 502 "Operating Systems"; "dl": "Deep Learning" four times over). A
+ * one-off name is too often a chance spelling ("pe": "Project
+ * Evaluation"), where a subject taught at both levels is a field with a
+ * name of its own.
  */
 function acronymIn(word: string, text: CourseText): boolean {
   return acronymStart(word, text) !== -1;
+}
+
+/** A name's words without the number ending a sequel's: "deep learning". */
+function subjectOf(nameTokens: string[]): string[] {
+  let end = nameTokens.length;
+  while (end > 0 && /^\d+$/.test(nameTokens[end - 1])) end--;
+  return nameTokens.slice(0, end);
+}
+
+/**
+ * Each course name, numbering aside, to the codes offering it: "operating
+ * systems" to CS3013 and CS502. Learned as course text is built.
+ */
+const subjectCodes = new Map<string, Set<string>>();
+
+function learnSubject(nameTokens: string[], code: string): void {
+  const subject = subjectOf(nameTokens).join(' ');
+  if (!subjectCodes.has(subject)) subjectCodes.set(subject, new Set());
+  subjectCodes.get(subject)!.add(code);
 }
 
 /** Where in the name the words `word` stands for start; -1 when they don't. */
@@ -214,13 +238,19 @@ function acronymStart(word: string, text: CourseText): number {
   }
   const defined = definedAcronyms.get(word);
   const usedHere = text.descriptionTokens.includes(word);
-  if (!defined && !usedHere) return -1;
   const tokens = text.nameTokens;
+  const spells = (run: string[]) =>
+    run.length === word.length &&
+    run.every(t => t.length >= 3 && !ACRONYM_STOP.has(t)) &&
+    run.map(t => t[0]).join('') === word;
+  if (!defined && !usedHere) {
+    const subject = subjectOf(tokens);
+    const codes = subjectCodes.get(subject.join(' '))?.size ?? 0;
+    return codes >= 2 && spells(subject) ? 0 : -1;
+  }
   return tokens.findIndex((_, i) => {
     const run = tokens.slice(i, i + word.length);
-    if (run.length < word.length) return false;
-    if (run.some(t => t.length < 3 || ACRONYM_STOP.has(t))) return false;
-    if (run.map(t => t[0]).join('') !== word) return false;
+    if (!spells(run)) return false;
     return usedHere || [...defined!].some(e => sameExpansion(run, e));
   });
 }
@@ -286,12 +316,14 @@ function courseText(course: Course): CourseText {
 
   learnAcronyms(stripMarks(`${course.name} ${course.description}`));
   for (const c of codes) knownDepartments.add(c.replace(/[^a-z].*$/, ''));
+  const nameTokens = tokenize(name).map(numeral);
+  learnSubject(nameTokens, code);
   const tokens = tokenize(haystack);
   text = {
     haystack,
     tokens: [...new Set([...tokens, ...tokens.map(numeral)])],
     name,
-    nameTokens: tokenize(name).map(numeral),
+    nameTokens,
     departmentNames: [
       departmentPhrase(tokenize(foldText(course.departmentName))),
       foldText(course.departmentAbbr),

@@ -518,6 +518,41 @@ describe('a department and one digit', () => {
   });
 });
 
+describe('acronyms of whole names', () => {
+  const named = (dept: string, number: string, name: string) =>
+    course({
+      id: `${dept}-${number}`,
+      departmentAbbr: dept,
+      number,
+      name,
+      description: 'Nothing defined here.',
+    });
+  const undergrad = named('CS', '3013', 'Operating Widgets');
+  const graduate = named('CS', '502', 'Operating Widgets II');
+  const oneOff = named('CE', '3025', 'Project Wrangling');
+  const longer = named('CS', '4801', 'Operating Widgets For Engineers');
+  const all = [undergrad, graduate, oneOff, longer];
+  const finds = (q: string, c: Course) =>
+    matchCourseText(c, parseSearchQuery(q)).all;
+
+  it('reads the initials of a subject offered under two codes', () => {
+    rankCoursesByRelevance([...all], 'warm up');
+    expect(finds('OW', undergrad)).toBe(true);
+    // A sequel's number is no initial.
+    expect(finds('OW', graduate)).toBe(true);
+    expect(rankCoursesByRelevance([...all], 'OW').slice(0, 2)).toEqual([
+      undergrad,
+      graduate,
+    ]);
+  });
+
+  it('ignores the initials of a one-off name, or of part of one', () => {
+    rankCoursesByRelevance([...all], 'warm up');
+    expect(finds('PW', oneOff)).toBe(false);
+    expect(finds('OW', longer)).toBe(false);
+  });
+});
+
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
     expect(parseSearchQuery('design game design GAME').words).toEqual([
