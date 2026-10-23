@@ -32,7 +32,19 @@ export interface ParsedQuery {
   words: string[];
   /** Set when the query reads as a course code or number, alone or first. */
   code: { dept: string; number: string } | null;
+  /**
+   * Distinct words past the first MAX_QUERY_WORDS, left out of the search;
+   * absent when none were.
+   */
+  ignored?: string[];
 }
+
+/**
+ * Distinct words a query is searched by; any more are ignored. Matching
+ * costs a pass over the catalog per word, and no course is about a dozen
+ * different things.
+ */
+export const MAX_QUERY_WORDS = 12;
 
 // "ma1022", "cs21", "ds502", "1022"; 2-5 letter departments (IMGD, BCB...).
 const CODE_RE = /^([a-z]{2,5})?(\d{2,4}[a-z]?)$/;
@@ -89,7 +101,15 @@ function readCode(compact: string): ParsedQuery['code'] {
     : null;
 }
 
-const queryWords = (text: string) => tokenize(text).map(numeral);
+/** The query's distinct words, in order, split from the cap's leftovers. */
+function queryWords(text: string): Pick<ParsedQuery, 'words' | 'ignored'> {
+  const distinct = [...new Set(tokenize(text).map(numeral))];
+  if (distinct.length <= MAX_QUERY_WORDS) return { words: distinct };
+  return {
+    words: distinct.slice(0, MAX_QUERY_WORDS),
+    ignored: distinct.slice(MAX_QUERY_WORDS),
+  };
+}
 
 /**
  * A department name as words, "and" left out, since the catalog writes
@@ -109,9 +129,9 @@ export function parseSearchQuery(query: string): ParsedQuery {
   const lead = LEADING_CODE_RE.exec(text);
   const leadCode = lead ? readCode(lead[1] + lead[2]) : null;
   if (lead && leadCode) {
-    return { text, words: queryWords(lead[3]), code: leadCode };
+    return { text, ...queryWords(lead[3]), code: leadCode };
   }
-  return { text, words: queryWords(text), code: null };
+  return { text, ...queryWords(text), code: null };
 }
 
 /** Words this short match only whole words, never inside one. */
@@ -312,27 +332,56 @@ function wordMatches(text: CourseText, word: string): boolean {
 }
 
 /**
- * Whether the course's own text matches the query; for a word query, the
- * words it matches. Section text (instructors, rooms) is checked separately
- * by SearchTextFilter, since it differs per section. A code query with words
- * after the code needs both.
+ * The course's own text against the query: `all` when it matches, and
+ * `word(i)` for whether it matches the query's i-th word, each worked out
+ * once and only when asked. Section text (instructors, rooms) is checked
+ * separately by SearchTextFilter, since it differs per section. A code query
+ * with words after the code needs both.
  */
-export function matchCourseText(
+export interface CourseWordMatch {
+  all: boolean;
+  word: (index: number) => boolean;
+}
+
+export function matchCourseWords(
   course: Course,
   query: ParsedQuery,
-): { all: boolean; matched: boolean[] } {
+): CourseWordMatch {
   const text = courseText(course);
   if (query.code) {
     const ok =
       (codeMatches(course, query.code) || mentionsCode(course, query.code)) &&
       query.words.every(word => wordMatches(text, word));
-    return { all: ok, matched: [ok] };
+    return { all: ok, word: () => ok };
   }
   if (namesDepartment(text, query.words)) {
-    return { all: true, matched: query.words.map(() => true) };
+    return { all: true, word: () => true };
   }
-  const matched = query.words.map(word => wordMatches(text, word));
-  return { all: matched.every(Boolean), matched };
+  const known: boolean[] = [];
+  const word = (i: number) => (known[i] ??= wordMatches(text, query.words[i]));
+  // Stops at the first word the course lacks: most of the catalog lacks the
+  // first word of any query, and the rest need not be looked at.
+  return { all: query.words.every((_, i) => word(i)), word };
+}
+
+/**
+ * Whether the course's own text matches the query; for a word query, the
+ * words it matches. `matched` is worked out when read, so a caller wanting
+ * only `all` stops at the first word the course lacks.
+ */
+export function matchCourseText(
+  course: Course,
+  query: ParsedQuery,
+): { all: boolean; matched: boolean[] } {
+  const { all, word } = matchCourseWords(course, query);
+  let matched: boolean[] | undefined;
+  return {
+    all,
+    get matched() {
+      matched ??= query.code ? [all] : query.words.map((_, i) => word(i));
+      return matched;
+    },
+  };
 }
 
 /**
@@ -482,10 +531,12 @@ export function rankCoursesByRelevance(
   if (!query.trim()) return courses;
   prepareSearch(courses);
 
-  // Score each course once rather than on every comparison.
+  // Score each course once rather than on every comparison, reading the
+  // query once for them all.
+  const parsed = parseSearchQuery(query);
   const scores = new Map<Course, number>();
   for (const course of courses) {
-    scores.set(course, calculateRelevanceScore(course, query));
+    scores.set(course, relevanceScore(course, parsed));
   }
   return courses.sort((a, b) => scores.get(b)! - scores.get(a)!);
 }
@@ -612,7 +663,10 @@ const DEPARTMENT_SCORE = 2200;
  * only through an instructor or room scores just its tie-breaks.
  */
 export function calculateRelevanceScore(course: Course, query: string): number {
-  const parsed = parseSearchQuery(query);
+  return relevanceScore(course, parseSearchQuery(query));
+}
+
+function relevanceScore(course: Course, parsed: ParsedQuery): number {
   if (!parsed.text) return 0;
   const text = courseText(course);
   let score: number;
@@ -625,7 +679,7 @@ export function calculateRelevanceScore(course: Course, query: string): number {
   } else {
     score = wordScore(text, parsed.words);
     if (score > 0) score += likelyFit(course);
-    if (score === 0 && matchCourseText(course, parsed).all) score = 1;
+    if (score === 0 && matchCourseWords(course, parsed).all) score = 1;
   }
 
   if (score === 0) return 0;

@@ -65,4 +65,18 @@ describe('SearchTextFilter', () => {
     expect(kept([taught(c, 'Ann Lee')], 'cinema francais')).toBe(1);
     expect(kept([taught(course(), 'Ann Lee')], 'cinéma')).toBe(0);
   });
+
+  it('takes each word from the section or the course, whichever has it', () => {
+    const robotics = course({
+      name: 'Introduction To Robotics',
+      description: 'Robots and their sensors.',
+    });
+    // "lee" only in the instructor, "robotics" and "sensors" only in the
+    // course: the course fails at "lee", and the later words still count.
+    const section = taught(robotics, 'Ann Lee');
+    expect(kept([section], 'lee robotics sensors')).toBe(1);
+    expect(kept([section], 'robotics lee sensors')).toBe(1);
+    expect(kept([section], 'lee robotics cooking')).toBe(0);
+    expect(kept([taught(robotics, 'Bo Chen')], 'lee robotics')).toBe(0);
+  });
 });

@@ -12,6 +12,7 @@ import {
   describeMatch,
   acronymExpansions,
   foldText,
+  MAX_QUERY_WORDS,
   namesHaveWord,
   textHasWord,
 } from '../../src/utils/searchUtils';
@@ -442,6 +443,48 @@ describe('short words, acronyms and numerals', () => {
     );
     expect(describeMatch(near, 'procedural generation')).toBe('description');
     expect(describeMatch(far, 'procedural generation')).toBe('scattered');
+  });
+});
+
+describe('long queries', () => {
+  it('searches each distinct word once, in order', () => {
+    expect(parseSearchQuery('design game design GAME').words).toEqual([
+      'design',
+      'game',
+    ]);
+    expect(parseSearchQuery('calculus i calculus 1').words).toEqual([
+      'calculus',
+      '1',
+    ]);
+    expect(parseSearchQuery('design game').ignored).toBeUndefined();
+  });
+
+  it(`searches the first ${MAX_QUERY_WORDS} distinct words and reports the rest`, () => {
+    const words = Array.from({ length: 30 }, (_, i) => `word${i}`);
+    const parsed = parseSearchQuery([...words, ...words].join(' '));
+    expect(parsed.words).toEqual(words.slice(0, MAX_QUERY_WORDS));
+    expect(parsed.ignored).toEqual(words.slice(MAX_QUERY_WORDS));
+    // After a code too.
+    const coded = parseSearchQuery(`MA 1022 ${words.join(' ')}`);
+    expect(coded.words).toHaveLength(MAX_QUERY_WORDS);
+  });
+
+  it('answers a query of thousands of words quickly', () => {
+    const c = course();
+    const many = Array.from({ length: 3000 }, (_, i) => `zz${i}`).join(' ');
+    const start = performance.now();
+    for (let i = 0; i < 50; i++) {
+      calculateRelevanceScore(c, many);
+      matchCourseText(c, parseSearchQuery(many));
+    }
+    expect(performance.now() - start).toBeLessThan(500);
+  });
+
+  it('still reports every word a course matches when asked', () => {
+    const c = course({ name: 'Robotics', description: 'Sensors.' });
+    const result = matchCourseText(c, parseSearchQuery('lee robotics sensors'));
+    expect(result.all).toBe(false);
+    expect(result.matched).toEqual([false, true, true]);
   });
 });
 

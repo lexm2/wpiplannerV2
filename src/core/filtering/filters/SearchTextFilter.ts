@@ -5,12 +5,12 @@ import type { Course, Section } from '../../../types/types';
 import { keepMatchingGroups } from '../lectureGroupScope';
 import {
   foldText,
-  matchCourseText,
+  matchCourseWords,
   parseSearchQuery,
   namesHaveWord,
   prepareSearch,
   textHasWord,
-  type ParsedQuery,
+  type CourseWordMatch,
 } from '../../../utils/searchUtils';
 
 /** The section's own searchable text: number, instructors, type, rooms. */
@@ -61,24 +61,26 @@ export class SearchTextFilter implements SectionBasedFilter {
     prepareSearch(new Set(sections.map(fs => fs.course)));
 
     // The course-level verdict is the same for each of its sections.
-    const byCourse = new Map<Course, ReturnType<typeof matchCourseText>>();
-    const courseMatch = (course: Course, q: ParsedQuery) => {
+    const byCourse = new Map<Course, CourseWordMatch>();
+    const courseMatch = (course: Course) => {
       let result = byCourse.get(course);
       if (!result) {
-        result = matchCourseText(course, q);
+        result = matchCourseWords(course, query);
         byCourse.set(course, result);
       }
       return result;
     };
 
     return keepMatchingGroups(sections, fs => {
-      const { all, matched } = courseMatch(fs.course, query);
-      if (all) return true;
+      const course = courseMatch(fs.course);
+      if (course.all) return true;
       // A code query is about the course alone.
       if (query.code) return false;
+      // Each word from the section or the course; the section's short text
+      // first, so the course's words are read only when it lacks them.
       const own = sectionText(fs.section);
       return query.words.every(
-        (word, i) => matched[i] || textHasWord(own, word),
+        (word, i) => textHasWord(own, word) || course.word(i),
       );
     });
   }
