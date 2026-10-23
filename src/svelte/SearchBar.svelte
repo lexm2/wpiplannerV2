@@ -4,7 +4,7 @@
   import { untrack } from 'svelte';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
-  import { getAvailableProfessors } from '../utils/searchUtils';
+  import { foldText, getAvailableProfessors } from '../utils/searchUtils';
   import type { FilterService } from '../services/filtering/FilterService';
   import type { DebouncedOperation } from '../utils/RequestCancellation';
   import type { SearchTextFilterCriteria } from '../types/filters';
@@ -72,10 +72,8 @@
   // Professor autocomplete (only in professor mode with a non-empty query).
   const professorMatches = $derived.by(() => {
     if (!professorMode || query.length === 0) return [];
-    const needle = query.toLowerCase();
-    return allProfessors
-      .filter(p => p.toLowerCase().includes(needle))
-      .slice(0, 10);
+    const needle = foldText(query);
+    return allProfessors.filter(p => foldText(p).includes(needle)).slice(0, 10);
   });
 
   // Commit the current query to the shared `searchText` filter, passing the
