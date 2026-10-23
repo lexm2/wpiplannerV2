@@ -14,10 +14,16 @@ import { DayOfWeek } from '../types/types';
 import { AcademicTerm } from '../types/schedule';
 import type {
   AcademicYearFilterCriteria,
+  AvailabilityFilterCriteria,
   ConflictCriteria,
+  CourseLevelFilterCriteria,
+  CreditRangeFilterCriteria,
   DegreeAttributeFilterCriteria,
+  DeliveryModeFilterCriteria,
   DepartmentFilterCriteria,
+  GraduateLevelFilterCriteria,
   InterestListFilterCriteria,
+  OfferingPatternFilterCriteria,
   RMPRatingFilterCriteria,
   SearchTextFilterCriteria,
   TermFilterCriteria,
@@ -769,16 +775,6 @@ interface ReadQuery {
   notices: string[];
 }
 
-/** Filters whose input already has their criteria's shape, passed on as given. */
-const PASS_THROUGH = [
-  'availability',
-  'creditRange',
-  'graduateLevel',
-  'courseLevel',
-  'deliveryMode',
-  'offeringPattern',
-] as const;
-
 /**
  * The FilterService criteria for a query, keyed by filter id, with loose
  * names resolved and the defaults filled in: the current academic year, as
@@ -859,7 +855,14 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     );
   }
 
-  for (const id of PASS_THROUGH) if (filters[id]) set(id, filters[id]);
+  if (filters.availability)
+    set<AvailabilityFilterCriteria>('availability', filters.availability);
+  if (filters.creditRange)
+    set<CreditRangeFilterCriteria>('creditRange', filters.creditRange);
+  if (filters.graduateLevel)
+    set<GraduateLevelFilterCriteria>('graduateLevel', filters.graduateLevel);
+  if (filters.courseLevel)
+    set<CourseLevelFilterCriteria>('courseLevel', filters.courseLevel);
   if (filters.degreeAttribute)
     set<DegreeAttributeFilterCriteria>('degreeAttribute', {
       attributes: resolveDegreeAttributes(
@@ -867,6 +870,13 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
         filters.degreeAttribute.attributes,
       ),
     });
+  if (filters.deliveryMode)
+    set<DeliveryModeFilterCriteria>('deliveryMode', filters.deliveryMode);
+  if (filters.offeringPattern)
+    set<OfferingPatternFilterCriteria>(
+      'offeringPattern',
+      filters.offeringPattern,
+    );
 
   if (filters.times) {
     const times: TimesFilterCriteria = {
