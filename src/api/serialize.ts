@@ -153,6 +153,9 @@ export interface SectionView {
   kind: SectionKind;
   /** For a lab or discussion: the CRNs of the lectures it can go with. */
   pairsWith: number[];
+  /** "MTRF 10:00-10:50", "Async" or "TBD"; periods joined by "; ". */
+  meets: string;
+  location: string;
   seats: number;
   /** Never below 0; see overEnrolled. */
   seatsAvailable: number;
@@ -455,7 +458,7 @@ function toPeriodView(
  * (no seat cap), whose practice times Workday leaves out, "no set meeting
  * times listed": "Async" there read as no meetings at all.
  */
-export const asyncText = (s: { seats: number }) =>
+const asyncText = (s: { seats: number }) =>
   isUncapped(s) ? 'no set meeting times listed' : 'Async';
 
 /**
@@ -465,7 +468,7 @@ export const asyncText = (s: { seats: number }) =>
  * 226), each meeting carries its own room and `location` is empty, so no
  * room is read against the wrong day.
  */
-export function meetingsAndRoom(parts: { when: string; room: string }[]): {
+function meetingsAndRoom(parts: { when: string; room: string }[]): {
   meets: string;
   location: string;
 } {
@@ -573,6 +576,7 @@ function toSectionView(
     term: section.computedTerm,
     kind,
     pairsWith,
+    ...meetings(section),
     seats: section.seats,
     ...openSeats(section),
     waitlist: section.actualWaitlist,

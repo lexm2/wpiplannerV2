@@ -21,10 +21,8 @@ import { one, plural } from '../api/text';
 import { escapeRegExp } from '../utils/searchUtils';
 import { QUARTERS, TERMS } from '../utils/typeGuards';
 import {
-  asyncText,
   isUncapped,
   LOW_SEATS,
-  meetingsAndRoom,
   ownDates,
   SOLID_RATINGS,
 } from '../api/serialize';
@@ -543,33 +541,28 @@ interface SectionDigest {
   endDate?: string;
 }
 
+/** The section's instructors over all its periods, each once. */
+function instructorsOf(s: SectionView): InstructorView[] {
+  const people = new Map<string, InstructorView>();
+  for (const p of s.periods)
+    for (const i of p.instructors) people.set(i.name, i);
+  return [...people.values()];
+}
+
 function digestSection(
   s: SectionView,
   term: DateSpan | undefined,
 ): SectionDigest {
   const dates = ownDates(s, term);
-  const { meets, location } = meetingsAndRoom(
-    s.periods.map(p => ({
-      when: p.isAsync
-        ? asyncText(s)
-        : p.start && p.end
-          ? `${p.days.join('')} ${p.start}-${p.end}`
-          : 'TBD',
-      room: p.location,
-    })),
-  );
-  const people = new Map<string, InstructorView>();
-  for (const p of s.periods)
-    for (const i of p.instructors) people.set(i.name, i);
   return {
     crn: s.crn,
     number: s.number,
     term: s.term,
     kind: s.kind,
     pairsWith: s.pairsWith,
-    meets,
-    location,
-    instructors: [...people.keys()],
+    meets: s.meets,
+    location: s.location,
+    instructors: instructorsOf(s).map(i => i.name),
     seats: s.seats,
     seatsAvailable: s.seatsAvailable,
     ...(s.overEnrolled && { overEnrolled: s.overEnrolled }),
@@ -582,22 +575,13 @@ function digestSection(
 }
 
 function viewLine(s: SectionView, term: DateSpan | undefined): string {
-  const d = digestSection(s, term);
-  const people = new Map<string, InstructorView>();
-  for (const p of s.periods)
-    for (const i of p.instructors) people.set(i.name, i);
-  return [
-    `${d.number} CRN ${d.crn}`,
-    runs(ownDates(s, term)),
-    d.meets,
-    d.location,
-    [...people.values()].map(i => instructor(i, true)).join('; '),
-    seats(s),
-    ...exceptions(s),
-    ...(d.meetsWith.length ? [`meets with ${d.meetsWith.join(', ')}`] : []),
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  const line = briefLine(
+    { ...s, instructors: instructorsOf(s), dates: ownDates(s, term) },
+    false,
+  );
+  return s.meetsWith.length
+    ? `${line} | meets with ${s.meetsWith.join(', ')}`
+    : line;
 }
 
 /**
@@ -646,13 +630,11 @@ export function courseDigest(
 /** Rate My Professor numbers per instructor shown, rated ones only. */
 function ratingsOf(sections: SectionView[]) {
   const ratings: Record<string, Omit<Rating, 'url'>> = {};
-  for (const s of sections)
-    for (const p of s.periods)
-      for (const i of p.instructors) {
-        if (!i.rmp) continue;
-        const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
-        ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
-      }
+  for (const i of sections.flatMap(instructorsOf)) {
+    if (!i.rmp) continue;
+    const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
+    ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
+  }
   return ratings;
 }
 
