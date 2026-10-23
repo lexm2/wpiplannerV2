@@ -314,7 +314,7 @@ describe('section dates on the real catalog', () => {
   it("prints a half-semester section's own dates", async () => {
     const section = [...catalog.sectionsByCrn.values()].find(
       e =>
-        e.section.computedTerm === 'F' &&
+        (e.section.computedTerm as string) === 'F' &&
         e.courses[0].academicYear === 2026 &&
         e.section.endDate &&
         e.section.endDate < '2026-12-01',
@@ -348,7 +348,7 @@ describe('omitted full sections on the real catalog', () => {
           .filter(
             e =>
               e.courses.includes(course) &&
-              e.section.computedTerm === term &&
+              (e.section.computedTerm as string) === term &&
               !e.section.isInterestList &&
               e.section.seatsAvailable <= 0,
           )
