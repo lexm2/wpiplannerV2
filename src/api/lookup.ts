@@ -36,7 +36,6 @@ import { andList, plural } from './text';
 import { forecastCourse, type Forecast } from './forecast';
 import {
   courseCode,
-  statementOf,
   termsOf,
   toCourseDetail,
   toCourseSummary,
@@ -398,8 +397,8 @@ export function lookupCourse(
           course: {
             ...summary,
             description: base.description,
-            recommendedBackground: statementOf(base, 'recommendedBackground'),
-            prerequisites: statementOf(base, 'prerequisites'),
+            recommendedBackground: base.recommendedBackground ?? null,
+            prerequisites: base.prerequisites ?? null,
             courseTypes: base.courseTypes,
           },
         },

@@ -25,8 +25,8 @@ import {
   LOW_SEATS,
   ownDates,
   SOLID_RATINGS,
-  STATEMENT_HEADING,
 } from '../api/serialize';
+import { STATEMENT_HEADING } from '../utils/statementHeadings';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;

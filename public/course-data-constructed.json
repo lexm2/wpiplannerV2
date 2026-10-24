@@ -5372,6 +5372,7 @@
           "crossListedWith": [
             "IMGD 174X"
           ],
+          "recommendedBackground": "No prerequisites are suggested or recommended",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -15774,6 +15775,7 @@
             "Special Topic"
           ],
           "crossListedWith": [],
+          "prerequisites": "will vary with topic.",
           "minCredits": 2,
           "maxCredits": 2,
           "isGraduate": true,
@@ -20219,6 +20221,7 @@
           "crossListedWith": [
             "ME 4814"
           ],
+          "recommendedBackground": "BB 3101 or equivalent Human Anatomy and Physiology, CH 1010 or equivalent General Chemistry, ES 2001 or equivalent Introduction to Materials Science and Engineering, and basic mathematics through differential and integral calculus.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -52248,6 +52251,7 @@
           "crossListedWith": [
             "DS 594"
           ],
+          "prerequisites": "Completion of at least 24 credits of the AI degree, or consent of the instructor.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": true,
@@ -53073,6 +53077,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "Data science basics equivalent to DS 1010, applied statistics and regression equivalent to MA 2611 and MA 2612, and the ability to write computer programs in a scientific language equivalent to a CS programming course at the CS 1000 or CS 2000 level are assumed.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -53218,6 +53223,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "Data science basics equivalent to DS 1010, and data analysis principles and modeling equivalent to DS 2010, knowledge of basic statistics equivalent to (MA 2611 and MA 2612), and the ability to program equivalent to (CS 1004 or CS 1101 or CS 1102) and (CS 2102, CS 2103 or CS 2119), as well as understanding of databases equivalent to (CS 3431 or MIS 3720) are assumed.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -54928,6 +54934,7 @@
           "crossListedWith": [
             "CS 594"
           ],
+          "prerequisites": "Completion of at least 24 credits of the AI degree, or consent of the instructor.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": true,
@@ -57381,7 +57388,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
-          "recommendedBackground": "ECE 2029 or equivalent knowledge of digital logic, logic signals, and logic operations.",
+          "recommendedBackground": "ECE 2039 (preferred for ECE majors) or a course in C language programming such as CS 2301/3 or equivalent; and ECE 2010 or equivalent knowledge in basic circuits, devices and analysis. ECE 2029 or equivalent knowledge of digital logic, logic signals, and logic operations.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -58143,6 +58150,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "ECE 2039 (preferred for ECE majors) or a prior course in computer programming such as CS 2301/3, CS 1004 or CS 1101/2; MA 2051; and ECE 2010.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -68445,6 +68453,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "mechanical systems (ES 2501 or equivalent), differential (MA 1021) and integral (MA 1022) calculus, vector algebra (MA 1023), and double and triple integration (MA 1024).",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -71527,6 +71536,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "five of the following: ACC 2101, BUS 1010, BUS 1020, BUS 2020, BUS 2060, BUS 3010, BUS 3020, BUS 4030, ETR 3915, OIE 2850.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -85944,6 +85954,7 @@
           "crossListedWith": [
             "SP 3526"
           ],
+          "recommendedBackground": "SP3521 and SP 3522",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -87195,6 +87206,7 @@
           "crossListedWith": [
             "AR 174X"
           ],
+          "recommendedBackground": "No prerequisites are suggested or recommended",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -89768,6 +89780,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "familiarity with 3d art and design software, interactive design fundamentals, such as AR 2101 and IMGD 2740, and experience with the development cycle, such as IMGD 1001 and IMGD 2900.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -132550,6 +132563,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "Multivariable calculus at the level of MA 1024: Calculus IV and linear algebra at the level of MA 2071: Matrices & Linear Algebra 1.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -133177,6 +133191,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "will vary from topic to topic and will thus be communicated by the Department of Mathematical Sciences for each offering.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -139298,6 +139313,7 @@
           "crossListedWith": [
             "BME 4814"
           ],
+          "recommendedBackground": "BB 3101 or equivalent Human Anatomy and Physiology, CH 1010 or equivalent General Chemistry, ES 2001 or equivalent Introduction to Materials Science and Engineering, and basic mathematics through differential and integral calculus.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -157650,6 +157666,7 @@
             "Studio"
           ],
           "crossListedWith": [],
+          "recommendedBackground": "Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022 (integral calculus) or higher.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -165086,6 +165103,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "Working knowledge of differential and integral calculus (MA 1021 and MA 1022).",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -167358,6 +167376,7 @@
             "Studio"
           ],
           "crossListedWith": [],
+          "recommendedBackground": "Working knowledge of the material presented in PH 1110 or PH 1111, of differential and integral calculus (MA 1021 and MA 1022).",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -180120,6 +180139,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "PH 1110, PH 1120, PH 1130 and PH 1140 (or their equivalents).",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -181055,6 +181075,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "will be published along with the specific course description.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -181671,6 +181692,7 @@
           "degreeAttributes": [],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "a bachelor’s degree in science or engineering.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": true,
@@ -191056,6 +191078,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "Spanish 1523 or 3 years of Spanish in high school.",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -191164,6 +191187,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "SP1523 and SP1524",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -191407,6 +191431,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "2522",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -191650,6 +191675,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "SP 2522",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -191848,6 +191874,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "SP 3521",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -192110,6 +192137,7 @@
           "crossListedWith": [
             "ID 3526"
           ],
+          "recommendedBackground": "SP3521 and SP 3522",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
@@ -192316,6 +192344,7 @@
           ],
           "courseTypes": [],
           "crossListedWith": [],
+          "recommendedBackground": "SP3521 and 3522",
           "minCredits": 3,
           "maxCredits": 3,
           "isGraduate": false,
