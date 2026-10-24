@@ -310,8 +310,11 @@ export class ICSGenerator {
           if (options.includeDescription !== false) {
             const descParts: string[] = [];
 
-            if (options.includeProfessor !== false && period.professor) {
-              descParts.push(`Professor: ${period.professor}`);
+            if (
+              options.includeProfessor !== false &&
+              period.instructors.length > 0
+            ) {
+              descParts.push(`Professor: ${period.instructors.join('; ')}`);
             }
 
             descParts.push(`CRN: ${section.crn}`);

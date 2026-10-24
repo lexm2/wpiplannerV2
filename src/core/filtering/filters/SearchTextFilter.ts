@@ -20,7 +20,7 @@ function sectionText(section: Section): string {
   return foldText(
     [
       section.number,
-      ...section.periods.flatMap(p => [p.professor, p.type]),
+      ...section.periods.flatMap(p => [...p.instructors, p.type]),
     ].join(' '),
   );
 }
@@ -59,7 +59,7 @@ function sectionWords(section: Section): SectionWords {
     buildings: foldWords(place.buildings),
     places: foldWords(place.all),
     instructors: foldWords(
-      section.periods.map(p => foldText(p.professor)).join(' '),
+      section.periods.flatMap(p => p.instructors.map(foldText)).join(' '),
     ),
   };
   wordsCache.set(section, words);

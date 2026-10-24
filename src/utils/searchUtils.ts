@@ -908,7 +908,7 @@ export function escapeRegExp(text: string): string {
 }
 
 /**
- * Unique professor names across all course sections, sorted; TBA entries excluded.
+ * Unique instructor names across all course sections, sorted.
  */
 export function getAvailableProfessors(courses: Course[]): string[] {
   const professors = new Set<string>();
@@ -917,9 +917,7 @@ export function getAvailableProfessors(courses: Course[]): string[] {
     const sections = getAllSections(course);
     sections.forEach(section => {
       section.periods.forEach(period => {
-        if (period.professor && period.professor !== 'TBA') {
-          professors.add(period.professor);
-        }
+        for (const name of period.instructors) professors.add(name);
       });
     });
   });

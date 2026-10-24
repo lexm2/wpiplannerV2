@@ -224,8 +224,7 @@ function parsePeriods(periods: RawPeriod[]): Period[] {
   return periods.map(periodData => {
     const period: Period = {
       type: parsePeriodType(periodData.type || 'Lecture'),
-      professor: periodData.professor || '',
-      professorEmail: undefined,
+      instructors: periodData.instructors ?? [],
       startTime: parseTime(periodData.startTime),
       endTime: parseTime(periodData.endTime),
       location: periodData.location || '',

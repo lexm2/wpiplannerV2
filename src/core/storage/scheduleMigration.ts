@@ -32,11 +32,12 @@ import type { Schedule } from '../../types/schedule';
  * 1 - a single `selectedSection`, whatever component the course had.
  * 2 - component selections split into three parallel selected* fields.
  * 3 - those three collapsed into one keyed `selected` map.
+ * 4 - a period's instructors as a list, not one "A; B" string.
  *
  * `tests/fixtures/legacy-schedules.json` covers the version this migration
  * currently reads from (`v2-*`); add a `v3-*` row alongside each new rung.
  */
-export const SCHEDULE_SCHEMA_VERSION = 3;
+export const SCHEDULE_SCHEMA_VERSION = 4;
 
 type StoredCourse = Record<string, unknown> & { course?: Course };
 
@@ -86,9 +87,66 @@ function collapseToSelectedMap(stored: StoredCourse): StoredCourse {
   return { ...rest, selected };
 }
 
+/**
+ * What the catalog wrote for a period with no instructor: "Not Assigned", or
+ * "N/A" on an interest list.
+ */
+const NO_INSTRUCTOR = new Set(['', 'Not Assigned', 'N/A']);
+
+/** v3 -> v4 for one period: `professor` "A; B" becomes `instructors`. */
+function periodWithInstructors(period: unknown): unknown {
+  if (!period || typeof period !== 'object' || !('professor' in period)) {
+    return period;
+  }
+  const {
+    professor,
+    professorEmail: _email,
+    ...rest
+  } = period as Record<string, unknown>;
+  const instructors =
+    typeof professor === 'string'
+      ? professor
+          .split(';')
+          .map(name => name.trim())
+          .filter(name => !NO_INSTRUCTOR.has(name))
+      : [];
+  return { ...rest, instructors };
+}
+
+/** `items` mapped by `f`, or `items` itself when `f` changed none of them. */
+function mapChanged(
+  items: unknown[],
+  f: (item: unknown) => unknown,
+): unknown[] {
+  const mapped = items.map(f);
+  return mapped.some((item, i) => item !== items[i]) ? mapped : items;
+}
+
+/**
+ * v3 -> v4: every period under the stored course and its selections, which
+ * are whole catalog sections. Walks plain objects and arrays only (days are
+ * Sets), and returns the value itself when nothing under it changed.
+ */
+function listInstructors(value: unknown): unknown {
+  if (Array.isArray(value)) return mapChanged(value, listInstructors);
+  if (!value || typeof value !== 'object' || value instanceof Set) return value;
+  let changed = false;
+  const next: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    next[key] =
+      key === 'periods' && Array.isArray(child)
+        ? mapChanged(child, periodWithInstructors)
+        : listInstructors(child);
+    if (next[key] !== child) changed = true;
+  }
+  return changed ? next : value;
+}
+
 /** Upgrades one stored course, returning a new object only when it changed. */
 function migrateSelectedCourse(stored: StoredCourse): StoredCourse {
-  return collapseToSelectedMap(upgradeSelectedSection(stored));
+  return listInstructors(
+    collapseToSelectedMap(upgradeSelectedSection(stored)),
+  ) as StoredCourse;
 }
 
 /**

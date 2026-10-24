@@ -236,21 +236,12 @@ export interface DetailContext {
   earlyEntry: boolean;
 }
 
-function isNamedProfessor(name: string): boolean {
-  return !!name.trim() && name !== 'TBA' && name !== 'Not Assigned';
-}
-
-/** A period's named instructors; co-taught "A; B" splits. */
-export function instructorNames(period: Period): string[] {
-  return period.professor.split(/\s*;\s*/).filter(isNamedProfessor);
-}
-
 /** Instructor names in order of first appearance. */
 function professorsOf(sections: Section[]): string[] {
   const names = new Set<string>();
   for (const section of sections) {
     for (const period of section.periods) {
-      for (const name of instructorNames(period)) names.add(name);
+      for (const name of period.instructors) names.add(name);
     }
   }
   return [...names];
@@ -402,7 +393,7 @@ function toPeriodView(
 
   return {
     type: period.type,
-    instructors: instructorNames(period).map(name => ({
+    instructors: period.instructors.map(name => ({
       name,
       rmp: ratingOf(name),
     })),

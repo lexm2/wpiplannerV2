@@ -161,7 +161,7 @@
     return section.periods[0]?.location || 'TBA';
   }
   function sectionProfessor(section: Section): string {
-    return section.periods[0]?.professor || 'Not Assigned';
+    return section.periods[0]?.instructors.join('; ') || 'Not Assigned';
   }
   function professorRmpUrl(section: Section): string | null {
     const professor = sectionProfessor(section);

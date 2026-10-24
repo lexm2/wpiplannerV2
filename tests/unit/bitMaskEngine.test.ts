@@ -27,7 +27,7 @@ function period(
 ): Period {
   return {
     type: PeriodType.LECTURE,
-    professor: 'Prof X',
+    instructors: ['Prof X'],
     startTime: { hours: startH, minutes: startM },
     endTime: { hours: endH, minutes: endM },
     location: 'SH',

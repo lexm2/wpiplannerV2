@@ -1074,10 +1074,10 @@ describe('sorted searches', () => {
             // Best rated: Ada; easiest: Barbara.
             course('MA-1022-2026', 'Calculus II', [
               section(90, 'BL01', 'B', [
-                period(['M'], '09:00', '09:50', 'Ada Lovelace'),
+                period(['M'], '09:00', '09:50', ['Ada Lovelace']),
               ]),
               section(91, 'BL02', 'B', [
-                period(['M'], '11:00', '11:50', 'Barbara Liskov'),
+                period(['M'], '11:00', '11:50', ['Barbara Liskov']),
               ]),
             ]),
             // Names MA 1022 in its description, taught by a better-rated
@@ -1413,7 +1413,7 @@ describe('search words', () => {
         courses: [
           course('PH-2201-2026', 'Optics', [
             section(110, 'B01', 'B', [
-              period(['M'], '09:00', '09:50', 'EJ Néel'),
+              period(['M'], '09:00', '09:50', ['EJ Néel']),
             ]),
           ]),
         ],

@@ -29,7 +29,7 @@ function period(days: DayOfWeek[], start: string, end: string): Period {
   const [eh, em] = end.split(':').map(Number);
   return {
     type: PeriodType.LECTURE,
-    professor: 'Prof X',
+    instructors: ['Prof X'],
     startTime: { hours: sh, minutes: sm },
     endTime: { hours: eh, minutes: em },
     location: 'SH',

@@ -9,12 +9,9 @@ type RatingNumbers = NonNullable<
   ReturnType<RateMyProfessorService['getRatings']>
 >;
 
-/** Every named instructor of the section's periods, co-instructors split. */
+/** Every instructor of the section's periods, each once. */
 function instructorsOf(fs: FilterableSection): string[] {
-  const names = fs.section.periods.flatMap(period =>
-    (period.professor ?? '').split(/\s*;\s*/),
-  );
-  return [...new Set(names.filter(name => name && name !== 'Not Assigned'))];
+  return [...new Set(fs.section.periods.flatMap(period => period.instructors))];
 }
 
 /**

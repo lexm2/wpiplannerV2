@@ -31,13 +31,13 @@ function course(over: Partial<Course> = {}): Course {
 
 function taught(
   c: Course,
-  professor: string,
+  instructors: string[],
   where: Partial<Period> = {},
 ): FilterableSection {
   const section = {
     crn: 1,
     number: 'A01',
-    periods: [{ professor, type: 'Lecture', ...where }],
+    periods: [{ instructors, type: 'Lecture', ...where }],
   } as unknown as Section;
   return { course: c, section } as unknown as FilterableSection;
 }
@@ -51,24 +51,24 @@ const kept = (
 
 describe('SearchTextFilter', () => {
   it('finds accented instructor names typed without accents, and back', () => {
-    const neel = taught(course(), 'EJ Néel');
-    const martin = taught(
-      course({ id: 'B' }),
-      'Marja Bakermans; William San Martín',
-    );
+    const neel = taught(course(), ['EJ Néel']);
+    const martin = taught(course({ id: 'B' }), [
+      'Marja Bakermans',
+      'William San Martín',
+    ]);
     expect(kept([neel], 'Neel', true)).toBe(1);
     expect(kept([neel], 'neel')).toBe(1);
     expect(kept([martin], 'Martin', true)).toBe(1);
     expect(kept([martin], 'san martin')).toBe(1);
-    const plain = taught(course({ id: 'C' }), 'Karl-Frederic Vieux');
+    const plain = taught(course({ id: 'C' }), ['Karl-Frederic Vieux']);
     expect(kept([plain], 'Frédéric', true)).toBe(1);
     expect(kept([plain], 'Frédéric')).toBe(1);
   });
 
   it('finds accented course text typed without accents', () => {
     const c = course({ name: 'Le Cinéma Français', description: 'Films.' });
-    expect(kept([taught(c, 'Ann Lee')], 'cinema francais')).toBe(1);
-    expect(kept([taught(course(), 'Ann Lee')], 'cinéma')).toBe(0);
+    expect(kept([taught(c, ['Ann Lee'])], 'cinema francais')).toBe(1);
+    expect(kept([taught(course(), ['Ann Lee'])], 'cinéma')).toBe(0);
   });
 
   it('takes each word from the section or the course, whichever has it', () => {
@@ -78,19 +78,19 @@ describe('SearchTextFilter', () => {
     });
     // "lee" only in the instructor, "robotics" and "sensors" only in the
     // course: the course fails at "lee", and the later words still count.
-    const section = taught(robotics, 'Ann Lee');
+    const section = taught(robotics, ['Ann Lee']);
     expect(kept([section], 'lee robotics sensors')).toBe(1);
     expect(kept([section], 'robotics lee sensors')).toBe(1);
     expect(kept([section], 'lee robotics cooking')).toBe(0);
-    expect(kept([taught(robotics, 'Bo Chen')], 'lee robotics')).toBe(0);
+    expect(kept([taught(robotics, ['Bo Chen'])], 'lee robotics')).toBe(0);
   });
 
   it('reads "QX2" as a code on the first search of a new department', () => {
     const qx = (number: string) =>
       course({ id: `QX-${number}`, departmentAbbr: 'QX', number });
     const sections = [
-      taught(qx('2001'), 'Ann Lee'),
-      taught(qx('3001'), 'Ann Lee'),
+      taught(qx('2001'), ['Ann Lee']),
+      taught(qx('3001'), ['Ann Lee']),
     ];
     expect(filter.apply(sections, { query: 'QX2' })).toEqual([sections[0]]);
   });
@@ -101,10 +101,10 @@ describe('SearchTextFilter', () => {
       name: 'Experimentation',
       description: 'Applied physics.',
     });
-    const inLabs = taught(physics, 'Ann Lee', {
+    const inLabs = taught(physics, ['Ann Lee'], {
       location: 'Higgins Labs 216 AE Undergraduate Lab',
     });
-    const labSection = taught(physics, 'Ann Lee', {
+    const labSection = taught(physics, ['Ann Lee'], {
       type: PeriodType.LAB,
       location: 'Olin Hall 107',
     });

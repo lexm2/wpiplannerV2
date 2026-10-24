@@ -5,7 +5,7 @@
 
 export interface RawPeriod {
   type?: string;
-  professor?: string;
+  instructors?: string[];
   startTime: string;
   endTime: string;
   location?: string;

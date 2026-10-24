@@ -387,7 +387,9 @@ describe('short words, acronyms and numerals', () => {
             section: {
               crn: 1,
               number,
-              periods: [{ professor, location: 'Atwater Kent 233' }],
+              periods: [
+                { instructors: [professor], location: 'Atwater Kent 233' },
+              ],
             },
             compatibleDiscussions: [],
             compatibleLabs: [],

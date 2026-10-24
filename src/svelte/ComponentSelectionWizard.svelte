@@ -279,7 +279,8 @@
               {#each group.sections as section, i (section.crn)}
                 {@const period = section.periods[0]}
                 {@const isAsync = isAsyncPeriod(period)}
-                {@const professor = period?.professor || 'Not Assigned'}
+                {@const professor =
+                  period?.instructors.join('; ') || 'Not Assigned'}
                 {@const rmp =
                   professor !== 'Not Assigned'
                     ? rateMyProfessorService.getRatingDisplay(professor)

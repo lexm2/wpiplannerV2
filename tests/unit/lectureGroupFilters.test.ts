@@ -17,7 +17,7 @@ function section(
   crn: number,
   number: string,
   type: PeriodType,
-  professor: string,
+  instructors: string[],
   seatsAvailable = 5,
 ): Section {
   return {
@@ -37,7 +37,7 @@ function section(
     periods: [
       {
         type,
-        professor,
+        instructors,
         building: '',
         room: '',
         location: '',
@@ -47,10 +47,10 @@ function section(
 }
 
 const labs = [
-  section(11, 'AX01', PeriodType.LAB, 'Not Assigned'),
-  section(12, 'AX02', PeriodType.LAB, 'Pat Teaching-Assistant', 0),
+  section(11, 'AX01', PeriodType.LAB, []),
+  section(12, 'AX02', PeriodType.LAB, ['Pat Teaching-Assistant'], 0),
 ];
-const discussion = section(21, 'AD01', PeriodType.DISCUSSION, 'Not Assigned');
+const discussion = section(21, 'AD01', PeriodType.DISCUSSION, []);
 
 const calculus: Course = {
   id: 'MA-1021-2026',
@@ -66,12 +66,12 @@ const calculus: Course = {
   maxCredits: 3,
   lectures: [
     {
-      section: section(1, 'AL04', PeriodType.LECTURE, 'Keenan Kidwell'),
+      section: section(1, 'AL04', PeriodType.LECTURE, ['Keenan Kidwell']),
       compatibleDiscussions: [discussion],
       compatibleLabs: labs,
     },
     {
-      section: section(2, 'AL01', PeriodType.LECTURE, 'Other Lecturer'),
+      section: section(2, 'AL01', PeriodType.LECTURE, ['Other Lecturer']),
       compatibleDiscussions: [discussion],
       compatibleLabs: labs,
     },

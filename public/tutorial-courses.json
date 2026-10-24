@@ -26,7 +26,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Stack Overflow",
+                "instructors": [
+                  "Prof. Stack Overflow"
+                ],
                 "startTime": "12:00",
                 "endTime": "12:00",
                 "location": "Unknown",
@@ -60,7 +62,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Stack Overflow",
+                "instructors": [
+                  "Prof. Stack Overflow"
+                ],
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Unity Hall 500",
@@ -97,7 +101,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "13:00",
                   "endTime": "13:50",
                   "location": "Unity Hall 500",
@@ -129,7 +135,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -164,7 +172,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Stack Overflow",
+                "instructors": [
+                  "Prof. Stack Overflow"
+                ],
                 "startTime": "14:00",
                 "endTime": "14:50",
                 "location": "Unity Hall 400",
@@ -201,7 +211,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -233,7 +245,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -268,7 +282,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Stack Overflow",
+                "instructors": [
+                  "Prof. Stack Overflow"
+                ],
                 "startTime": "09:00",
                 "endTime": "09:50",
                 "location": "Unity Hall 520",
@@ -305,7 +321,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "13:00",
                   "endTime": "13:50",
                   "location": "Unity Hall 500",
@@ -337,7 +355,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -369,7 +389,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -401,7 +423,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "11:00",
                   "endTime": "12:50",
                   "location": "Unity Hall 400",
@@ -433,7 +457,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -468,7 +494,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Stack Overflow",
+                "instructors": [
+                  "Prof. Stack Overflow"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Unity Hall 400",
@@ -505,7 +533,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -537,7 +567,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "11:00",
                   "endTime": "12:50",
                   "location": "Unity Hall 400",
@@ -572,7 +604,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Stack Overflow",
+                "instructors": [
+                  "Prof. Stack Overflow"
+                ],
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -609,7 +643,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -641,7 +677,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Stack Overflow",
+                  "instructors": [
+                    "Prof. Stack Overflow"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Fuller Labs PHL Perreault Hall - Lower Section",
@@ -693,7 +731,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Unity Hall 400",
@@ -729,7 +769,9 @@
               "periods": [
                 {
                   "type": "Discussion",
-                  "professor": "Dr. Isaac Newt",
+                  "instructors": [
+                    "Dr. Isaac Newt"
+                  ],
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Innovation Studio 203 Active Learning Classroom South",
@@ -765,7 +807,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 105",
@@ -783,7 +827,9 @@
               },
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Innovation Studio 205 Active Learning Classroom North",
@@ -804,7 +850,9 @@
               },
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Innovation Studio 203 Active Learning Classroom South",
@@ -843,7 +891,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Unity Hall 400",
@@ -879,7 +929,9 @@
               "periods": [
                 {
                   "type": "Discussion",
-                  "professor": "Dr. Isaac Newt",
+                  "instructors": [
+                    "Dr. Isaac Newt"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Unity Hall 400",
@@ -915,7 +967,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "16:00",
                 "endTime": "16:50",
                 "location": "Higgins Labs 116",
@@ -951,7 +1005,9 @@
               "periods": [
                 {
                   "type": "Discussion",
-                  "professor": "Dr. Isaac Newt",
+                  "instructors": [
+                    "Dr. Isaac Newt"
+                  ],
                   "startTime": "16:00",
                   "endTime": "17:50",
                   "location": "Unity Hall 500",
@@ -987,7 +1043,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "09:00",
                 "endTime": "09:50",
                 "location": "Fuller Labs PHU Perreault Hall - Upper Section",
@@ -1023,7 +1081,9 @@
               "periods": [
                 {
                   "type": "Discussion",
-                  "professor": "Dr. Isaac Newt",
+                  "instructors": [
+                    "Dr. Isaac Newt"
+                  ],
                   "startTime": "09:00",
                   "endTime": "09:50",
                   "location": "Higgins Labs 116",
@@ -1059,7 +1119,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Isaac Newt",
+                "instructors": [
+                  "Dr. Isaac Newt"
+                ],
                 "startTime": "12:00",
                 "endTime": "12:50",
                 "location": "Unity Hall 500",
@@ -1095,7 +1157,9 @@
               "periods": [
                 {
                   "type": "Discussion",
-                  "professor": "Dr. Isaac Newt",
+                  "instructors": [
+                    "Dr. Isaac Newt"
+                  ],
                   "startTime": "12:00",
                   "endTime": "13:50",
                   "location": "Unity Hall 500",
@@ -1148,7 +1212,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Fourier",
+                "instructors": [
+                  "Dr. Fourier"
+                ],
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Higgins Labs 218 Discovery Classroom",
@@ -1188,7 +1254,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Fourier",
+                "instructors": [
+                  "Dr. Fourier"
+                ],
                 "startTime": "09:00",
                 "endTime": "09:50",
                 "location": "Unity Hall 400",
@@ -1228,7 +1296,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Fourier",
+                "instructors": [
+                  "Dr. Fourier"
+                ],
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Kaven Hall 116",
@@ -1268,7 +1338,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Fourier",
+                "instructors": [
+                  "Dr. Fourier"
+                ],
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Higgins Labs 116",
@@ -1308,7 +1380,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Fourier",
+                "instructors": [
+                  "Dr. Fourier"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Atwater Kent 233",
@@ -1327,7 +1401,9 @@
               },
               {
                 "type": "Lecture",
-                "professor": "Dr. Fourier",
+                "instructors": [
+                  "Dr. Fourier"
+                ],
                 "startTime": "14:00",
                 "endTime": "14:50",
                 "location": "Atwater Kent 233",
@@ -1380,7 +1456,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Rudolf Kalman",
+                "instructors": [
+                  "Dr. Rudolf Kalman"
+                ],
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Higgins Labs 116",
@@ -1417,7 +1495,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Rudolf Kalman",
+                  "instructors": [
+                    "Dr. Rudolf Kalman"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1449,7 +1529,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Rudolf Kalman",
+                  "instructors": [
+                    "Dr. Rudolf Kalman"
+                  ],
                   "startTime": "11:00",
                   "endTime": "12:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1484,7 +1566,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Rudolf Kalman",
+                "instructors": [
+                  "Dr. Rudolf Kalman"
+                ],
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Goddard Hall 227 Classroom",
@@ -1521,7 +1605,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Rudolf Kalman",
+                  "instructors": [
+                    "Dr. Rudolf Kalman"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1553,7 +1639,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Rudolf Kalman",
+                  "instructors": [
+                    "Dr. Rudolf Kalman"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1588,7 +1676,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Rudolf Kalman",
+                "instructors": [
+                  "Dr. Rudolf Kalman"
+                ],
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Salisbury Labs 411",
@@ -1625,7 +1715,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Rudolf Kalman",
+                  "instructors": [
+                    "Dr. Rudolf Kalman"
+                  ],
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1657,7 +1749,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Rudolf Kalman",
+                  "instructors": [
+                    "Dr. Rudolf Kalman"
+                  ],
                   "startTime": "10:00",
                   "endTime": "11:50",
                   "location": "Higgins Labs 031 ME Computer Lab",
@@ -1709,7 +1803,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Cash Moneybags",
+                "instructors": [
+                  "Prof. Cash Moneybags"
+                ],
                 "startTime": "08:00",
                 "endTime": "09:50",
                 "location": "Innovation Studio 105 Active Learning Classroom",
@@ -1746,7 +1842,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Cash Moneybags",
+                "instructors": [
+                  "Prof. Cash Moneybags"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Innovation Studio 105 Active Learning Classroom",
@@ -1783,7 +1881,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Cash Moneybags",
+                "instructors": [
+                  "Prof. Cash Moneybags"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Innovation Studio 105 Active Learning Classroom",
@@ -1820,7 +1920,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Cash Moneybags",
+                "instructors": [
+                  "Prof. Cash Moneybags"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Innovation Studio 105 Active Learning Classroom",
@@ -1874,7 +1976,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -1910,7 +2014,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "15:00",
                 "endTime": "16:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -1946,7 +2052,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -1982,7 +2090,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2018,7 +2128,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2054,7 +2166,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2090,7 +2204,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 204",
@@ -2126,7 +2242,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 204",
@@ -2162,7 +2280,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Daniels Hall 102E",
@@ -2180,7 +2300,9 @@
               },
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2198,7 +2320,9 @@
               },
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "10:50",
                 "location": "Daniels Hall 102E",
@@ -2234,7 +2358,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2270,7 +2396,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2306,7 +2434,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2342,7 +2472,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2378,7 +2510,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2414,7 +2548,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2450,7 +2586,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2486,7 +2624,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -2522,7 +2662,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Stratton Hall 313",
@@ -2558,7 +2700,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2594,7 +2738,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Olin Hall 109",
@@ -2630,7 +2776,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 204",
@@ -2666,7 +2814,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2702,7 +2852,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -2738,7 +2890,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "13:00",
                 "endTime": "14:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2774,7 +2928,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2810,7 +2966,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2846,7 +3004,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -2882,7 +3042,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "15:00",
                 "endTime": "16:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2918,7 +3080,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2954,7 +3118,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -2990,7 +3156,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3026,7 +3194,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Stratton Hall 311",
@@ -3062,7 +3232,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3098,7 +3270,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Stratton Hall 311",
@@ -3134,7 +3308,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -3170,7 +3346,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3206,7 +3384,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3242,7 +3422,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3278,7 +3460,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3314,7 +3498,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Higgins Labs 154",
@@ -3350,7 +3536,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3386,7 +3574,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3422,7 +3612,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3458,7 +3650,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "08:00",
                 "endTime": "09:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3494,7 +3688,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3530,7 +3726,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -3566,7 +3764,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3602,7 +3802,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Washburn 323",
@@ -3638,7 +3840,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3674,7 +3878,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 011",
@@ -3710,7 +3916,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Kaven Hall 115",
@@ -3746,7 +3954,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3782,7 +3992,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3818,7 +4030,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3854,7 +4068,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3890,7 +4106,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3926,7 +4144,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -3962,7 +4182,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -3998,7 +4220,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Alden Hall B06 Janet Earle Room",
@@ -4034,7 +4258,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4070,7 +4296,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -4106,7 +4334,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4142,7 +4372,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4178,7 +4410,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "08:00",
                 "endTime": "09:50",
                 "location": "Salisbury Labs 124 Conference Room",
@@ -4214,7 +4448,9 @@
             "periods": [
               {
                 "type": "Seminar",
-                "professor": "Dr. Harold Bloom",
+                "instructors": [
+                  "Dr. Harold Bloom"
+                ],
                 "startTime": "14:00",
                 "endTime": "15:50",
                 "location": "Salisbury Labs 226 HUA Seminar Room",
@@ -4267,7 +4503,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Ty Murray",
+                "instructors": [
+                  "Dr. Ty Murray"
+                ],
                 "startTime": "12:00",
                 "endTime": "12:50",
                 "location": "Higgins Labs 218 Discovery Classroom",
@@ -4304,7 +4542,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4336,7 +4576,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "10:00",
                   "endTime": "11:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4371,7 +4613,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Ty Murray",
+                "instructors": [
+                  "Dr. Ty Murray"
+                ],
                 "startTime": "15:00",
                 "endTime": "15:50",
                 "location": "Unity Hall 520",
@@ -4408,7 +4652,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4440,7 +4686,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4472,7 +4720,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "18:00",
                   "endTime": "19:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4524,7 +4774,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Ty Murray",
+                "instructors": [
+                  "Dr. Ty Murray"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Unity Hall 420",
@@ -4561,7 +4813,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4593,7 +4847,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4628,7 +4884,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Ty Murray",
+                "instructors": [
+                  "Dr. Ty Murray"
+                ],
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Olin Hall 107",
@@ -4665,7 +4923,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4697,7 +4957,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4729,7 +4991,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Ty Murray",
+                  "instructors": [
+                    "Dr. Ty Murray"
+                  ],
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Innovation Studio 103 Robotics Lab",
@@ -4781,7 +5045,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Kirchhoff",
+                "instructors": [
+                  "Prof. Kirchhoff"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Goddard Hall 227 Classroom",
@@ -4818,7 +5084,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Kirchhoff",
+                  "instructors": [
+                    "Prof. Kirchhoff"
+                  ],
                   "startTime": "08:00",
                   "endTime": "09:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4850,7 +5118,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Kirchhoff",
+                  "instructors": [
+                    "Prof. Kirchhoff"
+                  ],
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4885,7 +5155,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Kirchhoff",
+                "instructors": [
+                  "Prof. Kirchhoff"
+                ],
                 "startTime": "13:00",
                 "endTime": "13:50",
                 "location": "Kaven Hall 116",
@@ -4922,7 +5194,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Kirchhoff",
+                  "instructors": [
+                    "Prof. Kirchhoff"
+                  ],
                   "startTime": "09:00",
                   "endTime": "10:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4954,7 +5228,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Kirchhoff",
+                  "instructors": [
+                    "Prof. Kirchhoff"
+                  ],
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -4989,7 +5265,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Kirchhoff",
+                "instructors": [
+                  "Prof. Kirchhoff"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 233",
@@ -5026,7 +5304,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Kirchhoff",
+                  "instructors": [
+                    "Prof. Kirchhoff"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -5058,7 +5338,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Kirchhoff",
+                  "instructors": [
+                    "Prof. Kirchhoff"
+                  ],
                   "startTime": "14:00",
                   "endTime": "15:50",
                   "location": "Atwater Kent 227 Lab Restricted Access",
@@ -5110,7 +5392,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Hans Moravec",
+                "instructors": [
+                  "Prof. Hans Moravec"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 219",
@@ -5147,7 +5431,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Hans Moravec",
+                  "instructors": [
+                    "Prof. Hans Moravec"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5179,7 +5465,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Hans Moravec",
+                  "instructors": [
+                    "Prof. Hans Moravec"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5214,7 +5502,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Prof. Hans Moravec",
+                "instructors": [
+                  "Prof. Hans Moravec"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Unity Hall 500",
@@ -5251,7 +5541,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Hans Moravec",
+                  "instructors": [
+                    "Prof. Hans Moravec"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5283,7 +5575,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Prof. Hans Moravec",
+                  "instructors": [
+                    "Prof. Hans Moravec"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5335,7 +5629,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Russ Tedrake",
+                "instructors": [
+                  "Dr. Russ Tedrake"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 219",
@@ -5372,7 +5668,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Russ Tedrake",
+                  "instructors": [
+                    "Dr. Russ Tedrake"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5404,7 +5702,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Russ Tedrake",
+                  "instructors": [
+                    "Dr. Russ Tedrake"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5439,7 +5739,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Russ Tedrake",
+                "instructors": [
+                  "Dr. Russ Tedrake"
+                ],
                 "startTime": "11:00",
                 "endTime": "11:50",
                 "location": "Fuller Labs PHU Perreault Hall - Upper Section",
@@ -5476,7 +5778,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Russ Tedrake",
+                  "instructors": [
+                    "Dr. Russ Tedrake"
+                  ],
                   "startTime": "13:00",
                   "endTime": "14:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5508,7 +5812,9 @@
               "periods": [
                 {
                   "type": "Lab",
-                  "professor": "Dr. Russ Tedrake",
+                  "instructors": [
+                    "Dr. Russ Tedrake"
+                  ],
                   "startTime": "15:00",
                   "endTime": "16:50",
                   "location": "Atwater Kent 120D Robotics Lab",
@@ -5560,7 +5866,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Alan Turing",
+                "instructors": [
+                  "Dr. Alan Turing"
+                ],
                 "startTime": "10:00",
                 "endTime": "11:50",
                 "location": "Atwater Kent 232",
@@ -5597,7 +5905,9 @@
             "periods": [
               {
                 "type": "Lecture",
-                "professor": "Dr. Alan Turing",
+                "instructors": [
+                  "Dr. Alan Turing"
+                ],
                 "startTime": "12:00",
                 "endTime": "13:50",
                 "location": "Higgins Labs 114",

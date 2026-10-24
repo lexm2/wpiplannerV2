@@ -37,12 +37,6 @@ export interface CourseView {
   >;
 }
 
-function isMeaningfulProf(prof: string): boolean {
-  return (
-    !!prof && prof !== 'TBA' && prof !== 'Not Assigned' && prof.trim() !== ''
-  );
-}
-
 // Identity-keyed memo: a CourseView depends only on the Course object, which is
 // a `$state.raw` value replaced wholesale on data refresh - so a cache hit means
 // the data is unchanged, and refreshed courses are new objects that miss cleanly.
@@ -99,7 +93,7 @@ export function buildCourseView(course: Course): CourseView {
         return;
       }
       const withProf = group.filter(s =>
-        s.periods.some(p => isMeaningfulProf(p.professor)),
+        s.periods.some(p => p.instructors.length > 0),
       );
       if (withProf.length > 0) deduped.push(...withProf);
       else deduped.push(group[0]);
@@ -110,7 +104,7 @@ export function buildCourseView(course: Course): CourseView {
     const badges: SectionBadge[] = display.map((section, i) => {
       const profSet = new Set<string>();
       section.periods.forEach(p => {
-        if (isMeaningfulProf(p.professor)) profSet.add(p.professor);
+        for (const name of p.instructors) profSet.add(name);
       });
       const profArray = Array.from(profSet);
       const profPlain = profArray.join(', ') || 'TBA';

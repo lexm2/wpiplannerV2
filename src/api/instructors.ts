@@ -8,7 +8,6 @@ import type { Course } from '../types/types';
 import { getAllSections } from '../utils/courseUtils';
 import { editDistance } from '../utils/editDistance';
 import { foldText } from '../utils/searchUtils';
-import { instructorNames } from './serialize';
 
 /** Names suggested at most. */
 const MAX_SUGGESTIONS = 3;
@@ -50,7 +49,7 @@ export function suggestInstructors(courses: Course[], query: string): string[] {
   for (const course of courses) {
     for (const section of getAllSections(course)) {
       for (const period of section.periods) {
-        for (const name of instructorNames(period)) names.add(name);
+        for (const name of period.instructors) names.add(name);
       }
     }
   }

@@ -73,7 +73,8 @@ export interface PlannerSection {
 
 export interface PlannerPeriod {
   type: string;
-  professor: string;
+  /** Workday's Instructors, "A; B" split; empty when none is assigned. */
+  instructors: string[];
   startTime: string;
   endTime: string;
   location: string;
