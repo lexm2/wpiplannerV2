@@ -123,208 +123,200 @@ const DetailParamsSchema = z
   })
   .strict();
 
-// GET /api/courses parameter names, each mapped onto the query's shape.
-const COURSE_PARAMS = new Set([
-  'q',
-  'professorOnly',
-  'department',
-  'term',
-  'year',
-  'availableOnly',
-  'minAvailable',
-  'minCredits',
-  'maxCredits',
-  'level',
-  'times',
-  ...RMP_BOUNDS,
-  'includeWithoutData',
-  'avoidCrns',
-  'semesterSpansQuarters',
-  'maxWaitlisted',
-  'minLevel',
-  'maxLevel',
-  'degreeAttribute',
-  'deliveryMode',
-  'offeringPattern',
-  'earliestStart',
-  'latestEnd',
-  'days',
-  'includeAsync',
-  'includeInterestLists',
-  'includeEndedTerms',
-  'includeSections',
-  'sort',
-  'offset',
-  'limit',
-]);
+/** A GET parameter's value as the POST body's field takes it. */
+type ReadParam = (params: URLSearchParams, key: string) => unknown;
 
 /**
- * Query parameters turned into the POST body's shape, so both go through the
- * one CourseQuerySchema. Values are only converted here, never validated:
- * "abc" becomes NaN and the schema rejects it.
+ * Values are only converted here, never validated: "abc" becomes NaN and
+ * the schema rejects it. Number() would take "0x7EA", "1e1" and "" (as 0),
+ * so only digits count as numbers.
  */
-function courseQueryFromParams(params: URLSearchParams): unknown {
-  const unknown = [...params.keys()].filter(k => !COURSE_PARAMS.has(k));
-  if (unknown.length > 0) {
-    throw new HttpError(400, `Unknown parameter: ${unknown.join(', ')}`);
-  }
-
-  const str = (k: string) => params.get(k) ?? undefined;
-  // Number() would take "0x7EA", "1e1" and "" (as 0); only digits count.
-  const parse = (k: string, re: RegExp, what: string) => {
-    const v = params.get(k);
-    if (v === null) return undefined;
+const digits =
+  (re: RegExp, what: string): ReadParam =>
+  (params, key) => {
+    const v = params.get(key)!;
     if (!re.test(v.trim())) {
-      throw new HttpError(400, `${k} must be ${what}, got "${echo(v)}".`);
+      throw new HttpError(400, `${key} must be ${what}, got "${echo(v)}".`);
     }
     return Number(v);
   };
-  const int = (k: string) => parse(k, INTEGER_RE, 'a whole number in digits');
-  const num = (k: string) =>
-    parse(k, DECIMAL_RE, 'a number in digits, e.g. 3 or 3.5');
-  const needs = (k: string, parent: string) => {
-    if (params.has(k) && !params.has(parent)) {
-      throw new HttpError(400, `${k} needs ${parent}: it qualifies it.`);
-    }
-  };
-  needs('professorOnly', 'q');
-  needs('semesterSpansQuarters', 'avoidCrns');
-  const bool = (k: string) => {
-    const v = params.get(k);
-    if (v === null) return undefined;
-    if (v === 'true' || v === '1') return true;
-    if (v === 'false' || v === '0') return false;
-    return v;
-  };
-  const list = (k: string) =>
-    params
-      .getAll(k)
-      .flatMap(v => v.split(','))
-      .map(v => v.trim())
-      .filter(Boolean);
+const int = digits(INTEGER_RE, 'a whole number in digits');
+const num = digits(DECIMAL_RE, 'a number in digits, e.g. 3 or 3.5');
+const str: ReadParam = (params, key) => params.get(key);
+const bool: ReadParam = (params, key) => {
+  const v = params.get(key)!;
+  if (v === 'true' || v === '1') return true;
+  if (v === 'false' || v === '0') return false;
+  return v;
+};
+/** Repeated or comma-separated: `term=A,B` or `term=A&term=B`. */
+const list: ReadParam = (params, key) =>
+  params
+    .getAll(key)
+    .flatMap(v => v.split(','))
+    .map(v => v.trim())
+    .filter(Boolean);
+const upperList: ReadParam = (params, key) =>
+  (list(params, key) as string[]).map(v => v.toUpperCase());
 
-  const filters: Record<string, unknown> = {};
+const yearOrAll: ReadParam = (params, key) =>
+  /^all$/i.test(params.get(key)!) ? 'all' : int(params, key);
 
-  if (params.has('q')) {
-    filters.searchText = {
-      query: str('q'),
-      professorOnly: bool('professorOnly'),
-    };
+/** "unknown" alone: only the courses with no category on record. */
+const offeringPattern: ReadParam = (params, key) => {
+  const values = list(params, key) as string[];
+  return {
+    categories: values
+      .filter(v => v.toLowerCase() !== 'unknown')
+      .map(v => (INTEGER_RE.test(v) ? Number(v) : v)),
+    includeUnknown:
+      values.some(v => v.toLowerCase() === 'unknown') || undefined,
+  };
+};
+
+const timesJson: ReadParam = (params, key) => {
+  let times: unknown;
+  try {
+    times = JSON.parse(params.get(key)!) as unknown;
+  } catch {
+    throw new HttpError(400, 'times must be JSON');
   }
-  if (params.has('department')) {
-    filters.department = { departments: list('department') };
+  if (!times || typeof times !== 'object' || Array.isArray(times)) {
+    throw new HttpError(
+      400,
+      'times must be a JSON object, e.g. {"mode":"avoid","earliestStart":"13:00"}',
+    );
   }
-  if (params.has('term')) {
-    filters.term = { terms: list('term').map(t => t.toUpperCase()) };
-  }
-  if (params.has('year')) {
-    const year = str('year')!;
-    filters.academicYear = {
-      year: /^all$/i.test(year) ? 'all' : int('year'),
-    };
-  }
-  if (
-    params.has('availableOnly') ||
-    params.has('minAvailable') ||
-    params.has('maxWaitlisted')
-  ) {
-    filters.availability = {
-      availableOnly: bool('availableOnly'),
-      minAvailable: int('minAvailable'),
-      maxWaitlisted: int('maxWaitlisted'),
-    };
-  }
-  if (params.has('minLevel') || params.has('maxLevel')) {
-    filters.courseLevel = { min: int('minLevel'), max: int('maxLevel') };
-  }
-  if (params.has('degreeAttribute')) {
-    filters.degreeAttribute = { attributes: list('degreeAttribute') };
-  }
-  if (params.has('deliveryMode')) {
-    filters.deliveryMode = { modes: list('deliveryMode') };
-  }
-  if (params.has('offeringPattern')) {
-    const values = list('offeringPattern');
-    // "unknown" alone: only the courses with no category on record.
-    filters.offeringPattern = {
-      categories: values
-        .filter(v => v.toLowerCase() !== 'unknown')
-        .map(v => (INTEGER_RE.test(v) ? Number(v) : v)),
-      includeUnknown:
-        values.some(v => v.toLowerCase() === 'unknown') || undefined,
-    };
-  }
-  if (params.has('minCredits') || params.has('maxCredits')) {
-    // An open end is no bound: minCredits=200 alone is 200 and up.
-    const min = num('minCredits') ?? 0;
-    filters.creditRange = { min, max: num('maxCredits') ?? Math.max(100, min) };
-  }
-  if (params.has('level')) {
-    filters.graduateLevel = { level: str('level') };
-  }
-  if (params.has('times')) {
-    let times: unknown;
-    try {
-      times = JSON.parse(params.get('times')!) as unknown;
-    } catch {
-      throw new HttpError(400, 'times must be JSON');
-    }
-    if (!times || typeof times !== 'object' || Array.isArray(times)) {
+  return times;
+};
+
+const crns: ReadParam = (params, key) =>
+  (list(params, key) as string[]).map(v => {
+    if (!INTEGER_RE.test(v)) {
       throw new HttpError(
         400,
-        'times must be a JSON object, e.g. {"mode":"avoid","earliestStart":"13:00"}',
+        `${key} takes CRNs in digits, got "${echo(v)}".`,
       );
     }
-    filters.times = times;
-  }
-  if (
-    params.has('earliestStart') ||
-    params.has('latestEnd') ||
-    params.has('days') ||
-    params.has('includeAsync')
-  ) {
-    filters.times = {
-      ...(filters.times as object | undefined),
-      earliestStart: str('earliestStart'),
-      latestEnd: str('latestEnd'),
-      days: params.has('days')
-        ? list('days').map(d => d.toUpperCase())
-        : undefined,
-      includeAsync: bool('includeAsync'),
-    };
-  }
-  if (RMP_BOUNDS.some(k => params.has(k)) || params.has('includeWithoutData')) {
-    filters.rmpRating = {
-      ...Object.fromEntries(
-        RMP_BOUNDS.map(k => [k, k === 'minNumRatings' ? int(k) : num(k)]),
-      ),
-      includeWithoutData: bool('includeWithoutData'),
-    };
-  }
-  if (params.has('avoidCrns')) {
-    filters.periodConflict = {
-      crns: list('avoidCrns').map(v => {
-        if (!INTEGER_RE.test(v)) {
-          throw new HttpError(
-            400,
-            `avoidCrns takes CRNs in digits, got "${echo(v)}".`,
-          );
-        }
-        return Number(v);
-      }),
-      semesterSpansQuarters: bool('semesterSpansQuarters'),
-    };
-  }
+    return Number(v);
+  });
 
-  return {
-    filters,
-    includeEndedTerms: bool('includeEndedTerms'),
-    includeInterestLists: bool('includeInterestLists'),
-    includeSections: bool('includeSections'),
-    sort: str('sort'),
-    offset: int('offset'),
-    limit: int('limit'),
-  };
+interface CourseParam {
+  /** Where the value goes in the POST body. */
+  to: string[];
+  read: ReadParam;
+  /** The parameter it qualifies, which must be given with it. */
+  needs?: string;
+}
+
+/**
+ * GET /courses's parameters, each mapped onto a field of the POST body, so
+ * both go through the one CourseQuerySchema. In order: `times` (a JSON
+ * object) comes before the shorthand fields that are set into it.
+ */
+const COURSE_PARAMS: Record<string, CourseParam> = {
+  q: { to: ['filters', 'searchText', 'query'], read: str },
+  professorOnly: {
+    to: ['filters', 'searchText', 'professorOnly'],
+    read: bool,
+    needs: 'q',
+  },
+  department: { to: ['filters', 'department', 'departments'], read: list },
+  term: { to: ['filters', 'term', 'terms'], read: upperList },
+  year: { to: ['filters', 'academicYear', 'year'], read: yearOrAll },
+  availableOnly: {
+    to: ['filters', 'availability', 'availableOnly'],
+    read: bool,
+  },
+  minAvailable: { to: ['filters', 'availability', 'minAvailable'], read: int },
+  maxWaitlisted: {
+    to: ['filters', 'availability', 'maxWaitlisted'],
+    read: int,
+  },
+  minLevel: { to: ['filters', 'courseLevel', 'min'], read: int },
+  maxLevel: { to: ['filters', 'courseLevel', 'max'], read: int },
+  degreeAttribute: {
+    to: ['filters', 'degreeAttribute', 'attributes'],
+    read: list,
+  },
+  deliveryMode: { to: ['filters', 'deliveryMode', 'modes'], read: list },
+  offeringPattern: {
+    to: ['filters', 'offeringPattern'],
+    read: offeringPattern,
+  },
+  minCredits: { to: ['filters', 'creditRange', 'min'], read: num },
+  maxCredits: { to: ['filters', 'creditRange', 'max'], read: num },
+  level: { to: ['filters', 'graduateLevel', 'level'], read: str },
+  times: { to: ['filters', 'times'], read: timesJson },
+  earliestStart: { to: ['filters', 'times', 'earliestStart'], read: str },
+  latestEnd: { to: ['filters', 'times', 'latestEnd'], read: str },
+  days: { to: ['filters', 'times', 'days'], read: upperList },
+  includeAsync: { to: ['filters', 'times', 'includeAsync'], read: bool },
+  ...Object.fromEntries(
+    RMP_BOUNDS.map(k => [
+      k,
+      {
+        to: ['filters', 'rmpRating', k],
+        read: k === 'minNumRatings' ? int : num,
+      },
+    ]),
+  ),
+  includeWithoutData: {
+    to: ['filters', 'rmpRating', 'includeWithoutData'],
+    read: bool,
+  },
+  avoidCrns: { to: ['filters', 'periodConflict', 'crns'], read: crns },
+  semesterSpansQuarters: {
+    to: ['filters', 'periodConflict', 'semesterSpansQuarters'],
+    read: bool,
+    needs: 'avoidCrns',
+  },
+  includeEndedTerms: { to: ['includeEndedTerms'], read: bool },
+  includeInterestLists: { to: ['includeInterestLists'], read: bool },
+  includeSections: { to: ['includeSections'], read: bool },
+  sort: { to: ['sort'], read: str },
+  offset: { to: ['offset'], read: int },
+  limit: { to: ['limit'], read: int },
+};
+
+type Body = Record<string, unknown>;
+
+/** Sets `value` at `path`, making the objects on the way. */
+function setAt(body: Body, path: string[], value: unknown): void {
+  let at = body;
+  for (const key of path.slice(0, -1)) {
+    at = (at[key] ??= {}) as Body;
+  }
+  at[path[path.length - 1]] = value;
+}
+
+/** Query parameters turned into the POST body's shape (COURSE_PARAMS). */
+function courseQueryFromParams(params: URLSearchParams): unknown {
+  const unknown = [...new Set(params.keys())].filter(
+    k => !Object.hasOwn(COURSE_PARAMS, k),
+  );
+  if (unknown.length > 0) {
+    throw new HttpError(
+      400,
+      `Unknown parameter: ${unknown.map(echo).join(', ')}`,
+    );
+  }
+  const body: Body = { filters: {} };
+  for (const [key, { to, read, needs }] of Object.entries(COURSE_PARAMS)) {
+    if (!params.has(key)) continue;
+    if (needs && !params.has(needs)) {
+      throw new HttpError(400, `${key} needs ${needs}: it qualifies it.`);
+    }
+    setAt(body, to, read(params, key));
+  }
+  // An open end is no bound: minCredits=200 alone is 200 and up.
+  const credits = (body.filters as Body).creditRange as
+    { min?: number; max?: number } | undefined;
+  if (credits) {
+    credits.min ??= 0;
+    credits.max ??= Math.max(100, credits.min);
+  }
+  return body;
 }
 
 function searchCourses(catalog: Catalog, input: unknown) {
