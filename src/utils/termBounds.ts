@@ -47,15 +47,13 @@ const TermBoundsDataSchema = z.object({
   years: z.record(z.string(), YearTermBoundsSchema),
 });
 
+/**
+ * The web app shares one instance (getInstance); the course API builds one
+ * per catalog, so a reload swaps term dates with the courses.
+ */
 export class TermBoundsService {
   private static instance: TermBoundsService | null = null;
   private termBoundsCache: TermBoundsData | null = null;
-
-  /**
-   * The web app shares one instance (getInstance); the course API builds
-   * one per catalog, so a reload swaps term dates with the courses.
-   */
-  public constructor() {}
 
   public static getInstance(): TermBoundsService {
     if (!TermBoundsService.instance) {

@@ -40,24 +40,11 @@ function json(
   });
 }
 
-/** An ApiError raised by the routes themselves, with headers to send. */
-class HttpError extends ApiError {
-  constructor(
-    status: number,
-    message: string,
-    details?: unknown,
-    readonly headers: Record<string, string> = {},
-  ) {
-    super(message, status, details);
-  }
-}
-
 /** Refuses any query parameter but `allowed`, as GET /courses does. */
 function onlyParams(params: URLSearchParams, allowed: string[]): void {
   const unknown = [...new Set(params.keys())].filter(k => !allowed.includes(k));
   if (unknown.length > 0) {
-    throw new HttpError(
-      400,
+    throw new ApiError(
       `Unknown parameter: ${unknown.map(echo).join(', ')}${allowed.length ? `. Accepted: ${allowed.join(', ')}` : '; this route takes none'}.`,
     );
   }
@@ -73,7 +60,7 @@ function parseOrThrow<T extends z.ZodType>(
 ): z.output<T> {
   const result = schema.safeParse(input);
   if (!result.success) {
-    throw new HttpError(400, 'Invalid request', result.error.issues);
+    throw new ApiError('Invalid request', 400, result.error.issues);
   }
   return result.data;
 }
@@ -82,7 +69,7 @@ async function readBody(request: Request): Promise<unknown> {
   try {
     return (await request.json()) as unknown;
   } catch {
-    throw new HttpError(400, 'Request body must be JSON');
+    throw new ApiError('Request body must be JSON');
   }
 }
 
@@ -127,16 +114,16 @@ const DetailParamsSchema = z
 type ReadParam = (params: URLSearchParams, key: string) => unknown;
 
 /**
- * Values are only converted here, never validated: "abc" becomes NaN and
- * the schema rejects it. Number() would take "0x7EA", "1e1" and "" (as 0),
- * so only digits count as numbers.
+ * Numbers must be written in digits: Number() would take "0x7EA", "1e1"
+ * and "" (as 0). Anything else is only converted here, and the schema
+ * rejects what it cannot take (bool passes "maybe" through for it).
  */
 const digits =
   (re: RegExp, what: string): ReadParam =>
   (params, key) => {
     const v = params.get(key)!;
     if (!re.test(v.trim())) {
-      throw new HttpError(400, `${key} must be ${what}, got "${echo(v)}".`);
+      throw new ApiError(`${key} must be ${what}, got "${echo(v)}".`);
     }
     return Number(v);
   };
@@ -179,11 +166,10 @@ const timesJson: ReadParam = (params, key) => {
   try {
     times = JSON.parse(params.get(key)!) as unknown;
   } catch {
-    throw new HttpError(400, 'times must be JSON');
+    throw new ApiError('times must be JSON');
   }
   if (!times || typeof times !== 'object' || Array.isArray(times)) {
-    throw new HttpError(
-      400,
+    throw new ApiError(
       'times must be a JSON object, e.g. {"mode":"avoid","earliestStart":"13:00"}',
     );
   }
@@ -193,10 +179,7 @@ const timesJson: ReadParam = (params, key) => {
 const crns: ReadParam = (params, key) =>
   (list(params, key) as string[]).map(v => {
     if (!INTEGER_RE.test(v)) {
-      throw new HttpError(
-        400,
-        `${key} takes CRNs in digits, got "${echo(v)}".`,
-      );
+      throw new ApiError(`${key} takes CRNs in digits, got "${echo(v)}".`);
     }
     return Number(v);
   });
@@ -296,16 +279,13 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     k => !Object.hasOwn(COURSE_PARAMS, k),
   );
   if (unknown.length > 0) {
-    throw new HttpError(
-      400,
-      `Unknown parameter: ${unknown.map(echo).join(', ')}`,
-    );
+    throw new ApiError(`Unknown parameter: ${unknown.map(echo).join(', ')}`);
   }
   const body: Body = { filters: {} };
   for (const [key, { to, read, needs }] of Object.entries(COURSE_PARAMS)) {
     if (!params.has(key)) continue;
     if (needs && !params.has(needs)) {
-      throw new HttpError(400, `${key} needs ${needs}: it qualifies it.`);
+      throw new ApiError(`${key} needs ${needs}: it qualifies it.`);
     }
     setAt(body, to, read(params, key));
   }
@@ -394,10 +374,7 @@ const ROUTES: Route[] = [
       try {
         id = decodeURIComponent(match![1]);
       } catch {
-        throw new HttpError(
-          400,
-          'The course in the path is not valid URL encoding.',
-        );
+        throw new ApiError('The course in the path is not valid URL encoding.');
       }
       const found = lookupCourse(await getCatalog(), id, options);
       // A year not yet published answers with the outlook instead.
@@ -431,16 +408,17 @@ async function route(
     const match = typeof key === 'string' ? null : key.exec(path);
     if (key !== path && !match) continue;
     if (request.method !== method) {
-      throw new HttpError(
+      return json(
+        {
+          error: `${path} takes ${method}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
+        },
         405,
-        `${path} takes ${method}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
-        undefined,
         { Allow: `${method}, OPTIONS` },
       );
     }
     return handle({ request, url, match, getCatalog });
   }
-  throw new HttpError(404, 'Not found');
+  throw new ApiError('Not found', 404);
 }
 
 /**
@@ -486,7 +464,6 @@ export function createApiHandler(options: {
         return json(
           { error: error.message, details: error.details },
           error.status,
-          error instanceof HttpError ? error.headers : {},
         );
       }
       logger.error('[api] Request failed:', error);
