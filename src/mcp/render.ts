@@ -1,7 +1,8 @@
 /**
  * The MCP tools' text content: compact, readable renderings of the src/api
- * results for a model to read and quote, never JSON. The same results go
- * out whole as structuredContent.
+ * results for a model to read and quote, never JSON. structuredContent
+ * carries the results as data beside them, trimmed for get_course and
+ * check_conflicts to what the text shows (courseDigest, conflictData).
  */
 import type { CourseQueryResult, CourseRow } from '../api/query';
 import type {

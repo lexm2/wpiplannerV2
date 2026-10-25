@@ -561,7 +561,7 @@ const KIND_RANK: Record<SectionKind, number> = {
 export function toCourseDetail(
   course: Course,
   context: DetailContext,
-  options: DetailOptions = {},
+  options: DetailOptions,
 ): CourseDetail {
   const ratingOf = ratingLookup(context.rmp);
   const ended = new Set(context.endedTerms);

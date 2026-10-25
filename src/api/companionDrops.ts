@@ -101,9 +101,7 @@ export function companionDrops(
   const kept = new Set(matches.map(c => c.id));
   const active = COMPANION_FILTERS.flatMap(entry => {
     const c = criteria.get(entry.filter.id);
-    return c !== undefined && entry.filter.isValidCriteria(c)
-      ? [{ ...entry, criteria: c }]
-      : [];
+    return c !== undefined ? [{ ...entry, criteria: c }] : [];
   });
   const drops = new Map<
     string,

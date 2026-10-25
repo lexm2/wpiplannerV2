@@ -122,9 +122,6 @@ function courseNotFound(
   if (id !== null) {
     return courseNotFound(catalog, key.slice(0, -5), id);
   }
-  if (year < currentAcademicYear(catalog) && !catalog.years.includes(year)) {
-    return yearNotInCatalog(catalog, year);
-  }
 
   if (CRN_RE.test(key)) {
     return new ApiError(
@@ -299,7 +296,7 @@ export interface CourseLookupOptions extends DetailOptions {
 export function lookupCourse(
   catalog: Catalog,
   input: string,
-  options: CourseLookupOptions = {},
+  options: CourseLookupOptions,
 ): CourseLookup {
   const { year, ...detailOptions } = options;
   const notices: Notice[] = [];
