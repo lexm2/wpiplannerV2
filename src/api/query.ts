@@ -37,14 +37,7 @@ import {
 } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
 import { getAllSections } from '../utils/courseUtils';
-import {
-  acronymExpansions,
-  describeMatch,
-  MAX_QUERY_WORDS,
-  parseSearchQuery,
-  rankCoursesByRelevance,
-  type SearchMatch,
-} from '../utils/searchUtils';
+import { MAX_QUERY_WORDS, type SearchMatch } from '../utils/searchUtils';
 import { TERM_ORDER, TERMS } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
@@ -644,7 +637,9 @@ function relax(
       const restores =
         codeSearch !== null && filter !== 'searchText'
           ? found
-              .filter(c => describeMatch(c, codeSearch) === 'code')
+              .filter(
+                c => catalog.search.describeMatch(c, codeSearch) === 'code',
+              )
               .map(courseCode)
           : [];
       return {
@@ -682,7 +677,7 @@ function leftOutByDefaults(
   return options.flatMap(({ reason, key }) => {
     if (query[key]) return [];
     const found = matchesFor(catalog, { ...query, [key]: true }).filter(
-      c => describeMatch(c, codeSearch) === 'code',
+      c => catalog.search.describeMatch(c, codeSearch) === 'code',
     );
     if (!found.length) return [];
     const sections = found.flatMap(c => getAllSections(c));
@@ -786,7 +781,7 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
   if (filters.searchText) {
     // No letter or digit survives tokenizing: as a filter it would match
     // every course, which reads as a search that found them all.
-    const parsed = parseSearchQuery(filters.searchText.query);
+    const parsed = catalog.search.parse(filters.searchText.query);
     if (!parsed.code && parsed.words.length === 0) {
       throw new ApiError(
         `"${echo(filters.searchText.query)}" has no searchable words; the catalog is searched in English (letters and digits).`,
@@ -910,7 +905,7 @@ function createFilterService(catalog: Catalog): FilterService {
   for (const filter of createDefaultFilters(catalog.rmp)) {
     service.registerFilter(filter);
   }
-  service.registerFilter(new SearchTextFilter());
+  service.registerFilter(new SearchTextFilter(() => catalog.search));
   service.registerFilter(new EndedTermsFilter());
   service.setConflictDetector();
   return service;
@@ -949,7 +944,7 @@ function filterCatalog(
     SearchTextFilterCriteria | undefined;
   return {
     courses: search
-      ? rankCoursesByRelevance(courses, search.query)
+      ? catalog.search.rank(courses, search.query)
       : [...courses].sort(byNumber),
     passed,
   };
@@ -1028,9 +1023,9 @@ function instructorNotice(inYear: Course[], query: string): string[] {
 }
 
 /** '"AI" read as AI or artificial intelligence.', for each acronym in the query. */
-function acronymNotices(words: string[]): string[] {
+function acronymNotices(catalog: Catalog, words: string[]): string[] {
   return words.flatMap(word => {
-    const expansions = acronymExpansions(word);
+    const expansions = catalog.search.acronymExpansions(word);
     if (!expansions.length) return [];
     return [
       `"${word.toUpperCase()}" read as ${word.toUpperCase()} or ${expansions.join(' or ')}.`,
@@ -1185,7 +1180,7 @@ export function runCourseQuery(
   const collapsed = collapseCrossListings(filtered);
 
   const text = query.filters.searchText;
-  const parsed = text ? parseSearchQuery(text.query) : null;
+  const parsed = text ? catalog.search.parse(text.query) : null;
   // Instructor-only searches are about people, not topics.
   const topic = text && !text.professorOnly ? text.query : null;
   // A search naming a course by its code ("ES 3002").
@@ -1193,7 +1188,8 @@ export function runCourseQuery(
   // How each course matched a text search.
   const matchOf = new Map<Course, SearchMatch>();
   if (topic !== null) {
-    for (const c of collapsed) matchOf.set(c, describeMatch(c, topic));
+    for (const c of collapsed)
+      matchOf.set(c, catalog.search.describeMatch(c, topic));
   }
   // A code search's own course stays ahead of the courses that only name
   // it, whatever the sort: sorted by rating, MA 1022 sank below courses
@@ -1259,7 +1255,8 @@ export function runCourseQuery(
       `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
     );
   }
-  if (topic !== null && parsed) notices.push(...acronymNotices(parsed.words));
+  if (topic !== null && parsed)
+    notices.push(...acronymNotices(catalog, parsed.words));
   const ignored = parsed?.ignored ?? [];
   if (ignored.length) {
     notices.push(

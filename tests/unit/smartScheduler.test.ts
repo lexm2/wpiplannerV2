@@ -21,6 +21,9 @@ import { getDisplayTerms } from '../../src/utils/typeGuards';
 import { AcademicYearFilter } from '../../src/core/filtering/filters/AcademicYearFilter';
 import { AvailabilityFilter } from '../../src/core/filtering/filters/AvailabilityFilter';
 import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
+import { SearchIndex } from '../../src/utils/searchUtils';
+
+const searchIndex = new SearchIndex();
 
 const { MONDAY: M, TUESDAY: T, WEDNESDAY: W } = DayOfWeek;
 
@@ -464,7 +467,7 @@ describe('SmartScheduler group search', () => {
 describe('SmartScheduler.buildCandidateData with course-list filters', () => {
   function filterServiceWithListFilters(): FilterService {
     const fs = filterServiceWith();
-    fs.registerFilter(new SearchTextFilter());
+    fs.registerFilter(new SearchTextFilter(() => searchIndex));
     fs.registerFilter(new AcademicYearFilter());
     fs.registerFilter(new AvailabilityFilter());
     return fs;

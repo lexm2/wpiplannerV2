@@ -4,22 +4,19 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-  rankCoursesByRelevance,
-  calculateRelevanceScore,
   getAvailableProfessors,
-  matchCourseWords,
-  parseSearchQuery,
-  describeMatch,
-  acronymExpansions,
   foldText,
   MAX_QUERY_WORDS,
   namesHaveWord,
+  SearchIndex,
   textHasWord,
-  prepareSearch,
-  resetSearchVocabulary,
 } from '../../src/utils/searchUtils';
 import { editDistance } from '../../src/utils/editDistance';
 import type { Course } from '../../src/types/types';
+
+// One index for the file, as for one catalog: what a course's text teaches
+// (acronyms, departments) applies to the courses read after it.
+const search = new SearchIndex();
 
 function course(over: Partial<Course> = {}): Course {
   return {
@@ -38,49 +35,45 @@ function course(over: Partial<Course> = {}): Course {
   };
 }
 
-describe('calculateRelevanceScore', () => {
+describe('SearchIndex.score', () => {
   it('scores an exact course-code match above a name match', () => {
     const c = course();
-    expect(calculateRelevanceScore(c, 'cs1101')).toBeGreaterThan(
-      calculateRelevanceScore(c, 'introduction to program design'),
+    expect(search.score(c, 'cs1101')).toBeGreaterThan(
+      search.score(c, 'introduction to program design'),
     );
   });
 
   it('ignores hyphens and spaces in the query when matching a code', () => {
     const c = course();
-    expect(calculateRelevanceScore(c, 'cs 1101')).toBe(
-      calculateRelevanceScore(c, 'cs1101'),
-    );
-    expect(calculateRelevanceScore(c, 'cs-1101')).toBe(
-      calculateRelevanceScore(c, 'cs1101'),
-    );
+    expect(search.score(c, 'cs 1101')).toBe(search.score(c, 'cs1101'));
+    expect(search.score(c, 'cs-1101')).toBe(search.score(c, 'cs1101'));
   });
 
   it('scores an exact match above a prefix match, and a prefix above a substring', () => {
     const c = course({ name: 'Algorithms' });
-    const exact = calculateRelevanceScore(c, 'algorithms');
-    const prefix = calculateRelevanceScore(c, 'algo');
-    const contains = calculateRelevanceScore(c, 'rithm');
+    const exact = search.score(c, 'algorithms');
+    const prefix = search.score(c, 'algo');
+    const contains = search.score(c, 'rithm');
     expect(exact).toBeGreaterThan(prefix);
     expect(prefix).toBeGreaterThan(contains);
   });
 
   it('returns 0 for a query matching nothing', () => {
-    expect(calculateRelevanceScore(course(), 'zzzznomatch')).toBe(0);
+    expect(search.score(course(), 'zzzznomatch')).toBe(0);
   });
 
   it('gives a description-only match a non-zero but low score', () => {
     const c = course({ description: 'Covers recursion and iteration.' });
-    const desc = calculateRelevanceScore(c, 'recursion');
+    const desc = search.score(c, 'recursion');
     expect(desc).toBeGreaterThan(0);
-    expect(desc).toBeLessThan(calculateRelevanceScore(c, 'cs1101'));
+    expect(desc).toBeLessThan(search.score(c, 'cs1101'));
   });
 });
 
-describe('rankCoursesByRelevance', () => {
+describe('SearchIndex.rank', () => {
   it('returns the input untouched for a blank query', () => {
     const list = [course({ id: 'A' }), course({ id: 'B' })];
-    expect(rankCoursesByRelevance(list, '   ')).toBe(list);
+    expect(search.rank(list, '   ')).toBe(list);
   });
 
   it('puts the best match first', () => {
@@ -96,8 +89,8 @@ describe('rankCoursesByRelevance', () => {
       departmentAbbr: 'MA',
       name: 'Calculus',
     });
-    expect(rankCoursesByRelevance([ma, cs], 'cs1101')[0].id).toBe('CS1101');
-    expect(rankCoursesByRelevance([cs, ma], 'calculus')[0].id).toBe('MA1021');
+    expect(search.rank([ma, cs], 'cs1101')[0].id).toBe('CS1101');
+    expect(search.rank([cs, ma], 'calculus')[0].id).toBe('MA1021');
   });
 
   it('sorts in place, so the caller receives the same array instance', () => {
@@ -106,28 +99,28 @@ describe('rankCoursesByRelevance', () => {
       course({ id: 'A', name: 'Zebra' }),
       course({ id: 'B', name: 'Apple' }),
     ];
-    expect(rankCoursesByRelevance(list, 'apple')).toBe(list);
+    expect(search.rank(list, 'apple')).toBe(list);
   });
 });
 
-describe('parseSearchQuery', () => {
+describe('SearchIndex.parse', () => {
   it('reads a course code with or without a space or hyphen', () => {
     for (const q of ['MA 1022', 'ma1022', 'MA-1022', ' ma  1022 ']) {
-      expect(parseSearchQuery(q).code).toEqual({ dept: 'ma', number: '1022' });
+      expect(search.parse(q).code).toEqual({ dept: 'ma', number: '1022' });
     }
-    expect(parseSearchQuery('cs 21').code).toEqual({
+    expect(search.parse('cs 21').code).toEqual({
       dept: 'cs',
       number: '21',
     });
-    expect(parseSearchQuery('1022').code).toEqual({ dept: '', number: '1022' });
+    expect(search.parse('1022').code).toEqual({ dept: '', number: '1022' });
   });
 
   it('reads anything else as words', () => {
-    expect(parseSearchQuery('Game  Design')).toMatchObject({
+    expect(search.parse('Game  Design')).toMatchObject({
       code: null,
       words: ['game', 'design'],
     });
-    expect(parseSearchQuery('21').code).toBeNull();
+    expect(search.parse('21').code).toBeNull();
   });
 });
 
@@ -141,7 +134,7 @@ describe('matchCourseWords', () => {
     description: 'Robots and their sensors.',
   });
   const match = (q: string, c = robotics) =>
-    matchCourseWords(c, parseSearchQuery(q)).all;
+    search.matchCourseWords(c, search.parse(q)).all;
 
   it('needs every word, each anywhere in the course', () => {
     expect(match('robotics sensors')).toBe(true);
@@ -192,7 +185,7 @@ describe('ranking', () => {
       description,
     });
   const ids = (list: Course[], q: string) =>
-    rankCoursesByRelevance([...list], q).map(c => c.id);
+    search.rank([...list], q).map(c => c.id);
 
   it('puts title matches above description matches', () => {
     const list = [
@@ -251,9 +244,9 @@ describe('short words, acronyms and numerals', () => {
       description,
     });
   const ids = (list: Course[], q: string) =>
-    rankCoursesByRelevance([...list], q).map(c => c.id);
+    search.rank([...list], q).map(c => c.id);
   const matches = (q: string, c: Course) =>
-    matchCourseWords(c, parseSearchQuery(q)).all;
+    search.matchCourseWords(c, search.parse(q)).all;
 
   const aircraft = make('AE', '4510', 'Aircraft Design', 'Air breathing.');
   const writing = make('IMGD', '2200', 'AI in Writing');
@@ -281,26 +274,25 @@ describe('short words, acronyms and numerals', () => {
   it('reads an acronym as the name words the catalog defines it as', () => {
     const list = [aircraft, accelerated, intro, definer, writing];
     expect(
-      rankCoursesByRelevance([...list], 'AI')
+      search
+        .rank([...list], 'AI')
         .filter(c => matches('AI', c))
         .map(c => c.id),
       // DS 1010 only says AI in its description.
     ).toEqual(['IMGD-2200-2026', 'CS-4341-2026', 'DS-1010-2026']);
     // Initials alone are not enough: "Accelerated Introduction" is not AI.
     expect(matches('AI', accelerated)).toBe(false);
-    expect(describeMatch(intro, 'AI')).toBe('title');
+    expect(search.describeMatch(intro, 'AI')).toBe('title');
   });
 
   it('ranks a spelled-out acronym level with the word itself', () => {
-    rankCoursesByRelevance([definer], 'AI');
+    search.rank([definer], 'AI');
     const spelled = make('ENV', '2720', 'Artificial Intelligence and Society');
     const literal = make('IMGD', '2720', 'AI in Writing and Society');
-    const diff =
-      calculateRelevanceScore(spelled, 'AI') -
-      calculateRelevanceScore(literal, 'AI');
+    const diff = search.score(spelled, 'AI') - search.score(literal, 'AI');
     // Only the tie-breaks (name length) tell them apart.
     expect(Math.abs(diff)).toBeLessThan(1);
-    expect(acronymExpansions('ai')).toEqual(['artificial intelligence']);
+    expect(search.acronymExpansions('ai')).toEqual(['artificial intelligence']);
   });
 
   it('puts what a student can take first among equal matches', () => {
@@ -370,12 +362,12 @@ describe('short words, acronyms and numerals', () => {
       'MA-1033-2026',
     ]);
     for (const q of ['MA 1022', 'MA-1022', 'MA_1022', 'ma1o22']) {
-      expect(parseSearchQuery(q).code, q).toEqual({
+      expect(search.parse(q).code, q).toEqual({
         dept: 'ma',
         number: '1022',
       });
     }
-    expect(describeMatch(list[0], 'MA 1022')).toBe('mentions');
+    expect(search.describeMatch(list[0], 'MA 1022')).toBe('mentions');
   });
 
   it('tells a section title match from an instructor or room match', () => {
@@ -397,9 +389,14 @@ describe('short words, acronyms and numerals', () => {
         ],
       } as unknown as Partial<Course>);
     expect(
-      describeMatch(titled('B01 - ST: AI and Economics', 'Ann Lee'), 'AI'),
+      search.describeMatch(
+        titled('B01 - ST: AI and Economics', 'Ann Lee'),
+        'AI',
+      ),
     ).toBe('sectionTitle');
-    expect(describeMatch(titled('B01', 'Ann Lee'), 'Lee')).toBe('section');
+    expect(search.describeMatch(titled('B01', 'Ann Lee'), 'Lee')).toBe(
+      'section',
+    );
   });
 
   it('reads "and" in a department name as the catalog\'s "&"', () => {
@@ -415,7 +412,7 @@ describe('short words, acronyms and numerals', () => {
       'Interactive Media & Game Development',
     ]) {
       expect(matches(q, imgd)).toBe(true);
-      expect(describeMatch(imgd, q)).toBe('title');
+      expect(search.describeMatch(imgd, q)).toBe('title');
     }
   });
 
@@ -445,8 +442,12 @@ describe('short words, acronyms and numerals', () => {
       'Relaying',
       'procedural rules for relays, with power generation',
     );
-    expect(describeMatch(near, 'procedural generation')).toBe('description');
-    expect(describeMatch(far, 'procedural generation')).toBe('scattered');
+    expect(search.describeMatch(near, 'procedural generation')).toBe(
+      'description',
+    );
+    expect(search.describeMatch(far, 'procedural generation')).toBe(
+      'scattered',
+    );
   });
 });
 
@@ -474,7 +475,7 @@ describe('department queries', () => {
       inDept('502', 'Graduate Seminar', true),
     ];
     for (const q of ['CS', 'computer science']) {
-      expect(rankCoursesByRelevance([...list], q).map(c => c.number)).toEqual([
+      expect(search.rank([...list], q).map(c => c.number)).toEqual([
         '1004',
         '1005',
         '1101',
@@ -502,23 +503,23 @@ describe('a department and one digit', () => {
   ];
 
   it('reads "CS2" and "CS 2" as every CS 2xxx', () => {
-    rankCoursesByRelevance([...list], 'warm up');
+    search.rank([...list], 'warm up');
     for (const q of ['CS2', 'CS 2', 'cs-2']) {
-      expect(parseSearchQuery(q).code).toEqual({ dept: 'cs', number: '2' });
+      expect(search.parse(q).code).toEqual({ dept: 'cs', number: '2' });
       const found = list.filter(
-        c => matchCourseWords(c, parseSearchQuery(q)).all,
+        c => search.matchCourseWords(c, search.parse(q)).all,
       );
       expect(found.map(c => c.number).sort()).toEqual(['2102', '2223']);
     }
   });
 
   it('leaves a word and a digit as words when the word is no department', () => {
-    rankCoursesByRelevance([...list], 'warm up');
-    expect(parseSearchQuery('calc 2')).toMatchObject({
+    search.rank([...list], 'warm up');
+    expect(search.parse('calc 2')).toMatchObject({
       code: null,
       words: ['calc', '2'],
     });
-    expect(matchCourseWords(list[3], parseSearchQuery('calc 2')).all).toBe(
+    expect(search.matchCourseWords(list[3], search.parse('calc 2')).all).toBe(
       true,
     );
   });
@@ -539,21 +540,21 @@ describe('acronyms of whole names', () => {
   const longer = named('CS', '4801', 'Operating Widgets For Engineers');
   const all = [undergrad, graduate, oneOff, longer];
   const finds = (q: string, c: Course) =>
-    matchCourseWords(c, parseSearchQuery(q)).all;
+    search.matchCourseWords(c, search.parse(q)).all;
 
   it('reads the initials of a subject offered under two codes', () => {
-    rankCoursesByRelevance([...all], 'warm up');
+    search.rank([...all], 'warm up');
     expect(finds('OW', undergrad)).toBe(true);
     // A sequel's number is no initial.
     expect(finds('OW', graduate)).toBe(true);
-    expect(rankCoursesByRelevance([...all], 'OW').slice(0, 2)).toEqual([
+    expect(search.rank([...all], 'OW').slice(0, 2)).toEqual([
       undergrad,
       graduate,
     ]);
   });
 
   it('ignores the initials of a one-off name, or of part of one', () => {
-    rankCoursesByRelevance([...all], 'warm up');
+    search.rank([...all], 'warm up');
     expect(finds('PW', oneOff)).toBe(false);
     expect(finds('OW', longer)).toBe(false);
   });
@@ -573,7 +574,7 @@ describe('short forms', () => {
     });
     for (const q of ['stats', 'stat', 'Stats']) {
       const found = [statistics, statistical, statics, statements].filter(
-        c => matchCourseWords(c, parseSearchQuery(q)).all,
+        c => search.matchCourseWords(c, search.parse(q)).all,
       );
       expect(found).toEqual([statistics, statistical]);
     }
@@ -591,16 +592,16 @@ describe('phrases in names', () => {
       named('CS-1101', 'Introduction To Program Design', 'Programming.'),
       named('CS-1004', 'Introduction To Programming For Non-Majors'),
     ];
-    const ranked = rankCoursesByRelevance([...list], 'intro to programming');
+    const ranked = search.rank([...list], 'intro to programming');
     expect(ranked.slice(0, 2).map(c => c.id)).toEqual(['CS-1004', 'CS-1101']);
-    expect(describeMatch(list[2], 'intro to programming')).toBe('title');
+    expect(search.describeMatch(list[2], 'intro to programming')).toBe('title');
   });
 
   it('does not read a typo as a shortened form', () => {
     expect(
-      matchCourseWords(
+      search.matchCourseWords(
         named('RBE-502', 'Robot Control'),
-        parseSearchQuery('robotcs'),
+        search.parse('robotcs'),
       ).all,
     ).toBe(false);
   });
@@ -611,13 +612,11 @@ describe('phrases in names', () => {
       named('ECE-4803', 'Machine Learning in Cybersecurity'),
       named('CS-4342', 'Machine Learning'),
     ];
-    expect(rankCoursesByRelevance([...list], 'machine lerning')[0].id).toBe(
-      'CS-4342',
-    );
+    expect(search.rank([...list], 'machine lerning')[0].id).toBe('CS-4342');
     // Spelt right, it still leads by more.
-    expect(
-      calculateRelevanceScore(list[2], 'machine learning'),
-    ).toBeGreaterThan(calculateRelevanceScore(list[2], 'machine lerning'));
+    expect(search.score(list[2], 'machine learning')).toBeGreaterThan(
+      search.score(list[2], 'machine lerning'),
+    );
   });
 });
 
@@ -639,33 +638,33 @@ describe('misspelt departments', () => {
       name: 'Combinatorics',
       description: 'Counting and graphs.',
     });
-    expect(rankCoursesByRelevance([counting, accounting], 'acounting')[0]).toBe(
+    expect(search.rank([counting, accounting], 'acounting')[0]).toBe(
       accounting,
     );
-    expect(describeMatch(accounting, 'acounting')).toBe('title');
+    expect(search.describeMatch(accounting, 'acounting')).toBe('title');
   });
 });
 
 describe('long queries', () => {
   it('searches each distinct word once, in order', () => {
-    expect(parseSearchQuery('design game design GAME').words).toEqual([
+    expect(search.parse('design game design GAME').words).toEqual([
       'design',
       'game',
     ]);
-    expect(parseSearchQuery('calculus i calculus 1').words).toEqual([
+    expect(search.parse('calculus i calculus 1').words).toEqual([
       'calculus',
       '1',
     ]);
-    expect(parseSearchQuery('design game').ignored).toBeUndefined();
+    expect(search.parse('design game').ignored).toBeUndefined();
   });
 
   it(`searches the first ${MAX_QUERY_WORDS} distinct words and reports the rest`, () => {
     const words = Array.from({ length: 30 }, (_, i) => `word${i}`);
-    const parsed = parseSearchQuery([...words, ...words].join(' '));
+    const parsed = search.parse([...words, ...words].join(' '));
     expect(parsed.words).toEqual(words.slice(0, MAX_QUERY_WORDS));
     expect(parsed.ignored).toEqual(words.slice(MAX_QUERY_WORDS));
     // After a code too.
-    const coded = parseSearchQuery(`MA 1022 ${words.join(' ')}`);
+    const coded = search.parse(`MA 1022 ${words.join(' ')}`);
     expect(coded.words).toHaveLength(MAX_QUERY_WORDS);
   });
 
@@ -674,17 +673,17 @@ describe('long queries', () => {
     const many = Array.from({ length: 3000 }, (_, i) => `zz${i}`).join(' ');
     const start = performance.now();
     for (let i = 0; i < 50; i++) {
-      calculateRelevanceScore(c, many);
-      matchCourseWords(c, parseSearchQuery(many));
+      search.score(c, many);
+      search.matchCourseWords(c, search.parse(many));
     }
     expect(performance.now() - start).toBeLessThan(500);
   });
 
   it('still reports every word a course matches when asked', () => {
     const c = course({ name: 'Robotics', description: 'Sensors.' });
-    const result = matchCourseWords(
+    const result = search.matchCourseWords(
       c,
-      parseSearchQuery('lee robotics sensors'),
+      search.parse('lee robotics sensors'),
     );
     expect(result.all).toBe(false);
     expect([0, 1, 2].map(result.word)).toEqual([false, true, true]);
@@ -705,10 +704,10 @@ describe('accents', () => {
       description: 'Le cinéma et la société.',
     });
     for (const q of ['etudes', 'études', 'francaises', 'cinema societe']) {
-      expect(matchCourseWords(french, parseSearchQuery(q)).all).toBe(true);
-      expect(calculateRelevanceScore(french, q)).toBeGreaterThan(0);
+      expect(search.matchCourseWords(french, search.parse(q)).all).toBe(true);
+      expect(search.score(french, q)).toBeGreaterThan(0);
     }
-    expect(parseSearchQuery('Frédéric').words).toEqual(['frederic']);
+    expect(search.parse('Frédéric').words).toEqual(['frederic']);
   });
 
   it('finds names in section text either way', () => {
@@ -725,17 +724,17 @@ describe('query words that name object members', () => {
       description: 'Classes, a constructor for each, and toString methods.',
     });
     for (const q of ['constructor', 'toString', '__proto__', 'valueOf']) {
-      expect(parseSearchQuery(q).words.every(w => typeof w === 'string')).toBe(
+      expect(search.parse(q).words.every(w => typeof w === 'string')).toBe(
         true,
       );
-      expect(() => calculateRelevanceScore(oop, q)).not.toThrow();
-      expect(() => describeMatch(oop, q)).not.toThrow();
+      expect(() => search.score(oop, q)).not.toThrow();
+      expect(() => search.describeMatch(oop, q)).not.toThrow();
     }
-    expect(matchCourseWords(oop, parseSearchQuery('constructor')).all).toBe(
+    expect(search.matchCourseWords(oop, search.parse('constructor')).all).toBe(
       true,
     );
     expect(
-      matchCourseWords(course(), parseSearchQuery('constructor')).all,
+      search.matchCourseWords(course(), search.parse('constructor')).all,
     ).toBe(false);
   });
 });
@@ -762,8 +761,6 @@ describe('getAvailableProfessors', () => {
   });
 });
 
-// Last in the file: it clears what earlier tests' courses taught, and those
-// course objects are cached, so they would not teach it again.
 describe('a catalog that replaces another', () => {
   it('forgets departments only the old catalog had', () => {
     const dept = (abbr: string) =>
@@ -774,12 +771,13 @@ describe('a catalog that replaces another', () => {
         number: '2001',
         name: 'Topics',
       });
-    prepareSearch([dept('QQ')]);
-    expect(parseSearchQuery('QQ2').code).toEqual({ dept: 'qq', number: '2' });
+    const old = new SearchIndex([dept('QQ')]);
+    expect(old.parse('QQ2').code).toEqual({ dept: 'qq', number: '2' });
 
-    resetSearchVocabulary();
-    prepareSearch([dept('ZZ')]);
-    expect(parseSearchQuery('QQ2').code).toBeNull();
-    expect(parseSearchQuery('ZZ2').code).toEqual({ dept: 'zz', number: '2' });
+    const fresh = new SearchIndex([dept('ZZ')]);
+    expect(fresh.parse('QQ2').code).toBeNull();
+    expect(fresh.parse('ZZ2').code).toEqual({ dept: 'zz', number: '2' });
+    // The old catalog's index, still in use until the swap, is untouched.
+    expect(old.parse('QQ2').code).toEqual({ dept: 'qq', number: '2' });
   });
 });

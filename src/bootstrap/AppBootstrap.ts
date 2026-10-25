@@ -126,7 +126,7 @@ export class AppBootstrap {
   }
 
   static initializeFilters(services: ServiceContainer): void {
-    const { filterService } = services;
+    const { filterService, courseDataService } = services;
 
     const filters = createDefaultFilters(rateMyProfessorService);
     filters.forEach(filter => {
@@ -135,7 +135,9 @@ export class AppBootstrap {
 
     // Backend-only: registered for the pipeline but intentionally has no
     // FilterPanel component.
-    const searchTextFilter = new SearchTextFilter();
+    const searchTextFilter = new SearchTextFilter(() =>
+      courseDataService.getSearchIndex(),
+    );
     filterService.registerFilter(searchTextFilter);
 
     filterService.registerFilter(new DegreeBucketFilter());

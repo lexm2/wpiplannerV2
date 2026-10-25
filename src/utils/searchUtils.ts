@@ -54,11 +54,46 @@ const CODE_RE = /^([a-z]{2,5})?(\d{1,4}[a-z]?)$/;
 const LEADING_CODE_RE = /^([a-z]{2,5})[\s_.-]*(\d{1,4}[a-z]?)\s+(.+)$/;
 
 /**
- * Department codes the catalog has, lowercased, learned as course text is
- * built (see prepareSearch). A single digit makes a code only after one of
- * these: "CS 2" is every CS 2xxx, while "calc 2" is two words.
+ * What search learns from the course text it reads, held by one SearchIndex
+ * per catalog: a catalog that replaces another gets a new index, so nothing
+ * the old courses taught carries over, and nothing changes under a search
+ * still reading the old catalog.
  */
-const knownDepartments = new Set<string>();
+interface Vocabulary {
+  /**
+   * Department codes the catalog has, lowercased. A single digit makes a
+   * code only after one of these: "CS 2" is every CS 2xxx, while "calc 2"
+   * is two words.
+   */
+  knownDepartments: Set<string>;
+  /**
+   * Acronyms the catalog itself defines, "artificial intelligence (AI)":
+   * the acronym, lowercased, to the words it stands for.
+   */
+  definedAcronyms: Map<string, Set<string>>;
+  /**
+   * Each course name, numbering aside, to the codes offering it: "operating
+   * systems" to CS3013 and CS502.
+   */
+  subjectCodes: Map<string, Set<string>>;
+  /**
+   * Every token of every course text built, so a query word's typo matches
+   * are worked out once per distinct token (nearTokens) rather than once
+   * per token of every course.
+   */
+  tokens: Set<string>;
+  /**
+   * Query words to the vocabulary tokens each is a typo of (nearPrefix),
+   * kept up to date as the vocabulary grows. Forgotten past a few dozen
+   * words, as a session of searches would otherwise pile them up.
+   */
+  nearCache: Map<string, Set<string>>;
+  /**
+   * Each course's text, built once. Catalog Course objects are never
+   * mutated (a data refresh builds new ones), so entries cannot go stale.
+   */
+  texts: WeakMap<Course, CourseText>;
+}
 
 /**
  * I-IV as course names number their sequels. A Map, not an object literal:
@@ -105,7 +140,7 @@ const tokenize = (text: string) => text.split(TOKEN_SPLIT).filter(Boolean);
  * "MA 1022", "MA-1022", "MA_1022", "ma1022", and "ma1o22" with a letter O
  * typed for a zero.
  */
-function readCode(compact: string): ParsedQuery['code'] {
+function readCode(vocab: Vocabulary, compact: string): ParsedQuery['code'] {
   const fixed = compact.replace(
     /^([a-z]{2,5})?([\do]+)([a-z]?)$/,
     (whole, dept: string | undefined, digits: string, tail: string) =>
@@ -119,7 +154,7 @@ function readCode(compact: string): ParsedQuery['code'] {
   const digits = number.replace(/\D/g, '').length;
   // A bare number needs three digits; "21" alone is too vague to be a code.
   if (!dept) return digits >= 3 ? { dept: '', number } : null;
-  if (digits === 1 && !knownDepartments.has(dept)) return null;
+  if (digits === 1 && !vocab.knownDepartments.has(dept)) return null;
   return { dept, number };
 }
 
@@ -146,12 +181,12 @@ const departmentPhrase = (words: string[]) =>
 const namesDepartment = (text: CourseText, words: string[]) =>
   words.length > 0 && text.departmentNames.includes(departmentPhrase(words));
 
-export function parseSearchQuery(query: string): ParsedQuery {
+function parseQuery(vocab: Vocabulary, query: string): ParsedQuery {
   const text = foldText(query).trim().replace(/\s+/g, ' ');
-  const code = readCode(text.replace(/[\s_.-]/g, ''));
+  const code = readCode(vocab, text.replace(/[\s_.-]/g, ''));
   if (code) return { text, words: [], code };
   const lead = LEADING_CODE_RE.exec(text);
-  const leadCode = lead ? readCode(lead[1] + lead[2]) : null;
+  const leadCode = lead ? readCode(vocab, lead[1] + lead[2]) : null;
   if (lead && leadCode) {
     return { text, ...queryWords(lead[3]), code: leadCode };
   }
@@ -179,15 +214,10 @@ function wordIn(word: string, text: string, tokens: string[]): boolean {
 // Not part of an acronym: "Art and Industry" does not spell "AI".
 const ACRONYM_STOP = new Set(['and', 'the', 'for', 'with', 'from', 'into']);
 
-/**
- * Acronyms the catalog itself defines, "artificial intelligence (AI)": the
- * acronym, lowercased, to the words it stands for. Learned from every course
- * text built (see prepareSearch), so it only grows with the catalog.
- */
-const definedAcronyms = new Map<string, Set<string>>();
 const DEFINITION_RE = /((?:[A-Za-z]+[ -]){1,4}[A-Za-z]+)\s*\(([A-Z]{2,4})\)/g;
 
-function learnAcronyms(raw: string): void {
+function learnAcronyms(vocab: Vocabulary, raw: string): void {
+  const { definedAcronyms } = vocab;
   for (const [, phrase, acronym] of raw.matchAll(DEFINITION_RE)) {
     const words = phrase.toLowerCase().split(/[ -]/).slice(-acronym.length);
     if (words.map(w => w[0]).join('') !== acronym.toLowerCase()) continue;
@@ -220,8 +250,8 @@ function sameExpansion(run: string[], expansion: string): boolean {
  * Evaluation"), where a subject taught at both levels is a field with a
  * name of its own.
  */
-function acronymIn(word: string, text: CourseText): boolean {
-  return acronymStart(word, text) !== -1;
+function acronymIn(vocab: Vocabulary, word: string, text: CourseText): boolean {
+  return acronymStart(vocab, word, text) !== -1;
 }
 
 /** A name's words without the number ending a sequel's: "deep learning". */
@@ -231,24 +261,27 @@ function subjectOf(nameTokens: string[]): string[] {
   return nameTokens.slice(0, end);
 }
 
-/**
- * Each course name, numbering aside, to the codes offering it: "operating
- * systems" to CS3013 and CS502. Learned as course text is built.
- */
-const subjectCodes = new Map<string, Set<string>>();
-
-function learnSubject(nameTokens: string[], code: string): void {
+function learnSubject(
+  vocab: Vocabulary,
+  nameTokens: string[],
+  code: string,
+): void {
+  const { subjectCodes } = vocab;
   const subject = subjectOf(nameTokens).join(' ');
   if (!subjectCodes.has(subject)) subjectCodes.set(subject, new Set());
   subjectCodes.get(subject)!.add(code);
 }
 
 /** Where in the name the words `word` stands for start; -1 when they don't. */
-function acronymStart(word: string, text: CourseText): number {
+function acronymStart(
+  vocab: Vocabulary,
+  word: string,
+  text: CourseText,
+): number {
   if (word.length < 2 || word.length > 4 || !/^[a-z]+$/.test(word)) {
     return -1;
   }
-  const defined = definedAcronyms.get(word);
+  const defined = vocab.definedAcronyms.get(word);
   const usedHere = text.descriptionTokens.includes(word);
   const tokens = text.nameTokens;
   const spells = (run: string[]) =>
@@ -257,7 +290,7 @@ function acronymStart(word: string, text: CourseText): number {
     run.map(t => t[0]).join('') === word;
   if (!defined && !usedHere) {
     const subject = subjectOf(tokens);
-    const codes = subjectCodes.get(subject.join(' '))?.size ?? 0;
+    const codes = vocab.subjectCodes.get(subject.join(' '))?.size ?? 0;
     return codes >= 2 && spells(subject) ? 0 : -1;
   }
   return tokens.findIndex((_, i) => {
@@ -265,15 +298,6 @@ function acronymStart(word: string, text: CourseText): number {
     if (!spells(run)) return false;
     return usedHere || [...defined!].some(e => sameExpansion(run, e));
   });
-}
-
-/**
- * The phrases a query word is read as, by the acronyms the catalog
- * defines: "ai" is "artificial intelligence". Learned as courses are
- * prepared (prepareSearch), so empty before any search has run.
- */
-export function acronymExpansions(word: string): string[] {
-  return [...(definedAcronyms.get(word.toLowerCase()) ?? [])];
 }
 
 interface CourseText {
@@ -295,14 +319,10 @@ interface CourseText {
   codes: string[];
 }
 
-// Built once per Course. Catalog Course objects are never mutated (a data
-// refresh builds new ones), so entries cannot go stale.
-const textCache = new WeakMap<Course, CourseText>();
-
 /**
  * Filtered copies of catalog courses to the course each copies. A copy
  * differs only in its sections, and course text reads none of them, so it
- * shares the original's entry in the text cache.
+ * shares the original's text.
  */
 const originals = new WeakMap<Course, Course>();
 
@@ -315,9 +335,10 @@ export function noteCourseCopy(copy: Course, original: Course): void {
   originals.set(copy, originals.get(original) ?? original);
 }
 
-function courseText(given: Course): CourseText {
+/** The course's text, built and learned from on first read. */
+function courseText(vocab: Vocabulary, given: Course): CourseText {
   const course = originals.get(given) ?? given;
-  let text = textCache.get(course);
+  let text = vocab.texts.get(course);
   if (text) return text;
 
   const code = foldText(`${course.departmentAbbr}${course.number}`);
@@ -343,13 +364,15 @@ function courseText(given: Course): CourseText {
     tagText,
   ].join(' ');
 
-  learnAcronyms(stripMarks(`${course.name} ${course.description}`));
-  for (const c of codes) knownDepartments.add(c.replace(/[^a-z].*$/, ''));
+  learnAcronyms(vocab, stripMarks(`${course.name} ${course.description}`));
+  for (const c of codes) {
+    vocab.knownDepartments.add(c.replace(/[^a-z].*$/, ''));
+  }
   const nameTokens = tokenize(name).map(numeral);
-  learnSubject(nameTokens, code);
+  learnSubject(vocab, nameTokens, code);
   const tokens = tokenize(haystack);
   const distinct = [...new Set([...tokens, ...tokens.map(numeral)])];
-  learnTokens(distinct);
+  learnTokens(vocab, distinct);
   text = {
     haystack,
     tokens: distinct,
@@ -366,7 +389,7 @@ function courseText(given: Course): CourseText {
     descriptionTokens: tokenize(description),
     codes,
   };
-  textCache.set(course, text);
+  vocab.texts.set(course, text);
   return text;
 }
 
@@ -384,39 +407,26 @@ function nearPrefix(word: string, token: string): boolean {
   return editDistance(word, token, limit, true) <= limit;
 }
 
-/**
- * Every token of every course text built, so a query word's typo matches
- * are worked out once per distinct token (nearTokens) rather than once per
- * token of every course. Never forgotten, not even by resetSearchVocabulary:
- * texts built before a reset stay cached and may still be searched.
- */
-const vocabulary = new Set<string>();
-
-/**
- * Query words to the vocabulary tokens each is a typo of (nearPrefix),
- * kept up to date as the vocabulary grows. Forgotten past a few dozen
- * words, as a session of searches would otherwise pile them up.
- */
-const nearCache = new Map<string, Set<string>>();
 const NEAR_CACHE_WORDS = 32;
 
-function learnTokens(tokens: string[]): void {
+function learnTokens(vocab: Vocabulary, tokens: string[]): void {
   for (const token of tokens) {
-    if (vocabulary.has(token)) continue;
-    vocabulary.add(token);
-    for (const [word, near] of nearCache) {
+    if (vocab.tokens.has(token)) continue;
+    vocab.tokens.add(token);
+    for (const [word, near] of vocab.nearCache) {
       if (nearPrefix(word, token)) near.add(token);
     }
   }
 }
 
 /** The tokens of any course text that `word` is a typo of. */
-function nearTokens(word: string): Set<string> {
+function nearTokens(vocab: Vocabulary, word: string): Set<string> {
+  const { nearCache } = vocab;
   let near = nearCache.get(word);
   if (near) return near;
   if (nearCache.size >= NEAR_CACHE_WORDS) nearCache.clear();
   near = new Set();
-  for (const token of vocabulary) {
+  for (const token of vocab.tokens) {
     if (nearPrefix(word, token)) near.add(token);
   }
   nearCache.set(word, near);
@@ -424,9 +434,13 @@ function nearTokens(word: string): Set<string> {
 }
 
 /** Some token is one `word` is a typo of; nearPrefix over each, but faster. */
-function hasNearToken(word: string, tokens: string[]): boolean {
+function hasNearToken(
+  vocab: Vocabulary,
+  word: string,
+  tokens: string[],
+): boolean {
   if (typoAllowance(word) === 0) return false;
-  const near = nearTokens(word);
+  const near = nearTokens(vocab, word);
   return near.size > 0 && tokens.some(t => near.has(t));
 }
 
@@ -457,27 +471,34 @@ function nameHit(word: string, token: string): NameHit | null {
   return nearPrefix(word, token) ? 'typo' : null;
 }
 
-function codeMatches(course: Course, code: { dept: string; number: string }) {
-  const { codes } = courseText(course);
-  if (code.dept) return codes.some(c => c.startsWith(code.dept + code.number));
+type Code = NonNullable<ParsedQuery['code']>;
+
+function codeMatches(course: Course, text: CourseText, code: Code) {
+  if (code.dept) {
+    return text.codes.some(c => c.startsWith(code.dept + code.number));
+  }
   return course.number.toLowerCase().startsWith(code.number);
 }
 
 /** The description names the code, as prerequisites do ("MA 1022"). */
-function mentionsCode(course: Course, code: { dept: string; number: string }) {
+function mentionsCode(text: CourseText, code: Code) {
   if (!code.dept) return false;
   return new RegExp(`\\b${code.dept}\\s*-?${code.number}\\b`).test(
-    courseText(course).description,
+    text.description,
   );
 }
 
 /** One word against the course's own text: anywhere, typo or acronym. */
-function wordMatches(text: CourseText, word: string): boolean {
+function wordMatches(
+  vocab: Vocabulary,
+  text: CourseText,
+  word: string,
+): boolean {
   return (
     wordIn(word, text.haystack, text.tokens) ||
-    hasNearToken(word, text.tokens) ||
+    hasNearToken(vocab, word, text.tokens) ||
     text.nameTokens.some(t => shortenedTo(word, t)) ||
-    acronymIn(word, text)
+    acronymIn(vocab, word, text)
   );
 }
 
@@ -493,22 +514,25 @@ export interface CourseWordMatch {
   word: (index: number) => boolean;
 }
 
-export function matchCourseWords(
+function matchWords(
+  vocab: Vocabulary,
   course: Course,
   query: ParsedQuery,
 ): CourseWordMatch {
-  const text = courseText(course);
+  const text = courseText(vocab, course);
   if (query.code) {
     const ok =
-      (codeMatches(course, query.code) || mentionsCode(course, query.code)) &&
-      query.words.every(word => wordMatches(text, word));
+      (codeMatches(course, text, query.code) ||
+        mentionsCode(text, query.code)) &&
+      query.words.every(word => wordMatches(vocab, text, word));
     return { all: ok, word: () => ok };
   }
   if (namesDepartment(text, query.words)) {
     return { all: true, word: () => true };
   }
   const known: boolean[] = [];
-  const word = (i: number) => (known[i] ??= wordMatches(text, query.words[i]));
+  const word = (i: number) =>
+    (known[i] ??= wordMatches(vocab, text, query.words[i]));
   // Stops at the first word the course lacks: most of the catalog lacks the
   // first word of any query, and the rest need not be looked at.
   return { all: query.words.every((_, i) => word(i)), word };
@@ -595,11 +619,15 @@ const isNear = (span: number | null, words: number) =>
   span !== null && span <= NEAR_SPAN + words - 2;
 
 /** The word in the name: a whole word, initials, a prefix or a typo. */
-function wordInName(text: CourseText, word: string): boolean {
+function wordInName(
+  vocab: Vocabulary,
+  text: CourseText,
+  word: string,
+): boolean {
   return (
     wordIn(word, text.name, text.nameTokens) ||
     text.nameTokens.some(t => nameHit(word, t) !== null) ||
-    acronymIn(word, text)
+    acronymIn(vocab, word, text)
   );
 }
 
@@ -657,14 +685,18 @@ function sectionTitles(course: Course): string {
     .join(' ');
 }
 
-export function describeMatch(course: Course, query: string): SearchMatch {
-  const parsed = parseSearchQuery(query);
+function describe(
+  vocab: Vocabulary,
+  course: Course,
+  query: string,
+): SearchMatch {
+  const parsed = parseQuery(vocab, query);
+  const text = courseText(vocab, course);
   if (parsed.code) {
-    return codeMatches(course, parsed.code) ? 'code' : 'mentions';
+    return codeMatches(course, text, parsed.code) ? 'code' : 'mentions';
   }
-  const text = courseText(course);
   if (namesDepartment(text, parsed.words)) return 'title';
-  const { all, word } = matchCourseWords(course, parsed);
+  const { all, word } = matchWords(vocab, course, parsed);
   if (!all) {
     const titles = foldWords(sectionTitles(course));
     const fromTitles = parsed.words.every(
@@ -673,7 +705,7 @@ export function describeMatch(course: Course, query: string): SearchMatch {
     return fromTitles ? 'sectionTitle' : 'section';
   }
   const inTitle = (word: string) =>
-    wordInName(text, word) ||
+    wordInName(vocab, text, word) ||
     text.codes.some(c => c.startsWith(word)) ||
     wordIn(word, text.departmentTokens.join(' '), text.departmentTokens) ||
     text.departmentTokens.some(t => nearPrefix(word, t)) ||
@@ -685,47 +717,6 @@ export function describeMatch(course: Course, query: string): SearchMatch {
     : 'scattered';
 }
 
-/**
- * Reads every course's text before any is matched, so acronyms one course
- * defines apply to all of them whatever order they are matched in.
- */
-export function prepareSearch(courses: Iterable<Course>): void {
-  for (const course of courses) courseText(course);
-}
-
-/**
- * Forgets the departments, acronyms and subjects learned so far, for a
- * catalog that replaces the old one: call prepareSearch with the new courses
- * right after. The new catalog's course objects are not in the text cache,
- * so preparing them learns everything again.
- */
-export function resetSearchVocabulary(): void {
-  knownDepartments.clear();
-  definedAcronyms.clear();
-  subjectCodes.clear();
-}
-
-/**
- * Ranks courses by relevance to a search query, best first. Sorts in place,
- * as callers expect the same array back.
- */
-export function rankCoursesByRelevance(
-  courses: Course[],
-  query: string,
-): Course[] {
-  if (!query.trim()) return courses;
-  prepareSearch(courses);
-
-  // Score each course once rather than on every comparison, reading the
-  // query once for them all.
-  const parsed = parseSearchQuery(query);
-  const scores = new Map<Course, number>();
-  for (const course of courses) {
-    scores.set(course, relevanceScore(course, parsed));
-  }
-  return courses.sort((a, b) => scores.get(b)! - scores.get(a)!);
-}
-
 /** The numeric part's first digit: 1-4 undergraduate, 5 and up graduate. */
 export function courseLevel(course: Course): number | null {
   const digits = /\d+/.exec(course.number)?.[0];
@@ -733,9 +724,8 @@ export function courseLevel(course: Course): number | null {
 }
 
 /** The code tier: above anything a word query can reach. */
-function codeScore(course: Course, code: { dept: string; number: string }) {
-  const { codes } = courseText(course);
-  const [own, ...crossListed] = codes;
+function codeScore(course: Course, text: CourseText, code: Code) {
+  const [own, ...crossListed] = text.codes;
   const want = code.dept + code.number;
   let score = 0;
   if (code.dept) {
@@ -745,7 +735,7 @@ function codeScore(course: Course, code: { dept: string; number: string }) {
     else if (crossListed.some(c => c.startsWith(want))) score += 1800;
   } else if (course.number.toLowerCase() === code.number) score += 2400;
   else if (course.number.toLowerCase().startsWith(code.number)) score += 1600;
-  if (mentionsCode(course, code)) score += 5;
+  if (mentionsCode(text, code)) score += 5;
   return score;
 }
 
@@ -755,7 +745,11 @@ function codeScore(course: Course, code: { dept: string; number: string }) {
  * that repeats a title word cannot lift its course over another titled
  * the same ("calculus" in MA 1022's description, not MA 1021's).
  */
-function wordScore(text: CourseText, words: string[]): number {
+function wordScore(
+  vocab: Vocabulary,
+  text: CourseText,
+  words: string[],
+): number {
   if (!words.length) return 0;
   let score = 0;
   // The whole query against the name, word for word ("calc" for
@@ -776,7 +770,7 @@ function wordScore(text: CourseText, words: string[]): number {
   // An acronym spelled out in the name is the same phrase: "AI" for
   // "Artificial Intelligence" ranks with "AI in Writing", not below it.
   if (!phrase && words.length === 1) {
-    const at = acronymStart(words[0], text);
+    const at = acronymStart(vocab, words[0], text);
     if (at === 0) score += 20;
     if (at !== -1) score += 400;
   }
@@ -786,8 +780,9 @@ function wordScore(text: CourseText, words: string[]): number {
     const short = isShort(word);
     let inName = 0;
     // An acronym the name spells out counts as the word itself.
-    if (text.nameTokens.includes(word) || acronymIn(word, text)) inName = 120;
-    else if (short && text.nameTokens.some(t => shortWordIs(word, t)))
+    if (text.nameTokens.includes(word) || acronymIn(vocab, word, text)) {
+      inName = 120;
+    } else if (short && text.nameTokens.some(t => shortWordIs(word, t)))
       inName = 100;
     else if (!short && text.nameTokens.some(t => t.startsWith(word)))
       inName = 90;
@@ -849,35 +844,27 @@ function likelyFit(course: Course): number {
 /** Above any word match, as a department code's prefix ranks. */
 const DEPARTMENT_SCORE = 2200;
 
-/**
- * Relevance of a course to a query, higher is better, 0 for no match on
- * the course's own text. Tiers, strongest first: the course code (with any
- * words after it ranked within), a query naming the course's department
- * ("computer science", "CS": its courses in number order), the whole query
- * in the name, each word in the name, then the department, degree
- * attributes and course types, and last the description. A course matched
- * only through an instructor or room scores just its tie-breaks.
- */
-export function calculateRelevanceScore(course: Course, query: string): number {
-  return relevanceScore(course, parseSearchQuery(query));
-}
-
-function relevanceScore(course: Course, parsed: ParsedQuery): number {
+/** See SearchIndex.score. */
+function relevanceScore(
+  vocab: Vocabulary,
+  course: Course,
+  parsed: ParsedQuery,
+): number {
   if (!parsed.text) return 0;
-  const text = courseText(course);
+  const text = courseText(vocab, course);
   let score: number;
 
   if (parsed.code) {
-    score = codeScore(course, parsed.code);
-    if (score > 0) score += wordScore(text, parsed.words);
+    score = codeScore(course, text, parsed.code);
+    if (score > 0) score += wordScore(vocab, text, parsed.words);
   } else if (namesDepartment(text, parsed.words)) {
     // Its courses in number order, and nothing else: seats or a short name
     // would scatter the list.
     return DEPARTMENT_SCORE + numberOrder(course);
   } else {
-    score = wordScore(text, parsed.words);
+    score = wordScore(vocab, text, parsed.words);
     if (score > 0) score += likelyFit(course);
-    if (score === 0 && matchCourseWords(course, parsed).all) score = 1;
+    if (score === 0 && matchWords(vocab, course, parsed).all) score = 1;
   }
 
   if (score === 0) return 0;
@@ -901,6 +888,87 @@ function relevanceScore(course: Course, parsed: ParsedQuery): number {
 function numberOrder(course: Course): number {
   const digits = /\d+/.exec(course.number)?.[0];
   return digits ? 1 - Number(digits.slice(0, 4).padEnd(4, '0')) / 10000 : 0;
+}
+
+/**
+ * Search over one catalog's courses, holding what it learns from their
+ * text: departments, the acronyms the catalog defines, subjects taught
+ * under several codes, and every word for typo matching. Each catalog gets
+ * its own, built before the catalog is put in use, so a refresh swaps the
+ * courses and their vocabulary in one step. Courses the index has not read
+ * are read on first use, but reading them all up front (the constructor,
+ * add) means acronyms one course defines apply to all of them whatever
+ * order they are matched in.
+ */
+export class SearchIndex {
+  private readonly vocab: Vocabulary = {
+    knownDepartments: new Set(),
+    definedAcronyms: new Map(),
+    subjectCodes: new Map(),
+    tokens: new Set(),
+    nearCache: new Map(),
+    texts: new WeakMap(),
+  };
+
+  constructor(courses: Iterable<Course> = []) {
+    this.add(courses);
+  }
+
+  /** Reads courses joining the catalog (the tutorial's); known ones are skipped. */
+  add(courses: Iterable<Course>): void {
+    for (const course of courses) courseText(this.vocab, course);
+  }
+
+  parse(query: string): ParsedQuery {
+    return parseQuery(this.vocab, query);
+  }
+
+  matchCourseWords(course: Course, query: ParsedQuery): CourseWordMatch {
+    return matchWords(this.vocab, course, query);
+  }
+
+  describeMatch(course: Course, query: string): SearchMatch {
+    return describe(this.vocab, course, query);
+  }
+
+  /**
+   * Relevance of a course to a query, higher is better, 0 for no match on
+   * the course's own text. Tiers, strongest first: the course code (with
+   * any words after it ranked within), a query naming the course's
+   * department ("computer science", "CS": its courses in number order), the
+   * whole query in the name, each word in the name, then the department,
+   * degree attributes and course types, and last the description. A course
+   * matched only through an instructor or room scores just its tie-breaks.
+   */
+  score(course: Course, query: string): number {
+    return relevanceScore(this.vocab, course, this.parse(query));
+  }
+
+  /**
+   * Ranks courses by relevance to a search query, best first. Sorts in
+   * place, as callers expect the same array back.
+   */
+  rank(courses: Course[], query: string): Course[] {
+    if (!query.trim()) return courses;
+    this.add(courses);
+
+    // Score each course once rather than on every comparison, reading the
+    // query once for them all.
+    const parsed = this.parse(query);
+    const scores = new Map<Course, number>();
+    for (const course of courses) {
+      scores.set(course, relevanceScore(this.vocab, course, parsed));
+    }
+    return courses.sort((a, b) => scores.get(b)! - scores.get(a)!);
+  }
+
+  /**
+   * The phrases a query word is read as, by the acronyms the catalog
+   * defines: "ai" is "artificial intelligence".
+   */
+  acronymExpansions(word: string): string[] {
+    return [...(this.vocab.definedAcronyms.get(word.toLowerCase()) ?? [])];
+  }
 }
 
 export function escapeRegExp(text: string): string {

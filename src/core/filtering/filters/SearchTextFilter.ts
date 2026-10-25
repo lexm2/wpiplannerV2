@@ -6,13 +6,11 @@ import { keepMatchingGroups } from '../lectureGroupScope';
 import {
   foldText,
   foldWords,
-  matchCourseWords,
-  parseSearchQuery,
   namesHaveWord,
-  prepareSearch,
   textHasWord,
   type CourseWordMatch,
   type FoldedText,
+  type SearchIndex,
 } from '../../../utils/searchUtils';
 
 /** The section's own searchable text: number, instructors, type. */
@@ -85,16 +83,25 @@ export class SearchTextFilter implements SectionBasedFilter {
   readonly description = 'Filter courses by search text';
   readonly priority = 1;
 
+  /** `searchIndex`: the loaded catalog's, read anew each search. */
+  constructor(private readonly searchIndex: () => SearchIndex) {}
+
+  /** Courses best match first, by the same index the filter matches with. */
+  rank(courses: Course[], query: string): Course[] {
+    return this.searchIndex().rank(courses, query);
+  }
+
   apply(
     sections: FilterableSection[],
     criteria: SearchTextFilterCriteria,
   ): FilterableSection[] {
     if (!criteria.query?.trim()) return sections;
     // Before the query is read: a code like "CS2" needs the departments.
-    // CourseDataService has read the catalog's courses already; this reads
-    // any it has not.
-    prepareSearch(sections.map(fs => fs.course));
-    const query = parseSearchQuery(criteria.query);
+    // The index has read the catalog's courses already; this reads any it
+    // has not.
+    const index = this.searchIndex();
+    index.add(sections.map(fs => fs.course));
+    const query = index.parse(criteria.query);
 
     // A match anywhere in a lecture group keeps the whole group: searching
     // a lecturer's name has to bring their lecture's labs along with it.
@@ -110,7 +117,7 @@ export class SearchTextFilter implements SectionBasedFilter {
     const courseMatch = (course: Course) => {
       let result = byCourse.get(course);
       if (!result) {
-        result = matchCourseWords(course, query);
+        result = index.matchCourseWords(course, query);
         byCourse.set(course, result);
       }
       return result;

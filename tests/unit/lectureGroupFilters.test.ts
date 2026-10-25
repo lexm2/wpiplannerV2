@@ -6,12 +6,15 @@
 import { describe, it, expect } from 'vitest';
 import { SectionFilterPipeline } from '../../src/core/filtering/SectionFilterPipeline';
 import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
+import { SearchIndex } from '../../src/utils/searchUtils';
 import { RMPRatingFilter } from '../../src/core/filtering/filters/RMPRatingFilter';
 import { AvailabilityFilter } from '../../src/core/filtering/filters/AvailabilityFilter';
 import type { RateMyProfessorService } from '../../src/services/external/RateMyProfessorService';
 import type { Course, Section } from '../../src/types/types';
 import { PeriodType } from '../../src/types/types';
 import { AcademicTerm } from '../../src/types/schedule';
+
+const searchIndex = new SearchIndex();
 
 function section(
   crn: number,
@@ -97,7 +100,7 @@ const rmp = {
 } as unknown as RateMyProfessorService;
 
 const pipeline = new SectionFilterPipeline();
-pipeline.registerFilter(new SearchTextFilter());
+pipeline.registerFilter(new SearchTextFilter(() => searchIndex));
 pipeline.registerFilter(new RMPRatingFilter(rmp));
 pipeline.registerFilter(new AvailabilityFilter());
 

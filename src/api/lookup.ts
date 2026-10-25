@@ -9,11 +9,6 @@ import { findCourseById } from '../types/ScheduleState';
 import { findCatalogCourse } from '../services/degree/catalogLookup';
 import { getAllSections } from '../utils/courseUtils';
 import { closestMatches, editDistance } from '../utils/editDistance';
-import {
-  matchCourseWords,
-  parseSearchQuery,
-  rankCoursesByRelevance,
-} from '../utils/searchUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
@@ -210,13 +205,16 @@ function courseByName(
   const classes = distinctClasses(close);
   if (classes.length === 1) return classes[0];
 
-  const query = parseSearchQuery(name);
-  const ranked = rankCoursesByRelevance(
-    classes.length
-      ? classes
-      : inYear.filter(c => matchCourseWords(c, query).all),
-    name,
-  ).slice(0, MAX_NAME_SUGGESTIONS);
+  const { search } = catalog;
+  const query = search.parse(name);
+  const ranked = search
+    .rank(
+      classes.length
+        ? classes
+        : inYear.filter(c => search.matchCourseWords(c, query).all),
+      name,
+    )
+    .slice(0, MAX_NAME_SUGGESTIONS);
   if (!ranked.length) return null;
   const list = ranked.map(c => `${courseCode(c)} ${c.name}`);
   throw new ApiError(

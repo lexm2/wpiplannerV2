@@ -4,6 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
+import { SearchIndex } from '../../src/utils/searchUtils';
 import type { FilterableSection } from '../../src/types/filterableUnit';
 import {
   PeriodType,
@@ -11,6 +12,8 @@ import {
   type Period,
   type Section,
 } from '../../src/types/types';
+
+const searchIndex = new SearchIndex();
 
 function course(over: Partial<Course> = {}): Course {
   return {
@@ -42,7 +45,7 @@ function taught(
   return { course: c, section } as unknown as FilterableSection;
 }
 
-const filter = new SearchTextFilter();
+const filter = new SearchTextFilter(() => searchIndex);
 const kept = (
   sections: FilterableSection[],
   query: string,
