@@ -37,7 +37,11 @@ import {
 } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
 import { getAllSections } from '../utils/courseUtils';
-import { MAX_QUERY_WORDS, type SearchMatch } from '../utils/searchUtils';
+import {
+  MAX_QUERY_WORDS,
+  type ParsedQuery,
+  type SearchMatch,
+} from '../utils/searchUtils';
 import { TERM_ORDER, TERMS } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
@@ -1200,10 +1204,25 @@ function companionNotices(
   );
 }
 
-export function runCourseQuery(
-  catalog: Catalog,
-  query: CourseQuery,
-): CourseQueryResult {
+/** A query's matches in the order asked for, and how each matched its text. */
+interface Matched {
+  read: ReadQuery;
+  /** Every course that passed, before cross-listings collapse. */
+  filtered: Course[];
+  passed: FilterableSection[];
+  matches: Course[];
+  matchOf: Map<Course, SearchMatch>;
+  /** The courses a code search names itself. */
+  named: Course[];
+  codeFirst: boolean;
+  parsed: ParsedQuery | null;
+  topic: string | null;
+  codeSearch: string | null;
+  search: CourseQueryResult['search'];
+}
+
+/** Filters, collapses and sorts the catalog for a query. */
+function matchQuery(catalog: Catalog, query: CourseQuery): Matched {
   const read = readQuery(catalog, query);
   const { courses: filtered, passed } = filterCatalog(catalog, read.criteria);
   const collapsed = collapseCrossListings(filtered);
@@ -1239,10 +1258,6 @@ export function runCourseQuery(
       ]
     : sortCourses(collapsed, query.sort, catalog);
 
-  const includeSections =
-    query.includeSections ??
-    (Object.keys(query.filters).some(id => !SECTION_LIST_FILTERS.has(id)) ||
-      !!query.filters.searchText?.professorOnly);
   const every = (kinds: SearchMatch[]) =>
     matchOf.size > 0 && [...matchOf.values()].every(m => kinds.includes(m));
   const search =
@@ -1254,18 +1269,42 @@ export function runCourseQuery(
             parsed.words.length >= 2 && every(['description', 'scattered']),
         }
       : null;
-  const limit =
-    query.limit ?? (search?.descriptionOnly ? LOOSE_LIMIT : DEFAULT_LIMIT);
 
+  return {
+    read,
+    filtered,
+    passed,
+    matches,
+    matchOf,
+    named,
+    codeFirst,
+    parsed,
+    topic,
+    codeSearch,
+    search,
+  };
+}
+
+/** The notices, and for a search that missed, what to change. */
+function explainMatches(
+  catalog: Catalog,
+  query: CourseQuery,
+  m: Matched,
+): Pick<
+  CourseQueryResult,
+  'notices' | 'relaxations' | 'unrestrictive' | 'leftOut'
+> {
+  const { read, matches, named, parsed, topic, codeSearch } = m;
+  const text = query.filters.searchText;
   const inYear = catalog.courses.filter(
     c => read.year === 'all' || c.academicYear === read.year,
   );
   const notices = [
     ...(topic !== null
-      ? knownTermNotes(topic, inYear).map(m => notice('knownTerm', m))
+      ? knownTermNotes(topic, inYear).map(n => notice('knownTerm', n))
       : []),
     ...read.notices,
-    ...companionNotices(read.criteria, passed, filtered),
+    ...companionNotices(read.criteria, m.passed, m.filtered),
   ];
   const unrestrictive =
     matches.length === 0
@@ -1305,7 +1344,7 @@ export function runCourseQuery(
       notice(
         'sorted',
         SORT_NOTICE[query.sort] +
-          (codeFirst
+          (m.codeFirst
             ? ` The ${one(named.length, 'course', 'courses')} the code names ${one(named.length, 'comes', 'come')} first, then the rest in that order.`
             : ''),
       ),
@@ -1314,7 +1353,7 @@ export function runCourseQuery(
   notices.push(...missingModes(query, matches, read.year));
   if (text && REGISTRATION_RE.test(text.query))
     notices.push(notice('registration', REGISTRATION_NOTE));
-  if (search?.descriptionOnly && query.limit === undefined) {
+  if (m.search?.descriptionOnly && query.limit === undefined) {
     if (matches.length > LOOSE_LIMIT) {
       notices.push(
         notice(
@@ -1332,6 +1371,56 @@ export function runCourseQuery(
       ),
     );
   }
+  return { notices, relaxations, unrestrictive, leftOut };
+}
+
+/** The page of rows asked for, and its limit. */
+function pageRows(
+  catalog: Catalog,
+  query: CourseQuery,
+  m: Matched,
+): { limit: number; courses: CourseRow[] } {
+  const includeSections =
+    query.includeSections ??
+    (Object.keys(query.filters).some(id => !SECTION_LIST_FILTERS.has(id)) ||
+      !!query.filters.searchText?.professorOnly);
+  const limit =
+    query.limit ?? (m.search?.descriptionOnly ? LOOSE_LIMIT : DEFAULT_LIMIT);
+  const courses = m.matches.slice(query.offset, query.offset + limit).map(c => {
+    // Under the difficulty sort, the row's top instructor is the easiest
+    // rated, the one the order went by.
+    const row: CourseRow = toCourseSummary(
+      c,
+      catalog.rmp,
+      query.sort === 'difficulty' ? 'difficulty' : 'rating',
+    );
+    const early =
+      c.academicYear !== undefined && isUnpublished(catalog, c.academicYear);
+    if (early) row.earlyEntry = true;
+    if (includeSections && !early) {
+      row.sections = rowSections(c, catalog);
+      const companions = rowCompanions(c, catalog);
+      if (companions.length) row.companions = companions;
+    }
+    const match = m.matchOf.get(c);
+    if (match) row.match = match;
+    return row;
+  });
+  return { limit, courses };
+}
+
+export function runCourseQuery(
+  catalog: Catalog,
+  query: CourseQuery,
+): CourseQueryResult {
+  const matched = matchQuery(catalog, query);
+  const { read, matches } = matched;
+  const { notices, relaxations, unrestrictive, leftOut } = explainMatches(
+    catalog,
+    query,
+    matched,
+  );
+  const { limit, courses } = pageRows(catalog, query, matched);
 
   return {
     year: read.year,
@@ -1339,27 +1428,8 @@ export function runCourseQuery(
     total: matches.length,
     offset: query.offset,
     limit,
-    courses: matches.slice(query.offset, query.offset + limit).map(c => {
-      // Under the difficulty sort, the row's top instructor is the easiest
-      // rated, the one the order went by.
-      const row: CourseRow = toCourseSummary(
-        c,
-        catalog.rmp,
-        query.sort === 'difficulty' ? 'difficulty' : 'rating',
-      );
-      const early =
-        c.academicYear !== undefined && isUnpublished(catalog, c.academicYear);
-      if (early) row.earlyEntry = true;
-      if (includeSections && !early) {
-        row.sections = rowSections(c, catalog);
-        const companions = rowCompanions(c, catalog);
-        if (companions.length) row.companions = companions;
-      }
-      const match = matchOf.get(c);
-      if (match) row.match = match;
-      return row;
-    }),
-    search,
+    courses,
+    search: matched.search,
     relaxations,
     unrestrictive,
     leftOut,
