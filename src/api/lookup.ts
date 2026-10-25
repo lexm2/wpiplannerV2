@@ -26,6 +26,7 @@ import {
   type TermNow,
   type YearInfo,
 } from './calendar';
+import { notice, type Notice } from './notices';
 import { ApiError, echo } from './errors';
 import { andList, plural } from './text';
 import { forecastCourse, type Forecast } from './forecast';
@@ -282,8 +283,8 @@ export interface CoursePlan {
 }
 
 export type CourseLookup =
-  | { kind: 'course'; detail: CourseDetail; notices: string[] }
-  | { kind: 'plan'; plan: CoursePlan; notices: string[] };
+  | { kind: 'course'; detail: CourseDetail; notices: Notice[] }
+  | { kind: 'plan'; plan: CoursePlan; notices: Notice[] };
 
 export interface CourseLookupOptions extends DetailOptions {
   year?: number;
@@ -301,7 +302,7 @@ export function lookupCourse(
   options: CourseLookupOptions = {},
 ): CourseLookup {
   const { year, ...detailOptions } = options;
-  const notices: string[] = [];
+  const notices: Notice[] = [];
   // "CRN 349614" as well as "349614"; "CRN0350041" is CRN 350041.
   const key = input
     .trim()
@@ -347,7 +348,10 @@ export function lookupCourse(
           ? ` of ${yearLabel(course.academicYear)}`
           : '';
       notices.push(
-        `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        notice(
+          'crnRead',
+          `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        ),
       );
     }
   } else {
@@ -362,7 +366,10 @@ export function lookupCourse(
       if (named) {
         course = named;
         notices.push(
-          `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+          notice(
+            'titleRead',
+            `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+          ),
         );
       }
     }
@@ -410,12 +417,18 @@ export function lookupCourse(
   if (isEarlyEntry(catalog, course)) {
     const { courseCount } = yearStatus(catalog, course.academicYear!);
     notices.push(
-      `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${plural(courseCount, 'early entry', 'early entries')}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      notice(
+        'earlyEntry',
+        `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${plural(courseCount, 'early entry', 'early entries')}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      ),
     );
   }
   if (course.academicYear !== undefined && course.academicYear < current) {
     notices.push(
-      `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
+      notice(
+        'pastYear',
+        `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
+      ),
     );
   }
   return {

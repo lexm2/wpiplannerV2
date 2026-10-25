@@ -17,6 +17,7 @@ import type { CoursePlan, catalogMeta, listDepartments } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow, YearInfo } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
+import type { Notice } from '../api/notices';
 import { one, plural } from '../api/text';
 import { escapeRegExp } from '../utils/searchUtils';
 import { QUARTERS, TERMS } from '../utils/typeGuards';
@@ -30,6 +31,9 @@ import { STATEMENT_HEADING } from '../utils/statementHeadings';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;
+
+/** Notices as the text reads them: their words, one line each. */
+const messages = (notices: Notice[]) => notices.map(n => n.message);
 
 const CATEGORY_TEXT: Record<1 | 2 | 3, string> = {
   1: 'Cat. I (offered every year)',
@@ -438,7 +442,7 @@ export function renderSearch(result: CourseQueryResult): string {
       ...result.leftOut.map(leftOutLine),
     );
   }
-  lines.push(...result.notices);
+  lines.push(...messages(result.notices));
   if (result.search?.onlyMentions) {
     lines.push(
       'No course is mainly about this; these only mention the words in their descriptions:',
@@ -590,7 +594,7 @@ function viewLine(s: SectionView, term: DateSpan | undefined): string {
  */
 export function courseDigest(
   d: CourseDetail,
-  notices: string[],
+  notices: Notice[],
   { dataAsOf, dataAgeDays }: SeatData,
   termDates: Partial<Record<TermLetter, DateSpan>> | null,
 ) {
@@ -718,7 +722,7 @@ function termBlock(
 
 export function renderCourse(
   d: CourseDetail,
-  notices: string[],
+  notices: Notice[],
   context: SeatData & {
     termDates: Partial<Record<TermLetter, DateSpan>> | null;
     today: string;
@@ -736,7 +740,7 @@ export function renderCourse(
       .filter(Boolean)
       .join(' | '),
   );
-  lines.push(...notices);
+  lines.push(...messages(notices));
 
   const facts: string[] = [];
   facts.push(
@@ -812,11 +816,11 @@ function attributesFact(attributes: string[]): string {
     : 'Degree attributes: none on record (tags are incomplete; see the degree audit)';
 }
 
-export function renderPlan(plan: CoursePlan, notices: string[]): string {
+export function renderPlan(plan: CoursePlan, notices: Notice[]): string {
   const c = plan.course;
   const lines = [
     `${c.code} ${c.name} | planning for ${yearLabel(plan.forecast.year)} | ${credits(c)}`,
-    ...notices,
+    ...messages(notices),
     plan.forecast.summary,
   ];
   lines.push(

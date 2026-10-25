@@ -54,6 +54,7 @@ import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
 import { ApiError, echo, listSome } from './errors';
+import { notice, type Notice } from './notices';
 import { one } from './text';
 import { EndedTermsFilter, type EndedTermsCriteria } from './endedTermsFilter';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
@@ -494,7 +495,7 @@ export interface CourseQueryResult {
   /** Whole days since then (see seatDataAge). */
   dataAgeDays: number | null;
   /** Things the caller should know about how the query was read. */
-  notices: string[];
+  notices: Notice[];
   /**
    * With searchText: the query, and whether every match only mentions it:
    * none has it in its name, code or department, its words together in a
@@ -751,7 +752,7 @@ interface ReadQuery {
   criteria: Map<string, unknown>;
   year: number | 'all';
   excludedEndedTerms: string[];
-  notices: string[];
+  notices: Notice[];
 }
 
 /**
@@ -763,7 +764,7 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
   const { filters } = query;
   const criteria = new Map<string, unknown>();
   const set = <T>(id: string, value: T) => criteria.set(id, value);
-  const notices: string[] = [];
+  const notices: Notice[] = [];
   const current = currentAcademicYear(catalog);
 
   const year = filters.academicYear?.year ?? current;
@@ -795,7 +796,7 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
       filters.department.departments,
     );
     set<DepartmentFilterCriteria>('department', { departments: abbrs });
-    notices.push(...notes);
+    notices.push(...notes.map(m => notice('departmentRead', m)));
   }
 
   // Sections of ended terms can no longer be taken; leave them out unless
@@ -811,7 +812,10 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     if (named.length) {
       const dates = termDates(catalog, current);
       notices.push(
-        `${named.map(t => `${t} term ended ${dates?.[t as TermLetter].end ?? ''}`.trim()).join('; ')}: its sections are listed but can no longer be taken.`,
+        notice(
+          'endedTermsListed',
+          `${named.map(t => `${t} term ended ${dates?.[t as TermLetter].end ?? ''}`.trim()).join('; ')}: its sections are listed but can no longer be taken.`,
+        ),
       );
     }
   } else if (ended.length && !query.includeEndedTerms) {
@@ -824,13 +828,19 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
       });
     }
     notices.push(
-      `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
+      notice(
+        'endedTermsLeftOut',
+        `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
+      ),
     );
   } else if (ended.length) {
     notices.push(
-      ended.length === 1
-        ? `Term ${ended[0]} has ended: its sections are listed but can no longer be taken.`
-        : `Terms ${ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
+      notice(
+        'endedTermsListed',
+        ended.length === 1
+          ? `Term ${ended[0]} has ended: its sections are listed but can no longer be taken.`
+          : `Terms ${ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
+      ),
     );
   }
 
@@ -864,7 +874,7 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
       includeAsync: filters.times.includeAsync,
     };
     set<TimesFilterCriteria>('times', times);
-    notices.push(describeTimes(times));
+    notices.push(notice('timesRead', describeTimes(times)));
   }
 
   if (filters.rmpRating) {
@@ -882,11 +892,17 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     );
     if (otherYear.length) {
       notices.push(
-        `filters.periodConflict ignores CRN ${listSome(otherYear)}: not ${yearLabel(year as number)} sections, so they cannot clash with the ones searched.`,
+        notice(
+          'conflictYears',
+          `filters.periodConflict ignores CRN ${listSome(otherYear)}: not ${yearLabel(year as number)} sections, so they cannot clash with the ones searched.`,
+        ),
       );
     } else if (year === 'all') {
       notices.push(
-        'filters.periodConflict compares weekdays and terms, not years: with academicYear "all", other years\' sections are compared with these CRNs too.',
+        notice(
+          'conflictYears',
+          'filters.periodConflict compares weekdays and terms, not years: with academicYear "all", other years\' sections are compared with these CRNs too.',
+        ),
       );
     }
     set<ConflictCriteria>('periodConflict', {
@@ -999,7 +1015,7 @@ function missingModes(
   query: CourseQuery,
   matches: Course[],
   year: number | 'all',
-): string[] {
+): Notice[] {
   const modes = query.filters.deliveryMode?.modes ?? [];
   if (modes.length < 2 || matches.length === 0) return [];
   const found = new Set(
@@ -1010,25 +1026,36 @@ function missingModes(
   const where = year === 'all' ? 'any year' : yearLabel(year);
   return modes
     .filter(m => !found.has(m.toLowerCase()))
-    .map(m => `${m}: none in ${where} matching the other filters.`);
+    .map(m =>
+      notice(
+        'deliveryModeMissing',
+        `${m}: none in ${where} matching the other filters.`,
+      ),
+    );
 }
 
 /** "Did you mean Gillian Smith?" for a search that found nothing. */
-function instructorNotice(inYear: Course[], query: string): string[] {
+function instructorNotice(inYear: Course[], query: string): Notice[] {
   const names = suggestInstructors(inYear, query);
   if (!names.length) return [];
   return [
-    `No instructor is named "${echo(query)}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
+    notice(
+      'instructorSuggested',
+      `No instructor is named "${echo(query)}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
+    ),
   ];
 }
 
 /** '"AI" read as AI or artificial intelligence.', for each acronym in the query. */
-function acronymNotices(catalog: Catalog, words: string[]): string[] {
+function acronymNotices(catalog: Catalog, words: string[]): Notice[] {
   return words.flatMap(word => {
     const expansions = catalog.search.acronymExpansions(word);
     if (!expansions.length) return [];
     return [
-      `"${word.toUpperCase()}" read as ${word.toUpperCase()} or ${expansions.join(' or ')}.`,
+      notice(
+        'acronymRead',
+        `"${word.toUpperCase()}" read as ${word.toUpperCase()} or ${expansions.join(' or ')}.`,
+      ),
     ];
   });
 }
@@ -1166,9 +1193,11 @@ function companionNotices(
   criteria: Map<string, unknown>,
   passed: FilterableSection[],
   matches: Course[],
-): string[] {
+): Notice[] {
   if (!judgesCompanions(criteria)) return [];
-  return companionDrops(passed, matches, criteria).map(dropNotice);
+  return companionDrops(passed, matches, criteria).map(drop =>
+    notice('companionsDropped', dropNotice(drop)),
+  );
 }
 
 export function runCourseQuery(
@@ -1232,7 +1261,9 @@ export function runCourseQuery(
     c => read.year === 'all' || c.academicYear === read.year,
   );
   const notices = [
-    ...(topic !== null ? knownTermNotes(topic, inYear) : []),
+    ...(topic !== null
+      ? knownTermNotes(topic, inYear).map(m => notice('knownTerm', m))
+      : []),
     ...read.notices,
     ...companionNotices(read.criteria, passed, filtered),
   ];
@@ -1252,7 +1283,10 @@ export function runCourseQuery(
   }
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
-      `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
+      notice(
+        'offsetPastEnd',
+        `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
+      ),
     );
   }
   if (topic !== null && parsed)
@@ -1260,29 +1294,42 @@ export function runCourseQuery(
   const ignored = parsed?.ignored ?? [];
   if (ignored.length) {
     notices.push(
-      `Searched by the first ${MAX_QUERY_WORDS} distinct words; ignored: ${echo(ignored.join(' '))}. Use one or two topic words.`,
+      notice(
+        'wordsIgnored',
+        `Searched by the first ${MAX_QUERY_WORDS} distinct words; ignored: ${echo(ignored.join(' '))}. Use one or two topic words.`,
+      ),
     );
   }
   if (query.sort !== 'relevance') {
     notices.push(
-      SORT_NOTICE[query.sort] +
-        (codeFirst
-          ? ` The ${one(named.length, 'course', 'courses')} the code names ${one(named.length, 'comes', 'come')} first, then the rest in that order.`
-          : ''),
+      notice(
+        'sorted',
+        SORT_NOTICE[query.sort] +
+          (codeFirst
+            ? ` The ${one(named.length, 'course', 'courses')} the code names ${one(named.length, 'comes', 'come')} first, then the rest in that order.`
+            : ''),
+      ),
     );
   }
   notices.push(...missingModes(query, matches, read.year));
-  if (text && REGISTRATION_RE.test(text.query)) notices.push(REGISTRATION_NOTE);
+  if (text && REGISTRATION_RE.test(text.query))
+    notices.push(notice('registration', REGISTRATION_NOTE));
   if (search?.descriptionOnly && query.limit === undefined) {
     if (matches.length > LOOSE_LIMIT) {
       notices.push(
-        `No course name has these words, only descriptions: listing the closest ${LOOSE_LIMIT} of ${matches.length}. Pass limit for more, or search one or two topic words.`,
+        notice(
+          'closestOnly',
+          `No course name has these words, only descriptions: listing the closest ${LOOSE_LIMIT} of ${matches.length}. Pass limit for more, or search one or two topic words.`,
+        ),
       );
     }
   }
   if (read.year === 'all') {
     notices.push(
-      `Searching every year; only ${yearLabel(currentAcademicYear(catalog))} can be scheduled.`,
+      notice(
+        'allYears',
+        `Searching every year; only ${yearLabel(currentAcademicYear(catalog))} can be scheduled.`,
+      ),
     );
   }
 
