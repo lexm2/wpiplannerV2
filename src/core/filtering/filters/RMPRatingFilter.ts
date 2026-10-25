@@ -9,12 +9,9 @@ type RatingNumbers = NonNullable<
   ReturnType<RateMyProfessorService['getRatings']>
 >;
 
-/** Every named instructor of the section's periods, co-instructors split. */
+/** Every instructor of the section's periods, each once. */
 function instructorsOf(fs: FilterableSection): string[] {
-  const names = fs.section.periods.flatMap(period =>
-    (period.professor ?? '').split(/\s*;\s*/),
-  );
-  return [...new Set(names.filter(name => name && name !== 'Not Assigned'))];
+  return [...new Set(fs.section.periods.flatMap(period => period.instructors))];
 }
 
 /**
@@ -25,41 +22,21 @@ function withinBounds(
   { rating, difficulty, wouldTakeAgain }: RatingNumbers,
   criteria: RMPRatingFilterCriteria,
 ): boolean {
-  const { minRating, maxRating, minDifficulty, maxDifficulty } = criteria;
-  if (minRating !== undefined && minRating > 0 && rating < minRating) {
-    return false;
-  }
-  if (maxRating !== undefined && maxRating < 5 && rating > maxRating) {
-    return false;
-  }
-  if (
-    minDifficulty !== undefined &&
-    minDifficulty > 0 &&
-    difficulty < minDifficulty
-  ) {
-    return false;
-  }
-  if (
-    maxDifficulty !== undefined &&
-    maxDifficulty < 5 &&
-    difficulty > maxDifficulty
-  ) {
-    return false;
-  }
-  if (wouldTakeAgain === null) return true;
-  const { minWouldTakeAgain, maxWouldTakeAgain } = criteria;
-  if (
-    minWouldTakeAgain !== undefined &&
-    minWouldTakeAgain > 0 &&
-    wouldTakeAgain < minWouldTakeAgain
-  ) {
-    return false;
-  }
-  return !(
-    maxWouldTakeAgain !== undefined &&
-    maxWouldTakeAgain < 100 &&
-    wouldTakeAgain > maxWouldTakeAgain
-  );
+  // Each value with the top of its scale and its bounds.
+  const bounds = [
+    [rating, 5, criteria.minRating, criteria.maxRating],
+    [difficulty, 5, criteria.minDifficulty, criteria.maxDifficulty],
+    [
+      wouldTakeAgain,
+      100,
+      criteria.minWouldTakeAgain,
+      criteria.maxWouldTakeAgain,
+    ],
+  ] as const;
+  return bounds.every(([value, top, min = 0, max = top]) => {
+    if (value === null) return true;
+    return !(min > 0 && value < min) && !(max < top && value > max);
+  });
 }
 
 export class RMPRatingFilter implements SectionBasedFilter {

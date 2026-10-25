@@ -27,7 +27,7 @@ function mondayAt10(number: string): Section {
     periods: [
       {
         type: PeriodType.LECTURE,
-        professor: 'Prof X',
+        instructors: ['Prof X'],
         startTime: { hours: 10, minutes: 0 },
         endTime: { hours: 10, minutes: 50 },
         location: 'SH',

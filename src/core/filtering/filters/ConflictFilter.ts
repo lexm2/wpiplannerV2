@@ -2,33 +2,13 @@ import { AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
 import { ConflictCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
-import { sectionToWeeklySlots } from '../../../utils/timeSlotUtils';
+import {
+  datesMeet,
+  sectionToWeeklySlots,
+  termsCovered,
+} from '../../../utils/timeSlotUtils';
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
 import { getSelectedSections } from '../../../utils/courseUtils';
-
-const QUARTERS = [
-  AcademicTerm.A,
-  AcademicTerm.B,
-  AcademicTerm.C,
-  AcademicTerm.D,
-];
-
-/**
- * The terms a slot occupies, for overlap tests and mask keys. With `spans`
- * a semester term is its two quarters, so F meets A and B. Without it terms
- * stand alone, and only ALL reaches every other term.
- */
-function termsCovered(term: AcademicTerm, spans: boolean): AcademicTerm[] {
-  if (spans) {
-    if (term === AcademicTerm.ALL) return QUARTERS;
-    if (term === AcademicTerm.F) return [AcademicTerm.A, AcademicTerm.B];
-    if (term === AcademicTerm.S) return [AcademicTerm.C, AcademicTerm.D];
-    return [term];
-  }
-  if (term === AcademicTerm.ALL)
-    return [...QUARTERS, AcademicTerm.F, AcademicTerm.S];
-  return [term];
-}
 
 /** A blocked slot parsed once per apply: owning CRN, terms, minute range. */
 interface PreparedSlot {
@@ -38,21 +18,6 @@ interface PreparedSlot {
   end: number;
   startDate?: string;
   endDate?: string;
-}
-
-/**
- * Whether two date ranges share a day. Most sections run their whole term,
- * but some run half of it (BB 3813 BX01 to Nov 12, BX02 from Nov 16), and
- * those never meet. Unknown dates are taken to meet.
- */
-function datesMeet(
-  aStart: string | undefined,
-  aEnd: string | undefined,
-  bStart: string | undefined,
-  bEnd: string | undefined,
-): boolean {
-  if (!aStart || !aEnd || !bStart || !bEnd) return true;
-  return aStart <= bEnd && bStart <= aEnd;
 }
 
 export class ConflictFilter implements SectionBasedFilter {

@@ -129,7 +129,7 @@ export function cellsFromWindows(
  * touching bands on the same day merged into one.
  */
 export function canonicalWindows(windows: readonly TimeWindow[]): TimeWindow[] {
-  const dayOrder = Object.values(DayOfWeek);
+  const dayOrder = TimeUtils.DAYS_ORDER;
   const sorted = [...windows].sort(
     (a, b) =>
       dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day) ||

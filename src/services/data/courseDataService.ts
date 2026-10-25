@@ -8,7 +8,11 @@ import type {
 import type { RawCourse } from '../../types/rawData';
 import { appState } from '../../core/state/appState.svelte';
 import { logger } from '../../utils/logger';
+import { SearchIndex } from '../../utils/searchUtils';
 import { parseCatalog, parseCourse } from './parseCatalog';
+
+const courseList = (departments: Department[]) =>
+  departments.flatMap(d => d.courses);
 
 /**
  * Fetches the WPI course catalog and parses it with parseCatalog.
@@ -20,8 +24,14 @@ export class CourseDataService {
   private scheduleDB: ScheduleDB | null = null;
   // Started by prefetchCourseData(), consumed by the next loadCourseData().
   private prefetched: Promise<ScheduleDB> | null = null;
+  /** Search over the loaded catalog; empty until it loads. */
+  private searchIndex = new SearchIndex();
 
   constructor() {}
+
+  getSearchIndex(): SearchIndex {
+    return this.searchIndex;
+  }
 
   /**
    * Starts the fetch + parse without publishing anything, so the download
@@ -42,8 +52,12 @@ export class CourseDataService {
       const pending = this.prefetched ?? this.fetchFreshData();
       this.prefetched = null;
       const freshData = await pending;
+      // Learn the search vocabulary now rather than on the first keystroke,
+      // which would otherwise pause to read every course. A new index per
+      // load: nothing the old courses taught carries over.
+      const searchIndex = new SearchIndex(courseList(freshData.departments));
       this.scheduleDB = freshData;
-
+      this.searchIndex = searchIndex;
       appState.loadedDepartments = freshData.departments;
 
       return freshData;
@@ -160,6 +174,9 @@ export class CourseDataService {
       return;
     }
 
+    // The same course objects plus any added (the tutorial's): nothing to
+    // forget, and only the new courses are read.
+    this.searchIndex.add(courseList(this.scheduleDB.departments));
     appState.loadedDepartments = this.scheduleDB.departments;
   }
 }

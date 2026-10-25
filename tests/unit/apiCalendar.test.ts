@@ -18,9 +18,10 @@ import {
   readAlternatingYears,
 } from '../../src/utils/alternatingYears';
 import { TermBoundsService } from '../../src/utils/termBounds';
+import { SearchIndex } from '../../src/utils/searchUtils';
 import type { Course } from '../../src/types/types';
 
-const bounds = TermBoundsService.getInstance();
+const bounds = new TermBoundsService();
 bounds.loadFromData({
   generated: '2026-09-01T00:00:00.000Z',
   years: {
@@ -83,6 +84,7 @@ function catalog(today: string, counts: Record<number, number>): Catalog {
     sectionsByCrn: new Map(),
     rmp: {} as Catalog['rmp'],
     termBounds: bounds,
+    search: new SearchIndex(),
     now: () => new Date(y, m - 1, d),
   };
 }

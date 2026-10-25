@@ -6,7 +6,10 @@
 import { describe, it, expect } from 'vitest';
 import { FilterService } from '../../src/services/filtering/FilterService';
 import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
+import { SearchIndex } from '../../src/utils/searchUtils';
 import type { Course } from '../../src/types/types';
+
+const searchIndex = new SearchIndex();
 
 function course(id: string, sections: number): Course {
   return {
@@ -43,7 +46,7 @@ describe('FilterService bookmark-only filtering', () => {
   const service = new FilterService({
     getBookmarkedCourseIds: () => ['CS1101', 'CS2102', 'MA1022'],
   });
-  service.registerFilter(new SearchTextFilter());
+  service.registerFilter(new SearchTextFilter(() => searchIndex));
 
   it('keeps bookmarked courses that have sections, in order', () => {
     service.addFilter('bookmark', { showBookmarkedOnly: true });

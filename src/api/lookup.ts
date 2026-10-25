@@ -9,14 +9,11 @@ import { findCourseById } from '../types/ScheduleState';
 import { findCatalogCourse } from '../services/degree/catalogLookup';
 import { getAllSections } from '../utils/courseUtils';
 import { closestMatches, editDistance } from '../utils/editDistance';
-import {
-  matchCourseText,
-  parseSearchQuery,
-  rankCoursesByRelevance,
-} from '../utils/searchUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
+  isEarlyEntry,
+  isUnpublished,
   seatDataAge,
   termDates,
   termNow,
@@ -29,11 +26,12 @@ import {
   type TermNow,
   type YearInfo,
 } from './calendar';
+import { notice, type Notice } from './notices';
 import { ApiError, echo } from './errors';
+import { andList, plural } from './text';
 import { forecastCourse, type Forecast } from './forecast';
 import {
   courseCode,
-  statementOf,
   termsOf,
   toCourseDetail,
   toCourseSummary,
@@ -92,9 +90,7 @@ function coverage(catalog: Catalog): string {
         ? `early ${yearLabel(y.year)} entries`
         : yearLabel(y.year),
     );
-  return years.length <= 1
-    ? (years[0] ?? 'no year')
-    : `${years.slice(0, -1).join(', ')} and ${years.at(-1)}`;
+  return andList(years) || 'no year';
 }
 
 /**
@@ -179,9 +175,6 @@ function courseNotFound(
   );
 }
 
-/** A course title as compared: lowercase words, "&" read as "and". */
-const titleWords = (title: string) => normalName(title);
-
 /** Suggestions an unresolved course name lists. */
 const MAX_NAME_SUGGESTIONS = 3;
 
@@ -197,14 +190,14 @@ function courseByName(
   name: string,
   year: number,
 ): Course | null {
-  const want = titleWords(name);
+  const want = normalName(name);
   if (want.length < 4) return null;
   const inYear = catalog.courses.filter(c => c.academicYear === year);
-  const exact = inYear.filter(c => titleWords(c.name) === want);
+  const exact = inYear.filter(c => normalName(c.name) === want);
   const close = exact.length
     ? exact
     : inYear.filter(c => {
-        const title = titleWords(c.name);
+        const title = normalName(c.name);
         return (
           title.startsWith(`${want} `) ||
           (want.length >= 8 && editDistance(want, title, 2) <= 2)
@@ -213,13 +206,16 @@ function courseByName(
   const classes = distinctClasses(close);
   if (classes.length === 1) return classes[0];
 
-  const query = parseSearchQuery(name);
-  const ranked = rankCoursesByRelevance(
-    classes.length
-      ? classes
-      : inYear.filter(c => matchCourseText(c, query).all),
-    name,
-  ).slice(0, MAX_NAME_SUGGESTIONS);
+  const { search } = catalog;
+  const query = search.parse(name);
+  const ranked = search
+    .rank(
+      classes.length
+        ? classes
+        : inYear.filter(c => search.matchCourseWords(c, query).all),
+      name,
+    )
+    .slice(0, MAX_NAME_SUGGESTIONS);
   if (!ranked.length) return null;
   const list = ranked.map(c => `${courseCode(c)} ${c.name}`);
   throw new ApiError(
@@ -254,12 +250,6 @@ function detailContext(catalog: Catalog, course: Course) {
   };
 }
 
-/** One of an unpublished year's few early entries. */
-const isEarlyEntry = (catalog: Catalog, course: Course) =>
-  course.academicYear !== undefined &&
-  course.academicYear > currentAcademicYear(catalog) &&
-  yearStatus(catalog, course.academicYear).status === 'not yet published';
-
 /**
  * The course's outlook for the year after its own, when that year has not
  * been published; null once it has (its real schedule answers instead).
@@ -268,7 +258,7 @@ function nextYearForecast(catalog: Catalog, course: Course): Forecast | null {
   // Only the current year's schedule is a sound base to read on from.
   if (course.academicYear !== currentAcademicYear(catalog)) return null;
   const next = course.academicYear + 1;
-  if (yearStatus(catalog, next).status !== 'not yet published') return null;
+  if (!isUnpublished(catalog, next)) return null;
   return forecastFor(catalog, course, next);
 }
 
@@ -293,8 +283,8 @@ export interface CoursePlan {
 }
 
 export type CourseLookup =
-  | { kind: 'course'; detail: CourseDetail; notices: string[] }
-  | { kind: 'plan'; plan: CoursePlan; notices: string[] };
+  | { kind: 'course'; detail: CourseDetail; notices: Notice[] }
+  | { kind: 'plan'; plan: CoursePlan; notices: Notice[] };
 
 export interface CourseLookupOptions extends DetailOptions {
   year?: number;
@@ -312,7 +302,7 @@ export function lookupCourse(
   options: CourseLookupOptions = {},
 ): CourseLookup {
   const { year, ...detailOptions } = options;
-  const notices: string[] = [];
+  const notices: Notice[] = [];
   // "CRN 349614" as well as "349614"; "CRN0350041" is CRN 350041.
   const key = input
     .trim()
@@ -341,10 +331,7 @@ export function lookupCourse(
       year !== undefined &&
       own !== undefined &&
       own !== year &&
-      !(
-        year > current &&
-        yearStatus(catalog, year).status === 'not yet published'
-      )
+      !(year > current && isUnpublished(catalog, year))
     ) {
       throw new ApiError(
         `CRN ${key} is ${courseCode(entry.courses[0])} section ${entry.section.number} of ${yearLabel(own)}, not ${yearLabel(year)}. Leave out year to see it, or give the course code with year ${year}.`,
@@ -361,7 +348,10 @@ export function lookupCourse(
           ? ` of ${yearLabel(course.academicYear)}`
           : '';
       notices.push(
-        `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        notice(
+          'crnRead',
+          `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        ),
       );
     }
   } else {
@@ -376,7 +366,10 @@ export function lookupCourse(
       if (named) {
         course = named;
         notices.push(
-          `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+          notice(
+            'titleRead',
+            `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+          ),
         );
       }
     }
@@ -384,8 +377,9 @@ export function lookupCourse(
 
   if (year !== undefined) {
     const status = yearStatus(catalog, year);
+    const unpublished = status.status === 'not yet published';
     // Only the year after this one can be read off this year's schedule.
-    if (year > current + 1 && status.status === 'not yet published') {
+    if (year > current + 1 && unpublished) {
       throw new ApiError(
         `Only next year (${current + 1}, ${yearLabel(current + 1)}) can be forecast, from this year's schedule; ${yearLabel(year)} is too far ahead. Call get_course with year ${current + 1}, or without a year for ${yearLabel(current)}.`,
         422,
@@ -395,15 +389,8 @@ export function lookupCourse(
     if (year < current && status.courseCount === 0) {
       throw yearNotInCatalog(catalog, year);
     }
-  }
-
-  if (year !== undefined && year > current) {
-    const status = yearStatus(catalog, year);
     // One of the year's early entries answers as itself, below.
-    if (
-      status.status === 'not yet published' &&
-      course?.academicYear !== year
-    ) {
+    if (year > current && unpublished && course?.academicYear !== year) {
       const base = course ?? findCourse(catalog, key);
       if (!base) throw courseNotFound(catalog, key, current);
       const summary = toCourseSummary(base, catalog.rmp);
@@ -415,8 +402,8 @@ export function lookupCourse(
           course: {
             ...summary,
             description: base.description,
-            recommendedBackground: statementOf(base, 'recommendedBackground'),
-            prerequisites: statementOf(base, 'prerequisites'),
+            recommendedBackground: base.recommendedBackground ?? null,
+            prerequisites: base.prerequisites ?? null,
             courseTypes: base.courseTypes,
           },
         },
@@ -430,12 +417,18 @@ export function lookupCourse(
   if (isEarlyEntry(catalog, course)) {
     const { courseCount } = yearStatus(catalog, course.academicYear!);
     notices.push(
-      `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${courseCount} early entr${courseCount === 1 ? 'y' : 'ies'}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      notice(
+        'earlyEntry',
+        `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${plural(courseCount, 'early entry', 'early entries')}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      ),
     );
   }
   if (course.academicYear !== undefined && course.academicYear < current) {
     notices.push(
-      `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
+      notice(
+        'pastYear',
+        `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
+      ),
     );
   }
   return {
@@ -472,7 +465,7 @@ export function unpublishedYearError(
   const current = currentAcademicYear(catalog);
   if (info.status === 'not yet published') {
     return new ApiError(
-      `The ${yearLabel(year)} schedule is not published yet: the catalog has ${info.courseCount ? `${info.courseCount} early entr${info.courseCount === 1 ? 'y' : 'ies'}` : 'nothing'} for it, against ${yearStatus(catalog, current).courseCount} courses in ${yearLabel(current)}. WPI sets each year's terms and times when it publishes, so they cannot be searched yet. To plan ahead, search the current year (${current}) and narrow with filters.offeringPattern (categories [1] = offered every year), then call get_course with year ${year} for a course's outlook.`,
+      `The ${yearLabel(year)} schedule is not published yet: the catalog has ${info.courseCount ? plural(info.courseCount, 'early entry', 'early entries') : 'nothing'} for it, against ${yearStatus(catalog, current).courseCount} courses in ${yearLabel(current)}. WPI sets each year's terms and times when it publishes, so they cannot be searched yet. To plan ahead, search the current year (${current}) and narrow with filters.offeringPattern (categories [1] = offered every year), then call get_course with year ${year} for a course's outlook.`,
       422,
       { year, status: info.status, courseCount: info.courseCount },
     );
@@ -506,7 +499,7 @@ export function listDepartments(
     .sort((a, b) => a.abbr.localeCompare(b.abbr));
 }
 
-/** A department name as compared: lowercase words, "&" read as "and". */
+/** A department or course name as compared: lowercase words, "&" read as "and". */
 function normalName(name: string): string {
   return name
     .toLowerCase()
@@ -703,8 +696,7 @@ export function catalogMeta(catalog: Catalog): CatalogMeta {
   const dates: CatalogMeta['termDates'] = {};
   for (const year of Object.keys(catalog.termBounds.getAllBounds() ?? {})) {
     const d = termDates(catalog, Number(year));
-    const published =
-      yearStatus(catalog, Number(year)).status !== 'not yet published';
+    const published = !isUnpublished(catalog, Number(year));
     if (d && published) dates[year] = d;
   }
   const current = currentAcademicYear(catalog);

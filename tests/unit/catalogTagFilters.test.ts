@@ -34,7 +34,7 @@ function section(crn: number, over: Partial<Section> = {}): Section {
     periods: [
       {
         type: PeriodType.LECTURE,
-        professor: crn % 2 ? 'Ada Lovelace' : 'Few Ratings',
+        instructors: [crn % 2 ? 'Ada Lovelace' : 'Few Ratings'],
       } as Section['periods'][number],
     ],
     ...over,

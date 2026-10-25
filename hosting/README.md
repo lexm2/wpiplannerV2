@@ -73,7 +73,7 @@ Useful commands:
 
 Both setups serve, beside the app:
 
-- `https://<domain>/wpiplannerV2/api/` — read-only JSON. `GET health`,
+- `https://<domain>/wpiplannerV2/api/v1/` — read-only JSON. `GET health`,
   `meta`, `departments`, `courses?department=CS&term=C&limit=20`,
   `courses/CS2102`; `POST courses/search` (the filter panel's criteria as
   JSON) and `POST conflicts` (`{"crns": [...]}`).

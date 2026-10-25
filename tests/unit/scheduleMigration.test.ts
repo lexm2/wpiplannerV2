@@ -12,11 +12,13 @@
  * profile and decompressing `serializedData`; the edge-case row was derived
  * from those same real courses.
  *
- * Each row is NAMED for the stored schema version whose shape it holds. The
- * fixture only covers the version this migration reads from - `v2-*`, the three
- * parallel selected* fields - because that is the shape live data is actually
- * in. Adding a rung means adding a `v3-*` row alongside it; older versions are
- * settled history and are not re-litigated here.
+ * Each row is NAMED for the stored schema version whose shape it holds:
+ * `v2-*`, the three parallel selected* fields, the shape the captured data is
+ * in, and `v3-*`, the keyed `selected` map with each period's instructors in
+ * one `professor` string. The v3 row is v2-edge-cases run through the v3
+ * migration, with one period made co-taught and one unassigned. Adding a rung
+ * means adding a row alongside; older versions are settled history and are
+ * not re-litigated here.
  *
  * The names are the only version marker: every row's `schemaVersion` is
  * deliberately undefined, because they predate stamping, which is the case
@@ -138,10 +140,54 @@ describe('migrateStoredSchedule', () => {
     expect('selected' in corrupt).toBe(false);
   });
 
+  describe('instructor lists (v4)', () => {
+    /** Every period anywhere under the schedule. */
+    const periods = (value: unknown): Record<string, unknown>[] => {
+      if (Array.isArray(value)) return value.flatMap(periods);
+      if (!value || typeof value !== 'object' || value instanceof Set)
+        return [];
+      return Object.entries(value).flatMap(([key, child]) =>
+        key === 'periods' && Array.isArray(child) ? child : periods(child),
+      );
+    };
+
+    it('splits co-instructors and drops the no-instructor placeholder', () => {
+      const out = migrate(row('v3-edge-cases'));
+      const ae = courseById(out, 'AE-2320-2025');
+      const bb = courseById(out, 'BB-2920-2025');
+
+      expect(ae.selected.lecture.periods[0].instructors).toEqual([
+        'Ye Lu',
+        'Inna Nechipurenko',
+      ]);
+      expect(bb.selected.lecture.periods[0].instructors).toEqual([]);
+    });
+
+    it('leaves no period with the old field, in any row', () => {
+      for (const fixtureRow of rows) {
+        for (const period of periods(migrate(fixtureRow))) {
+          expect('professor' in period).toBe(false);
+          expect(Array.isArray(period.instructors)).toBe(true);
+        }
+      }
+    });
+
+    it('keeps a single name as one instructor', () => {
+      const out = migrate(row('v2-schedule'));
+      const names = new Set(
+        periods(out).flatMap(p => p.instructors as string[]),
+      );
+      expect(names.has('Sanath Wijerathna')).toBe(true);
+      expect(names.has('Not Assigned')).toBe(false);
+    });
+  });
+
   it('is idempotent', () => {
-    const once = migrate(row('v2-schedule'));
-    const twice = migrateStoredSchedule(once);
-    expect(twice).toEqual(once);
+    for (const name of ['v2-schedule', 'v3-edge-cases']) {
+      const once = migrate(row(name));
+      const twice = migrateStoredSchedule(once);
+      expect(twice).toEqual(once);
+    }
   });
 
   describe('version stamp', () => {

@@ -18,8 +18,8 @@ export const period = (
   days: string[],
   startTime: string,
   endTime: string,
-  professor = 'Ada Lovelace',
-) => ({ type: 'Lecture', professor, startTime, endTime, days });
+  instructors = ['Ada Lovelace'],
+) => ({ type: 'Lecture', instructors, startTime, endTime, days });
 
 export const section = (
   crn: number,
@@ -67,7 +67,7 @@ export const course = (
 // MA 543 and DS 502 are one class under two codes, meeting Monday evenings
 // all fall, which clashes with PSY 1400 in B term.
 const crossListed = section(30, 'F01', 'F', [
-  period(['M'], '18:00', '20:50', 'Grace Hopper'),
+  period(['M'], '18:00', '20:50', ['Grace Hopper']),
 ]);
 
 export function catalogJson(extraName = '') {
@@ -89,12 +89,9 @@ export function catalogJson(extraName = '') {
                 'AL01',
                 'A',
                 [
-                  period(
-                    ['M', 'T', 'R', 'F'],
-                    '13:00',
-                    '13:50',
+                  period(['M', 'T', 'R', 'F'], '13:00', '13:50', [
                     'Grace Hopper',
-                  ),
+                  ]),
                 ],
                 0,
               ),
@@ -185,13 +182,13 @@ export function catalogJson(extraName = '') {
             'General Physics',
             (() => {
               const any = section(22, 'BX01', 'B', [
-                period(['W'], '14:00', '14:50', 'Not Assigned'),
+                period(['W'], '14:00', '14:50', []),
               ]);
               const online = section(
                 23,
                 'BX02',
                 'B',
-                [period(['R'], '14:00', '14:50', 'Not Assigned')],
+                [period(['R'], '14:00', '14:50', [])],
                 10,
                 { deliveryMode: 'Online' },
               );
@@ -208,12 +205,9 @@ export function catalogJson(extraName = '') {
                     'BL02',
                     'B',
                     [
-                      period(
-                        ['M', 'T', 'R', 'F'],
-                        '11:00',
-                        '11:50',
+                      period(['M', 'T', 'R', 'F'], '11:00', '11:50', [
                         'Alan Turing',
-                      ),
+                      ]),
                     ],
                     10,
                     { deliveryMode: 'Online' },
@@ -238,7 +232,7 @@ export function catalogJson(extraName = '') {
                 40,
                 'B01',
                 'B',
-                [period(['M'], '18:00', '20:50', 'Grace Hopper')],
+                [period(['M'], '18:00', '20:50', ['Grace Hopper'])],
                 0,
                 { actualWaitlist: 5, status: 'Waitlist' },
               ),
@@ -259,7 +253,7 @@ export function catalogJson(extraName = '') {
                 8,
                 'BL01',
                 'B',
-                [period(['T', 'F'], '13:00', '14:50', 'Grace Hopper')],
+                [period(['T', 'F'], '13:00', '14:50', ['Grace Hopper'])],
                 2,
               ),
               // Workday's 999 seats: a section with no enrollment limit.
@@ -267,7 +261,7 @@ export function catalogJson(extraName = '') {
                 10,
                 'BL02',
                 'B',
-                [period(['T', 'F'], '16:00', '17:50', 'Grace Hopper')],
+                [period(['T', 'F'], '16:00', '17:50', ['Grace Hopper'])],
                 990,
                 { seats: 999 },
               ),
@@ -384,7 +378,7 @@ export async function callOn(
   body?: unknown,
 ) {
   const response = await api(
-    new Request(`http://localhost${BASE}/api${path}`, {
+    new Request(`http://localhost${BASE}/api/v1${path}`, {
       method: body === undefined ? 'GET' : 'POST',
       body: body === undefined ? undefined : JSON.stringify(body),
     }),

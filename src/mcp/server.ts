@@ -9,21 +9,23 @@ import * as z from 'zod';
 import {
   createMcpHandler,
   McpServer,
+  type CallToolResult,
   type McpHttpHandler,
+  type StandardSchemaWithJSON,
+  type ToolCallback,
 } from '@modelcontextprotocol/server';
 import { currentAcademicYear, type Catalog } from '../api/catalog';
+import { seatDataAge, termDates, today, yearStatus } from '../api/calendar';
 import {
-  seatDataAge,
-  termDates,
-  today,
-  yearLabel,
-  yearStatus,
-} from '../api/calendar';
-import { CourseQuerySchema, runCourseQuery, TERMS } from '../api/query';
+  CourseQuerySchema,
+  FallYearSchema,
+  runCourseQuery,
+} from '../api/query';
 import { caseless } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
 import { logger } from '../utils/logger';
+import { TERMS } from '../utils/typeGuards';
 import {
   catalogMeta,
   listDepartments,
@@ -36,6 +38,7 @@ import {
   renderCatalogInfo,
   renderConflicts,
   renderCourse,
+  renderDepartments,
   renderPlan,
   renderSearch,
 } from './render';
@@ -118,12 +121,12 @@ function failure(error: unknown, tool: string) {
   };
 }
 
-const YearInputSchema = z
-  .number()
-  .int()
-  .min(2000)
-  .max(2100)
-  .describe('Academic year by its fall year: 2026 means 2026-27.');
+const YearInputSchema = FallYearSchema.describe(
+  'Academic year by its fall year: 2026 means 2026-27.',
+);
+
+/** Every tool only reads the catalog it is given. */
+const READ_ONLY = { readOnlyHint: true, openWorldHint: false };
 
 function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
   const server = new McpServer(
@@ -136,7 +139,29 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
     },
   );
 
-  server.registerTool(
+  /**
+   * A read-only tool whose failures come back through failure(). The cast:
+   * the SDK's callback type depends on the schema, which TypeScript leaves
+   * unresolved for a generic one.
+   */
+  const readTool = <I extends StandardSchemaWithJSON>(
+    name: string,
+    config: { title: string; description: string; inputSchema: I },
+    run: (
+      args: StandardSchemaWithJSON.InferOutput<I>,
+    ) => Promise<CallToolResult>,
+  ) =>
+    server.registerTool(name, { ...config, annotations: READ_ONLY }, (async (
+      args: StandardSchemaWithJSON.InferOutput<I>,
+    ) => {
+      try {
+        return await run(args);
+      } catch (error) {
+        return failure(error, name);
+      }
+    }) as ToolCallback<I>);
+
+  readTool(
     'search_courses',
     {
       title: 'Search courses',
@@ -149,22 +174,17 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         '(under sort "difficulty", the "easiest rated" instead, by difficulty). ' +
         'Returns a page (default 25), the total, and the open seats over every match.',
       inputSchema: CourseQuerySchema,
-      annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async query => {
-      try {
-        const result = runCourseQuery(await getCatalog(), query);
-        return {
-          content: text(renderSearch(result)),
-          structuredContent: { ...result },
-        };
-      } catch (error) {
-        return failure(error, 'search_courses');
-      }
+      const result = runCourseQuery(await getCatalog(), query);
+      return {
+        content: text(renderSearch(result)),
+        structuredContent: { ...result },
+      };
     },
   );
 
-  server.registerTool(
+  readTool(
     'get_course',
     {
       title: 'Get course details',
@@ -211,47 +231,37 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
             ),
         })
         .strict(),
-      annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ course, ...options }) => {
-      try {
-        const catalog = await getCatalog();
-        const found = lookupCourse(catalog, course, options);
-        if (found.kind === 'plan') {
-          return {
-            content: text(renderPlan(found.plan, found.notices)),
-            structuredContent: { ...found.plan, notices: found.notices },
-          };
-        }
-        const { detail } = found;
-        const year = detail.year ?? currentAcademicYear(catalog);
-        const seatData = {
-          dataAsOf: catalog.lastUpdated,
-          dataAgeDays: seatDataAge(catalog),
-        };
-        const dates = termDates(catalog, year);
+      const catalog = await getCatalog();
+      const found = lookupCourse(catalog, course, options);
+      if (found.kind === 'plan') {
         return {
-          content: text(
-            renderCourse(detail, found.notices, {
-              ...seatData,
-              termDates: dates,
-              today: today(catalog),
-            }),
-          ),
-          structuredContent: courseDigest(
-            detail,
-            found.notices,
-            seatData,
-            dates,
-          ),
+          content: text(renderPlan(found.plan, found.notices)),
+          structuredContent: { ...found.plan, notices: found.notices },
         };
-      } catch (error) {
-        return failure(error, 'get_course');
       }
+      const { detail } = found;
+      const year = detail.year ?? currentAcademicYear(catalog);
+      const seatData = {
+        dataAsOf: catalog.lastUpdated,
+        dataAgeDays: seatDataAge(catalog),
+      };
+      const dates = termDates(catalog, year);
+      return {
+        content: text(
+          renderCourse(detail, found.notices, {
+            ...seatData,
+            termDates: dates,
+            today: today(catalog),
+          }),
+        ),
+        structuredContent: courseDigest(detail, found.notices, seatData, dates),
+      };
     },
   );
 
-  server.registerTool(
+  readTool(
     'list_departments',
     {
       title: 'List departments',
@@ -265,38 +275,22 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
             .describe('Fall year, or "all"; defaults to the current year.'),
         })
         .strict(),
-      annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ year }) => {
-      try {
-        const catalog = await getCatalog();
-        const departments = listDepartments(catalog, year);
-        const lines: string[] = [];
-        if (year === 'all') lines.push('Departments in any year:');
-        else {
-          const y = year ?? currentAcademicYear(catalog);
-          const status = yearStatus(catalog, y);
-          lines.push(`Departments with courses in ${yearLabel(y)}:`);
-          if (status.status === 'not yet published') {
-            lines.push(
-              `${yearLabel(y)} is not published yet; these are only early entries (${status.courseCount} course${status.courseCount === 1 ? '' : 's'}).`,
-            );
-          }
-        }
-        lines.push(
-          ...departments.map(d => `${d.abbr} ${d.name} (${d.courseCount})`),
-        );
-        return {
-          content: text(lines.join('\n')),
-          structuredContent: { departments },
-        };
-      } catch (error) {
-        return failure(error, 'list_departments');
-      }
+      const catalog = await getCatalog();
+      const departments = listDepartments(catalog, year);
+      const status =
+        year === 'all'
+          ? null
+          : yearStatus(catalog, year ?? currentAcademicYear(catalog));
+      return {
+        content: text(renderDepartments(departments, status)),
+        structuredContent: { departments },
+      };
     },
   );
 
-  server.registerTool(
+  readTool(
     'get_catalog_info',
     {
       title: 'Catalog info',
@@ -307,22 +301,17 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         'as published once it lists at least a quarter as many courses as the current year; fewer means only early ' +
         'entries are in.',
       inputSchema: z.object({}).strict(),
-      annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async () => {
-      try {
-        const meta = catalogMeta(await getCatalog());
-        return {
-          content: text(renderCatalogInfo(meta)),
-          structuredContent: { ...meta },
-        };
-      } catch (error) {
-        return failure(error, 'get_catalog_info');
-      }
+      const meta = catalogMeta(await getCatalog());
+      return {
+        content: text(renderCatalogInfo(meta)),
+        structuredContent: { ...meta },
+      };
     },
   );
 
-  server.registerTool(
+  readTool(
     'check_conflicts',
     {
       title: 'Check a schedule',
@@ -335,18 +324,13 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
         '{days: ["T", "R"], start: "13:00", end: "17:00", label: "work"}), every section meeting during one is reported. ' +
         'Read-only; registration is in Workday.',
       inputSchema: ConflictCheckInputSchema,
-      annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ crns, busy }) => {
-      try {
-        const check = findConflicts(await getCatalog(), crns, busy);
-        return {
-          content: text(renderConflicts(check)),
-          structuredContent: conflictData(check),
-        };
-      } catch (error) {
-        return failure(error, 'check_conflicts');
-      }
+      const check = findConflicts(await getCatalog(), crns, busy);
+      return {
+        content: text(renderConflicts(check)),
+        structuredContent: conflictData(check),
+      };
     },
   );
 

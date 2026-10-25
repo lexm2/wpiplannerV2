@@ -63,7 +63,7 @@ afterEach(() => {
 function period(days: DayOfWeek[], overrides: Partial<Period> = {}): Period {
   return {
     type: PeriodType.LECTURE,
-    professor: 'Prof',
+    instructors: ['Prof'],
     startTime: { hours: 10, minutes: 0, displayTime: '10:00 AM' },
     endTime: { hours: 10, minutes: 50, displayTime: '10:50 AM' },
     location: 'SL 104',

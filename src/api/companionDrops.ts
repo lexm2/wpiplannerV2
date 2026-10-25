@@ -17,6 +17,7 @@ import { DeliveryModeFilter } from '../core/filtering/filters/DeliveryModeFilter
 import { TimesFilter } from '../core/filtering/filters/TimesFilter';
 import { timedPeriods } from '../utils/timeWindows';
 import { courseCode } from './serialize';
+import { listFirst, one, plural } from './text';
 
 /** The per-section filters a companion can fail, with what failing means. */
 const COMPANION_FILTERS: {
@@ -179,12 +180,10 @@ export function companionDrops(
  */
 export function dropNotice(drop: Drop): string {
   const n = drop.courses.length;
-  const named = drop.courses.slice(0, MAX_NAMED).join(', ');
-  const more = n > MAX_NAMED ? ` +${n - MAX_NAMED} more` : '';
-  const its = n === 1 ? 'its' : 'their';
+  const its = one(n, 'its', 'their');
   const which = drop.filters.map(f => `filters.${f}`).join(', ');
   const why = drop.reason
     ? `${its} ${drop.kinds} ${drop.reason}`
     : `none of ${its} ${drop.kinds} passes all of these filters together`;
-  return `${n === 1 ? '1 course' : `${n} courses`} dropped because ${why} (${which}): ${named}${more}.`;
+  return `${plural(n, 'course')} dropped because ${why} (${which}): ${listFirst(drop.courses, MAX_NAMED)}.`;
 }

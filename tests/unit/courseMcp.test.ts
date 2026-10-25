@@ -986,7 +986,7 @@ describe('terms in progress', () => {
 });
 
 describe('statements without a colon', () => {
-  it('lifts the background and prerequisites a description heads without a colon', async () => {
+  it('cuts a statement headed without a colon from the description', async () => {
     const { mcp, api } = await customEndpoints([
       {
         abbreviation: 'PH',
@@ -999,6 +999,9 @@ describe('statements without a colon', () => {
             {
               description:
                 '<p>Mechanics for engineers. Recommended Background Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022. Students may not receive credit for both PH 1110 and PH 1111.</p>',
+              // As the converter lifts it (extractPrerequisites).
+              recommendedBackground:
+                'Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022.',
             },
           ),
           course(
@@ -1009,6 +1012,8 @@ describe('statements without a colon', () => {
               isGraduate: true,
               description:
                 '<p>A capstone project. Prerequisites Completion of at least 24 credits, or consent of the instructor. It may be repeated.</p>',
+              prerequisites:
+                'Completion of at least 24 credits, or consent of the instructor.',
             },
           ),
         ],
@@ -1029,12 +1034,12 @@ describe('statements without a colon', () => {
     expect(project.text).toContain(
       'Prerequisites (as the description states): Completion of at least 24 credits, or consent of the instructor',
     );
-    expect(project.data.prerequisites).toBe(
-      'Completion of at least 24 credits, or consent of the instructor',
+    expect(project.text).toContain(
+      'Description: A capstone project. It may be repeated.',
     );
     const http = await callOn(api, '/courses/PH1110');
     expect(http.body.recommendedBackground).toBe(
-      'Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022',
+      'Working knowledge of differential calculus (MA 1021), and concurrent study of MA 1022.',
     );
     const plan = await toolOn(mcp, 'get_course', {
       course: 'PH 1110',
@@ -1069,10 +1074,10 @@ describe('sorted searches', () => {
             // Best rated: Ada; easiest: Barbara.
             course('MA-1022-2026', 'Calculus II', [
               section(90, 'BL01', 'B', [
-                period(['M'], '09:00', '09:50', 'Ada Lovelace'),
+                period(['M'], '09:00', '09:50', ['Ada Lovelace']),
               ]),
               section(91, 'BL02', 'B', [
-                period(['M'], '11:00', '11:50', 'Barbara Liskov'),
+                period(['M'], '11:00', '11:50', ['Barbara Liskov']),
               ]),
             ]),
             // Names MA 1022 in its description, taught by a better-rated
@@ -1192,6 +1197,38 @@ describe('an empty search with many filters', () => {
       'filters.creditRange, filters.graduateLevel, filters.courseLevel, filters.deliveryMode, filters.offeringPattern let every course through as given, so they are not to blame.',
     );
     expect(text).not.toContain('No single filter');
+  });
+});
+
+describe('a filter that looks unrestrictive', () => {
+  it('is tried when it drops a course the whole range would seem to keep', async () => {
+    // A level range of 1-9 reads as every level, but a course number
+    // without digits has no level and never passes it.
+    const { mcp } = await customEndpoints([
+      {
+        abbreviation: 'ID',
+        name: 'Interdisciplinary',
+        courses: [
+          course('ID-ISP-2026', 'Independent Study', [
+            section(70, 'A01', 'A', []),
+          ]),
+          course('ID-2050-2026', 'Seminar', [section(71, 'A01', 'A', [])]),
+        ],
+      },
+    ]);
+    const { data } = await toolOn(mcp, 'search_courses', {
+      filters: {
+        searchText: { query: 'independent study' },
+        courseLevel: { min: 1, max: 9 },
+        graduateLevel: { level: 'all' },
+      },
+    });
+    expect(data.total).toBe(0);
+    expect(data.unrestrictive).toEqual(['graduateLevel']);
+    expect(data.relaxations[0]).toMatchObject({
+      filter: 'courseLevel',
+      total: 1,
+    });
   });
 });
 
@@ -1376,7 +1413,7 @@ describe('search words', () => {
         courses: [
           course('PH-2201-2026', 'Optics', [
             section(110, 'B01', 'B', [
-              period(['M'], '09:00', '09:50', 'EJ Néel'),
+              period(['M'], '09:00', '09:50', ['EJ Néel']),
             ]),
           ]),
         ],

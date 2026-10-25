@@ -5,7 +5,6 @@
  * single-course lookups the CourseDetail, which lists each section once.
  */
 import type { Course, Period, Section, Time } from '../types/types';
-import { DayOfWeek } from '../types/types';
 import { getAllSections, seatsLabel } from '../utils/courseUtils';
 import { TERM_ORDER } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
@@ -13,9 +12,9 @@ import { timedPeriods } from '../utils/timeWindows';
 import type { RateMyProfessorService } from '../services/external/RateMyProfessorService';
 import type { Forecast } from './forecast';
 import type { DateSpan } from './calendar';
+import { clockText } from './clock';
 
 const MAX_SUMMARY_PROFESSORS = 4;
-const DAY_ORDER = Object.values(DayOfWeek);
 
 export type SectionKind = 'lecture' | 'discussion' | 'lab' | 'standaloneLab';
 
@@ -43,6 +42,9 @@ const UNCAPPED_SEATS = 999;
 
 /** A section without a real seat cap; see UNCAPPED_SEATS. */
 export const isUncapped = (s: { seats: number }) => s.seats >= UNCAPPED_SEATS;
+
+/** At or below this many open seats, a count from the last refresh may be gone. */
+export const LOW_SEATS = 3;
 
 export interface SeatTotals {
   /** Over the capped sections only. */
@@ -151,6 +153,9 @@ export interface SectionView {
   kind: SectionKind;
   /** For a lab or discussion: the CRNs of the lectures it can go with. */
   pairsWith: number[];
+  /** "MTRF 10:00-10:50", "Async" or "TBD"; periods joined by "; ". */
+  meets: string;
+  location: string;
   seats: number;
   /** Never below 0; see overEnrolled. */
   seatsAvailable: number;
@@ -231,21 +236,12 @@ export interface DetailContext {
   earlyEntry: boolean;
 }
 
-function isNamedProfessor(name: string): boolean {
-  return !!name.trim() && name !== 'TBA' && name !== 'Not Assigned';
-}
-
-/** A period's named instructors; co-taught "A; B" splits. */
-export function instructorNames(period: Period): string[] {
-  return period.professor.split(/\s*;\s*/).filter(isNamedProfessor);
-}
-
 /** Instructor names in order of first appearance. */
 function professorsOf(sections: Section[]): string[] {
   const names = new Set<string>();
   for (const section of sections) {
     for (const period of section.periods) {
-      for (const name of instructorNames(period)) names.add(name);
+      for (const name of period.instructors) names.add(name);
     }
   }
   return [...names];
@@ -262,41 +258,15 @@ export function termsOf(sections: Section[]): string[] {
   return [...terms].sort((a, b) => termRank(a) - termRank(b));
 }
 
-/**
- * Where a description's own heading for a statement starts: at a sentence
- * start, with or without a colon ("Recommended Background Working
- * knowledge of...", "The recommended background for this course is...",
- * "Prerequisites Completion of 24 credits..."). The catalog parser lifts
- * only the colon form, so 27 courses (PH 1110, DS 2010, CS 594...) had
- * the statement in their description and none in the field.
- */
-const STATEMENT_HEADINGS = {
-  recommendedBackground:
-    /(?:^|[.!?)]\s+)(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?\s*/,
-  prerequisites: /(?:^|[.!?)]\s+)Prerequisites?\s*[:;]?\s*/,
-};
-
-/**
- * The course's prerequisite or background statement: the parsed field, or
- * else the sentence its heading starts in the description, up to the
- * sentence's end. Null when the description has neither.
- */
-export function statementOf(
-  course: Pick<
-    Course,
-    'description' | 'prerequisites' | 'recommendedBackground'
-  >,
-  kind: keyof typeof STATEMENT_HEADINGS,
-): string | null {
-  const parsed = course[kind];
-  if (parsed) return parsed;
-  const heading = STATEMENT_HEADINGS[kind].exec(course.description);
-  if (!heading) return null;
-  const rest = course.description.slice(heading.index + heading[0].length);
-  // To the first full stop ending a sentence: before a capital or the end.
-  const end = /\.(?=\s+[A-Z(]|\s*$)/.exec(rest);
-  const statement = (end ? rest.slice(0, end.index) : rest).trim();
-  return statement || null;
+/** `f` of each term's sections, with the term first, A-D then F/S. */
+export function byTerm<T extends object>(
+  sections: Section[],
+  f: (ofTerm: Section[]) => T,
+): (T & { term: string })[] {
+  return termsOf(sections).map(term => ({
+    term,
+    ...f(sections.filter(s => (s.computedTerm as string) === term)),
+  }));
 }
 
 export function courseCode(course: Course): string {
@@ -316,16 +286,7 @@ type RatingLookup = (name: string) => RatingView | null;
 function ratingLookup(rmp: RateMyProfessorService): RatingLookup {
   return name => {
     const r = rmp.getRatings(name);
-    if (!r) return null;
-    return {
-      ...r,
-      // RMP reports -1 when too few raters answered.
-      wouldTakeAgain:
-        r.wouldTakeAgain !== null && r.wouldTakeAgain >= 0
-          ? r.wouldTakeAgain
-          : null,
-      url: rmp.getProfessorRMPUrl(name),
-    };
+    return r && { ...r, url: rmp.getProfessorRMPUrl(name) };
   };
 }
 
@@ -404,10 +365,7 @@ export function toCourseSummary(
     year: course.academicYear ?? null,
     terms: termsOf(all),
     seats: seatTotals(primary),
-    seatsByTerm: termsOf(primary).map(term => ({
-      term,
-      ...seatTotals(primary.filter(s => (s.computedTerm as string) === term)),
-    })),
+    seatsByTerm: byTerm(primary, seatTotals),
     sectionCount: primary.length,
     isGraduate: course.isGraduate ?? false,
     professors: professorsOf(primary).slice(0, MAX_SUMMARY_PROFESSORS),
@@ -418,16 +376,14 @@ export function toCourseSummary(
   };
 }
 
-function hhmm(time: Time): string {
-  return `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
-}
+const hhmm = (time: Time) => clockText(time.hours * 60 + time.minutes);
 
 function toPeriodView(
   period: Period,
   timed: boolean,
   ratingOf: RatingLookup,
 ): PeriodView {
-  const days = DAY_ORDER.filter(d => period.days.has(d));
+  const days = TimeUtils.DAYS_ORDER.filter(d => period.days.has(d));
   const hasTime = period.startTime.displayTime !== 'TBD';
   let display: string;
   if (period.isAsync) display = 'Async';
@@ -437,7 +393,7 @@ function toPeriodView(
 
   return {
     type: period.type,
-    instructors: instructorNames(period).map(name => ({
+    instructors: period.instructors.map(name => ({
       name,
       rmp: ratingOf(name),
     })),
@@ -455,7 +411,7 @@ function toPeriodView(
  * (no seat cap), whose practice times Workday leaves out, "no set meeting
  * times listed": "Async" there read as no meetings at all.
  */
-export const asyncText = (s: { seats: number }) =>
+const asyncText = (s: { seats: number }) =>
   isUncapped(s) ? 'no set meeting times listed' : 'Async';
 
 /**
@@ -465,7 +421,7 @@ export const asyncText = (s: { seats: number }) =>
  * 226), each meeting carries its own room and `location` is empty, so no
  * room is read against the wrong day.
  */
-export function meetingsAndRoom(parts: { when: string; room: string }[]): {
+function meetingsAndRoom(parts: { when: string; room: string }[]): {
   meets: string;
   location: string;
 } {
@@ -490,7 +446,7 @@ function meetings(section: Section): { meets: string; location: string } {
       if (!timed.has(p) || p.startTime.displayTime === 'TBD') {
         return { when: 'TBD', room };
       }
-      const days = DAY_ORDER.filter(d => p.days.has(d)).join('');
+      const days = TimeUtils.DAYS_ORDER.filter(d => p.days.has(d)).join('');
       return { when: `${days} ${hhmm(p.startTime)}-${hhmm(p.endTime)}`, room };
     }),
   );
@@ -573,6 +529,7 @@ function toSectionView(
     term: section.computedTerm,
     kind,
     pairsWith,
+    ...meetings(section),
     seats: section.seats,
     ...openSeats(section),
     waitlist: section.actualWaitlist,
@@ -697,8 +654,8 @@ export function toCourseDetail(
     departmentName: course.departmentName,
     description: course.description,
     courseTypes: course.courseTypes,
-    recommendedBackground: statementOf(course, 'recommendedBackground'),
-    prerequisites: statementOf(course, 'prerequisites'),
+    recommendedBackground: course.recommendedBackground ?? null,
+    prerequisites: course.prerequisites ?? null,
     sections,
     lectureGroups,
     standaloneLabs: standaloneLabs.map(l => l.crn),

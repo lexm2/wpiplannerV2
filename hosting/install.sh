@@ -140,12 +140,12 @@ install_docker_nginx() {
 
     log "Waiting for the app to answer"
     for _ in $(seq 60); do
-        curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/api/health" && break
+        curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/api/v1/health" && break
         sleep 1
     done
     curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/" ||
         die "The app is not answering on 127.0.0.1:$PORT; see: docker compose -f $COMPOSE_FILE logs"
-    curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/api/health" ||
+    curl -fsS -o /dev/null "http://127.0.0.1:$PORT/wpiplannerV2/api/v1/health" ||
         die "The course API is not answering; see: docker compose -f $COMPOSE_FILE logs api"
 
     log "Configuring nginx"
@@ -240,7 +240,7 @@ EOF
     cat <<EOF
 
 WPI Planner is running at $URL
-  Course API:     ${URL}api/
+  Course API:     ${URL}api/v1/
   MCP endpoint:   ${URL}mcp
 
   Update:         re-run this script with the same options
@@ -347,10 +347,10 @@ install_rhel_apache() {
     # Restart, not start: an update must load the new code.
     systemctl restart wpiplanner-api
     for _ in $(seq 30); do
-        curl -fsS -o /dev/null "http://127.0.0.1:$API_PORT/wpiplannerV2/api/health" && break
+        curl -fsS -o /dev/null "http://127.0.0.1:$API_PORT/wpiplannerV2/api/v1/health" && break
         sleep 1
     done
-    curl -fsS -o /dev/null "http://127.0.0.1:$API_PORT/wpiplannerV2/api/health" ||
+    curl -fsS -o /dev/null "http://127.0.0.1:$API_PORT/wpiplannerV2/api/v1/health" ||
         die "The course API is not answering on 127.0.0.1:$API_PORT; see: journalctl -u wpiplanner-api"
     # httpd may not open connections at all by default; relay lets it reach
     # http_port_t ports such as the API's, not every port.
@@ -418,13 +418,13 @@ EOF
     fi
     curl -fsS -o /dev/null "${CHECK[@]}" "$LOCAL_URL" ||
         die "Apache is not serving the app; see: journalctl -u httpd and /var/log/httpd/error_log"
-    curl -fsS -o /dev/null "${CHECK[@]}" "${LOCAL_URL}api/health" ||
+    curl -fsS -o /dev/null "${CHECK[@]}" "${LOCAL_URL}api/v1/health" ||
         die "Apache is not reaching the course API; see /var/log/httpd/error_log (an SELinux denial shows in: ausearch -m avc -c httpd)"
 
     cat <<EOF
 
 WPI Planner is running at $URL
-  Course API:     ${URL}api/
+  Course API:     ${URL}api/v1/
   MCP endpoint:   ${URL}mcp
 
   Update:         re-run this script with the same options

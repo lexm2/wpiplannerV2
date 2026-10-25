@@ -21,6 +21,9 @@ import { getDisplayTerms } from '../../src/utils/typeGuards';
 import { AcademicYearFilter } from '../../src/core/filtering/filters/AcademicYearFilter';
 import { AvailabilityFilter } from '../../src/core/filtering/filters/AvailabilityFilter';
 import { SearchTextFilter } from '../../src/core/filtering/filters/SearchTextFilter';
+import { SearchIndex } from '../../src/utils/searchUtils';
+
+const searchIndex = new SearchIndex();
 
 const { MONDAY: M, TUESDAY: T, WEDNESDAY: W } = DayOfWeek;
 
@@ -29,7 +32,7 @@ function period(days: DayOfWeek[], start: string, end: string): Period {
   const [eh, em] = end.split(':').map(Number);
   return {
     type: PeriodType.LECTURE,
-    professor: 'Prof X',
+    instructors: ['Prof X'],
     startTime: { hours: sh, minutes: sm },
     endTime: { hours: eh, minutes: em },
     location: 'SH',
@@ -464,7 +467,7 @@ describe('SmartScheduler group search', () => {
 describe('SmartScheduler.buildCandidateData with course-list filters', () => {
   function filterServiceWithListFilters(): FilterService {
     const fs = filterServiceWith();
-    fs.registerFilter(new SearchTextFilter());
+    fs.registerFilter(new SearchTextFilter(() => searchIndex));
     fs.registerFilter(new AcademicYearFilter());
     fs.registerFilter(new AvailabilityFilter());
     return fs;

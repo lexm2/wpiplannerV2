@@ -13,20 +13,27 @@ import type {
   SectionView,
 } from '../api/serialize';
 import type { ConflictCheck } from '../api/conflicts';
-import type { CoursePlan, catalogMeta } from '../api/lookup';
-import type { DateSpan, TermLetter, TermNow } from '../api/calendar';
+import type { CoursePlan, catalogMeta, listDepartments } from '../api/lookup';
+import type { DateSpan, TermLetter, TermNow, YearInfo } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
 import { echo } from '../api/errors';
+import type { Notice } from '../api/notices';
+import { one, plural } from '../api/text';
+import { escapeRegExp } from '../utils/searchUtils';
+import { QUARTERS, TERMS } from '../utils/typeGuards';
 import {
-  asyncText,
   isUncapped,
-  meetingsAndRoom,
+  LOW_SEATS,
   ownDates,
   SOLID_RATINGS,
 } from '../api/serialize';
+import { STATEMENT_HEADING } from '../utils/statementHeadings';
 
 /** How many matching sections a search row lists before "+N more". */
 const MAX_ROW_SECTIONS = 6;
+
+/** Notices as the text reads them: their words, one line each. */
+const messages = (notices: Notice[]) => notices.map(n => n.message);
 
 const CATEGORY_TEXT: Record<1 | 2 | 3, string> = {
   1: 'Cat. I (offered every year)',
@@ -44,9 +51,6 @@ function credits(c: CourseSummary): string {
 function asOf(dataAsOf: string | null): string {
   return dataAsOf ? dataAsOf.slice(0, 10) : 'an unknown date';
 }
-
-/** At or below this many open seats, a count from the last refresh may be gone. */
-const LOW_SEATS = 3;
 
 const isLow = (available: number) => available > 0 && available <= LOW_SEATS;
 
@@ -73,7 +77,7 @@ function seatDataLine(data: SeatData, low: boolean): string {
       ? `Seat data is from ${date}`
       : days === 0
         ? `Seat data is under a day old (${date})`
-        : `Seat data is ${days === 1 ? '1 day' : `${days} days`} old (${date})`;
+        : `Seat data is ${plural(days, 'day')} old (${date})`;
   if (days !== null && days > STALE_DAYS) {
     return `${age}: check live seats in Workday before registering.`;
   }
@@ -102,8 +106,8 @@ function ratingText(r: Omit<Rating, 'url'>, again: boolean): string {
   return `${parts.join(', ')} ${ratingCount(r.numRatings)}`;
 }
 
-function instructor(i: InstructorView, again = false): string {
-  return i.rmp ? `${i.name} ${ratingText(i.rmp, again)}` : i.name;
+function instructor(i: InstructorView): string {
+  return i.rmp ? `${i.name} ${ratingText(i.rmp, true)}` : i.name;
 }
 
 function seats(s: {
@@ -161,16 +165,12 @@ function briefLine(s: SectionBrief, withTerm: boolean): string {
     runs(s.dates),
     s.meets,
     s.location,
-    s.instructors.map(i => instructor(i, true)).join('; '),
+    s.instructors.map(instructor).join('; '),
     seats(s),
     ...exceptions(s),
   ]
     .filter(Boolean)
     .join(' | ');
-}
-
-function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
@@ -192,11 +192,8 @@ function describe(c: {
       ' ',
     );
   };
-  cut(
-    '(?:the\\s+)?(?:recommended|suggested|required)\\s+backgrounds?(?:\\s+for\\s+this\\s+course)?(?:\\s+(?:is|includes|consists\\s+of))?\\s*[:;]?',
-    c.recommendedBackground,
-  );
-  cut('prerequisites?\\s*[:;]?', c.prerequisites);
+  cut(STATEMENT_HEADING.recommendedBackground, c.recommendedBackground);
+  cut(STATEMENT_HEADING.prerequisites, c.prerequisites);
   const lines: string[] = [];
   description = description.replace(/\s{2,}/g, ' ').trim();
   if (description) lines.push(`Description: ${description}`);
@@ -227,8 +224,6 @@ function totalSeats(t: SeatTotals): string {
   });
   return t.uncapped > 0 ? `${capped} + ${t.uncapped} with no seat cap` : capped;
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 /** "101 open in 13 sections", plus any without a seat cap. */
 function termTotalsText(t: {
@@ -285,8 +280,10 @@ function rowLine(
   search: CourseQueryResult['search'],
   easiest: boolean,
 ): string {
+  const note = matchNote(c, search);
   const parts = [
     `${index}. ${c.code} ${c.name}`,
+    ...(note ? [`(${note})`] : []),
     credits(c),
     c.terms.length
       ? `${c.terms.join(',')}${c.earlyEntry ? ' (tentative)' : ''}`
@@ -295,8 +292,6 @@ function rowLine(
       ? `${yearLabel(c.year)} early entry: not published, cannot be scheduled yet`
       : rowSeats(c),
   ];
-  const note = matchNote(c, search);
-  if (note) parts.splice(1, 0, `(${note})`);
   if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
   if (c.topInstructor) {
     const t = c.topInstructor;
@@ -328,7 +323,7 @@ function companionLine(
 ): string {
   const noun = kind === 'lab' ? 'lab' : 'discussion';
   if (members.length <= COMPANION_EXAMPLES) {
-    return `     + ${members.length === 1 ? noun : `${noun}s`}${pairing} ${members.map(companionText).join('; ')}`;
+    return `     + ${one(members.length, noun, `${noun}s`)}${pairing} ${members.map(companionText).join('; ')}`;
   }
   const examples = [
     ...members.filter(m => m.seatsAvailable > 0),
@@ -380,11 +375,11 @@ function companionLines(
 
 /** "BME 4023 ran only in A term (ended); includeEndedTerms: true shows it." */
 function leftOutLine(l: CourseQueryResult['leftOut'][number]): string {
-  const terms = `${l.terms.join(', ')} term${l.terms.length === 1 ? '' : 's'}`;
+  const terms = `${l.terms.join(', ')} ${one(l.terms.length, 'term', 'terms')}`;
   const codes = l.codes.join(', ');
   return l.reason === 'endedTerms'
-    ? `${codes} ran only in ${terms}, which ${l.terms.length === 1 ? 'has' : 'have'} ended; includeEndedTerms: true shows ${l.codes.length === 1 ? 'it' : 'them'}.`
-    : `${codes} ${l.codes.length === 1 ? 'has' : 'have'} only an interest list so far (${terms}: a placeholder to join before sections open); includeInterestLists: true shows ${l.codes.length === 1 ? 'it' : 'them'}.`;
+    ? `${codes} ran only in ${terms}, which ${one(l.terms.length, 'has', 'have')} ended; includeEndedTerms: true shows ${one(l.codes.length, 'it', 'them')}.`
+    : `${codes} ${one(l.codes.length, 'has', 'have')} only an interest list so far (${terms}: a placeholder to join before sections open); includeInterestLists: true shows ${one(l.codes.length, 'it', 'them')}.`;
 }
 
 /** Which filter emptied a search, and what leaving it out would find. */
@@ -394,7 +389,7 @@ function relaxationLines(
 ): string[] {
   const allowAll = unrestrictive.length
     ? [
-        `${unrestrictive.map(f => `filters.${f}`).join(', ')} ${unrestrictive.length === 1 ? 'lets' : 'let'} every course through as given, so ${unrestrictive.length === 1 ? 'it is' : 'they are'} not to blame.`,
+        `${unrestrictive.map(f => `filters.${f}`).join(', ')} ${one(unrestrictive.length, 'lets', 'let')} every course through as given, so ${one(unrestrictive.length, 'it is', 'they are')} not to blame.`,
       ]
     : [];
   if (!relaxations.length) return allowAll;
@@ -404,7 +399,7 @@ function relaxationLines(
   const first = helps[0];
   if (first?.restores.length) {
     lines.push(
-      `Most restrictive: filters.${first.filter}; without it, ${first.restores.join(', ')} ${first.restores.length === 1 ? 'is' : 'are'} back.`,
+      `Most restrictive: filters.${first.filter}; without it, ${first.restores.join(', ')} ${one(first.restores.length, 'is', 'are')} back.`,
     );
   }
   if (helps.length) {
@@ -412,7 +407,7 @@ function relaxationLines(
       `${first.restores.length ? '' : `Most restrictive: filters.${first.filter}. `}Leaving out one filter at a time: ${helps
         .map(
           r =>
-            `without ${r.filter}, ${r.total} course${r.total === 1 ? '' : 's'}${r.terms.length ? ` (in ${r.terms.join(', ')})` : ''}`,
+            `without ${r.filter}, ${plural(r.total, 'course')}${r.terms.length ? ` (in ${r.terms.join(', ')})` : ''}`,
         )
         .join('; ')}.`,
     );
@@ -447,7 +442,7 @@ export function renderSearch(result: CourseQueryResult): string {
       ...result.leftOut.map(leftOutLine),
     );
   }
-  lines.push(...result.notices);
+  lines.push(...messages(result.notices));
   if (result.search?.onlyMentions) {
     lines.push(
       'No course is mainly about this; these only mention the words in their descriptions:',
@@ -548,33 +543,28 @@ interface SectionDigest {
   endDate?: string;
 }
 
+/** The section's instructors over all its periods, each once. */
+function instructorsOf(s: SectionView): InstructorView[] {
+  const people = new Map<string, InstructorView>();
+  for (const p of s.periods)
+    for (const i of p.instructors) people.set(i.name, i);
+  return [...people.values()];
+}
+
 function digestSection(
   s: SectionView,
   term: DateSpan | undefined,
 ): SectionDigest {
   const dates = ownDates(s, term);
-  const { meets, location } = meetingsAndRoom(
-    s.periods.map(p => ({
-      when: p.isAsync
-        ? asyncText(s)
-        : p.start && p.end
-          ? `${p.days.join('')} ${p.start}-${p.end}`
-          : 'TBD',
-      room: p.location,
-    })),
-  );
-  const people = new Map<string, InstructorView>();
-  for (const p of s.periods)
-    for (const i of p.instructors) people.set(i.name, i);
   return {
     crn: s.crn,
     number: s.number,
     term: s.term,
     kind: s.kind,
     pairsWith: s.pairsWith,
-    meets,
-    location,
-    instructors: [...people.keys()],
+    meets: s.meets,
+    location: s.location,
+    instructors: instructorsOf(s).map(i => i.name),
     seats: s.seats,
     seatsAvailable: s.seatsAvailable,
     ...(s.overEnrolled && { overEnrolled: s.overEnrolled }),
@@ -587,22 +577,13 @@ function digestSection(
 }
 
 function viewLine(s: SectionView, term: DateSpan | undefined): string {
-  const d = digestSection(s, term);
-  const people = new Map<string, InstructorView>();
-  for (const p of s.periods)
-    for (const i of p.instructors) people.set(i.name, i);
-  return [
-    `${d.number} CRN ${d.crn}`,
-    runs(ownDates(s, term)),
-    d.meets,
-    d.location,
-    [...people.values()].map(i => instructor(i, true)).join('; '),
-    seats(s),
-    ...exceptions(s),
-    ...(d.meetsWith.length ? [`meets with ${d.meetsWith.join(', ')}`] : []),
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  const line = briefLine(
+    { ...s, instructors: instructorsOf(s), dates: ownDates(s, term) },
+    false,
+  );
+  return s.meetsWith.length
+    ? `${line} | meets with ${s.meetsWith.join(', ')}`
+    : line;
 }
 
 /**
@@ -613,7 +594,7 @@ function viewLine(s: SectionView, term: DateSpan | undefined): string {
  */
 export function courseDigest(
   d: CourseDetail,
-  notices: string[],
+  notices: Notice[],
   { dataAsOf, dataAgeDays }: SeatData,
   termDates: Partial<Record<TermLetter, DateSpan>> | null,
 ) {
@@ -651,13 +632,11 @@ export function courseDigest(
 /** Rate My Professor numbers per instructor shown, rated ones only. */
 function ratingsOf(sections: SectionView[]) {
   const ratings: Record<string, Omit<Rating, 'url'>> = {};
-  for (const s of sections)
-    for (const p of s.periods)
-      for (const i of p.instructors) {
-        if (!i.rmp) continue;
-        const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
-        ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
-      }
+  for (const i of sections.flatMap(instructorsOf)) {
+    if (!i.rmp) continue;
+    const { rating, difficulty, wouldTakeAgain, numRatings } = i.rmp;
+    ratings[i.name] = { rating, difficulty, wouldTakeAgain, numRatings };
+  }
   return ratings;
 }
 
@@ -724,12 +703,7 @@ function termBlock(
       : '';
   const lines = [`${term} term${span}${ended}${running}${early}:`];
   const lectures = sections.filter(s => s.kind === 'lecture');
-  for (const kind of [
-    'lecture',
-    'standaloneLab',
-    'discussion',
-    'lab',
-  ] as const) {
+  for (const kind of Object.keys(KIND_HEADING) as SectionView['kind'][]) {
     const ofKind = sections.filter(s => s.kind === kind);
     if (!ofKind.length) continue;
     const companion = kind === 'discussion' || kind === 'lab';
@@ -748,7 +722,7 @@ function termBlock(
 
 export function renderCourse(
   d: CourseDetail,
-  notices: string[],
+  notices: Notice[],
   context: SeatData & {
     termDates: Partial<Record<TermLetter, DateSpan>> | null;
     today: string;
@@ -766,7 +740,7 @@ export function renderCourse(
       .filter(Boolean)
       .join(' | '),
   );
-  lines.push(...notices);
+  lines.push(...messages(notices));
 
   const facts: string[] = [];
   facts.push(
@@ -797,7 +771,7 @@ export function renderCourse(
     );
   if (omitted.fullSections)
     hidden.push(
-      `${omitted.fullSections} full section${omitted.fullSections === 1 ? '' : 's'} (includeFull: true)`,
+      `${plural(omitted.fullSections, 'full section')} (includeFull: true)`,
     );
   if (hidden.length) lines.push(`Not shown: ${hidden.join('; ')}.`);
 
@@ -842,11 +816,11 @@ function attributesFact(attributes: string[]): string {
     : 'Degree attributes: none on record (tags are incomplete; see the degree audit)';
 }
 
-export function renderPlan(plan: CoursePlan, notices: string[]): string {
+export function renderPlan(plan: CoursePlan, notices: Notice[]): string {
   const c = plan.course;
   const lines = [
     `${c.code} ${c.name} | planning for ${yearLabel(plan.forecast.year)} | ${credits(c)}`,
-    ...notices,
+    ...messages(notices),
     plan.forecast.summary,
   ];
   lines.push(
@@ -913,7 +887,7 @@ export function renderConflicts(check: ConflictCheck): string {
   const moreConflicts = check.conflicts.length - MAX_CONFLICT_LINES;
   if (moreConflicts > 0) {
     lines.push(
-      `+${moreConflicts} more conflicting pair${moreConflicts === 1 ? '' : 's'} not listed; check fewer CRNs at a time to see them.`,
+      `+${plural(moreConflicts, 'more conflicting pair')} not listed; check fewer CRNs at a time to see them.`,
     );
   }
   const band = (o: { days: string[]; start: string; end: string }) =>
@@ -930,7 +904,7 @@ export function renderConflicts(check: ConflictCheck): string {
   const moreBusy = check.busyConflicts.length - MAX_CONFLICT_LINES;
   if (moreBusy > 0) {
     lines.push(
-      `+${moreBusy} more section and busy-time overlap${moreBusy === 1 ? '' : 's'} not listed.`,
+      `+${plural(moreBusy, 'more section and busy-time overlap')} not listed.`,
     );
   }
   for (const issue of check.issues) {
@@ -947,7 +921,7 @@ export function renderConflicts(check: ConflictCheck): string {
       : n < 2
         ? 'One section, so no times to compare.'
         : check.conflicts.length
-          ? `${check.conflicts.length} time conflict${check.conflicts.length === 1 ? '' : 's'} among ${n} sections; other pairs fit.`
+          ? `${plural(check.conflicts.length, 'time conflict')} among ${n} sections; other pairs fit.`
           : `No time conflicts among these ${n} sections.`;
   const busySections = new Set(check.busyConflicts.map(b => b.section.crn))
     .size;
@@ -955,12 +929,12 @@ export function renderConflicts(check: ConflictCheck): string {
     check.busyBlocks === 0 || n === 0
       ? ''
       : busySections
-        ? `${busySections === 1 ? '1 section meets' : `${busySections} sections meet`} during your busy times.`
+        ? `${plural(busySections, 'section')} ${one(busySections, 'meets', 'meet')} during your busy times.`
         : 'None meets during your busy times.';
   const times = [pairs, busy].filter(Boolean).join(' ');
   const missing = check.issues.some(i => i.kind === 'missingCompanion');
   const verdict = errors
-    ? `${errors} problem${errors === 1 ? '' : 's'} to fix before registering.`
+    ? `${plural(errors, 'problem')} to fix before registering.`
     : check.conflicts.length || check.busyConflicts.length
       ? ''
       : missing
@@ -995,11 +969,11 @@ export function renderCatalogInfo(
   const lines = [
     termNowText(meta.currentTerm, meta.today),
     `Current academic year: ${meta.currentAcademicYear} (${yearLabel(meta.currentAcademicYear)}), the only one with schedules (sections, times, CRNs).`,
-    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${meta.dataAgeDays} day${meta.dataAgeDays === 1 ? '' : 's'} old)`}; seat counts are from then.`,
+    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${plural(meta.dataAgeDays, 'day')} old)`}; seat counts are from then.`,
     `Years: ${meta.years
       .map(
         y =>
-          `${y.year} = ${yearLabel(y.year)} ${y.status}, ${y.courseCount} course${y.courseCount === 1 ? '' : 's'}`,
+          `${y.year} = ${yearLabel(y.year)} ${y.status}, ${plural(y.courseCount, 'course')}`,
       )
       .join('; ')}.`,
   ];
@@ -1013,14 +987,12 @@ export function renderCatalogInfo(
     const t = (k: TermLetter) =>
       `${k} ${dates[k].start} to ${dates[k].end}${state(k)}`;
     lines.push(
-      `${yearLabel(Number(year))} terms: ${(['A', 'B', 'C', 'D'] as const).map(t).join(', ')}. Semesters: F (fall, A+B) ${dates.F.start} to ${dates.F.end}${state('F')}; S (spring, C+D) ${dates.S.start} to ${dates.S.end}${state('S')}.`,
+      `${yearLabel(Number(year))} terms: ${QUARTERS.map(t).join(', ')}. Semesters: F (fall, A+B) ${dates.F.start} to ${dates.F.end}${state('F')}; S (spring, C+D) ${dates.S.start} to ${dates.S.end}${state('S')}.`,
     );
-    const running = (['A', 'B', 'C', 'D', 'F', 'S'] as const).filter(
-      k => state(k) === ' (in progress)',
-    );
+    const running = TERMS.filter(k => state(k) === ' (in progress)');
     if (running.length) {
       lines.push(
-        `${running.join(' and ')} ${running.length === 1 ? 'is' : 'are'} in progress: adding a section late may need instructor or registrar approval.`,
+        `${running.join(' and ')} ${one(running.length, 'is', 'are')} in progress: adding a section late may need instructor or registrar approval.`,
       );
     }
   }
@@ -1031,5 +1003,26 @@ export function renderCatalogInfo(
     'Degree attribute tags are incomplete in the catalog data: a course without one may still count toward a requirement. Check the degree audit or an academic advisor.',
     `Delivery modes, for filters.deliveryMode: ${meta.deliveryModes.join(', ')}.`,
   );
+  return lines.join('\n');
+}
+
+// --- list_departments -------------------------------------------------------
+
+/** The departments of one year (its status given), or of every year (null). */
+export function renderDepartments(
+  departments: ReturnType<typeof listDepartments>,
+  year: YearInfo | null,
+): string {
+  const lines: string[] = [];
+  if (!year) lines.push('Departments in any year:');
+  else {
+    lines.push(`Departments with courses in ${yearLabel(year.year)}:`);
+    if (year.status === 'not yet published') {
+      lines.push(
+        `${yearLabel(year.year)} is not published yet; these are only early entries (${plural(year.courseCount, 'course')}).`,
+      );
+    }
+  }
+  lines.push(...departments.map(d => `${d.abbr} ${d.name} (${d.courseCount})`));
   return lines.join('\n');
 }

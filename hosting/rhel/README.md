@@ -72,7 +72,7 @@ cp hosting/rhel/systemd/wpiplanner-api.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now wpiplanner-api
 sleep 3  # it loads the catalog before listening
-curl -fsS http://127.0.0.1:8008/wpiplannerV2/api/health
+curl -fsS http://127.0.0.1:8008/wpiplannerV2/api/v1/health
 setsebool -P httpd_can_network_relay 1
 
 # Apache. Edit the vhost's name and certificate paths first.
@@ -87,7 +87,7 @@ firewall-cmd --reload
 ```
 
 The site is then at `https://<your name>/wpiplannerV2/`, the API at
-`.../wpiplannerV2/api/` and the MCP endpoint at `.../wpiplannerV2/mcp`.
+`.../wpiplannerV2/api/v1/` and the MCP endpoint at `.../wpiplannerV2/mcp`.
 
 ## HTTPS
 

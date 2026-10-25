@@ -2,26 +2,30 @@
  * Workday has no structured prerequisites; descriptions state them in prose,
  * as "Recommended background: ..." (also Suggested / Required background) or
  * "Prerequisite(s): ...". This lifts those statements out, leaving the
- * description as it is.
+ * description as it is. A heading with its colon counts anywhere, so
+ * "(Prerequisites: CS 503.)" does; one without ("Recommended Background
+ * Working knowledge of...") only where it starts a sentence, since the words
+ * also turn up in prose ("No prerequisites are suggested").
  *
  * Deliberately conservative: a statement runs to the next marker or the end
  * of the description, but stops early at a sentence that plainly starts
  * something else ("Students may not receive credit...", "This course...").
  */
+import { STATEMENT_HEADING } from '../../../src/utils/statementHeadings';
 
-const MARKERS = [
-  {
-    key: 'recommendedBackground',
-    pattern: /\b(?:Recommended|Suggested|Required)\s+background\s*[:-]\s*/gi,
-  },
-  { key: 'prerequisites', pattern: /\bPrerequisites?\s*:\s*/gi },
-] as const;
+type Key = keyof typeof STATEMENT_HEADING;
 
-type Key = (typeof MARKERS)[number]['key'];
+const MARKERS = (Object.keys(STATEMENT_HEADING) as Key[]).map(key => ({
+  key,
+  pattern: new RegExp(String.raw`\b${STATEMENT_HEADING[key]}\s*`, 'gi'),
+}));
+
+/** Where a heading without a separator may stand: opening a sentence. */
+const SENTENCE_START = /(?:^|[.!?)]\s+|\(\s*)$/;
 
 // Sentences that start a new topic rather than continue the statement.
 const NEW_TOPIC =
-  /(?<=[.!?)])\s*(?=(?:Students|Student|This|These|The course|The class|Note|NOTE|Although|While|Some sections|Undergraduate|Anticipated|Topics|Credit|Offered|Not open|Intended|Enrollment|Please|Course|See)\b)/;
+  /(?<=[.!?)])\s*(?=(?:Students|Student|This|These|The course|The class|Note|NOTE|Although|While|Some sections|Undergraduate|Anticipated|Topics|Credit|Offered|Not open|Intended|Enrollment|Please|Course|See|With permission)\b)/;
 
 /** Drops a ")" left over from a statement written in parentheses. */
 function closeParens(statement: string): string {
@@ -36,6 +40,10 @@ export function extractPrerequisites(
   const found: { key: Key; start: number; end: number }[] = [];
   for (const { key, pattern } of MARKERS) {
     for (const match of text.matchAll(pattern)) {
+      const separated = /[:;-]\s*$/.test(match[0]);
+      if (!separated && !SENTENCE_START.test(text.slice(0, match.index))) {
+        continue;
+      }
       found.push({
         key,
         start: match.index,

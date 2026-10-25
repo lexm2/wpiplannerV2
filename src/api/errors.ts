@@ -1,3 +1,5 @@
+import { listFirst } from './text';
+
 /**
  * Input that parses but cannot be answered as asked: an unknown course,
  * department or CRN, a year with no published schedule. The message is
@@ -42,8 +44,5 @@ export function echo(text: string): string {
 const LISTED = 10;
 
 /** "1, 2, 3", or the first LISTED and "and N more". */
-export function listSome(items: (string | number)[]): string {
-  const shown = items.slice(0, LISTED).join(', ');
-  const more = items.length - LISTED;
-  return more > 0 ? `${shown} and ${more} more` : shown;
-}
+export const listSome = (items: (string | number)[]) =>
+  listFirst(items, LISTED, more => `and ${more} more`);

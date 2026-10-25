@@ -5,12 +5,12 @@ import {
   SearchTextFilterCriteria,
 } from '../../types/filters';
 import { FilterState } from '../../core/filtering/FilterState';
-import { rankCoursesByRelevance } from '../../utils/searchUtils';
 import {
   SectionFilterPipeline,
   SectionBasedFilter,
 } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
+import { SearchTextFilter } from '../../core/filtering/filters/SearchTextFilter';
 import { FilterableSection } from '../../types/filterableUnit';
 import { getAllSections } from '../../utils/courseUtils';
 import type { FilterOption } from '../../types/common';
@@ -200,8 +200,11 @@ export class FilterService {
       );
     }
 
-    if (searchCriteria && searchCriteria.query) {
-      filteredCourses = rankCoursesByRelevance(
+    // A search criterion was only accepted through the registered
+    // SearchTextFilter, which ranks by the index it matched with.
+    const searchFilter = this.registeredFilters.get('searchText');
+    if (searchCriteria?.query && searchFilter instanceof SearchTextFilter) {
+      filteredCourses = searchFilter.rank(
         filteredCourses,
         searchCriteria.query,
       );
