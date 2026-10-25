@@ -452,6 +452,13 @@ async function route(
 }
 
 /**
+ * The route version, in every path: `{basePath}/api/v1/courses`. Within
+ * one, responses only gain fields; renaming or removing one, or changing
+ * what a field holds, is a new version.
+ */
+export const API_VERSION = 'v1';
+
+/**
  * Handles everything under `{basePath}/api`; returns null for other paths so
  * the server can try its other handlers.
  */
@@ -459,15 +466,24 @@ export function createApiHandler(options: {
   basePath: string;
   getCatalog: () => Promise<Catalog>;
 }): (request: Request) => Promise<Response | null> {
-  const prefix = `${options.basePath}/api`;
+  const root = `${options.basePath}/api`;
+  const prefix = `${root}/${API_VERSION}`;
+  const under = (path: string, base: string) =>
+    path === base || path.startsWith(`${base}/`);
 
   return async request => {
     const url = new URL(request.url);
-    if (url.pathname !== prefix && !url.pathname.startsWith(`${prefix}/`)) {
-      return null;
-    }
+    if (!under(url.pathname, root)) return null;
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
+    }
+    if (!under(url.pathname, prefix)) {
+      return json(
+        {
+          error: `The API's routes are under ${prefix}, e.g. ${prefix}/courses.`,
+        },
+        404,
+      );
     }
 
     const path = url.pathname.slice(prefix.length).replace(/\/$/, '');

@@ -378,7 +378,7 @@ export async function callOn(
   body?: unknown,
 ) {
   const response = await api(
-    new Request(`http://localhost${BASE}/api${path}`, {
+    new Request(`http://localhost${BASE}/api/v1${path}`, {
       method: body === undefined ? 'GET' : 'POST',
       body: body === undefined ? undefined : JSON.stringify(body),
     }),

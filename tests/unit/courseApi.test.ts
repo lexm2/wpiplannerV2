@@ -793,7 +793,7 @@ describe('canonicalWindows', () => {
 describe('HTTP edge cases', () => {
   const send = async (method: string, path: string, body?: unknown) => {
     const response = await endpoints(BEFORE_A).api(
-      new Request(`http://localhost${BASE}/api${path}`, {
+      new Request(`http://localhost${BASE}/api/v1${path}`, {
         method,
         body: body === undefined ? undefined : JSON.stringify(body),
       }),
@@ -903,6 +903,14 @@ describe('HTTP edge cases', () => {
       allow: 'POST, OPTIONS',
     });
     expect((await send('DELETE', '/courses/CS2102')).status).toBe(405);
+  });
+
+  it('points a path without the version at the versioned routes', async () => {
+    const response = await endpoints(BEFORE_A).api(
+      new Request(`http://localhost${BASE}/api/courses`),
+    );
+    expect(response!.status).toBe(404);
+    expect((await response!.json()).error).toContain(`${BASE}/api/v1/courses`);
   });
 
   it('refuses a course id too long to be one', async () => {
