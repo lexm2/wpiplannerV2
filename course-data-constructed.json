@@ -160362,7 +160362,7 @@
                 "number": "D02",
                 "seats": 30,
                 "seatsAvailable": 0,
-                "actualWaitlist": 4,
+                "actualWaitlist": 5,
                 "maxWaitlist": 10,
                 "note": null,
                 "computedTerm": "D",
@@ -160379,7 +160379,7 @@
                     "room": "Higgins Labs 116",
                     "seats": 30,
                     "seatsAvailable": 0,
-                    "actualWaitlist": 4,
+                    "actualWaitlist": 5,
                     "maxWaitlist": 10,
                     "specificSection": "D02",
                     "days": [
