@@ -1,5 +1,7 @@
-import { DayOfWeek } from '../../../types/types';
-import type { TimesFilterCriteria, TimeWindow } from '../../../types/filters';
+import {
+  TimesFilterCriteriaSchema,
+  type TimesFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import {
@@ -10,8 +12,6 @@ import {
   timedPeriods,
   windowsByDay,
 } from '../../../utils/timeWindows';
-
-const VALID_DAYS = new Set<string>(Object.values(DayOfWeek));
 
 /**
  * Restricts courses by when they meet, using the weekly grid painted in the
@@ -28,7 +28,10 @@ const VALID_DAYS = new Set<string>(Object.values(DayOfWeek));
  * since painting the times to meet in says when classes should meet.
  */
 export class TimesFilter implements SectionBasedFilter {
-  readonly id = 'times';
+  static readonly id = 'times';
+  static readonly criteria = TimesFilterCriteriaSchema;
+  readonly id = TimesFilter.id;
+  readonly criteria = TimesFilter.criteria;
   readonly name = 'Times';
   readonly description = 'Show only courses that meet during selected times';
   readonly priority = 15;
@@ -53,28 +56,6 @@ export class TimesFilter implements SectionBasedFilter {
       return whitelist
         ? periods.every(p => periodInsideWindows(p, byDay))
         : !periods.some(p => periodOverlapsWindows(p, byDay));
-    });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is TimesFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const c = criteria as Record<string, unknown>;
-
-    if (c.mode !== 'only' && c.mode !== 'avoid') return false;
-    if (!Array.isArray(c.windows)) return false;
-    if (c.includeAsync !== undefined && typeof c.includeAsync !== 'boolean')
-      return false;
-
-    // An empty window list is valid - it is the cleared state.
-    return c.windows.every(w => {
-      if (!w || typeof w !== 'object') return false;
-      const t = w as TimeWindow;
-      return (
-        VALID_DAYS.has(t.day) &&
-        Number.isFinite(t.startMin) &&
-        Number.isFinite(t.endMin) &&
-        t.startMin < t.endMin
-      );
     });
   }
 

@@ -4,17 +4,22 @@
  * drop the same letter in every year (2027-28's A with 2026-27's), so this
  * drops only the given year's sections in the given terms.
  */
+import * as z from 'zod';
 import type { SectionBasedFilter } from '../core/filtering/SectionFilterPipeline';
 import type { FilterableSection } from '../types/filterableUnit';
 
-export interface EndedTermsCriteria {
+const EndedTermsCriteriaSchema = z.object({
   /** The year whose terms have ended: the current one. */
-  year: number;
-  terms: string[];
-}
+  year: z.number(),
+  terms: z.array(z.string()),
+});
+export type EndedTermsCriteria = z.output<typeof EndedTermsCriteriaSchema>;
 
 export class EndedTermsFilter implements SectionBasedFilter {
-  readonly id = 'endedTerms';
+  static readonly id = 'endedTerms';
+  static readonly criteria = EndedTermsCriteriaSchema;
+  readonly id = EndedTermsFilter.id;
+  readonly criteria = EndedTermsFilter.criteria;
   readonly name = 'Ended terms';
   readonly description = "Leave out sections of this year's ended terms";
   // With the term filter.
@@ -27,11 +32,6 @@ export class EndedTermsFilter implements SectionBasedFilter {
         fs.course.academicYear !== year ||
         !terms.includes(fs.section.computedTerm),
     );
-  }
-
-  isValidCriteria(criteria: unknown): boolean {
-    const c = criteria as EndedTermsCriteria | null;
-    return !!c && typeof c.year === 'number' && Array.isArray(c.terms);
   }
 
   getDisplayValue(criteria: unknown): string {

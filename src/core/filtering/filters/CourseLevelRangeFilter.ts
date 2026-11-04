@@ -1,10 +1,10 @@
-import type { CourseLevelFilterCriteria } from '../../../types/filters';
+import {
+  CourseLevelFilterCriteriaSchema,
+  type CourseLevelFilterCriteria,
+} from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { courseLevel } from '../../../utils/searchUtils';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
-
-const inRange = (n: unknown) =>
-  n === undefined || (typeof n === 'number' && n >= 0 && n <= 9);
 
 /**
  * Courses by level, the first digit of the course number: MA 1022 is level
@@ -12,7 +12,10 @@ const inRange = (n: unknown) =>
  * 5 and up graduate. A course number without digits never passes.
  */
 export class CourseLevelRangeFilter implements SectionBasedFilter {
-  readonly id = 'courseLevel';
+  static readonly id = 'courseLevel';
+  static readonly criteria = CourseLevelFilterCriteriaSchema;
+  readonly id = CourseLevelRangeFilter.id;
+  readonly criteria = CourseLevelRangeFilter.criteria;
   readonly name = 'Course Level';
   readonly description = 'Filter courses by the level of their number';
   readonly priority = 21;
@@ -27,12 +30,6 @@ export class CourseLevelRangeFilter implements SectionBasedFilter {
       const level = courseLevel(fs.course);
       return level !== null && level >= min && level <= max;
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is CourseLevelFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const { min, max } = criteria as Record<string, unknown>;
-    return inRange(min) && inRange(max);
   }
 
   getDisplayValue(criteria: CourseLevelFilterCriteria): string {

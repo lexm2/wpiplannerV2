@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { acceptsCriteria } from '../../src/core/filtering/SectionFilterPipeline';
 import { DegreeBucketFilter } from '../../src/core/filtering/filters/DegreeBucketFilter';
 import type { DegreeBucketFilterCriteria } from '../../src/types/filters';
 import type { FilterableSection } from '../../src/types/filterableUnit';
@@ -108,20 +109,23 @@ describe('DegreeBucketFilter', () => {
     expect(codes(filter.apply([twin, other], c))).toEqual(['RE 2000']);
   });
 
-  it('isValidCriteria accepts well-formed and rejects malformed input', () => {
+  it('acceptsCriteria accepts well-formed and rejects malformed input', () => {
     expect(
-      filter.isValidCriteria({
+      acceptsCriteria(filter, {
         allowedDepartments: ['CS'],
         excludedCourses: [],
       }),
     ).toBe(true);
     expect(
-      filter.isValidCriteria({ allowedDepartments: 'CS', excludedCourses: [] }),
+      acceptsCriteria(filter, {
+        allowedDepartments: 'CS',
+        excludedCourses: [],
+      }),
     ).toBe(false);
     expect(
-      filter.isValidCriteria({ allowedDepartments: [1], excludedCourses: [] }),
+      acceptsCriteria(filter, { allowedDepartments: [1], excludedCourses: [] }),
     ).toBe(false);
-    expect(filter.isValidCriteria(null)).toBe(false);
+    expect(acceptsCriteria(filter, null)).toBe(false);
   });
 
   it('getDisplayValue summarizes the bucket', () => {

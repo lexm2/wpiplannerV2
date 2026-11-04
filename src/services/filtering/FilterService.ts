@@ -9,8 +9,8 @@ import { rankCoursesByRelevance } from '../../utils/searchUtils';
 import {
   SectionFilterPipeline,
   SectionBasedFilter,
+  acceptsCriteria,
 } from '../../core/filtering/SectionFilterPipeline';
-import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import { FilterableSection } from '../../types/filterableUnit';
 import { getAllSections } from '../../utils/courseUtils';
 import type { FilterOption } from '../../types/common';
@@ -33,11 +33,6 @@ export class FilterService {
     this.sectionPipeline.registerFilter(filter);
   }
 
-  setConflictDetector(): void {
-    const conflictFilter = new ConflictFilter();
-    this.registerFilter(conflictFilter);
-  }
-
   addFilter(filterId: string, criteria: unknown): boolean {
     // Bookmark filter is course-level, handled outside the section pipeline
     if (filterId === 'bookmark') {
@@ -55,7 +50,7 @@ export class FilterService {
       return false;
     }
 
-    if (!filter.isValidCriteria(criteria)) {
+    if (!acceptsCriteria(filter, criteria)) {
       logger.error(`Invalid criteria for filter '${filterId}'`);
       return false;
     }
@@ -79,7 +74,7 @@ export class FilterService {
       return false;
     }
 
-    if (!filter.isValidCriteria(criteria)) {
+    if (!acceptsCriteria(filter, criteria)) {
       return false;
     }
 

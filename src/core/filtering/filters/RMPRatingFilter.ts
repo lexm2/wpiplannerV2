@@ -1,8 +1,12 @@
-import type { RMPRatingFilterCriteria } from '../../../types/filters';
+import {
+  RMPRatingFilterCriteriaSchema,
+  type RMPRatingFilterCriteria,
+} from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { keepMatchingGroups } from '../lectureGroupScope';
 import { SectionType, type Section } from '../../../types/types';
+import type { FilterDeps } from './index';
 import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 
 type RatingNumbers = NonNullable<
@@ -43,12 +47,19 @@ function withinBounds(
 }
 
 export class RMPRatingFilter implements SectionBasedFilter {
-  readonly id = 'rmpRating';
+  static readonly id = 'rmpRating';
+  static readonly criteria = RMPRatingFilterCriteriaSchema;
+  readonly id = RMPRatingFilter.id;
+  readonly criteria = RMPRatingFilter.criteria;
   readonly name = 'Rate My Professor';
   readonly description = 'Filter courses by professor ratings';
   readonly priority = 8;
 
-  constructor(private rmpService: RateMyProfessorService) {}
+  private rmpService: RateMyProfessorService;
+
+  constructor({ rmp }: FilterDeps) {
+    this.rmpService = rmp;
+  }
 
   apply(
     sections: FilterableSection[],
@@ -96,70 +107,6 @@ export class RMPRatingFilter implements SectionBasedFilter {
       if (rated.length === 0) return includeWithoutData;
       return rated.some(ratings => withinBounds(ratings, criteria));
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is RMPRatingFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') {
-      return false;
-    }
-
-    const c = criteria as Record<string, unknown>;
-
-    if (
-      c.minRating !== undefined &&
-      (typeof c.minRating !== 'number' || c.minRating < 0 || c.minRating > 5)
-    ) {
-      return false;
-    }
-    if (
-      c.maxRating !== undefined &&
-      (typeof c.maxRating !== 'number' || c.maxRating < 0 || c.maxRating > 5)
-    ) {
-      return false;
-    }
-
-    if (
-      c.minDifficulty !== undefined &&
-      (typeof c.minDifficulty !== 'number' ||
-        c.minDifficulty < 0 ||
-        c.minDifficulty > 5)
-    ) {
-      return false;
-    }
-    if (
-      c.maxDifficulty !== undefined &&
-      (typeof c.maxDifficulty !== 'number' ||
-        c.maxDifficulty < 0 ||
-        c.maxDifficulty > 5)
-    ) {
-      return false;
-    }
-
-    if (
-      c.minWouldTakeAgain !== undefined &&
-      (typeof c.minWouldTakeAgain !== 'number' ||
-        c.minWouldTakeAgain < 0 ||
-        c.minWouldTakeAgain > 100)
-    ) {
-      return false;
-    }
-    if (
-      c.maxWouldTakeAgain !== undefined &&
-      (typeof c.maxWouldTakeAgain !== 'number' ||
-        c.maxWouldTakeAgain < 0 ||
-        c.maxWouldTakeAgain > 100)
-    ) {
-      return false;
-    }
-
-    if (
-      c.minNumRatings !== undefined &&
-      (typeof c.minNumRatings !== 'number' || c.minNumRatings < 0)
-    ) {
-      return false;
-    }
-
-    return true;
   }
 
   getDisplayValue(criteria: RMPRatingFilterCriteria): string {

@@ -16,12 +16,8 @@ import {
 } from '@modelcontextprotocol/server';
 import { currentAcademicYear, type Catalog } from '../api/catalog';
 import { seatDataAge, termDates, today, yearStatus } from '../api/calendar';
-import {
-  CourseQuerySchema,
-  FallYearSchema,
-  runCourseQuery,
-} from '../api/query';
-import { caseless } from '../api/schemaHints';
+import { CourseQuerySchema, runCourseQuery } from '../api/query';
+import { caseless, FallYearSchema } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
 import {

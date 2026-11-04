@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { acceptsCriteria } from '../../src/core/filtering/SectionFilterPipeline';
 import { TimesFilter } from '../../src/core/filtering/filters/TimesFilter';
 import type { TimesFilterCriteria, TimeWindow } from '../../src/types/filters';
 import type { FilterableSection } from '../../src/types/filterableUnit';
@@ -244,30 +245,30 @@ describe('TimesFilter', () => {
     });
   });
 
-  describe('isValidCriteria', () => {
+  describe('acceptsCriteria', () => {
     it('accepts an empty window list', () => {
-      expect(filter.isValidCriteria({ mode: 'only', windows: [] })).toBe(true);
+      expect(acceptsCriteria(filter, { mode: 'only', windows: [] })).toBe(true);
     });
 
     it('accepts a well-formed window', () => {
-      expect(filter.isValidCriteria(only(tueThu10to12))).toBe(true);
+      expect(acceptsCriteria(filter, only(tueThu10to12))).toBe(true);
     });
 
     it('rejects an unknown mode', () => {
-      expect(filter.isValidCriteria({ mode: 'maybe', windows: [] })).toBe(
+      expect(acceptsCriteria(filter, { mode: 'maybe', windows: [] })).toBe(
         false,
       );
     });
 
     it('rejects non-array windows', () => {
-      expect(filter.isValidCriteria({ mode: 'only', windows: null })).toBe(
+      expect(acceptsCriteria(filter, { mode: 'only', windows: null })).toBe(
         false,
       );
     });
 
     it('rejects an inverted window', () => {
       expect(
-        filter.isValidCriteria({
+        acceptsCriteria(filter, {
           mode: 'only',
           windows: [{ day: T, startMin: 720, endMin: 600 }],
         }),
@@ -276,7 +277,7 @@ describe('TimesFilter', () => {
 
     it('rejects an unknown day', () => {
       expect(
-        filter.isValidCriteria({
+        acceptsCriteria(filter, {
           mode: 'only',
           windows: [{ day: 'X', startMin: 600, endMin: 720 }],
         }),

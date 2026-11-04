@@ -98,7 +98,7 @@ const rmp = {
 
 const pipeline = new SectionFilterPipeline();
 pipeline.registerFilter(new SearchTextFilter());
-pipeline.registerFilter(new RMPRatingFilter(rmp));
+pipeline.registerFilter(new RMPRatingFilter({ rmp }));
 pipeline.registerFilter(new AvailabilityFilter());
 
 function run(filters: Record<string, unknown>): Course[] {

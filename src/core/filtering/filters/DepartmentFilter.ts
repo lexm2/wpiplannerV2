@@ -1,9 +1,15 @@
-import { DepartmentFilterCriteria } from '../../../types/filters';
+import {
+  DepartmentFilterCriteriaSchema,
+  type DepartmentFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 
 export class DepartmentFilter implements SectionBasedFilter {
-  readonly id = 'department';
+  static readonly id = 'department';
+  static readonly criteria = DepartmentFilterCriteriaSchema;
+  readonly id = DepartmentFilter.id;
+  readonly criteria = DepartmentFilter.criteria;
   readonly name = 'Department';
   readonly description = 'Filter courses by department(s)';
   readonly priority = 25;
@@ -22,18 +28,6 @@ export class DepartmentFilter implements SectionBasedFilter {
 
     return sections.filter(fs =>
       departmentSet.has(fs.course.departmentAbbr.toLowerCase()),
-    );
-  }
-
-  isValidCriteria(criteria: unknown): criteria is DepartmentFilterCriteria {
-    return !!(
-      criteria &&
-      typeof criteria === 'object' &&
-      'departments' in criteria &&
-      Array.isArray((criteria as DepartmentFilterCriteria).departments) &&
-      (criteria as DepartmentFilterCriteria).departments.every(
-        (dept: unknown) => typeof dept === 'string',
-      )
     );
   }
 

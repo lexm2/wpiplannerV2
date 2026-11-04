@@ -5,12 +5,13 @@
  */
 import * as z from 'zod';
 import type { Catalog } from './catalog';
+import { CourseQuerySchema, runCourseQuery } from './query';
 import {
-  CourseQuerySchema,
-  FallYearSchema,
-  RMP_BOUNDS,
-  runCourseQuery,
-} from './query';
+  FILTER_PARAMS,
+  filtersFromParams,
+  type ParamReader,
+} from './filterInputs';
+import { FallYearSchema } from './schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { AutoScheduleInputSchema, generateSchedules } from './autoSchedule';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
@@ -124,35 +125,12 @@ const DetailParamsSchema = z
   })
   .strict();
 
-// GET /api/courses parameter names, each mapped onto the query's shape.
+// GET /courses parameters: each filter's own (filterInputs.ts), then the
+// query's options.
 const COURSE_PARAMS = new Set([
-  'q',
-  'professorOnly',
-  'department',
-  'term',
-  'year',
-  'availableOnly',
-  'minAvailable',
-  'minCredits',
-  'maxCredits',
-  'level',
-  'times',
-  ...RMP_BOUNDS,
-  'includeWithoutData',
-  'avoidCrns',
-  'semesterSpansQuarters',
-  'maxWaitlisted',
-  'minLevel',
-  'maxLevel',
-  'degreeAttribute',
-  'deliveryMode',
-  'offeringPattern',
-  'earliestStart',
-  'latestEnd',
-  'days',
-  'includeAsync',
-  'includeInterestLists',
+  ...FILTER_PARAMS,
   'includeEndedTerms',
+  'includeInterestLists',
   'includeSections',
   'sort',
   'offset',
@@ -181,15 +159,6 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     return Number(v);
   };
   const int = (k: string) => parse(k, INTEGER_RE, 'a whole number in digits');
-  const num = (k: string) =>
-    parse(k, DECIMAL_RE, 'a number in digits, e.g. 3 or 3.5');
-  const needs = (k: string, parent: string) => {
-    if (params.has(k) && !params.has(parent)) {
-      throw new HttpError(400, `${k} needs ${parent}: it qualifies it.`);
-    }
-  };
-  needs('professorOnly', 'q');
-  needs('semesterSpansQuarters', 'avoidCrns');
   const bool = (k: string) => {
     const v = params.get(k);
     if (v === null) return undefined;
@@ -197,128 +166,45 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     if (v === 'false' || v === '0') return false;
     return v;
   };
-  const list = (k: string) =>
-    params
-      .getAll(k)
-      .flatMap(v => v.split(','))
-      .map(v => v.trim())
-      .filter(Boolean);
-
-  const filters: Record<string, unknown> = {};
-
-  if (params.has('q')) {
-    filters.searchText = {
-      query: str('q'),
-      professorOnly: bool('professorOnly'),
-    };
-  }
-  if (params.has('department')) {
-    filters.department = { departments: list('department') };
-  }
-  if (params.has('term')) {
-    filters.term = { terms: list('term').map(t => t.toUpperCase()) };
-  }
-  if (params.has('year')) {
-    const year = str('year')!;
-    filters.academicYear = {
-      year: /^all$/i.test(year) ? 'all' : int('year'),
-    };
-  }
-  if (
-    params.has('availableOnly') ||
-    params.has('minAvailable') ||
-    params.has('maxWaitlisted')
-  ) {
-    filters.availability = {
-      availableOnly: bool('availableOnly'),
-      minAvailable: int('minAvailable'),
-      maxWaitlisted: int('maxWaitlisted'),
-    };
-  }
-  if (params.has('minLevel') || params.has('maxLevel')) {
-    filters.courseLevel = { min: int('minLevel'), max: int('maxLevel') };
-  }
-  if (params.has('degreeAttribute')) {
-    filters.degreeAttribute = { attributes: list('degreeAttribute') };
-  }
-  if (params.has('deliveryMode')) {
-    filters.deliveryMode = { modes: list('deliveryMode') };
-  }
-  if (params.has('offeringPattern')) {
-    const values = list('offeringPattern');
-    // "unknown" alone: only the courses with no category on record.
-    filters.offeringPattern = {
-      categories: values
-        .filter(v => v.toLowerCase() !== 'unknown')
-        .map(v => (INTEGER_RE.test(v) ? Number(v) : v)),
-      includeUnknown:
-        values.some(v => v.toLowerCase() === 'unknown') || undefined,
-    };
-  }
-  if (params.has('minCredits') || params.has('maxCredits')) {
-    // An open end is no bound: minCredits=200 alone is 200 and up.
-    const min = num('minCredits') ?? 0;
-    filters.creditRange = { min, max: num('maxCredits') ?? Math.max(100, min) };
-  }
-  if (params.has('level')) {
-    filters.graduateLevel = { level: str('level') };
-  }
-  if (params.has('times')) {
-    let times: unknown;
-    try {
-      times = JSON.parse(params.get('times')!) as unknown;
-    } catch {
-      throw new HttpError(400, 'times must be JSON');
-    }
-    if (!times || typeof times !== 'object' || Array.isArray(times)) {
-      throw new HttpError(
-        400,
-        'times must be a JSON object, e.g. {"mode":"avoid","earliestStart":"13:00"}',
-      );
-    }
-    filters.times = times;
-  }
-  if (
-    params.has('earliestStart') ||
-    params.has('latestEnd') ||
-    params.has('days') ||
-    params.has('includeAsync')
-  ) {
-    filters.times = {
-      ...(filters.times as object | undefined),
-      earliestStart: str('earliestStart'),
-      latestEnd: str('latestEnd'),
-      days: params.has('days')
-        ? list('days').map(d => d.toUpperCase())
-        : undefined,
-      includeAsync: bool('includeAsync'),
-    };
-  }
-  if (RMP_BOUNDS.some(k => params.has(k)) || params.has('includeWithoutData')) {
-    filters.rmpRating = {
-      ...Object.fromEntries(
-        RMP_BOUNDS.map(k => [k, k === 'minNumRatings' ? int(k) : num(k)]),
-      ),
-      includeWithoutData: bool('includeWithoutData'),
-    };
-  }
-  if (params.has('avoidCrns')) {
-    filters.periodConflict = {
-      crns: list('avoidCrns').map(v => {
-        if (!INTEGER_RE.test(v)) {
-          throw new HttpError(
-            400,
-            `avoidCrns takes CRNs in digits, got "${echo(v)}".`,
-          );
-        }
-        return Number(v);
-      }),
-      semesterSpansQuarters: bool('semesterSpansQuarters'),
-    };
-  }
+  const reader: ParamReader = {
+    has: k => params.has(k),
+    str,
+    int,
+    num: k => parse(k, DECIMAL_RE, 'a number in digits, e.g. 3 or 3.5'),
+    bool,
+    list: k =>
+      params
+        .getAll(k)
+        .flatMap(v => v.split(','))
+        .map(v => v.trim())
+        .filter(Boolean),
+    json: (k, example) => {
+      let value: unknown;
+      try {
+        value = JSON.parse(params.get(k)!) as unknown;
+      } catch {
+        throw new HttpError(400, `${k} must be JSON`);
+      }
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new HttpError(
+          400,
+          `${k} must be a JSON object${example ? `, e.g. ${example}` : ''}`,
+        );
+      }
+      return value;
+    },
+    needs: (k, parent) => {
+      if (params.has(k) && !params.has(parent)) {
+        throw new HttpError(400, `${k} needs ${parent}: it qualifies it.`);
+      }
+    },
+    fail: message => {
+      throw new HttpError(400, message);
+    },
+  };
 
   return {
-    filters,
+    filters: filtersFromParams(reader),
     includeEndedTerms: bool('includeEndedTerms'),
     includeInterestLists: bool('includeInterestLists'),
     includeSections: bool('includeSections'),

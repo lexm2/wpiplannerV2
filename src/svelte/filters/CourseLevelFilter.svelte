@@ -2,7 +2,7 @@
   import FilterSection from './FilterSection.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import { slideFade } from '../transitions';
-  import { UNDERGRAD_LEVELS } from '../../core/filtering/filters/GraduateLevelFilter';
+  import { UNDERGRAD_LEVELS } from '../../types/filters';
   import type { Course } from '../../types/types';
   import type { AcademicTerm } from '../../types/schedule';
   import type {

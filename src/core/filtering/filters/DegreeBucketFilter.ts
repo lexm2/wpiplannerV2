@@ -1,4 +1,7 @@
-import type { DegreeBucketFilterCriteria } from '../../../types/filters';
+import {
+  DegreeBucketFilterCriteriaSchema,
+  type DegreeBucketFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { candidateCodes } from '../../../services/degree/catalogLookup';
@@ -19,7 +22,12 @@ import { candidateCodes } from '../../../services/degree/catalogLookup';
  * but the coarser, system-imposed restriction, so it pre-filters first.
  */
 export class DegreeBucketFilter implements SectionBasedFilter {
-  readonly id = 'degreeBucket';
+  static readonly id = 'degreeBucket';
+  static readonly criteria = DegreeBucketFilterCriteriaSchema;
+  // Set by the Degree page itself, never chosen in the filter panel.
+  static readonly internal = true;
+  readonly id = DegreeBucketFilter.id;
+  readonly criteria = DegreeBucketFilter.criteria;
   readonly name = 'Degree Requirement';
   readonly description =
     'Restrict courses to those eligible for a degree requirement bucket';
@@ -55,18 +63,6 @@ export class DegreeBucketFilter implements SectionBasedFilter {
         candidateCodes(listed).some(c => excluded.has(`${c.dept} ${c.number}`)),
       );
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is DegreeBucketFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const c = criteria as DegreeBucketFilterCriteria;
-    return (
-      Array.isArray(c.allowedDepartments) &&
-      c.allowedDepartments.every(d => typeof d === 'string') &&
-      Array.isArray(c.excludedCourses) &&
-      c.excludedCourses.every(d => typeof d === 'string') &&
-      (c.bucketId === undefined || typeof c.bucketId === 'string')
-    );
   }
 
   getDisplayValue(criteria: DegreeBucketFilterCriteria): string {

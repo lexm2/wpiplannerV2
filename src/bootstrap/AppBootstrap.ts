@@ -11,11 +11,7 @@ import { loadServerTimestamp } from '../svelte/timestampState.svelte';
 import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
 import { StorageWorkerManager } from '../workers/StorageWorkerManager';
 import { TermBoundsService } from '../utils/termBounds';
-import {
-  createDefaultFilters,
-  SearchTextFilter,
-  DegreeBucketFilter,
-} from '../core/filtering/filters';
+import { createFilters } from '../core/filtering/filters';
 import { CourseColorService } from '../services/scheduling/CourseColorService';
 import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator';
 import { DegreeImportService } from '../services/degree/degreeImportService';
@@ -128,19 +124,9 @@ export class AppBootstrap {
   static initializeFilters(services: ServiceContainer): void {
     const { filterService } = services;
 
-    const filters = createDefaultFilters(rateMyProfessorService);
-    filters.forEach(filter => {
+    for (const filter of createFilters({ rmp: rateMyProfessorService })) {
       filterService.registerFilter(filter);
-    });
-
-    // Backend-only: registered for the pipeline but intentionally has no
-    // FilterPanel component.
-    const searchTextFilter = new SearchTextFilter();
-    filterService.registerFilter(searchTextFilter);
-
-    filterService.registerFilter(new DegreeBucketFilter());
-
-    filterService.setConflictDetector();
+    }
   }
 
   static async initializeAsyncServices(
