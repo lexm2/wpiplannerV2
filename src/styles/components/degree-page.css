@@ -1326,6 +1326,43 @@
   .degree-dropzone {
     padding: 1.5rem 1rem;
   }
+
+  /* Configure buckets: a name beside the handle, credit target and the Edit /
+     Delete buttons left it 6-100px wide and ellipsized. Now the name takes the
+     row (and wraps), with target and buttons on a line under it. */
+  .bucket-config-row {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .bucket-config-handle {
+    align-self: flex-start;
+  }
+
+  .bucket-config-name {
+    flex: 1 1 calc(100% - 2.5rem);
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Pushes the badge and buttons to the right of the second line. */
+  .bucket-config-target {
+    margin-right: auto;
+  }
+
+  /* The edit form fills the row: stacked fields, then Save and Cancel. */
+  .bucket-config-edit {
+    flex: 1 1 calc(100% - 2.5rem);
+  }
+
+  .bucket-config-edit .field {
+    flex: 1 1 100%;
+  }
+
+  .bucket-config-edit .modal-btn {
+    flex: 1 1 0;
+  }
 }
 
 /* ---- To place, below 992px (ToPlaceList.svelte) ---- */
