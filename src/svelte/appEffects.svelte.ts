@@ -4,6 +4,7 @@ import type { ConflictCriteria } from '../types/filters';
 import type { ServiceContainer } from '../bootstrap/ServiceContainer';
 import { uiState } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
+import { degreeState } from './degree/degreeState.svelte';
 import { updateClientTimestamp } from './timestampState.svelte';
 import { wizardState } from './wizardState.svelte';
 import {
@@ -179,6 +180,21 @@ export function installAppEffects(services: ServiceContainer): void {
     appState.activeScheduleId; // track active-schedule changes
     untrack(() => {
       services.tutorial?.onActiveScheduleChange();
+    });
+  });
+
+  // Degree record cleared -> drop the degree filter. It narrows the course list
+  // to a requirement of that record, so it can't outlive it. The initial run is
+  // skipped (no record is loaded yet at mount).
+  let degreeRecordInit = false;
+  $effect(() => {
+    const record = degreeState.record; // track the record only
+    untrack(() => {
+      if (!degreeRecordInit) {
+        degreeRecordInit = true;
+        return;
+      }
+      if (record === null) services.filterService.removeFilter('degreeBucket');
     });
   });
 }

@@ -1839,3 +1839,36 @@ html.is-mobile
 .degree-warning-dialog .modal-footer a.modal-btn {
   text-decoration: none;
 }
+
+/* ---- Degree filter banner (DegreeFilterBanner.svelte, on the planner) ---- */
+.degree-filter-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.875rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--effect-border-radius);
+  font-size: 0.875rem;
+}
+
+.degree-filter-banner-text {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-text-secondary);
+}
+
+.degree-filter-banner-text strong {
+  color: var(--color-text);
+}
+
+.degree-filter-banner-back {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.degree-filter-banner-clear {
+  flex-shrink: 0;
+}

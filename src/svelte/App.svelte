@@ -29,6 +29,7 @@
   import FilterButtons from './FilterButtons.svelte';
   import ViewToggle from './ViewToggle.svelte';
   import CourseList from './CourseList.svelte';
+  import DegreeFilterBanner from './degree/DegreeFilterBanner.svelte';
   import SelectedCoursesPanel from './SelectedCoursesPanel.svelte';
   import CourseDescription from './CourseDescription.svelte';
   import PageTabs from './PageTabs.svelte';
@@ -244,6 +245,7 @@
       </div>
     </div>
     <div class="course-container" id="course-container">
+      <DegreeFilterBanner filterService={services.filterService} />
       <CourseList
         filterService={services.filterService}
         courseSelectionService={services.courseSelectionService}

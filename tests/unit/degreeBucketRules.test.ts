@@ -64,6 +64,39 @@ describe('degreeBucketRules lookup', () => {
     expect(rule?.excludedCourses).toContain('CS 2119');
   });
 
+  it("finds a renamed Workday bucket's rule by its departments", () => {
+    // Workday's "Core Requirement" is the sheet's "COMPUTER SCIENCE (18/3 units)".
+    const rule = getBucketRule(
+      'Computer Science',
+      2029,
+      'major_specific',
+      'Core Requirement',
+      ['CS'],
+    );
+    expect(rule?.label).toMatch(/^COMPUTER SCIENCE/);
+    expect(rule?.excludedCourses).toContain('CS 2119');
+  });
+
+  it('returns null rather than guessing when nothing matches', () => {
+    expect(
+      getBucketRule(
+        'Computer Science',
+        2029,
+        'major_specific',
+        'Core Requirement',
+      ),
+    ).toBeNull();
+    expect(
+      getBucketRule(
+        'Computer Science',
+        2029,
+        'major_specific',
+        'Core Requirement',
+        ['HI'],
+      ),
+    ).toBeNull();
+  });
+
   it('produces filter criteria from a bucket rule', () => {
     const criteria = getDegreeBucketCriteria(
       'Computer Science',

@@ -86,12 +86,20 @@ export function getSheetRules(
  * One bucket rule by category, optionally disambiguated by label (needed when a
  * major has several `major_specific` buckets). Matching is exact on category, then
  * a case-insensitive substring match on label when provided.
+ *
+ * Workday's names do not always echo the sheet's: CS's "Core Requirement" is
+ * the sheet's "COMPUTER SCIENCE (18/3 units)". So when the label matches
+ * nothing, the rule admitting `hintDepartments` (the departments the bucket's
+ * own courses come from, most-relevant first) is taken instead - and with no
+ * such rule, null, since the first candidate would be a guess (for CS, the
+ * science/engineering bucket).
  */
 export function getBucketRule(
   major: string,
   classYear: number | null,
   category: RequirementCategory,
   label?: string,
+  hintDepartments: readonly string[] = [],
 ): DegreeBucketRule | null {
   const candidates = getSheetRules(major, classYear).filter(
     r => r.category === category,
@@ -107,7 +115,14 @@ export function getBucketRule(
       r.label.toLowerCase().includes(needle) ||
       needle.includes(r.label.toLowerCase()),
   );
-  return partial ?? candidates[0];
+  if (partial) return partial;
+
+  for (const dept of hintDepartments) {
+    const upper = dept.toUpperCase();
+    const byDept = candidates.find(r => r.validDepartments.includes(upper));
+    if (byDept) return byDept;
+  }
+  return null;
 }
 
 /** Convert a bucket rule into `degreeBucket` filter criteria. */
@@ -130,7 +145,14 @@ export function getDegreeBucketCriteria(
   classYear: number | null,
   category: RequirementCategory,
   label?: string,
+  hintDepartments: readonly string[] = [],
 ): DegreeBucketFilterCriteria | null {
-  const rule = getBucketRule(major, classYear, category, label);
+  const rule = getBucketRule(
+    major,
+    classYear,
+    category,
+    label,
+    hintDepartments,
+  );
   return rule ? bucketRuleToCriteria(rule) : null;
 }

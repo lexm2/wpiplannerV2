@@ -7,6 +7,7 @@ import {
   inferBucketDepartments,
   type DegreeBucket,
 } from './degreeBuckets';
+import type { DegreeBucketFilterCriteria } from '../../types/filters';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { candidateCodes, findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
@@ -31,40 +32,81 @@ class DegreePlanService {
   }
 
   /**
-   * From an empty bucket slot: filter the courses page to the departments that
-   * give credit for the bucket (+ the active academic year) and navigate there
-   * so the user can pick a course.
+   * From an empty bucket slot: filter the courses page to the courses that give
+   * credit for the bucket (+ the active academic year), leaving out any already
+   * taken or scheduled, and navigate there so the user can pick one.
    */
   browseForBucket(bucket: DegreeBucket): void {
-    if (!this.filterService) return;
+    const rule = this.bucketRule(bucket);
+    this.browse(
+      rule
+        ? {
+            ...rule,
+            excludedCourses: [...rule.excludedCourses, ...this.coveredCodes()],
+            label: bucket.name,
+          }
+        : null,
+    );
+  }
 
-    // Imported buckets prefer the tracking-sheet rules (valid departments +
-    // excluded courses) via the backend-only degreeBucket filter. Custom buckets
-    // have no sheet rule, so they take the department path below.
+  /**
+   * What gives credit for a bucket. Imported buckets prefer the tracking-sheet
+   * rule (valid departments + excluded courses, either possibly empty); custom
+   * buckets, and imported ones the sheets lack, fall back to inferred
+   * departments. null when there is neither.
+   */
+  private bucketRule(bucket: DegreeBucket): DegreeBucketFilterCriteria | null {
     const record = degreeState.record;
     const classYear = record?.startYear != null ? record.startYear + 4 : null;
-    const bucketCriteria =
+    const depts = inferBucketDepartments(bucket, appState.loadedDepartments);
+    const sheet =
       record && bucket.source === 'import'
         ? getDegreeBucketCriteria(
             record.major,
             classYear,
             bucket.category,
             bucketRuleLabel(bucket),
+            depts,
           )
         : null;
+    if (sheet) {
+      return {
+        allowedDepartments: sheet.allowedDepartments,
+        excludedCourses: sheet.excludedCourses,
+      };
+    }
 
-    if (bucketCriteria) {
-      this.filterService.addFilter('degreeBucket', bucketCriteria);
-      this.filterService.removeFilter('department');
+    return depts.length
+      ? { allowedDepartments: depts, excludedCourses: [] }
+      : null;
+  }
+
+  /** Codes already taken, in progress, or in the active schedule. */
+  private coveredCodes(): string[] {
+    const codes = new Set(degreeState.record?.courses.map(c => c.code) ?? []);
+    for (const sc of appState.selectedCourses)
+      codes.add(`${sc.course.departmentAbbr} ${sc.course.number}`);
+    return [...codes];
+  }
+
+  /**
+   * Apply (or, with null, clear) the degree filter for the active schedule's
+   * year and go to the planner.
+   */
+  private browse(criteria: DegreeBucketFilterCriteria | null): void {
+    if (!this.filterService) return;
+
+    if (criteria) {
+      this.filterService.addFilter('degreeBucket', criteria);
+      // A BS requirement's departments include their graduate courses, which
+      // swamp the list; the visible level toggle lets the user flip it back.
+      this.filterService.addFilter('graduateLevel', { level: 'undergraduate' });
     } else {
       this.filterService.removeFilter('degreeBucket');
-      const depts = inferBucketDepartments(bucket, appState.loadedDepartments);
-      if (depts.length) {
-        this.filterService.addFilter('department', { departments: depts });
-      } else {
-        this.filterService.removeFilter('department');
-      }
     }
+    // The degree filter says which departments; a leftover department filter
+    // would narrow it further, or to nothing.
+    this.filterService.removeFilter('department');
 
     // A search left behind by openCourse would narrow the bucket's courses down
     // to that one code, or to nothing.

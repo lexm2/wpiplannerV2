@@ -96,6 +96,18 @@ describe('DegreeBucketFilter', () => {
     expect(codes(filter.apply(sections, c))).toEqual(['cs 3013']);
   });
 
+  it('drops a course whose cross-listed code is excluded', () => {
+    const twin = fs('RE', '1731');
+    twin.course.crossListedWith = ['PY 1731'];
+    const other = fs('RE', '2000');
+    other.course.crossListedWith = ['PY 2000'];
+    const c: DegreeBucketFilterCriteria = {
+      allowedDepartments: [],
+      excludedCourses: ['PY 1731'],
+    };
+    expect(codes(filter.apply([twin, other], c))).toEqual(['RE 2000']);
+  });
+
   it('isValidCriteria accepts well-formed and rejects malformed input', () => {
     expect(
       filter.isValidCriteria({

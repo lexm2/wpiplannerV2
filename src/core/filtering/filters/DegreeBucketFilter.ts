@@ -1,4 +1,4 @@
-import { DegreeBucketFilterCriteria } from '../../../types/filters';
+import type { DegreeBucketFilterCriteria } from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { candidateCodes } from '../../../services/degree/catalogLookup';
@@ -11,6 +11,9 @@ import { candidateCodes } from '../../../services/degree/catalogLookup';
  * Registered like SearchTextFilter (no FilterPanel component), so it never appears
  * in the UI; it is applied programmatically from the Degree page when a requirement
  * bucket is focused. Empty criteria is a no-op pass-through.
+ *
+ * A course is also dropped when any of its cross-listed codes is excluded: the
+ * same class under another code (PY 1731 taken or scheduled hides RE 1731).
  *
  * Priority 24 places it just before DepartmentFilter (25): same allowlist family,
  * but the coarser, system-imposed restriction, so it pre-filters first.
@@ -46,9 +49,11 @@ export class DegreeBucketFilter implements SectionBasedFilter {
     return sections.filter(fs => {
       const dept = fs.course.departmentAbbr.toUpperCase();
       if (hasDeptRestriction && !allowed.has(dept)) return false;
-      if (hasExclusions && excluded.has(`${dept} ${fs.course.number}`))
-        return false;
-      return true;
+      if (!hasExclusions) return true;
+      if (excluded.has(`${dept} ${fs.course.number}`)) return false;
+      return !fs.course.crossListedWith.some(listed =>
+        candidateCodes(listed).some(c => excluded.has(`${c.dept} ${c.number}`)),
+      );
     });
   }
 
