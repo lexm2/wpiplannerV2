@@ -667,6 +667,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-filter'],
+          openDisclosures: ['auto-schedule-filters'],
         },
       },
       {
@@ -679,6 +680,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-filter'],
+          openDisclosures: ['auto-schedule-filters'],
         },
         appState: {
           filters: [{ id: 'availability', criteria: { availableOnly: true } }],

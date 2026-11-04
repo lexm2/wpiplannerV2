@@ -101,6 +101,27 @@
   }
 </script>
 
+{#snippet essentialFilters()}
+  <TermsFilter {filterService} {allCourses} />
+  <CourseLevelFilter {filterService} />
+  <AvailabilityFilter {filterService} {courseSelectionService} />
+{/snippet}
+
+{#snippet advancedFilters()}
+  <AcademicYearFilter {filterService} {allCourses} />
+  <DepartmentFilter {filterService} {allCourses} />
+  <TimesFilter {filterService} />
+  <CreditHoursFilter {filterService} />
+  <AvailabilityDetailsFilter
+    {filterService}
+    {courseSelectionService}
+    {autoScheduleOrchestrator}
+  />
+  {#key resetNonce}
+    <RmpRatingFilter {filterService} bind:this={rmpFilter} />
+  {/key}
+{/snippet}
+
 <div class="modal-header">
   <h3 class="modal-title">
     {title}
@@ -114,28 +135,26 @@
 
 <div class="modal-body filter-modal-body">
   <div class="filter-sections">
-    {#if isAuto}<RankingPreferences />{/if}
-    <TermsFilter {filterService} {allCourses} />
-    <CourseLevelFilter {filterService} />
-    <AvailabilityFilter {filterService} {courseSelectionService} />
-    <MoreSection
-      id="more-filters"
-      label="More filters"
-      activeCount={advancedCount}
-    >
-      <AcademicYearFilter {filterService} {allCourses} />
-      <DepartmentFilter {filterService} {allCourses} />
-      <TimesFilter {filterService} />
-      <CreditHoursFilter {filterService} />
-      <AvailabilityDetailsFilter
-        {filterService}
-        {courseSelectionService}
-        {autoScheduleOrchestrator}
-      />
-      {#key resetNonce}
-        <RmpRatingFilter {filterService} bind:this={rmpFilter} />
-      {/key}
-    </MoreSection>
+    {#if isAuto}
+      <RankingPreferences />
+      <MoreSection
+        id="auto-schedule-filters"
+        label="Filters"
+        activeCount={filterCount}
+      >
+        {@render essentialFilters()}
+        {@render advancedFilters()}
+      </MoreSection>
+    {:else}
+      {@render essentialFilters()}
+      <MoreSection
+        id="more-filters"
+        label="More filters"
+        activeCount={advancedCount}
+      >
+        {@render advancedFilters()}
+      </MoreSection>
+    {/if}
   </div>
 </div>
 

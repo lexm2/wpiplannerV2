@@ -98,23 +98,17 @@
   border-color: var(--color-primary);
 }
 
-.params {
+.reveal {
   flex: 1 1 100%;
+}
+
+.params {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
   color: var(--color-text);
-}
-
-/* Still editable while Off, so a time can be set before switching it on. */
-.muted {
-  color: var(--color-text-secondary);
-}
-
-.muted .select {
-  opacity: 0.7;
 }
 
 .days {

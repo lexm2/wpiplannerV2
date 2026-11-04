@@ -331,6 +331,44 @@ async function setEarlyClasses(page: Page, time: string): Promise<void> {
   await row.getByRole('combobox').selectOption(time);
 }
 
+test('a ranking row shows its options only while it is not Off', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, ['CS2102']);
+  await openSettings(page);
+  const row = rankingRow(page, 'earlyClasses');
+  await expect(row.getByRole('combobox')).toHaveCount(0);
+
+  await row.getByRole('radio', { name: 'Low' }).check({ force: true });
+  await expect(row.getByRole('combobox')).toHaveCount(1);
+
+  await row.getByRole('radio', { name: 'Off' }).check({ force: true });
+  await expect(row.getByRole('combobox')).toHaveCount(0);
+});
+
+test('the filters in the settings stay folded until opened, then stay open', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, ['CS2102']);
+  await openSettings(page);
+  const toggle = page.locator('#auto-schedule-filters-toggle');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('#available-only-filter')).toHaveCount(0);
+
+  await toggle.click();
+  await page.check('#available-only-filter');
+  await expect(toggle).toContainText('active');
+
+  await page.keyboard.press('Escape');
+  await page.click('#auto-schedule-btn');
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+  await expect(page.locator('#available-only-filter')).toBeChecked();
+});
+
 test('ranking preferences persist across a reload', async ({ page }) => {
   await loadApp(page);
   await selectCourses(page, ['CS2102']);
