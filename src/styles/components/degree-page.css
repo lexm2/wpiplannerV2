@@ -233,11 +233,12 @@
   gap: 0.5rem;
 }
 
-/* Earned, in progress and transfer. The total is the progress bar's own
-   label, so it isn't repeated here. */
+/* Earned, in progress, transfer, scheduled, and requirements satisfied. The
+   total is the progress bar's own label, so it isn't repeated here. Five
+   across while they fit, wrapping to fewer on a narrow column. */
 .degree-credit-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
   gap: 0.75rem;
   margin-top: 1.25rem;
 }
@@ -261,6 +262,13 @@
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* The projection note: where the scheduled courses would land the degree. */
+.degree-plan-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 
 /* ---- Progress bars ---- */
@@ -345,13 +353,6 @@
 }
 .degree-legend-swatch.seg-schedule {
   background: var(--color-primary);
-}
-
-.degree-progress-fill {
-  height: 100%;
-  background: var(--color-primary);
-  border-radius: var(--effect-border-radius);
-  transition: width 0.3s ease;
 }
 
 .degree-progress-label {

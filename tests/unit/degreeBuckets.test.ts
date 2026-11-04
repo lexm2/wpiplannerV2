@@ -3,6 +3,7 @@ import {
   buildBuckets,
   computePlacements,
   computeUnassigned,
+  projectPlan,
   inferBucketDepartments,
   bucketRuleLabel,
   type DegreeBucket,
@@ -371,6 +372,57 @@ describe('computeUnassigned', () => {
     expect(
       computeUnassigned(null, selected(course('CS', '4341')), {}),
     ).toHaveLength(1);
+  });
+});
+
+// --- projectPlan ------------------------------------------------------------
+
+function inYear(c: Course, year: number): Course {
+  return { ...c, id: `${c.departmentAbbr}-${c.number}-${year}` };
+}
+
+describe('projectPlan', () => {
+  it('adds the credits of courses not on the transcript', () => {
+    const rec = record([], [applied('CS 1101'), planned('CS 2102')]);
+    const plan = projectPlan(
+      rec,
+      selected(
+        course('CS', '2102'), // in progress already - Workday counts it
+        course('CS', '3013'),
+        inYear(course('MA', '2071'), 2027),
+      ),
+    );
+    expect(plan).toEqual({ credits: 6, courses: 2 });
+  });
+
+  it('counts a code planned in two years once', () => {
+    const plan = projectPlan(
+      record([]),
+      selected(course('CS', '3013'), inYear(course('CS', '3013'), 2027)),
+    );
+    expect(plan.credits).toBe(3);
+  });
+
+  it('counts a course and its cross-listed twin once', () => {
+    const cs = { ...course('CS', '2022'), crossListedWith: ['MA 2201'] };
+    const ma = { ...course('MA', '2201'), crossListedWith: ['CS 2022'] };
+    const plan = projectPlan(record([]), selected(cs, ma));
+    expect(plan).toEqual({ credits: 3, courses: 1 });
+  });
+
+  it('skips a scheduled twin of a transcript course', () => {
+    const rec = record([], [applied('CS 2022/ MA 2201')]);
+    const re = { ...course('RE', '2022'), crossListedWith: ['CS 2022'] };
+    expect(projectPlan(rec, selected(re)).courses).toBe(0);
+  });
+
+  it('matches cross-listed transcript codes', () => {
+    const rec = record([], [applied('CS 2022/ MA 2201')]);
+    expect(projectPlan(rec, selected(course('MA', '2201'))).courses).toBe(0);
+  });
+
+  it('is empty with nothing planned', () => {
+    expect(projectPlan(null, [])).toEqual({ credits: 0, courses: 0 });
   });
 });
 

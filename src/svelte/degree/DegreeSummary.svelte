@@ -8,6 +8,11 @@
   import { getInlineSVG } from '../../utils/iconPaths';
   import { clickOutside } from '../clickOutside';
   import { scaleFade, slideFade } from '../transitions';
+  import { appState } from '../../core/state/appState.svelte';
+  import {
+    projectPlan,
+    UMBRELLA_CATEGORIES,
+  } from '../../services/degree/degreeBuckets';
 
   let {
     record,
@@ -31,6 +36,67 @@
   const overallPct = $derived(
     required && required > 0
       ? Math.min(100, Math.round((record.credits.earned / required) * 100))
+      : null,
+  );
+
+  // Where the degree lands: the transcript plus the active schedule's courses
+  // Workday does not already list.
+  const plan = $derived(projectPlan(record, appState.selectedCourses));
+  const projected = $derived(
+    record.credits.earned + record.credits.inProgress + plan.credits,
+  );
+  const pctOf = (credits: number): number | null =>
+    required && required > 0
+      ? Math.min(100, Math.round((credits / required) * 100))
+      : null;
+  const projectedPct = $derived(pctOf(projected));
+  // Each step adds to the last: earned, then in progress, then scheduled.
+  const withInProgressPct = $derived(
+    pctOf(record.credits.earned + record.credits.inProgress),
+  );
+  const progressLabel = $derived.by(() => {
+    let label = `${overallPct}% of ${required} credits`;
+    let shown = overallPct ?? 0;
+    if (withInProgressPct !== null && withInProgressPct > shown) {
+      label += ` \u00b7 ${withInProgressPct}% with in progress`;
+      shown = withInProgressPct;
+    }
+    if (projectedPct !== null && projectedPct > shown)
+      label += ` \u00b7 ${projectedPct}% with schedule`;
+    return label;
+  });
+  const stillNeeded = $derived(
+    required ? Math.max(0, Math.round((required - projected) * 100) / 100) : 0,
+  );
+
+  // The bar's three parts, in the cards' colours: completed, in progress, and
+  // scheduled - each clamped to what is left of the bar.
+  const segments = $derived.by(() => {
+    if (!required || required <= 0) return null;
+    const earned = Math.min(record.credits.earned / required, 1);
+    const inProgress = Math.min(
+      record.credits.inProgress / required,
+      1 - earned,
+    );
+    const planned = Math.min(plan.credits / required, 1 - earned - inProgress);
+    return { earned, inProgress, planned };
+  });
+
+  // Requirements met once the placed courses count - the cards' live status -
+  // out of the ones a course can be placed in (not the degree-wide aggregates).
+  const requirements = $derived.by(() => {
+    const listed = degreeState.buckets.filter(
+      b => !UMBRELLA_CATEGORIES.has(b.category),
+    );
+    const met = listed.filter(
+      b => degreeState.progressById.get(b.id)?.status === 'satisfied',
+    ).length;
+    return { met, total: listed.length };
+  });
+
+  const planNote = $derived(
+    plan.courses
+      ? `With ${plan.courses} scheduled course${plan.courses === 1 ? '' : 's'}: ${projectedPct ?? 0}% of ${required} credits, ${stillNeeded} credits still needed.`
       : null,
   );
 
@@ -76,6 +142,63 @@
     }
   }
 </script>
+
+{#snippet bar(extra: string)}
+  <div
+    class="degree-progress-bar {extra}"
+    role="img"
+    aria-label={progressLabel}
+  >
+    <div
+      class="degree-progress-seg seg-earned"
+      style:width="{(segments?.earned ?? 0) * 100}%"
+    ></div>
+    <div
+      class="degree-progress-seg seg-planned"
+      style:width="{(segments?.inProgress ?? 0) * 100}%"
+    ></div>
+    <div
+      class="degree-progress-seg seg-schedule"
+      style:width="{(segments?.planned ?? 0) * 100}%"
+    ></div>
+  </div>
+{/snippet}
+
+{#snippet stats()}
+  <div class="degree-credit-stats">
+    <div class="degree-stat">
+      <span class="degree-stat-value">{record.credits.earned}</span><span
+        class="degree-stat-label">Earned</span
+      >
+    </div>
+    <div class="degree-stat">
+      <span class="degree-stat-value">{record.credits.inProgress}</span><span
+        class="degree-stat-label">In progress</span
+      >
+    </div>
+    <div class="degree-stat">
+      <span class="degree-stat-value">{record.credits.transfer}</span><span
+        class="degree-stat-label">Transfer</span
+      >
+    </div>
+    <div class="degree-stat">
+      <span class="degree-stat-value">{plan.credits}</span><span
+        class="degree-stat-label">Scheduled</span
+      >
+    </div>
+    <div class="degree-stat">
+      <span class="degree-stat-value"
+        >{requirements.met}/{requirements.total}</span
+      ><span class="degree-stat-label">Satisfied</span>
+    </div>
+  </div>
+{/snippet}
+
+{#snippet planDetails()}
+  {#if planNote}
+    <p class="degree-plan-note" id="degree-plan-note">{planNote}</p>
+  {/if}
+{/snippet}
 
 {#if phoneLayout.current}
   <section class="degree-summary degree-summary-compact">
@@ -147,10 +270,8 @@
       </div>
     </div>
 
-    {#if overallPct !== null}
-      <div class="degree-progress-bar degree-summary-bar">
-        <div class="degree-progress-fill" style:width="{overallPct}%"></div>
-      </div>
+    {#if segments}
+      {@render bar('degree-summary-bar')}
     {/if}
 
     {#if parsing}
@@ -166,21 +287,8 @@
         {#if record.startYear}
           <p class="degree-summary-sub">Entered {record.startYear}</p>
         {/if}
-        <div class="degree-credit-stats">
-          <div class="degree-stat">
-            <span class="degree-stat-value">{record.credits.earned}</span><span
-              class="degree-stat-label">Earned</span
-            >
-          </div>
-          <div class="degree-stat">
-            <span class="degree-stat-value">{record.credits.inProgress}</span
-            ><span class="degree-stat-label">In progress</span>
-          </div>
-          <div class="degree-stat">
-            <span class="degree-stat-value">{record.credits.transfer}</span
-            ><span class="degree-stat-label">Transfer</span>
-          </div>
-        </div>
+        {@render stats()}
+        {@render planDetails()}
       </div>
     {/if}
   </section>
@@ -228,33 +336,14 @@
       </p>
     {/if}
 
-    {#if overallPct !== null}
+    {#if segments}
       <div class="degree-progress">
-        <div class="degree-progress-bar">
-          <div class="degree-progress-fill" style:width="{overallPct}%"></div>
-        </div>
-        <span class="degree-progress-label"
-          >{overallPct}% of {required} credits</span
-        >
+        {@render bar('')}
+        <span class="degree-progress-label">{progressLabel}</span>
       </div>
     {/if}
 
-    <div class="degree-credit-stats">
-      <div class="degree-stat">
-        <span class="degree-stat-value">{record.credits.earned}</span><span
-          class="degree-stat-label">Earned</span
-        >
-      </div>
-      <div class="degree-stat">
-        <span class="degree-stat-value">{record.credits.inProgress}</span><span
-          class="degree-stat-label">In progress</span
-        >
-      </div>
-      <div class="degree-stat">
-        <span class="degree-stat-value">{record.credits.transfer}</span><span
-          class="degree-stat-label">Transfer</span
-        >
-      </div>
-    </div>
+    {@render stats()}
+    {@render planDetails()}
   </section>
 {/if}

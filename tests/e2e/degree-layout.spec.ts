@@ -59,11 +59,13 @@ test.describe('at 1280x800', () => {
       'Planned',
       'Schedule',
     ]);
-    // The total is the progress bar's label, not a fourth stat.
+    // The total is the progress bar's label, not another stat.
     await expect(page.locator('.degree-stat-label')).toHaveText([
       'Earned',
       'In progress',
       'Transfer',
+      'Scheduled',
+      'Satisfied',
     ]);
     await expect(page.locator('.degree-rail .course-badge')).toHaveCount(0);
   });

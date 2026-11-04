@@ -2,8 +2,8 @@ import { test, expect, type Page } from './fixtures';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Planning ahead from the Degree page: browsing the planner for one
- * requirement.
+ * Planning ahead from the Degree page: the projection of the active schedule's
+ * courses, and browsing the planner for one requirement.
  */
 
 const fixture = fileURLToPath(
@@ -42,7 +42,26 @@ async function setup(page: Page): Promise<void> {
   await warning.waitFor({ state: 'detached' });
 }
 
+const scheduledStat = (page: Page) =>
+  page
+    .locator('.degree-stat')
+    .filter({ hasText: 'Scheduled' })
+    .locator('.degree-stat-value');
+
 test.use({ viewport: { width: 1280, height: 800 } });
+
+test("the active schedule's courses project onto the summary", async ({
+  page,
+}) => {
+  await setup(page);
+  expect(Number(await scheduledStat(page).textContent())).toBeGreaterThan(0);
+  await expect(page.locator('#degree-plan-note')).toContainText(
+    'With 1 scheduled course',
+  );
+  await expect(
+    page.locator('.degree-summary .degree-progress-label'),
+  ).toContainText('with schedule');
+});
 
 test("a requirement's browse button filters the planner to it and says so", async ({
   page,

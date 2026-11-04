@@ -20,7 +20,7 @@ import type {
 import { importedBucketId } from '../../types/degree';
 import type { Course, Department } from '../../types/types';
 import type { SelectedCourse } from '../../types/schedule';
-import { academicYearForPeriod } from './catalogLookup';
+import { academicYearForPeriod, candidateCodes } from './catalogLookup';
 
 /**
  * Degree-wide aggregates: they accumulate every course rather than naming
@@ -263,6 +263,50 @@ export function computeUnassigned(
       return !transcriptCodes.some(tc => appliedCodeMatches(tc, code));
     })
     .map(sc => scheduleTile(sc.course, ''));
+}
+
+/** What the active schedule adds to the degree, on top of the transcript. */
+export interface PlanProjection {
+  /** Credits from schedule courses not already on the transcript. */
+  credits: number;
+  courses: number;
+}
+
+/**
+ * Credits the scheduled courses would add. A course already on the transcript
+ * (completed or in progress) is skipped - Workday counts it already - and so is
+ * a cross-listed twin of one already counted or on the transcript: the same
+ * class under another code is one class. A course's codes are its own plus its
+ * cross-listings; if any is already seen, the course is skipped, otherwise all
+ * of them are marked seen.
+ */
+export function projectPlan(
+  record: StudentRecord | null,
+  selectedCourses: SelectedCourse[],
+): PlanProjection {
+  const transcriptCodes = record?.courses.map(c => c.code) ?? [];
+  const seen = new Set<string>();
+  let credits = 0;
+  let courses = 0;
+  for (const sc of selectedCourses) {
+    const codes = [
+      codeOf(sc.course),
+      ...sc.course.crossListedWith.flatMap(listed =>
+        candidateCodes(listed).map(c => `${c.dept} ${c.number}`),
+      ),
+    ];
+    if (codes.some(code => seen.has(code))) continue;
+    if (
+      codes.some(code =>
+        transcriptCodes.some(tc => appliedCodeMatches(tc, code)),
+      )
+    )
+      continue;
+    for (const code of codes) seen.add(code);
+    credits += sc.course.minCredits;
+    courses++;
+  }
+  return { credits: Math.round(credits * 100) / 100, courses };
 }
 
 /**
