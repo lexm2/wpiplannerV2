@@ -1,21 +1,11 @@
 import { appState } from '../../core/state/appState.svelte';
 import { AcademicTerm, EventType } from '../../types/schedule';
-import type { WeeklyTimeSlot } from '../../types/schedule';
+import type { LocalCalendarEvent, WeeklyTimeSlot } from '../../types/schedule';
 import type { CalendarEventProvider } from './AutoScheduleOrchestrator';
 
-/**
- * Whether a blocked slot came from a calendar event rather than a section.
- * Event slots are keyed `${event.id}-${term}-${day}`, and local event ids
- * start `local-` (older ones used `calendar-` or a UUID); section slots
- * start with the CRN.
- */
-export function isCalendarSlot(slot: WeeklyTimeSlot): boolean {
-  const { id } = slot;
-  return (
-    id.startsWith('local-') ||
-    id.includes('calendar-') ||
-    /^[0-9a-f]{8}-[0-9a-f]{4}-/.test(id)
-  );
+/** Only visible recurring events block time; one-time events block nothing. */
+function blocksTime(event: LocalCalendarEvent): boolean {
+  return event.visible && event.eventType !== EventType.ONE_TIME;
 }
 
 /**
@@ -31,11 +21,7 @@ export const calendarEventProvider: CalendarEventProvider = {
     if (!localEvents) return [];
 
     const blockedTimes: WeeklyTimeSlot[] = [];
-    const visibleEvents = localEvents.filter(e => e.visible);
-
-    for (const event of visibleEvents) {
-      if (event.eventType === EventType.ONE_TIME) continue;
-
+    for (const event of localEvents.filter(blocksTime)) {
       const days = event.days || [];
       const terms = event.terms || [AcademicTerm.ALL];
 
@@ -57,7 +43,7 @@ export const calendarEventProvider: CalendarEventProvider = {
   },
 
   getLocalEventCount(): number {
-    return (appState.activeSchedule?.localEvents || []).filter(e => e.visible)
+    return (appState.activeSchedule?.localEvents || []).filter(blocksTime)
       .length;
   },
 };

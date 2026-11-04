@@ -338,10 +338,31 @@
 }
 
 .schedule-main {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--color-background);
   overflow: hidden;
+  padding: 1rem;
+}
+
+/* Shown while a file is dragged over the grids; the drop itself is handled by
+   the icsDropTarget action on .schedule-main. */
+.ics-drop-overlay {
+  position: absolute;
+  inset: 0.5rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  border: 3px dashed var(--color-primary);
+  border-radius: var(--effect-border-radius);
+  background: color-mix(in srgb, var(--color-background) 85%, transparent);
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
   padding: 1rem;
 }
 
@@ -677,7 +698,24 @@
   font-weight: 500;
   font-size: 0.7rem;
   overflow: hidden;
+  container-type: inline-size;
   /* height and top set inline based on actual event duration */
+}
+
+/* One line cut with an ellipsis, so a long title never spills out of its
+   block; in a block too narrow for even that (many overlapping events) the
+   label is dropped and the tooltip carries it. */
+.external-event-block .event-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container (max-width: 17px) {
+  .external-event-block .event-label {
+    display: none;
+  }
 }
 
 .external-event-block:hover {

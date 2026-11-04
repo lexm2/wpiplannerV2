@@ -211,3 +211,21 @@
   padding-top: 0.25rem;
   user-select: none;
 }
+
+.type-hint {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Delete sits at the start of the footer, away from Cancel and Save. */
+.footer-start {
+  margin-right: auto;
+}
+
+@media (max-width: 600px) {
+  .footer-start {
+    margin-right: 0;
+  }
+}

@@ -21,7 +21,12 @@ export interface CalendarEventProvider {
 export type GenerateOutcome =
   | { status: 'generated' }
   | { status: 'nothing-to-schedule' }
-  | { status: 'no-candidates'; courses: Course[] }
+  | {
+      status: 'no-candidates';
+      courses: Course[];
+      /** The ones that would have a usable section without the calendar events. */
+      blockedByEvents?: Course[];
+    }
   | { status: 'no-schedules' };
 
 export class AutoScheduleOrchestrator {
@@ -87,16 +92,38 @@ export class AutoScheduleOrchestrator {
     selectedCourses: SelectedCourse[],
   ): Promise<GenerateOutcome> {
     try {
-      const scheduler = new SmartScheduler(this.filterService);
-      const built = scheduler.buildCandidateData(
-        selectedCourses,
-        normalizeRankingPreferences(appState.preferences.autoSchedule),
-        rateMyProfessorService,
+      // Events are read now, not when a filter was set: unless the user
+      // opted out, classes stay clear of whatever is on the calendar today.
+      const calendarSlots =
+        appState.preferences.avoidCalendarEvents === false
+          ? []
+          : this.getAllCalendarBlockedTimes();
+      const preferences = normalizeRankingPreferences(
+        appState.preferences.autoSchedule,
       );
+      const build = (slots: typeof calendarSlots) =>
+        new SmartScheduler(this.filterService, slots).buildCandidateData(
+          selectedCourses,
+          preferences,
+          rateMyProfessorService,
+        );
+      const built = build(calendarSlots);
 
       if (!built.ok) {
         this.resetSchedules();
-        return { status: 'no-candidates', courses: built.unschedulable };
+        // Say so when it's the calendar events that leave a course nothing.
+        let blockedByEvents: Course[] = [];
+        if (calendarSlots.length > 0) {
+          const without = build([]);
+          blockedByEvents = built.unschedulable.filter(
+            c => without.ok || !without.unschedulable.includes(c),
+          );
+        }
+        return {
+          status: 'no-candidates',
+          courses: built.unschedulable,
+          blockedByEvents,
+        };
       }
       // Every course was left locked in the intro.
       if (built.input.courses.length === 0) {

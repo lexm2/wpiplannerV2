@@ -36,7 +36,7 @@ class AppState {
    * {@link ProfileStateManager} reassigns this (a fresh object) whenever the
    * active schedule is switched, deleted, or has its metadata updated;
    * consumers `watch` it to refresh and read `.source` to branch on origin
-   * (e.g. 'calendar-event-exclusion'). A reassigned object - rather than a
+   * (e.g. 'calendar-event'). A reassigned object - rather than a
    * counter - fires on exactly these events without the spurious fires that
    * watching `activeSchedule` identity would bring (it changes on every course
    * add).

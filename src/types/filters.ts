@@ -138,6 +138,12 @@ export const ConflictCriteriaSchema = z.object({
    * comparison, where F only conflicts with F.
    */
   semesterSpansQuarters: z.boolean().optional(),
+  /**
+   * Also hide sections that clash with the active schedule's calendar events.
+   * The events are read live when the filter runs, never copied here, so
+   * adding or deleting one takes effect at once.
+   */
+  avoidCalendarEvents: z.boolean().optional(),
   selectedCourses: z.array(z.custom<SelectedCourse>()).optional(),
 });
 export type ConflictCriteria = z.output<typeof ConflictCriteriaSchema>;

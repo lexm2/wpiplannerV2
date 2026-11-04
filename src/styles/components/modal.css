@@ -724,10 +724,51 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   align-self: flex-end;
 }
 
+/* Shown while a calendar file is dragged over a modal that accepts one. */
+.modal-dialog {
+  position: relative;
+}
+
+.modal-drop-overlay {
+  position: absolute;
+  inset: 0.5rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  border: 3px dashed var(--color-primary);
+  border-radius: var(--effect-border-radius);
+  /* Opaque: rows showing through crowd the label, worst in High Contrast. */
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 1.15rem;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  padding: 1rem;
+}
+
 /* Add/Edit Event: the form's day pills, term toggles and start/end time row all
    crowd at the 500px default, so this one runs about twice as wide. */
 .modal-dialog.local-event-dialog {
   max-width: 1000px;
+}
+
+/* Calendar Events: the event list, comfortable a little wider than 500px. */
+.modal-dialog.calendar-events-dialog {
+  max-width: 640px;
+}
+
+/* Import Calendar: a list of event rows, comfortable a little wider than the
+   500px default. */
+.modal-dialog.ics-import-dialog {
+  max-width: 640px;
+}
+
+.modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .filter-modal-body {

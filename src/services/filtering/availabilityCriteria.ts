@@ -1,11 +1,9 @@
 import type { FilterService } from './FilterService';
 import type { CourseSelectionService } from '../selection/CourseSelectionService';
-import type { AutoScheduleOrchestrator } from '../scheduling/AutoScheduleOrchestrator';
 import type {
   AvailabilityFilterCriteria,
   ConflictCriteria,
 } from '../../types/filters';
-import { isCalendarSlot } from '../scheduling/calendarEventProvider';
 
 /**
  * The availability and period-conflict filters are edited from two sections of
@@ -32,7 +30,7 @@ export function readAvailability(
     availableOnly: avail?.availableOnly ?? false,
     minAvailable: avail?.minAvailable,
     avoidConflicts: conflict?.avoidConflicts ?? false,
-    hasCalendarEvents: (conflict?.blockedSlots ?? []).some(isCalendarSlot),
+    hasCalendarEvents: conflict?.avoidCalendarEvents ?? false,
     // Unset means on: F conflicts with A and B, S with C and D.
     semesterSpans: conflict?.semesterSpansQuarters ?? true,
   };
@@ -62,56 +60,52 @@ export function setAvoidConflicts(
     filterService.getCriteria<ConflictCriteria>('periodConflict');
   const blockedSlots = conflict?.blockedSlots ?? [];
   const semesterSpansQuarters = conflict?.semesterSpansQuarters ?? true;
+  const avoidCalendarEvents = conflict?.avoidCalendarEvents ?? false;
   if (checked) {
     filterService.addFilter('periodConflict', {
       avoidConflicts: true,
       selectedCourses: courseSelectionService.getSelectedCourses(),
-      blockedSlots, // preserve existing (e.g. calendar) slots
+      blockedSlots,
       semesterSpansQuarters,
+      avoidCalendarEvents,
     });
-  } else if (blockedSlots.length > 0) {
+  } else if (blockedSlots.length > 0 || avoidCalendarEvents) {
     filterService.addFilter('periodConflict', {
       avoidConflicts: false,
       blockedSlots,
       semesterSpansQuarters,
+      avoidCalendarEvents,
     });
   } else {
     filterService.removeFilter('periodConflict');
   }
 }
 
+/**
+ * Turns hiding sections that clash with calendar events on or off. Only the
+ * flag is stored: ConflictFilter reads the events when it runs, so a copy of
+ * their slots can never go stale.
+ */
 export function setCalendarConflicts(
   filterService: FilterService,
   courseSelectionService: CourseSelectionService,
-  autoScheduleOrchestrator: AutoScheduleOrchestrator,
   checked: boolean,
 ): void {
   const conflict =
     filterService.getCriteria<ConflictCriteria>('periodConflict');
   const avoidConflicts = conflict?.avoidConflicts ?? false;
+  const blockedSlots = conflict?.blockedSlots ?? [];
   const semesterSpansQuarters = conflict?.semesterSpansQuarters ?? true;
-  const selectedCourses =
-    conflict?.selectedCourses ?? courseSelectionService.getSelectedCourses();
-  const nonCalendarSlots = (conflict?.blockedSlots ?? []).filter(
-    s => !isCalendarSlot(s),
-  );
 
-  if (checked) {
+  if (checked || avoidConflicts || blockedSlots.length > 0) {
     filterService.addFilter('periodConflict', {
       avoidConflicts,
-      selectedCourses,
-      blockedSlots: [
-        ...nonCalendarSlots,
-        ...autoScheduleOrchestrator.getAllCalendarBlockedTimes(),
-      ],
+      selectedCourses:
+        conflict?.selectedCourses ??
+        courseSelectionService.getSelectedCourses(),
+      blockedSlots,
       semesterSpansQuarters,
-    });
-  } else if (nonCalendarSlots.length > 0 || avoidConflicts) {
-    filterService.addFilter('periodConflict', {
-      avoidConflicts,
-      selectedCourses,
-      blockedSlots: nonCalendarSlots,
-      semesterSpansQuarters,
+      avoidCalendarEvents: checked,
     });
   } else {
     filterService.removeFilter('periodConflict');

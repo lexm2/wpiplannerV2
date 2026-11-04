@@ -1,4 +1,4 @@
-import type { SelectedCourse } from '../../types/schedule';
+import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
 import type { Course, SectionsByKind } from '../../types/types';
 import {
   AutoScheduler,
@@ -40,7 +40,14 @@ export type CandidateData =
   { ok: true; input: SchedulerInput } | { ok: false; unschedulable: Course[] };
 
 export class SmartScheduler {
-  constructor(private filterService: FilterService) {}
+  /**
+   * `calendarSlots` are the calendar events' weekly slots to keep clear of;
+   * the caller decides whether the user wants that.
+   */
+  constructor(
+    private filterService: FilterService,
+    private calendarSlots: WeeklyTimeSlot[] = [],
+  ) {}
 
   /**
    * `ratings` is only consulted when the preferences rank by instructor
@@ -64,6 +71,7 @@ export class SmartScheduler {
     // current sections, so those block the courses being scheduled.
     const blockedMasks = autoScheduler.getBlockedMasksByTerm(
       selectedCourses.filter(sc => sc.allowedTerms?.length === 0),
+      this.calendarSlots,
     );
 
     const candidatesPerCourse: MaskedCandidate[][] = [];

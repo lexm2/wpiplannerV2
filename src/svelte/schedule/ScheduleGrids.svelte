@@ -27,12 +27,12 @@
     colorService,
     conflictEngine,
     onOpenSectionInfo,
-    onOpenDeleteEvent,
+    onOpenEvent,
   }: {
     colorService: CourseColorService;
     conflictEngine: BitMaskEngine | null;
     onOpenSectionInfo: (courseId: string, sectionNumber: string) => void;
-    onOpenDeleteEvent: (eventId: string) => void;
+    onOpenEvent: (eventId: string) => void;
   } = $props();
 
   // Selected courses with the committed wizard preview overlaid. Shape repair
@@ -116,7 +116,7 @@
       hidden={termFocus.term !== null && termFocus.term !== term}
       onToggleFocus={() => toggleFocus(term)}
       {onOpenSectionInfo}
-      {onOpenDeleteEvent}
+      {onOpenEvent}
     />
   {/each}
   {#if appState.scheduleGenerating}

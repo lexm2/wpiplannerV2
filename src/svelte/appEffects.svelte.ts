@@ -38,7 +38,7 @@ export function installAppEffects(services: ServiceContainer): void {
         activationInit = true;
         return;
       }
-      if (appState.activation.source === 'calendar-event-exclusion') return;
+      if (appState.activation.source === 'calendar-event') return;
 
       const activeSchedule =
         services.scheduleManagementService.getActiveSchedule();

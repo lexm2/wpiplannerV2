@@ -23,6 +23,20 @@ interface PreparedSlot {
   endDate?: string;
 }
 
+/** Where the filter reads the active schedule's calendar-event slots from. */
+export type CalendarSlotSource = () => WeeklyTimeSlot[];
+
+let calendarSlotSource: CalendarSlotSource | null = null;
+
+/**
+ * Injects the live calendar-event slots for criteria with `avoidCalendarEvents`.
+ * Left unset on the server, where there is no calendar: the flag then adds
+ * nothing.
+ */
+export function setCalendarSlotSource(source: CalendarSlotSource | null): void {
+  calendarSlotSource = source;
+}
+
 export class ConflictFilter implements SectionBasedFilter {
   static readonly id = 'periodConflict';
   static readonly criteria = ConflictCriteriaSchema;
@@ -46,7 +60,7 @@ export class ConflictFilter implements SectionBasedFilter {
     sections: FilterableSection[],
     criteria: ConflictCriteria,
   ): FilterableSection[] {
-    if (!criteria.avoidConflicts) {
+    if (!criteria.avoidConflicts && !criteria.avoidCalendarEvents) {
       return sections;
     }
 
@@ -132,14 +146,20 @@ export class ConflictFilter implements SectionBasedFilter {
   private getBlockedSlots(criteria: ConflictCriteria): WeeklyTimeSlot[] {
     const slots: WeeklyTimeSlot[] = [];
 
-    if (criteria.blockedSlots) {
-      slots.push(...criteria.blockedSlots);
+    if (criteria.avoidConflicts) {
+      if (criteria.blockedSlots) {
+        slots.push(...criteria.blockedSlots);
+      }
+
+      for (const sc of criteria.selectedCourses ?? []) {
+        for (const section of getSelectedSections(sc)) {
+          slots.push(...sectionToWeeklySlots(section));
+        }
+      }
     }
 
-    for (const sc of criteria.selectedCourses ?? []) {
-      for (const section of getSelectedSections(sc)) {
-        slots.push(...sectionToWeeklySlots(section));
-      }
+    if (criteria.avoidCalendarEvents && calendarSlotSource) {
+      slots.push(...calendarSlotSource());
     }
 
     return slots;
@@ -148,13 +168,19 @@ export class ConflictFilter implements SectionBasedFilter {
   getDisplayValue(criteria: unknown): string {
     if (!criteria || typeof criteria !== 'object') return 'Conflicts allowed';
     const c = criteria as ConflictCriteria;
+    // The calendar slots are not counted: they change without this being
+    // rebuilt, and the display value is stored.
     if (c.avoidConflicts) {
-      const blockedSlots = this.getBlockedSlots(c);
+      const blockedSlots = this.getBlockedSlots({
+        ...c,
+        avoidCalendarEvents: false,
+      });
       if (blockedSlots.length > 0) {
         return `Avoiding conflicts (${blockedSlots.length} blocked slots)`;
       }
       return 'Avoiding conflicts';
     }
+    if (c.avoidCalendarEvents) return 'Avoiding calendar events';
     return 'Conflicts allowed';
   }
 

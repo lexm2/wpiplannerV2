@@ -17,6 +17,9 @@
   import { modalState } from './modals/modalState.svelte';
   import { componentWizardService } from '../services/scheduling/componentWizardService';
   import { localEventService } from '../services/scheduling/localEventService';
+  import { icsDropTarget } from './schedule/icsDropTarget';
+  import { fade } from 'svelte/transition';
+  import { dur } from './transitions';
   import { sectionInfoService } from '../services/scheduling/sectionInfoService';
   import { autoScheduleService } from '../services/scheduling/autoScheduleService';
   import { timestampState } from './timestampState.svelte';
@@ -65,6 +68,8 @@
   // uiState.currentPage. {#if} is avoided so a page's reactive child components
   // are never torn down on a page switch.
   const currentPage = $derived(uiState.currentPage);
+  // A file drag is over the schedule grid area.
+  let icsDropActive = $state(false);
 
   const scheduleName = $derived(appState.activeSchedule?.name ?? 'Schedule');
 
@@ -109,6 +114,8 @@
 
   function handleKeydown(e: KeyboardEvent): void {
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    // Undo would change the schedule hidden behind the modal.
+    if (uiState.openModals.length > 0) return;
     // Leave text fields their own native undo.
     const target = e.target as Element | null;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
@@ -301,7 +308,7 @@
             class="calendar-events-header-slot"
           >
             <CalendarEventsButton
-              onClick={() => localEventService.openAddModal()}
+              onClick={() => localEventService.openManager()}
             />
           </div>
           <ScheduleFilterButton
@@ -335,14 +342,25 @@
       </div>
     </SidePanel>
 
-    <main class="schedule-main">
+    <main
+      class="schedule-main"
+      use:icsDropTarget={{
+        onActiveChange: active => (icsDropActive = active),
+        onFile: file => void localEventService.importFile(file),
+      }}
+    >
+      {#if icsDropActive}
+        <div class="ics-drop-overlay" transition:fade={{ duration: dur(150) }}>
+          <span>Drop to import calendar events</span>
+        </div>
+      {/if}
       <ScheduleGrids
         colorService={services.colorService}
         conflictEngine={services.conflictDetector}
         onOpenSectionInfo={(courseId: string, sectionNumber: string) =>
           sectionInfoService.show(courseId, sectionNumber)}
-        onOpenDeleteEvent={(eventId: string) =>
-          localEventService.openDeleteModal(eventId)}
+        onOpenEvent={(eventId: string) =>
+          localEventService.openEditModal(eventId)}
       />
     </main>
   </div>

@@ -59,7 +59,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-utils': ['lz-string', 'rrule', 'zod'],
+          'vendor-utils': ['lz-string', 'zod'],
           'worker-storage': ['src/workers/storage.worker.ts'],
         },
       },

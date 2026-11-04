@@ -4,6 +4,10 @@
 
 ### Added
 - Schedule Preferences in Auto-Schedule settings. Set how much you care about early classes, late classes, time between classes, a lunch break, fewer days with class, keeping days free, balanced terms, open seats and professor ratings. They decide which schedules come first and never rule one out
+- Import calendar events from an .ics file (Google, Outlook or Apple Calendar). Events that repeat weekly on the same day and time for at least 30% of a term's weeks are added to every week of those terms. Find it under Calendar Events, or drop the file on the schedule
+- Calendar Events lists your events. Edit them, delete several at once, or add and import more. One-time events show here too
+- Click an event on the schedule to edit or delete it
+- Courses in a calendar you export are marked, so importing that calendar later skips them instead of adding them as events
 
 ### Changed
 - Auto-Schedule picks each course's sections by your preferences instead of only by the least time between classes
@@ -14,9 +18,18 @@
 - The List/Grid view switch is in the gear menu
 - Clear all sections is at the end of the schedule's course list instead of in the sidebar's top bar
 - On the Degree page, Configure buckets, Re-import and Clear record are in the ⋯ menu on the summary card
+- Auto-Schedule keeps classes clear of your calendar events. Turn this off in Auto-Schedule settings, under Filters
+- Classes that overlap a calendar event show as a conflict on the schedule
+- Adding, importing or deleting calendar events can be undone
+- Thursday shows as R in Add Event, like the rest of the planner
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
+
+### Fixed
+- Hiding sections that conflict with calendar events now follows events you add or delete after turning it on
+- The calendar events count leaves out one-time events, which don't block any time
+- Undo and redo shortcuts no longer change the schedule behind an open window
 
 ## [2026-10-10]
 

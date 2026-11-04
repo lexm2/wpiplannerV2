@@ -59,15 +59,17 @@ describe('countAdvancedFilters', () => {
     ).toBe(1);
   });
 
-  it('counts calendar slots and the exact-term overlap separately', () => {
+  it('counts the calendar-event toggle and the exact-term overlap separately', () => {
     const calendar = f('periodConflict', {
       avoidConflicts: false,
-      blockedSlots: [slot('local-1')],
+      blockedSlots: [],
+      avoidCalendarEvents: true,
     });
     expect(countAdvancedFilters([calendar], undefined)).toBe(1);
     const both = f('periodConflict', {
       avoidConflicts: false,
-      blockedSlots: [slot('local-1')],
+      blockedSlots: [],
+      avoidCalendarEvents: true,
       semesterSpansQuarters: false,
     });
     expect(countAdvancedFilters([both], undefined)).toBe(2);

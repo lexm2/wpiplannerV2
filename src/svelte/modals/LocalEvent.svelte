@@ -24,7 +24,7 @@
     { value: DayOfWeek.MONDAY, label: 'Monday', short: 'M' },
     { value: DayOfWeek.TUESDAY, label: 'Tuesday', short: 'T' },
     { value: DayOfWeek.WEDNESDAY, label: 'Wednesday', short: 'W' },
-    { value: DayOfWeek.THURSDAY, label: 'Thursday', short: 'T' },
+    { value: DayOfWeek.THURSDAY, label: 'Thursday', short: 'R' },
     { value: DayOfWeek.FRIDAY, label: 'Friday', short: 'F' },
   ];
   const TERMS = QUARTER_TERMS;
@@ -56,6 +56,7 @@
 
   // Error flags. Each drives the `error` prop on its surrounding Field.
   let titleError = $state(false);
+  let dayError = $state(false);
   let termError = $state(false);
   let dateError = $state(false);
   let endError = $state(false);
@@ -79,17 +80,15 @@
       : '10:00';
     selectedDays = new Set(ev?.days?.length ? ev.days : [DayOfWeek.MONDAY]);
     selectedTerms = new Set(ev?.terms?.length ? ev.terms : TERMS);
-    titleError = termError = dateError = endError = false;
+    titleError = dayError = termError = dateError = endError = false;
   });
 
   function toggleDay(day: DayOfWeek): void {
     const next = new Set(selectedDays);
-    if (next.has(day)) {
-      if (next.size > 1) next.delete(day); // keep at least one
-    } else {
-      next.add(day);
-    }
+    if (next.has(day)) next.delete(day);
+    else next.add(day);
     selectedDays = next;
+    dayError = false;
   }
 
   function toggleTerm(term: string): void {
@@ -105,8 +104,8 @@
     if (titleError) return false;
 
     if (eventType === EventType.RECURRING) {
-      // No dayError check: toggleDay keeps at least one day selected, so the
-      // set can never be empty here.
+      dayError = selectedDays.size === 0;
+      if (dayError) return false;
       termError = selectedTerms.size === 0;
       if (termError) return false;
     } else {
@@ -233,10 +232,20 @@
               bind:value={date}
               oninput={() => (dateError = false)}
             />
+            <p class={styles['type-hint']}>
+              One-time events aren't drawn on the weekly grids, but they are
+              included when you export your schedule to a calendar.
+            </p>
           </div>
         {:else}
           <div class={styles['recurring-fields']}>
-            <Field group required label="Days" controlId="event-days">
+            <Field
+              group
+              required
+              label="Days"
+              controlId="event-days"
+              error={dayError ? 'Pick at least one day.' : undefined}
+            >
               <div class={styles['day-selector']}>
                 {#each WEEKDAYS as day (day.value)}
                   <button
@@ -312,6 +321,16 @@
         </Field>
       </div>
       <div class="modal-footer">
+        {#if isEditMode && payload.onDelete}
+          <button
+            type="button"
+            id="delete-event-btn"
+            class="modal-btn btn-danger {styles['footer-start']}"
+            onclick={() => payload.onDelete?.()}
+          >
+            Delete event
+          </button>
+        {/if}
         <button class="modal-btn btn-secondary" onclick={close}>Cancel</button>
         <button class="modal-btn btn-primary" onclick={() => save(close)}>
           {@html getInlineSVG('CHECK', 'btn-icon')}

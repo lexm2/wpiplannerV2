@@ -116,6 +116,7 @@
     {filterService}
     {courseSelectionService}
     {autoScheduleOrchestrator}
+    {mode}
   />
   {#key resetNonce}
     <RmpRatingFilter {filterService} bind:this={rmpFilter} />

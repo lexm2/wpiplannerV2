@@ -4,7 +4,6 @@ import type {
   AvailabilityFilterCriteria,
   ConflictCriteria,
 } from '../../types/filters';
-import { isCalendarSlot } from '../scheduling/calendarEventProvider';
 
 /**
  * How many of the filters tucked into "More filters" differ from their
@@ -33,7 +32,7 @@ export function countAdvancedFilters(
     count++;
 
   const conflict = criteriaOf<ConflictCriteria>('periodConflict');
-  if (conflict?.blockedSlots.some(isCalendarSlot)) count++;
+  if (conflict?.avoidCalendarEvents) count++;
   if (conflict?.semesterSpansQuarters === false) count++;
 
   return count;

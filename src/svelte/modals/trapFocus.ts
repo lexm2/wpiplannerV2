@@ -109,7 +109,17 @@ export function trapFocus(node: HTMLElement) {
       // that opened as this one closed already has it.
       const active = document.activeElement;
       if (active && active !== document.body && !node.contains(active)) return;
-      candidates.find(el => el.isConnected)?.focus?.({ preventScroll: true });
+      // With another dialog still open, focus belongs inside the topmost one:
+      // a candidate behind it (say the button that opened it, when the row
+      // that opened this dialog was just deleted) would let Tab walk the page.
+      const top = [...restoreTargets.keys()].pop();
+      const target = top
+        ? (candidates.find(el => el.isConnected && top.contains(el)) ??
+          focusableWithin(top)[0] ??
+          top)
+        : candidates.find(el => el.isConnected);
+      if (target === top && top) top.tabIndex = -1;
+      target?.focus?.({ preventScroll: true });
     },
   };
 }

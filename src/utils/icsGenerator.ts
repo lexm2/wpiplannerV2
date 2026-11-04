@@ -9,6 +9,12 @@ import type { DateRange } from '../types/common';
 import { TermBoundsService } from './termBounds';
 import { getSelectedSections } from './courseUtils';
 import { parseLocalDate } from './localDate';
+import { timezoneOffsetMs } from './timezone';
+import {
+  PLANNER_KIND_COURSE,
+  PLANNER_KIND_PROPERTY,
+  PLANNER_NOTE,
+} from './plannerExportMarker';
 
 type Quarter = 'A' | 'B' | 'C' | 'D';
 
@@ -26,31 +32,6 @@ const TERM_SPANS: Record<string, [Quarter, Quarter]> = {
   S: ['C', 'D'],
   ALL: ['A', 'D'],
 };
-
-/** Milliseconds `timezone`'s wall clock runs ahead of UTC at `utcMs`. */
-function timezoneOffsetMs(utcMs: number, timezone: string): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    hourCycle: 'h23',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(new Date(utcMs));
-  const get = (type: Intl.DateTimeFormatPartTypes): number =>
-    Number(parts.find(p => p.type === type)?.value);
-  const wallAsUtc = Date.UTC(
-    get('year'),
-    get('month') - 1,
-    get('day'),
-    get('hour'),
-    get('minute'),
-    get('second'),
-  );
-  return wallAsUtc - utcMs;
-}
 
 /**
  * The last second of `day` in `timezone`, formatted as an RRULE UNTIL in UTC.
@@ -306,8 +287,10 @@ export class ICSGenerator {
             period.type.charAt(0).toUpperCase() + period.type.slice(1);
           const summary = `${periodTypePrefix}: ${courseId} ${selectedCourse.course.name}`;
 
-          let description: string | undefined;
-          if (options.includeDescription !== false) {
+          let description: string;
+          if (options.includeDescription === false) {
+            description = PLANNER_NOTE;
+          } else {
             const descParts: string[] = [];
 
             if (options.includeProfessor !== false && period.professor) {
@@ -322,6 +305,8 @@ export class ICSGenerator {
               descParts.push(selectedCourse.course.description);
             }
 
+            descParts.push('');
+            descParts.push(PLANNER_NOTE);
             description = descParts.join('\n');
           }
 
@@ -340,6 +325,7 @@ export class ICSGenerator {
             location: location,
             timezone: timezone,
             repeating: this.weeklyRule(period.days, termDates.end, timezone),
+            x: [[PLANNER_KIND_PROPERTY, PLANNER_KIND_COURSE]],
           });
         }
       }

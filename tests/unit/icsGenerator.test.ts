@@ -225,6 +225,39 @@ describe('ICSGenerator.findFirstMeetingDate', () => {
   });
 });
 
+describe('planner export markers', () => {
+  const unfold = (ics: string) => ics.replace(/\r\n[ \t]/g, '');
+
+  it.each([true, false])(
+    'marks a course event (includeDescription %s)',
+    includeDescription => {
+      const result = ICSGenerator.generateICS(
+        schedule([course(section(AcademicTerm.A, [period([M])]), 2026)]),
+        { includeDescription },
+      );
+      const ics = unfold(result.data!);
+      expect(lines(ics, 'X-WPIPLANNER-KIND')).toEqual([
+        'X-WPIPLANNER-KIND:course',
+      ]);
+      const [desc] = lines(ics, 'DESCRIPTION');
+      expect(desc.endsWith('Added by WPI Course Planner')).toBe(true);
+      if (!includeDescription) {
+        expect(desc).toBe('DESCRIPTION:Added by WPI Course Planner');
+      } else {
+        expect(desc).toContain('\\n\\nAdded by');
+      }
+    },
+  );
+
+  it('leaves local events unmarked', () => {
+    const ics = unfold(
+      exportICS(schedule([], [recurring([AcademicTerm.A], [M])], 2026)),
+    );
+    expect(lines(ics, 'X-WPIPLANNER-KIND')).toEqual([]);
+    expect(ics).not.toContain('Added by WPI Course Planner');
+  });
+});
+
 describe('ICSGenerator.generateICS', () => {
   it('starts an MWF class on the first Friday when term starts Thursday', () => {
     const ics = exportICS(

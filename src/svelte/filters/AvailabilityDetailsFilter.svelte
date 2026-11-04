@@ -11,21 +11,35 @@
     setSemesterSpans,
     writeAvailability,
   } from '../../services/filtering/availabilityCriteria';
+  import { appState } from '../../core/state/appState.svelte';
+  import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 
   let {
     filterService,
     courseSelectionService,
     autoScheduleOrchestrator,
+    mode,
   }: {
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
+    mode: 'filter' | 'auto-schedule';
   } = $props();
 
   const state = $derived(readAvailability(filterService));
+  const isAuto = $derived(mode === 'auto-schedule');
+  // Auto-Schedule's own setting; unset means on.
+  const keepClearOfEvents = $derived(
+    appState.preferences.avoidCalendarEvents !== false,
+  );
 
   const calendarEventCount = $derived(
     autoScheduleOrchestrator?.getLocalEventCount() ?? 0,
+  );
+  // A course-list toggle left on stays visible with no events, so it can be
+  // turned off: otherwise it hides sections again the moment an event exists.
+  const showCalendarToggle = $derived(
+    calendarEventCount > 0 || (!isAuto && state.hasCalendarEvents),
   );
   const calendarCountText = $derived(
     calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`,
@@ -41,18 +55,24 @@
 </script>
 
 <FilterSection title="Availability details">
-  {#if calendarEventCount > 0}
-    <FilterToggle
-      label={`Hide sections that conflict with calendar events (${calendarCountText})`}
-      checked={state.hasCalendarEvents}
-      onchange={checked =>
-        setCalendarConflicts(
-          filterService,
-          courseSelectionService,
-          autoScheduleOrchestrator,
-          checked,
-        )}
-    />
+  {#if showCalendarToggle}
+    {#if isAuto}
+      <FilterToggle
+        id="keep-clear-of-events"
+        label={`Keep classes clear of my calendar events (${calendarCountText})`}
+        checked={keepClearOfEvents}
+        onchange={checked =>
+          autoScheduleService.setAvoidCalendarEvents(checked)}
+      />
+    {:else}
+      <FilterToggle
+        id="hide-calendar-conflicts-filter"
+        label={`Hide sections that conflict with calendar events (${calendarCountText})`}
+        checked={state.hasCalendarEvents}
+        onchange={checked =>
+          setCalendarConflicts(filterService, courseSelectionService, checked)}
+      />
+    {/if}
   {/if}
 
   {#if state.avoidConflicts || state.hasCalendarEvents}

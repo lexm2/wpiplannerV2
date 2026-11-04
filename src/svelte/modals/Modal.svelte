@@ -2,7 +2,9 @@
   import type { Snippet } from 'svelte';
   import { trapFocus } from './trapFocus';
   import { uiState } from '../../services/ui/uiState.svelte';
-  import { scrim, riseFade } from '../transitions';
+  import { fade } from 'svelte/transition';
+  import { scrim, riseFade, dur } from '../transitions';
+  import { icsDropTarget } from '../schedule/icsDropTarget';
 
   let {
     typeId,
@@ -14,6 +16,7 @@
     hideClose = false,
     extraClass,
     dialogClass,
+    onFileDrop,
     onRequestClose,
     children,
   }: {
@@ -34,6 +37,8 @@
     extraClass?: string;
     /** Extra class(es) on the dialog, e.g. 'schedule-picker-modal-dialog no-transform'. */
     dialogClass?: string;
+    /** Makes the whole modal a drop target for a calendar file. */
+    onFileDrop?: (file: File) => void;
     onRequestClose: () => void;
     children: Snippet<[() => void]>;
   } = $props();
@@ -66,6 +71,8 @@
   // Escape is bound on the window, so every stacked dialog sees the same
   // event. Only the topmost closes, and not when something inside it already
   // used the key (preventDefault), such as cancelling an edit.
+  let fileOver = $state(false);
+
   const isTop = $derived(uiState.openModals.at(-1) === typeId);
 
   function onKeydown(event: KeyboardEvent): void {
@@ -87,6 +94,9 @@
   data-modal-type={typeId}
   transition:scrim|global
   onclick={backdropClick}
+  use:icsDropTarget={onFileDrop
+    ? { onActiveChange: active => (fileOver = active), onFile: onFileDrop }
+    : undefined}
 >
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_interactive_supports_focus (dialog onclick only stops backdrop propagation) -->
   <div
@@ -98,6 +108,11 @@
     onclick={stop}
     use:trapFocus
   >
+    {#if fileOver}
+      <div class="modal-drop-overlay" transition:fade={{ duration: dur(150) }}>
+        <span>Drop to import calendar events</span>
+      </div>
+    {/if}
     <div class="modal-content">
       {#if header}
         {@render header(close)}

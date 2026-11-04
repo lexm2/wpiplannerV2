@@ -12,6 +12,7 @@ import {
 } from '../../types/schedule';
 import { getComputedTerm, getDisplayTerms } from '../../utils/typeGuards';
 import { getSelectedSections, sectionsOf } from '../../utils/courseUtils';
+import { TimeUtils } from '../../utils/timeUtils';
 import { gridRangeOf, type GridRange } from '../../utils/gridRange';
 
 /**
@@ -50,6 +51,10 @@ export interface GridBlock {
   sectionNumber?: string;
   eventId?: string;
   title?: string;
+  /** Event blocks: the time range as shown to the user, e.g. "9:00-11:00 AM". */
+  timeRange?: string;
+  /** Event blocks: the event's description (imported events keep the location here). */
+  description?: string;
   conflictInfo?: string;
 }
 
@@ -274,6 +279,8 @@ export function buildTermBlocks(
     block: GridBlock;
   }[] = [];
 
+  const eventBlocks: GridBlock[] = [];
+
   // Solid section blocks, tracked per-day for conflict detection.
   type Solid = { crn: number; startMin: number; endMin: number; label: string };
   const solidByDay = new Map<number, Solid[]>();
@@ -314,6 +321,40 @@ export function buildTermBlocks(
     }
   }
 
+  // Gray calendar-event blocks (packed side-by-side with classes).
+  const eventsByDay = new Map<number, Solid[]>();
+  for (const ev of visibleTermEvents(events, term)) {
+    const startMin = ev.startTime.hours * 60 + ev.startTime.minutes;
+    const endMin = ev.endTime.hours * 60 + ev.endTime.minutes;
+    if (startMin >= endMin) continue;
+    const title = ev.title || 'Untitled Event';
+    WEEKDAYS.forEach((day, dayIndex) => {
+      if (!ev.days?.includes(day)) return;
+      const block: GridBlock = {
+        key: `ev-${ev.id}-${dayIndex}`,
+        kind: 'event',
+        label: title,
+        title,
+        // An empty displayTime makes TimeUtils format the hours itself.
+        timeRange: TimeUtils.formatTimeRange(
+          { ...ev.startTime, displayTime: '' },
+          { ...ev.endTime, displayTime: '' },
+        ),
+        description: ev.description || undefined,
+        eventId: ev.id,
+        startMin,
+        endMin,
+        left: '',
+        width: '',
+      };
+      eventBlocks.push(block);
+      pack.push({ dayIndex, startMin, endMin, block });
+      const arr = eventsByDay.get(dayIndex) ?? [];
+      arr.push({ crn: -1, startMin, endMin, label: title });
+      eventsByDay.set(dayIndex, arr);
+    });
+  }
+
   // Conflict overlays: one per conflicting PAIR's overlap region, deduped by
   // region so several clusters on the same day each get their own highlight
   // (a single merged region would wrongly collapse separate clashes).
@@ -342,6 +383,23 @@ export function buildTermBlocks(
         region.labels.add(b.label);
       }
     }
+    // A class over a calendar event clashes with it too.
+    for (const a of daySolids) {
+      for (const ev of eventsByDay.get(dayIndex) ?? []) {
+        const start = Math.max(a.startMin, ev.startMin);
+        const end = Math.min(a.endMin, ev.endMin);
+        if (start >= end) continue;
+        hasConflict = true;
+        const key = `${start}-${end}`;
+        let region = regions.get(key);
+        if (!region) {
+          region = { start, end, labels: new Set() };
+          regions.set(key, region);
+        }
+        region.labels.add(a.label);
+        region.labels.add(ev.label);
+      }
+    }
     for (const [key, region] of regions) {
       // Conflict overlays span the full day column (over both side-by-side
       // blocks) to mark the clashing time band.
@@ -357,29 +415,7 @@ export function buildTermBlocks(
     }
   }
 
-  // Gray calendar-event blocks (packed side-by-side with classes).
-  for (const ev of visibleTermEvents(events, term)) {
-    const startMin = ev.startTime.hours * 60 + ev.startTime.minutes;
-    const endMin = ev.endTime.hours * 60 + ev.endTime.minutes;
-    if (startMin >= endMin) continue;
-    const title = ev.title || 'Untitled Event';
-    WEEKDAYS.forEach((day, dayIndex) => {
-      if (!ev.days?.includes(day)) return;
-      const block: GridBlock = {
-        key: `ev-${ev.id}-${dayIndex}`,
-        kind: 'event',
-        label: title,
-        title,
-        eventId: ev.id,
-        startMin,
-        endMin,
-        left: '',
-        width: '',
-      };
-      blocks.push(block);
-      pack.push({ dayIndex, startMin, endMin, block });
-    });
-  }
+  blocks.push(...eventBlocks);
 
   // Column-pack the section + event blocks per day, so overlapping items sit
   // side-by-side (each at 1/N width) instead of stacking and hiding each other.
