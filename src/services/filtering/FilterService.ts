@@ -105,7 +105,10 @@ export class FilterService {
   /** Check if filters are in "default" state (only the schedule's year filter, or empty) */
   hasNonDefaultFilters(scheduleYear?: number): boolean {
     const filters = this.getActiveFilters();
-    if (filters.length === 0) return false;
+    if (filters.length === 0) {
+      // "All" years (no year filter) differs from a schedule that has a year.
+      return scheduleYear !== undefined;
+    }
     if (
       filters.length === 1 &&
       filters[0].id === 'academicYear' &&

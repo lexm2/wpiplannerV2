@@ -95,7 +95,6 @@
       {filterService}
       {courseSelectionService}
       {autoScheduleOrchestrator}
-      {profileStateManager}
       {getDepartments}
       onRequestClose={() => closeModal('filter-modal')}
     />
@@ -110,7 +109,6 @@
       {filterService}
       {courseSelectionService}
       {autoScheduleOrchestrator}
-      {profileStateManager}
       {getDepartments}
       onRequestClose={() => closeModal('auto-schedule-filter')}
     />

@@ -5,7 +5,6 @@
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
   import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
-  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { Department } from '../../types/types';
 
   let {
@@ -13,7 +12,6 @@
     filterService,
     courseSelectionService,
     autoScheduleOrchestrator,
-    profileStateManager,
     getDepartments,
     onRequestClose,
   }: {
@@ -22,7 +20,6 @@
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
-    profileStateManager: ProfileStateManager;
     getDepartments: () => Department[];
     onRequestClose: () => void;
   } = $props();
@@ -49,7 +46,6 @@
       {filterService}
       {courseSelectionService}
       {autoScheduleOrchestrator}
-      {profileStateManager}
       {getDepartments}
       requestClose={close}
     />

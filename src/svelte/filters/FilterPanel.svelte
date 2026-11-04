@@ -3,7 +3,6 @@
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
   import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
-  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { Department } from '../../types/types';
   import type { SelectedCourse } from '../../types/schedule';
 
@@ -23,7 +22,6 @@
     filterService,
     courseSelectionService,
     autoScheduleOrchestrator,
-    profileStateManager,
     getDepartments,
     requestClose,
   }: {
@@ -33,7 +31,6 @@
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
-    profileStateManager: ProfileStateManager;
     getDepartments: () => Department[];
     requestClose: () => void;
   } = $props();
@@ -110,7 +107,7 @@
 <div class="modal-body filter-modal-body">
   <div class="filter-sections">
     <CourseLevelFilter {filterService} {allCourses} />
-    <AcademicYearFilter {filterService} {profileStateManager} {allCourses} />
+    <AcademicYearFilter {filterService} {allCourses} />
     <BookmarksFilter {filterService} />
     <AvailabilityFilter
       {filterService}

@@ -1,17 +1,14 @@
 <script lang="ts">
   import FilterSection from './FilterSection.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
-  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { Course } from '../../types/types';
   import type { AcademicYearFilterCriteria } from '../../types/filters';
 
   let {
     filterService,
-    profileStateManager,
     allCourses,
   }: {
     filterService: FilterService;
-    profileStateManager: ProfileStateManager;
     allCourses: Course[];
   } = $props();
 
@@ -28,18 +25,11 @@
       ?.year ?? 'all',
   );
 
+  // The year filter only filters: a schedule's own year is the academic year it
+  // targets, so choosing a year to browse must not rewrite it.
   function setYear(year: number | 'all'): void {
     if (year === 'all') filterService.removeFilter('academicYear');
     else filterService.addFilter('academicYear', { year });
-    // Keep the active schedule's year in sync with the chosen filter year.
-    const active = profileStateManager.getActiveSchedule();
-    if (active) {
-      profileStateManager.updateSchedule(
-        active.id,
-        { year: year === 'all' ? undefined : year },
-        'filter-sync',
-      );
-    }
   }
 </script>
 
