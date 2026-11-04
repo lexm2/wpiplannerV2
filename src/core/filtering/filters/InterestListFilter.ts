@@ -1,4 +1,7 @@
-import type { InterestListFilterCriteria } from '../../../types/filters';
+import {
+  InterestListFilterCriteriaSchema,
+  type InterestListFilterCriteria,
+} from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 
@@ -10,7 +13,12 @@ import { SectionBasedFilter } from '../SectionFilterPipeline';
  * Runs first, so every other filter and every count sees only real sections.
  */
 export class InterestListFilter implements SectionBasedFilter {
-  readonly id = 'interestList';
+  static readonly id = 'interestList';
+  static readonly criteria = InterestListFilterCriteriaSchema;
+  // The course API sets it from its own includeInterestLists flag.
+  static readonly internal = true;
+  readonly id = InterestListFilter.id;
+  readonly criteria = InterestListFilter.criteria;
   readonly name = 'Interest Lists';
   readonly description = 'Hide interest-list placeholder sections';
   readonly priority = 0;
@@ -21,12 +29,6 @@ export class InterestListFilter implements SectionBasedFilter {
   ): FilterableSection[] {
     if (criteria.includeInterestLists) return sections;
     return sections.filter(fs => !fs.section.isInterestList);
-  }
-
-  isValidCriteria(criteria: unknown): criteria is InterestListFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const { includeInterestLists } = criteria as Record<string, unknown>;
-    return typeof includeInterestLists === 'boolean';
   }
 
   getDisplayValue(criteria: InterestListFilterCriteria): string {

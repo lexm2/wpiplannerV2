@@ -10,7 +10,10 @@ import type { FilterableSection } from '../types/filterableUnit';
 import type { Course, LectureGroup, Section } from '../types/types';
 import { SectionType } from '../types/types';
 import type { TimesFilterCriteria } from '../types/filters';
-import type { SectionBasedFilter } from '../core/filtering/SectionFilterPipeline';
+import {
+  acceptsCriteria,
+  type SectionBasedFilter,
+} from '../core/filtering/SectionFilterPipeline';
 import { AvailabilityFilter } from '../core/filtering/filters/AvailabilityFilter';
 import { ConflictFilter } from '../core/filtering/filters/ConflictFilter';
 import { DeliveryModeFilter } from '../core/filtering/filters/DeliveryModeFilter';
@@ -101,7 +104,7 @@ export function companionDrops(
   const kept = new Set(matches.map(c => c.id));
   const active = COMPANION_FILTERS.flatMap(entry => {
     const c = criteria.get(entry.filter.id);
-    return c !== undefined && entry.filter.isValidCriteria(c)
+    return c !== undefined && acceptsCriteria(entry.filter, c)
       ? [{ ...entry, criteria: c }]
       : [];
   });

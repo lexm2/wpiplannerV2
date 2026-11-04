@@ -242,10 +242,11 @@ test.describe('no usable section', () => {
   }) => {
     await loadApp(page);
     await selectCourses(page, ['CS2102']);
-    // A term no section is offered in leaves CS2102 with nothing to pick.
+    // A term no section is offered in (CS2102 runs in B and D) leaves it
+    // with nothing to pick.
     await page.evaluate(() =>
       (window as any).services.filterService.addFilter('term', {
-        terms: ['Z'],
+        terms: ['S'],
       }),
     );
 

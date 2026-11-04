@@ -1,4 +1,7 @@
-import type { DeliveryModeFilterCriteria } from '../../../types/filters';
+import {
+  DeliveryModeFilterCriteriaSchema,
+  type DeliveryModeFilterCriteria,
+} from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 
@@ -9,7 +12,10 @@ import { SectionBasedFilter } from '../SectionFilterPipeline';
  * mode; an Online section may still meet at set times.
  */
 export class DeliveryModeFilter implements SectionBasedFilter {
-  readonly id = 'deliveryMode';
+  static readonly id = 'deliveryMode';
+  static readonly criteria = DeliveryModeFilterCriteriaSchema;
+  readonly id = DeliveryModeFilter.id;
+  readonly criteria = DeliveryModeFilter.criteria;
   readonly name = 'Delivery Mode';
   readonly description = 'Filter sections by in-person, online or hybrid';
   readonly priority = 26;
@@ -23,12 +29,6 @@ export class DeliveryModeFilter implements SectionBasedFilter {
     return sections.filter(fs =>
       wanted.has(fs.section.deliveryMode.toLowerCase()),
     );
-  }
-
-  isValidCriteria(criteria: unknown): criteria is DeliveryModeFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const { modes } = criteria as Record<string, unknown>;
-    return Array.isArray(modes) && modes.every(m => typeof m === 'string');
   }
 
   getDisplayValue(criteria: DeliveryModeFilterCriteria): string {

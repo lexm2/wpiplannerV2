@@ -1,9 +1,15 @@
-import { CreditRangeFilterCriteria } from '../../../types/filters';
+import {
+  CreditRangeFilterCriteriaSchema,
+  type CreditRangeFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 
 export class CreditRangeFilter implements SectionBasedFilter {
-  readonly id = 'creditRange';
+  static readonly id = 'creditRange';
+  static readonly criteria = CreditRangeFilterCriteriaSchema;
+  readonly id = CreditRangeFilter.id;
+  readonly criteria = CreditRangeFilter.criteria;
   readonly name = 'Credit Range';
   readonly description = 'Filter courses by credit hours';
   readonly priority = 99;
@@ -18,17 +24,6 @@ export class CreditRangeFilter implements SectionBasedFilter {
         course.maxCredits >= criteria.min && course.minCredits <= criteria.max
       );
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is CreditRangeFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const c = criteria as Record<string, unknown>;
-    return (
-      typeof c.min === 'number' &&
-      typeof c.max === 'number' &&
-      c.min >= 0 &&
-      c.max >= c.min
-    );
   }
 
   getDisplayValue(criteria: CreditRangeFilterCriteria): string {

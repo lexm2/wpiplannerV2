@@ -239,7 +239,7 @@ describe('RMPRatingFilter', () => {
 
   it('keeps sections with no listed instructor when including those without data', async () => {
     const service = await serviceWith([prof('Amy', 'Curran', 4.5)]);
-    const filter = new RMPRatingFilter(service);
+    const filter = new RMPRatingFilter({ rmp: service });
     const unassigned = sectionTaughtBy('Not Assigned', '');
     const rated = sectionTaughtBy('Amy Curran');
 
@@ -259,7 +259,7 @@ describe('RMPRatingFilter', () => {
 
   it("judges by the listed instructor, not an unassigned period's lack of data", async () => {
     const service = await serviceWith([prof('Amy', 'Curran', 2)]);
-    const filter = new RMPRatingFilter(service);
+    const filter = new RMPRatingFilter({ rmp: service });
     const section = sectionTaughtBy('Amy Curran', 'Not Assigned');
 
     expect(
@@ -270,7 +270,7 @@ describe('RMPRatingFilter', () => {
   it('compares the rounded rating, as displayed', async () => {
     // 3.96 shows as 4.0, so it passes a 4.0 minimum
     const service = await serviceWith([prof('Amy', 'Curran', 3.96)]);
-    const filter = new RMPRatingFilter(service);
+    const filter = new RMPRatingFilter({ rmp: service });
     const section = sectionTaughtBy('Amy Curran');
 
     expect(filter.apply([section], { minRating: 4 })).toEqual([section]);
@@ -282,7 +282,7 @@ describe('RMPRatingFilter', () => {
       { ...prof('Amy', 'Curran'), wouldTakeAgainPercent: -1 },
       { ...prof('Ada', 'Lovelace'), wouldTakeAgainPercent: 20 },
     ]);
-    const filter = new RMPRatingFilter(service);
+    const filter = new RMPRatingFilter({ rmp: service });
     const missing = sectionTaughtBy('Laura Susanin');
     const negative = sectionTaughtBy('Amy Curran');
     const low = sectionTaughtBy('Ada Lovelace');
@@ -307,7 +307,7 @@ describe('RMPRatingFilter', () => {
     const service = await serviceWith([
       { ...prof('Amy', 'Curran', 1), numRatings: 0 },
     ]);
-    const filter = new RMPRatingFilter(service);
+    const filter = new RMPRatingFilter({ rmp: service });
     const section = sectionTaughtBy('Amy Curran');
 
     expect(
@@ -329,7 +329,7 @@ describe('RMPRatingFilter', () => {
         rated('Amity', 'Manning', 2, 6),
         rated('Scarlet', 'Shell', 4.1, 15),
       ]);
-      const filter = new RMPRatingFilter(service);
+      const filter = new RMPRatingFilter({ rmp: service });
       const bb552 = sectionTaughtBy('Amity Manning; Scarlet Shell');
       expect(filter.apply([bb552], { minRating: 4 })).toEqual([bb552]);
       expect(filter.apply([bb552], { maxRating: 2.5 })).toEqual([bb552]);
@@ -341,7 +341,7 @@ describe('RMPRatingFilter', () => {
         rated('Marja', 'Bakermans', 4.8, 5),
         rated('Kristin', 'Pfeifer', 4.5, 13),
       ]);
-      const filter = new RMPRatingFilter(service);
+      const filter = new RMPRatingFilter({ rmp: service });
       const fy1101 = sectionTaughtBy('Marja Bakermans; Kristin Pfeifer');
       expect(
         filter.apply([fy1101], {
@@ -362,7 +362,7 @@ describe('RMPRatingFilter', () => {
         rated('Shahin', 'Farzin', 0, 0),
         rated('Tahar', 'El-Korchi', 3.1, 21),
       ]);
-      const filter = new RMPRatingFilter(service);
+      const filter = new RMPRatingFilter({ rmp: service });
       const aren = sectionTaughtBy('Shahin Farzin; Tahar El-Korchi');
       const unrated = sectionTaughtBy('Shahin Farzin; Nobody Known');
       expect(
@@ -378,7 +378,7 @@ describe('RMPRatingFilter', () => {
 
     it('does not let an unrated co-instructor rescue a failing one', async () => {
       const service = await serviceWith([rated('Amy', 'Curran', 2, 10)]);
-      const filter = new RMPRatingFilter(service);
+      const filter = new RMPRatingFilter({ rmp: service });
       const section = sectionTaughtBy('Amy Curran; Nobody Known');
       expect(
         filter.apply([section], { minRating: 4, includeWithoutData: true }),
@@ -390,7 +390,7 @@ describe('RMPRatingFilter', () => {
         rated('Amy', 'Curran', 2, 10),
         rated('Laura', 'Susanin', 4.5, 10),
       ]);
-      const filter = new RMPRatingFilter(service);
+      const filter = new RMPRatingFilter({ rmp: service });
       const section = sectionTaughtBy('Amy Curran', 'Laura Susanin');
       expect(filter.apply([section], { minRating: 4 })).toEqual([section]);
     });

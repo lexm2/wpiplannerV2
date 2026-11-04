@@ -1,3 +1,4 @@
+import type * as z from 'zod';
 import type { Course, Section, LectureGroup } from '../../types/types';
 import { SectionType } from '../../types/types';
 import type { FilterableSection } from '../../types/filterableUnit';
@@ -9,10 +10,23 @@ export interface SectionBasedFilter {
   readonly name: string;
   readonly description: string;
   readonly priority: number;
-
+  /**
+   * The criteria the filter takes (src/types/filters.ts). Criteria are
+   * checked against it before the filter runs, and the course API offers
+   * it as the filter's input, so a filter added to the registry needs no
+   * API change.
+   */
+  readonly criteria: z.ZodObject;
   apply(sections: FilterableSection[], criteria: unknown): FilterableSection[];
-  isValidCriteria(criteria: unknown): boolean;
   getDisplayValue(criteria: unknown): string;
+}
+
+/** Whether `criteria` is what `filter` takes. */
+export function acceptsCriteria(
+  filter: SectionBasedFilter,
+  criteria: unknown,
+): boolean {
+  return filter.criteria.safeParse(criteria).success;
 }
 
 type ActiveSectionFilter = {
@@ -235,7 +249,7 @@ export class SectionFilterPipeline {
 
     for (const [filterId, criteria] of activeFilters.entries()) {
       const filter = this.registeredFilters.get(filterId);
-      if (filter && filter.isValidCriteria(criteria)) {
+      if (filter && acceptsCriteria(filter, criteria)) {
         filtersToApply.push({ id: filterId, filter, criteria });
       }
     }

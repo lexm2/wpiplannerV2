@@ -21,6 +21,7 @@ import {
 import { AcademicTerm, type SelectedCourse } from '../../src/types/schedule';
 import type { ConflictCriteria } from '../../src/types/filters';
 import { FilterService } from '../../src/services/filtering/FilterService';
+import { ConflictFilter } from '../../src/core/filtering/filters/ConflictFilter';
 import { sectionsOf } from '../../src/utils/courseUtils';
 import { getDisplayTerms } from '../../src/utils/typeGuards';
 import { AcademicYearFilter } from '../../src/core/filtering/filters/AcademicYearFilter';
@@ -187,7 +188,7 @@ describe('SmartScheduler.findSchedules semester/quarter conflicts', () => {
 
 function filterServiceWith(conflict?: ConflictCriteria): FilterService {
   const fs = new FilterService();
-  fs.setConflictDetector();
+  fs.registerFilter(new ConflictFilter());
   if (conflict) fs.addFilter('periodConflict', conflict);
   return fs;
 }

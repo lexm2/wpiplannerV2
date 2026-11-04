@@ -1,4 +1,7 @@
-import type { DegreeAttributeFilterCriteria } from '../../../types/filters';
+import {
+  DegreeAttributeFilterCriteriaSchema,
+  type DegreeAttributeFilterCriteria,
+} from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 
@@ -9,7 +12,10 @@ import { SectionBasedFilter } from '../SectionFilterPipeline';
  * its sections' tags, which answers "can this course count for X".
  */
 export class DegreeAttributeFilter implements SectionBasedFilter {
-  readonly id = 'degreeAttribute';
+  static readonly id = 'degreeAttribute';
+  static readonly criteria = DegreeAttributeFilterCriteriaSchema;
+  readonly id = DegreeAttributeFilter.id;
+  readonly criteria = DegreeAttributeFilter.criteria;
   readonly name = 'Degree Attribute';
   readonly description =
     'Filter courses by the degree requirements they count toward';
@@ -23,16 +29,6 @@ export class DegreeAttributeFilter implements SectionBasedFilter {
     const wanted = new Set(criteria.attributes.map(a => a.toLowerCase()));
     return sections.filter(fs =>
       fs.course.degreeAttributes.some(a => wanted.has(a.toLowerCase())),
-    );
-  }
-
-  isValidCriteria(
-    criteria: unknown,
-  ): criteria is DegreeAttributeFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const { attributes } = criteria as Record<string, unknown>;
-    return (
-      Array.isArray(attributes) && attributes.every(a => typeof a === 'string')
     );
   }
 

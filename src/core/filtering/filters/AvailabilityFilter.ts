@@ -1,9 +1,15 @@
-import { AvailabilityFilterCriteria } from '../../../types/filters';
+import {
+  AvailabilityFilterCriteriaSchema,
+  type AvailabilityFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 
 export class AvailabilityFilter implements SectionBasedFilter {
-  readonly id = 'availability';
+  static readonly id = 'availability';
+  static readonly criteria = AvailabilityFilterCriteriaSchema;
+  readonly id = AvailabilityFilter.id;
+  readonly criteria = AvailabilityFilter.criteria;
   readonly name = 'Availability';
   readonly description = 'Show only courses with available seats';
   readonly priority = 50;
@@ -41,21 +47,6 @@ export class AvailabilityFilter implements SectionBasedFilter {
 
       return true;
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is AvailabilityFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const c = criteria as Record<string, unknown>;
-    if (typeof c.availableOnly !== 'boolean') {
-      return false;
-    }
-    if (c.minAvailable !== undefined && typeof c.minAvailable !== 'number') {
-      return false;
-    }
-    if (c.maxWaitlisted !== undefined && typeof c.maxWaitlisted !== 'number') {
-      return false;
-    }
-    return true;
   }
 
   getDisplayValue(criteria: AvailabilityFilterCriteria): string {

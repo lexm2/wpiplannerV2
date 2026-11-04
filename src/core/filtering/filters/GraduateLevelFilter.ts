@@ -1,9 +1,9 @@
-import { GraduateLevelFilterCriteria } from '../../../types/filters';
+import {
+  GraduateLevelFilterCriteriaSchema,
+  type GraduateLevelFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
-
-/** The undergraduate levels the Course Level filter can narrow to. */
-export const UNDERGRAD_LEVELS = [1000, 2000, 3000, 4000] as const;
 
 /**
  * A course's level: its number's leading digit x 1000 (`174X` is 1000, `3010`
@@ -15,7 +15,10 @@ export function courseLevelOf(course: { number: string }): number | null {
 }
 
 export class GraduateLevelFilter implements SectionBasedFilter {
-  readonly id = 'graduateLevel';
+  static readonly id = 'graduateLevel';
+  static readonly criteria = GraduateLevelFilterCriteriaSchema;
+  readonly id = GraduateLevelFilter.id;
+  readonly criteria = GraduateLevelFilter.criteria;
   readonly name = 'Graduate Level';
   readonly description = 'Filter courses by graduate/undergraduate level';
   readonly priority = 80;
@@ -43,19 +46,6 @@ export class GraduateLevelFilter implements SectionBasedFilter {
 
       return true;
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is GraduateLevelFilterCriteria {
-    if (!criteria || typeof criteria !== 'object' || !('level' in criteria))
-      return false;
-    const c = criteria as Record<string, unknown>;
-    return (
-      typeof c.level === 'string' &&
-      ['all', 'undergraduate', 'graduate'].includes(c.level) &&
-      (c.undergradLevel === undefined ||
-        (typeof c.undergradLevel === 'number' &&
-          (UNDERGRAD_LEVELS as readonly number[]).includes(c.undergradLevel)))
-    );
   }
 
   getDisplayValue(criteria: GraduateLevelFilterCriteria): string {

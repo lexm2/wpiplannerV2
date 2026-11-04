@@ -1,5 +1,7 @@
+import * as z from 'zod';
 import { DayOfWeek } from './types';
-import { AcademicTerm, SelectedCourse, WeeklyTimeSlot } from './schedule';
+import { AcademicTerm } from './schedule';
+import type { SelectedCourse, WeeklyTimeSlot } from './schedule';
 
 export interface ActiveFilter<TCriteria = unknown> {
   id: string;
@@ -8,147 +10,197 @@ export interface ActiveFilter<TCriteria = unknown> {
   displayValue: string;
 }
 
-export interface DepartmentFilterCriteria {
-  departments: string[];
-}
+export const DepartmentFilterCriteriaSchema = z.object({
+  departments: z.array(z.string()),
+});
+export type DepartmentFilterCriteria = z.output<
+  typeof DepartmentFilterCriteriaSchema
+>;
 
-export interface AvailabilityFilterCriteria {
-  availableOnly: boolean;
-  minAvailable?: number;
+export const AvailabilityFilterCriteriaSchema = z.object({
+  availableOnly: z.boolean(),
+  minAvailable: z.number().optional(),
   /** Keep sections with at most this many students on the waitlist. */
-  maxWaitlisted?: number;
-}
+  maxWaitlisted: z.number().optional(),
+});
+export type AvailabilityFilterCriteria = z.output<
+  typeof AvailabilityFilterCriteriaSchema
+>;
 
-export interface CreditRangeFilterCriteria {
-  min: number;
-  max: number;
-}
+export const CreditRangeFilterCriteriaSchema = z
+  .object({
+    min: z.number().min(0),
+    max: z.number(),
+  })
+  .refine(c => c.max >= c.min, 'max must be at least min');
+export type CreditRangeFilterCriteria = z.output<
+  typeof CreditRangeFilterCriteriaSchema
+>;
 
-export interface TermFilterCriteria {
-  terms: AcademicTerm[];
-}
+export const TermFilterCriteriaSchema = z.object({
+  terms: z.array(z.enum(AcademicTerm)),
+});
+export type TermFilterCriteria = z.output<typeof TermFilterCriteriaSchema>;
 
-export interface SearchTextFilterCriteria {
-  query: string;
-  professorOnly?: boolean;
-}
+export const SearchTextFilterCriteriaSchema = z.object({
+  query: z.string(),
+  professorOnly: z.boolean().optional(),
+});
+export type SearchTextFilterCriteria = z.output<
+  typeof SearchTextFilterCriteriaSchema
+>;
 
-/** Courses counting toward any of these degree attributes ("Social Sciences"). */
-export interface DegreeAttributeFilterCriteria {
-  attributes: string[];
-}
+export const DegreeAttributeFilterCriteriaSchema = z.object({
+  /** Courses counting toward any of these degree attributes ("Social Sciences"). */
+  attributes: z.array(z.string()),
+});
+export type DegreeAttributeFilterCriteria = z.output<
+  typeof DegreeAttributeFilterCriteriaSchema
+>;
 
-/** Sections taught in any of these modes: "In-Person", "Online", "Hybrid". */
-export interface DeliveryModeFilterCriteria {
-  modes: string[];
-}
+export const DeliveryModeFilterCriteriaSchema = z.object({
+  /** Sections taught in any of these modes: "In-Person", "Online", "Hybrid". */
+  modes: z.array(z.string()),
+});
+export type DeliveryModeFilterCriteria = z.output<
+  typeof DeliveryModeFilterCriteriaSchema
+>;
 
 /**
  * Courses whose number's first digit (1-4 undergraduate, 5 and up graduate:
  * MA 1022 is 1, DS 502 is 5) lies in [min, max]; either bound may be unset.
  */
-export interface CourseLevelFilterCriteria {
-  min?: number;
-  max?: number;
-}
+export const CourseLevelFilterCriteriaSchema = z.object({
+  min: z.number().min(0).max(9).optional(),
+  max: z.number().min(0).max(9).optional(),
+});
+export type CourseLevelFilterCriteria = z.output<
+  typeof CourseLevelFilterCriteriaSchema
+>;
 
 /**
  * Courses with any of these offering categories: 1 every year, 2 at least
  * every other year, 3 occasionally. includeUnknown also keeps courses with
  * no category on record, most graduate courses among them.
  */
-export interface OfferingPatternFilterCriteria {
-  categories: (1 | 2 | 3)[];
-  includeUnknown?: boolean;
-}
+export const OfferingPatternFilterCriteriaSchema = z.object({
+  categories: z.array(z.union([z.literal(1), z.literal(2), z.literal(3)])),
+  includeUnknown: z.boolean().optional(),
+});
+export type OfferingPatternFilterCriteria = z.output<
+  typeof OfferingPatternFilterCriteriaSchema
+>;
 
 /**
  * Interest-list placeholders (no times; joined before the real sections
  * open) are dropped unless includeInterestLists is true.
  */
-export interface InterestListFilterCriteria {
-  includeInterestLists: boolean;
-}
+export const InterestListFilterCriteriaSchema = z.object({
+  includeInterestLists: z.boolean(),
+});
+export type InterestListFilterCriteria = z.output<
+  typeof InterestListFilterCriteriaSchema
+>;
 
-export interface GraduateLevelFilterCriteria {
-  level: 'all' | 'undergraduate' | 'graduate';
+/** The undergraduate levels the Course Level filter can narrow to. */
+export const UNDERGRAD_LEVELS = [1000, 2000, 3000, 4000] as const;
+
+export const GraduateLevelFilterCriteriaSchema = z.object({
+  level: z.enum(['all', 'undergraduate', 'graduate']),
   /**
    * Narrows to one undergraduate level (1000-4000). Only applies when `level`
    * is 'undergraduate'; ignored otherwise.
    */
-  undergradLevel?: 1000 | 2000 | 3000 | 4000;
-}
+  undergradLevel: z
+    .union([z.literal(1000), z.literal(2000), z.literal(3000), z.literal(4000)])
+    .optional(),
+});
+export type GraduateLevelFilterCriteria = z.output<
+  typeof GraduateLevelFilterCriteriaSchema
+>;
 
-export interface AcademicYearFilterCriteria {
-  year: number | 'all';
-}
+export const AcademicYearFilterCriteriaSchema = z.object({
+  year: z.union([z.number(), z.literal('all')]),
+});
+export type AcademicYearFilterCriteria = z.output<
+  typeof AcademicYearFilterCriteriaSchema
+>;
 
-interface ConflictFilterCriteria {
-  avoidConflicts: boolean;
-  blockedSlots: WeeklyTimeSlot[];
+export const ConflictCriteriaSchema = z.object({
+  avoidConflicts: z.boolean(),
+  blockedSlots: z.array(z.custom<WeeklyTimeSlot>()),
   /**
    * A semester section (F/S) conflicts with the quarters it runs through
    * (F: A and B, S: C and D). Unset means on; false keeps the exact-term
    * comparison, where F only conflicts with F.
    */
-  semesterSpansQuarters?: boolean;
-}
-
-export interface ConflictCriteria extends ConflictFilterCriteria {
-  selectedCourses?: SelectedCourse[];
-}
+  semesterSpansQuarters: z.boolean().optional(),
+  selectedCourses: z.array(z.custom<SelectedCourse>()).optional(),
+});
+export type ConflictCriteria = z.output<typeof ConflictCriteriaSchema>;
 
 /**
  * Backend-only filter criteria for restricting the course list to those eligible
  * for a degree-requirement bucket (derived from WPI program tracking sheets).
  * Not surfaced in the FilterPanel UI - applied programmatically from the Degree page.
  */
-export interface DegreeBucketFilterCriteria {
+export const DegreeBucketFilterCriteriaSchema = z.object({
   /** UPPERCASE valid department codes. Empty array => no department restriction. */
-  allowedDepartments: string[];
+  allowedDepartments: z.array(z.string()),
   /** Course codes NOT allowed even though their department qualifies ("DEPT NUMBER"). */
-  excludedCourses: string[];
+  excludedCourses: z.array(z.string()),
   /** Optional bucket label for getDisplayValue (e.g. "Social Science"). */
-  label?: string;
+  label: z.string().optional(),
   /** The degree bucket this was built for, so it can be rebuilt when the record or schedule changes. */
-  bucketId?: string;
-}
+  bucketId: z.string().optional(),
+});
+export type DegreeBucketFilterCriteria = z.output<
+  typeof DegreeBucketFilterCriteriaSchema
+>;
 
-export interface RMPRatingFilterCriteria {
-  minRating?: number; // Minimum average rating (0-5 scale)
-  maxRating?: number; // Maximum average rating (0-5 scale)
-  minDifficulty?: number; // Minimum difficulty rating (0-5 scale)
-  maxDifficulty?: number; // Maximum difficulty rating (0-5 scale)
-  minWouldTakeAgain?: number; // Minimum "would take again" percentage (0-100)
-  maxWouldTakeAgain?: number; // Maximum "would take again" percentage (0-100)
-  includeWithoutData?: boolean; // Include professors without RMP data (default: true)
-  minNumRatings?: number; // Fewest ratings a professor's numbers may rest on
-}
+export const RMPRatingFilterCriteriaSchema = z.object({
+  minRating: z.number().min(0).max(5).optional(), // Minimum average rating (0-5 scale)
+  maxRating: z.number().min(0).max(5).optional(), // Maximum average rating (0-5 scale)
+  minDifficulty: z.number().min(0).max(5).optional(), // Minimum difficulty rating (0-5 scale)
+  maxDifficulty: z.number().min(0).max(5).optional(), // Maximum difficulty rating (0-5 scale)
+  minWouldTakeAgain: z.number().min(0).max(100).optional(), // Minimum "would take again" percentage (0-100)
+  maxWouldTakeAgain: z.number().min(0).max(100).optional(), // Maximum "would take again" percentage (0-100)
+  includeWithoutData: z.boolean().optional(), // Include professors without RMP data (default: true)
+  minNumRatings: z.number().min(0).optional(), // Fewest ratings a professor's numbers may rest on
+});
+export type RMPRatingFilterCriteria = z.output<
+  typeof RMPRatingFilterCriteriaSchema
+>;
 
 export interface BookmarkFilterCriteria {
   showBookmarkedOnly: boolean;
 }
 
-export type TimeGridMode = 'only' | 'avoid';
+const TimeGridModeSchema = z.enum(['only', 'avoid']);
+export type TimeGridMode = z.output<typeof TimeGridModeSchema>;
 
 /** One painted band on one weekday. Minutes from midnight; half-open [start, end). */
-export interface TimeWindow {
-  day: DayOfWeek;
-  startMin: number;
-  endMin: number;
-}
+const TimeWindowSchema = z
+  .object({
+    day: z.enum(DayOfWeek),
+    startMin: z.number(),
+    endMin: z.number(),
+  })
+  .refine(w => w.startMin < w.endMin, 'startMin must be before endMin');
+export type TimeWindow = z.output<typeof TimeWindowSchema>;
 
 /**
  * `windows` is canonical: sorted by weekday then start, non-overlapping, and
  * non-adjacent. TimesFilter's containment test depends on touching bands
  * having been merged.
  */
-export interface TimesFilterCriteria {
-  mode: TimeGridMode;
-  windows: TimeWindow[];
+export const TimesFilterCriteriaSchema = z.object({
+  mode: TimeGridModeSchema,
+  windows: z.array(TimeWindowSchema),
   /**
    * Keep sections with nothing on the grid (async, no meeting days). Unset
    * means no: painting times is a statement about when classes meet.
    */
-  includeAsync?: boolean;
-}
+  includeAsync: z.boolean().optional(),
+});
+export type TimesFilterCriteria = z.output<typeof TimesFilterCriteriaSchema>;

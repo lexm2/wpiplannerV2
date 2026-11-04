@@ -1,5 +1,8 @@
 import { AcademicTerm, WeeklyTimeSlot } from '../../../types/schedule';
-import { ConflictCriteria } from '../../../types/filters';
+import {
+  ConflictCriteriaSchema,
+  type ConflictCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
 import {
@@ -21,7 +24,10 @@ interface PreparedSlot {
 }
 
 export class ConflictFilter implements SectionBasedFilter {
-  readonly id = 'periodConflict';
+  static readonly id = 'periodConflict';
+  static readonly criteria = ConflictCriteriaSchema;
+  readonly id = ConflictFilter.id;
+  readonly criteria = ConflictFilter.criteria;
   readonly name = 'Time Conflicts';
   readonly description =
     'Hide periods that conflict with selected sections or blocked times';
@@ -137,15 +143,6 @@ export class ConflictFilter implements SectionBasedFilter {
     }
 
     return slots;
-  }
-
-  isValidCriteria(criteria: unknown): boolean {
-    if (!criteria || typeof criteria !== 'object') {
-      return false;
-    }
-    return (
-      typeof (criteria as Record<string, unknown>).avoidConflicts === 'boolean'
-    );
   }
 
   getDisplayValue(criteria: unknown): string {

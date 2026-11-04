@@ -184,7 +184,7 @@ describe('ratings on the real catalog', () => {
   it('passes a co-taught lecture when any instructor passes', () => {
     const lectures = coTaught();
     expect(lectures.length).toBeGreaterThan(10);
-    const filter = new RMPRatingFilter(catalog.rmp);
+    const filter = new RMPRatingFilter({ rmp: catalog.rmp });
     const cases: [RMPRatingFilterCriteria, (r: Ratings) => boolean][] = [
       [{ minRating: 4, includeWithoutData: false }, r => r.rating >= 4],
       [

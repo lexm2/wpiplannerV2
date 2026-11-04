@@ -1,4 +1,7 @@
-import { SearchTextFilterCriteria } from '../../../types/filters';
+import {
+  SearchTextFilterCriteriaSchema,
+  type SearchTextFilterCriteria,
+} from '../../../types/filters';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import type { Course, Section } from '../../../types/types';
@@ -80,7 +83,10 @@ const PLACE_WORDS = new Set(['lab', 'labs', 'hall', 'center', 'room']);
  * section, not a course meeting in Higgins Labs.
  */
 export class SearchTextFilter implements SectionBasedFilter {
-  readonly id = 'searchText';
+  static readonly id = 'searchText';
+  static readonly criteria = SearchTextFilterCriteriaSchema;
+  readonly id = SearchTextFilter.id;
+  readonly criteria = SearchTextFilter.criteria;
   readonly name = 'Search Text';
   readonly description = 'Filter courses by search text';
   readonly priority = 1;
@@ -131,15 +137,6 @@ export class SearchTextFilter implements SectionBasedFilter {
         textHasWord(own, word) || (namesBuilding && textHasWord(places, word));
       return query.words.every((word, i) => ownHas(word) || course.word(i));
     });
-  }
-
-  isValidCriteria(criteria: unknown): criteria is SearchTextFilterCriteria {
-    return !!(
-      criteria &&
-      typeof criteria === 'object' &&
-      'query' in criteria &&
-      typeof criteria.query === 'string'
-    );
   }
 
   getDisplayValue(criteria: SearchTextFilterCriteria): string {

@@ -4,7 +4,10 @@
  * on availability and the rating-count bound on Rate My Professor.
  */
 import { describe, it, expect } from 'vitest';
-import { SectionFilterPipeline } from '../../src/core/filtering/SectionFilterPipeline';
+import {
+  acceptsCriteria,
+  SectionFilterPipeline,
+} from '../../src/core/filtering/SectionFilterPipeline';
 import { DegreeAttributeFilter } from '../../src/core/filtering/filters/DegreeAttributeFilter';
 import { DeliveryModeFilter } from '../../src/core/filtering/filters/DeliveryModeFilter';
 import { CourseLevelRangeFilter } from '../../src/core/filtering/filters/CourseLevelRangeFilter';
@@ -97,7 +100,7 @@ function run(
     | RMPRatingFilter,
   criteria: unknown,
 ) {
-  expect(filter.isValidCriteria(criteria)).toBe(true);
+  expect(acceptsCriteria(filter, criteria)).toBe(true);
   const pipeline = new SectionFilterPipeline();
   pipeline.registerFilter(filter);
   const kept = pipeline.applyFilters(
@@ -131,7 +134,7 @@ describe('CourseLevelRangeFilter', () => {
     expect(run(filter, { min: 5 })).toEqual([5]);
     expect(run(filter, { max: 1 })).toEqual([1]);
     expect(run(filter, { min: 2, max: 4 })).toEqual([2, 3]);
-    expect(filter.isValidCriteria({ min: 10 })).toBe(false);
+    expect(acceptsCriteria(filter, { min: 10 })).toBe(false);
   });
 });
 
@@ -142,7 +145,7 @@ describe('OfferingPatternFilter', () => {
     expect(run(filter, { categories: [2], includeUnknown: true })).toEqual([
       2, 3, 5,
     ]);
-    expect(filter.isValidCriteria({ categories: [4] })).toBe(false);
+    expect(acceptsCriteria(filter, { categories: [4] })).toBe(false);
   });
 });
 
@@ -163,7 +166,7 @@ describe('AvailabilityFilter maxWaitlisted', () => {
 
 describe('RMPRatingFilter minNumRatings', () => {
   it('treats a rating resting on too few reviews as no data', () => {
-    const filter = new RMPRatingFilter(rmp);
+    const filter = new RMPRatingFilter({ rmp });
     // Section 2 is taught by "Few Ratings" (2 reviews).
     expect(
       run(filter, {

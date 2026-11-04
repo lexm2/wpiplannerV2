@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { acceptsCriteria } from '../../src/core/filtering/SectionFilterPipeline';
 import {
   GraduateLevelFilter,
   courseLevelOf,
@@ -106,20 +107,23 @@ describe('GraduateLevelFilter undergradLevel', () => {
 
 describe('GraduateLevelFilter criteria', () => {
   it('accepts the optional field', () => {
-    expect(filter.isValidCriteria({ level: 'undergraduate' })).toBe(true);
+    expect(acceptsCriteria(filter, { level: 'undergraduate' })).toBe(true);
     for (const n of [1000, 2000, 3000, 4000]) {
       expect(
-        filter.isValidCriteria({ level: 'undergraduate', undergradLevel: n }),
+        acceptsCriteria(filter, { level: 'undergraduate', undergradLevel: n }),
       ).toBe(true);
     }
   });
   it('rejects anything else', () => {
     for (const bad of [5000, 3500, '3000', null, 0]) {
       expect(
-        filter.isValidCriteria({ level: 'undergraduate', undergradLevel: bad }),
+        acceptsCriteria(filter, {
+          level: 'undergraduate',
+          undergradLevel: bad,
+        }),
       ).toBe(false);
     }
-    expect(filter.isValidCriteria({ level: 'nope' })).toBe(false);
+    expect(acceptsCriteria(filter, { level: 'nope' })).toBe(false);
   });
   it('describes the criteria', () => {
     const d = (c: GraduateLevelFilterCriteria) => filter.getDisplayValue(c);

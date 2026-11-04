@@ -1,4 +1,7 @@
-import type { OfferingPatternFilterCriteria } from '../../../types/filters';
+import {
+  OfferingPatternFilterCriteriaSchema,
+  type OfferingPatternFilterCriteria,
+} from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 
@@ -14,7 +17,10 @@ const LABELS = {
  * only published signal of what a later year will offer.
  */
 export class OfferingPatternFilter implements SectionBasedFilter {
-  readonly id = 'offeringPattern';
+  static readonly id = 'offeringPattern';
+  static readonly criteria = OfferingPatternFilterCriteriaSchema;
+  readonly id = OfferingPatternFilter.id;
+  readonly criteria = OfferingPatternFilter.criteria;
   readonly name = 'Offering Pattern';
   readonly description = 'Filter courses by how often WPI offers them';
   readonly priority = 23;
@@ -30,18 +36,6 @@ export class OfferingPatternFilter implements SectionBasedFilter {
         ? (criteria.includeUnknown ?? false)
         : wanted.has(category);
     });
-  }
-
-  isValidCriteria(
-    criteria: unknown,
-  ): criteria is OfferingPatternFilterCriteria {
-    if (!criteria || typeof criteria !== 'object') return false;
-    const { categories, includeUnknown } = criteria as Record<string, unknown>;
-    return (
-      Array.isArray(categories) &&
-      categories.every(c => c === 1 || c === 2 || c === 3) &&
-      (includeUnknown === undefined || typeof includeUnknown === 'boolean')
-    );
   }
 
   getDisplayValue(criteria: OfferingPatternFilterCriteria): string {

@@ -7,6 +7,7 @@ import {
   masksConflict,
 } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
+import { acceptsCriteria } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import type { ConflictCriteria } from '../../types/filters';
 import { instructorsOf } from '../../core/filtering/filters/RMPRatingFilter';
@@ -87,7 +88,7 @@ export class AutoScheduler {
     const criteria = this.filterService
       .getActiveFilters()
       .find(f => f.id === 'periodConflict')?.criteria;
-    const blockedSlots = conflictFilter.isValidCriteria(criteria)
+    const blockedSlots = acceptsCriteria(conflictFilter, criteria)
       ? (criteria as ConflictCriteria).blockedSlots
       : [];
 

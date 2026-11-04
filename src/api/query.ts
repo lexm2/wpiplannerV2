@@ -31,10 +31,7 @@ import type {
   TimeWindow,
 } from '../types/filters';
 import { FilterService } from '../services/filtering/FilterService';
-import {
-  createDefaultFilters,
-  SearchTextFilter,
-} from '../core/filtering/filters';
+import { createFilters } from '../core/filtering/filters';
 import { canonicalWindows } from '../utils/timeWindows';
 import { getAllSections } from '../utils/courseUtils';
 import {
@@ -937,12 +934,10 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
 /** A FilterService with the filter panel's filters, as AppBootstrap wires it. */
 function createFilterService(catalog: Catalog): FilterService {
   const service = new FilterService();
-  for (const filter of createDefaultFilters(catalog.rmp)) {
+  for (const filter of createFilters({ rmp: catalog.rmp })) {
     service.registerFilter(filter);
   }
-  service.registerFilter(new SearchTextFilter());
   service.registerFilter(new EndedTermsFilter());
-  service.setConflictDetector();
   return service;
 }
 
