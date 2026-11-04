@@ -25,6 +25,8 @@
   const index = $derived(tutorialOverlayState.index);
   const total = $derived(tutorialOverlayState.total);
 
+  const SETTLE_MS = 1200;
+
   let backDisabled = $state(false);
 
   // Bound inside an {#if}, so it must be reactive.
@@ -49,7 +51,10 @@
   // the course list or schedule sidebar can slide the target straight under the
   // box - which then covers the very thing the step asks the user to click. So
   // re-check on any scroll (captured, since scroll doesn't bubble) and on resize.
-  // The rAF here only throttles measurement; it drives no animation.
+  // A target can also settle into place with no scroll or resize - a wizard or
+  // page that is still laying out when the step applies - so the first moments
+  // of every step re-check each frame too. The rAF here only throttles
+  // measurement; it drives no animation.
   $effect(() => {
     if (!step || !boxEl) return;
     const box = boxEl;
@@ -72,6 +77,15 @@
         clampToViewport(box);
       });
     };
+    const settleUntil = performance.now() + SETTLE_MS;
+    let settleFrame = 0;
+    const settle = () => {
+      repositionIfObstructed(box, selector, false);
+      clampToViewport(box);
+      if (performance.now() < settleUntil)
+        settleFrame = requestAnimationFrame(settle);
+    };
+    settleFrame = requestAnimationFrame(settle);
     document.addEventListener('scroll', recheck, {
       capture: true,
       passive: true,
@@ -81,6 +95,7 @@
       disposed = true;
       stopWatching();
       if (frame) cancelAnimationFrame(frame);
+      cancelAnimationFrame(settleFrame);
       document.removeEventListener('scroll', recheck, { capture: true });
       window.removeEventListener('resize', recheck);
     };

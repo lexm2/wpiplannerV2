@@ -34,3 +34,9 @@ export function placesBySheet(): boolean {
  * so from there down the page lists those courses at its top instead.
  */
 export const railStacked = new MediaQuery('(max-width: 991px)');
+
+/**
+ * The header folds Schedules, theme and undo/redo into the gear menu here.
+ * The same 1250px as header.css.
+ */
+export const headerCollapsed = new MediaQuery('(max-width: 1250px)');

@@ -288,7 +288,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '[data-tutorial-next]',
         title: 'Next Tutorial: Filtering',
         description:
-          'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to move past a tutorial for any reason just hit next tutorial and it will move onto the next one, or hit skip tutorial to leave the tutorials entirely. If you want to restart a tutorial, go to the schedules button at the top right then settings then click on tutorials.',
+          'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to move past a tutorial for any reason just hit next tutorial and it will move onto the next one, or hit skip tutorial to leave the tutorials entirely. If you want to restart a tutorial, open the gear menu at the top right and choose Tutorials.',
         waitFor: 'manual',
         uiState: {
           currentPage: 'schedule',
@@ -719,6 +719,14 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         description: 'Click the Schedules button to open the schedule manager.',
         waitFor: 'click',
         uiState: { currentPage: 'planner' },
+        // The header hides the button here, so the gear menu holds it: the
+        // gear is what gets pointed at, and choosing Schedules is the click.
+        compact: {
+          selector: '#settings-menu-btn',
+          waitForSelector: '#settings-schedules-btn',
+          description:
+            'Open the gear menu at the top right, then choose Schedules to open the schedule manager.',
+        },
       },
       {
         selector: '.schedule-picker-modal-dialog .schedule-list',
@@ -880,6 +888,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   // whichever tutorial would have come next.
   tutorialService.onExit(() => {
     stateMachine.clear();
+    // A step's own window (Auto-Schedule settings, Schedules) would otherwise
+    // stay open over the app the tutorial just stopped setting up.
+    closeAllModals();
     endTutorials();
   });
 
