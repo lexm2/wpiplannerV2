@@ -34,6 +34,12 @@
     Array.from({ length: gridHours(range) }, (_, i) => i),
   );
 
+  // "MA1021 A01" may break between the letters and the digits when the block
+  // is too narrow for it on one line, never inside a word.
+  function labelParts(label: string): string[] {
+    return label.split(/(?<=[A-Za-z])(?=\d)/);
+  }
+
   function sectionClick(e: MouseEvent, b: GridBlock): void {
     e.stopPropagation(); // don't bubble to the term-graph focus toggle
     if (b.courseId && b.sectionNumber)
@@ -57,6 +63,13 @@
     }
   }
 </script>
+
+{#snippet blockLabel(label: string)}
+  <span class="block-label"
+    >{#each labelParts(label) as part, i (i)}{#if i > 0}<wbr
+        />{/if}{part}{/each}</span
+  >
+{/snippet}
 
 <!-- A hidden card is only transparent, not display:none, so the zoom has
      something to fade; `inert` is what keeps it out of the tab order. -->
@@ -112,13 +125,15 @@
             style:left={b.left}
             style:width={b.width}
             style:background-color={b.color}
+            title={b.label}
+            aria-label={b.label}
             onmouseenter={() =>
               (scheduleSidebarState.hoveredCourseId = b.courseId ?? null)}
             onmouseleave={() => (scheduleSidebarState.hoveredCourseId = null)}
             onclick={e => sectionClick(e, b)}
             onkeydown={e => sectionKey(e, b)}
           >
-            {b.label}
+            {@render blockLabel(b.label)}
           </div>
         {:else if b.kind === 'preview'}
           <div
@@ -130,7 +145,7 @@
             style:border-color={b.color}
             style:--preview-color={b.color}
           >
-            {b.label}
+            {@render blockLabel(b.label)}
           </div>
         {:else if b.kind === 'conflict'}
           <div

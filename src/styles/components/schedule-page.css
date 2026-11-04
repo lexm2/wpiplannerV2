@@ -549,8 +549,10 @@
   font-size: 0.8rem;
   font-weight: bold;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  /* `safe` falls back to start alignment when the label is wider than the
+     block, so an overflowing label is cut at its end, not at both ends. */
+  justify-content: safe center;
+  align-items: safe center;
   text-align: center;
   cursor: pointer;
   transition: var(--effect-transition);
@@ -560,7 +562,37 @@
   box-sizing: border-box;
   z-index: 10;
   overflow: hidden;
+  container-type: inline-size;
   /* height and top set inline based on actual class duration */
+}
+
+/* The label wraps instead of overflowing (the markup offers a break between
+   the department and the number). A conflict splits a day column into 2-3
+   blocks, down to ~30px wide on a phone, so the type steps down with the
+   block's own width and the label drops out entirely when not even a few
+   digits fit; the block's title and aria-label still name the course. */
+.block-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.1;
+}
+
+@container (max-width: 33px) {
+  .block-label {
+    font-size: 0.6rem;
+  }
+}
+
+@container (max-width: 23px) {
+  .block-label {
+    font-size: 0.5rem;
+  }
+}
+
+@container (max-width: 17px) {
+  .block-label {
+    display: none;
+  }
 }
 
 .section-block:hover {
@@ -577,8 +609,8 @@
   font-weight: bold;
   color: var(--color-text);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: safe center;
+  align-items: safe center;
   text-align: center;
   pointer-events: none;
   position: absolute;
@@ -588,6 +620,7 @@
   z-index: 15;
   overflow: hidden;
   opacity: 0.8;
+  container-type: inline-size;
   box-shadow: 0 0 8px 2px var(--preview-color, var(--color-primary));
   /* height and top set inline based on actual class duration */
 }
