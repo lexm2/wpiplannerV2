@@ -395,8 +395,7 @@ export class ProfileStateManager {
     updates: Partial<Schedule>,
     source: string = 'user',
   ): boolean {
-    const isAutomated =
-      source === 'calendar-event-exclusion' || source === 'storage-service';
+    const isAutomated = source === 'storage-service';
     const update = () => {
       const index = this.state.schedules.findIndex(s => s.id === scheduleId);
       if (index < 0) return false;

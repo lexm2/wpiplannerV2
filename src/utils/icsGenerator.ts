@@ -9,6 +9,7 @@ import type { DateRange } from '../types/common';
 import { TermBoundsService } from './termBounds';
 import { getSelectedSections } from './courseUtils';
 import { parseLocalDate } from './localDate';
+import { timezoneOffsetMs } from './timezone';
 
 type Quarter = 'A' | 'B' | 'C' | 'D';
 
@@ -26,31 +27,6 @@ const TERM_SPANS: Record<string, [Quarter, Quarter]> = {
   S: ['C', 'D'],
   ALL: ['A', 'D'],
 };
-
-/** Milliseconds `timezone`'s wall clock runs ahead of UTC at `utcMs`. */
-function timezoneOffsetMs(utcMs: number, timezone: string): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    hourCycle: 'h23',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(new Date(utcMs));
-  const get = (type: Intl.DateTimeFormatPartTypes): number =>
-    Number(parts.find(p => p.type === type)?.value);
-  const wallAsUtc = Date.UTC(
-    get('year'),
-    get('month') - 1,
-    get('day'),
-    get('hour'),
-    get('minute'),
-    get('second'),
-  );
-  return wallAsUtc - utcMs;
-}
 
 /**
  * The last second of `day` in `timezone`, formatted as an RRULE UNTIL in UTC.

@@ -17,6 +17,9 @@
   import { modalState } from './modals/modalState.svelte';
   import { componentWizardService } from '../services/scheduling/componentWizardService';
   import { localEventService } from '../services/scheduling/localEventService';
+  import { icsDropTarget } from './schedule/icsDropTarget';
+  import { fade } from 'svelte/transition';
+  import { dur } from './transitions';
   import { sectionInfoService } from '../services/scheduling/sectionInfoService';
   import { autoScheduleService } from '../services/scheduling/autoScheduleService';
   import { timestampState } from './timestampState.svelte';
@@ -67,6 +70,8 @@
   // uiState.currentPage. {#if} is avoided so a page's reactive child components
   // are never torn down on a page switch.
   const currentPage = $derived(uiState.currentPage);
+  // A file drag is over the schedule grid area.
+  let icsDropActive = $state(false);
 
   const scheduleName = $derived(appState.activeSchedule?.name ?? 'Schedule');
 
@@ -339,7 +344,18 @@
       </div>
     </SidePanel>
 
-    <main class="schedule-main">
+    <main
+      class="schedule-main"
+      use:icsDropTarget={{
+        onActiveChange: active => (icsDropActive = active),
+        onFile: file => void localEventService.importFile(file),
+      }}
+    >
+      {#if icsDropActive}
+        <div class="ics-drop-overlay" transition:fade={{ duration: dur(150) }}>
+          <span>Drop to import calendar events</span>
+        </div>
+      {/if}
       <ScheduleGrids
         colorService={services.colorService}
         conflictEngine={services.conflictDetector}

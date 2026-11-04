@@ -1,6 +1,7 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
   import { modalState } from './modalState.svelte';
+  import { localEventService } from '../../services/scheduling/localEventService';
   import type { LocalCalendarEvent } from '../../types/schedule';
   import { AcademicTerm, EventType } from '../../types/schedule';
   import { DayOfWeek } from '../../types/types';
@@ -148,6 +149,16 @@
     close();
   }
 
+  let icsInput: HTMLInputElement | undefined = $state();
+
+  // Hands the chosen file to the import flow, which swaps this modal for the
+  // Import Calendar one.
+  function onIcsPicked(): void {
+    const file = icsInput?.files?.[0];
+    if (icsInput) icsInput.value = '';
+    if (file) void localEventService.importFile(file);
+  }
+
   function onTitleKeydown(e: KeyboardEvent, close: () => void): void {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -169,6 +180,32 @@
         class="modal-body {styles['local-event-form']}"
         data-type={eventType}
       >
+        {#if !isEditMode}
+          <div class={styles['import-row']}>
+            <button
+              type="button"
+              id="import-ics-btn"
+              class="modal-btn btn-secondary"
+              onclick={() => icsInput?.click()}
+            >
+              {@html getInlineSVG('CALENDAR_DOWN', 'btn-icon')}
+              Import from calendar (.ics)
+            </button>
+            <span class={styles['import-hint']}>
+              Add weekly classes and work shifts from Google, Outlook or Apple
+              Calendar.
+            </span>
+            <input
+              bind:this={icsInput}
+              type="file"
+              accept=".ics,text/calendar"
+              class={styles['import-input']}
+              aria-label="Calendar file"
+              onchange={onIcsPicked}
+            />
+          </div>
+        {/if}
+
         <TextField
           id="event-title"
           label="Title"

@@ -1,6 +1,7 @@
 import type { SectionData } from '../../types/modal';
 import { openModal } from '../../services/ui/uiState.svelte';
 import type { LocalCalendarEvent, SelectedCourse } from '../../types/schedule';
+import type { IcsImportResult } from '../../services/scheduling/weeklyEventDetection';
 
 /** `input: true` makes it a prompt, and onConfirm receives the entered value. */
 export interface ConfirmPayload {
@@ -27,6 +28,13 @@ interface LocalEventPayload {
   existingEvent?: LocalCalendarEvent;
 }
 
+/** State of the "Import Calendar" modal; see localEventService.importFile. */
+type IcsImportPayload =
+  | { status: 'idle' }
+  | { status: 'parsing'; fileName: string }
+  | { status: 'ready'; fileName: string; year: number; result: IcsImportResult }
+  | { status: 'error'; fileName?: string; message: string };
+
 interface FilterModalPayload {
   /** 'filter' = planner/schedule filter; 'auto-schedule' = generate settings. */
   mode: 'filter' | 'auto-schedule';
@@ -47,6 +55,7 @@ class ModalState {
   sectionInfo = $state.raw<SectionData | null>(null);
   confirm = $state.raw<ConfirmPayload | null>(null);
   localEvent = $state.raw<LocalEventPayload | null>(null);
+  icsImport = $state.raw<IcsImportPayload | null>(null);
   autoScheduleIntro = $state.raw<AutoScheduleIntroPayload | null>(null);
   // Tutorial-driven term-preference overrides. The component merges these
   // into its per-course term selection whenever this changes.

@@ -730,6 +730,18 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   max-width: 1000px;
 }
 
+/* Import Calendar: a list of event rows, comfortable a little wider than the
+   500px default. */
+.modal-dialog.ics-import-dialog {
+  max-width: 640px;
+}
+
+.modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .filter-modal-body {
   padding: 1rem 0;
   flex-direction: column;

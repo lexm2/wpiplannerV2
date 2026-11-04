@@ -211,3 +211,24 @@
   padding-top: 0.25rem;
   user-select: none;
 }
+
+.local-event-form > .import-row {
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.import-hint {
+  flex: 1 1 14rem;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.import-input {
+  display: none;
+}

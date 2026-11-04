@@ -4,9 +4,11 @@
 
 ### Added
 - Schedule Preferences in Auto-Schedule settings. Set how much you care about early classes, late classes, time between classes, a lunch break, fewer days with class, keeping days free, balanced terms, open seats and professor ratings. They decide which schedules come first and never rule one out
+- Import calendar events from an .ics file (Google, Outlook or Apple Calendar). Events that repeat weekly on the same day and time for at least 30% of a term's weeks are added to those terms. Find it under Calendar Events, or drop the file on the schedule
 
 ### Changed
 - Auto-Schedule picks each course's sections by your preferences instead of only by the least time between classes
+- Adding, importing or deleting calendar events can be undone
 
 ## [2026-10-10]
 
