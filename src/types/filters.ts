@@ -112,8 +112,11 @@ export const GraduateLevelFilterCriteriaSchema = z.object({
    * is 'undergraduate'; ignored otherwise.
    */
   undergradLevel: z
-    .union([z.literal(1000), z.literal(2000), z.literal(3000), z.literal(4000)])
-    .optional(),
+    .literal(UNDERGRAD_LEVELS)
+    .optional()
+    .describe(
+      'With level "undergraduate": only courses of this level, 1000-4000 (MA 1022 is 1000).',
+    ),
 });
 export type GraduateLevelFilterCriteria = z.output<
   typeof GraduateLevelFilterCriteriaSchema

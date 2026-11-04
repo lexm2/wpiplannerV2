@@ -31,10 +31,7 @@ export interface FilterDeps {
   rmp: RateMyProfessorService;
 }
 
-/**
- * A filter class as the registry holds it: what it takes, and how to make one.
- * @public
- */
+/** A filter class as the registry holds it: what it takes, and how to make one. */
 export interface FilterClass {
   readonly id: string;
   readonly criteria: z.ZodObject;
@@ -43,10 +40,7 @@ export interface FilterClass {
   new (deps: FilterDeps): SectionBasedFilter;
 }
 
-/**
- * Every filter the app registers, in the order the course API lists them.
- * @public
- */
+/** Every filter the app registers, in the order the course API lists them. */
 export const FILTERS = [
   SearchTextFilter,
   DepartmentFilter,
@@ -65,9 +59,6 @@ export const FILTERS = [
   InterestListFilter,
   DegreeBucketFilter,
 ] as const satisfies readonly FilterClass[];
-
-/** @public */
-export type FilterId = (typeof FILTERS)[number]['id'];
 
 export const createFilters = (deps: FilterDeps): SectionBasedFilter[] =>
   FILTERS.map(F => new F(deps));

@@ -44,8 +44,9 @@ import {
   requireCourse,
   unpublishedYearError,
 } from './lookup';
-import { filterServiceFor, FallYearSchema, leaveOutEndedTerms } from './query';
-import { caseless } from './schemaHints';
+import { leaveOutEndedTerms } from './filterInputs';
+import { filterServiceFor } from './query';
+import { caseless, FallYearSchema } from './schemaHints';
 import {
   courseCode,
   toSectionBrief,

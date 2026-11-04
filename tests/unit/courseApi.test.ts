@@ -852,6 +852,27 @@ describe('HTTP edge cases', () => {
     );
   });
 
+  it('takes any filter as JSON under its id, but not with its flat parameters too', async () => {
+    const level = { level: 'undergraduate', undergradLevel: 2000 };
+    const get = await call(
+      `/courses?graduateLevel=${encodeURIComponent(JSON.stringify(level))}`,
+    );
+    const post = await call('/courses/search', {
+      filters: { graduateLevel: level },
+    });
+    expect(get.status).toBe(200);
+    expect(get.body).toEqual(post.body);
+    expect(codes(get.body)).toEqual(['CS-2102-2026']);
+
+    const both = await call(
+      `/courses?graduateLevel=${encodeURIComponent('{"level":"graduate"}')}&level=all`,
+    );
+    expect(both.status).toBe(400);
+    expect(both.body.error).toBe(
+      'graduateLevel and level both give filters.graduateLevel; use one or the other.',
+    );
+  });
+
   it('needs times to be a JSON object', async () => {
     const { status, body } = await call('/courses?times=%22x%22');
     expect(status).toBe(400);

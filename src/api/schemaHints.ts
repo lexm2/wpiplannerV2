@@ -38,6 +38,9 @@ export const DaySchema = caseless(
   Object.values(DayOfWeek) as [DayOfWeek, ...DayOfWeek[]],
 );
 
+/** An academic year by its fall year, within reason. */
+export const FallYearSchema = z.number().int().min(2000).max(2100);
+
 /** The object shape under optional, default, pipe and array wrappers. */
 function shapeOf(schema: unknown): Record<string, unknown> | null {
   let current = schema as SchemaInternals | undefined;
