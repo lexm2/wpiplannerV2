@@ -805,6 +805,59 @@ html.is-mobile .filter-select-none {
   border-radius: 0 0 var(--effect-border-radius) var(--effect-border-radius);
 }
 
+.more-section {
+  margin: 0 1rem;
+}
+
+.more-section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: var(--effect-transition);
+}
+
+.more-section-toggle:hover {
+  border-color: var(--color-primary);
+}
+
+.more-section-label {
+  flex: 1;
+}
+
+.more-section-badge {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.75rem;
+}
+
+.more-section-toggle.open .more-section-chevron {
+  transform: rotate(180deg);
+}
+
+.more-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+/* The sections sit in a body that already carries the modal's side margin. */
+.more-section-body > .filter-section {
+  margin: 0;
+}
+
 /* Second (and later) visually distinct group inside a filter section. */
 .filter-subsection {
   margin-top: 0.75rem;
@@ -1247,15 +1300,11 @@ html.is-mobile .filter-preview {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Term filter row (inline with course level) */
 .filter-term-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: space-between;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--color-border);
 }
 
 .filter-term-row .filter-term-label {

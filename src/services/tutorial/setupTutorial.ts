@@ -15,6 +15,7 @@ import {
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
+import { setOpen } from '../../svelte/ui/disclosureState.svelte';
 import { logger } from '../../utils/logger';
 
 interface TutorialEntry {
@@ -855,6 +856,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     if (desired.schedulePickerTab) {
       modalState.schedulePickerTab = desired.schedulePickerTab;
     }
+    for (const id of desired.openDisclosures ?? []) setOpen(id, true);
   });
 
   tutorialService.onStepApply(index => {

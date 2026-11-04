@@ -19,6 +19,8 @@ export const STORAGE_KEYS = {
   DEGREE_BUCKET_CONFIG: 'wpi-planner-degree-buckets',
   /** Degree page view preferences: bucket layout, finder panel, course sort. */
   DEGREE_VIEW: 'wpi-planner-degree-view',
+  /** Which "More…" disclosures the user left open, as { [id]: boolean }. */
+  DISCLOSURES: 'wpi-planner-disclosures',
   /** Set on first visit; gates the welcome tutorial auto-start. */
   VISITED: 'wpi_visited',
   /** Expanded/collapsed state of the selected-courses panel. */

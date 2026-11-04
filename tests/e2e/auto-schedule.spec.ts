@@ -58,6 +58,7 @@ test('calendar-events toggle reflects its state and turns off cleanly', async ({
   });
 
   await page.click('#filter-btn');
+  await page.click('#more-filters-toggle');
   const toggle = page.getByLabel(
     'Hide sections that conflict with calendar events (1 event)',
   );

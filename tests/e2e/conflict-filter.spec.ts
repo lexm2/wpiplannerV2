@@ -20,6 +20,7 @@ async function openFilters(page: Page): Promise<void> {
     { timeout: 30000 },
   );
   await page.click('#filter-btn');
+  await page.click('#more-filters-toggle');
 }
 
 const spansCriteria = (page: Page) =>

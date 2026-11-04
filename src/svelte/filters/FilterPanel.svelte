@@ -7,14 +7,17 @@
   import type { SelectedCourse } from '../../types/schedule';
 
   import RankingPreferences from './RankingPreferences.svelte';
+  import TermsFilter from './TermsFilter.svelte';
   import CourseLevelFilter from './CourseLevelFilter.svelte';
   import AcademicYearFilter from './AcademicYearFilter.svelte';
-  import BookmarksFilter from './BookmarksFilter.svelte';
   import AvailabilityFilter from './AvailabilityFilter.svelte';
+  import AvailabilityDetailsFilter from './AvailabilityDetailsFilter.svelte';
   import DepartmentFilter from './DepartmentFilter.svelte';
   import TimesFilter from './TimesFilter.svelte';
   import CreditHoursFilter from './CreditHoursFilter.svelte';
   import RmpRatingFilter from './RmpRatingFilter.svelte';
+  import MoreSection from '../ui/MoreSection.svelte';
+  import { countAdvancedFilters } from '../../services/filtering/advancedFilterCount';
 
   let {
     mode,
@@ -51,6 +54,10 @@
     filterService.hasNonDefaultFilters(activeYear)
       ? filterService.getFilterCount()
       : 0,
+  );
+
+  const advancedCount = $derived(
+    countAdvancedFilters(filterService.getActiveFilters(), activeYear),
   );
 
   const previewText = $derived.by(() => {
@@ -108,20 +115,27 @@
 <div class="modal-body filter-modal-body">
   <div class="filter-sections">
     {#if isAuto}<RankingPreferences />{/if}
-    <CourseLevelFilter {filterService} {allCourses} />
-    <AcademicYearFilter {filterService} {allCourses} />
-    <BookmarksFilter {filterService} />
-    <AvailabilityFilter
-      {filterService}
-      {courseSelectionService}
-      {autoScheduleOrchestrator}
-    />
-    <DepartmentFilter {filterService} {allCourses} />
-    <TimesFilter {filterService} />
-    <CreditHoursFilter {filterService} />
-    {#key resetNonce}
-      <RmpRatingFilter {filterService} bind:this={rmpFilter} />
-    {/key}
+    <TermsFilter {filterService} {allCourses} />
+    <CourseLevelFilter {filterService} />
+    <AvailabilityFilter {filterService} {courseSelectionService} />
+    <MoreSection
+      id="more-filters"
+      label="More filters"
+      activeCount={advancedCount}
+    >
+      <AcademicYearFilter {filterService} {allCourses} />
+      <DepartmentFilter {filterService} {allCourses} />
+      <TimesFilter {filterService} />
+      <CreditHoursFilter {filterService} />
+      <AvailabilityDetailsFilter
+        {filterService}
+        {courseSelectionService}
+        {autoScheduleOrchestrator}
+      />
+      {#key resetNonce}
+        <RmpRatingFilter {filterService} bind:this={rmpFilter} />
+      {/key}
+    </MoreSection>
   </div>
 </div>
 

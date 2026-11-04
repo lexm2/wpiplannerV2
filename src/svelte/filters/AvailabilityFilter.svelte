@@ -1,174 +1,39 @@
 <script lang="ts">
   import FilterSection from './FilterSection.svelte';
-  import TextField from '../ui/TextField.svelte';
   import FilterToggle from './FilterToggle.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
-  import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
-  import type {
-    AvailabilityFilterCriteria,
-    ConflictCriteria,
-  } from '../../types/filters';
-  import { isCalendarSlot } from '../../services/scheduling/calendarEventProvider';
+  import {
+    readAvailability,
+    setAvoidConflicts,
+    writeAvailability,
+  } from '../../services/filtering/availabilityCriteria';
 
   let {
     filterService,
     courseSelectionService,
-    autoScheduleOrchestrator,
   }: {
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
-    autoScheduleOrchestrator: AutoScheduleOrchestrator;
   } = $props();
 
-  const availCriteria = $derived(
-    filterService.getCriteria<AvailabilityFilterCriteria>('availability'),
-  );
-  const availableOnly = $derived(availCriteria?.availableOnly ?? false);
-  const minAvailable = $derived(availCriteria?.minAvailable);
-
-  const conflictCriteria = $derived(
-    filterService.getCriteria<ConflictCriteria>('periodConflict'),
-  );
-  const avoidConflicts = $derived(conflictCriteria?.avoidConflicts ?? false);
-  const blockedSlots = $derived(conflictCriteria?.blockedSlots ?? []);
-  const hasCalendarEvents = $derived(blockedSlots.some(isCalendarSlot));
-  // Unset means on: F conflicts with A and B, S with C and D.
-  const semesterSpans = $derived(
-    conflictCriteria?.semesterSpansQuarters ?? true,
-  );
-
-  const calendarEventCount = $derived(
-    autoScheduleOrchestrator?.getLocalEventCount() ?? 0,
-  );
-  const showCalendarToggle = $derived(calendarEventCount > 0);
-  const calendarCountText = $derived(
-    calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`,
-  );
-
-  function writeAvailability(
-    onlyAvail: boolean,
-    minAvail: number | undefined,
-  ): void {
-    if (onlyAvail || minAvail) {
-      filterService.addFilter('availability', {
-        availableOnly: onlyAvail,
-        minAvailable: minAvail || undefined,
-      });
-    } else {
-      filterService.removeFilter('availability');
-    }
-  }
-
-  function onAvailableOnly(checked: boolean): void {
-    writeAvailability(checked, minAvailable);
-  }
-
-  function onMinSeats(value: string): void {
-    writeAvailability(availableOnly, value ? parseInt(value) : undefined);
-  }
-
-  function onAvoidConflicts(checked: boolean): void {
-    if (checked) {
-      const selectedCourses = courseSelectionService.getSelectedCourses();
-      filterService.addFilter('periodConflict', {
-        avoidConflicts: true,
-        selectedCourses,
-        blockedSlots, // preserve existing (e.g. calendar) slots
-        semesterSpansQuarters: semesterSpans,
-      });
-    } else if (blockedSlots.length > 0) {
-      filterService.addFilter('periodConflict', {
-        avoidConflicts: false,
-        blockedSlots,
-        semesterSpansQuarters: semesterSpans,
-      });
-    } else {
-      filterService.removeFilter('periodConflict');
-    }
-  }
-
-  function onCalendarToggle(checked: boolean): void {
-    const avoid = avoidConflicts;
-    const selectedCourses =
-      conflictCriteria?.selectedCourses ??
-      courseSelectionService.getSelectedCourses();
-    const nonCalendarSlots = blockedSlots.filter(s => !isCalendarSlot(s));
-
-    if (checked) {
-      const calendarSlots =
-        autoScheduleOrchestrator.getAllCalendarBlockedTimes();
-      filterService.addFilter('periodConflict', {
-        avoidConflicts: avoid,
-        selectedCourses,
-        blockedSlots: [...nonCalendarSlots, ...calendarSlots],
-        semesterSpansQuarters: semesterSpans,
-      });
-    } else if (nonCalendarSlots.length > 0 || avoid) {
-      filterService.addFilter('periodConflict', {
-        avoidConflicts: avoid,
-        selectedCourses,
-        blockedSlots: nonCalendarSlots,
-        semesterSpansQuarters: semesterSpans,
-      });
-    } else {
-      filterService.removeFilter('periodConflict');
-    }
-  }
-
-  function onSemesterSpans(checked: boolean): void {
-    if (!conflictCriteria) return;
-    filterService.addFilter('periodConflict', {
-      ...conflictCriteria,
-      semesterSpansQuarters: checked,
-    });
-  }
+  const state = $derived(readAvailability(filterService));
 </script>
 
 <FilterSection title="Availability">
   <FilterToggle
     id="avoid-conflicts-filter"
     label="Hide periods that conflict with selected sections"
-    checked={avoidConflicts}
-    onchange={onAvoidConflicts}
+    checked={state.avoidConflicts}
+    onchange={checked =>
+      setAvoidConflicts(filterService, courseSelectionService, checked)}
   />
-
-  {#if showCalendarToggle}
-    <FilterToggle
-      label={`Hide sections that conflict with calendar events (${calendarCountText})`}
-      checked={hasCalendarEvents}
-      onchange={onCalendarToggle}
-    />
-  {/if}
-
-  {#if avoidConflicts || hasCalendarEvents}
-    <FilterToggle
-      id="semester-spans-filter"
-      label="Semester courses (F, S) conflict with their quarters (A and B, C and D)"
-      checked={semesterSpans}
-      onchange={onSemesterSpans}
-    />
-  {/if}
 
   <FilterToggle
     id="available-only-filter"
     label="Show only sections with available seats"
-    checked={availableOnly}
-    onchange={onAvailableOnly}
+    checked={state.availableOnly}
+    onchange={checked =>
+      writeAvailability(filterService, checked, state.minAvailable)}
   />
-
-  <div class="filter-range-container filter-subsection">
-    <TextField
-      id="min-seats-filter"
-      type="number"
-      inputmode="numeric"
-      label="Minimum Available Seats"
-      panel
-      min={0}
-      max={999}
-      placeholder="Any"
-      value={String(minAvailable ?? '')}
-      oninput={e => onMinSeats((e.currentTarget as HTMLInputElement).value)}
-    />
-  </div>
 </FilterSection>
