@@ -1485,6 +1485,42 @@ html.is-mobile .changelog-modal-body {
   justify-content: flex-end;
 }
 
+/* A phone-width card is too narrow for code, name and term pills in one row:
+   the pills (flex-shrink: 0) squeezed the name to a few letters and pushed
+   the code into them. The pills drop to their own row under the text, the
+   accent stays a full-height stripe, and the selected card no longer slides
+   right (the shift had nowhere to go, so it overflowed the grid). Selection
+   still reads from the border, shadow and opacity transitions. */
+@media (max-width: 560px) {
+  .as-course-card {
+    display: grid;
+    grid-template-columns: 8px minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .as-course-card.selected {
+    transform: none;
+  }
+
+  .as-course-card-accent {
+    grid-row: 1 / span 2;
+  }
+
+  .as-card-terms {
+    grid-column: 2;
+    justify-content: flex-start;
+    padding: 0 0.75rem 0.6rem;
+  }
+}
+
+/* Above a phone the selected card still slides 6px right; the grid reserves
+   that space so the slide stays inside the modal body. */
+@media (min-width: 561px) {
+  .as-course-grid {
+    padding-right: 6px;
+  }
+}
+
 /* The selectable term badges are buttons; undo the UA button styles that
    .term-badge doesn't already set, so they match the span badges. */
 .as-card-terms button {
