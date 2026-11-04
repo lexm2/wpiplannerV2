@@ -19,7 +19,7 @@
 {#if criteria}
   <div class="degree-filter-banner" role="status">
     <span class="degree-filter-banner-text">
-      Courses that count toward
+      Showing courses that count toward
       <strong>{criteria.label ?? 'a degree requirement'}</strong>, minus ones
       already on your record or schedule
     </span>
