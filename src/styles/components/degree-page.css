@@ -1932,3 +1932,20 @@ html.is-mobile
 .degree-filter-banner-clear {
   flex-shrink: 0;
 }
+
+/* The message gets the full width of the banner on a phone, and the two
+   buttons share a line under it, where side by side they left the text 90px
+   wide and nine lines tall. After the base rules, so it overrides them. */
+@media (max-width: 560px) {
+  .degree-filter-banner {
+    flex-wrap: wrap;
+  }
+
+  .degree-filter-banner-text {
+    flex: 1 1 100%;
+  }
+
+  .degree-filter-banner-back {
+    flex: 1;
+  }
+}
