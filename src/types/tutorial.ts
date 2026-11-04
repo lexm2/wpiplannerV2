@@ -25,6 +25,10 @@ export interface TutorialAppState {
 }
 
 export interface TutorialStep {
+  /**
+   * What to point at. Must resolve at every window width the tutorials run at
+   * (see `compact` for what moves).
+   */
   selector: string;
   title: string;
   description: string;
@@ -34,6 +38,13 @@ export interface TutorialStep {
   stopPropagation?: boolean;
   uiState?: Partial<UIState>;
   appState?: TutorialAppState;
+  /**
+   * Replaces fields of this step while the header is collapsed into the gear
+   * menu (<=1250px), for a target that is only reachable another way there.
+   */
+  compact?: Partial<
+    Pick<TutorialStep, 'selector' | 'waitForSelector' | 'description'>
+  >;
 }
 
 export interface Tutorial {

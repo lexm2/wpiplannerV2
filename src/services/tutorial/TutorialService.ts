@@ -7,6 +7,7 @@ import { getInlineSVG } from '../../utils/iconPaths';
 import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState.svelte';
 import { courseListState } from '../../svelte/courseListState.svelte';
 import { scrollParent } from '../../utils/scrollParent';
+import { headerCollapsed } from '../../svelte/phoneLayout.svelte';
 
 import type { UIState } from '../../types/uiState';
 import { logger } from '../../utils/logger';
@@ -32,6 +33,7 @@ export class TutorialService {
   private highlightObserver: MutationObserver | null = null;
   private actionObserver: MutationObserver | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private layoutObserver: ResizeObserver | null = null;
   private svgContainer: HTMLElement | null = null;
   private originalPosition: string | null = null;
   private uiStateTransitionCallback: UIStateTransitionCallback | null = null;
@@ -168,7 +170,7 @@ export class TutorialService {
     const suppress = this.suppressAutoAdvance;
     this.suppressAutoAdvance = false;
     this.stepApplyCallback?.(index);
-    const step = tutorial.steps[index];
+    const step = this.resolveStep(tutorial.steps[index]);
     if (step.appState && this.appStateTransitionCallback) {
       await this.appStateTransitionCallback(step.appState);
       // Exited, skipped, or moved on while the app caught up - this step is
@@ -181,6 +183,13 @@ export class TutorialService {
     this.highlightElement(step.selector, step.scrollArrow ?? false);
     tutorialOverlayState.set(step, index, tutorial.steps.length);
     if (step.waitFor !== 'manual') this.listenForAction(step, suppress);
+  }
+
+  // The step as it applies at the current window width.
+  private resolveStep(step: TutorialStep): TutorialStep {
+    return headerCollapsed.current && step.compact
+      ? { ...step, ...step.compact }
+      : step;
   }
 
   private highlightElement(selector: string, scrollArrow: boolean): void {
@@ -228,9 +237,24 @@ export class TutorialService {
 
   // Scroll a found target into view if it's outside the viewport, so the
   // highlight (and the user) land on it. The SVG overlay is a child of the
-  // target's container, so it follows this scroll automatically.
+  // target's container, so it follows this scroll automatically. A target on a
+  // page the step's own transition just switched to is in the DOM but still
+  // display:none, where scrolling does nothing - so wait until it has a box.
   private revealInView(el: Element): void {
+    this.layoutObserver?.disconnect();
+    this.layoutObserver = null;
     const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) {
+      this.layoutObserver = new ResizeObserver(() => {
+        const box = el.getBoundingClientRect();
+        if (box.width === 0 && box.height === 0) return;
+        this.layoutObserver?.disconnect();
+        this.layoutObserver = null;
+        this.revealInView(el);
+      });
+      this.layoutObserver.observe(el);
+      return;
+    }
     const outOfView =
       r.bottom <= 0 ||
       r.top >= window.innerHeight ||
@@ -451,6 +475,8 @@ export class TutorialService {
 
   private cleanup(): void {
     this.currentSelector = null;
+    this.layoutObserver?.disconnect();
+    this.layoutObserver = null;
     this.removeHighlight();
     this.stopReveal();
     this.highlightObserver?.disconnect();

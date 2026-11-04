@@ -72,3 +72,32 @@ test.describe('desktop', () => {
     await expect(page.locator('#tutorials-btn')).toHaveCount(0);
   });
 });
+
+test.describe('collapsed header', () => {
+  test.use({ viewport: { width: 1100, height: 800 } });
+
+  // The header hides the Schedules button here, so the Managing Schedules
+  // tutorial points at the gear and advances on choosing Schedules in its menu.
+  test('the schedules tutorial opens through the gear menu', async ({
+    page,
+  }) => {
+    await appLoaded(page);
+    await expect(page.locator(SKIP)).toBeVisible();
+    await page.evaluate(() =>
+      (window as any).services.tutorial.start('schedules'),
+    );
+
+    await expect(page.locator('#schedule-picker-btn')).toBeHidden();
+    const gear = page.locator('#settings-menu-btn');
+    await expect(gear.locator('.tutorial-highlight-svg')).toBeAttached();
+
+    await gear.click();
+    await page.click('#settings-schedules-btn');
+    await expect(page.locator('.schedule-picker-modal-dialog')).toBeVisible();
+    expect(
+      await page.evaluate(() =>
+        (window as any).services.tutorial.service.getCurrentStepIndex(),
+      ),
+    ).toBe(1);
+  });
+});

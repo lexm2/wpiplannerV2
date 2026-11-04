@@ -27,6 +27,9 @@
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
 
 ### Fixed
+- The Managing Schedules tutorial no longer gets stuck on windows narrower than 1250px, where the Schedules button is in the gear menu. It points at the gear and moves on when you choose Schedules
+- Tutorial steps scroll to their target on a page they have just switched to, and the tutorial box moves off it once the target settles
+- Skipping a tutorial closes the window it had open, and the end of the first tutorial tells you where Tutorials is now
 - Hiding sections that conflict with calendar events now follows events you add or delete after turning it on
 - The calendar events count leaves out one-time events, which don't block any time
 - Undo and redo shortcuts no longer change the schedule behind an open window
