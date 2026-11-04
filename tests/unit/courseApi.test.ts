@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { utimes } from 'node:fs/promises';
 import { join } from 'node:path';
 import { CatalogSource } from '../../src/api/catalog';
+import { notice } from '../../src/api/notices';
 import { canonicalWindows } from '../../src/utils/timeWindows';
 import { DayOfWeek } from '../../src/types/types';
 import {
@@ -25,6 +26,10 @@ import {
   scheduleDepartments,
   write,
 } from './courseApiFixture';
+
+/** A response's notices as the text of their messages. */
+const noticeText = (body: { notices: { message: string }[] }) =>
+  body.notices.map(n => n.message).join('\n');
 
 describe('course search', () => {
   it('defaults to the current year, sorted by department then number', async () => {
@@ -84,8 +89,11 @@ describe('course search', () => {
     expect(
       tops.slice(tops.indexOf(null)).every((t: unknown) => t === null),
     ).toBe(true);
-    expect(rating.notices).toContain(
-      'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
+    expect(rating.notices).toContainEqual(
+      notice(
+        'sorted',
+        'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
+      ),
     );
     const seats = await sorted('openSeats');
     const open = seats.courses.map(
@@ -185,8 +193,11 @@ describe('course search', () => {
         },
       },
     });
-    expect(both.body.notices).toContain(
-      'Times read as: only within every day 10:00-12:00; M 18:00-21:00.',
+    expect(both.body.notices).toContainEqual(
+      notice(
+        'timesRead',
+        'Times read as: only within every day 10:00-12:00; M 18:00-21:00.',
+      ),
     );
   });
 
@@ -201,8 +212,11 @@ describe('course search', () => {
       latestEnd: '17:00',
     });
     expect(codes(everyDay.body)).not.toContain('PH-1110-2026');
-    expect(everyDay.body.notices).toContain(
-      'Times read as: avoiding every day 13:00-17:00, sections with no set time kept.',
+    expect(everyDay.body.notices).toContainEqual(
+      notice(
+        'timesRead',
+        'Times read as: avoiding every day 13:00-17:00, sections with no set time kept.',
+      ),
     );
     // A Tue/Thu shift leaves PH 1110's Wednesday lab, and drops RBE 1001.
     const shift = await avoid({
@@ -212,8 +226,11 @@ describe('course search', () => {
     });
     expect(codes(shift.body)).toContain('PH-1110-2026');
     expect(codes(shift.body)).not.toContain('RBE-1001-2026');
-    expect(shift.body.notices).toContain(
-      'Times read as: avoiding T,R 13:00-17:00, sections with no set time kept.',
+    expect(shift.body.notices).toContainEqual(
+      notice(
+        'timesRead',
+        'Times read as: avoiding T,R 13:00-17:00, sections with no set time kept.',
+      ),
     );
     const get = await call(
       '/courses?earliestStart=13:00&latestEnd=17:00&days=T,R&times=' +
@@ -223,8 +240,11 @@ describe('course search', () => {
     // Days alone: the whole day.
     const friday = await avoid({ days: ['F'] });
     expect(codes(friday.body)).not.toContain('RBE-1001-2026');
-    expect(friday.body.notices).toContain(
-      'Times read as: avoiding all of F, sections with no set time kept.',
+    expect(friday.body.notices).toContainEqual(
+      notice(
+        'timesRead',
+        'Times read as: avoiding all of F, sections with no set time kept.',
+      ),
     );
   });
 
@@ -434,7 +454,12 @@ describe('term awareness', () => {
     const { body } = await callOn(api, '/courses');
     expect(codes(body)).not.toContain('CS-2102-2026');
     expect(body.excludedEndedTerms).toEqual(['A']);
-    expect(body.notices.join(' ')).toContain('includeEndedTerms');
+    expect(body.notices).toContainEqual(
+      notice(
+        'endedTermsLeftOut',
+        'Sections in terms that have ended (A) are left out; pass includeEndedTerms: true to include them.',
+      ),
+    );
     const ma = body.courses.find(
       (c: { id: string }) => c.id === 'MA-1021-2026',
     );
@@ -445,7 +470,8 @@ describe('term awareness', () => {
     // Naming the ended term keeps it, with a warning.
     const named = await callOn(api, '/courses?term=A');
     expect(codes(named.body)).toEqual(['CS-2102-2026', 'MA-1021-2026']);
-    expect(named.body.notices[0]).toContain('A term ended 2026-01-20');
+    expect(named.body.notices[0].code).toBe('endedTermsListed');
+    expect(named.body.notices[0].message).toContain('A term ended 2026-01-20');
   });
 
   it('reports today, the term and the years', async () => {
@@ -505,7 +531,8 @@ describe('next year', () => {
     // MA 1021 has an early 2027 entry, which is shown with a warning.
     const early = await call('/courses/MA1021?year=2027');
     expect(early.body.id).toBe('MA-1021-2027');
-    expect(early.body.notices[0]).toContain('not published yet');
+    expect(early.body.notices[0].code).toBe('earlyEntry');
+    expect(early.body.notices[0].message).toContain('not published yet');
   });
 });
 
@@ -518,7 +545,8 @@ describe('course detail', () => {
     );
     const byCrn = await call('/courses/30');
     expect(byCrn.body.id).toBe('MA-543-2026');
-    expect(byCrn.body.notices[0]).toContain('also listed as DS 502');
+    expect(byCrn.body.notices[0].code).toBe('crnRead');
+    expect(byCrn.body.notices[0].message).toContain('also listed as DS 502');
   });
 
   it('explains what it could not find', async () => {
@@ -771,7 +799,7 @@ describe('canonicalWindows', () => {
 describe('HTTP edge cases', () => {
   const send = async (method: string, path: string, body?: unknown) => {
     const response = await endpoints(BEFORE_A).api(
-      new Request(`http://localhost${BASE}/api${path}`, {
+      new Request(`http://localhost${BASE}/api/v1${path}`, {
         method,
         body: body === undefined ? undefined : JSON.stringify(body),
       }),
@@ -904,6 +932,14 @@ describe('HTTP edge cases', () => {
     expect((await send('DELETE', '/courses/CS2102')).status).toBe(405);
   });
 
+  it('points a path without the version at the versioned routes', async () => {
+    const response = await endpoints(BEFORE_A).api(
+      new Request(`http://localhost${BASE}/api/courses`),
+    );
+    expect(response!.status).toBe(404);
+    expect((await response!.json()).error).toContain(`${BASE}/api/v1/courses`);
+  });
+
   it('refuses a course id too long to be one', async () => {
     const { status, body } = await call(`/courses/${'x'.repeat(300)}`);
     expect(status).toBe(400);
@@ -998,8 +1034,8 @@ describe('schedule generation', () => {
     expect(none.body.unschedulable).toEqual([
       { code: 'XX 1001', name: 'Morning Or Noon' },
     ]);
-    expect(none.body.notices.join('\n')).toContain('the busy blocks');
-    expect(none.body.notices.join('\n')).toContain('keepCrns');
+    expect(noticeText(none.body)).toContain('the busy blocks');
+    expect(noticeText(none.body)).toContain('keepCrns');
   });
 
   it('refuses a kept CRN of a requested course and ignores another year', async () => {
@@ -1008,7 +1044,7 @@ describe('schedule generation', () => {
     expect(own.body.error).toContain('CRN 101, a section of XX 1001');
     const other = await generate({ courses: ['XX 1001'], keepCrns: [107] });
     expect(other.status).toBe(200);
-    expect(other.body.notices.join('\n')).toContain('keepCrns ignores CRN 107');
+    expect(noticeText(other.body)).toContain('keepCrns ignores CRN 107');
     const unknown = await generate({ courses: ['XX 1001'], keepCrns: [999] });
     expect(unknown.status).toBe(400);
   });
@@ -1028,7 +1064,7 @@ describe('schedule generation', () => {
       openSeatsOnly: true,
     });
     expect(closed.body.schedules).toEqual([]);
-    expect(closed.body.notices.join('\n')).toContain('openSeatsOnly');
+    expect(noticeText(closed.body)).toContain('openSeatsOnly');
   });
 
   it('limits a course to the terms given, and leaves out ended terms', async () => {
@@ -1044,7 +1080,7 @@ describe('schedule generation', () => {
     expect(ended.body.schedules.map((s: { crns: number[] }) => s.crns)).toEqual(
       [[202]],
     );
-    expect(ended.body.notices.join('\n')).toContain('terms that have ended');
+    expect(noticeText(ended.body)).toContain('terms that have ended');
     const asked = await generate(
       { courses: ['XX 1002'], includeEndedTerms: true },
       AFTER_A,
@@ -1059,7 +1095,8 @@ describe('schedule generation', () => {
     expect(status).toBe(200);
     expect(body.schedules).toEqual([]);
     expect(body.found.count).toBe(0);
-    expect(body.notices.join('\n')).toContain('every combination');
+    expect(noticeText(body)).toContain('every combination');
+    expect(body.notices[0].code).toBe('noSchedule');
   });
 
   it('returns only as many schedules as limit asks for', async () => {

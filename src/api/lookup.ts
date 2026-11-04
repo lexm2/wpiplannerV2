@@ -9,11 +9,6 @@ import { findCourseById } from '../types/ScheduleState';
 import { findCatalogCourse } from '../services/degree/catalogLookup';
 import { getAllSections } from '../utils/courseUtils';
 import { closestMatches, editDistance } from '../utils/editDistance';
-import {
-  matchCourseWords,
-  parseSearchQuery,
-  rankCoursesByRelevance,
-} from '../utils/searchUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
 import {
   endedTerms,
@@ -31,12 +26,12 @@ import {
   type TermNow,
   type YearInfo,
 } from './calendar';
+import { notice, type Notice } from './notices';
 import { ApiError, echo } from './errors';
 import { andList, plural } from './text';
 import { forecastCourse, type Forecast } from './forecast';
 import {
   courseCode,
-  statementOf,
   termsOf,
   toCourseDetail,
   toCourseSummary,
@@ -127,9 +122,6 @@ function courseNotFound(
   if (id !== null) {
     return courseNotFound(catalog, key.slice(0, -5), id);
   }
-  if (year < currentAcademicYear(catalog) && !catalog.years.includes(year)) {
-    return yearNotInCatalog(catalog, year);
-  }
 
   if (CRN_RE.test(key)) {
     return new ApiError(
@@ -211,13 +203,16 @@ function courseByName(
   const classes = distinctClasses(close);
   if (classes.length === 1) return classes[0];
 
-  const query = parseSearchQuery(name);
-  const ranked = rankCoursesByRelevance(
-    classes.length
-      ? classes
-      : inYear.filter(c => matchCourseWords(c, query).all),
-    name,
-  ).slice(0, MAX_NAME_SUGGESTIONS);
+  const { search } = catalog;
+  const query = search.parse(name);
+  const ranked = search
+    .rank(
+      classes.length
+        ? classes
+        : inYear.filter(c => search.matchCourseWords(c, query).all),
+      name,
+    )
+    .slice(0, MAX_NAME_SUGGESTIONS);
   if (!ranked.length) return null;
   const list = ranked.map(c => `${courseCode(c)} ${c.name}`);
   throw new ApiError(
@@ -285,8 +280,8 @@ export interface CoursePlan {
 }
 
 export type CourseLookup =
-  | { kind: 'course'; detail: CourseDetail; notices: string[] }
-  | { kind: 'plan'; plan: CoursePlan; notices: string[] };
+  | { kind: 'course'; detail: CourseDetail; notices: Notice[] }
+  | { kind: 'plan'; plan: CoursePlan; notices: Notice[] };
 
 export interface CourseLookupOptions extends DetailOptions {
   year?: number;
@@ -302,8 +297,8 @@ function resolveCourse(
   catalog: Catalog,
   input: string,
   year?: number,
-): { key: string; course: Course | null; notices: string[] } {
-  const notices: string[] = [];
+): { key: string; course: Course | null; notices: Notice[] } {
+  const notices: Notice[] = [];
   // "CRN 349614" as well as "349614"; "CRN0350041" is CRN 350041.
   const key = input
     .trim()
@@ -349,7 +344,10 @@ function resolveCourse(
           ? ` of ${yearLabel(course.academicYear)}`
           : '';
       notices.push(
-        `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        notice(
+          'crnRead',
+          `CRN ${key} is ${courseCode(course)} section ${s.number} (${s.computedTerm} term${of})${also.length ? `, also listed as ${also.join(', ')}` : ''}.`,
+        ),
       );
     }
   } else {
@@ -364,7 +362,10 @@ function resolveCourse(
       if (named) {
         course = named;
         notices.push(
-          `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+          notice(
+            'titleRead',
+            `"${echo(key)}" read as ${courseCode(named)} ${named.name}.`,
+          ),
         );
       }
     }
@@ -377,7 +378,7 @@ export function requireCourse(
   catalog: Catalog,
   input: string,
   year: number,
-): { course: Course; notices: string[] } {
+): { course: Course; notices: Notice[] } {
   const { key, course, notices } = resolveCourse(catalog, input, year);
   if (!course) throw courseNotFound(catalog, key, year);
   return { course, notices };
@@ -392,7 +393,7 @@ export function requireCourse(
 export function lookupCourse(
   catalog: Catalog,
   input: string,
-  options: CourseLookupOptions = {},
+  options: CourseLookupOptions,
 ): CourseLookup {
   const { year, ...detailOptions } = options;
   const { key, course, notices } = resolveCourse(catalog, input, year);
@@ -425,8 +426,8 @@ export function lookupCourse(
           course: {
             ...summary,
             description: base.description,
-            recommendedBackground: statementOf(base, 'recommendedBackground'),
-            prerequisites: statementOf(base, 'prerequisites'),
+            recommendedBackground: base.recommendedBackground ?? null,
+            prerequisites: base.prerequisites ?? null,
             courseTypes: base.courseTypes,
           },
         },
@@ -440,12 +441,18 @@ export function lookupCourse(
   if (isEarlyEntry(catalog, course)) {
     const { courseCount } = yearStatus(catalog, course.academicYear!);
     notices.push(
-      `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${plural(courseCount, 'early entry', 'early entries')}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      notice(
+        'earlyEntry',
+        `${yearLabel(course.academicYear!)} is not published yet; this is one of its ${plural(courseCount, 'early entry', 'early entries')}: its term, times, room and instructor are tentative and may change, and it cannot be registered for yet.`,
+      ),
     );
   }
   if (course.academicYear !== undefined && course.academicYear < current) {
     notices.push(
-      `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
+      notice(
+        'pastYear',
+        `This is the ${yearLabel(course.academicYear)} offering, a past year.`,
+      ),
     );
   }
   return {

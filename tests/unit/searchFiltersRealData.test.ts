@@ -46,7 +46,7 @@ describe('search on the real catalog', () => {
     const accented = new Set(
       catalog.courses.flatMap(c =>
         getAllSections(c).flatMap(sec =>
-          sec.periods.flatMap(p => p.professor.split(/\s*;\s*/)),
+          sec.periods.flatMap(p => p.instructors),
         ),
       ),
     );
@@ -160,7 +160,7 @@ describe('ratings on the real catalog', () => {
   it('reads an unknown would-take-again share as no data', () => {
     const lookups = catalog.courses.flatMap(c =>
       (c.lectures ?? []).flatMap(l =>
-        l.section.periods.flatMap(p => p.professor.split(/\s*;\s*/)),
+        l.section.periods.flatMap(p => p.instructors),
       ),
     );
     for (const name of new Set(lookups)) {
@@ -177,7 +177,7 @@ describe('ratings on the real catalog', () => {
       .filter(
         fs =>
           fs.sectionType === SectionType.LECTURE &&
-          fs.section.periods.some(p => p.professor.includes(';')),
+          fs.section.periods.some(p => p.instructors.length > 1),
       );
   }
 
@@ -195,9 +195,7 @@ describe('ratings on the real catalog', () => {
     ];
     for (const [criteria, passes] of cases) {
       for (const fs of lectures) {
-        const names = fs.section.periods.flatMap(p =>
-          p.professor.split(/\s*;\s*/),
-        );
+        const names = fs.section.periods.flatMap(p => p.instructors);
         const want = names.some(name => {
           const r = catalog.rmp.getRatings(name);
           return r !== null && passes(r);

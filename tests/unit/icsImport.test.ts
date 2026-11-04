@@ -821,7 +821,7 @@ describe('planner exports', () => {
       periods: [
         {
           type: 'lecture',
-          professor: 'Prof',
+          instructors: ['Prof'],
           startTime: { hours: 10, minutes: 0 },
           endTime: { hours: 10, minutes: 50 },
           location: 'SL 104',

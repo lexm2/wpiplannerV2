@@ -11319,5 +11319,627 @@
       "timestamp": 1700000001000,
       "year": 2025
     }
+  },
+  {
+    "id": "schedule_edge_cases_000000-v3",
+    "timestamp": 1700000001000,
+    "compressed": true,
+    "schedule": {
+      "id": "schedule_edge_cases_000000",
+      "name": "v3-edge-cases",
+      "selectedCourses": [
+        {
+          "course": {
+            "id": "AE-2320-2025",
+            "number": "2320",
+            "name": "Introduction to Orbital Mechanics",
+            "description": "An introductory course that covers the fundamentals of space flight. Topics studied include: two-body orbital dynamics, classifion of orbits, and time of flight analysis; geocentric orbits and impulsive maneuvers: orbit shaping, escape trajectories, Hohmann and non-Hohmann transfers; orbital elements in 3D; interplanetary Hohmann and generalized transfers, intercepts, flybys. Recommended background: multivariable calculus (MA 1024 or equivalent), differential equations (MA 2051 or equivalent), dynamics (ES 2503, PH 2201 or equivalent). Students may not receive credit for both AE 2320 and AE 2713.",
+            "category": 1,
+            "departmentAbbr": "AE",
+            "departmentName": "Aerospace Engineering",
+            "lectures": [
+              {
+                "section": {
+                  "crn": 336199,
+                  "number": "CL01",
+                  "seats": 120,
+                  "seatsAvailable": 18,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 20,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4326",
+                  "computedTerm": "C",
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lecture",
+                      "professor": "Ye Lu",
+                      "startTime": {
+                        "hours": 9,
+                        "minutes": 0,
+                        "displayTime": "9:00 AM"
+                      },
+                      "endTime": {
+                        "hours": 9,
+                        "minutes": 50,
+                        "displayTime": "9:50 AM"
+                      },
+                      "location": "Unity Hall 400",
+                      "building": "",
+                      "room": "Unity Hall 400",
+                      "seats": 120,
+                      "seatsAvailable": 18,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 20,
+                      "days": {
+                        "__type": "Set",
+                        "value": ["M", "T", "W", "R", "F"]
+                      },
+                      "specificSection": "CL01",
+                      "isAsync": false
+                    }
+                  ]
+                },
+                "compatibleDiscussions": [],
+                "compatibleLabs": [
+                  {
+                    "crn": 336554,
+                    "number": "CX01",
+                    "seats": 40,
+                    "seatsAvailable": 2,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4326",
+                    "computedTerm": "C",
+                    "isInterestList": false,
+                    "periods": [
+                      {
+                        "type": "Lab",
+                        "professor": "Ye Lu",
+                        "startTime": {
+                          "hours": 14,
+                          "minutes": 0,
+                          "displayTime": "2:00 PM"
+                        },
+                        "endTime": {
+                          "hours": 14,
+                          "minutes": 50,
+                          "displayTime": "2:50 PM"
+                        },
+                        "location": "Higgins Labs 230 Geom Modeling Computer Lab",
+                        "building": "",
+                        "room": "Higgins Labs 230 Geom Modeling Computer Lab",
+                        "seats": 40,
+                        "seatsAvailable": 2,
+                        "actualWaitlist": 0,
+                        "maxWaitlist": 0,
+                        "days": {
+                          "__type": "Set",
+                          "value": ["R"]
+                        },
+                        "specificSection": "CX01",
+                        "isAsync": false
+                      }
+                    ]
+                  },
+                  {
+                    "crn": 336516,
+                    "number": "CX02",
+                    "seats": 40,
+                    "seatsAvailable": 1,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4326",
+                    "computedTerm": "C",
+                    "isInterestList": false,
+                    "periods": [
+                      {
+                        "type": "Lab",
+                        "professor": "Ye Lu",
+                        "startTime": {
+                          "hours": 15,
+                          "minutes": 0,
+                          "displayTime": "3:00 PM"
+                        },
+                        "endTime": {
+                          "hours": 15,
+                          "minutes": 50,
+                          "displayTime": "3:50 PM"
+                        },
+                        "location": "Higgins Labs 230 Geom Modeling Computer Lab",
+                        "building": "",
+                        "room": "Higgins Labs 230 Geom Modeling Computer Lab",
+                        "seats": 40,
+                        "seatsAvailable": 1,
+                        "actualWaitlist": 0,
+                        "maxWaitlist": 0,
+                        "days": {
+                          "__type": "Set",
+                          "value": ["R"]
+                        },
+                        "specificSection": "CX02",
+                        "isAsync": false
+                      }
+                    ]
+                  },
+                  {
+                    "crn": 336542,
+                    "number": "CX03",
+                    "seats": 40,
+                    "seatsAvailable": 15,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4326",
+                    "computedTerm": "C",
+                    "isInterestList": false,
+                    "periods": [
+                      {
+                        "type": "Lab",
+                        "professor": "Ye Lu",
+                        "startTime": {
+                          "hours": 16,
+                          "minutes": 0,
+                          "displayTime": "4:00 PM"
+                        },
+                        "endTime": {
+                          "hours": 16,
+                          "minutes": 50,
+                          "displayTime": "4:50 PM"
+                        },
+                        "location": "Higgins Labs 230 Geom Modeling Computer Lab",
+                        "building": "",
+                        "room": "Higgins Labs 230 Geom Modeling Computer Lab",
+                        "seats": 40,
+                        "seatsAvailable": 15,
+                        "actualWaitlist": 0,
+                        "maxWaitlist": 0,
+                        "days": {
+                          "__type": "Set",
+                          "value": ["R"]
+                        },
+                        "specificSection": "CX03",
+                        "isAsync": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "minCredits": 3,
+            "maxCredits": 3,
+            "isGraduate": false,
+            "academicYear": 2025
+          },
+          "isRequired": true,
+          "lockedSections": {
+            "__type": "Set",
+            "value": []
+          },
+          "allowedTerms": ["C"],
+          "selected": {
+            "lecture": {
+              "crn": 336199,
+              "number": "CL01",
+              "seats": 120,
+              "seatsAvailable": 18,
+              "actualWaitlist": 0,
+              "maxWaitlist": 20,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4326",
+              "computedTerm": "C",
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lecture",
+                  "professor": "Ye Lu; Inna Nechipurenko",
+                  "startTime": {
+                    "hours": 9,
+                    "minutes": 0,
+                    "displayTime": "9:00 AM"
+                  },
+                  "endTime": {
+                    "hours": 9,
+                    "minutes": 50,
+                    "displayTime": "9:50 AM"
+                  },
+                  "location": "Unity Hall 400",
+                  "building": "",
+                  "room": "Unity Hall 400",
+                  "seats": 120,
+                  "seatsAvailable": 18,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 20,
+                  "days": {
+                    "__type": "Set",
+                    "value": ["M", "T", "W", "R", "F"]
+                  },
+                  "specificSection": "CL01",
+                  "isAsync": false
+                }
+              ]
+            },
+            "lab": {
+              "crn": 336554,
+              "number": "CX01",
+              "seats": 40,
+              "seatsAvailable": 2,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4326",
+              "computedTerm": "C",
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lab",
+                  "professor": "Ye Lu",
+                  "startTime": {
+                    "hours": 14,
+                    "minutes": 0,
+                    "displayTime": "2:00 PM"
+                  },
+                  "endTime": {
+                    "hours": 14,
+                    "minutes": 50,
+                    "displayTime": "2:50 PM"
+                  },
+                  "location": "Higgins Labs 230 Geom Modeling Computer Lab",
+                  "building": "",
+                  "room": "Higgins Labs 230 Geom Modeling Computer Lab",
+                  "seats": 40,
+                  "seatsAvailable": 2,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "days": {
+                    "__type": "Set",
+                    "value": ["R"]
+                  },
+                  "specificSection": "CX01",
+                  "isAsync": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "course": {
+            "id": "BB-2920-2025",
+            "number": "2920",
+            "name": "Genetics",
+            "description": "Through interactive lectures, group problem solving, and analysis of primary scientific literature, this course will help students understand the gene concept and its applion in modern biological analysis. This course will cover patterns of inheritance, the relationship between genotype and phenotype, and the transmission, coding, and expression of genetic information contained in DNA in both model systems and humans. Students will gain an understanding of the modern tools of genetic analysis, including genomics creation of transgenic organisms, CRISPR editing and RNA interference. Applions of genetic analysis to current advancements in human health, such as gene therapy and personalized medicine, will be explored. Recommended background: Foundational knowledge of concepts in biology and biotechnology (BB 1101 and BB 1102 or equivalent)",
+            "category": 1,
+            "departmentAbbr": "BB",
+            "departmentName": "Biology",
+            "lectures": [
+              {
+                "section": {
+                  "crn": 334665,
+                  "number": "A01",
+                  "seats": 69,
+                  "seatsAvailable": 29,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 20,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lecture",
+                      "professor": "Joseph Duffy",
+                      "startTime": {
+                        "hours": 12,
+                        "minutes": 0,
+                        "displayTime": "12:00 PM"
+                      },
+                      "endTime": {
+                        "hours": 12,
+                        "minutes": 50,
+                        "displayTime": "12:50 PM"
+                      },
+                      "location": "Salisbury Labs 104",
+                      "building": "",
+                      "room": "Salisbury Labs 104",
+                      "seats": 69,
+                      "seatsAvailable": 29,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 20,
+                      "days": {
+                        "__type": "Set",
+                        "value": ["M", "T", "W", "R", "F"]
+                      },
+                      "specificSection": "A01",
+                      "isAsync": false
+                    }
+                  ]
+                },
+                "compatibleDiscussions": [
+                  {
+                    "crn": 336182,
+                    "number": "CD01",
+                    "seats": 60,
+                    "seatsAvailable": -1,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4420",
+                    "computedTerm": "C",
+                    "isInterestList": false,
+                    "periods": [
+                      {
+                        "type": "Discussion",
+                        "professor": "Inna Nechipurenko",
+                        "startTime": {
+                          "hours": 15,
+                          "minutes": 0,
+                          "displayTime": "3:00 PM"
+                        },
+                        "endTime": {
+                          "hours": 15,
+                          "minutes": 50,
+                          "displayTime": "3:50 PM"
+                        },
+                        "location": "Goddard Hall 227 Classroom",
+                        "building": "",
+                        "room": "Goddard Hall 227 Classroom",
+                        "seats": 60,
+                        "seatsAvailable": -1,
+                        "actualWaitlist": 0,
+                        "maxWaitlist": 0,
+                        "days": {
+                          "__type": "Set",
+                          "value": ["W"]
+                        },
+                        "specificSection": "CD01",
+                        "isAsync": false
+                      }
+                    ]
+                  }
+                ],
+                "compatibleLabs": []
+              },
+              {
+                "section": {
+                  "crn": 336181,
+                  "number": "CL01",
+                  "seats": 60,
+                  "seatsAvailable": -1,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 15,
+                  "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4420",
+                  "computedTerm": "C",
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lecture",
+                      "professor": "Inna Nechipurenko",
+                      "startTime": {
+                        "hours": 15,
+                        "minutes": 0,
+                        "displayTime": "3:00 PM"
+                      },
+                      "endTime": {
+                        "hours": 15,
+                        "minutes": 50,
+                        "displayTime": "3:50 PM"
+                      },
+                      "location": "Unity Hall 520",
+                      "building": "",
+                      "room": "Unity Hall 520",
+                      "seats": 60,
+                      "seatsAvailable": -1,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 15,
+                      "days": {
+                        "__type": "Set",
+                        "value": ["M", "T", "R", "F"]
+                      },
+                      "specificSection": "CL01",
+                      "isAsync": false
+                    }
+                  ]
+                },
+                "compatibleDiscussions": [
+                  {
+                    "crn": 336182,
+                    "number": "CD01",
+                    "seats": 60,
+                    "seatsAvailable": -1,
+                    "actualWaitlist": 0,
+                    "maxWaitlist": 0,
+                    "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4420",
+                    "computedTerm": "C",
+                    "isInterestList": false,
+                    "periods": [
+                      {
+                        "type": "Discussion",
+                        "professor": "Inna Nechipurenko",
+                        "startTime": {
+                          "hours": 15,
+                          "minutes": 0,
+                          "displayTime": "3:00 PM"
+                        },
+                        "endTime": {
+                          "hours": 15,
+                          "minutes": 50,
+                          "displayTime": "3:50 PM"
+                        },
+                        "location": "Goddard Hall 227 Classroom",
+                        "building": "",
+                        "room": "Goddard Hall 227 Classroom",
+                        "seats": 60,
+                        "seatsAvailable": -1,
+                        "actualWaitlist": 0,
+                        "maxWaitlist": 0,
+                        "days": {
+                          "__type": "Set",
+                          "value": ["W"]
+                        },
+                        "specificSection": "CD01",
+                        "isAsync": false
+                      }
+                    ]
+                  }
+                ],
+                "compatibleLabs": []
+              }
+            ],
+            "minCredits": 3,
+            "maxCredits": 3,
+            "isGraduate": false,
+            "academicYear": 2025
+          },
+          "isRequired": false,
+          "lockedSections": {
+            "__type": "Set",
+            "value": []
+          },
+          "customColor": "#00b3a4",
+          "selected": {
+            "lecture": {
+              "crn": 999999,
+              "number": "A01",
+              "seats": 69,
+              "seatsAvailable": 29,
+              "actualWaitlist": 0,
+              "maxWaitlist": 20,
+              "note": null,
+              "computedTerm": "A",
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Lecture",
+                  "professor": "Not Assigned",
+                  "startTime": {
+                    "hours": 12,
+                    "minutes": 0,
+                    "displayTime": "12:00 PM"
+                  },
+                  "endTime": {
+                    "hours": 12,
+                    "minutes": 50,
+                    "displayTime": "12:50 PM"
+                  },
+                  "location": "Salisbury Labs 104",
+                  "building": "",
+                  "room": "Salisbury Labs 104",
+                  "seats": 69,
+                  "seatsAvailable": 29,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 20,
+                  "days": {
+                    "__type": "Set",
+                    "value": ["M", "T", "W", "R", "F"]
+                  },
+                  "specificSection": "A01",
+                  "isAsync": false
+                }
+              ]
+            },
+            "discussion": {
+              "crn": 336182,
+              "number": "CD01",
+              "seats": 60,
+              "seatsAvailable": -1,
+              "actualWaitlist": 0,
+              "maxWaitlist": 0,
+              "note": "STUDENT_COURSE_SECTION_CLUSTER-3-4420",
+              "computedTerm": "C",
+              "isInterestList": false,
+              "periods": [
+                {
+                  "type": "Discussion",
+                  "professor": "Inna Nechipurenko",
+                  "startTime": {
+                    "hours": 15,
+                    "minutes": 0,
+                    "displayTime": "3:00 PM"
+                  },
+                  "endTime": {
+                    "hours": 15,
+                    "minutes": 50,
+                    "displayTime": "3:50 PM"
+                  },
+                  "location": "Goddard Hall 227 Classroom",
+                  "building": "",
+                  "room": "Goddard Hall 227 Classroom",
+                  "seats": 60,
+                  "seatsAvailable": -1,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 0,
+                  "days": {
+                    "__type": "Set",
+                    "value": ["W"]
+                  },
+                  "specificSection": "CD01",
+                  "isAsync": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "course": {
+            "id": "AB-1531-2025",
+            "number": "1531",
+            "name": "Elementary Arabic I",
+            "description": "An intensive course to introduce the Arabic language to students with no background in Arabic. Oral language acquisition will stress structures and vocabulary required for basic communive tasks. Emphasis will be on grammar, vocabulary, and writing system. Cultural aspects of Arabic-speaking countries introduced through course material.This course is closed to native speakers of Arabic and heritage speakers except with written permission from the instructor.",
+            "category": 1,
+            "departmentAbbr": "AB",
+            "departmentName": "Arabic",
+            "lectures": [
+              {
+                "section": {
+                  "crn": 334531,
+                  "number": "A01",
+                  "seats": 25,
+                  "seatsAvailable": -1,
+                  "actualWaitlist": 0,
+                  "maxWaitlist": 9,
+                  "note": null,
+                  "computedTerm": "A",
+                  "isInterestList": false,
+                  "periods": [
+                    {
+                      "type": "Lecture",
+                      "professor": "Mohammed El Hamzaoui",
+                      "startTime": {
+                        "hours": 9,
+                        "minutes": 0,
+                        "displayTime": "9:00 AM"
+                      },
+                      "endTime": {
+                        "hours": 9,
+                        "minutes": 50,
+                        "displayTime": "9:50 AM"
+                      },
+                      "location": "Fuller Labs 311",
+                      "building": "",
+                      "room": "Fuller Labs 311",
+                      "seats": 25,
+                      "seatsAvailable": -1,
+                      "actualWaitlist": 0,
+                      "maxWaitlist": 9,
+                      "days": {
+                        "__type": "Set",
+                        "value": ["M", "T", "R", "F"]
+                      },
+                      "specificSection": "A01",
+                      "isAsync": false
+                    }
+                  ]
+                },
+                "compatibleDiscussions": [],
+                "compatibleLabs": []
+              }
+            ],
+            "minCredits": 3,
+            "maxCredits": 3,
+            "isGraduate": false,
+            "academicYear": 2025
+          },
+          "isRequired": false
+        }
+      ],
+      "generatedSchedules": [],
+      "localEvents": [],
+      "timestamp": 1700000001000,
+      "year": 2025
+    }
   }
 ]

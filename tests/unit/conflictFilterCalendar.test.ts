@@ -30,7 +30,7 @@ function mondaySection(number: string, hour: number): Section {
     periods: [
       {
         type: PeriodType.LECTURE,
-        professor: 'Prof X',
+        instructors: ['Prof X'],
         startTime: { hours: hour, minutes: 0 },
         endTime: { hours: hour, minutes: 50 },
         location: 'SH',

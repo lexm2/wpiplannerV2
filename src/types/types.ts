@@ -126,8 +126,8 @@ export enum PeriodType {
 
 export interface Period {
   type: PeriodType;
-  professor: string;
-  professorEmail?: string;
+  /** Named instructors, co-instructors each their own; empty when none is assigned. */
+  instructors: string[];
   startTime: Time;
   endTime: Time;
   location: string;

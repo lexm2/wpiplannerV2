@@ -9,6 +9,7 @@
  */
 import type * as z from 'zod';
 import type { SectionBasedFilter } from '../SectionFilterPipeline';
+import type { SearchIndex } from '../../../utils/searchUtils';
 import type { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 import { SearchTextFilter } from './SearchTextFilter';
 import { DepartmentFilter } from './DepartmentFilter';
@@ -29,6 +30,8 @@ import { DegreeBucketFilter } from './DegreeBucketFilter';
 
 export interface FilterDeps {
   rmp: RateMyProfessorService;
+  /** The loaded catalog's search index, read anew each search. */
+  searchIndex: () => SearchIndex;
 }
 
 /** A filter class as the registry holds it: what it takes, and how to make one. */

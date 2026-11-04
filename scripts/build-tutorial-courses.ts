@@ -104,7 +104,7 @@ const remapSection = (s: Record<string, unknown>, professor: string) => ({
   number: 'T' + (s.number as string),
   periods: ((s.periods as Record<string, unknown>[]) ?? []).map(p => ({
     ...p,
-    professor,
+    instructors: [professor],
   })),
 });
 

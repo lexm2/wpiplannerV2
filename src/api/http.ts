@@ -42,24 +42,11 @@ function json(
   });
 }
 
-/** An ApiError raised by the routes themselves, with headers to send. */
-class HttpError extends ApiError {
-  constructor(
-    status: number,
-    message: string,
-    details?: unknown,
-    readonly headers: Record<string, string> = {},
-  ) {
-    super(message, status, details);
-  }
-}
-
 /** Refuses any query parameter but `allowed`, as GET /courses does. */
 function onlyParams(params: URLSearchParams, allowed: string[]): void {
   const unknown = [...new Set(params.keys())].filter(k => !allowed.includes(k));
   if (unknown.length > 0) {
-    throw new HttpError(
-      400,
+    throw new ApiError(
       `Unknown parameter: ${unknown.map(echo).join(', ')}${allowed.length ? `. Accepted: ${allowed.join(', ')}` : '; this route takes none'}.`,
     );
   }
@@ -75,7 +62,7 @@ function parseOrThrow<T extends z.ZodType>(
 ): z.output<T> {
   const result = schema.safeParse(input);
   if (!result.success) {
-    throw new HttpError(400, 'Invalid request', result.error.issues);
+    throw new ApiError('Invalid request', 400, result.error.issues);
   }
   return result.data;
 }
@@ -84,7 +71,7 @@ async function readBody(request: Request): Promise<unknown> {
   try {
     return (await request.json()) as unknown;
   } catch {
-    throw new HttpError(400, 'Request body must be JSON');
+    throw new ApiError('Request body must be JSON');
   }
 }
 
@@ -143,9 +130,11 @@ const COURSE_PARAMS = new Set([
  * "abc" becomes NaN and the schema rejects it.
  */
 function courseQueryFromParams(params: URLSearchParams): unknown {
-  const unknown = [...params.keys()].filter(k => !COURSE_PARAMS.has(k));
+  const unknown = [...new Set(params.keys())].filter(
+    k => !COURSE_PARAMS.has(k),
+  );
   if (unknown.length > 0) {
-    throw new HttpError(400, `Unknown parameter: ${unknown.join(', ')}`);
+    throw new ApiError(`Unknown parameter: ${unknown.map(echo).join(', ')}`);
   }
 
   const str = (k: string) => params.get(k) ?? undefined;
@@ -154,7 +143,7 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     const v = params.get(k);
     if (v === null) return undefined;
     if (!re.test(v.trim())) {
-      throw new HttpError(400, `${k} must be ${what}, got "${echo(v)}".`);
+      throw new ApiError(`${k} must be ${what}, got "${echo(v)}".`);
     }
     return Number(v);
   };
@@ -183,11 +172,10 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
       try {
         value = JSON.parse(params.get(k)!) as unknown;
       } catch {
-        throw new HttpError(400, `${k} must be JSON`);
+        throw new ApiError(`${k} must be JSON`);
       }
       if (!value || typeof value !== 'object' || Array.isArray(value)) {
-        throw new HttpError(
-          400,
+        throw new ApiError(
           `${k} must be a JSON object${example ? `, e.g. ${example}` : ''}`,
         );
       }
@@ -195,11 +183,11 @@ function courseQueryFromParams(params: URLSearchParams): unknown {
     },
     needs: (k, parent) => {
       if (params.has(k) && !params.has(parent)) {
-        throw new HttpError(400, `${k} needs ${parent}: it qualifies it.`);
+        throw new ApiError(`${k} needs ${parent}: it qualifies it.`);
       }
     },
     fail: message => {
-      throw new HttpError(400, message);
+      throw new ApiError(message);
     },
   };
 
@@ -289,10 +277,7 @@ const ROUTES: Route[] = [
       try {
         id = decodeURIComponent(match![1]);
       } catch {
-        throw new HttpError(
-          400,
-          'The course in the path is not valid URL encoding.',
-        );
+        throw new ApiError('The course in the path is not valid URL encoding.');
       }
       const found = lookupCourse(await getCatalog(), id, options);
       // A year not yet published answers with the outlook instead.
@@ -337,17 +322,25 @@ async function route(
     const match = typeof key === 'string' ? null : key.exec(path);
     if (key !== path && !match) continue;
     if (request.method !== method) {
-      throw new HttpError(
+      return json(
+        {
+          error: `${path} takes ${method}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
+        },
         405,
-        `${path} takes ${method}${path === '/courses/search' ? '; GET /courses takes the search as query parameters' : ''}.`,
-        undefined,
         { Allow: `${method}, OPTIONS` },
       );
     }
     return handle({ request, url, match, getCatalog });
   }
-  throw new HttpError(404, 'Not found');
+  throw new ApiError('Not found', 404);
 }
+
+/**
+ * The route version, in every path: `{basePath}/api/v1/courses`. Within
+ * one, responses only gain fields; renaming or removing one, or changing
+ * what a field holds, is a new version.
+ */
+export const API_VERSION = 'v1';
 
 /**
  * Handles everything under `{basePath}/api`; returns null for other paths so
@@ -357,15 +350,24 @@ export function createApiHandler(options: {
   basePath: string;
   getCatalog: () => Promise<Catalog>;
 }): (request: Request) => Promise<Response | null> {
-  const prefix = `${options.basePath}/api`;
+  const root = `${options.basePath}/api`;
+  const prefix = `${root}/${API_VERSION}`;
+  const under = (path: string, base: string) =>
+    path === base || path.startsWith(`${base}/`);
 
   return async request => {
     const url = new URL(request.url);
-    if (url.pathname !== prefix && !url.pathname.startsWith(`${prefix}/`)) {
-      return null;
-    }
+    if (!under(url.pathname, root)) return null;
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
+    }
+    if (!under(url.pathname, prefix)) {
+      return json(
+        {
+          error: `The API's routes are under ${prefix}, e.g. ${prefix}/courses.`,
+        },
+        404,
+      );
     }
 
     const path = url.pathname.slice(prefix.length).replace(/\/$/, '');
@@ -376,7 +378,6 @@ export function createApiHandler(options: {
         return json(
           { error: error.message, details: error.details },
           error.status,
-          error instanceof HttpError ? error.headers : {},
         );
       }
       logger.error('[api] Request failed:', error);

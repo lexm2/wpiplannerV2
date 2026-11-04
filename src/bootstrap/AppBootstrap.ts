@@ -123,9 +123,13 @@ export class AppBootstrap {
   }
 
   static initializeFilters(services: ServiceContainer): void {
-    const { filterService } = services;
+    const { filterService, courseDataService } = services;
 
-    for (const filter of createFilters({ rmp: rateMyProfessorService })) {
+    const deps = {
+      rmp: rateMyProfessorService,
+      searchIndex: () => courseDataService.getSearchIndex(),
+    };
+    for (const filter of createFilters(deps)) {
       filterService.registerFilter(filter);
     }
   }

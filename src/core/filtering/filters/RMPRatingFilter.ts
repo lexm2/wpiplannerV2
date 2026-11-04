@@ -13,12 +13,9 @@ type RatingNumbers = NonNullable<
   ReturnType<RateMyProfessorService['getRatings']>
 >;
 
-/** Every named instructor of the section's periods, co-instructors split. */
+/** Every instructor of the section's periods, each once. */
 export function instructorsOf(section: Section): string[] {
-  const names = section.periods.flatMap(period =>
-    (period.professor ?? '').split(/\s*;\s*/),
-  );
-  return [...new Set(names.filter(name => name && name !== 'Not Assigned'))];
+  return [...new Set(section.periods.flatMap(period => period.instructors))];
 }
 
 /**
@@ -57,7 +54,7 @@ export class RMPRatingFilter implements SectionBasedFilter {
 
   private rmpService: RateMyProfessorService;
 
-  constructor({ rmp }: FilterDeps) {
+  constructor({ rmp }: Pick<FilterDeps, 'rmp'>) {
     this.rmpService = rmp;
   }
 

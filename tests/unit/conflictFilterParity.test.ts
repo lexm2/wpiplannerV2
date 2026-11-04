@@ -114,7 +114,7 @@ function randomSection(r: () => number, crn: number): Section {
     };
     return {
       type: PeriodType.LECTURE,
-      professor: 'P',
+      instructors: ['P'],
       startTime: start,
       endTime: end,
       location: '',

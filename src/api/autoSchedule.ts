@@ -45,6 +45,7 @@ import {
   unpublishedYearError,
 } from './lookup';
 import { leaveOutEndedTerms } from './filterInputs';
+import { notice, type Notice } from './notices';
 import { filterServiceFor } from './query';
 import { caseless, FallYearSchema } from './schemaHints';
 import {
@@ -185,7 +186,7 @@ export interface ScheduleSet {
   /** Courses with no usable section; empty when every course has one. */
   unschedulable: { code: string; name: string }[];
   preferences: z.output<typeof RankingPreferencesSchema>;
-  notices: string[];
+  notices: Notice[];
   dataAsOf: string | null;
   dataAgeDays: number | null;
 }
@@ -199,7 +200,7 @@ function requestedCourses(
   catalog: Catalog,
   input: AutoScheduleInput,
   year: number,
-  notices: string[],
+  notices: Notice[],
 ): Requested[] {
   const requested: Requested[] = [];
   for (const entry of input.courses) {
@@ -230,7 +231,7 @@ function keptSlots(
   keepCrns: number[],
   year: number,
   requested: Requested[],
-  notices: string[],
+  notices: Notice[],
 ) {
   const { slots, otherYear } = blockedSlotsForCrns(catalog, keepCrns, year);
   for (const crn of keepCrns) {
@@ -248,7 +249,10 @@ function keptSlots(
   }
   if (otherYear.length) {
     notices.push(
-      `keepCrns ignores CRN ${listSome(otherYear)}: not ${yearLabel(year)} sections, so they cannot clash with the ones scheduled.`,
+      notice(
+        'conflictYears',
+        `keepCrns ignores CRN ${listSome(otherYear)}: not ${yearLabel(year)} sections, so they cannot clash with the ones scheduled.`,
+      ),
     );
   }
   return slots;
@@ -366,7 +370,7 @@ export function generateSchedules(
   const unpublished = unpublishedYearError(catalog, year);
   if (unpublished) throw unpublished;
 
-  const notices: string[] = [];
+  const notices: Notice[] = [];
   const requested = requestedCourses(catalog, input, year, notices);
   const blockedSlots = [
     ...keptSlots(catalog, input.keepCrns ?? [], year, requested, notices),
@@ -378,7 +382,10 @@ export function generateSchedules(
     )
   ) {
     notices.push(
-      'Busy blocks on Saturday or Sunday are not applied: sections are fitted Monday to Friday.',
+      notice(
+        'weekendIgnored',
+        'Busy blocks on Saturday or Sunday are not applied: sections are fitted Monday to Friday.',
+      ),
     );
   }
 
@@ -425,7 +432,10 @@ export function generateSchedules(
   if (!candidates.ok) {
     const names = candidates.unschedulable.map(c => courseCode(c));
     notices.push(
-      `No schedule: ${names.join(', ')} ${names.length === 1 ? 'has' : 'have'} no section that can be scheduled. Likely causes: ${causes(input, ended)}.`,
+      notice(
+        'noSchedule',
+        `No schedule: ${names.join(', ')} ${names.length === 1 ? 'has' : 'have'} no section that can be scheduled. Likely causes: ${causes(input, ended)}.`,
+      ),
     );
     return {
       ...base,
@@ -447,19 +457,31 @@ export function generateSchedules(
   // shown that everything clashes.
   if (cutShort && found.length === 0) {
     notices.push(
-      `No schedule yet: the search ran out of time (${SEARCH_BUDGET_MS / 1000} second) before finishing one, so this says nothing about whether one fits. Give fewer courses, or terms for the courses with many lab and discussion choices.`,
+      notice(
+        'searchCutShort',
+        `No schedule yet: the search ran out of time (${SEARCH_BUDGET_MS / 1000} second) before finishing one, so this says nothing about whether one fits. Give fewer courses, or terms for the courses with many lab and discussion choices.`,
+      ),
     );
   } else if (found.length === 0) {
     notices.push(
-      `No schedule: every combination of the courses' sections clashes, with each other or with what is blocked. Likely causes: ${causes(input, ended)}. Try fewer courses, or more terms.`,
+      notice(
+        'noSchedule',
+        `No schedule: every combination of the courses' sections clashes, with each other or with what is blocked. Likely causes: ${causes(input, ended)}. Try fewer courses, or more terms.`,
+      ),
     );
   } else if (cutShort) {
     notices.push(
-      `The search was cut short after ${SEARCH_BUDGET_MS / 1000} second: these are the best of the ${plural(found.length, 'schedule')} found so far, and better ones may exist. Fewer courses, or terms for the courses with many lab and discussion choices, make it complete.`,
+      notice(
+        'searchCutShort',
+        `The search was cut short after ${SEARCH_BUDGET_MS / 1000} second: these are the best of the ${plural(found.length, 'schedule')} found so far, and better ones may exist. Fewer courses, or terms for the courses with many lab and discussion choices, make it complete.`,
+      ),
     );
   } else if (found.length >= SEARCH_CAP) {
     notices.push(
-      `The search stopped after ${plural(SEARCH_CAP, 'schedule')}; the best of those are shown, and a better one may exist.`,
+      notice(
+        'searchCapped',
+        `The search stopped after ${plural(SEARCH_CAP, 'schedule')}; the best of those are shown, and a better one may exist.`,
+      ),
     );
   }
   const order = requested.map(r => r.course);

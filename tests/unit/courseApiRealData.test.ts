@@ -11,6 +11,7 @@ import { createMcpEndpoint } from '../../src/mcp/server';
 import { resolveDepartments } from '../../src/api/lookup';
 import { findConflicts } from '../../src/api/conflicts';
 import type { ApiError } from '../../src/api/errors';
+import { notice } from '../../src/api/notices';
 
 const source = new CatalogSource({
   publicDir: join(import.meta.dirname, '../../public'),
@@ -137,7 +138,9 @@ describe('ranking on the real catalog', () => {
     expect(codes).toContain('CS 4341');
     const graduate = ai.courses.map(c => c.isGraduate);
     expect(graduate.indexOf(true)).toBeGreaterThan(graduate.lastIndexOf(false));
-    expect(ai.notices).toContain('"AI" read as AI or artificial intelligence.');
+    expect(ai.notices).toContainEqual(
+      notice('acronymRead', '"AI" read as AI or artificial intelligence.'),
+    );
   });
 
   it('ranks calculus by number and numeral, whatever the spelling', () => {
@@ -183,7 +186,8 @@ describe('loose searches on the real catalog', () => {
     expect(loose.total).toBeGreaterThan(20);
     expect(loose.courses).toHaveLength(5);
     expect(loose.search?.descriptionOnly).toBe(true);
-    expect(loose.notices.join(' ')).toContain('listing the closest 5 of');
+    const closest = loose.notices.find(n => n.code === 'closestOnly');
+    expect(closest?.message).toContain('listing the closest 5 of');
     // An explicit limit, and a search matching names, are not capped.
     const asked = runCourseQuery(
       catalog,
@@ -200,13 +204,16 @@ describe('loose searches on the real catalog', () => {
 describe('known terms on the real catalog', () => {
   it('names the catalog courses an IQP or HUA search means', () => {
     const iqp = search('IQP', 5);
-    expect(iqp.notices[0]).toContain('Catalog courses named for it: ID 2050');
+    expect(iqp.notices[0].code).toBe('knownTerm');
+    expect(iqp.notices[0].message).toContain(
+      'Catalog courses named for it: ID 2050',
+    );
     expect(iqp.courses[0].code).toBe('ID 2050');
     const hua = search('HUA', 5);
-    expect(hua.notices[0]).toContain(
+    expect(hua.notices[0].message).toContain(
       'HU 3900 Inquiry Seminar In Humanities And Arts',
     );
-    expect(hua.notices[0]).toContain(
+    expect(hua.notices[0].message).toContain(
       'HU 3910 Practicum In Humanities And Arts',
     );
   });

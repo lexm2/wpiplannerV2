@@ -59,10 +59,10 @@ export function transformSection(
   const sectionDetails = workdaySection.Section_Details || '';
   const meetingPatterns = parseSectionDetails(sectionDetails);
 
-  let professor = workdaySection.Instructors || 'Not Assigned';
-  if (!professor || professor.trim() === '') {
-    professor = isInterestList ? 'N/A' : 'Not Assigned';
-  }
+  const instructors = (workdaySection.Instructors ?? '')
+    .split(';')
+    .map(name => name.trim())
+    .filter(Boolean);
 
   const type =
     instructionalFormat === 'Laboratory' ? 'Lab' : instructionalFormat;
@@ -72,7 +72,7 @@ export function transformSection(
       pattern.startTime === '12:00' && pattern.endTime === '12:00';
     return {
       type: type,
-      professor: professor,
+      instructors,
       startTime: pattern.startTime,
       endTime: pattern.endTime,
       location: pattern.location,

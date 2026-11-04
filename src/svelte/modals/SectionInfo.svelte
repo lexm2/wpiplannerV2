@@ -24,9 +24,7 @@
   const professors = $derived.by<ProfessorLink[]>(() => {
     if (!data) return [];
     const names = [
-      ...new Set(
-        data.section.periods.map(p => p.professor).filter(p => p && p.trim()),
-      ),
+      ...new Set(data.section.periods.flatMap(p => p.instructors)),
     ];
     return names.map(name => ({
       name,

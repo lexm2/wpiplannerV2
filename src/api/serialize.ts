@@ -227,21 +227,12 @@ export interface DetailContext {
   earlyEntry: boolean;
 }
 
-function isNamedProfessor(name: string): boolean {
-  return !!name.trim() && name !== 'TBA' && name !== 'Not Assigned';
-}
-
-/** A period's named instructors; co-taught "A; B" splits. */
-export function instructorNames(period: Period): string[] {
-  return period.professor.split(/\s*;\s*/).filter(isNamedProfessor);
-}
-
 /** Instructor names in order of first appearance. */
 function professorsOf(sections: Section[]): string[] {
   const names = new Set<string>();
   for (const section of sections) {
     for (const period of section.periods) {
-      for (const name of instructorNames(period)) names.add(name);
+      for (const name of period.instructors) names.add(name);
     }
   }
   return [...names];
@@ -267,54 +258,6 @@ export function byTerm<T extends object>(
     term,
     ...f(sections.filter(s => (s.computedTerm as string) === term)),
   }));
-}
-
-/**
- * A description's own heading for a statement, as a pattern source, with
- * or without a colon ("Recommended Background Working knowledge of...",
- * "The recommended background for this course is...", "Prerequisites
- * Completion of 24 credits..."). The catalog parser lifts only the colon
- * form, so 27 courses (PH 1110, DS 2010, CS 594...) had the statement in
- * their description and none in the field. The MCP text cuts the same
- * headings, in any case, from the description it shows.
- */
-export const STATEMENT_HEADING = {
-  recommendedBackground: String.raw`(?:The\s+)?(?:[Rr]ecommended|[Ss]uggested|[Rr]equired)\s+[Bb]ackgrounds?(?:\s+for\s+this\s+course)?(?:\s+(?:is|includes|consists\s+of))?\s*[:;]?`,
-  prerequisites: String.raw`Prerequisites?\s*[:;]?`,
-};
-
-/** A heading as statementOf looks for it: starting a sentence. */
-const atSentenceStart = (heading: string) =>
-  new RegExp(String.raw`(?:^|[.!?)]\s+)${heading}\s*`);
-
-const STATEMENT_HEADINGS = {
-  recommendedBackground: atSentenceStart(
-    STATEMENT_HEADING.recommendedBackground,
-  ),
-  prerequisites: atSentenceStart(STATEMENT_HEADING.prerequisites),
-};
-
-/**
- * The course's prerequisite or background statement: the parsed field, or
- * else the sentence its heading starts in the description, up to the
- * sentence's end. Null when the description has neither.
- */
-export function statementOf(
-  course: Pick<
-    Course,
-    'description' | 'prerequisites' | 'recommendedBackground'
-  >,
-  kind: keyof typeof STATEMENT_HEADINGS,
-): string | null {
-  const parsed = course[kind];
-  if (parsed) return parsed;
-  const heading = STATEMENT_HEADINGS[kind].exec(course.description);
-  if (!heading) return null;
-  const rest = course.description.slice(heading.index + heading[0].length);
-  // To the first full stop ending a sentence: before a capital or the end.
-  const end = /\.(?=\s+[A-Z(]|\s*$)/.exec(rest);
-  const statement = (end ? rest.slice(0, end.index) : rest).trim();
-  return statement || null;
 }
 
 export function courseCode(course: Course): string {
@@ -441,7 +384,7 @@ function toPeriodView(
 
   return {
     type: period.type,
-    instructors: instructorNames(period).map(name => ({
+    instructors: period.instructors.map(name => ({
       name,
       rmp: ratingOf(name),
     })),
@@ -609,7 +552,7 @@ const KIND_RANK: Record<SectionKind, number> = {
 export function toCourseDetail(
   course: Course,
   context: DetailContext,
-  options: DetailOptions = {},
+  options: DetailOptions,
 ): CourseDetail {
   const ratingOf = ratingLookup(context.rmp);
   const ended = new Set(context.endedTerms);
@@ -702,8 +645,8 @@ export function toCourseDetail(
     departmentName: course.departmentName,
     description: course.description,
     courseTypes: course.courseTypes,
-    recommendedBackground: statementOf(course, 'recommendedBackground'),
-    prerequisites: statementOf(course, 'prerequisites'),
+    recommendedBackground: course.recommendedBackground ?? null,
+    prerequisites: course.prerequisites ?? null,
     sections,
     lectureGroups,
     standaloneLabs: standaloneLabs.map(l => l.crn),

@@ -18,11 +18,8 @@ import { FilterService } from '../services/filtering/FilterService';
 import { createFilters } from '../core/filtering/filters';
 import { getAllSections } from '../utils/courseUtils';
 import {
-  acronymExpansions,
-  describeMatch,
   MAX_QUERY_WORDS,
-  parseSearchQuery,
-  rankCoursesByRelevance,
+  type ParsedQuery,
   type SearchMatch,
 } from '../utils/searchUtils';
 import { currentAcademicYear, type Catalog } from './catalog';
@@ -38,6 +35,7 @@ import { companionDrops, dropNotice, judgesCompanions } from './companionDrops';
 import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
 import { echo } from './errors';
+import { notice, type Notice } from './notices';
 import { one } from './text';
 import { EndedTermsFilter } from './endedTermsFilter';
 import { strictObject } from './schemaHints';
@@ -45,7 +43,6 @@ import {
   filtersSchema,
   picksCoursesOnly,
   readFilters,
-  unrestrictiveFilters,
   type FilterId,
   type ReadContext,
 } from './filterInputs';
@@ -182,7 +179,7 @@ export interface CourseQueryResult {
   /** Whole days since then (see seatDataAge). */
   dataAgeDays: number | null;
   /** Things the caller should know about how the query was read. */
-  notices: string[];
+  notices: Notice[];
   /**
    * With searchText: the query, and whether every match only mentions it:
    * none has it in its name, code or department, its words together in a
@@ -257,6 +254,35 @@ interface Relaxation {
 }
 
 /**
+ * Filters given in a form that lets every course through: run alone on the
+ * year's sections, they keep every one (the full credit range, every level,
+ * mode, term or offering category, an availability or rating filter with
+ * no bound). Leaving one out changes nothing, so an empty search never
+ * blames or reruns it. Asking the filters themselves, rather than listing
+ * what "everything" means for each, keeps this true as they change: a
+ * level range of 1-9 drops a course number without digits.
+ */
+function unrestrictiveFilters(
+  catalog: Catalog,
+  query: CourseQuery,
+  criteria: Map<string, unknown>,
+): FilterId[] {
+  const always = ['academicYear', 'interestList'] as const;
+  const base = always.map(id => [id, criteria.get(id)] as const);
+  const kept = (...extra: (readonly [string, unknown])[]) =>
+    filterServiceFor(catalog, new Map([...base, ...extra])).apply(
+      catalog.courses,
+    ).length;
+  const all = kept();
+  return (Object.keys(query.filters) as FilterId[]).filter(
+    id =>
+      id !== 'academicYear' &&
+      criteria.has(id) &&
+      kept([id, criteria.get(id)]) === all,
+  );
+}
+
+/**
  * The same search with each given filter left out in turn, so an empty
  * result can say which filter emptied it. The year stays: it is a choice
  * of what can be scheduled, not a narrowing. Filters that let everything
@@ -294,7 +320,9 @@ function relax(
       const restores =
         codeSearch !== null && filter !== 'searchText'
           ? found
-              .filter(c => describeMatch(c, codeSearch) === 'code')
+              .filter(
+                c => catalog.search.describeMatch(c, codeSearch) === 'code',
+              )
               .map(courseCode)
           : [];
       return {
@@ -332,7 +360,7 @@ function leftOutByDefaults(
   return options.flatMap(({ reason, key }) => {
     if (query[key]) return [];
     const found = matchesFor(catalog, { ...query, [key]: true }).filter(
-      c => describeMatch(c, codeSearch) === 'code',
+      c => catalog.search.describeMatch(c, codeSearch) === 'code',
     );
     if (!found.length) return [];
     const sections = found.flatMap(c => getAllSections(c));
@@ -354,7 +382,7 @@ interface ReadQuery {
   criteria: Map<string, unknown>;
   year: number | 'all';
   excludedEndedTerms: string[];
-  notices: string[];
+  notices: Notice[];
 }
 
 /**
@@ -399,7 +427,10 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
 /** A FilterService with the filter panel's filters, as AppBootstrap wires it. */
 function createFilterService(catalog: Catalog): FilterService {
   const service = new FilterService();
-  for (const filter of createFilters({ rmp: catalog.rmp })) {
+  for (const filter of createFilters({
+    rmp: catalog.rmp,
+    searchIndex: () => catalog.search,
+  })) {
     service.registerFilter(filter);
   }
   service.registerFilter(new EndedTermsFilter());
@@ -439,7 +470,7 @@ function filterCatalog(
     SearchTextFilterCriteria | undefined;
   return {
     courses: search
-      ? rankCoursesByRelevance(courses, search.query)
+      ? catalog.search.rank(courses, search.query)
       : [...courses].sort(byNumber),
     passed,
   };
@@ -494,7 +525,7 @@ function missingModes(
   query: CourseQuery,
   matches: Course[],
   year: number | 'all',
-): string[] {
+): Notice[] {
   const modes = query.filters.deliveryMode?.modes ?? [];
   if (modes.length < 2 || matches.length === 0) return [];
   const found = new Set(
@@ -505,25 +536,36 @@ function missingModes(
   const where = year === 'all' ? 'any year' : yearLabel(year);
   return modes
     .filter(m => !found.has(m.toLowerCase()))
-    .map(m => `${m}: none in ${where} matching the other filters.`);
+    .map(m =>
+      notice(
+        'deliveryModeMissing',
+        `${m}: none in ${where} matching the other filters.`,
+      ),
+    );
 }
 
 /** "Did you mean Gillian Smith?" for a search that found nothing. */
-function instructorNotice(inYear: Course[], query: string): string[] {
+function instructorNotice(inYear: Course[], query: string): Notice[] {
   const names = suggestInstructors(inYear, query);
   if (!names.length) return [];
   return [
-    `No instructor is named "${echo(query)}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
+    notice(
+      'instructorSuggested',
+      `No instructor is named "${echo(query)}"; did you mean ${names.join(' or ')}? Search their courses with filters.searchText {query: "${names[0]}", professorOnly: true}.`,
+    ),
   ];
 }
 
 /** '"AI" read as AI or artificial intelligence.', for each acronym in the query. */
-function acronymNotices(words: string[]): string[] {
+function acronymNotices(catalog: Catalog, words: string[]): Notice[] {
   return words.flatMap(word => {
-    const expansions = acronymExpansions(word);
+    const expansions = catalog.search.acronymExpansions(word);
     if (!expansions.length) return [];
     return [
-      `"${word.toUpperCase()}" read as ${word.toUpperCase()} or ${expansions.join(' or ')}.`,
+      notice(
+        'acronymRead',
+        `"${word.toUpperCase()}" read as ${word.toUpperCase()} or ${expansions.join(' or ')}.`,
+      ),
     ];
   });
 }
@@ -653,21 +695,38 @@ function companionNotices(
   criteria: Map<string, unknown>,
   passed: FilterableSection[],
   matches: Course[],
-): string[] {
+): Notice[] {
   if (!judgesCompanions(criteria)) return [];
-  return companionDrops(passed, matches, criteria).map(dropNotice);
+  return companionDrops(passed, matches, criteria).map(drop =>
+    notice('companionsDropped', dropNotice(drop)),
+  );
 }
 
-export function runCourseQuery(
-  catalog: Catalog,
-  query: CourseQuery,
-): CourseQueryResult {
+/** A query's matches in the order asked for, and how each matched its text. */
+interface Matched {
+  read: ReadQuery;
+  /** Every course that passed, before cross-listings collapse. */
+  filtered: Course[];
+  passed: FilterableSection[];
+  matches: Course[];
+  matchOf: Map<Course, SearchMatch>;
+  /** The courses a code search names itself. */
+  named: Course[];
+  codeFirst: boolean;
+  parsed: ParsedQuery | null;
+  topic: string | null;
+  codeSearch: string | null;
+  search: CourseQueryResult['search'];
+}
+
+/** Filters, collapses and sorts the catalog for a query. */
+function matchQuery(catalog: Catalog, query: CourseQuery): Matched {
   const read = readQuery(catalog, query);
   const { courses: filtered, passed } = filterCatalog(catalog, read.criteria);
   const collapsed = collapseCrossListings(filtered);
 
   const text = query.filters.searchText;
-  const parsed = text ? parseSearchQuery(text.query) : null;
+  const parsed = text ? catalog.search.parse(text.query) : null;
   // Instructor-only searches are about people, not topics.
   const topic = text && !text.professorOnly ? text.query : null;
   // A search naming a course by its code ("ES 3002").
@@ -675,7 +734,8 @@ export function runCourseQuery(
   // How each course matched a text search.
   const matchOf = new Map<Course, SearchMatch>();
   if (topic !== null) {
-    for (const c of collapsed) matchOf.set(c, describeMatch(c, topic));
+    for (const c of collapsed)
+      matchOf.set(c, catalog.search.describeMatch(c, topic));
   }
   // A code search's own course stays ahead of the courses that only name
   // it, whatever the sort: sorted by rating, MA 1022 sank below courses
@@ -696,10 +756,6 @@ export function runCourseQuery(
       ]
     : sortCourses(collapsed, query.sort, catalog);
 
-  const includeSections =
-    query.includeSections ??
-    (!picksCoursesOnly(query.filters) ||
-      !!query.filters.searchText?.professorOnly);
   const every = (kinds: SearchMatch[]) =>
     matchOf.size > 0 && [...matchOf.values()].every(m => kinds.includes(m));
   const search =
@@ -711,19 +767,47 @@ export function runCourseQuery(
             parsed.words.length >= 2 && every(['description', 'scattered']),
         }
       : null;
-  const limit =
-    query.limit ?? (search?.descriptionOnly ? LOOSE_LIMIT : DEFAULT_LIMIT);
 
+  return {
+    read,
+    filtered,
+    passed,
+    matches,
+    matchOf,
+    named,
+    codeFirst,
+    parsed,
+    topic,
+    codeSearch,
+    search,
+  };
+}
+
+/** The notices, and for a search that missed, what to change. */
+function explainMatches(
+  catalog: Catalog,
+  query: CourseQuery,
+  m: Matched,
+): Pick<
+  CourseQueryResult,
+  'notices' | 'relaxations' | 'unrestrictive' | 'leftOut'
+> {
+  const { read, matches, named, parsed, topic, codeSearch } = m;
+  const text = query.filters.searchText;
   const inYear = catalog.courses.filter(
     c => read.year === 'all' || c.academicYear === read.year,
   );
   const notices = [
-    ...(topic !== null ? knownTermNotes(topic, inYear) : []),
+    ...(topic !== null
+      ? knownTermNotes(topic, inYear).map(n => notice('knownTerm', n))
+      : []),
     ...read.notices,
-    ...companionNotices(read.criteria, passed, filtered),
+    ...companionNotices(read.criteria, m.passed, m.filtered),
   ];
   const unrestrictive =
-    matches.length === 0 ? unrestrictiveFilters(query.filters, catalog) : [];
+    matches.length === 0
+      ? unrestrictiveFilters(catalog, query, read.criteria)
+      : [];
   const relaxations =
     matches.length === 0
       ? relax(catalog, query, unrestrictive, codeSearch)
@@ -736,38 +820,105 @@ export function runCourseQuery(
   }
   if (matches.length > 0 && query.offset >= matches.length) {
     notices.push(
-      `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
+      notice(
+        'offsetPastEnd',
+        `Offset ${query.offset} is past the end: there are only ${matches.length} matching courses.`,
+      ),
     );
   }
-  if (topic !== null && parsed) notices.push(...acronymNotices(parsed.words));
+  if (topic !== null && parsed)
+    notices.push(...acronymNotices(catalog, parsed.words));
   const ignored = parsed?.ignored ?? [];
   if (ignored.length) {
     notices.push(
-      `Searched by the first ${MAX_QUERY_WORDS} distinct words; ignored: ${echo(ignored.join(' '))}. Use one or two topic words.`,
+      notice(
+        'wordsIgnored',
+        `Searched by the first ${MAX_QUERY_WORDS} distinct words; ignored: ${echo(ignored.join(' '))}. Use one or two topic words.`,
+      ),
     );
   }
   if (query.sort !== 'relevance') {
     notices.push(
-      SORT_NOTICE[query.sort] +
-        (codeFirst
-          ? ` The ${one(named.length, 'course', 'courses')} the code names ${one(named.length, 'comes', 'come')} first, then the rest in that order.`
-          : ''),
+      notice(
+        'sorted',
+        SORT_NOTICE[query.sort] +
+          (m.codeFirst
+            ? ` The ${one(named.length, 'course', 'courses')} the code names ${one(named.length, 'comes', 'come')} first, then the rest in that order.`
+            : ''),
+      ),
     );
   }
   notices.push(...missingModes(query, matches, read.year));
-  if (text && REGISTRATION_RE.test(text.query)) notices.push(REGISTRATION_NOTE);
-  if (search?.descriptionOnly && query.limit === undefined) {
+  if (text && REGISTRATION_RE.test(text.query))
+    notices.push(notice('registration', REGISTRATION_NOTE));
+  if (m.search?.descriptionOnly && query.limit === undefined) {
     if (matches.length > LOOSE_LIMIT) {
       notices.push(
-        `No course name has these words, only descriptions: listing the closest ${LOOSE_LIMIT} of ${matches.length}. Pass limit for more, or search one or two topic words.`,
+        notice(
+          'closestOnly',
+          `No course name has these words, only descriptions: listing the closest ${LOOSE_LIMIT} of ${matches.length}. Pass limit for more, or search one or two topic words.`,
+        ),
       );
     }
   }
   if (read.year === 'all') {
     notices.push(
-      `Searching every year; only ${yearLabel(currentAcademicYear(catalog))} can be scheduled.`,
+      notice(
+        'allYears',
+        `Searching every year; only ${yearLabel(currentAcademicYear(catalog))} can be scheduled.`,
+      ),
     );
   }
+  return { notices, relaxations, unrestrictive, leftOut };
+}
+
+/** The page of rows asked for, and its limit. */
+function pageRows(
+  catalog: Catalog,
+  query: CourseQuery,
+  m: Matched,
+): { limit: number; courses: CourseRow[] } {
+  const includeSections =
+    query.includeSections ??
+    (!picksCoursesOnly(query.filters) ||
+      !!query.filters.searchText?.professorOnly);
+  const limit =
+    query.limit ?? (m.search?.descriptionOnly ? LOOSE_LIMIT : DEFAULT_LIMIT);
+  const courses = m.matches.slice(query.offset, query.offset + limit).map(c => {
+    // Under the difficulty sort, the row's top instructor is the easiest
+    // rated, the one the order went by.
+    const row: CourseRow = toCourseSummary(
+      c,
+      catalog.rmp,
+      query.sort === 'difficulty' ? 'difficulty' : 'rating',
+    );
+    const early =
+      c.academicYear !== undefined && isUnpublished(catalog, c.academicYear);
+    if (early) row.earlyEntry = true;
+    if (includeSections && !early) {
+      row.sections = rowSections(c, catalog);
+      const companions = rowCompanions(c, catalog);
+      if (companions.length) row.companions = companions;
+    }
+    const match = m.matchOf.get(c);
+    if (match) row.match = match;
+    return row;
+  });
+  return { limit, courses };
+}
+
+export function runCourseQuery(
+  catalog: Catalog,
+  query: CourseQuery,
+): CourseQueryResult {
+  const matched = matchQuery(catalog, query);
+  const { read, matches } = matched;
+  const { notices, relaxations, unrestrictive, leftOut } = explainMatches(
+    catalog,
+    query,
+    matched,
+  );
+  const { limit, courses } = pageRows(catalog, query, matched);
 
   return {
     year: read.year,
@@ -775,27 +926,8 @@ export function runCourseQuery(
     total: matches.length,
     offset: query.offset,
     limit,
-    courses: matches.slice(query.offset, query.offset + limit).map(c => {
-      // Under the difficulty sort, the row's top instructor is the easiest
-      // rated, the one the order went by.
-      const row: CourseRow = toCourseSummary(
-        c,
-        catalog.rmp,
-        query.sort === 'difficulty' ? 'difficulty' : 'rating',
-      );
-      const early =
-        c.academicYear !== undefined && isUnpublished(catalog, c.academicYear);
-      if (early) row.earlyEntry = true;
-      if (includeSections && !early) {
-        row.sections = rowSections(c, catalog);
-        const companions = rowCompanions(c, catalog);
-        if (companions.length) row.companions = companions;
-      }
-      const match = matchOf.get(c);
-      if (match) row.match = match;
-      return row;
-    }),
-    search,
+    courses,
+    search: matched.search,
     relaxations,
     unrestrictive,
     leftOut,

@@ -14,7 +14,7 @@ const lecture = {
     periods: [
       {
         type: 'Lecture',
-        professor: 'Ada Lovelace',
+        instructors: ['Ada Lovelace'],
         startTime: '13:00',
         endTime: '13:50',
         days: ['M', 'r'],

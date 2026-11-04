@@ -23,13 +23,13 @@ import { DayOfWeek } from '../types/types';
 import { TERM_ORDER, TERMS } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
 import { canonicalWindows } from '../utils/timeWindows';
-import { parseSearchQuery } from '../utils/searchUtils';
 import type { Catalog } from './catalog';
 import { termDates, yearLabel, type TermLetter } from './calendar';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
 import { blockedSlotsForCrns, MAX_CRNS } from './conflicts';
 import type { EndedTermsCriteria } from './endedTermsFilter';
 import { ApiError, echo, listSome } from './errors';
+import { notice, type Notice } from './notices';
 import {
   DELIVERY_MODES,
   resolveDegreeAttributes,
@@ -103,7 +103,7 @@ export interface ReadContext {
   readonly ended: string[];
   readonly includeEndedTerms: boolean;
   readonly criteria: Map<string, unknown>;
-  readonly notices: string[];
+  readonly notices: Notice[];
   excludedEndedTerms: string[];
 }
 
@@ -134,14 +134,6 @@ interface FilterInput<
   ) => CriteriaOf<Id>;
   /** When a query leaves the filter out: what applies anyway, a default. */
   absent?: (ctx: ReadContext) => void;
-  /**
-   * The input lets every course through as given (the whole credit range,
-   * every mode), so an empty search neither blames nor reruns it.
-   */
-  unrestrictive?: (
-    input: z.output<z.ZodObject<InputShape<Id, F, O>>>,
-    catalog: Catalog,
-  ) => boolean;
   /**
    * The filter picks courses rather than sections: a search with only such
    * filters leaves each row's sections out unless asked.
@@ -265,18 +257,21 @@ export function leaveOutEndedTerms(
   year: number | 'all',
   current: number,
   ended: string[],
-): { id: string; criteria: unknown; notice: string } {
-  const notice = `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`;
+): { id: string; criteria: unknown; notice: Notice } {
+  const left = notice(
+    'endedTermsLeftOut',
+    `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
+  );
   if (year === 'all') {
     const criteria: EndedTermsCriteria = { year: current, terms: ended };
-    return { id: 'endedTerms', criteria, notice };
+    return { id: 'endedTerms', criteria, notice: left };
   }
   return {
     id: 'term',
     criteria: {
       terms: TERM_ORDER.filter(t => !ended.includes(t)) as AcademicTerm[],
     },
-    notice,
+    notice: left,
   };
 }
 
@@ -313,10 +308,10 @@ const INPUTS = {
         .optional()
         .describe('Match the words against instructor names only.'),
     }),
-    toCriteria: search => {
+    toCriteria: (search, ctx) => {
       // No letter or digit survives tokenizing: as a filter it would match
       // every course, which reads as a search that found them all.
-      const parsed = parseSearchQuery(search.query);
+      const parsed = ctx.catalog.search.parse(search.query);
       if (!parsed.code && parsed.words.length === 0) {
         throw new ApiError(
           `"${echo(search.query)}" has no searchable words; the catalog is searched in English (letters and digits).`,
@@ -347,7 +342,7 @@ const INPUTS = {
         ctx.catalog,
         department.departments,
       );
-      ctx.notices.push(...notes);
+      ctx.notices.push(...notes.map(m => notice('departmentRead', m)));
       return { ...department, departments: abbrs };
     },
     picksCourses: true,
@@ -369,7 +364,10 @@ const INPUTS = {
       if (named.length) {
         const dates = termDates(ctx.catalog, ctx.current);
         ctx.notices.push(
-          `${named.map(t => `${t} term ended ${dates?.[t as TermLetter].end ?? ''}`.trim()).join('; ')}: its sections are listed but can no longer be taken.`,
+          notice(
+            'endedTermsListed',
+            `${named.map(t => `${t} term ended ${dates?.[t as TermLetter].end ?? ''}`.trim()).join('; ')}: its sections are listed but can no longer be taken.`,
+          ),
         );
       }
       return term;
@@ -388,13 +386,14 @@ const INPUTS = {
         return;
       }
       ctx.notices.push(
-        ctx.ended.length === 1
-          ? `Term ${ctx.ended[0]} has ended: its sections are listed but can no longer be taken.`
-          : `Terms ${ctx.ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
+        notice(
+          'endedTermsListed',
+          ctx.ended.length === 1
+            ? `Term ${ctx.ended[0]} has ended: its sections are listed but can no longer be taken.`
+            : `Terms ${ctx.ended.join(', ')} have ended: their sections are listed but can no longer be taken.`,
+        ),
       );
     },
-    unrestrictive: term =>
-      TERM_ORDER.every(t => (term.terms as string[]).includes(t)),
     params: {
       names: ['term'],
       read: p =>
@@ -453,10 +452,6 @@ const INPUTS = {
           'Keep only sections with at most this many students waitlisted; 0 for no waitlist.',
         ),
     }),
-    unrestrictive: a =>
-      !a.availableOnly &&
-      a.minAvailable === undefined &&
-      a.maxWaitlisted === undefined,
     params: {
       names: ['availableOnly', 'minAvailable', 'maxWaitlisted'],
       read: p =>
@@ -477,10 +472,6 @@ const INPUTS = {
     refine: s => s.refine(c => c.max >= c.min, 'max must be at least min'),
     describe:
       'Keep courses whose credit range overlaps [min, max]. A standard WPI course is 1/3 unit = 3 credits.',
-    unrestrictive: (range, catalog) =>
-      catalog.courses.every(
-        c => c.minCredits <= range.max && c.maxCredits >= range.min,
-      ),
     params: {
       names: ['minCredits', 'maxCredits'],
       read: p => {
@@ -493,7 +484,6 @@ const INPUTS = {
   }),
 
   graduateLevel: input<'graduateLevel'>()({
-    unrestrictive: g => g.level === 'all',
     params: {
       names: ['level'],
       read: p => (p.has('level') ? { level: p.str('level') } : undefined),
@@ -512,7 +502,6 @@ const INPUTS = {
       ),
     describe:
       'Bounds on the first digit of the course number: 1 = 1000-level (MA 1022), 4 = 4000-level; 1-4 undergraduate, 5+ graduate (DS 502 and CS 5007 are both 5). {min: 3, max: 4} for upper-level undergraduate.',
-    unrestrictive: c => (c.min ?? 1) <= 1 && (c.max ?? 9) >= 9,
     params: {
       names: ['minLevel', 'maxLevel'],
       read: p =>
@@ -547,7 +536,6 @@ const INPUTS = {
     }),
     describe:
       'Keep sections taught In-Person, Online or Hybrid. Asynchronous is different: it describes a meeting with no set time and shows as "Async"; an Online section may still meet live.',
-    unrestrictive: d => DELIVERY_MODES.every(m => d.modes.includes(m)),
     params: {
       names: ['deliveryMode'],
       read: p =>
@@ -582,9 +570,6 @@ const INPUTS = {
       ),
     describe:
       'The only signal of what a later year will offer: Cat. I courses are likely to run again next year.',
-    unrestrictive: o =>
-      !!o.includeUnknown &&
-      ([1, 2, 3] as const).every(c => o.categories.includes(c)),
     params: {
       names: ['offeringPattern'],
       read: p => {
@@ -683,7 +668,7 @@ const INPUTS = {
         ...rest,
         windows: timeWindows({ ...times, earliestStart, latestEnd, days }),
       };
-      ctx.notices.push(describeTimes(criteria));
+      ctx.notices.push(notice('timesRead', describeTimes(criteria)));
       return criteria;
     },
     params: {
@@ -766,9 +751,6 @@ const INPUTS = {
       includeWithoutData:
         rmp.includeWithoutData ?? !RMP_BOUNDS.some(k => rmp[k] !== undefined),
     }),
-    unrestrictive: rmp =>
-      RMP_BOUNDS.every(k => rmp[k] === undefined) &&
-      rmp.includeWithoutData !== false,
     params: {
       names: [...RMP_BOUNDS, 'includeWithoutData'],
       read: p =>
@@ -812,11 +794,17 @@ const INPUTS = {
       );
       if (otherYear.length) {
         ctx.notices.push(
-          `filters.periodConflict ignores CRN ${listSome(otherYear)}: not ${yearLabel(ctx.year as number)} sections, so they cannot clash with the ones searched.`,
+          notice(
+            'conflictYears',
+            `filters.periodConflict ignores CRN ${listSome(otherYear)}: not ${yearLabel(ctx.year as number)} sections, so they cannot clash with the ones searched.`,
+          ),
         );
       } else if (ctx.year === 'all') {
         ctx.notices.push(
-          'filters.periodConflict compares weekdays and terms, not years: with academicYear "all", other years\' sections are compared with these CRNs too.',
+          notice(
+            'conflictYears',
+            'filters.periodConflict compares weekdays and terms, not years: with academicYear "all", other years\' sections are compared with these CRNs too.',
+          ),
         );
       }
       return { ...rest, avoidConflicts: true, blockedSlots: slots };
@@ -856,7 +844,6 @@ export type FiltersShape = {
 /** An INPUTS entry with its types erased, for the loops below. */
 type AnyInput = FilterInput<FilterId, z.core.$ZodLooseShape, never> & {
   toCriteria?: (input: unknown, ctx: ReadContext) => unknown;
-  unrestrictive?: (input: unknown, catalog: Catalog) => boolean;
   refine?: (schema: z.ZodObject) => z.ZodObject;
 };
 
@@ -923,20 +910,6 @@ export function readFilters(filters: FiltersInput, ctx: ReadContext): void {
     ctx.criteria.set(filter.id, criteria);
   }
 }
-
-/**
- * The filters given in a form that lets every course through, so leaving
- * one out changes nothing and an empty search never blames or reruns it.
- */
-export const unrestrictiveFilters = (
-  filters: FiltersInput,
-  catalog: Catalog,
-): FilterId[] =>
-  (Object.keys(filters) as FilterId[]).filter(
-    id =>
-      filters[id] !== undefined &&
-      !!specOf(id)?.unrestrictive?.(filters[id], catalog),
-  );
 
 /** Whether every filter given picks courses rather than sections. */
 export const picksCoursesOnly = (filters: FiltersInput) =>

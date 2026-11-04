@@ -26,7 +26,7 @@ function lecture(startHour: number, endHour: number): Section {
     periods: [
       {
         type: PeriodType.LECTURE,
-        professor: 'Prof X',
+        instructors: ['Prof X'],
         startTime: { hours: startHour, minutes: 0 },
         endTime: { hours: endHour, minutes: 0 },
         location: 'SH',

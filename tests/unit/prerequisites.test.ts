@@ -61,6 +61,40 @@ describe('extractPrerequisites', () => {
     });
   });
 
+  it('reads a heading without a colon where it starts a sentence', () => {
+    expect(
+      extractPrerequisites(
+        'Mechanics. Students may not receive credit for both PH 1110 and PH 1111. Recommended Background Working knowledge of differential calculus (MA 1021).',
+      ),
+    ).toEqual({
+      recommendedBackground:
+        'Working knowledge of differential calculus (MA 1021).',
+    });
+    expect(
+      extractPrerequisites(
+        'Capstone. Prerequisites Completion of at least 24 credits of the AI degree, or consent of the instructor. With permission of the instructor, the GQP can be taken a 2nd time.',
+      ),
+    ).toEqual({
+      prerequisites:
+        'Completion of at least 24 credits of the AI degree, or consent of the instructor.',
+    });
+    expect(
+      extractPrerequisites(
+        'Startups. Recommended background for this course consists of five of the following: ACC 2101, BUS 1010.',
+      ),
+    ).toEqual({
+      recommendedBackground: 'five of the following: ACC 2101, BUS 1010.',
+    });
+  });
+
+  it('leaves the words alone mid-sentence without a colon', () => {
+    expect(
+      extractPrerequisites(
+        'A studio course with no prerequisites beyond the recommended background in drawing.',
+      ),
+    ).toEqual({});
+  });
+
   it('returns nothing for a description without either', () => {
     expect(extractPrerequisites('An introduction to calculus.')).toEqual({});
   });

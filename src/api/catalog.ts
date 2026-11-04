@@ -13,7 +13,7 @@ import { TermBoundsService } from '../utils/termBounds';
 import type { FilterableSection } from '../types/filterableUnit';
 import { SectionFilterPipeline } from '../core/filtering/SectionFilterPipeline';
 import { logger } from '../utils/logger';
-import { prepareSearch, resetSearchVocabulary } from '../utils/searchUtils';
+import { SearchIndex } from '../utils/searchUtils';
 
 const CATALOG_FILE = 'course-data-constructed.json';
 const TERM_BOUNDS_FILE = 'term-bounds.json';
@@ -39,6 +39,8 @@ export interface Catalog {
   sectionsByCrn: Map<number, CrnEntry>;
   rmp: RateMyProfessorService;
   termBounds: TermBoundsService;
+  /** Search over `courses`, built with them. */
+  search: SearchIndex;
   /** The clock every date-aware answer reads; injectable for tests. */
   now: () => Date;
 }
@@ -171,7 +173,7 @@ export class CatalogSource {
       logger.error('[catalog] Rate My Professor data unavailable:', error);
     }
 
-    const termBounds = TermBoundsService.getInstance();
+    const termBounds = new TermBoundsService();
     try {
       termBounds.loadFromData(
         await readJson(await this.resolve(TERM_BOUNDS_FILE)),
@@ -198,14 +200,11 @@ export class CatalogSource {
       ),
     ].sort((a, b) => a - b);
 
-    // Code reading ("CS2" as every CS 2xxx) and acronyms depend on the
-    // departments and definitions search learns from course text, so learn
-    // them before the first lookup parses a query, not on the first search.
-    // A refresh forgets what the old data taught first. Both run in one
-    // synchronous stretch, so no request sees the vocabulary half-built.
-    resetSearchVocabulary();
-    prepareSearch(courses);
-
+    // Everything a request reads is built here, apart from the catalog in
+    // use, and swapped in with it in one assignment: a failed reload leaves
+    // the old catalog whole, and a request never sees two halves. Search
+    // learns code reading ("CS2" as every CS 2xxx) and acronyms from course
+    // text, so its index reads every course now, not on the first search.
     const catalog: Catalog = {
       departments: db.departments,
       courses,
@@ -214,6 +213,7 @@ export class CatalogSource {
       sectionsByCrn: indexSections(courses),
       rmp,
       termBounds,
+      search: new SearchIndex(courses),
       now: this.now,
     };
 
