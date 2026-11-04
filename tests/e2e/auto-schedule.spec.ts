@@ -309,3 +309,95 @@ test('the intro offers a semester-only course its F term', async ({ page }) => {
   await expect(fall).not.toHaveClass(/selected/);
   await expect(card).not.toHaveClass(/(^|\s)selected(\s|$)/);
 });
+
+/** The auto-schedule settings modal, reached through the intro's Next. */
+async function openSettings(page: Page): Promise<void> {
+  await page.click('#auto-schedule-btn');
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+}
+
+function rankingRow(page: Page, key: string) {
+  return page.locator(`[data-ranking="${key}"]`);
+}
+
+/** Sets "Avoid classes before" to High at the given time through the UI. */
+async function setEarlyClasses(page: Page, time: string): Promise<void> {
+  const row = rankingRow(page, 'earlyClasses');
+  await row.getByRole('radio', { name: 'High' }).check({ force: true });
+  await row.getByRole('combobox').selectOption(time);
+}
+
+test('ranking preferences persist across a reload', async ({ page }) => {
+  await loadApp(page);
+  await selectCourses(page, ['CS2102']);
+  await openSettings(page);
+  await setEarlyClasses(page, '10:00');
+
+  const stored = () =>
+    page.evaluate(
+      () =>
+        (window as any).services.profileStateManager.getPreferences()
+          .autoSchedule?.earlyClasses,
+    );
+  await expect.poll(stored).toEqual({ importance: 'high', before: '10:00' });
+
+  await page.reload();
+  await page.waitForFunction(
+    () =>
+      (window as any).services?.courseDataService?.getAllDepartments()?.length >
+      0,
+    undefined,
+    { timeout: 30000 },
+  );
+  await page.click('#schedule-tab');
+  await openSettings(page);
+  const row = rankingRow(page, 'earlyClasses');
+  await expect(row.getByRole('radio', { name: 'High' })).toBeChecked();
+  await expect(row.getByRole('combobox')).toHaveValue('10:00');
+  // Reset appears once something differs from the defaults, and restores them.
+  await page.getByRole('button', { name: 'Reset' }).click();
+  await expect(row.getByRole('radio', { name: 'Off' })).toBeChecked();
+  await expect(page.getByRole('button', { name: 'Reset' })).toHaveCount(0);
+});
+
+test('the early-classes preference picks the later lecture section', async ({
+  page,
+}) => {
+  // HI2314 (term C) has one lecture at 9:00 and another at 10:00, no labs.
+  await loadApp(page);
+  await selectCourses(page, ['HI2314']);
+
+  const lectureStart = () =>
+    page.evaluate(() => {
+      const sc = (window as any).services.courseSelectionService
+        .getSelectedCourses()
+        .find(
+          (c: any) =>
+            `${c.course.departmentAbbr}${c.course.number}` === 'HI2314',
+        );
+      const lecture = sc.selected.lecture;
+      return Math.min(
+        ...lecture.periods
+          .filter((p: any) => !p.isAsync)
+          .map((p: any) => p.startTime.hours * 60 + p.startTime.minutes),
+      );
+    });
+
+  // Without a preference the first-listed (9:00) section wins.
+  await page.click('#auto-schedule-btn');
+  await generateFromIntro(page);
+  expect(await lectureStart()).toBeLessThan(10 * 60);
+
+  await page.getByRole('button', { name: 'Restart auto-schedule' }).click();
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+  await setEarlyClasses(page, '10:00');
+  await page.click('#modal-primary-btn');
+  await expect(page.locator('.schedule-generating-overlay')).toHaveCount(0, {
+    timeout: 60_000,
+  });
+  expect(await lectureStart()).toBeGreaterThanOrEqual(10 * 60);
+});

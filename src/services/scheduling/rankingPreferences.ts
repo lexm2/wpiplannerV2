@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
-const IMPORTANCE_LEVELS = ['off', 'low', 'medium', 'high'] as const;
-type Importance = (typeof IMPORTANCE_LEVELS)[number];
+export const IMPORTANCE_LEVELS = ['off', 'low', 'medium', 'high'] as const;
+export type Importance = (typeof IMPORTANCE_LEVELS)[number];
 
 export const IMPORTANCE_WEIGHT: Record<Importance, number> = {
   off: 0,
@@ -124,7 +124,7 @@ const RankingPreferencesSchema = z.strictObject({
 
 export type RankingPreferences = z.output<typeof RankingPreferencesSchema>;
 
-const DEFAULT_RANKING_PREFERENCES: RankingPreferences =
+export const DEFAULT_RANKING_PREFERENCES: RankingPreferences =
   RankingPreferencesSchema.parse({});
 
 /**

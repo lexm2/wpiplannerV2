@@ -1,3 +1,5 @@
+import { ProfileStateManager } from '../../core/state/ProfileStateManager';
+import type { RankingPreferences } from './rankingPreferences';
 import { appState } from '../../core/state/appState.svelte';
 import { modalState } from '../../svelte/modals/modalState.svelte';
 import { openModal, showAppError } from '../ui/uiState.svelte';
@@ -77,6 +79,15 @@ class AutoScheduleService {
       },
     };
     openModal('auto-schedule-filter');
+  }
+
+  /**
+   * Persist the ranking preferences. Callers pass plain, normalized data:
+   * appState.preferences is $state.raw and persisted, so a deep $state proxy
+   * here would break the structured clone.
+   */
+  setRankingPreferences(autoSchedule: RankingPreferences): void {
+    ProfileStateManager.getInstance().updatePreferences({ autoSchedule });
   }
 
   openAutoScheduleIntro(): void {

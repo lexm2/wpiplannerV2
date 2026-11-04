@@ -7,6 +7,7 @@
   import type { Department } from '../../types/types';
   import type { SelectedCourse } from '../../types/schedule';
 
+  import RankingPreferences from './RankingPreferences.svelte';
   import CourseLevelFilter from './CourseLevelFilter.svelte';
   import AcademicYearFilter from './AcademicYearFilter.svelte';
   import BookmarksFilter from './BookmarksFilter.svelte';
@@ -109,6 +110,7 @@
 
 <div class="modal-body filter-modal-body">
   <div class="filter-sections">
+    {#if isAuto}<RankingPreferences />{/if}
     <CourseLevelFilter {filterService} {allCourses} />
     <AcademicYearFilter {filterService} {profileStateManager} {allCourses} />
     <BookmarksFilter {filterService} />
