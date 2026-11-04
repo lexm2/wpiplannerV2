@@ -128,10 +128,11 @@
 }
 
 /* The shared segmented buttons stretch to fill their row; here they size to
-   their labels, so "Avoid these times" stays on one line. */
+   their labels, so "Avoid these times" stays on one line where there is room.
+   On a phone-width dialog they shrink and wrap their label instead of pushing
+   the pair past the edge. */
 .toolbar :global(.segmented-btn) {
-  flex: 0 0 auto;
-  white-space: nowrap;
+  flex: 0 1 auto;
 }
 
 .summary {

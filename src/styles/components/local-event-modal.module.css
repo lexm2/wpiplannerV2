@@ -15,6 +15,9 @@
    them. Both selectors are (0,2,0); this one is later, so it wins. */
 .local-event-form > .hug {
   align-self: flex-start;
+  /* Hug the content, but never outgrow the dialog: at 320px the time row's two
+     inputs ran 12px past it. */
+  max-width: 100%;
 }
 
 .event-type-selector {
@@ -37,6 +40,7 @@
   transition: var(--effect-transition);
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
+  white-space: nowrap;
 }
 
 .event-type-option:hover {
@@ -185,12 +189,20 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .form-group-time {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* A time input has an intrinsic width; let it follow its cell instead. */
+.form-group-time :global(input) {
+  width: 100%;
+  min-width: 0;
 }
 
 .time-separator {

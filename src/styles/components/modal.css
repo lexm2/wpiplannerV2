@@ -121,6 +121,9 @@
   transition: var(--effect-transition);
   border: 1px solid;
   min-width: 80px;
+  /* "Clear All" and "Generate Schedule" stay on one line; a footer that is
+     short of room wraps its buttons onto another row instead. */
+  white-space: nowrap;
 }
 
 .modal-btn .btn-icon {
@@ -710,6 +713,12 @@ html.is-mobile .section-enrollment-waitlist {
   background: color-mix(in srgb, var(--color-text-secondary) 45%, transparent);
 }
 
+/* The 90% would leave the picker 260px wide at 320px; a phone gets the
+   backdrop's full width, like every other dialog. */
+html.is-mobile .time-grid-modal .modal-dialog {
+  width: 100%;
+}
+
 /* Phones stack the footer with Done on top; keep the toggle at the right. */
 html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   align-self: flex-end;
@@ -1036,6 +1045,8 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
 
 .filter-modal .modal-footer {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
@@ -1046,12 +1057,17 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
 }
 
 .filter-preview {
+  /* A basis of its own: with none it shrank to its longest word (46px wide, 5
+     lines) beside the buttons. Below ~10rem it wraps onto its own row. */
+  flex: 1 1 10rem;
+  min-width: 0;
   font-size: 0.9rem;
   color: var(--color-text-secondary);
 }
 
 .filter-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -1120,6 +1136,18 @@ html.is-mobile .filter-actions {
   width: 100%;
   justify-content: space-between;
 }
+
+/* The shared full-width phone button would put each on a row of its own; they
+   share one row instead, and wrap only when it is too narrow for both. */
+html.is-mobile .filter-actions .modal-btn {
+  width: auto;
+  flex: 1 1 auto;
+}
+
+/* The preview's row basis (10rem) would be a height in this column. */
+html.is-mobile .filter-preview {
+  flex: none;
+}
 /* ===== RMP Filter Range Sliders ===== */
 .filter-slider-container {
   display: flex;
@@ -1187,6 +1215,9 @@ html.is-mobile .filter-actions {
 
 .segmented-btn {
   flex: 1;
+  /* Let the pills shrink below their label, or three of them overflow a
+     phone-width modal and "Graduate" spills. */
+  min-width: 0;
   padding: 0.5rem 0.75rem;
   border: none;
   background: transparent;
@@ -1212,6 +1243,8 @@ html.is-mobile .filter-actions {
 /* Term filter row (inline with course level) */
 .filter-term-row {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   justify-content: space-between;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
