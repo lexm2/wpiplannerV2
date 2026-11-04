@@ -65,15 +65,14 @@ test('Escape cancels a rename and leaves the picker open', async ({ page }) => {
   expect(stored).toBe(before);
 });
 
-test('a failed import from Settings leaves no empty schedule behind', async ({
+test('a failed import of a new schedule leaves no empty schedule behind', async ({
   page,
 }) => {
   await load(page);
   await page.click('#schedule-picker-btn');
-  await page.locator(`${PICKER} .nav-tab[data-tab="settings"]`).click();
 
   const chooser = page.waitForEvent('filechooser');
-  await page.click('#import-schedule-btn-settings');
+  await page.click('#import-schedule-btn');
   await (
     await chooser
   ).setFiles({

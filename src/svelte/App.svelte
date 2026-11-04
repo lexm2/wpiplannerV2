@@ -173,12 +173,6 @@
       </div>
     </nav>
     <div class="header-controls">
-      <SettingsMenu
-        onSchedules={openSchedulePicker}
-        onToggleTheme={toggleTheme}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-      />
       <div class="undo-redo-controls">
         <UndoRedoButtons onUndo={handleUndo} onRedo={handleRedo} />
       </div>
@@ -206,6 +200,14 @@
       <div class="theme-selector">
         <ThemeSelector />
       </div>
+      <SettingsMenu
+        scheduleManagementService={services.scheduleManagementService}
+        getTutorial={() => services.tutorial}
+        onSchedules={openSchedulePicker}
+        onToggleTheme={toggleTheme}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+      />
     </div>
   </div>
 </header>

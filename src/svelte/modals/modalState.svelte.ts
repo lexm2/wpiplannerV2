@@ -52,9 +52,6 @@ class ModalState {
   autoScheduleIntroTermPrefs = $state.raw<Record<string, string[]> | null>(
     null,
   );
-  // Tutorial-driven schedule-picker tab navigation. The component applies it
-  // to its local active-tab then nulls this channel.
-  schedulePickerTab = $state.raw<'schedules' | 'settings' | null>(null);
   // Filter modal payload (mode + auto-schedule continuation). Set by the
   // trigger site before openModal('filter-modal' | 'auto-schedule-filter').
   filter = $state.raw<FilterModalPayload | null>(null);

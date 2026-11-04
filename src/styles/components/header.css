@@ -219,7 +219,7 @@
 }
 
 .settings-menu-btn {
-  display: none;
+  display: flex;
   padding: 0.5rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -255,7 +255,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 90;
   min-width: 200px;
-  overflow: hidden;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
 }
 
 .settings-dropdown-menu.up {
@@ -283,6 +284,26 @@
 
 .settings-menu-item:hover:not(:disabled) {
   background: var(--color-primary-background);
+}
+
+.settings-menu-item.danger,
+.settings-menu-item.danger svg {
+  color: var(--color-error);
+}
+
+.settings-menu-item.danger:hover:not(:disabled) {
+  background: var(--color-danger-background);
+}
+
+.settings-menu-item.danger:hover:not(:disabled) svg {
+  color: var(--color-error);
+}
+
+/* Items for what the header's own controls cover above 1250px. */
+@media (min-width: 1251px) {
+  .settings-menu-item.narrow-only {
+    display: none;
+  }
 }
 
 .settings-menu-item:disabled {
@@ -342,10 +363,6 @@
 
   #schedule-picker-btn {
     display: none;
-  }
-
-  .settings-menu-btn {
-    display: flex;
   }
 }
 

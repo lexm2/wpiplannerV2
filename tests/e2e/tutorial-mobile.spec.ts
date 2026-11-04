@@ -19,22 +19,10 @@ async function appLoaded(page: Page): Promise<void> {
   );
 }
 
-/** Open the schedule picker (via the gear menu on a narrow window) on Settings. */
-async function openSettingsTab(page: Page): Promise<void> {
-  const direct = page.locator('#schedule-picker-btn');
-  if (await direct.isVisible()) {
-    await direct.click();
-  } else {
-    await page.click('.settings-menu-btn');
-    await page.getByRole('button', { name: 'Schedules' }).click();
-  }
-  // A short landscape window can clip the tab bar; the settings page is in the
-  // DOM either way, which is what the assertions below read.
-  const tab = page.locator(
-    '[data-modal-type="schedule-picker"] [data-tab="settings"]',
-  );
-  if (await tab.isVisible()) await tab.click();
-  await expect(page.locator('#clear-all-data-btn-settings')).toHaveCount(1);
+/** Open the gear menu, where Clear All Data always is and Tutorials sometimes. */
+async function openSettingsMenu(page: Page): Promise<void> {
+  await page.click('.settings-menu-btn');
+  await expect(page.locator('#clear-all-data-btn')).toHaveCount(1);
 }
 
 async function expectNoTutorialNorButton(page: Page): Promise<void> {
@@ -46,8 +34,8 @@ async function expectNoTutorialNorButton(page: Page): Promise<void> {
     await page.evaluate(() => localStorage.getItem('wpi_visited')),
   ).toBeNull();
 
-  await openSettingsTab(page);
-  await expect(page.locator('#tutorials-btn-settings')).toHaveCount(0);
+  await openSettingsMenu(page);
+  await expect(page.locator('#tutorials-btn')).toHaveCount(0);
 }
 
 test.describe('phone width', () => {
@@ -79,8 +67,8 @@ test.describe('desktop', () => {
     await expect(page.locator(SKIP)).toHaveCount(0);
     await expect(page.locator('.tutorial-highlight-svg')).toHaveCount(0);
 
-    // The app is usable afterwards: the picker opens with no tutorial button.
-    await openSettingsTab(page);
-    await expect(page.locator('#tutorials-btn-settings')).toHaveCount(0);
+    // The app is usable afterwards: the menu opens with no tutorial button.
+    await openSettingsMenu(page);
+    await expect(page.locator('#tutorials-btn')).toHaveCount(0);
   });
 });
