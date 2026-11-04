@@ -1009,7 +1009,13 @@
   bottom: calc(100% + 0.25rem);
   left: 0;
   z-index: 20;
-  min-width: 14rem;
+  /* Sized to its names, not to the 50px trigger it hangs from, so a bucket
+     name and its "9 credits left" label sit side by side without the name
+     breaking onto four lines. Every real use spans its container instead (see
+     below), so this only matters for a menu hung from a bare button. */
+  width: max-content;
+  min-width: 18rem;
+  max-width: min(24rem, calc(100vw - 2rem));
   max-height: 15rem;
   overflow-y: auto;
   transform-origin: bottom left;
@@ -1046,20 +1052,31 @@
   font-style: italic;
 }
 
-/* The rail clips anything wider than itself, so there the popup spans the
-   course it belongs to instead of hanging off its small button. */
-.degree-rail .requirement-course {
+/* The popup spans the course it belongs to, not its small button. The rail
+   clips anything wider than itself, and in a card row or a course finder card
+   the button sits at the right edge, so a popup hung from it either ran off
+   the screen or left only ~118px for a bucket name. The course's own width is
+   always on screen and wide enough for a name beside its "9 credits left". */
+.degree-rail .requirement-course,
+.degree-card-list .requirement-course,
+.course-finder-row {
   position: relative;
 }
 
-.degree-rail .assign-menu {
+.degree-rail .assign-menu,
+.degree-card-list .assign-menu,
+.course-finder-row .assign-menu {
   position: static;
 }
 
-.degree-rail .assign-menu-popup {
+.degree-rail .assign-menu-popup,
+.degree-card-list .assign-menu-popup,
+.course-finder-row .assign-menu-popup {
   left: 0;
   right: 0;
+  width: auto;
   min-width: 0;
+  max-width: none;
 }
 
 /* Too narrow there for a name and its label side by side. */
