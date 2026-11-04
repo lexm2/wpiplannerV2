@@ -27,7 +27,6 @@
   import DepartmentSidebar from './DepartmentSidebar.svelte';
   import SearchBar from './SearchBar.svelte';
   import FilterButtons from './FilterButtons.svelte';
-  import ViewToggle from './ViewToggle.svelte';
   import CourseList from './CourseList.svelte';
   import DegreeFilterBanner from './degree/DegreeFilterBanner.svelte';
   import SelectedCoursesPanel from './SelectedCoursesPanel.svelte';
@@ -38,7 +37,6 @@
   import SettingsMenu from './SettingsMenu.svelte';
   import CalendarEventsButton from './CalendarEventsButton.svelte';
   import ScheduleFilterButton from './ScheduleFilterButton.svelte';
-  import ClearAllSectionsButton from './ClearAllSectionsButton.svelte';
   import ScheduleSidebar from './ScheduleSidebar.svelte';
   import WizardHost from './WizardHost.svelte';
   import AutoScheduleControls from './AutoScheduleControls.svelte';
@@ -242,7 +240,6 @@
             onFilter={openFilterModal}
           />
         </div>
-        <ViewToggle />
         <DrawerToggle drawer="details" label="Details" side="right" />
       </div>
     </div>
@@ -310,9 +307,6 @@
           <ScheduleFilterButton
             filterService={services.filterService}
             onFilter={openFilterModal}
-          />
-          <ClearAllSectionsButton
-            courseSelectionService={services.courseSelectionService}
           />
         </div>
       </div>

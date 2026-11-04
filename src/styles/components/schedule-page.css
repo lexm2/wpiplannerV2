@@ -122,14 +122,20 @@
   cursor: not-allowed;
 }
 
-.schedule-filter-controls .clear-all-sections-btn {
-  padding: 0.5rem 0.75rem;
-  flex-shrink: 0;
+.schedule-sidebar-content .clear-all-sections-btn {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.25rem 0.5rem;
+  background: none;
+  border: none;
+  border-radius: var(--effect-border-radius);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
 }
 
-.schedule-filter-controls .clear-all-sections-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.schedule-sidebar-content .clear-all-sections-btn:hover {
+  color: var(--color-error);
 }
 
 .schedule-generating-overlay {
@@ -158,8 +164,7 @@
   animation: spin 0.75s linear infinite;
 }
 
-.auto-schedule-icon,
-.clear-all-eraser-icon {
+.auto-schedule-icon {
   width: 18px;
   height: 18px;
   display: block;

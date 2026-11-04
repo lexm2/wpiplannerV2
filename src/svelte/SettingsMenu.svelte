@@ -76,9 +76,8 @@
   const canUndo = $derived(appState.canUndo);
   const canRedo = $derived(appState.canRedo);
 
-  // The Classes page's List/Grid switch. Its buttons give way to the search
-  // field wherever that page's panels are drawers (main-content.css), so the
-  // menu carries it too, offering whichever view is not showing.
+  // The Classes page's only List/Grid switch, offering whichever view is not
+  // showing.
   const onClasses = $derived(uiState.currentPage === 'planner');
   const otherView = $derived(uiState.currentView === 'list' ? 'grid' : 'list');
 
