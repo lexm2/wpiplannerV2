@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-11-04]
+
+### Added
+- Schedule Preferences in Auto-Schedule settings. Set how much you care about early classes, late classes, time between classes, a lunch break, fewer days with class, keeping days free, balanced terms, open seats and professor ratings. They decide which schedules come first and never rule one out
+
+### Changed
+- Auto-Schedule picks each course's sections by your preferences instead of only by the least time between classes
+
 ## [2026-10-10]
 
 ### Added
