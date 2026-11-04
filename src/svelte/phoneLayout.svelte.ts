@@ -1,10 +1,20 @@
 import { MediaQuery } from 'svelte/reactivity';
+import { DeviceDetection } from '../utils/deviceDetection';
 
 /**
  * The phone layout, for markup that differs there and not just its styling.
  * The same 560px as every phone rule in the CSS, so the two never disagree.
  */
 export const phoneLayout = new MediaQuery('(max-width: 560px)');
+
+/**
+ * Whether the interactive tutorials can run. They are built around the desktop
+ * layout, so a phone gets none: the narrow layout, or a phone user agent (a
+ * phone in landscape is wider than 560px). Reactive through phoneLayout.
+ */
+export function tutorialsAvailable(): boolean {
+  return !(phoneLayout.current || DeviceDetection.isMobilePhone());
+}
 
 /**
  * A touch screen as the main pointer, at any width. Courses can't be dragged

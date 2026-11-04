@@ -4,6 +4,7 @@
   import { modalState, showConfirm } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
+  import { tutorialsAvailable } from '../phoneLayout.svelte';
   import { triggerFileDownload } from '../../utils/download';
   import { logger } from '../../utils/logger';
   import { ThemeManager } from '../../themes/ThemeManager';
@@ -856,7 +857,7 @@
               What's New</span
             ></button
           >
-          {#if getTutorial()}
+          {#if getTutorial() && tutorialsAvailable()}
             <button
               class="btn btn-secondary"
               id="tutorials-btn-settings"

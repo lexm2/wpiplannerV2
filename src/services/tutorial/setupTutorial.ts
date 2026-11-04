@@ -13,6 +13,7 @@ import {
   closeAllModals,
 } from '../ui/uiState.svelte';
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
+import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
 import { logger } from '../../utils/logger';
 
@@ -907,7 +908,13 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   ];
 
   async function start(id: string) {
+    if (!tutorialsAvailable()) return;
     await sharedSetup();
+    // The window may have narrowed while the setup ran.
+    if (!tutorialsAvailable()) {
+      endTutorials();
+      return;
+    }
     filteringStarted = id !== 'welcome';
     autoScheduleStarted = id === 'autoSchedule' || id === 'schedules';
     schedulesStarted = id === 'schedules';

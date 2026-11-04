@@ -2,10 +2,12 @@ import { untrack } from 'svelte';
 import type { PageId } from '../types/uiState';
 import type { ConflictCriteria } from '../types/filters';
 import type { ServiceContainer } from '../bootstrap/ServiceContainer';
-import { uiState } from '../services/ui/uiState.svelte';
+import { uiState, closeModal } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
 import { degreeState } from './degree/degreeState.svelte';
 import { degreePlanService } from '../services/degree/degreePlanService';
+import { tutorialsAvailable } from './phoneLayout.svelte';
+import { tutorialOverlayState } from './tutorial/tutorialOverlayState.svelte';
 import { updateClientTimestamp } from './timestampState.svelte';
 import { wizardState } from './wizardState.svelte';
 import {
@@ -91,6 +93,19 @@ export function installAppEffects(services: ServiceContainer): void {
         drawerForWizard = false;
         closeDrawer('schedule');
       }
+    });
+  });
+
+  // Window narrows to a phone -> no tutorials there. A running one ends the
+  // way "Skip tutorial" does (exit: restores the user's schedules and leaves
+  // the tutorial system without chaining into the next one), and the
+  // Tutorials list closes, since its buttons could no longer start anything.
+  $effect(() => {
+    const available = tutorialsAvailable();
+    untrack(() => {
+      if (available) return;
+      if (tutorialOverlayState.step) services.tutorial?.service.exit();
+      closeModal('tutorials');
     });
   });
 
