@@ -12,6 +12,7 @@ import type { WeeklyTimeSlot } from '../types/schedule';
 import { AcademicTerm } from '../types/schedule';
 import type { Course, LectureGroup, Section } from '../types/types';
 import { SectionType } from '../types/types';
+import { QUARTERS } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
 import { ConflictFilter } from '../core/filtering/filters/ConflictFilter';
 import {
@@ -39,7 +40,7 @@ import { DaySchema } from './schemaHints';
 /** CRNs a schedule check, or a search fitted around CRNs, takes at most. */
 export const MAX_CRNS = 100;
 
-const BusyBlockSchema = z
+export const BusyBlockSchema = z
   .object({
     days: z
       .array(DaySchema)
@@ -84,6 +85,29 @@ export const ConflictCheckInputSchema = z
   .strict();
 
 export type BusyBlock = z.infer<typeof BusyBlockSchema>;
+
+/**
+ * Busy blocks as ConflictFilter's blockedSlots: every term, so one slot per
+ * quarter and day. The id has no CRN in front, so no section is mistaken
+ * for owning one.
+ */
+export function busyBlockSlots(blocks: BusyBlock[]): WeeklyTimeSlot[] {
+  const time = (clock: string) => {
+    const minutes = clockMinutes(clock);
+    return { hours: Math.floor(minutes / 60), minutes: minutes % 60 };
+  };
+  return blocks.flatMap((block, i) =>
+    block.days.flatMap(day =>
+      QUARTERS.map(term => ({
+        id: `busy${i}-${term}-${day}`,
+        day,
+        startTime: time(block.start),
+        endTime: time(block.end),
+        term,
+      })),
+    ),
+  );
+}
 
 function lookup(
   catalog: Catalog,

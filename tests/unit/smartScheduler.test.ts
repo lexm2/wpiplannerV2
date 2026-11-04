@@ -576,3 +576,49 @@ describe('SmartScheduler.findSchedules ranking', () => {
     ]);
   });
 });
+
+describe('SmartScheduler.findSchedulesBefore', () => {
+  // Six courses of ten sections each, none clashing: ~10^6 combinations.
+  const many = Array.from({ length: 6 }, (_, c) =>
+    course(
+      `XX${c}`,
+      Array.from({ length: 10 }, (_, i) =>
+        section(
+          AcademicTerm.A,
+          [[M, T, W, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY][c % 5]],
+          `${8 + i}:00`,
+          `${8 + i}:50`,
+        ),
+      ),
+    ),
+  );
+  const input = {
+    candidatesPerCourse: many.map(candidates),
+    courses: many,
+    preferences: DEFAULTS,
+  };
+
+  it('stops at the deadline with what it has, and says so', () => {
+    const cut = SmartScheduler.findSchedulesBefore(
+      input,
+      50,
+      performance.now() - 1,
+    );
+    expect(cut.cutShort).toBe(true);
+    expect(cut.schedules.length).toBeLessThanOrEqual(1);
+  });
+
+  it('is not cut short with time to spare', () => {
+    const done = SmartScheduler.findSchedulesBefore(
+      {
+        ...input,
+        candidatesPerCourse: [input.candidatesPerCourse[0]],
+        courses: [many[0]],
+      },
+      50,
+      performance.now() + 60_000,
+    );
+    expect(done.cutShort).toBe(false);
+    expect(done.schedules).toHaveLength(1);
+  });
+});

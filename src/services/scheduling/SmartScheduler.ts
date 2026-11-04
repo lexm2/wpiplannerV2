@@ -25,6 +25,16 @@ interface GroupBest {
   cost: number;
 }
 
+/** Where a search stands against its deadline, shared by all its walks. */
+interface Budget {
+  deadline: number | undefined;
+  visits: number;
+  expired: boolean;
+}
+
+/** The clock is read once per this many candidates visited. */
+const CHECK_EVERY = 4096;
+
 /** Candidates for each course to schedule, or the courses that have none. */
 export type CandidateData =
   { ok: true; input: SchedulerInput } | { ok: false; unschedulable: Course[] };
@@ -89,9 +99,26 @@ export class SmartScheduler {
     input: SchedulerInput,
     maxResults: number,
   ): ScheduleResult[][] {
+    return SmartScheduler.findSchedulesBefore(input, maxResults).schedules;
+  }
+
+  /**
+   * findSchedules that gives up at `deadline` (a performance.now() time):
+   * the schedules found so far, still best first among themselves, and
+   * `cutShort` set. A request with many courses and many lab and discussion
+   * choices can take seconds, which a server must not spend on one caller.
+   */
+  static findSchedulesBefore(
+    input: SchedulerInput,
+    maxResults: number,
+    deadline?: number,
+  ): { schedules: ScheduleResult[][]; cutShort: boolean } {
+    const budget: Budget = { deadline, visits: 0, expired: false };
     const { candidatesPerCourse, courses, preferences } = input;
 
-    if (candidatesPerCourse.length === 0) return [];
+    if (candidatesPerCourse.length === 0) {
+      return { schedules: [], cutShort: false };
+    }
 
     const termOptionsPerCourse = candidatesPerCourse.map(candidates => [
       ...new Set(candidates.map(c => c.term)),
@@ -111,7 +138,7 @@ export class SmartScheduler {
     const bestByGroup = new Map<string, GroupBest | null>();
 
     for (const assignment of assignments) {
-      if (results.length >= maxResults) break;
+      if (results.length >= maxResults || budget.expired) break;
 
       const termGroups = new Map<string, number[]>();
       for (let i = 0; i < courses.length; i++) {
@@ -134,7 +161,17 @@ export class SmartScheduler {
           const groupCandidates = indices.map(i =>
             candidatesPerCourse[i].filter(c => c.term === assignment[i]),
           );
-          best = SmartScheduler.bestForTermGroup(groupCandidates, scorer);
+          best = SmartScheduler.bestForTermGroup(
+            groupCandidates,
+            scorer,
+            budget,
+          );
+          // A walk cut short has only a best-so-far, which must not pass
+          // for this assignment's best.
+          if (budget.expired) {
+            valid = false;
+            break;
+          }
           bestByGroup.set(key, best);
         }
         if (!best) {
@@ -160,7 +197,10 @@ export class SmartScheduler {
     }
 
     // Stable, so schedules of equal cost keep their enumeration order.
-    return results.sort((a, b) => a.cost - b.cost).map(r => r.schedule);
+    return {
+      schedules: results.sort((a, b) => a.cost - b.cost).map(r => r.schedule),
+      cutShort: budget.expired,
+    };
   }
 
   /**
@@ -248,6 +288,7 @@ export class SmartScheduler {
   private static bestForTermGroup(
     candidatesPerCourse: MaskedCandidate[][],
     scorer: ScheduleScorer,
+    budget: Budget = { deadline: undefined, visits: 0, expired: false },
   ): GroupBest | null {
     const n = candidatesPerCourse.length;
     if (n === 0) return { combos: [], cost: 0 };
@@ -269,6 +310,15 @@ export class SmartScheduler {
         return;
       }
       for (const candidate of candidatesPerCourse[i]) {
+        if (budget.expired) return;
+        if (
+          budget.deadline !== undefined &&
+          ++budget.visits % CHECK_EVERY === 0 &&
+          performance.now() > budget.deadline
+        ) {
+          budget.expired = true;
+          return;
+        }
         // Costs are never negative, so nothing beats zero, and ties keep the
         // first found.
         if (bestCost === 0) return;
