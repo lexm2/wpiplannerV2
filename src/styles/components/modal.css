@@ -1174,6 +1174,17 @@ html.is-mobile .filter-actions {
   gap: 3px;
 }
 
+.filter-segmented-sub {
+  margin-top: 0.5rem;
+}
+
+/* Five buttons across a phone-width modal: let them shrink below their
+   content width and trim the side padding so "4000" is not clipped. */
+.filter-segmented-sub .segmented-btn {
+  min-width: 0;
+  padding-inline: 0.25rem;
+}
+
 .segmented-btn {
   flex: 1;
   padding: 0.5rem 0.75rem;

@@ -72,6 +72,11 @@ export interface InterestListFilterCriteria {
 
 export interface GraduateLevelFilterCriteria {
   level: 'all' | 'undergraduate' | 'graduate';
+  /**
+   * Narrows to one undergraduate level (1000-4000). Only applies when `level`
+   * is 'undergraduate'; ignored otherwise.
+   */
+  undergradLevel?: 1000 | 2000 | 3000 | 4000;
 }
 
 export interface AcademicYearFilterCriteria {

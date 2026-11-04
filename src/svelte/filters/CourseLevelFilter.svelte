@@ -1,6 +1,8 @@
 <script lang="ts">
   import FilterSection from './FilterSection.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
+  import { slideFade } from '../transitions';
+  import { UNDERGRAD_LEVELS } from '../../core/filtering/filters/GraduateLevelFilter';
   import type { Course } from '../../types/types';
   import type { AcademicTerm } from '../../types/schedule';
   import type {
@@ -24,6 +26,11 @@
       ?.level ?? 'all',
   );
 
+  const currentUndergradLevel = $derived(
+    filterService.getCriteria<GraduateLevelFilterCriteria>('graduateLevel')
+      ?.undergradLevel,
+  );
+
   const activeTerms = $derived<AcademicTerm[]>(
     filterService.getCriteria<TermFilterCriteria>('term')?.terms ?? [],
   );
@@ -31,6 +38,17 @@
   function setLevel(level: Level): void {
     if (level === 'all') filterService.removeFilter('graduateLevel');
     else filterService.addFilter('graduateLevel', { level });
+  }
+
+  function setUndergradLevel(
+    undergradLevel: GraduateLevelFilterCriteria['undergradLevel'],
+  ): void {
+    filterService.addFilter(
+      'graduateLevel',
+      undergradLevel === undefined
+        ? { level: 'undergraduate' }
+        : { level: 'undergraduate', undergradLevel },
+    );
   }
 
   function toggleTerm(term: AcademicTerm, checked: boolean): void {
@@ -60,6 +78,27 @@
       onclick={() => setLevel('graduate')}>Graduate</button
     >
   </div>
+  {#if currentLevel === 'undergraduate'}
+    <div
+      class="filter-segmented-control filter-segmented-sub"
+      role="group"
+      aria-label="Undergraduate level"
+      transition:slideFade={{ duration: 150 }}
+    >
+      <button
+        class="segmented-btn"
+        class:active={currentUndergradLevel === undefined}
+        onclick={() => setUndergradLevel(undefined)}>All</button
+      >
+      {#each UNDERGRAD_LEVELS as lvl (lvl)}
+        <button
+          class="segmented-btn"
+          class:active={currentUndergradLevel === lvl}
+          onclick={() => setUndergradLevel(lvl)}>{lvl}</button
+        >
+      {/each}
+    </div>
+  {/if}
   <div class="filter-term-row">
     {#each terms as term (term)}
       <label class="filter-term-label">
