@@ -486,4 +486,13 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+
+  /* Back / Cancel / Finish at their fixed padding were 9px wider than the
+     320px drawer's content. They share the row equally and may shrink. */
+  .wizard-btn {
+    flex: 1;
+    min-width: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }

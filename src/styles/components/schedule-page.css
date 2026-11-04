@@ -780,11 +780,62 @@ html.is-mobile .term-graph {
     padding-right: 1rem;
   }
 
+  /* In a ~270px drawer the name sat in a column beside the two icon buttons
+     (125px at 320: ECE 2010 broke over four lines). The buttons take the
+     code's line instead and the name, sections and credits run the full
+     width below. `display: contents` lets the info's children join the
+     header's grid. */
+  .schedule-course-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: start;
+  }
+
+  .schedule-course-info {
+    display: contents;
+  }
+
+  .schedule-course-info > * {
+    grid-column: 1 / -1;
+  }
+
+  .schedule-course-info > .schedule-course-code {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    margin-bottom: 0;
+  }
+
+  .course-item-controls {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   /* The term warning sat in the card's top-right corner, on top of the "Fri"
      header. It belongs to the whole term, so it moves beside the term letter
      in the corner cell. */
   .term-conflict-warning {
     right: auto;
     left: 0.25rem;
+  }
+}
+
+@media (max-width: 360px) {
+  /* The slot is ~127px at 320px, too narrow for the label beside its icon
+     ("Calendar E..."), so below 360px it shows the icon alone. The label is
+     clipped rather than removed to stay the button's accessible name. */
+  .calendar-events-btn {
+    position: relative;
+    justify-content: center;
+  }
+
+  .calendar-events-btn-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
