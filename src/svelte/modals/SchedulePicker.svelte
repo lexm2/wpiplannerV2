@@ -537,45 +537,6 @@
                     void handleAction('duplicate', schedule);
                   }}>Duplicate</button
                 >
-                {#if schedules.length > 1}
-                  <button
-                    class="btn-link inline-action-btn"
-                    onclick={e => {
-                      e.stopPropagation();
-                      void handleAction('copy-into', schedule);
-                    }}>Copy Into</button
-                  >
-                {/if}
-                <button
-                  class="btn-link inline-action-btn"
-                  onclick={e => {
-                    e.stopPropagation();
-                    void handleAction('export', schedule);
-                  }}>Export</button
-                >
-                <button
-                  class="btn-link inline-action-btn"
-                  onclick={e => {
-                    e.stopPropagation();
-                    void handleAction('export-ics', schedule);
-                  }}>Export ICS</button
-                >
-                <button
-                  class="btn-link inline-action-btn"
-                  onclick={e => {
-                    e.stopPropagation();
-                    void handleAction('import', schedule);
-                  }}>Import</button
-                >
-                {#if schedules.length > 1}
-                  <button
-                    class="btn-link inline-action-btn danger"
-                    onclick={e => {
-                      e.stopPropagation();
-                      void handleAction('delete', schedule);
-                    }}>Delete</button
-                  >
-                {/if}
                 <button
                   class="btn-link {styles['menuBtn']}"
                   title="More options"
@@ -596,14 +557,14 @@
               style:top={`${menuPos.top}px`}
             >
               <button
-                class={styles['menuAction']}
+                class="{styles['menuAction']} {styles['inlineAbove']}"
                 onclick={e => {
                   e.stopPropagation();
                   void handleAction('rename', schedule);
                 }}>Rename</button
               >
               <button
-                class={styles['menuAction']}
+                class="{styles['menuAction']} {styles['inlineAbove']}"
                 onclick={e => {
                   e.stopPropagation();
                   void handleAction('duplicate', schedule);
