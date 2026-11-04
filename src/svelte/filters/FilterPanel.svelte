@@ -115,6 +115,7 @@
       {filterService}
       {courseSelectionService}
       {autoScheduleOrchestrator}
+      {mode}
     />
     <DepartmentFilter {filterService} {allCourses} />
     <TimesFilter {filterService} />

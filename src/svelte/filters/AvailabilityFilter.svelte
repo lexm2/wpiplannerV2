@@ -9,16 +9,19 @@
     AvailabilityFilterCriteria,
     ConflictCriteria,
   } from '../../types/filters';
-  import { isCalendarSlot } from '../../services/scheduling/calendarEventProvider';
+  import { appState } from '../../core/state/appState.svelte';
+  import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 
   let {
     filterService,
     courseSelectionService,
     autoScheduleOrchestrator,
+    mode,
   }: {
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
+    mode: 'filter' | 'auto-schedule';
   } = $props();
 
   const availCriteria = $derived(
@@ -32,7 +35,14 @@
   );
   const avoidConflicts = $derived(conflictCriteria?.avoidConflicts ?? false);
   const blockedSlots = $derived(conflictCriteria?.blockedSlots ?? []);
-  const hasCalendarEvents = $derived(blockedSlots.some(isCalendarSlot));
+  const hideCalendarClashes = $derived(
+    conflictCriteria?.avoidCalendarEvents ?? false,
+  );
+  // Unset means on.
+  const keepClearOfEvents = $derived(
+    appState.preferences.avoidCalendarEvents !== false,
+  );
+  const isAuto = $derived(mode === 'auto-schedule');
   // Unset means on: F conflicts with A and B, S with C and D.
   const semesterSpans = $derived(
     conflictCriteria?.semesterSpansQuarters ?? true,
@@ -74,14 +84,16 @@
       filterService.addFilter('periodConflict', {
         avoidConflicts: true,
         selectedCourses,
-        blockedSlots, // preserve existing (e.g. calendar) slots
+        blockedSlots,
         semesterSpansQuarters: semesterSpans,
+        avoidCalendarEvents: hideCalendarClashes,
       });
-    } else if (blockedSlots.length > 0) {
+    } else if (blockedSlots.length > 0 || hideCalendarClashes) {
       filterService.addFilter('periodConflict', {
         avoidConflicts: false,
         blockedSlots,
         semesterSpansQuarters: semesterSpans,
+        avoidCalendarEvents: hideCalendarClashes,
       });
     } else {
       filterService.removeFilter('periodConflict');
@@ -89,27 +101,22 @@
   }
 
   function onCalendarToggle(checked: boolean): void {
-    const avoid = avoidConflicts;
-    const selectedCourses =
-      conflictCriteria?.selectedCourses ??
-      courseSelectionService.getSelectedCourses();
-    const nonCalendarSlots = blockedSlots.filter(s => !isCalendarSlot(s));
-
     if (checked) {
-      const calendarSlots =
-        autoScheduleOrchestrator.getAllCalendarBlockedTimes();
       filterService.addFilter('periodConflict', {
-        avoidConflicts: avoid,
-        selectedCourses,
-        blockedSlots: [...nonCalendarSlots, ...calendarSlots],
+        avoidConflicts,
+        selectedCourses:
+          conflictCriteria?.selectedCourses ??
+          courseSelectionService.getSelectedCourses(),
+        blockedSlots,
         semesterSpansQuarters: semesterSpans,
+        avoidCalendarEvents: true,
       });
-    } else if (nonCalendarSlots.length > 0 || avoid) {
+    } else if (avoidConflicts || blockedSlots.length > 0) {
       filterService.addFilter('periodConflict', {
-        avoidConflicts: avoid,
-        selectedCourses,
-        blockedSlots: nonCalendarSlots,
-        semesterSpansQuarters: semesterSpans,
+        ...conflictCriteria,
+        avoidConflicts,
+        blockedSlots,
+        avoidCalendarEvents: false,
       });
     } else {
       filterService.removeFilter('periodConflict');
@@ -134,14 +141,25 @@
   />
 
   {#if showCalendarToggle}
-    <FilterToggle
-      label={`Hide sections that conflict with calendar events (${calendarCountText})`}
-      checked={hasCalendarEvents}
-      onchange={onCalendarToggle}
-    />
+    {#if isAuto}
+      <FilterToggle
+        id="keep-clear-of-events"
+        label={`Keep classes clear of my calendar events (${calendarCountText})`}
+        checked={keepClearOfEvents}
+        onchange={checked =>
+          autoScheduleService.setAvoidCalendarEvents(checked)}
+      />
+    {:else}
+      <FilterToggle
+        id="hide-calendar-conflicts-filter"
+        label={`Hide sections that conflict with calendar events (${calendarCountText})`}
+        checked={hideCalendarClashes}
+        onchange={onCalendarToggle}
+      />
+    {/if}
   {/if}
 
-  {#if avoidConflicts || hasCalendarEvents}
+  {#if avoidConflicts || hideCalendarClashes}
     <FilterToggle
       id="semester-spans-filter"
       label="Semester courses (F, S) conflict with their quarters (A and B, C and D)"

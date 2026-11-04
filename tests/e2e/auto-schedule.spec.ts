@@ -21,13 +21,45 @@ async function loadApp(page: Page): Promise<void> {
   );
 }
 
-/** Blocked-slot count stored on the conflict filter, or null if it is off. */
-function blockedSlotCount(page: Page): Promise<number | null> {
-  return page.evaluate(
-    () =>
-      (window as any).services.filterService.getCriteria('periodConflict')
-        ?.blockedSlots?.length ?? null,
+/** The conflict filter's stored criteria, or undefined if it is off. */
+function conflictCriteria(page: Page): Promise<any> {
+  return page.evaluate(() =>
+    (window as any).services.filterService.getCriteria('periodConflict'),
   );
+}
+
+/** Replaces the active schedule's calendar events the way the app does. */
+function setEvents(page: Page, events: unknown[]): Promise<void> {
+  return page.evaluate(events => {
+    const psm = (window as any).services.profileStateManager;
+    psm.updateSchedule(
+      psm.getActiveSchedule().id,
+      { localEvents: events },
+      'calendar-event',
+    );
+  }, events);
+}
+
+function weeklyEvent(
+  id: string,
+  title: string,
+  days: string[],
+  start: number,
+  end: number,
+  terms = ['A', 'B', 'C', 'D'],
+) {
+  return {
+    id: `local-${id}`,
+    title,
+    eventType: 'recurring',
+    days,
+    startTime: { hours: start, minutes: 0 },
+    endTime: { hours: end, minutes: 0 },
+    terms,
+    visible: true,
+    createdAt: 1,
+    updatedAt: 1,
+  };
 }
 
 test('calendar-events toggle reflects its state and turns off cleanly', async ({
@@ -65,7 +97,11 @@ test('calendar-events toggle reflects its state and turns off cleanly', async ({
 
   await toggle.click();
   await expect(toggle).toBeChecked();
-  expect(await blockedSlotCount(page)).toBe(4); // 2 terms x 2 days
+  // The events are read live: no copy of their slots goes into the filter.
+  expect(await conflictCriteria(page)).toMatchObject({
+    avoidCalendarEvents: true,
+    blockedSlots: [],
+  });
 
   // A freshly rendered panel reads its state from the filter, not from the
   // checkbox's own memory of the last click.
@@ -76,7 +112,55 @@ test('calendar-events toggle reflects its state and turns off cleanly', async ({
 
   await toggle.click();
   await expect(toggle).not.toBeChecked();
-  expect(await blockedSlotCount(page)).toBeNull();
+  expect(await conflictCriteria(page)).toBeUndefined();
+});
+
+test('the toggle counts only visible recurring events', async ({ page }) => {
+  await loadApp(page);
+  await setEvents(page, [
+    weeklyEvent('1', 'Practice', ['M'], 15, 17),
+    { ...weeklyEvent('2', 'Hidden', ['T'], 15, 17), visible: false },
+    {
+      ...weeklyEvent('3', 'Once', ['W'], 15, 17),
+      eventType: 'one-time',
+      date: '2026-11-10',
+    },
+  ]);
+  await page.click('#filter-btn');
+  await expect(
+    page.getByLabel(
+      'Hide sections that conflict with calendar events (1 event)',
+    ),
+  ).toBeVisible();
+});
+
+test('the course list follows calendar events added and deleted while the toggle is on', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await setEvents(page, [weeklyEvent('1', 'Practice', ['M'], 6, 7)]);
+  await page.click('#filter-btn');
+  await page
+    .getByLabel('Hide sections that conflict with calendar events (1 event)')
+    .check();
+
+  const preview = page.locator('.filter-preview span');
+  const matching = async (): Promise<number> =>
+    Number(((await preview.innerText()).match(/^(\d+) courses/) ?? [])[1]);
+  const before = await matching();
+  expect(before).toBeGreaterThan(0);
+
+  // A job covering the whole working week hides what meets in it, with the
+  // toggle left alone.
+  await setEvents(page, [
+    weeklyEvent('1', 'Practice', ['M'], 6, 7),
+    weeklyEvent('2', 'Co-op job', ['M', 'T', 'W', 'R', 'F'], 8, 17),
+  ]);
+  await expect.poll(matching).toBeLessThan(before);
+
+  // Deleting both brings every course back.
+  await setEvents(page, []);
+  await expect.poll(matching).toBe(before);
 });
 
 test('"avoid conflicts" follows the selection made after it was switched on', async ({
@@ -400,4 +484,136 @@ test('the early-classes preference picks the later lecture section', async ({
     timeout: 60_000,
   });
   expect(await lectureStart()).toBeGreaterThanOrEqual(10 * 60);
+});
+
+const WEEK = ['M', 'T', 'W', 'R', 'F'];
+// 8-5 leaves these two courses no section at all; 8-12 leaves some.
+const WORKDAY = weeklyEvent('job', 'Co-op job', WEEK, 8, 17);
+const MORNING = weeklyEvent('job', 'Co-op job', WEEK, 8, 12);
+
+/** Start and end minutes of every meeting of the selected sections. */
+async function selectedMeetings(page: Page): Promise<[number, number][]> {
+  return page.evaluate(() =>
+    (window as any).services.courseSelectionService
+      .getSelectedCourses()
+      .flatMap((sc: any) =>
+        ['lecture', 'discussion', 'lab']
+          .map(k => sc.selected?.[k])
+          .filter(Boolean),
+      )
+      .flatMap((s: any) => s.periods)
+      .filter((p: any) => !p.isAsync)
+      .map((p: any) => [
+        p.startTime.hours * 60 + p.startTime.minutes,
+        p.endTime.hours * 60 + p.endTime.minutes,
+      ]),
+  );
+}
+
+const inMorning = ([start, end]: [number, number]): boolean =>
+  start < 12 * 60 && 8 * 60 < end;
+const inWorkday = ([start, end]: [number, number]): boolean =>
+  start < 17 * 60 && 8 * 60 < end;
+
+test('Auto-Schedule keeps classes clear of calendar events by default', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await setEvents(page, [MORNING]);
+  await selectCourses(page, ['CS2102', 'MA1022']);
+  await page.click('#auto-schedule-btn');
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+  const keepClear = page.getByLabel(
+    'Keep classes clear of my calendar events (1 event)',
+  );
+  await expect(keepClear).toBeChecked();
+  await page.click('#modal-primary-btn');
+  await expect(page.locator('.schedule-generating-overlay')).toHaveCount(0, {
+    timeout: 60_000,
+  });
+
+  const meetings = await selectedMeetings(page);
+  expect(meetings.length).toBeGreaterThan(0);
+  expect(meetings.filter(inMorning)).toEqual([]);
+});
+
+test('opting out of the calendar lets Auto-Schedule use the time', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await setEvents(page, [WORKDAY]);
+  await selectCourses(page, ['CS2102', 'MA1022']);
+  await openSettings(page);
+  await page
+    .getByLabel('Keep classes clear of my calendar events (1 event)')
+    .uncheck();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as any).services.profileStateManager.getPreferences()
+            .avoidCalendarEvents,
+      ),
+    )
+    .toBe(false);
+  await page.click('#modal-primary-btn');
+  await expect(page.locator('.schedule-generating-overlay')).toHaveCount(0, {
+    timeout: 60_000,
+  });
+
+  const meetings = await selectedMeetings(page);
+  expect(meetings.length).toBeGreaterThan(0);
+  expect(meetings.some(inWorkday)).toBe(true);
+});
+
+test('a class over a calendar event shows a conflict on the grid', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await page.click('#schedule-tab');
+  const hit = await page.evaluate(async () => {
+    const services = (window as any).services;
+    const course = services.courseDataService
+      .getAllDepartments()
+      .flatMap((d: any) => d.courses)
+      .find(
+        (c: any) =>
+          `${c.departmentAbbr}${c.number}` === 'CS2102' && c.lectures?.length,
+      );
+    const lecture = course.lectures.find(
+      (l: any) =>
+        l.section.periods[0]?.days?.size && !l.section.periods[0].isAsync,
+    ).section;
+    await services.courseSelectionService.selectCourse(course);
+    await services.courseSelectionService.setSelectedSection(
+      course,
+      lecture.number,
+    );
+    const p = lecture.periods[0];
+    const term = lecture.computedTerm === 'F' ? 'A' : lecture.computedTerm;
+    return {
+      term,
+      day: [...p.days][0],
+      start: p.startTime.hours,
+      end: p.endTime.hours + 1,
+    };
+  });
+  await setEvents(page, [
+    weeklyEvent('clash', 'Work Shift', [hit.day], hit.start, hit.end, [
+      hit.term,
+    ]),
+  ]);
+  await expect(
+    page.locator(`.term-graph[data-term="${hit.term}"] .conflict-overlay`),
+  ).not.toHaveCount(0);
+  await expect(
+    page
+      .locator(`.term-graph[data-term="${hit.term}"] .conflict-overlay`)
+      .first(),
+  ).toHaveAttribute('data-conflicts-with', /CS2102 \w+, Work Shift/);
+  await expect(
+    page.locator(`.term-graph[data-term="${hit.term}"] .term-conflict-warning`),
+  ).toBeVisible();
 });

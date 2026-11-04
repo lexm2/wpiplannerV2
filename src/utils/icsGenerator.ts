@@ -10,6 +10,11 @@ import { TermBoundsService } from './termBounds';
 import { getSelectedSections } from './courseUtils';
 import { parseLocalDate } from './localDate';
 import { timezoneOffsetMs } from './timezone';
+import {
+  PLANNER_KIND_COURSE,
+  PLANNER_KIND_PROPERTY,
+  PLANNER_NOTE,
+} from './plannerExportMarker';
 
 type Quarter = 'A' | 'B' | 'C' | 'D';
 
@@ -282,8 +287,10 @@ export class ICSGenerator {
             period.type.charAt(0).toUpperCase() + period.type.slice(1);
           const summary = `${periodTypePrefix}: ${courseId} ${selectedCourse.course.name}`;
 
-          let description: string | undefined;
-          if (options.includeDescription !== false) {
+          let description: string;
+          if (options.includeDescription === false) {
+            description = PLANNER_NOTE;
+          } else {
             const descParts: string[] = [];
 
             if (options.includeProfessor !== false && period.professor) {
@@ -298,6 +305,8 @@ export class ICSGenerator {
               descParts.push(selectedCourse.course.description);
             }
 
+            descParts.push('');
+            descParts.push(PLANNER_NOTE);
             description = descParts.join('\n');
           }
 
@@ -316,6 +325,7 @@ export class ICSGenerator {
             location: location,
             timezone: timezone,
             repeating: this.weeklyRule(period.days, termDates.end, timezone),
+            x: [[PLANNER_KIND_PROPERTY, PLANNER_KIND_COURSE]],
           });
         }
       }

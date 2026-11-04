@@ -2,8 +2,10 @@ import ICAL from 'ical.js';
 import { DayOfWeek } from '../../types/types';
 import { formatLocalDate } from '../../utils/localDate';
 import { timezoneOffsetMs, zonedWallToUtcMs } from '../../utils/timezone';
+import { isPlannerCourseEvent } from '../../utils/plannerExportMarker';
 import {
   detectWeeklyEvents,
+  distinctTitles,
   type IcsImportResult,
   type IcsOccurrence,
   type ParsedCalendar,
@@ -143,6 +145,12 @@ function toWall(
   return wallFromComponents(new Date(asUtc));
 }
 
+/** The calendar day after "YYYY-MM-DD". */
+function nextDate(date: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+}
+
 function dtstartTzid(component: ICAL.Component): string | undefined {
   const value = component.getFirstProperty('dtstart')?.getParameter('tzid');
   return typeof value === 'string' ? value : undefined;
@@ -153,39 +161,129 @@ function isCancelled(component: ICAL.Component): boolean {
   return typeof status === 'string' && status.toUpperCase() === 'CANCELLED';
 }
 
-function parseCalendars(text: string): ICAL.Component[] {
-  const source = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
-  if (!source.trim()) {
-    throw new IcsImportError('That file is empty.');
-  }
-  if (!/BEGIN:VCALENDAR/i.test(source)) {
-    throw new IcsImportError(
-      "That file isn't a calendar (.ics) export. Export your calendar as .ics and try again.",
-    );
-  }
-  let parsed: unknown;
-  try {
-    parsed = ICAL.parse(source);
-  } catch {
-    throw new IcsImportError(
-      "That calendar file couldn't be read. It may be damaged or not a real .ics file.",
-    );
-  }
+const NOT_A_CALENDAR =
+  "That file isn't a calendar (.ics) export. Export your calendar as .ics and try again.";
+
+function toCalendars(parsed: unknown): ICAL.Component[] {
   const jcals: unknown[] =
     Array.isArray(parsed) && typeof parsed[0] === 'string'
       ? [parsed]
       : Array.isArray(parsed)
         ? parsed
         : [];
-  const calendars = jcals
+  return jcals
     .filter(j => Array.isArray(j) && j[0] === 'vcalendar')
     .map(j => new ICAL.Component(j as never));
-  if (calendars.length === 0) {
-    throw new IcsImportError(
-      "That file isn't a calendar (.ics) export. Export your calendar as .ics and try again.",
-    );
+}
+
+/** The SUMMARY value of an (unfolded) VEVENT block, if it has a readable one. */
+function summaryOfBlock(block: string[]): string {
+  for (const line of block) {
+    const m = /^SUMMARY(?:;[^:]*)?:(.*)$/i.exec(line);
+    if (m) {
+      const text = m[1]
+        .replace(/\\([,;\\])/g, '$1')
+        .replace(/\\n/gi, ' ')
+        .trim();
+      if (text) return text;
+    }
   }
-  return calendars;
+  return 'Untitled Event';
+}
+
+/**
+ * Fallback for a file ical.js rejects as a whole: parse each VEVENT inside its
+ * own VCALENDAR (header properties and every VTIMEZONE kept), so one bad event
+ * only loses itself.
+ */
+function parseEventByEvent(source: string): {
+  calendars: ICAL.Component[];
+  unreadable: string[];
+} {
+  const lines = source
+    .replace(/\r\n|\r/g, '\n')
+    .replace(/\n[ \t]/g, '')
+    .split('\n');
+  const header: string[] = [];
+  const zones: string[][] = [];
+  const events: string[][] = [];
+  let current: string[] | null = null;
+  let kind = '';
+  let depth = 0;
+  for (const line of lines) {
+    const upper = line.trim().toUpperCase();
+    if (current) {
+      current.push(line);
+      if (upper.startsWith('BEGIN:')) depth++;
+      else if (upper.startsWith('END:')) {
+        depth--;
+        if (depth === 0) {
+          (kind === 'VEVENT' ? events : zones).push(current);
+          current = null;
+        }
+      }
+    } else if (upper === 'BEGIN:VEVENT' || upper === 'BEGIN:VTIMEZONE') {
+      current = [line];
+      kind = upper.slice(6);
+      depth = 1;
+    } else if (
+      upper &&
+      !upper.startsWith('BEGIN:') &&
+      !upper.startsWith('END:') &&
+      zones.length === 0 &&
+      events.length === 0
+    ) {
+      header.push(line);
+    }
+  }
+
+  const wrap = (parts: string[][]): string =>
+    ['BEGIN:VCALENDAR', ...header, ...parts.flat(), 'END:VCALENDAR'].join(
+      '\r\n',
+    );
+  const calendars: ICAL.Component[] = [];
+  const unreadable: string[] = [];
+  for (const block of events) {
+    let parsed: unknown = null;
+    for (const attempt of [[...zones, block], [block]]) {
+      try {
+        parsed = ICAL.parse(wrap(attempt));
+        break;
+      } catch {
+        // try without the time zones, then give up on this event
+      }
+    }
+    const found = parsed ? toCalendars(parsed) : [];
+    if (found.length > 0) calendars.push(...found);
+    else unreadable.push(summaryOfBlock(block));
+  }
+  return { calendars, unreadable };
+}
+
+function parseCalendars(text: string): {
+  calendars: ICAL.Component[];
+  unreadable: string[];
+} {
+  const source = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  if (!source.trim()) {
+    throw new IcsImportError('That file is empty.');
+  }
+  if (!/BEGIN:VCALENDAR/i.test(source)) {
+    throw new IcsImportError(NOT_A_CALENDAR);
+  }
+  let result: { calendars: ICAL.Component[]; unreadable: string[] };
+  try {
+    result = { calendars: toCalendars(ICAL.parse(source)), unreadable: [] };
+  } catch {
+    result = parseEventByEvent(source);
+    if (result.calendars.length === 0) {
+      throw new IcsImportError(
+        "That calendar file couldn't be read. It may be damaged or not a real .ics file.",
+      );
+    }
+  }
+  if (result.calendars.length === 0) throw new IcsImportError(NOT_A_CALENDAR);
+  return result;
 }
 
 interface EventGroup {
@@ -202,7 +300,7 @@ export function parseIcsOccurrences(
   window: { start: Date; end: Date },
   timezone: string = 'America/New_York',
 ): ParsedCalendar {
-  const calendars = parseCalendars(text);
+  const { calendars, unreadable } = parseCalendars(text);
   const startStr = formatLocalDate(window.start);
   const endStr = formatLocalDate(window.end);
   // Occurrences are expanded in order, so stop a day or two past the window
@@ -229,7 +327,19 @@ export function parseIcsOccurrences(
     cancelled: 0,
     tooDense: 0,
     outsideWindow: 0,
+    unreadable: 0,
+    noLength: 0,
+    plannerExport: 0,
   };
+  const titles = new Map<keyof ParsedCalendar['dropped'], string[]>();
+  const drop = (reason: keyof ParsedCalendar['dropped'], title: string) => {
+    dropped[reason]++;
+    const list = titles.get(reason);
+    if (list) list.push(title);
+    else titles.set(reason, [title]);
+  };
+  for (const title of unreadable) drop('unreadable', title);
+  const exportedUids = new Set<string>();
   let first: string | null = null;
   let last: string | null = null;
   const seen = (date: string): void => {
@@ -277,18 +387,36 @@ export function parseIcsOccurrences(
   }
 
   for (const { uid, master, exceptions } of units) {
+    const rawTitle = master.getFirstPropertyValue('summary');
+    const title =
+      (typeof rawTitle === 'string' && rawTitle.trim()) || 'Untitled Event';
     try {
+      const description = master.getFirstPropertyValue('description');
+      const kind = master.getFirstPropertyValue('x-wpiplanner-kind');
+      if (
+        isPlannerCourseEvent({
+          uid,
+          description: typeof description === 'string' ? description : null,
+          kind: typeof kind === 'string' ? kind : null,
+        })
+      ) {
+        if (!exportedUids.has(uid)) {
+          exportedUids.add(uid);
+          drop('plannerExport', title);
+        }
+        continue;
+      }
       const dtstart = master.getFirstPropertyValue('dtstart');
       if (!(dtstart instanceof ICAL.Time)) continue;
       const startWall = toWall(dtstart, dtstartTzid(master), timezone);
       seen(startWall.date);
 
       if (isCancelled(master)) {
-        dropped.cancelled++;
+        drop('cancelled', title);
         continue;
       }
       if (dtstart.isDate) {
-        dropped.allDay++;
+        drop('allDay', title);
         continue;
       }
 
@@ -296,9 +424,9 @@ export function parseIcsOccurrences(
       const iterator = event.iterator();
       let inWindow = 0;
       let overnight = 0;
+      let noLength = 0;
       let reachedEnd = false;
       const collected: IcsOccurrence[] = [];
-      const title = event.summary?.trim() || 'Untitled Event';
       const location = event.location?.trim() || undefined;
 
       // The latest occurrence passed over before the window, for `span`.
@@ -330,11 +458,19 @@ export function parseIcsOccurrences(
         seen(s.date);
         if (s.date < startStr || s.date > endStr) continue;
         inWindow++;
+        let endMin = e.minutes;
         if (e.date !== s.date) {
-          overnight++;
+          // Ending exactly at midnight is the end of the day, not overnight.
+          if (e.minutes === 0 && e.date === nextDate(s.date)) endMin = 1439;
+          else {
+            overnight++;
+            continue;
+          }
+        }
+        if (endMin <= s.minutes) {
+          noLength++;
           continue;
         }
-        if (e.minutes <= s.minutes) continue;
         collected.push({
           uid,
           title,
@@ -342,19 +478,21 @@ export function parseIcsOccurrences(
           date: s.date,
           day: s.day,
           startMin: s.minutes,
-          endMin: e.minutes,
+          endMin,
         });
       }
 
       if (lastSkipped) {
         seen(toWall(lastSkipped, dtstartTzid(master), timezone).date);
       }
-      if (!reachedEnd) dropped.tooDense++;
+      if (!reachedEnd) drop('tooDense', title);
       else if (collected.length > 0) occurrences.push(...collected);
-      else if (inWindow === 0) dropped.outsideWindow++;
-      else if (overnight === inWindow) dropped.overnight++;
+      else if (inWindow === 0) drop('outsideWindow', title);
+      else if (overnight + noLength === inWindow)
+        drop(overnight > 0 ? 'overnight' : 'noLength', title);
     } catch {
-      // One malformed event (bad RRULE, etc.) shouldn't sink the whole import.
+      // One malformed event shouldn't sink the whole import; report it.
+      drop('unreadable', title);
     }
   }
 
@@ -362,6 +500,9 @@ export function parseIcsOccurrences(
     occurrences,
     span: first !== null && last !== null ? { first, last } : null,
     dropped,
+    droppedTitles: Object.fromEntries(
+      [...titles].map(([reason, list]) => [reason, distinctTitles(list)]),
+    ),
   };
 }
 

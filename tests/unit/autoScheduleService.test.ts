@@ -76,6 +76,35 @@ describe('autoScheduleService error reporting', () => {
     expect(message).not.toContain('Could not generate a valid schedule.\n');
   });
 
+  it('blames the calendar events when they are what leaves a course nothing', async () => {
+    const cs = { departmentAbbr: 'CS', number: '2102' };
+    setup(() =>
+      Promise.resolve({
+        status: 'no-candidates',
+        courses: [cs],
+        blockedByEvents: [cs],
+      }),
+    );
+
+    const message = await run();
+
+    expect(message).toMatch(/CS2102 meets during your calendar events/);
+    expect(message).toContain('Keep classes clear of my calendar events');
+  });
+
+  it('keeps the general causes when events explain only some courses', async () => {
+    const cs = { departmentAbbr: 'CS', number: '2102' };
+    setup(() =>
+      Promise.resolve({
+        status: 'no-candidates',
+        courses: [cs, { departmentAbbr: 'MA', number: '1022' }],
+        blockedByEvents: [cs],
+      }),
+    );
+
+    expect(await run()).toMatch(/Common causes/);
+  });
+
   it('says so when every course was left locked', async () => {
     setup(() => Promise.resolve({ status: 'nothing-to-schedule' }));
 

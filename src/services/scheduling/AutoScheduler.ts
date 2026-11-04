@@ -1,5 +1,5 @@
 import type { Course, Section, SectionsByKind } from '../../types/types';
-import type { SelectedCourse } from '../../types/schedule';
+import type { SelectedCourse, WeeklyTimeSlot } from '../../types/schedule';
 import { AcademicTerm } from '../../types/schedule';
 import type { SectionCandidate } from '../../types/scheduling';
 import {
@@ -82,6 +82,7 @@ export class AutoScheduler {
    */
   getBlockedMasksByTerm(
     fixedCourses: SelectedCourse[] = [],
+    calendarSlots: WeeklyTimeSlot[] = [],
   ): Map<string, bigint> {
     const conflictFilter = new ConflictFilter();
     const criteria = this.filterService
@@ -95,7 +96,7 @@ export class AutoScheduler {
     // blocks both of its quarters, whatever the course-list toggle says.
     return conflictFilter.getBlockedMasksByTerm({
       avoidConflicts: true,
-      blockedSlots: blockedSlots ?? [],
+      blockedSlots: [...(blockedSlots ?? []), ...calendarSlots],
       selectedCourses: fixedCourses,
       semesterSpansQuarters: true,
     });

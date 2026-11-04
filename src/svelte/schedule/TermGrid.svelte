@@ -14,7 +14,7 @@
     hidden,
     onToggleFocus,
     onOpenSectionInfo,
-    onOpenDeleteEvent,
+    onOpenEvent,
   }: {
     term: string;
     blocks: GridBlock[];
@@ -24,7 +24,7 @@
     hidden: boolean;
     onToggleFocus: () => void;
     onOpenSectionInfo: (courseId: string, sectionNumber: string) => void;
-    onOpenDeleteEvent: (eventId: string) => void;
+    onOpenEvent: (eventId: string) => void;
   } = $props();
 
   // Scaffold: term label + 5 day headers + one row of background cells
@@ -52,14 +52,21 @@
         onOpenSectionInfo(b.courseId, b.sectionNumber);
     }
   }
+  function eventTooltip(b: GridBlock): string {
+    return [b.title, b.timeRange, b.description].filter(Boolean).join('\n');
+  }
+  function eventAriaLabel(b: GridBlock): string {
+    const range = b.timeRange?.replace('-', '\u2013');
+    return `${b.title}${range ? `, ${range}` : ''}. Edit event`;
+  }
   function eventClick(e: MouseEvent, b: GridBlock): void {
     e.stopPropagation();
-    if (b.eventId) onOpenDeleteEvent(b.eventId);
+    if (b.eventId) onOpenEvent(b.eventId);
   }
   function eventKey(e: KeyboardEvent, b: GridBlock): void {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      if (b.eventId) onOpenDeleteEvent(b.eventId);
+      if (b.eventId) onOpenEvent(b.eventId);
     }
   }
 </script>
@@ -161,7 +168,8 @@
           <div
             class="external-event-block"
             data-event-id={b.eventId}
-            title={b.title}
+            title={eventTooltip(b)}
+            aria-label={eventAriaLabel(b)}
             role="button"
             tabindex="0"
             style:top={v.top}
@@ -171,7 +179,7 @@
             onclick={e => eventClick(e, b)}
             onkeydown={e => eventKey(e, b)}
           >
-            {b.label}
+            <span class="event-label">{b.label}</span>
           </div>
         {/if}
       {/each}

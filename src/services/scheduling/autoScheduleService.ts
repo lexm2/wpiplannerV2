@@ -90,6 +90,13 @@ class AutoScheduleService {
     ProfileStateManager.getInstance().updatePreferences({ autoSchedule });
   }
 
+  /** Persist whether Auto-Schedule keeps classes clear of calendar events. */
+  setAvoidCalendarEvents(avoid: boolean): void {
+    ProfileStateManager.getInstance().updatePreferences({
+      avoidCalendarEvents: avoid,
+    });
+  }
+
   openAutoScheduleIntro(): void {
     if (!this.courseSelectionService) return;
     const selectedCourses = this.courseSelectionService.getSelectedCourses();
@@ -169,6 +176,11 @@ function failureMessage(
     case 'nothing-to-schedule':
       return 'No courses are included in auto-scheduling: every course is locked to its current sections.\n\nRestart and click the courses you want rescheduled.';
     case 'no-candidates': {
+      const byEvents = outcome.blockedByEvents ?? [];
+      if (byEvents.length === outcome.courses.length) {
+        const one = byEvents.length === 1;
+        return `Could not generate a schedule: every usable section of ${listCourses(byEvents)} meets during your calendar events.\n\nChange or remove ${one ? 'the event' : 'those events'} under Calendar Events, or turn off "Keep classes clear of my calendar events" in Auto-Schedule settings.`;
+      }
       const one = outcome.courses.length === 1;
       return `Could not generate a schedule: no section of ${listCourses(outcome.courses)} can be used.\n\nCommon causes:\n• Active schedule filters exclude all of ${one ? 'its' : 'their'} sections\n• ${one ? 'Its' : 'Their'} sections clash with locked courses or calendar events\n• ${one ? 'Its' : 'Their'} sections are missing time/day data`;
     }

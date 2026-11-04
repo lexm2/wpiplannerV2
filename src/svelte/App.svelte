@@ -116,6 +116,8 @@
 
   function handleKeydown(e: KeyboardEvent): void {
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    // Undo would change the schedule hidden behind the modal.
+    if (uiState.openModals.length > 0) return;
     // Leave text fields their own native undo.
     const target = e.target as Element | null;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
@@ -307,7 +309,7 @@
             class="calendar-events-header-slot"
           >
             <CalendarEventsButton
-              onClick={() => localEventService.openAddModal()}
+              onClick={() => localEventService.openManager()}
             />
           </div>
           <ScheduleFilterButton
@@ -361,8 +363,8 @@
         conflictEngine={services.conflictDetector}
         onOpenSectionInfo={(courseId: string, sectionNumber: string) =>
           sectionInfoService.show(courseId, sectionNumber)}
-        onOpenDeleteEvent={(eventId: string) =>
-          localEventService.openDeleteModal(eventId)}
+        onOpenEvent={(eventId: string) =>
+          localEventService.openEditModal(eventId)}
       />
     </main>
   </div>

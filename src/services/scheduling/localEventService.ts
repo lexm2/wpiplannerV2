@@ -1,6 +1,7 @@
 import { appState } from '../../core/state/appState.svelte';
 import { modalState, showConfirm } from '../../svelte/modals/modalState.svelte';
 import { closeModal, openModal, uiState } from '../ui/uiState.svelte';
+import { describeEvent } from '../../utils/localEventFormat';
 import { TermBoundsService } from '../../utils/termBounds';
 import { ICSGenerator } from '../../utils/icsGenerator';
 import type { TermWindow } from './weeklyEventDetection';
@@ -28,6 +29,19 @@ export type LocalEventDraft = Omit<
 const MAX_ICS_BYTES = 20 * 1024 * 1024;
 const TERM_LETTERS = ['A', 'B', 'C', 'D'] as const;
 
+/** Decodes a calendar file, honouring a UTF-16 byte-order mark (UTF-8 otherwise). */
+function decodeCalendarText(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) {
+    return new TextDecoder('utf-16le').decode(bytes.subarray(2));
+  }
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) {
+    return new TextDecoder('utf-16be').decode(bytes.subarray(2));
+  }
+  // TextDecoder drops a UTF-8 BOM itself.
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
 function startOfDay(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -39,6 +53,12 @@ class LocalEventService {
 
   init(profileStateManager: ProfileStateManager): void {
     this.profileStateManager = profileStateManager;
+  }
+
+  /** The Calendar Events manager: every event on the active schedule. */
+  openManager(): void {
+    if (!appState.activeSchedule) return;
+    openModal('calendar-events');
   }
 
   openAddModal(): void {
@@ -55,12 +75,25 @@ class LocalEventService {
     openModal('local-event');
   }
 
-  /** Opens the import modal on its "choose a file" screen. */
+  /** Opens Edit Event for an event of the active schedule. */
+  openEditModal(eventId: string): void {
+    const event = this.find(eventId);
+    if (!event) return;
+
+    modalState.localEvent = {
+      existingEvent: event,
+      onSave: draft => this.update(eventId, draft),
+      onDelete: () =>
+        this.confirmDelete([event], () => closeModal('local-event')),
+    };
+    openModal('local-event');
+  }
+
+  /** Opens the import modal on its "choose a file" screen, over whatever is open. */
   openImportModal(): void {
     if (!appState.activeSchedule) return;
     this.importRun++;
     modalState.icsImport = { status: 'idle' };
-    closeModal('local-event');
     openModal('ics-import');
   }
 
@@ -80,7 +113,6 @@ class LocalEventService {
     const fileName = file.name;
 
     modalState.icsImport = { status: 'parsing', fileName };
-    closeModal('local-event');
     // Already open when a second file is dropped onto the schedule.
     if (!uiState.openModals.includes('ics-import')) openModal('ics-import');
 
@@ -104,7 +136,12 @@ class LocalEventService {
     }
 
     try {
-      const text = await file.text();
+      // Let "Reading <file>..." paint before the synchronous parse blocks the
+      // thread (rAF only defers here; it drives no animation).
+      await new Promise<void>(resolve =>
+        requestAnimationFrame(() => setTimeout(resolve)),
+      );
+      const text = decodeCalendarText(await file.arrayBuffer());
       if (text.startsWith('PK')) {
         show({
           status: 'error',
@@ -161,20 +198,41 @@ class LocalEventService {
     }
   }
 
-  /** Delete-confirmation modal for a local event (the grid's external-event-block click target). */
-  openDeleteModal(eventId: string): void {
-    const schedule = appState.activeSchedule;
-    if (!schedule) return;
-
-    const localEvent = (schedule.localEvents || []).find(e => e.id === eventId);
-    const title = localEvent?.title || 'Untitled Event';
+  /**
+   * Themed confirm naming exactly what is removed. `onDeleted` runs after the
+   * events are gone (e.g. to close the Edit modal that asked).
+   */
+  confirmDelete(
+    events: readonly LocalCalendarEvent[],
+    onDeleted?: () => void,
+  ): void {
+    if (events.length === 0) return;
+    const ids = events.map(e => e.id);
+    const shown = events.slice(0, 6).map(describeEvent);
+    const more =
+      events.length > shown.length
+        ? [`and ${events.length - shown.length} more`]
+        : [];
+    const message =
+      events.length === 1
+        ? `Delete ${shown[0]}?`
+        : [`Delete ${events.length} events?`, ...shown, ...more].join('\n');
     showConfirm({
-      title: 'Delete Event',
-      message: `Delete "${title}"?`,
+      title: events.length === 1 ? 'Delete Event' : 'Delete Events',
+      message,
       confirmLabel: 'Delete',
       variant: 'danger',
-      onConfirm: () => this.delete(eventId),
+      onConfirm: () => {
+        this.deleteMany(ids);
+        onDeleted?.();
+      },
     });
+  }
+
+  private find(eventId: string): LocalCalendarEvent | undefined {
+    return (appState.activeSchedule?.localEvents ?? []).find(
+      e => e.id === eventId,
+    );
   }
 
   private add(eventData: LocalEventDraft): void {
@@ -206,16 +264,41 @@ class LocalEventService {
     );
   }
 
-  private delete(eventId: string): void {
+  /** Saves an edit: same id and createdAt, fresh updatedAt, one undo step. */
+  private update(eventId: string, draft: LocalEventDraft): void {
     const schedule = appState.activeSchedule;
     if (!schedule || !this.profileStateManager) return;
-
-    const updatedLocalEvents = (schedule.localEvents || []).filter(
-      e => e.id !== eventId,
+    const now = Date.now();
+    const localEvents = (schedule.localEvents ?? []).map(e =>
+      e.id === eventId
+        ? {
+            ...draft,
+            visible: e.visible,
+            id: e.id,
+            createdAt: e.createdAt,
+            updatedAt: now,
+          }
+        : e,
     );
     this.profileStateManager.updateSchedule(
       schedule.id,
-      { localEvents: updatedLocalEvents },
+      { localEvents },
+      'calendar-event',
+    );
+  }
+
+  /** Removes several events as one change (one save, one undo step). */
+  deleteMany(eventIds: readonly string[]): void {
+    const schedule = appState.activeSchedule;
+    if (!schedule || !this.profileStateManager || eventIds.length === 0) return;
+
+    const doomed = new Set(eventIds);
+    const localEvents = (schedule.localEvents ?? []).filter(
+      e => !doomed.has(e.id),
+    );
+    this.profileStateManager.updateSchedule(
+      schedule.id,
+      { localEvents },
       'calendar-event',
     );
   }

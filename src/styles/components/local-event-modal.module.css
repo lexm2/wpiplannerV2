@@ -212,23 +212,20 @@
   user-select: none;
 }
 
-.local-event-form > .import-row {
-  align-self: stretch;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.import-hint {
-  flex: 1 1 14rem;
+.type-hint {
+  margin: 0.5rem 0 0;
   color: var(--color-text-secondary);
   font-size: 0.85rem;
   line-height: 1.4;
 }
 
-.import-input {
-  display: none;
+/* Delete sits at the start of the footer, away from Cancel and Save. */
+.footer-start {
+  margin-right: auto;
+}
+
+@media (max-width: 600px) {
+  .footer-start {
+    margin-right: 0;
+  }
 }

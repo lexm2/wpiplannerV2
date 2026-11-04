@@ -209,10 +209,12 @@ for (const { name, ...options } of SCHEDULE_CASES) {
 
       // A modal opened from the drawer: Escape closes the modal only.
       await sidebar.getByRole('button', { name: /Calendar Events/ }).click();
-      const localEvent = page.locator('[data-modal-type="local-event"]');
-      await expect(localEvent).toBeVisible();
+      const calendarEvents = page.locator(
+        '[data-modal-type="calendar-events"]',
+      );
+      await expect(calendarEvents).toBeVisible();
       await page.keyboard.press('Escape');
-      await expect(localEvent).toHaveCount(0);
+      await expect(calendarEvents).toHaveCount(0);
       await expectShown(sidebar);
 
       await sidebar

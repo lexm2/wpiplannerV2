@@ -26,6 +26,8 @@ interface LocalEventPayload {
   ) => void;
   /** Optional: existing event to edit (if not provided, creates new) */
   existingEvent?: LocalCalendarEvent;
+  /** Edit mode: asks to delete the event (the service confirms, then closes the modal). */
+  onDelete?: () => void;
 }
 
 /** State of the "Import Calendar" modal; see localEventService.importFile. */

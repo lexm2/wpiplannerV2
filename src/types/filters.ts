@@ -92,6 +92,12 @@ interface ConflictFilterCriteria {
    * comparison, where F only conflicts with F.
    */
   semesterSpansQuarters?: boolean;
+  /**
+   * Also hide sections that clash with the active schedule's calendar events.
+   * The events are read live when the filter runs, never copied here, so
+   * adding or deleting one takes effect at once.
+   */
+  avoidCalendarEvents?: boolean;
 }
 
 export interface ConflictCriteria extends ConflictFilterCriteria {

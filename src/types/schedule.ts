@@ -40,6 +40,8 @@ export interface SchedulePreferences {
   bookmarkedCourseIds?: string[];
   /** Auto-schedule ranking preferences; read via normalizeRankingPreferences. */
   autoSchedule?: RankingPreferences;
+  /** Auto-schedule keeps classes clear of calendar events; unset means on. */
+  avoidCalendarEvents?: boolean;
 }
 
 /**

@@ -20,6 +20,7 @@ import { CourseColorService } from '../services/scheduling/CourseColorService';
 import { AutoScheduleOrchestrator } from '../services/scheduling/AutoScheduleOrchestrator';
 import { DegreeImportService } from '../services/degree/degreeImportService';
 import { TransactionalStorageManager } from '../core/storage/TransactionalStorageManager';
+import { setCalendarSlotSource } from '../core/filtering/filters/ConflictFilter';
 import { calendarEventProvider } from '../services/scheduling/calendarEventProvider';
 import { componentWizardService } from '../services/scheduling/componentWizardService';
 import { localEventService } from '../services/scheduling/localEventService';
@@ -209,6 +210,11 @@ export class AppBootstrap {
   static async startApp(services: ServiceContainer): Promise<void> {
     services.autoScheduleOrchestrator.setCalendarEventProvider(
       calendarEventProvider,
+    );
+    // Calendar-event filtering reads the events live, so adding or deleting
+    // one re-filters the course list with no copy to go stale.
+    setCalendarSlotSource(() =>
+      calendarEventProvider.getAllLocalEventBlockedTimes(),
     );
     AppBootstrap.setupWindowUnloadHandler();
 

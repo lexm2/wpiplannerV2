@@ -4,6 +4,7 @@
   import Tutorials from './Tutorials.svelte';
   import SectionInfo from './SectionInfo.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
+  import CalendarEvents from './CalendarEvents.svelte';
   import LocalEvent from './LocalEvent.svelte';
   import IcsImport from './IcsImport.svelte';
   import AutoScheduleIntro from './AutoScheduleIntro.svelte';
@@ -67,6 +68,8 @@
     <SectionInfo onRequestClose={() => closeModal('section-info')} />
   {:else if id === 'confirm'}
     <ConfirmDialog onRequestClose={() => closeModal('confirm')} />
+  {:else if id === 'calendar-events'}
+    <CalendarEvents onRequestClose={() => closeModal('calendar-events')} />
   {:else if id === 'local-event'}
     <LocalEvent onRequestClose={() => closeModal('local-event')} />
   {:else if id === 'ics-import'}

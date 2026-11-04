@@ -134,6 +134,10 @@ test('the wizard footer is opaque over the section cards', async ({ page }) => {
 test('add event day pills show which days are selected', async ({ page }) => {
   await setupSchedule(page);
   await page.click('#calendar-events-btn');
+  await page
+    .locator('[data-modal-type="calendar-events"]')
+    .getByRole('button', { name: 'Add event' })
+    .click();
   const modal = page.locator('[data-modal-type="local-event"]');
   await expect(modal).toBeVisible();
   await page.waitForTimeout(SETTLE_MS);
@@ -159,6 +163,17 @@ test('add event day pills show which days are selected', async ({ page }) => {
   await expect(tue).toHaveAttribute('aria-pressed', 'true');
   // Polled: the pill eases between its colours.
   await expect.poll(() => bg(tue)).toBe(await bg(mon));
+
+  // Thursday reads "R", as on the course list, so the two pills are distinct.
+  await expect(modal.locator('button[title="Thursday"]')).toHaveText('R');
+  await expect(tue).toHaveText('T');
+
+  // The last day can be deselected; saving then asks for one.
+  await mon.click();
+  await tue.click();
+  await modal.locator('#event-title').fill('No days');
+  await modal.getByRole('button', { name: 'Add Event' }).click();
+  await expect(modal.getByText('Pick at least one day.')).toBeVisible();
 });
 
 test('escape closes the theme dropdown', async ({ page }) => {

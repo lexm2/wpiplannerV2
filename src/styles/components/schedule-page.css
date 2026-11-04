@@ -693,7 +693,24 @@
   font-weight: 500;
   font-size: 0.7rem;
   overflow: hidden;
+  container-type: inline-size;
   /* height and top set inline based on actual event duration */
+}
+
+/* One line cut with an ellipsis, so a long title never spills out of its
+   block; in a block too narrow for even that (many overlapping events) the
+   label is dropped and the tooltip carries it. */
+.external-event-block .event-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container (max-width: 17px) {
+  .external-event-block .event-label {
+    display: none;
+  }
 }
 
 .external-event-block:hover {

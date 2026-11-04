@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   IcsImportError,
   importIcsText,
@@ -7,7 +7,8 @@ import {
 } from '../../src/services/scheduling/icsImport';
 import {
   detectWeeklyEvents,
-  matchesExistingEvent,
+  courseCodeInTitle,
+  remainingAfterExisting,
   type ParsedCalendar,
   type TermWindow,
   type WeeklyEventCandidate,
@@ -18,6 +19,8 @@ import {
   type LocalCalendarEvent,
 } from '../../src/types/schedule';
 import { DayOfWeek } from '../../src/types/types';
+import { ICSGenerator } from '../../src/utils/icsGenerator';
+import { TermBoundsService } from '../../src/utils/termBounds';
 
 const M = DayOfWeek.MONDAY;
 const T = DayOfWeek.TUESDAY;
@@ -147,6 +150,16 @@ describe('canonical Google-style fixture', () => {
       cancelled: 1,
       overnight: 0,
       tooDense: 0,
+      unreadable: 0,
+      noLength: 0,
+      plannerExport: 0,
+    });
+    expect(result.skippedTitles).toEqual({
+      occasional: ['Career Fair', 'Club Meeting', 'Dentist'],
+      weekend: ['Long Run'],
+      outsideTerms: ['Summer Internship'],
+      allDay: ['Thanksgiving Break'],
+      cancelled: ['Old Lab'],
     });
     expect(result.span).toEqual({ first: '2026-06-01', last: '2026-12-11' });
   });
@@ -196,7 +209,11 @@ describe('30% threshold', () => {
       cancelled: 0,
       tooDense: 0,
       outsideWindow: 0,
+      unreadable: 0,
+      noLength: 0,
+      plannerExport: 0,
     },
+    droppedTitles: {},
   });
 
   it('3 of 10 passes exactly at the boundary, with no float error', () => {
@@ -236,7 +253,11 @@ describe('30% threshold', () => {
         cancelled: 0,
         tooDense: 0,
         outsideWindow: 0,
+        unreadable: 0,
+        noLength: 0,
+        plannerExport: 0,
       },
+      droppedTitles: {},
     };
     const six = [window('A', '2026-09-01', '2026-10-06')]; // 6 Tuesdays
     const seven = [window('A', '2026-09-01', '2026-10-13')]; // 7 Tuesdays
@@ -572,51 +593,449 @@ describe('invalid input', () => {
   });
 });
 
-describe('matchesExistingEvent', () => {
-  const candidate: WeeklyEventCandidate = {
+function weekly(lines: string[], uid: string): string {
+  return vevent(lines, uid);
+}
+
+function gym(extra: string[] = [], uid = 'g'): string {
+  return weekly(
+    [
+      'DTSTART;TZID=America/New_York:20260824T090000',
+      'DTEND;TZID=America/New_York:20260824T100000',
+      'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+      'SUMMARY:Gym',
+      ...extra,
+    ],
+    uid,
+  );
+}
+
+describe('malformed events', () => {
+  it.each(['FREQ=SOMETIMES', 'FREQ=WEEKLY;BYDAY=', 'FREQ=WEEKLY;BYDAY=XX'])(
+    'keeps the good events when one has RRULE:%s',
+    rule => {
+      const text = ics(
+        NY_VTIMEZONE,
+        gym(),
+        weekly(
+          [
+            'DTSTART;TZID=America/New_York:20260825T090000',
+            'DTEND;TZID=America/New_York:20260825T100000',
+            `RRULE:${rule}`,
+            'SUMMARY:Broken',
+          ],
+          'bad',
+        ),
+      );
+      const result = importIcsText(text, TERMS);
+      expect(result.candidates.map(c => c.title)).toEqual(['Gym']);
+      expect(result.skipped.unreadable).toBe(1);
+      expect(result.skippedTitles.unreadable).toEqual(['Broken']);
+    },
+  );
+
+  it('keeps folded lines and time zones in the per-event fallback', () => {
+    const text = ics(
+      NY_VTIMEZONE,
+      weekly(
+        [
+          'DTSTART;TZID=America/New_York:20260824T090000',
+          'DTEND;TZID=America/New_York:20260824T100000',
+          'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+          'SUMMARY:Folded',
+          ' Title',
+        ],
+        'ok',
+      ),
+      weekly(['DTSTART:20260824T090000', 'RRULE:FREQ=NOPE'], 'bad'),
+    );
+    const result = importIcsText(text, TERMS);
+    expect(result.candidates.map(c => c.title)).toEqual(['FoldedTitle']);
+    expect(result.skippedTitles.unreadable).toEqual(['Untitled Event']);
+  });
+
+  it('still throws when nothing can be read', () => {
+    const text = ics(
+      weekly(['DTSTART:20260824T090000', 'RRULE:FREQ=NOPE', 'SUMMARY:A'], 'a'),
+    );
+    expect(() => importIcsText(text, TERMS)).toThrow(IcsImportError);
+  });
+});
+
+describe('end-of-day and length handling', () => {
+  it('treats an end at midnight as 23:59 the same day', () => {
+    const text = ics(
+      weekly(
+        [
+          'DTSTART;TZID=America/New_York:20260824T220000',
+          'DTEND;TZID=America/New_York:20260825T000000',
+          'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+          'SUMMARY:Late Shift',
+        ],
+        'l',
+      ),
+    );
+    const result = importIcsText(text, TERMS);
+    expect(result.skipped.overnight).toBe(0);
+    expect(result.candidates[0].startTime).toEqual(hm(22));
+    expect(result.candidates[0].endTime).toEqual(hm(23, 59));
+  });
+
+  it('counts timed events with no length', () => {
+    const text = ics(
+      weekly(
+        [
+          'DTSTART;TZID=America/New_York:20260824T090000',
+          'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+          'SUMMARY:Reminder',
+        ],
+        'n',
+      ),
+    );
+    const result = importIcsText(text, TERMS);
+    expect(result.skipped.noLength).toBe(1);
+    expect(result.skippedTitles.noLength).toEqual(['Reminder']);
+  });
+});
+
+describe('planner exports', () => {
+  const rewritten = (description: string, uid = 'abc123@google.com') =>
+    weekly(
+      [
+        'DTSTART;TZID=America/New_York:20260824T090000',
+        'DTEND;TZID=America/New_York:20260824T100000',
+        'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+        'SUMMARY:Lecture: CS-2102 OOD',
+        description,
+      ],
+      uid,
+    );
+
+  it('skips wpi- UIDs but keeps local- ones', () => {
+    const text = ics(
+      gym([], 'wpi-CS2102-BL01-lecture-0-20260824@wpiplannerv2'),
+      gym([], 'local-abc-A@wpiplannerv2'),
+    );
+    const result = importIcsText(text, TERMS);
+    expect(result.skipped.plannerExport).toBe(1);
+    expect(result.skippedTitles.plannerExport).toEqual(['Gym']);
+    expect(result.candidates).toHaveLength(1);
+  });
+
+  it('skips a round-tripped event by its description note', () => {
+    const result = importIcsText(
+      ics(rewritten('DESCRIPTION:CRN: 1\\n\\nAdded by WPI Course Planner')),
+      TERMS,
+    );
+    expect(result.skipped.plannerExport).toBe(1);
+    expect(result.candidates).toEqual([]);
+  });
+
+  it('finds the note inside HTML', () => {
+    const result = importIcsText(
+      ics(
+        rewritten(
+          'DESCRIPTION:<p>CRN: 1</p><br><br>Added by WPI Course Planner<br>',
+        ),
+      ),
+      TERMS,
+    );
+    expect(result.skipped.plannerExport).toBe(1);
+  });
+
+  it('skips an event by the X- property alone', () => {
+    const result = importIcsText(
+      ics(rewritten('X-WPIPLANNER-KIND:course')),
+      TERMS,
+    );
+    expect(result.skipped.plannerExport).toBe(1);
+  });
+
+  it('does not skip a description that merely mentions the planner', () => {
+    const result = importIcsText(
+      ics(rewritten('DESCRIPTION:Added by WPI Course Planner? no')),
+      TERMS,
+    );
+    expect(result.skipped.plannerExport).toBe(0);
+    expect(result.candidates).toHaveLength(1);
+  });
+
+  it('round-trips: course skipped, recurring local event imported', async () => {
+    const service = TermBoundsService.getInstance();
+    if (!service.getTermDates('A', 2026)) {
+      const bounds = (startDate: string, endDate: string) => ({
+        startDate,
+        endDate,
+        offeringPeriod: '',
+        sampleSize: 1,
+      });
+      const fetchStub = () =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              generated: '2026-09-01T00:00:00Z',
+              years: {
+                '2026': {
+                  A: bounds('2026-08-20', '2026-10-09'),
+                  B: bounds('2026-10-19', '2026-12-11'),
+                  C: bounds('2027-01-13', '2027-03-05'),
+                  D: bounds('2027-03-15', '2027-05-05'),
+                },
+              },
+            }),
+        });
+      vi.stubGlobal('fetch', vi.fn(fetchStub));
+      await service.loadTermBounds();
+      vi.unstubAllGlobals();
+    }
+    const section = {
+      crn: 1234,
+      number: 'A01',
+      computedTerm: 'A',
+      periods: [
+        {
+          type: 'lecture',
+          professor: 'Prof',
+          startTime: { hours: 10, minutes: 0 },
+          endTime: { hours: 10, minutes: 50 },
+          location: 'SL 104',
+          days: new Set([M, W]),
+        },
+      ],
+    };
+    const schedule = {
+      id: 's',
+      name: 'Test',
+      year: 2026,
+      selectedCourses: [
+        {
+          course: {
+            number: '1101',
+            name: 'Intro',
+            description: '',
+            departmentAbbr: 'CS',
+            academicYear: 2026,
+          },
+          selected: { lecture: section },
+          lockedSections: new Set(),
+        },
+      ],
+      generatedSchedules: [],
+      localEvents: [
+        {
+          id: 'ev',
+          title: 'Practice',
+          eventType: EventType.RECURRING,
+          days: [T],
+          terms: [AcademicTerm.A],
+          startTime: hm(18),
+          endTime: hm(19),
+          visible: true,
+          createdAt: 0,
+          updatedAt: 0,
+        },
+      ],
+    };
+    for (const includeDescription of [true, false]) {
+      const out = ICSGenerator.generateICS(schedule as never, {
+        includeDescription,
+      });
+      expect(out.success).toBe(true);
+      const result = importIcsText(out.data!, TERMS);
+      expect(result.skipped.plannerExport).toBe(1);
+      expect(result.candidates.map(c => c.title)).toEqual(['Practice']);
+    }
+  });
+});
+
+describe('weekend, titles and ordering', () => {
+  it('counts a Saturday+Monday series as weekend and still yields Monday', () => {
+    const text = ics(
+      weekly(
+        [
+          'DTSTART;TZID=America/New_York:20260822T090000',
+          'DTEND;TZID=America/New_York:20260822T100000',
+          'RRULE:FREQ=WEEKLY;BYDAY=SA,MO;UNTIL=20261009T000000Z',
+          'SUMMARY:Practice',
+        ],
+        'p',
+      ),
+    );
+    const result = importIcsText(text, TERMS);
+    expect(result.skipped.weekend).toBe(1);
+    expect(result.skipped.occasional).toBe(0);
+    expect(result.skippedTitles.weekend).toEqual(['Practice']);
+    expect(result.candidates.map(c => c.days)).toEqual([[M]]);
+  });
+
+  it('merges titles that differ only by dash, quotes, case or spacing', () => {
+    const mk = (title: string, uid: string) =>
+      weekly(
+        [
+          'DTSTART;TZID=America/New_York:20260824T090000',
+          'DTEND;TZID=America/New_York:20260824T100000',
+          'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+          `SUMMARY:${title}`,
+        ],
+        uid,
+      );
+    const result = importIcsText(
+      ics(mk('Shift - Library', 'a'), mk('Shift –  library', 'b')),
+      TERMS,
+    );
+    expect(result.candidates).toHaveLength(1);
+  });
+
+  it('sorts titles naturally', () => {
+    const mk = (title: string, uid: string) =>
+      weekly(
+        [
+          'DTSTART;TZID=America/New_York:20260824T090000',
+          'DTEND;TZID=America/New_York:20260824T100000',
+          'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=7',
+          `SUMMARY:${title}`,
+        ],
+        uid,
+      );
+    const result = importIcsText(
+      ics(mk('thing 10', 'a'), mk('thing 2', 'b')),
+      TERMS,
+    );
+    expect(result.candidates.map(c => c.title)).toEqual([
+      'thing 2',
+      'thing 10',
+    ]);
+  });
+});
+
+describe('remainingAfterExisting', () => {
+  const cand = (
+    title: string,
+    days: DayOfWeek[],
+    terms: AcademicTerm[],
+    start = 9,
+    end = 11,
+  ): WeeklyEventCandidate => ({
     key: 'k',
-    title: 'Work Shift',
-    days: [M, W],
-    terms: [AcademicTerm.A, AcademicTerm.B],
-    startTime: hm(9),
-    endTime: hm(11),
-    coverage: {},
-  };
-  const existing: LocalCalendarEvent = {
-    id: '1',
-    title: ' work  shift ',
-    eventType: EventType.RECURRING,
-    days: [W, M],
-    terms: [AcademicTerm.B, AcademicTerm.A],
-    startTime: hm(9),
-    endTime: hm(11),
+    title,
+    location: 'Here',
+    days,
+    terms,
+    startTime: hm(start),
+    endTime: hm(end),
+    coverage: Object.fromEntries(terms.map(t => [t, { met: 5, possible: 7 }])),
+  });
+  const ev = (
+    title: string,
+    days: DayOfWeek[],
+    terms: AcademicTerm[],
+    start = 9,
+    end = 11,
+    eventType = EventType.RECURRING,
+  ): LocalCalendarEvent => ({
+    id: title,
+    title,
+    eventType,
+    days,
+    terms,
+    startTime: hm(start),
+    endTime: hm(end),
     visible: true,
     createdAt: 0,
     updatedAt: 0,
-  };
+  });
+  const A = AcademicTerm.A;
+  const B = AcademicTerm.B;
+  const C = AcademicTerm.C;
+  const D = AcademicTerm.D;
 
-  it('matches regardless of array order and title case or spacing', () => {
-    expect(matchesExistingEvent(candidate, existing)).toBe(true);
+  it('returns [] when fully covered by a hand-made event on more terms', () => {
+    const gymC = cand('Gym', [M, W, F], [B, C], 7, 8);
+    expect(
+      remainingAfterExisting(gymC, [
+        ev('gym', [M, W, F], [AcademicTerm.ALL], 7, 8),
+      ]),
+    ).toEqual([]);
   });
 
-  it('rejects differing days, terms, times, or one-time events', () => {
-    expect(matchesExistingEvent(candidate, { ...existing, days: [M] })).toBe(
-      false,
+  it('keeps only the uncovered terms', () => {
+    const out = remainingAfterExisting(cand('Work Shift', [M, W], [A, B]), [
+      ev('Work Shift', [M, W], [B]),
+    ]);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({
+      days: [M, W],
+      terms: [A],
+      location: 'Here',
+    });
+    expect(out[0].coverage).toEqual({ A: { met: 5, possible: 7 } });
+    expect(out[0].key).not.toBe('k');
+  });
+
+  it('keeps only the uncovered days', () => {
+    const out = remainingAfterExisting(cand('Work Shift', [M, W, F], [B]), [
+      ev('Work Shift', [M, W], [A, B]),
+    ]);
+    expect(out.map(c => [c.days, c.terms])).toEqual([[[F], [B]]]);
+  });
+
+  it('groups terms with the same remaining days', () => {
+    const out = remainingAfterExisting(
+      cand('Work Shift', [M, W], [A, B, C, D]),
+      [ev('Work Shift', [M, W], [A])],
     );
+    expect(out.map(c => [c.days, c.terms])).toEqual([
+      [
+        [M, W],
+        [B, C, D],
+      ],
+    ]);
+  });
+
+  it('expands F and S', () => {
+    const out = remainingAfterExisting(cand('Work Shift', [M], [A, B, C, D]), [
+      ev('Work Shift', [M], [AcademicTerm.F]),
+    ]);
+    expect(out.map(c => c.terms)).toEqual([[C, D]]);
     expect(
-      matchesExistingEvent(candidate, {
-        ...existing,
-        terms: [AcademicTerm.A],
-      }),
-    ).toBe(false);
+      remainingAfterExisting(cand('Work Shift', [M], [C, D]), [
+        ev('Work Shift', [M], [AcademicTerm.S]),
+      ]),
+    ).toEqual([]);
+  });
+
+  it('ignores one-time events, other times and other titles', () => {
+    const c = cand('Work Shift', [M], [A]);
     expect(
-      matchesExistingEvent(candidate, { ...existing, endTime: hm(12) }),
-    ).toBe(false);
-    expect(
-      matchesExistingEvent(candidate, {
-        ...existing,
-        eventType: EventType.ONE_TIME,
-      }),
-    ).toBe(false);
+      remainingAfterExisting(c, [
+        ev('Work Shift', [M], [A], 9, 11, EventType.ONE_TIME),
+        ev('Work Shift', [M], [A], 9, 12),
+        ev('Other', [M], [A]),
+      ]),
+    ).toEqual([c]);
+  });
+});
+
+describe('courseCodeInTitle', () => {
+  it.each([
+    ['CS 2102 Lecture', 'CS2102'],
+    ['Lecture: CS-2102 Object-Oriented Design', 'CS2102'],
+    ['ma1022', 'MA1022'],
+    ['ECE 2049X', 'ECE2049X'],
+    ['ECE2049X lab', 'ECE2049X'],
+  ])('reads %s', (title, code) => {
+    expect(courseCodeInTitle(title)).toBe(code);
+  });
+
+  it.each([
+    ['call 555-1234'],
+    ['Gym'],
+    ['Lecturer1234'],
+    ['CS 21020'],
+    ['ABCDE 1234'],
+    ['CS 2102XY'],
+  ])('finds nothing in %s', title => {
+    expect(courseCodeInTitle(title)).toBeNull();
   });
 });
