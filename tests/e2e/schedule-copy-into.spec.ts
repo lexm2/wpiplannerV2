@@ -1,4 +1,5 @@
 import { test, expect, type Page } from './fixtures';
+import type { Locator } from '@playwright/test';
 
 /**
  * "Copy Into" in the schedule picker: pick a source schedule, then click the
@@ -70,13 +71,19 @@ async function courseIdsOf(page: Page, scheduleId: string) {
 const row = (page: Page, id: string) =>
   page.locator(`${PICKER} .schedule-item[data-schedule-id="${id}"]`);
 
+/** Copy Into lives in a row's ⋮ menu. */
+async function chooseCopyInto(rowLoc: Locator): Promise<void> {
+  await rowLoc.getByTitle('More options').click();
+  await rowLoc.getByRole('button', { name: 'Copy Into' }).click();
+}
+
 test('copies one schedule into another without duplicating shared courses', async ({
   page,
 }) => {
   const { firstId, secondId, courseIds } = await seed(page);
 
   await page.click('#schedule-picker-btn');
-  await row(page, secondId).getByRole('button', { name: 'Copy Into' }).click();
+  await chooseCopyInto(row(page, secondId));
 
   const banner = page.locator(`${PICKER} .schedule-copy-banner`);
   await expect(banner).toContainText('Second');
@@ -110,7 +117,7 @@ test('cancel leaves copy mode without copying or switching', async ({
   const { firstId, secondId, courseIds } = await seed(page);
 
   await page.click('#schedule-picker-btn');
-  await row(page, firstId).getByRole('button', { name: 'Copy Into' }).click();
+  await chooseCopyInto(row(page, firstId));
 
   // Clicking the source itself does nothing.
   await row(page, firstId).click();
@@ -150,7 +157,7 @@ test('a copy into the active schedule is one undo step and keeps earlier history
   }, courseIds[3]);
 
   await page.click('#schedule-picker-btn');
-  await row(page, secondId).getByRole('button', { name: 'Copy Into' }).click();
+  await chooseCopyInto(row(page, secondId));
   await row(page, firstId).click();
   await expect(row(page, firstId)).toContainText('4 courses');
   await expect(page.locator('#undo-btn')).toBeEnabled();
@@ -171,7 +178,7 @@ test('a copy into an inactive schedule is undone by one undo', async ({
   const { firstId, secondId, courseIds } = await seed(page);
 
   await page.click('#schedule-picker-btn');
-  await row(page, firstId).getByRole('button', { name: 'Copy Into' }).click();
+  await chooseCopyInto(row(page, firstId));
   await row(page, secondId).click();
   await expect(row(page, secondId)).toContainText('3 courses');
 
@@ -189,7 +196,7 @@ test('copy mode ends if the source schedule goes away', async ({ page }) => {
   const copy = page.locator(`${PICKER} .schedule-item`, {
     hasText: 'First (Copy)',
   });
-  await copy.getByRole('button', { name: 'Copy Into' }).click();
+  await chooseCopyInto(copy);
   await expect(page.locator(`${PICKER} .schedule-copy-banner`)).toBeVisible();
 
   // Undo the duplicate out from under copy mode.
@@ -205,11 +212,7 @@ test('copy mode ends if the source schedule goes away', async ({ page }) => {
 test('the copy banner hides the rows scrolling under it', async ({ page }) => {
   await seed(page);
   await page.click('#schedule-picker-btn');
-  await page
-    .locator(`${PICKER} .schedule-item`)
-    .first()
-    .getByRole('button', { name: 'Copy Into' })
-    .click();
+  await chooseCopyInto(page.locator(`${PICKER} .schedule-item`).first());
 
   const alpha = await page
     .locator(`${PICKER} .schedule-copy-banner`)
@@ -225,7 +228,7 @@ test('Escape cancels copy mode without closing the picker', async ({
 }) => {
   const { firstId } = await seed(page);
   await page.click('#schedule-picker-btn');
-  await row(page, firstId).getByRole('button', { name: 'Copy Into' }).click();
+  await chooseCopyInto(row(page, firstId));
   const banner = page.locator(`${PICKER} .schedule-copy-banner`);
   await expect(banner).toBeVisible();
 
@@ -241,6 +244,8 @@ test('copy mode works from the keyboard', async ({ page }) => {
   const { firstId, secondId, courseIds } = await seed(page);
   await page.click('#schedule-picker-btn');
 
+  await row(page, secondId).getByTitle('More options').focus();
+  await page.keyboard.press('Enter');
   await row(page, secondId).getByRole('button', { name: 'Copy Into' }).focus();
   await page.keyboard.press('Enter');
 

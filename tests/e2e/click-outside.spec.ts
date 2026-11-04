@@ -83,11 +83,12 @@ test.describe('schedule picker More options menu', () => {
 
   test("another row's toggle moves the menu there", async ({ page }) => {
     await openPicker(page);
-    await rows(page).nth(0).getByTitle('More options').click();
+    // The lower row opens first: an open menu hangs over the rows below it.
     await rows(page).nth(1).getByTitle('More options').click();
+    await rows(page).nth(0).getByTitle('More options').click();
     await expect(openMenu(page)).toHaveCount(1);
     await expect(
-      rows(page).nth(1).locator('[data-visible="true"]'),
+      rows(page).nth(0).locator('[data-visible="true"]'),
     ).toHaveCount(1);
   });
 

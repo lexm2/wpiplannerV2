@@ -74,7 +74,6 @@
 
 .filter-icon,
 .bookmark-icon,
-.view-toggle-icon,
 .eraser-icon {
   width: 18px;
   height: 18px;
@@ -127,17 +126,10 @@
   }
 }
 
-/* Wherever the Classes page's panels are drawers, the List/Grid toggle lives
-   in the settings menu instead, and the search field sits centered in the
-   row, under the page tabs: the filter buttons to its left, Details at the
-   far right. The side columns share what is left, either one growing if its
-   buttons need more. */
-@media (max-width: 1200px) {
-  #view-toggle-btn {
-    display: none;
-  }
-}
-
+/* Wherever the Classes page's panels are drawers, the search field sits
+   centered in the row, under the page tabs: the filter buttons to its left,
+   Details at the far right. The side columns share what is left, either one
+   growing if its buttons need more. */
 @media (min-width: 561px) and (max-width: 1200px) {
   .content-controls {
     display: grid;

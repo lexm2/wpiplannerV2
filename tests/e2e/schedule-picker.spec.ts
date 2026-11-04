@@ -65,15 +65,14 @@ test('Escape cancels a rename and leaves the picker open', async ({ page }) => {
   expect(stored).toBe(before);
 });
 
-test('a failed import from Settings leaves no empty schedule behind', async ({
+test('a failed import of a new schedule leaves no empty schedule behind', async ({
   page,
 }) => {
   await load(page);
   await page.click('#schedule-picker-btn');
-  await page.locator(`${PICKER} .nav-tab[data-tab="settings"]`).click();
 
   const chooser = page.waitForEvent('filechooser');
-  await page.click('#import-schedule-btn-settings');
+  await page.click('#import-schedule-btn');
   await (
     await chooser
   ).setFiles({
@@ -103,26 +102,37 @@ test('undo starts disabled on a fresh load', async ({ page }) => {
 });
 
 test.describe('More options button', () => {
-  test.use({ viewport: { width: 1440, height: 900 } });
-
-  test('is hidden while every action shows inline', async ({ page }) => {
+  test('at wide widths the row shows Rename and Duplicate beside it', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await load(page);
     await page.click('#schedule-picker-btn');
     const row = firstRow(page);
     await expect(row.getByRole('button', { name: 'Rename' })).toBeVisible();
-    await expect(row.getByTitle('More options')).toBeHidden();
+    await expect(row.getByRole('button', { name: 'Duplicate' })).toBeVisible();
+    await expect(row.getByRole('button', { name: 'Export' })).toBeHidden();
+    await row.getByTitle('More options').click();
+    const menu = row.locator('[data-visible="true"]');
+    await expect(
+      menu.getByRole('button', { name: 'Export ICS' }),
+    ).toBeVisible();
+    await expect(menu.getByRole('button', { name: 'Import' })).toBeVisible();
+    await expect(menu.getByRole('button', { name: 'Rename' })).toBeHidden();
   });
 
-  test('comes back when the actions no longer fit', async ({ page }) => {
+  test('at narrow widths it holds every action', async ({ page }) => {
     await page.setViewportSize({ width: 1000, height: 700 });
     await load(page);
     await page.click('#settings-menu-btn');
-    await page
-      .locator('#settings-dropdown-menu .settings-menu-item')
-      .first()
-      .click();
+    await page.locator('#settings-schedules-btn').click();
     const row = firstRow(page);
     await expect(row.getByRole('button', { name: 'Rename' })).toBeHidden();
-    await expect(row.getByTitle('More options')).toBeVisible();
+    await row.getByTitle('More options').click();
+    await expect(
+      row.locator('[data-visible="true"]').getByRole('button', {
+        name: 'Rename',
+      }),
+    ).toBeVisible();
   });
 });

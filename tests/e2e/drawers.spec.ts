@@ -205,7 +205,25 @@ for (const { name, ...options } of SCHEDULE_CASES) {
       const sidebar = scheduleSidebar(page);
       expect(await focusIsWithin(sidebar)).toBe(true);
       await expect(sidebar.locator('.schedule-course-item')).toHaveCount(2);
-      await expect(sidebar.locator('#clear-all-sections-btn')).toBeVisible();
+      // Clear all sections appears at the end of the list once a section is
+      // chosen, not in the header.
+      await expect(sidebar.locator('#clear-all-sections-btn')).toHaveCount(0);
+      await page.evaluate(async () => {
+        const s = (window as any).services;
+        const course = s.courseSelectionService
+          .getSelectedCourses()
+          .map((sc: any) => sc.course)
+          .find((c: any) => c.lectures?.length);
+        await s.courseSelectionService.setSelectedSection(
+          course,
+          course.lectures[0].section.number,
+        );
+      });
+      const clearAll = sidebar.locator(
+        '.schedule-sidebar-content #clear-all-sections-btn',
+      );
+      await expect(clearAll).toBeVisible();
+      await expect(clearAll).toHaveText('Clear all sections');
 
       // A modal opened from the drawer: Escape closes the modal only.
       await sidebar.getByRole('button', { name: /Calendar Events/ }).click();
