@@ -1672,7 +1672,7 @@ html.is-mobile .changelog-modal-body {
    and rows slide through it instead of surfacing above the heading's rule. */
 .course-finder-rows {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
   gap: 0.5rem;
   padding-top: 0.6rem;
 }
@@ -2035,20 +2035,24 @@ html.is-mobile .course-finder-modal .modal-dialog {
   }
 
   .course-finder-row-buckets {
-    grid-column: 1;
     margin-bottom: 0;
   }
 
+  /* The foot sits under the buckets, not beside them: beside them it took
+     ~90px, leaving a bucket name about 70px beside its progress bar. */
   .course-finder-row-foot {
-    grid-column: 2;
-    grid-row: 2;
-    flex-direction: column;
-    align-items: flex-end;
-    align-self: start;
-    gap: 0;
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+  }
+
+  .course-finder-row-buckets {
+    grid-column: 1 / -1;
+  }
+
+  /* Room for the name to take a second line rather than an ellipsis. */
+  .course-finder-bucket-name {
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   /* Both are finger targets, and the same height keeps them on one line. */

@@ -107,7 +107,7 @@
         type="search"
         class="course-finder-search"
         id="course-finder-search"
-        placeholder="Course code, title, or bucket"
+        placeholder="Code, title, or bucket"
         aria-label="Search courses"
         bind:value={query}
       />
