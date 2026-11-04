@@ -15,6 +15,7 @@ import {
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
+import { setOpen } from '../../svelte/ui/disclosureState.svelte';
 import { logger } from '../../utils/logger';
 
 interface TutorialEntry {
@@ -666,6 +667,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-filter'],
+          openDisclosures: ['auto-schedule-filters'],
         },
       },
       {
@@ -678,6 +680,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-filter'],
+          openDisclosures: ['auto-schedule-filters'],
         },
         appState: {
           filters: [{ id: 'availability', criteria: { availableOnly: true } }],
@@ -837,6 +840,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     } else {
       closeAllModals();
     }
+    for (const id of desired.openDisclosures ?? []) setOpen(id, true);
   });
 
   tutorialService.onStepApply(index => {

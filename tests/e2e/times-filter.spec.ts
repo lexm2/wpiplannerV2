@@ -26,6 +26,7 @@ async function openPicker(page: Page): Promise<void> {
     { timeout: 30000 },
   );
   await page.click('#filter-btn');
+  await page.click('#more-filters-toggle');
   await page.click('#edit-times-btn');
   await expect(page.locator(BODY)).toBeVisible();
   // The dialog is still mid-riseFade when it first becomes visible, so its box
