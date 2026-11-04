@@ -37,7 +37,6 @@ export class ScheduleState {
     this.year = year;
   }
 
-  /** Create from a plain Schedule interface. */
   static fromSchedule(schedule: Schedule): ScheduleState {
     return new ScheduleState(
       schedule.id,
@@ -50,7 +49,6 @@ export class ScheduleState {
     );
   }
 
-  /** Convert to a plain Schedule interface. */
   toSchedule(): Schedule {
     return {
       id: this.id,
@@ -64,7 +62,6 @@ export class ScheduleState {
   }
 }
 
-/** Find a course by ID across all departments. */
 export function findCourseById(
   courseId: string,
   departments: Department[],

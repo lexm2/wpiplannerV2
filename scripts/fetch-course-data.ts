@@ -76,7 +76,7 @@ async function fetchJsonWithRetry(
         );
       }
 
-      // Exponential backoff: 1s, 2s, 4s
+      // Exponential backoff, capped at 5s.
       const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
       console.log(`Retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
@@ -119,8 +119,7 @@ async function fetchCourseData(): Promise<void> {
     if (jsonString === readFileOrNull(RAW_OUTPUT_PATH)) {
       console.log('Data is identical to the saved copy, leaving it untouched');
     } else {
-      // Save raw data for section construction pipeline (tmp + rename so a
-      // crash mid-write never leaves a truncated file behind)
+      // tmp + rename, so a crash mid-write never leaves a truncated file.
       console.log('Saving raw course data...');
       const tmpPath = `${RAW_OUTPUT_PATH}.tmp`;
       writeFileSync(tmpPath, jsonString);

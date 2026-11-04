@@ -1,14 +1,8 @@
-/**
- * Compatibility checking logic for section combinations
- * Checks cluster constraints and time conflicts between sections
- */
-
 import { PlannerSection, PlannerPeriod } from '../types/outputTypes.js';
 import { timeRangesOverlap } from './timeParser.js';
 
 /**
- * Checks if two sections are compatible (can be taken together)
- * Compatibility requires:
+ * Whether two sections can be taken together. That requires:
  * 1. The same term: a course groups a whole academic year, and a lab with no
  *    cluster would otherwise pair with every lecture in it
  * 2. Cluster constraints satisfied (GPS courses, cluster matching)
@@ -34,8 +28,6 @@ export function areCompatible(
 }
 
 /**
- * Checks cluster compatibility between two sections
- *
  * GPS Course Rules:
  * - Both sections MUST have the same cluster ID
  * - If either lacks a cluster, they're incompatible
@@ -51,7 +43,6 @@ function checkClusterCompatibility(
   const cluster1 = section1.note;
   const cluster2 = section2.note;
 
-  // GPS courses: both MUST have same cluster
   if (section1.isGps || section2.isGps) {
     if (!cluster1 || !cluster2) {
       return false;
@@ -59,19 +50,13 @@ function checkClusterCompatibility(
     return cluster1 === cluster2;
   }
 
-  // Non-GPS: if either has no cluster, they're compatible
   if (!cluster1 || !cluster2) {
     return true;
   }
 
-  // Both have clusters: must match
   return cluster1 === cluster2;
 }
 
-/**
- * Checks if two sections have time conflicts
- * Compares all period pairs between the two sections
- */
 function hasTimeConflict(
   section1: PlannerSection,
   section2: PlannerSection,
@@ -121,7 +106,6 @@ function periodsConflict(
 }
 
 /**
- * Filters a list of sections to only those compatible with a reference section
  * Used to build compatibleDiscussions and compatibleLabs arrays
  */
 export function filterCompatibleSections(

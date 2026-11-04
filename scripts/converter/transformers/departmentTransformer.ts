@@ -1,7 +1,3 @@
-/**
- * Builds department structure from course data
- */
-
 import { PlannerDepartment } from '../types/outputTypes.js';
 
 // WPI Department list (copied from Schedb.java)
@@ -81,9 +77,6 @@ export const WPI_DEPARTMENTS = [
   { abbreviation: 'WPE', name: 'Wellness & Physical Education' },
 ];
 
-/**
- * Initializes all WPI departments with empty course arrays
- */
 export function initializeDepartments(): Map<string, PlannerDepartment> {
   const departments = new Map<string, PlannerDepartment>();
 

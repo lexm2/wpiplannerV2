@@ -3,7 +3,8 @@
  * Two mechanisms, not interchangeable:
  *   1. Media queries. Breakpoints in use: 1600, 1440, 1400, 1250, 1200, 1024,
  *      991, 700, 560 (plus max-height 1100, 599, 499). Note 1200 is also used
- *      as a MIN-width in course-list.css and schedule-picker-modal.css.
+ *      as a MIN-width in course-list.module.css and both schedule-picker-modal
+ *      stylesheets.
  *   2. html.is-mobile, set by utils/deviceDetection.ts: on for a phone user
  *      agent (a phone in landscape is wider than 560px) and for any window of
  *      560px or less, live. It means "the phone layout", so a narrow desktop
@@ -13,9 +14,6 @@
  * A rule that must hold at every width belongs in a media query or the base
  * rule. .is-mobile is the phone layout, whichever way it was reached.
  */
-
-/* The 1440px `.course-sections` rule lived here; that class is hashed by
-   course-list.module.css now, so the rule moved there. */
 
 /* The side panels are not hidden here. At these widths SidePanel turns them
    into drawers (drawerState.svelte.ts) and side-panel.css parks a closed drawer

@@ -1,7 +1,3 @@
-/**
- * Transforms Workday course data into PlannerCourse objects
- */
-
 import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerCourse } from '../types/outputTypes.js';
 import {
@@ -24,9 +20,6 @@ const COMPANION_FORMATS = new Set(['Laboratory', 'Discussion']);
 // Workday's marker for an interest list, not a kind of course.
 const PLACEHOLDER_COURSE_TYPE = 'Waitlist Section';
 
-/**
- * Transforms a group of Workday sections (same course) into a PlannerCourse
- */
 export function transformCourse(
   workdaySections: WorkdaySection[],
   departmentAbbrev: string,

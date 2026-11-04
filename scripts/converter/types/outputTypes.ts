@@ -1,7 +1,3 @@
-/**
- * Type definitions for the hierarchical planner JSON output format
- */
-
 // No generation timestamp: the output depends only on the input, so an
 // unchanged feed converts to an identical file. last-updated.json carries
 // the time instead.

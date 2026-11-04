@@ -43,15 +43,13 @@
     getDepartments: () => Department[];
   } = $props();
 
-  // Single declarative modal layer - the only modal renderer in the app.
-  // Renders a Svelte component for each open modal type-id in the registry
-  // below; uiState.openModals is the sole modal source of truth.
+  // The app's only modal renderer: one component per type-id in
+  // uiState.openModals, the modal source of truth.
   //
-  // Closing goes through closeModal(id) so uiState.openModals
-  // stays the single source of truth (keeping tutorial snapshots correct);
-  // that removal unmounts the component, after its ~225ms hide animation has
-  // already played. Payload modals (section-info, confirm) read
-  // their data from modalState (set by the trigger sites before modalOpened).
+  // Closing goes through closeModal(id), which keeps tutorial snapshots
+  // correct; removing the id plays the hide transition, then unmounts the
+  // component. Modals with a payload read it from modalState, set by the
+  // trigger site before openModal.
 </script>
 
 {#each uiState.openModals as id (id)}

@@ -4,7 +4,7 @@
 
 @import url('./styles/components/reset.css');
 @import url('./styles/components/header.css');
-@import url('./styles/components/theme-selector-base.css'); /* Base styles for index.html */
+@import url('./styles/components/theme-selector-base.css');
 /* theme-selector.module.css - dynamic classes imported in src/svelte/ThemeSelector.svelte */
 @import url('./styles/components/layout.css');
 @import url('./styles/components/side-panel.css');

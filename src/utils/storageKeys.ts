@@ -9,7 +9,7 @@
 export const STORAGE_KEYS = {
   /** Serialized SchedulePreferences, including the selected theme. */
   PREFERENCES: 'wpi-planner-preferences',
-  /** Serialized UserScheduleState. */
+  /** Legacy: nothing writes this, but clearAllData still purges it. */
   USER_STATE: 'wpi-planner-user-state',
   /** Id of the currently active schedule. */
   ACTIVE_SCHEDULE_ID: 'wpi-planner-active-schedule-id',

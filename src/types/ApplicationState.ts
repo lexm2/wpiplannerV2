@@ -35,7 +35,6 @@ export class ApplicationState {
     this.preferences = preferences;
   }
 
-  /** Convert to minimal format for export. */
   toMinimalFormat(): ExportData {
     return {
       v: this.version,
@@ -62,9 +61,6 @@ export class ApplicationState {
     };
   }
 
-  /**
-   * Hydrate from minimal export format using the department catalog.
-   */
   static fromMinimalFormat(
     data: ExportData,
     courseCatalog: Department[],

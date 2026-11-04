@@ -169,7 +169,7 @@ export class ThemeManager {
     this.currentTheme = themeId;
     if (changed) this.applyTheme(themeId, true);
     if (persist) this.saveThemePreference(themeId);
-    // Notify reactive consumers (e.g. the Svelte ThemeSelector) of the new
+    // Notify reactive consumers (e.g. ThemeSelector) of the new
     // visible theme - ThemeManager has no listener system of its own.
     uiState.currentThemeId = themeId;
 

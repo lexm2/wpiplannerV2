@@ -12,7 +12,7 @@ import { showAppError } from '../ui/uiState.svelte';
 /**
  * Standalone component-selection wizard launcher for the schedule page.
  *
- * Drives the reactive `wizardState` store (WizardHost renders the Svelte
+ * Drives the reactive `wizardState` store (WizardHost renders the
  * ComponentSelectionWizard panel) and pushes the calendar preview through the
  * `schedulePreviewState` rune. Persists committed selections via
  * CourseSelectionService - the schedule sidebar re-renders on its own.

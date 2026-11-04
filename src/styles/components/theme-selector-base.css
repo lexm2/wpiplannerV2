@@ -1,11 +1,11 @@
-/* Applied to static HTML structure in index.html lines 87-95 */
+/* The global half of the theme selector's styles; see ThemeSelector.svelte. */
 
 .theme-selector {
   position: relative;
   display: inline-block;
 }
 
-/* Real <button> now, so reset default button chrome. */
+/* A real <button>, so reset the default button chrome. */
 .theme-dropdown {
   border: none;
   font: inherit;

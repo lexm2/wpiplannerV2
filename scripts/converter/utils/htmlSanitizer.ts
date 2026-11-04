@@ -1,8 +1,3 @@
-/**
- * HTML sanitization utilities for course descriptions
- * Workday provides descriptions with HTML markup that needs to be cleaned
- */
-
 export function extractCategory(html: string | null): {
   category: 1 | 2 | 3 | null;
   cleanedHtml: string;

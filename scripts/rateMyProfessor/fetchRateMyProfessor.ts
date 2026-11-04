@@ -1,13 +1,10 @@
-/**
- * Script to fetch Rate My Professor data for WPI professors
- * Uses direct GraphQL queries to the Rate My Professors API
- */
+// Fetches WPI's professors from the Rate My Professors GraphQL API.
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import type { Professor, RateMyProfessorData, School } from './types';
 
-// WPI School Information (obtained from https://www.ratemyprofessors.com/school/1220)
+// From https://www.ratemyprofessors.com/school/1220.
 const WPI_LEGACY_ID = 1220;
 const WPI_SCHOOL_NAME = 'Worcester Polytechnic Institute';
 const WPI_SCHOOL_CITY = 'Worcester';
@@ -16,7 +13,6 @@ const WPI_SCHOOL_STATE = 'MA';
 // Encode school ID for GraphQL API (format: "School-{id}" in base64)
 const WPI_SCHOOL_ID = Buffer.from(`School-${WPI_LEGACY_ID}`).toString('base64');
 
-// Rate My Professors GraphQL API endpoint
 const GRAPHQL_URL = 'https://www.ratemyprofessors.com/graphql';
 
 // Authorization token (from @mtucourses/rate-my-professors library)
@@ -24,7 +20,6 @@ const AUTH_TOKEN = 'dGVzdDp0ZXN0';
 
 const OUTPUT_PATH = path.join(process.cwd(), 'public', 'rateMyProfessor.json');
 
-// Rate limiting configuration
 const DELAY_BETWEEN_REQUESTS_MS = 100;
 const REQUEST_TIMEOUT_MS = 15000;
 
@@ -112,15 +107,11 @@ async function searchTeachers(
   return data.newSearch.teachers.edges.map((edge: any) => edge.node);
 }
 
-/**
- * Fetch all professors for WPI by searching through the alphabet
- */
 async function fetchWPIProfessors(): Promise<Professor[]> {
   console.log(`Searching for professors at ${WPI_SCHOOL_NAME}...`);
 
   try {
-    // The API doesn't support getting all teachers at once, so we search by letter
-    // This is a workaround to get as many professors as possible
+    // The API can't list every teacher at once, so search letter by letter.
     const allTeachers = new Map<string, any>();
     const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
     const failedLetters: string[] = [];
@@ -133,7 +124,7 @@ async function fetchWPIProfessors(): Promise<Professor[]> {
         const teachers = await searchTeachers(WPI_SCHOOL_ID, letter);
 
         for (const teacher of teachers) {
-          // Use ID as key to avoid duplicates
+          // A teacher turns up under several letters.
           if (!allTeachers.has(teacher.id)) {
             allTeachers.set(teacher.id, teacher);
           }

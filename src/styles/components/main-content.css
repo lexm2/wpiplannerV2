@@ -24,7 +24,7 @@
   flex: 1;
 }
 
-/* The FilterButtons Svelte component mounts here: clear-filters-btn and
+/* FilterButtons mounts here: clear-filters-btn and
    .filter-buttons, held together so the row can place them as one. */
 .content-controls-filter-host {
   display: flex;
@@ -189,7 +189,7 @@ html.is-mobile .filter-buttons {
     min-height: 44px;
   }
 
-  /* Same height as the buttons beside it (it was 38px against their 44). */
+  /* Same height as the buttons beside it. */
   .content-controls .search-field .field-shell {
     min-height: 44px;
   }
