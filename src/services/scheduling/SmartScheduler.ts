@@ -1,11 +1,13 @@
 import type { SelectedCourse } from '../../types/schedule';
 import type { Course, SectionsByKind } from '../../types/types';
-import { sectionsOf } from '../../utils/courseUtils';
 import {
   AutoScheduler,
   type ScheduleResult,
   type MaskedCandidate,
+  type RatingSource,
 } from './AutoScheduler';
+import { ScheduleScorer } from './ScheduleScorer';
+import type { RankingPreferences } from './rankingPreferences';
 import { masksConflict } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
 import { logger } from '../../utils/logger';
@@ -14,7 +16,24 @@ import { getDisplayTerms } from '../../utils/typeGuards';
 export interface SchedulerInput {
   candidatesPerCourse: MaskedCandidate[][];
   courses: Course[];
+  preferences: RankingPreferences;
 }
+
+/** A group's cheapest conflict-free combination and its cost. */
+interface GroupBest {
+  combos: SectionsByKind[];
+  cost: number;
+}
+
+/** Where a search stands against its deadline, shared by all its walks. */
+interface Budget {
+  deadline: number | undefined;
+  visits: number;
+  expired: boolean;
+}
+
+/** The clock is read once per this many candidates visited. */
+const CHECK_EVERY = 4096;
 
 /** Candidates for each course to schedule, or the courses that have none. */
 export type CandidateData =
@@ -23,9 +42,22 @@ export type CandidateData =
 export class SmartScheduler {
   constructor(private filterService: FilterService) {}
 
-  buildCandidateData(selectedCourses: SelectedCourse[]): CandidateData {
+  /**
+   * `ratings` is only consulted when the preferences rank by instructor
+   * rating, so a caller can always pass it.
+   */
+  buildCandidateData(
+    selectedCourses: SelectedCourse[],
+    preferences: RankingPreferences,
+    ratings?: RatingSource,
+  ): CandidateData {
     if (selectedCourses.length === 0)
-      return { ok: true, input: { candidatesPerCourse: [], courses: [] } };
+      return {
+        ok: true,
+        input: { candidatesPerCourse: [], courses: [], preferences },
+      };
+    const ratingSource =
+      preferences.instructorRating.importance === 'off' ? undefined : ratings;
 
     const autoScheduler = new AutoScheduler(this.filterService);
     // A course with no allowed terms was locked in the intro: it keeps its
@@ -40,7 +72,11 @@ export class SmartScheduler {
     const unschedulable: Course[] = [];
     for (const sc of selectedCourses) {
       if (sc.allowedTerms?.length === 0) continue;
-      const candidates = autoScheduler.getMaskedCandidates(sc, blockedMasks);
+      const candidates = autoScheduler.getMaskedCandidates(
+        sc,
+        blockedMasks,
+        ratingSource,
+      );
       if (candidates.length === 0) {
         logger.warn(
           `[SmartScheduler] No valid candidates for ${sc.course.departmentAbbr}${sc.course.number}`,
@@ -55,7 +91,7 @@ export class SmartScheduler {
     if (unschedulable.length > 0) return { ok: false, unschedulable };
     return {
       ok: true,
-      input: { candidatesPerCourse, courses: scheduledCourses },
+      input: { candidatesPerCourse, courses: scheduledCourses, preferences },
     };
   }
 
@@ -63,9 +99,26 @@ export class SmartScheduler {
     input: SchedulerInput,
     maxResults: number,
   ): ScheduleResult[][] {
-    const { candidatesPerCourse, courses } = input;
+    return SmartScheduler.findSchedulesBefore(input, maxResults).schedules;
+  }
 
-    if (candidatesPerCourse.length === 0) return [];
+  /**
+   * findSchedules that gives up at `deadline` (a performance.now() time):
+   * the schedules found so far, still best first among themselves, and
+   * `cutShort` set. A request with many courses and many lab and discussion
+   * choices can take seconds, which a server must not spend on one caller.
+   */
+  static findSchedulesBefore(
+    input: SchedulerInput,
+    maxResults: number,
+    deadline?: number,
+  ): { schedules: ScheduleResult[][]; cutShort: boolean } {
+    const budget: Budget = { deadline, visits: 0, expired: false };
+    const { candidatesPerCourse, courses, preferences } = input;
+
+    if (candidatesPerCourse.length === 0) {
+      return { schedules: [], cutShort: false };
+    }
 
     const termOptionsPerCourse = candidatesPerCourse.map(candidates => [
       ...new Set(candidates.map(c => c.term)),
@@ -80,11 +133,12 @@ export class SmartScheduler {
       relaxed > 3 ? [3, relaxed, Infinity] : [3, Infinity],
     );
 
-    const results: ScheduleResult[][] = [];
-    const bestByGroup = new Map<string, SectionsByKind[] | null>();
+    const scorer = new ScheduleScorer(preferences);
+    const results: { schedule: ScheduleResult[]; cost: number }[] = [];
+    const bestByGroup = new Map<string, GroupBest | null>();
 
     for (const assignment of assignments) {
-      if (results.length >= maxResults) break;
+      if (results.length >= maxResults || budget.expired) break;
 
       const termGroups = new Map<string, number[]>();
       for (let i = 0; i < courses.length; i++) {
@@ -96,23 +150,36 @@ export class SmartScheduler {
       const allSelections: Array<{ courseIdx: number; combo: SectionsByKind }> =
         [];
       let valid = true;
+      let cost = scorer.termBalanceCost(assignment);
 
       for (const indices of SmartScheduler.overlappingGroups(termGroups)) {
         // Assignments share most of their groups, and a group's best
         // combination depends only on its courses and their terms.
         const key = indices.map(i => `${i}:${assignment[i]}`).join(',');
-        let combos = bestByGroup.get(key);
-        if (combos === undefined) {
+        let best = bestByGroup.get(key);
+        if (best === undefined) {
           const groupCandidates = indices.map(i =>
             candidatesPerCourse[i].filter(c => c.term === assignment[i]),
           );
-          combos = SmartScheduler.bestForTermGroup(groupCandidates);
-          bestByGroup.set(key, combos);
+          best = SmartScheduler.bestForTermGroup(
+            groupCandidates,
+            scorer,
+            budget,
+          );
+          // A walk cut short has only a best-so-far, which must not pass
+          // for this assignment's best.
+          if (budget.expired) {
+            valid = false;
+            break;
+          }
+          bestByGroup.set(key, best);
         }
-        if (!combos) {
+        if (!best) {
           valid = false;
           break;
         }
+        cost += best.cost;
+        const { combos } = best;
         indices.forEach((courseIdx, i) => {
           allSelections.push({ courseIdx, combo: combos[i] });
         });
@@ -120,15 +187,20 @@ export class SmartScheduler {
 
       if (!valid) continue;
 
-      results.push(
-        allSelections.map(({ courseIdx, combo }) => ({
+      results.push({
+        schedule: allSelections.map(({ courseIdx, combo }) => ({
           course: courses[courseIdx],
           combination: combo,
         })),
-      );
+        cost,
+      });
     }
 
-    return results;
+    // Stable, so schedules of equal cost keep their enumeration order.
+    return {
+      schedules: results.sort((a, b) => a.cost - b.cost).map(r => r.schedule),
+      cutShort: budget.expired,
+    };
   }
 
   /**
@@ -207,19 +279,21 @@ export class SmartScheduler {
   }
 
   /**
-   * The conflict-free combination with the least idle time, or null. A
-   * depth-first walk in course order that abandons a branch at its first
-   * clash, so combinations are visited in the same order as the full
-   * cartesian product (ties still go to the first one found) while clashing
-   * prefixes are never extended.
+   * The conflict-free combination of least cost, or null. A depth-first walk
+   * in course order that abandons a branch at its first clash, so
+   * combinations are visited in the same order as the full cartesian product
+   * (ties still go to the first one found) while clashing prefixes are never
+   * extended.
    */
   private static bestForTermGroup(
     candidatesPerCourse: MaskedCandidate[][],
-  ): SectionsByKind[] | null {
+    scorer: ScheduleScorer,
+    budget: Budget = { deadline: undefined, visits: 0, expired: false },
+  ): GroupBest | null {
     const n = candidatesPerCourse.length;
-    if (n === 0) return [];
+    if (n === 0) return { combos: [], cost: 0 };
 
-    let bestGap = Infinity;
+    let bestCost = Infinity;
     let bestCombo: SectionsByKind[] | null = null;
 
     // Occupied time per quarter: a semester section fills both of its own.
@@ -228,16 +302,26 @@ export class SmartScheduler {
 
     const visit = (i: number): void => {
       if (i === n) {
-        const gap = SmartScheduler.gapForSelections(selections);
-        if (gap < bestGap) {
-          bestGap = gap;
+        const cost = scorer.groupCost(selections);
+        if (cost < bestCost) {
+          bestCost = cost;
           bestCombo = selections.map(s => s.combination);
         }
         return;
       }
       for (const candidate of candidatesPerCourse[i]) {
-        // Nothing can beat zero idle time, and ties keep the first found.
-        if (bestGap === 0) return;
+        if (budget.expired) return;
+        if (
+          budget.deadline !== undefined &&
+          ++budget.visits % CHECK_EVERY === 0 &&
+          performance.now() > budget.deadline
+        ) {
+          budget.expired = true;
+          return;
+        }
+        // Costs are never negative, so nothing beats zero, and ties keep the
+        // first found.
+        if (bestCost === 0) return;
         const quarters = getDisplayTerms(candidate.term);
         const before = quarters.map(q => occupied.get(q) ?? 0n);
         if (before.some(mask => masksConflict(candidate.mask, mask))) continue;
@@ -251,39 +335,6 @@ export class SmartScheduler {
     };
     visit(0);
 
-    return bestCombo;
-  }
-
-  /** Idle minutes between classes, summed per quarter and day. */
-  private static gapForSelections(selections: MaskedCandidate[]): number {
-    const byQuarterDay = new Map<string, { start: number; end: number }[]>();
-
-    for (const { combination, term } of selections) {
-      for (const section of sectionsOf(combination)) {
-        for (const period of section.periods) {
-          if (period.isAsync) continue;
-          for (const quarter of getDisplayTerms(term)) {
-            for (const day of period.days) {
-              const key = `${quarter}-${day}`;
-              if (!byQuarterDay.has(key)) byQuarterDay.set(key, []);
-              byQuarterDay.get(key)!.push({
-                start: period.startTime.hours * 60 + period.startTime.minutes,
-                end: period.endTime.hours * 60 + period.endTime.minutes,
-              });
-            }
-          }
-        }
-      }
-    }
-
-    let total = 0;
-    for (const slots of byQuarterDay.values()) {
-      if (slots.length < 2) continue;
-      slots.sort((a, b) => a.start - b.start);
-      for (let i = 1; i < slots.length; i++) {
-        total += Math.max(0, slots[i].start - slots[i - 1].end);
-      }
-    }
-    return total;
+    return bestCombo ? { combos: bestCombo, cost: bestCost } : null;
   }
 }

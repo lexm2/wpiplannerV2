@@ -12,6 +12,7 @@ import {
   runCourseQuery,
 } from './query';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
+import { AutoScheduleInputSchema, generateSchedules } from './autoSchedule';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
 import { ApiError, echo } from './errors';
 import { logger } from '../utils/logger';
@@ -425,6 +426,17 @@ const ROUTES: Route[] = [
         await readBody(request),
       );
       return json(findConflicts(await getCatalog(), crns, busy));
+    },
+  },
+  {
+    path: '/schedules',
+    method: 'POST',
+    handle: async ({ request, getCatalog }) => {
+      const input = parseOrThrow(
+        AutoScheduleInputSchema,
+        await readBody(request),
+      );
+      return json(generateSchedules(await getCatalog(), input));
     },
   },
 ];

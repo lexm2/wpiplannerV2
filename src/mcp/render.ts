@@ -13,6 +13,7 @@ import type {
   SectionView,
 } from '../api/serialize';
 import type { ConflictCheck } from '../api/conflicts';
+import type { GeneratedSchedule, ScheduleSet } from '../api/autoSchedule';
 import type { CoursePlan, catalogMeta, listDepartments } from '../api/lookup';
 import type { DateSpan, TermLetter, TermNow, YearInfo } from '../api/calendar';
 import { yearLabel } from '../api/calendar';
@@ -20,8 +21,8 @@ import { echo } from '../api/errors';
 import { one, plural } from '../api/text';
 import { escapeRegExp } from '../utils/searchUtils';
 import { QUARTERS, TERMS } from '../utils/typeGuards';
+import { isUncapped } from '../utils/seats';
 import {
-  isUncapped,
   LOW_SEATS,
   ownDates,
   SOLID_RATINGS,
@@ -943,6 +944,97 @@ export function renderConflicts(check: ConflictCheck): string {
         check,
         check.issues.some(i => i.kind === 'lowSeats'),
       ),
+    );
+  }
+  return lines.join('\n');
+}
+
+// --- generate_schedules -----------------------------------------------------
+
+type Preferences = ScheduleSet['preferences'];
+
+/** The preferences that are on, as the ranking line names them. */
+function rankingCriteria(p: Preferences): string[] {
+  const on = (c: { importance: string }) => c.importance !== 'off';
+  const level = (c: { importance: string }) => `(${c.importance})`;
+  const parts: string[] = [];
+  if (on(p.earlyClasses)) {
+    parts.push(
+      `no classes before ${p.earlyClasses.before} ${level(p.earlyClasses)}`,
+    );
+  }
+  if (on(p.lateClasses)) {
+    parts.push(
+      `no classes after ${p.lateClasses.after} ${level(p.lateClasses)}`,
+    );
+  }
+  if (on(p.gaps)) {
+    const { min, max } = p.gaps;
+    const wanted = [
+      min > 0 && `at least ${min} min between classes`,
+      max > 0 && `idle time up to ${max} min`,
+    ].filter(Boolean);
+    parts.push(
+      `${wanted.join(', ') || 'least idle time between classes'} ${level(p.gaps)}`,
+    );
+  }
+  if (on(p.lunch)) {
+    const { minutes, from, to } = p.lunch;
+    parts.push(`${minutes} free min for lunch ${from}-${to} ${level(p.lunch)}`);
+  }
+  if (on(p.fewerDays)) parts.push(`fewest class days ${level(p.fewerDays)}`);
+  if (on(p.freeDays)) {
+    parts.push(`${p.freeDays.days.join('')} kept free ${level(p.freeDays)}`);
+  }
+  if (on(p.termBalance)) {
+    parts.push(`three courses per term ${level(p.termBalance)}`);
+  }
+  if (on(p.openSeats)) parts.push(`open seats ${level(p.openSeats)}`);
+  if (on(p.instructorRating)) {
+    parts.push(`better-rated instructors ${level(p.instructorRating)}`);
+  }
+  return parts;
+}
+
+function scheduleLines(schedule: GeneratedSchedule): string[] {
+  const lines = [`#${schedule.rank}: CRNs ${schedule.crns.join(', ')}`];
+  for (const q of schedule.quarters) {
+    lines.push(
+      `  ${q.quarter}: ${q.days.join('')}, ${q.earliestStart}-${q.latestEnd}, ${plural(q.idleMinutes, 'idle minute')}`,
+    );
+  }
+  for (const course of schedule.courses) {
+    for (const s of course.sections) {
+      lines.push(
+        `  ${course.code} ${s.kind === 'standaloneLab' ? 'lab' : s.kind}: ${briefLine(s, true)}`,
+      );
+    }
+  }
+  return lines;
+}
+
+export function renderSchedules(set: ScheduleSet): string {
+  const criteria = rankingCriteria(set.preferences);
+  const lines = [
+    criteria.length
+      ? `Ranked best first by: ${criteria.join('; ')}. Preferences only order schedules; none rules one out.`
+      : 'No ranking preferences are on: schedules are in the order found.',
+  ];
+  const { count, capped, cutShort } = set.found;
+  lines.push(
+    count === 0
+      ? `No schedule found for ${yearLabel(set.year)}.`
+      : `${plural(count, 'schedule')} found${capped || cutShort ? ` (search ${cutShort ? 'cut short' : 'cap reached'}; better ones may exist)` : ''} for ${yearLabel(set.year)}; ${set.schedules.length < count ? `showing the best ${set.schedules.length}` : 'all shown'}.`,
+  );
+  for (const schedule of set.schedules) {
+    lines.push('', ...scheduleLines(schedule));
+  }
+  if (set.notices.length) lines.push('', ...set.notices.map(n => `Note: ${n}`));
+  if (set.schedules.length) {
+    lines.push(
+      '',
+      'Run check_conflicts on the chosen CRNs before relying on one, then register in WPI Workday with those CRNs.',
+      seatDataLine(set, false),
     );
   }
   return lines.join('\n');

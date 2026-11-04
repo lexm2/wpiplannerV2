@@ -293,17 +293,16 @@ export interface CourseLookupOptions extends DetailOptions {
 }
 
 /**
- * One course by id, code or CRN, as the get_course tool and GET
- * /courses/:id answer it. A year whose schedule is not published yet
- * answers with the current year's course and its outlook instead; anything
- * not found throws an ApiError that says where to look.
+ * What an input names: a course code, catalog id, CRN or title, read in
+ * `year` (when given; a code otherwise reads in the current year). `course`
+ * is null when nothing matches; `notices` say how a CRN or title was read.
+ * Throws for input that cannot name a course, or a CRN of another year.
  */
-export function lookupCourse(
+function resolveCourse(
   catalog: Catalog,
   input: string,
-  options: CourseLookupOptions = {},
-): CourseLookup {
-  const { year, ...detailOptions } = options;
+  year?: number,
+): { key: string; course: Course | null; notices: string[] } {
   const notices: string[] = [];
   // "CRN 349614" as well as "349614"; "CRN0350041" is CRN 350041.
   const key = input
@@ -370,6 +369,34 @@ export function lookupCourse(
       }
     }
   }
+  return { key, course, notices };
+}
+
+/** The course an input names in `year`, or the error saying where to look. */
+export function requireCourse(
+  catalog: Catalog,
+  input: string,
+  year: number,
+): { course: Course; notices: string[] } {
+  const { key, course, notices } = resolveCourse(catalog, input, year);
+  if (!course) throw courseNotFound(catalog, key, year);
+  return { course, notices };
+}
+
+/**
+ * One course by id, code or CRN, as the get_course tool and GET
+ * /courses/:id answer it. A year whose schedule is not published yet
+ * answers with the current year's course and its outlook instead; anything
+ * not found throws an ApiError that says where to look.
+ */
+export function lookupCourse(
+  catalog: Catalog,
+  input: string,
+  options: CourseLookupOptions = {},
+): CourseLookup {
+  const { year, ...detailOptions } = options;
+  const { key, course, notices } = resolveCourse(catalog, input, year);
+  const current = currentAcademicYear(catalog);
 
   if (year !== undefined) {
     const status = yearStatus(catalog, year);

@@ -17,6 +17,7 @@ import {
   IN_B,
   period,
   rpcOn,
+  scheduleDepartments,
   section,
   tool,
   toolOn,
@@ -31,6 +32,7 @@ describe('MCP server', () => {
       'list_departments',
       'get_catalog_info',
       'check_conflicts',
+      'generate_schedules',
     ]);
   });
 
@@ -1455,5 +1457,81 @@ describe('tool schemas', () => {
     ]);
     const lower = await tool('get_course', { course: 'PH 1110', terms: ['b'] });
     expect(lower.isError).toBe(false);
+  });
+});
+
+describe('generate_schedules', () => {
+  it('renders the ranking, each schedule and the follow-up steps', async () => {
+    const mcp = (await customEndpoints(scheduleDepartments())).mcp;
+    const result = await toolOn(mcp, 'generate_schedules', {
+      courses: ['XX 1001', 'XX 1003'],
+      preferences: {
+        earlyClasses: { importance: 'high', before: '10:00' },
+        lunch: { importance: 'low' },
+      },
+    });
+    expect(result.isError).toBe(false);
+    const { text } = result;
+    expect(text).toContain(
+      'Ranked best first by: no classes before 10:00 (high); least idle time between classes (medium); 45 free min for lunch 11:00-14:00 (low); three courses per term (high).',
+    );
+    expect(text).toContain('Preferences only order schedules');
+    // One schedule per assignment of courses to terms; both are in A.
+    expect(text).toContain('1 schedule found for 2026-27; all shown.');
+    expect(text).toContain('#1: CRNs 102, 301, 302');
+    expect(text).toContain('  A: MTWR, 11:00-16:50, 0 idle minutes');
+    expect(text).toContain(
+      '  XX 1001 lecture: AL02 CRN 102 A | MR 11:00-12:50 | Ada Lovelace RMP 4.5, diff 2.1, 91% again (12) | 10/30 open',
+    );
+    expect(text).toContain('  XX 1003 lab: AL01 CRN 302 A | T 15:00-16:50');
+    expect(text).toContain('Run check_conflicts on the chosen CRNs');
+    expect(text).toContain('register in WPI Workday');
+    expect(text).toContain('Seat data is under a day old');
+    // The structured content is the API's answer.
+    expect(result.data.schedules[0].crns).toEqual([102, 301, 302]);
+    expect(result.data.preferences.earlyClasses.before).toBe('10:00');
+    expect(result.data.found).toEqual({
+      count: 1,
+      capped: false,
+      cutShort: false,
+    });
+  });
+
+  it('says why nothing fits, and reports input errors as tool errors', async () => {
+    const mcp = (await customEndpoints(scheduleDepartments())).mcp;
+    const none = await toolOn(mcp, 'generate_schedules', {
+      courses: ['XX 1005', 'XX 1008'],
+    });
+    expect(none.isError).toBe(false);
+    expect(none.text).toContain('No schedule found for 2026-27.');
+    expect(none.text).toContain('Note: No schedule: every combination');
+    expect(none.text).not.toContain('Run check_conflicts');
+    const bad = await toolOn(mcp, 'generate_schedules', {
+      courses: ['XX 9999'],
+    });
+    expect(bad.isError).toBe(true);
+    expect(bad.text).toContain('No course XX 9999 in 2026-27.');
+    const own = await toolOn(mcp, 'generate_schedules', {
+      courses: ['XX 1001'],
+      keepCrns: [101],
+    });
+    expect(own.isError).toBe(true);
+    expect(own.text).toContain('CRN 101, a section of XX 1001');
+  });
+
+  it('tells a model that preferences only order, and instructs the workflow', async () => {
+    const { tools } = await rpcOn(endpoints(BEFORE_A).mcp, 'tools/list', {});
+    const generate = tools.find(
+      (t: { name: string }) => t.name === 'generate_schedules',
+    );
+    expect(generate.description).toContain('never exclude');
+    expect(generate.inputSchema.properties.preferences).toBeDefined();
+    expect(generate.annotations.readOnlyHint).toBe(true);
+    const init = await rpcOn(endpoints(BEFORE_A).mcp, 'initialize', {
+      protocolVersion: '2025-06-18',
+      capabilities: {},
+      clientInfo: { name: 'test', version: '1' },
+    });
+    expect(init.instructions).toContain('generate_schedules');
   });
 });

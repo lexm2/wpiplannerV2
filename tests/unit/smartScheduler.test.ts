@@ -4,6 +4,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import { SmartScheduler } from '../../src/services/scheduling/SmartScheduler';
+import { ScheduleScorer } from '../../src/services/scheduling/ScheduleScorer';
+import {
+  normalizeRankingPreferences,
+  type RankingPreferences,
+} from '../../src/services/scheduling/rankingPreferences';
 import type { MaskedCandidate } from '../../src/services/scheduling/AutoScheduler';
 import { sectionToMask } from '../../src/core/scheduling/BitMaskEngine';
 import {
@@ -98,9 +103,15 @@ function candidates(c: Course): MaskedCandidate[] {
   }));
 }
 
-function schedulesFor(courses: Course[], maxResults = 50) {
+const DEFAULTS = normalizeRankingPreferences(undefined);
+
+function schedulesFor(
+  courses: Course[],
+  maxResults = 50,
+  preferences: RankingPreferences = DEFAULTS,
+) {
   return SmartScheduler.findSchedules(
-    { candidatesPerCourse: courses.map(candidates), courses },
+    { candidatesPerCourse: courses.map(candidates), courses, preferences },
     maxResults,
   );
 }
@@ -200,7 +211,7 @@ function candidateNumbers(
   fs: FilterService,
   selection: SelectedCourse[],
 ): string[][] | null {
-  const build = new SmartScheduler(fs).buildCandidateData(selection);
+  const build = new SmartScheduler(fs).buildCandidateData(selection, DEFAULTS);
   if (!build.ok) return null;
   return build.input.candidatesPerCourse.map(cs =>
     cs.map(c => c.combination.lecture!.number),
@@ -267,6 +278,7 @@ describe('SmartScheduler.buildCandidateData locked courses', () => {
 
     const build = new SmartScheduler(filterServiceWith()).buildCandidateData(
       selection,
+      DEFAULTS,
     );
     expect(build.ok).toBe(false);
     expect(!build.ok && build.unschedulable.map(c => c.id)).toEqual([
@@ -393,15 +405,18 @@ function randomGroup(seed: number): MaskedCandidate[][] {
   );
 }
 
+const scorer = new ScheduleScorer(DEFAULTS);
 const internals = SmartScheduler as unknown as {
-  bestForTermGroup(c: MaskedCandidate[][]): object[] | null;
-  gapForSelections(s: MaskedCandidate[]): number;
+  bestForTermGroup(
+    c: MaskedCandidate[][],
+    s: ScheduleScorer,
+  ): { combos: object[]; cost: number } | null;
 };
 
-/** Every combination in order, keeping the first with the smallest gap. */
+/** Every combination in order, keeping the first with the lowest cost. */
 function bruteForce(group: MaskedCandidate[][]): object[] | null {
   let best: MaskedCandidate[] | null = null;
-  let bestGap = Infinity;
+  let bestCost = Infinity;
   const visit = (i: number, chosen: MaskedCandidate[]): void => {
     if (i === group.length) {
       const clash = chosen.some((a, x) =>
@@ -412,9 +427,9 @@ function bruteForce(group: MaskedCandidate[][]): object[] | null {
         }),
       );
       if (clash) return;
-      const gap = internals.gapForSelections(chosen);
-      if (gap < bestGap) {
-        bestGap = gap;
+      const cost = scorer.groupCost(chosen);
+      if (cost < bestCost) {
+        bestCost = cost;
         best = [...chosen];
       }
       return;
@@ -429,9 +444,10 @@ describe('SmartScheduler group search', () => {
   it('picks the same combination as an exhaustive search', () => {
     for (let seed = 1; seed <= 400; seed++) {
       const group = randomGroup(seed);
-      expect(internals.bestForTermGroup(group), `seed ${seed}`).toEqual(
-        bruteForce(group),
-      );
+      expect(
+        internals.bestForTermGroup(group, scorer)?.combos ?? null,
+        `seed ${seed}`,
+      ).toEqual(bruteForce(group));
     }
   });
 
@@ -456,7 +472,7 @@ describe('SmartScheduler group search', () => {
     );
 
     const started = performance.now();
-    expect(internals.bestForTermGroup(group)).toBeNull();
+    expect(internals.bestForTermGroup(group, scorer)).toBeNull();
     expect(performance.now() - started).toBeLessThan(100);
   });
 });
@@ -491,5 +507,118 @@ describe('SmartScheduler.buildCandidateData with course-list filters', () => {
     const ma1022 = course('MA1022', [full, open]);
 
     expect(candidateNumbers(fs, [picked(ma1022, null)])).toEqual([['AL02']]);
+  });
+});
+
+describe('SmartScheduler.findSchedules ranking', () => {
+  const prefs = (over: Record<string, unknown>) =>
+    normalizeRankingPreferences(over);
+
+  /** One course with an 8:00 section and an 11:00 one, beside a 9:00 class. */
+  function earlyVersusLate() {
+    const anchor = course('MA1021', [
+      section(AcademicTerm.A, [M], '09:00', '09:50', 'A01'),
+    ]);
+    // 8:00-8:50 leaves no idle time before the 9:00 class; 11:00 leaves 70.
+    const flexible = course('CS1101', [
+      section(AcademicTerm.A, [M], '08:00', '08:50', 'EARLY'),
+      section(AcademicTerm.A, [M], '11:00', '11:50', 'LATE'),
+    ]);
+    return [anchor, flexible];
+  }
+  const flexibleNumber = (s: ReturnType<typeof schedulesFor>[number]) =>
+    s.find(r => r.course.id === 'CS1101')?.combination.lecture?.number;
+
+  it('keeps the least-idle section with the default preferences', () => {
+    const [best] = schedulesFor(earlyVersusLate());
+    expect(flexibleNumber(best)).toBe('EARLY');
+  });
+
+  it('picks the 11:00 section over the 8:00 one when early classes matter', () => {
+    const [best] = schedulesFor(
+      earlyVersusLate(),
+      50,
+      prefs({ earlyClasses: { importance: 'high', before: '10:00' } }),
+    );
+    expect(flexibleNumber(best)).toBe('LATE');
+  });
+
+  it('still schedules a course offered only at 8:00', () => {
+    const only = course('PH1110', [
+      section(AcademicTerm.A, [M], '08:00', '08:50', 'ONLY'),
+    ]);
+    const [best] = schedulesFor(
+      [only],
+      50,
+      prefs({ earlyClasses: { importance: 'high' } }),
+    );
+    expect(best[0].combination.lecture?.number).toBe('ONLY');
+  });
+
+  it('returns the best schedule first and keeps ties in enumeration order', () => {
+    const a = course('MA1021', [
+      section(AcademicTerm.A, [M], '09:00', '09:50', 'A1'),
+      section(AcademicTerm.B, [M], '09:00', '09:50', 'B1'),
+    ]);
+    const b = course('MA1022', [
+      section(AcademicTerm.A, [T], '09:00', '09:50', 'A2'),
+      section(AcademicTerm.B, [T], '09:00', '09:50', 'B2'),
+    ]);
+    const terms = schedulesFor([a, b]).map(s =>
+      s.map(r => r.combination.lecture?.number),
+    );
+    // Both in one quarter (deviation 1) beats one in each (deviation 4).
+    expect(terms).toEqual([
+      ['A1', 'A2'],
+      ['B1', 'B2'],
+      ['A1', 'B2'],
+      ['B1', 'A2'],
+    ]);
+  });
+});
+
+describe('SmartScheduler.findSchedulesBefore', () => {
+  // Six courses of ten sections each, none clashing: ~10^6 combinations.
+  const many = Array.from({ length: 6 }, (_, c) =>
+    course(
+      `XX${c}`,
+      Array.from({ length: 10 }, (_, i) =>
+        section(
+          AcademicTerm.A,
+          [[M, T, W, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY][c % 5]],
+          `${8 + i}:00`,
+          `${8 + i}:50`,
+        ),
+      ),
+    ),
+  );
+  const input = {
+    candidatesPerCourse: many.map(candidates),
+    courses: many,
+    preferences: DEFAULTS,
+  };
+
+  it('stops at the deadline with what it has, and says so', () => {
+    const cut = SmartScheduler.findSchedulesBefore(
+      input,
+      50,
+      performance.now() - 1,
+    );
+    expect(cut.cutShort).toBe(true);
+    expect(cut.schedules.length).toBeLessThanOrEqual(1);
+  });
+
+  it('is not cut short with time to spare', () => {
+    const done = SmartScheduler.findSchedulesBefore(
+      {
+        ...input,
+        candidatesPerCourse: [input.candidatesPerCourse[0]],
+        courses: [many[0]],
+      },
+      50,
+      performance.now() + 60_000,
+    );
+    expect(done.cutShort).toBe(false);
+    expect(done.schedules).toHaveLength(1);
   });
 });

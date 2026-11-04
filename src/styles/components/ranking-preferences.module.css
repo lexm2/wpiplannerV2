@@ -1,0 +1,139 @@
+/* Schedule Preferences section of the auto-schedule panel. */
+.hint {
+  margin: 0 0 0.75rem;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* The label and the importance control share a line and wrap on a phone. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.label {
+  flex: 1 1 12rem;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.segments {
+  display: flex;
+  background: var(--color-border);
+  border-radius: var(--effect-border-radius);
+  padding: 2px;
+  gap: 2px;
+}
+
+.segment,
+.day {
+  position: relative;
+  display: flex;
+}
+
+/* Visually hidden but focusable, so the group stays keyboard-operable. */
+.radio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segmentText {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-radius: calc(var(--effect-border-radius) - 2px);
+  transition: var(--effect-transition);
+  user-select: none;
+}
+
+.radio:checked + .segmentText {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Off is the resting state: only the criteria that are on take the accent. */
+.radio[value='off']:checked + .segmentText {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.radio:not(:checked):hover + .segmentText {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.radio:focus-visible + .segmentText {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* A day toggle is its own pill rather than part of a joined control. */
+.day .segmentText {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.day .radio:checked + .segmentText {
+  border-color: var(--color-primary);
+}
+
+.params {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+/* Still editable while Off, so a time can be set before switching it on. */
+.muted {
+  color: var(--color-text-secondary);
+}
+
+.muted .select {
+  opacity: 0.7;
+}
+
+.days {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.select {
+  max-width: 100%;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}

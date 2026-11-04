@@ -2,7 +2,7 @@ import type { RMPRatingFilterCriteria } from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { keepMatchingGroups } from '../lectureGroupScope';
-import { SectionType } from '../../../types/types';
+import { SectionType, type Section } from '../../../types/types';
 import { RateMyProfessorService } from '../../../services/external/RateMyProfessorService';
 
 type RatingNumbers = NonNullable<
@@ -10,8 +10,8 @@ type RatingNumbers = NonNullable<
 >;
 
 /** Every named instructor of the section's periods, co-instructors split. */
-function instructorsOf(fs: FilterableSection): string[] {
-  const names = fs.section.periods.flatMap(period =>
+export function instructorsOf(section: Section): string[] {
+  const names = section.periods.flatMap(period =>
     (period.professor ?? '').split(/\s*;\s*/),
   );
   return [...new Set(names.filter(name => name && name !== 'Not Assigned'))];
@@ -87,7 +87,7 @@ export class RMPRatingFilter implements SectionBasedFilter {
       // lecture passes when any instructor with ratings passes, and counts
       // as without data only when none has ratings (or enough of them), so
       // an unrated co-instructor neither hides nor rescues a rated one.
-      const rated = instructorsOf(fs)
+      const rated = instructorsOf(fs.section)
         .map(name => this.rmpService.getRatings(name))
         .filter(
           (r): r is RatingNumbers =>

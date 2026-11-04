@@ -9,6 +9,7 @@ import {
 import type { FilterService } from '../filtering/FilterService';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import type { ConflictCriteria } from '../../types/filters';
+import { instructorsOf } from '../../core/filtering/filters/RMPRatingFilter';
 
 export interface ScheduleResult {
   course: Course;
@@ -46,7 +47,21 @@ export interface MaskedCandidate {
   combination: SectionsByKind;
   mask: bigint;
   term: string;
+  /**
+   * Best rating among the instructors of the lecture (the lab when there is
+   * no lecture); null when none has enough ratings. Set only when the
+   * schedules are being ranked by instructor rating.
+   */
+  rating?: number | null;
 }
+
+/** Where instructor ratings come from: the Rate My Professor service. */
+export interface RatingSource {
+  getRatings(name: string): { rating: number; numRatings: number } | null;
+}
+
+/** Fewer ratings than this say too little about an instructor. */
+const MIN_RATINGS = 3;
 
 /**
  * Generates conflict-free schedules using bitmask optimization.
@@ -89,6 +104,7 @@ export class AutoScheduler {
   getMaskedCandidates(
     selectedCourse: SelectedCourse,
     blockedMasksByTerm: Map<string, bigint>,
+    ratings?: RatingSource,
   ): MaskedCandidate[] {
     const course = selectedCourse.course;
     const candidates: MaskedCandidate[] = [];
@@ -113,6 +129,7 @@ export class AutoScheduler {
           combination: { lab },
           mask,
           term: lab.computedTerm,
+          ...(ratings && { rating: this.bestRating(lab, ratings) }),
         };
 
         candidates.push(candidate);
@@ -135,6 +152,7 @@ export class AutoScheduler {
         passingCrns,
       );
       if (lectureMask === null) continue;
+      const rating = ratings && this.bestRating(lecture, ratings);
 
       const discussionCandidates: SectionCandidate[] = [];
       if (typeInfo.hasDiscussions) {
@@ -191,6 +209,7 @@ export class AutoScheduler {
             },
             mask: combinedMask,
             term: lecture.computedTerm,
+            ...(ratings && { rating }),
           };
 
           candidates.push(candidate);
@@ -199,6 +218,16 @@ export class AutoScheduler {
     }
 
     return candidates;
+  }
+
+  private bestRating(section: Section, ratings: RatingSource): number | null {
+    let best: number | null = null;
+    for (const name of instructorsOf(section)) {
+      const r = ratings.getRatings(name);
+      if (!r || r.numRatings < MIN_RATINGS) continue;
+      if (best === null || r.rating > best) best = r.rating;
+    }
+    return best;
   }
 
   /** The section's mask, or null when it can't be scheduled. */

@@ -471,3 +471,67 @@ afterAll(async () => {
 
 export const codes = (body: { courses: { id: string }[] }) =>
   body.courses.map(c => c.id);
+
+/**
+ * Courses for the schedule generator, for customEndpoints: XX 1001 has a
+ * section at 08:00 and one at 11:00, XX 1002 one in A and one in B, XX 1003
+ * a lecture with two labs, XX 1004 a closed section in A and an open one in
+ * B, XX 1005 and XX 1008 only the same 08:00 slot, XX 1006 (M and R at
+ * 11:00) is for CRNs the student already has, and XX 1001's 2027 entry is
+ * an unpublished year's early one.
+ */
+export function scheduleDepartments() {
+  const labs = (...crns: number[]) =>
+    crns.map((crn, i) =>
+      section(crn, `AL0${i + 1}`, 'A', [
+        period([['T', 'F'][i]], '15:00', '16:50'),
+      ]),
+    );
+  return [
+    {
+      abbreviation: 'XX',
+      name: 'Schedule Tests',
+      courses: [
+        course('XX-1001-2026', 'Morning Or Noon', [
+          section(101, 'AL01', 'A', [period(['M', 'R'], '08:00', '09:50')]),
+          section(102, 'AL02', 'A', [period(['M', 'R'], '11:00', '12:50')]),
+        ]),
+        course('XX-1001-2027', 'Morning Or Noon', [
+          section(107, 'AL01', 'A', [period(['M', 'R'], '08:00', '09:50')]),
+        ]),
+        course('XX-1002-2026', 'Any Time', [
+          section(201, 'AL01', 'A', [period(['T', 'F'], '09:00', '10:50')]),
+          section(202, 'BL01', 'B', [period(['T', 'F'], '09:00', '10:50')]),
+        ]),
+        course('XX-1003-2026', 'Lab Course', [
+          {
+            section: section(301, 'AL01', 'A', [
+              period(['W'], '13:00', '14:50'),
+            ]),
+            compatibleLabs: labs(302, 303),
+          },
+        ]),
+        course('XX-1004-2026', 'Seats', [
+          section(401, 'AL01', 'A', [period(['M'], '15:00', '15:50')], 0, {
+            status: 'Closed',
+          }),
+          section(402, 'BL01', 'B', [period(['M'], '15:00', '15:50')]),
+        ]),
+        course('XX-1005-2026', 'Only Early', [
+          section(501, 'AL01', 'A', [period(['M', 'R'], '08:00', '09:50')]),
+        ]),
+        course('XX-1006-2026', 'Already Taken', [
+          section(601, 'AL01', 'A', [period(['M', 'R'], '11:00', '12:50')]),
+        ]),
+        course('XX-1007-2026', 'Only Closed', [
+          section(701, 'AL01', 'A', [period(['F'], '13:00', '13:50')], 0, {
+            status: 'Closed',
+          }),
+        ]),
+        course('XX-1008-2026', 'Also Early', [
+          section(801, 'AL01', 'A', [period(['M', 'R'], '08:00', '09:50')]),
+        ]),
+      ],
+    },
+  ];
+}

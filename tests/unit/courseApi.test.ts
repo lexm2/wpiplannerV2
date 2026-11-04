@@ -19,8 +19,10 @@ import {
   callOn,
   catalogJson,
   codes,
+  customEndpoints,
   endpoints,
   fixtureDirs,
+  scheduleDepartments,
   write,
 } from './courseApiFixture';
 
@@ -885,5 +887,187 @@ describe('HTTP edge cases', () => {
     const { status, body } = await call(`/courses/${'x'.repeat(300)}`);
     expect(status).toBe(400);
     expect(body.error.length).toBeLessThan(250);
+  });
+});
+
+describe('schedule generation', () => {
+  const generate = async (body: unknown, today = BEFORE_A) => {
+    const { api } = await customEndpoints(scheduleDepartments(), today);
+    return callOn(api, '/schedules', body);
+  };
+  const crnsOf = (body: { schedules: { crns: number[] }[] }, i = 0) =>
+    body.schedules[i].crns;
+
+  it('returns a schedule whose CRNs fit together, one lecture and lab per course', async () => {
+    const { api } = await customEndpoints(scheduleDepartments());
+    const { status, body } = await callOn(api, '/schedules', {
+      courses: ['XX 1001', 'XX 1002', 'XX 1003'],
+    });
+    expect(status).toBe(200);
+    expect(body.year).toBe(2026);
+    expect(body.found.count).toBeGreaterThan(0);
+    const [best] = body.schedules;
+    expect(best.rank).toBe(1);
+    expect(best.courses.map((c: { code: string }) => c.code)).toEqual([
+      'XX 1001',
+      'XX 1002',
+      'XX 1003',
+    ]);
+    const lab = best.courses[2].sections;
+    expect(lab.map((s: { kind: string }) => s.kind)).toEqual([
+      'lecture',
+      'lab',
+    ]);
+    expect(best.crns).toHaveLength(4);
+    expect(best.quarters[0]).toMatchObject({ quarter: 'A' });
+    // What it hands back passes the conflict check it points to.
+    const check = await callOn(api, '/conflicts', { crns: best.crns });
+    expect(check.body.conflicts).toEqual([]);
+    expect(check.body.issues).toEqual([]);
+    expect(body.preferences.gaps.importance).toBe('medium');
+  });
+
+  it('lets a preference reorder the schedules but never drop one', async () => {
+    const plain = await generate({ courses: ['XX 1001'] });
+    const early = await generate({
+      courses: ['XX 1001'],
+      preferences: { earlyClasses: { importance: 'high', before: '10:00' } },
+    });
+    expect(plain.body.found.count).toBe(1);
+    expect(crnsOf(plain.body)).toEqual([101]);
+    expect(crnsOf(early.body)).toEqual([102]);
+    // A course with only an 08:00 section is still scheduled at 08:00.
+    const only = await generate({
+      courses: ['XX 1005'],
+      preferences: { earlyClasses: { importance: 'high', before: '10:00' } },
+    });
+    expect(crnsOf(only.body)).toEqual([501]);
+    expect(only.body.schedules[0].quarters).toEqual([
+      {
+        quarter: 'A',
+        days: ['M', 'R'],
+        earliestStart: '08:00',
+        latestEnd: '09:50',
+        idleMinutes: 0,
+      },
+    ]);
+  });
+
+  it('fits around keepCrns and busy blocks', async () => {
+    // CRN 601 meets M and R at 11:00, so the 11:00 section would clash.
+    const kept = await generate({
+      courses: ['XX 1001'],
+      keepCrns: [601],
+      preferences: { earlyClasses: { importance: 'high', before: '10:00' } },
+    });
+    expect(crnsOf(kept.body)).toEqual([101]);
+    const busy = await generate({
+      courses: ['XX 1001'],
+      busy: [{ days: ['M'], start: '07:00', end: '09:00', label: 'work' }],
+    });
+    expect(crnsOf(busy.body)).toEqual([102]);
+    // Both cover every section: nothing to schedule.
+    const none = await generate({
+      courses: ['XX 1001'],
+      keepCrns: [601],
+      busy: [{ days: ['R'], start: '08:00', end: '09:00' }],
+    });
+    expect(none.status).toBe(200);
+    expect(none.body.schedules).toEqual([]);
+    expect(none.body.unschedulable).toEqual([
+      { code: 'XX 1001', name: 'Morning Or Noon' },
+    ]);
+    expect(none.body.notices.join('\n')).toContain('the busy blocks');
+    expect(none.body.notices.join('\n')).toContain('keepCrns');
+  });
+
+  it('refuses a kept CRN of a requested course and ignores another year', async () => {
+    const own = await generate({ courses: ['XX 1001'], keepCrns: [101] });
+    expect(own.status).toBe(400);
+    expect(own.body.error).toContain('CRN 101, a section of XX 1001');
+    const other = await generate({ courses: ['XX 1001'], keepCrns: [107] });
+    expect(other.status).toBe(200);
+    expect(other.body.notices.join('\n')).toContain('keepCrns ignores CRN 107');
+    const unknown = await generate({ courses: ['XX 1001'], keepCrns: [999] });
+    expect(unknown.status).toBe(400);
+  });
+
+  it('leaves out full sections only when asked', async () => {
+    const open = await generate({
+      courses: ['XX 1004'],
+      openSeatsOnly: true,
+    });
+    expect(open.body.schedules.map((s: { crns: number[] }) => s.crns)).toEqual([
+      [402],
+    ]);
+    const all = await generate({ courses: ['XX 1004'] });
+    expect(all.body.found.count).toBe(2);
+    const closed = await generate({
+      courses: ['XX 1007'],
+      openSeatsOnly: true,
+    });
+    expect(closed.body.schedules).toEqual([]);
+    expect(closed.body.notices.join('\n')).toContain('openSeatsOnly');
+  });
+
+  it('limits a course to the terms given, and leaves out ended terms', async () => {
+    const b = await generate({
+      courses: [{ course: 'XX 1002', terms: ['b'] }],
+    });
+    expect(crnsOf(b.body)).toEqual([202]);
+    const both = await generate({ courses: ['XX 1002'] });
+    expect(both.body.found.count).toBe(2);
+
+    // A has ended: its sections are left out unless asked for.
+    const ended = await generate({ courses: ['XX 1002'] }, AFTER_A);
+    expect(ended.body.schedules.map((s: { crns: number[] }) => s.crns)).toEqual(
+      [[202]],
+    );
+    expect(ended.body.notices.join('\n')).toContain('terms that have ended');
+    const asked = await generate(
+      { courses: ['XX 1002'], includeEndedTerms: true },
+      AFTER_A,
+    );
+    expect(asked.body.found.count).toBe(2);
+  });
+
+  it('answers 200 with the likely causes when every combination clashes', async () => {
+    const { status, body } = await generate({
+      courses: ['XX 1005', 'XX 1008'],
+    });
+    expect(status).toBe(200);
+    expect(body.schedules).toEqual([]);
+    expect(body.found.count).toBe(0);
+    expect(body.notices.join('\n')).toContain('every combination');
+  });
+
+  it('returns only as many schedules as limit asks for', async () => {
+    const two = await generate({ courses: ['XX 1002'] });
+    expect(two.body.schedules).toHaveLength(2);
+    const one = await generate({ courses: ['XX 1002'], limit: 1 });
+    expect(one.body.schedules).toHaveLength(1);
+    expect(one.body.found.count).toBe(2);
+    expect((await generate({ courses: ['XX 1002'], limit: 11 })).status).toBe(
+      400,
+    );
+  });
+
+  it('refuses unknown courses with the lookup suggestions, repeats, and bad years', async () => {
+    const unknown = await generate({ courses: ['XX 9999'] });
+    expect(unknown.status).toBe(404);
+    expect(unknown.body.error).toContain('No course XX 9999 in 2026-27.');
+    expect(unknown.body.error).toContain('search_courses finds courses');
+    const twice = await generate({ courses: ['XX 1001', 'XX-1001-2026'] });
+    expect(twice.status).toBe(400);
+    const future = await generate({ courses: ['XX 1001'], year: 2027 });
+    expect(future.status).toBe(422);
+    expect(future.body.error).toContain('not published yet');
+    expect((await generate({ courses: [] })).status).toBe(400);
+    expect((await generate({ courses: Array(9).fill('XX 1001') })).status).toBe(
+      400,
+    );
+    expect((await generate({ courses: ['XX 1001'], extra: 1 })).status).toBe(
+      400,
+    );
   });
 });

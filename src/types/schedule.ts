@@ -1,3 +1,4 @@
+import type { RankingPreferences } from '../services/scheduling/rankingPreferences';
 import {
   Course,
   Section,
@@ -37,6 +38,8 @@ export interface ScheduleCombination {
 export interface SchedulePreferences {
   theme?: string;
   bookmarkedCourseIds?: string[];
+  /** Auto-schedule ranking preferences; read via normalizeRankingPreferences. */
+  autoSchedule?: RankingPreferences;
 }
 
 /**

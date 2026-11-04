@@ -1,11 +1,17 @@
 /**
- * ScheduleScorer: idle minutes are counted per quarter and day, semester
- * sections (F, S) weigh in on both of their quarters, and sortBest puts the
- * best schedule first without reshuffling ties.
+ * ScheduleScorer: every criterion's penalty on small hand-built schedules,
+ * with idle minutes counted per quarter and day and semester sections (F, S)
+ * weighing in on both of their quarters.
  */
 import { describe, it, expect } from 'vitest';
-import { ScheduleScorer } from '../../src/services/scheduling/ScheduleScorer';
-import type { ScheduleResult } from '../../src/services/scheduling/AutoScheduler';
+import {
+  ScheduleScorer,
+  type ScoredSelection,
+} from '../../src/services/scheduling/ScheduleScorer';
+import {
+  normalizeRankingPreferences,
+  IMPORTANCE_WEIGHT,
+} from '../../src/services/scheduling/rankingPreferences';
 import type { Section } from '../../src/types/types';
 
 interface Slot {
@@ -20,86 +26,101 @@ function time(hhmm: string) {
   return { hours, minutes, displayTime: hhmm };
 }
 
-function section(term: string, ...slots: Slot[]): Section {
+function section(
+  term: string,
+  slots: Slot[],
+  extra: Partial<Section> = {},
+): Section {
   return {
     computedTerm: term,
+    seats: 30,
+    seatsAvailable: 5,
+    status: 'Open',
     periods: slots.map(s => ({
       startTime: time(s.start),
       endTime: time(s.end),
       days: new Set(s.days.split('')),
       isAsync: s.isAsync,
     })),
+    ...extra,
   } as unknown as Section;
 }
 
-let n = 0;
-function course(lecture: Section, lab?: Section): ScheduleResult {
+function pick(
+  term: string,
+  slot: Slot | Slot[],
+  extra: Partial<Section> = {},
+  rating?: number | null,
+): ScoredSelection {
   return {
-    course: { id: `c${n++}` },
-    combination: lab ? { lecture, lab } : { lecture },
-  } as unknown as ScheduleResult;
+    combination: {
+      lecture: section(term, Array.isArray(slot) ? slot : [slot], extra),
+    },
+    term,
+    ...(rating !== undefined && { rating }),
+  };
 }
-
-const scorer = new ScheduleScorer();
-const internals = scorer as unknown as {
-  gapMinutes(s: ScheduleResult[]): number;
-  termScore(s: ScheduleResult[]): number;
-};
-const gap = (...s: ScheduleResult[]) => internals.gapMinutes(s);
-const terms = (...s: ScheduleResult[]) => internals.termScore(s);
 
 const MON_9 = { days: 'M', start: '9:00', end: '9:50' };
 const MON_11 = { days: 'M', start: '11:00', end: '11:50' };
 const MON_14 = { days: 'M', start: '14:00', end: '14:50' };
 
-describe('ScheduleScorer gap minutes', () => {
+/** Default preferences with the given criteria overridden. */
+const scorerWith = (over: Record<string, unknown> = {}) =>
+  new ScheduleScorer(normalizeRankingPreferences(over));
+
+/** Only `over` is on: everything else switched off. */
+function only(over: Record<string, unknown>) {
+  const off = {
+    gaps: { importance: 'off' },
+    termBalance: { importance: 'off' },
+  };
+  return scorerWith({ ...off, ...over });
+}
+
+const W = IMPORTANCE_WEIGHT;
+const defaultGap = (...s: ScoredSelection[]) =>
+  scorerWith().groupCost(s) / W.medium;
+
+describe('ScheduleScorer idle minutes (default gaps)', () => {
   it('counts idle time between classes on the same day and quarter', () => {
-    expect(gap(course(section('A', MON_9)), course(section('A', MON_11)))).toBe(
-      70,
-    );
+    expect(defaultGap(pick('A', MON_9), pick('A', MON_11))).toBe(70);
   });
 
   it('sums consecutive gaps whatever order the courses arrive in', () => {
     expect(
-      gap(
-        course(section('A', MON_14)),
-        course(section('A', MON_9)),
-        course(section('A', MON_11)),
-      ),
+      defaultGap(pick('A', MON_14), pick('A', MON_9), pick('A', MON_11)),
     ).toBe(70 + 130);
   });
 
   it('includes gaps between a lecture and its own lab', () => {
-    expect(gap(course(section('A', MON_9), section('A', MON_11)))).toBe(70);
+    const selection: ScoredSelection = {
+      combination: {
+        lecture: section('A', [MON_9]),
+        lab: section('A', [MON_11]),
+      },
+      term: 'A',
+    };
+    expect(defaultGap(selection)).toBe(70);
   });
 
   it('ignores classes on different days or in different quarters', () => {
     const tue11 = { ...MON_11, days: 'T' };
-    expect(gap(course(section('A', MON_9)), course(section('A', tue11)))).toBe(
-      0,
-    );
-    expect(gap(course(section('A', MON_9)), course(section('B', MON_11)))).toBe(
-      0,
-    );
+    expect(defaultGap(pick('A', MON_9), pick('A', tue11))).toBe(0);
+    expect(defaultGap(pick('A', MON_9), pick('B', MON_11))).toBe(0);
   });
 
   it('counts each day of a multi-day period', () => {
     const mw9 = { ...MON_9, days: 'MW' };
     const mw11 = { ...MON_11, days: 'MW' };
-    expect(gap(course(section('C', mw9)), course(section('C', mw11)))).toBe(
-      140,
-    );
+    expect(defaultGap(pick('C', mw9), pick('C', mw11))).toBe(140);
   });
 
   it('does not go negative for overlapping or back-to-back classes', () => {
     const overlap = { days: 'M', start: '9:30', end: '10:20' };
     const after = { days: 'M', start: '9:50', end: '10:40' };
-    expect(
-      gap(course(section('A', MON_9)), course(section('A', overlap))),
-    ).toBe(0);
-    expect(gap(course(section('A', MON_9)), course(section('A', after)))).toBe(
-      0,
-    );
+    expect(defaultGap(pick('A', MON_9), pick('A', overlap))).toBe(0);
+    expect(defaultGap(pick('A', MON_9), pick('A', after))).toBe(0);
   });
 
   it('skips async periods', () => {
@@ -109,76 +130,168 @@ describe('ScheduleScorer gap minutes', () => {
       end: '12:00',
       isAsync: true,
     };
-    expect(
-      gap(course(section('A', MON_9)), course(section('A', asyncSlot))),
-    ).toBe(0);
+    expect(defaultGap(pick('A', MON_9), pick('A', asyncSlot))).toBe(0);
   });
 
   it('places an F section in both A and B', () => {
-    const fall = course(section('F', MON_9));
-    expect(gap(fall, course(section('A', MON_11)))).toBe(70);
-    expect(gap(fall, course(section('B', MON_11)))).toBe(70);
-    expect(gap(fall, course(section('C', MON_11)))).toBe(0);
+    const fall = pick('F', MON_9);
+    expect(defaultGap(fall, pick('A', MON_11))).toBe(70);
+    expect(defaultGap(fall, pick('B', MON_11))).toBe(70);
+    expect(defaultGap(fall, pick('C', MON_11))).toBe(0);
   });
 
   it('places an S section in both C and D', () => {
-    const spring = course(section('S', MON_9));
-    expect(gap(spring, course(section('C', MON_11)))).toBe(70);
-    expect(gap(spring, course(section('D', MON_11)))).toBe(70);
-    expect(gap(spring, course(section('A', MON_11)))).toBe(0);
+    const spring = pick('S', MON_9);
+    expect(defaultGap(spring, pick('C', MON_11))).toBe(70);
+    expect(defaultGap(spring, pick('D', MON_11))).toBe(70);
+    expect(defaultGap(spring, pick('A', MON_11))).toBe(0);
+  });
+
+  it('counts an F section against an A one once per shared quarter', () => {
+    // A 70 minute gap in A and in B, not a doubled one.
+    expect(
+      defaultGap(pick('F', MON_9), pick('A', MON_11), pick('B', MON_11)),
+    ).toBe(140);
   });
 });
 
-describe('ScheduleScorer term balance', () => {
-  it('scores three courses in each quarter as perfect', () => {
-    const quarter = (t: string) =>
-      [0, 1, 2].map(() => course(section(t, MON_9)));
-    expect(terms(...quarter('A'), ...quarter('B'))).toBe(100);
-  });
-
-  it('counts an F section like one A plus one B section', () => {
-    expect(terms(course(section('F', MON_9)))).toBe(
-      terms(course(section('A', MON_9)), course(section('B', MON_9))),
+describe('ScheduleScorer criteria', () => {
+  it('earlyClasses: minutes before the cutoff, per quarter-day', () => {
+    const s = only({ earlyClasses: { importance: 'high', before: '10:00' } });
+    // 9:00 is 60 early; a second class later the same day adds nothing.
+    expect(s.groupCost([pick('A', MON_9), pick('A', MON_11)])).toBe(
+      W.high * 60,
     );
-    const threeF = [0, 1, 2].map(() => course(section('F', MON_9)));
-    expect(terms(...threeF)).toBe(100);
+    expect(s.groupCost([pick('A', MON_11)])).toBe(0);
+    // An F section is early in both of its quarters.
+    expect(s.groupCost([pick('F', MON_9)])).toBe(W.high * 120);
   });
 
-  it('counts an S section like one C plus one D section', () => {
-    expect(terms(course(section('S', MON_9)))).toBe(
-      terms(course(section('C', MON_9)), course(section('D', MON_9))),
+  it('lateClasses: minutes past the cutoff, per quarter-day', () => {
+    const s = only({ lateClasses: { importance: 'low', after: '14:30' } });
+    expect(s.groupCost([pick('A', MON_14)])).toBe(W.low * 20);
+    expect(s.groupCost([pick('A', MON_11)])).toBe(0);
+  });
+
+  it('gaps min: back-to-back classes are short', () => {
+    const s = scorerWith({
+      termBalance: { importance: 'off' },
+      gaps: { importance: 'low', min: 15 },
+    });
+    const next = { days: 'M', start: '9:50', end: '10:40' };
+    expect(s.groupCost([pick('A', MON_9), pick('A', next)])).toBe(W.low * 15);
+    // max is raised to min (15), so a 70 minute gap is 55 over it.
+    expect(s.groupCost([pick('A', MON_9), pick('A', MON_11)])).toBe(
+      W.low * (70 - 15),
     );
   });
 
-  it('counts a course once, by its first section', () => {
-    // An A lecture with a B lab still counts as one A course.
-    expect(terms(course(section('A', MON_9), section('B', MON_11)))).toBe(
-      terms(course(section('A', MON_9))),
+  it('gaps max: only idle time beyond it counts', () => {
+    const s = scorerWith({
+      termBalance: { importance: 'off' },
+      gaps: { importance: 'medium', max: 60 },
+    });
+    expect(s.groupCost([pick('A', MON_9), pick('A', MON_11)])).toBe(
+      W.medium * 10,
+    );
+    expect(s.groupCost([pick('A', MON_9), pick('A', MON_14)])).toBe(
+      W.medium * (250 - 60),
     );
   });
-});
 
-describe('ScheduleScorer.sortBest', () => {
-  it('puts the higher score first, gaps breaking a term-balance tie', () => {
-    const gappy = [course(section('A', MON_9)), course(section('A', MON_14))];
-    const tight = [course(section('A', MON_9)), course(section('A', MON_11))];
-    const balanced = [0, 1, 2].map(() => course(section('A', MON_9)));
-
-    const sorted = scorer.sortBest([gappy, tight, balanced]);
-    expect(sorted).toEqual([balanced, tight, gappy]);
-    expect(scorer.score(tight)).toBeGreaterThan(scorer.score(gappy));
+  it('lunch: shortfall of the longest free stretch in the window', () => {
+    const s = only({
+      lunch: { importance: 'medium', from: '11:00', to: '14:00', minutes: 45 },
+    });
+    // 11:00-11:50 leaves 12:00-14:00 free: lunch is fine.
+    expect(s.groupCost([pick('A', MON_11)])).toBe(0);
+    // Classes 11:00-12:50 and 13:30-14:20 leave 40 minutes at most.
+    const busy = [
+      pick('A', { days: 'M', start: '11:00', end: '12:50' }),
+      pick('A', { days: 'M', start: '13:30', end: '14:20' }),
+    ];
+    expect(s.groupCost(busy)).toBe(W.medium * 5);
+    // A class covering the whole window leaves nothing.
+    expect(
+      s.groupCost([pick('A', { days: 'M', start: '10:00', end: '15:00' })]),
+    ).toBe(W.medium * 45);
+    // A day with no class is not charged.
+    expect(s.groupCost([])).toBe(0);
   });
 
-  it('sorts in place and keeps ties in their original order', () => {
-    const tied = [0, 1, 2, 3].map(() => [course(section('A', MON_9))]);
-    const better = [0, 1, 2].map(() => course(section('A', MON_9)));
-    const input = [tied[0], tied[1], better, tied[2], tied[3]];
+  it('fewerDays: 90 per quarter-day with a class', () => {
+    const s = only({ fewerDays: { importance: 'low' } });
+    const tue = { ...MON_9, days: 'T' };
+    expect(s.groupCost([pick('A', MON_9), pick('A', MON_11)])).toBe(90);
+    expect(s.groupCost([pick('A', MON_9), pick('A', tue)])).toBe(180);
+    expect(s.groupCost([pick('F', MON_9)])).toBe(180);
+  });
 
-    const sorted = scorer.sortBest(input);
-    expect(sorted).toBe(input);
-    expect(sorted).toEqual([better, ...tied]);
-    for (let i = 0; i < tied.length; i++) {
-      expect(sorted[i + 1]).toBe(tied[i]);
-    }
+  it('freeDays: 120 per quarter-day on a listed day', () => {
+    const s = only({ freeDays: { importance: 'low', days: ['F'] } });
+    const fri = { ...MON_9, days: 'F' };
+    expect(s.groupCost([pick('A', MON_9)])).toBe(0);
+    expect(
+      s.groupCost([pick('A', fri), pick('A', { ...fri, start: '13:00' })]),
+    ).toBe(120);
+    expect(s.groupCost([pick('S', fri)])).toBe(240);
+  });
+
+  it('termBalance: 200 per course away from three in a quarter', () => {
+    const s = scorerWith();
+    expect(s.termBalanceCost(['A', 'A', 'A', 'B', 'B', 'B'])).toBe(0);
+    expect(s.termBalanceCost(['A'])).toBe(W.high * 200 * 2);
+    // An F course is one in A and one in B.
+    expect(s.termBalanceCost(['F'])).toBe(W.high * 200 * 4);
+    expect(s.termBalanceCost(['S', 'S', 'S'])).toBe(0);
+    expect(s.termBalanceCost(['A', 'A', 'A', 'A'])).toBe(W.high * 200);
+    expect(
+      scorerWith({ termBalance: { importance: 'off' } }).termBalanceCost(['A']),
+    ).toBe(0);
+  });
+
+  it('openSeats: capped full, closed and waitlisted sections count', () => {
+    const s = only({ openSeats: { importance: 'low' } });
+    const full = { seatsAvailable: 0 };
+    expect(s.groupCost([pick('A', MON_9)])).toBe(0);
+    expect(s.groupCost([pick('A', MON_9, full)])).toBe(120);
+    expect(s.groupCost([pick('A', MON_9, { status: 'Closed' })])).toBe(120);
+    expect(s.groupCost([pick('A', MON_9, { status: 'Waitlist' })])).toBe(120);
+  });
+
+  it('openSeats: an uncapped section is not full', () => {
+    const s = only({ openSeats: { importance: 'low' } });
+    expect(
+      s.groupCost([pick('A', MON_9, { seats: 999, seatsAvailable: 0 })]),
+    ).toBe(0);
+  });
+
+  it('openSeats: every full component counts', () => {
+    const s = only({ openSeats: { importance: 'low' } });
+    const full = { seatsAvailable: 0 };
+    const selection: ScoredSelection = {
+      combination: {
+        lecture: section('A', [MON_9], full),
+        lab: section('A', [MON_11], full),
+      },
+      term: 'A',
+    };
+    expect(s.groupCost([selection])).toBe(240);
+  });
+
+  it('instructorRating: 40 per point below five, 3.5 when unknown', () => {
+    const s = only({ instructorRating: { importance: 'low' } });
+    expect(s.groupCost([pick('A', MON_9, {}, 5)])).toBe(0);
+    expect(s.groupCost([pick('A', MON_9, {}, 4)])).toBe(40);
+    expect(s.groupCost([pick('A', MON_9, {}, null)])).toBe(60);
+    expect(s.groupCost([pick('A', MON_9)])).toBe(60);
+  });
+
+  it('costs nothing for criteria that are off', () => {
+    const s = scorerWith({
+      gaps: { importance: 'off' },
+      termBalance: { importance: 'off' },
+    });
+    expect(s.groupCost([pick('A', MON_9), pick('A', MON_14)])).toBe(0);
   });
 });
