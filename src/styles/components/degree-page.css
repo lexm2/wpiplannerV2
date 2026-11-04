@@ -1344,6 +1344,21 @@
     padding: 1.5rem 1rem;
   }
 
+  /* The status pill goes under the name instead of beside it, so the name has
+     the card's full width, and may take a third line: the distinguishing part
+     of "Humanities and Arts Completion of Degree" used to be clipped, with
+     the full text only in a title tooltip a phone can't show. Phone cards size
+     to content, so the extra line costs no row alignment. */
+  .requirement-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .requirement-card-name {
+    -webkit-line-clamp: 3;
+  }
+
   /* Configure buckets: a name beside the handle, credit target and the Edit /
      Delete buttons left it 6-100px wide and ellipsized. Now the name takes the
      row (and wraps), with target and buttons on a line under it. */
