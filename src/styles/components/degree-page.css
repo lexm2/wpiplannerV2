@@ -214,7 +214,6 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .degree-summary-title {
@@ -226,11 +225,6 @@
   margin: 0.25rem 0 0;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
-}
-
-.degree-summary-actions {
-  display: flex;
-  gap: 0.5rem;
 }
 
 /* Earned, in progress, transfer, scheduled, and requirements satisfied. The
@@ -1496,7 +1490,7 @@
   color: var(--color-text-secondary);
 }
 
-/* ---- Phone: one-line summary (DegreeSummary.svelte) ---- */
+/* ---- Record actions menu and phone one-line summary (DegreeSummary.svelte) ---- */
 .degree-summary-compact {
   margin-bottom: 0.75rem;
 }
