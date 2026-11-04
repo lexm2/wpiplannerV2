@@ -290,7 +290,7 @@
               minGaps,
               setMinGap,
             )}
-            , at most
+            and at most
             {@render numberSelect(
               'Gaps: maximum time between classes',
               prefs.gaps.max,

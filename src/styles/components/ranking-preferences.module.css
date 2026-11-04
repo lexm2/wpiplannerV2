@@ -72,6 +72,12 @@
   color: var(--color-text-inverse);
 }
 
+/* Off is the resting state: only the criteria that are on take the accent. */
+.radio[value='off']:checked + .segmentText {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
 .radio:not(:checked):hover + .segmentText {
   background: var(--color-surface);
   color: var(--color-text);
