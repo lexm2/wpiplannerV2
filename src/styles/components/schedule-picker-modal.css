@@ -354,10 +354,11 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
   .schedule-picker-modal-dialog .modal-title {
     font-size: 1.125rem;
   }
-}
 
-html.is-mobile .schedule-picker-modal-dialog .modal-footer {
-  display: none;
+  /* The footer holds the Schedules / Settings tabs; keep it, but slim. */
+  .schedule-picker-modal-dialog .modal-footer {
+    padding: 0.375rem 1rem;
+  }
 }
 
 /* Copy-into mode: a banner names the source, and every other row becomes a

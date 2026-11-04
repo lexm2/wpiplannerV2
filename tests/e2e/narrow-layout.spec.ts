@@ -54,11 +54,13 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
       page,
     }) => {
       await boot(page);
+      // Both get the phone layout: the class follows a phone UA or a width of
+      // 560px or less, so a 390px desktop window has it too.
       expect(
         await page.evaluate(() =>
           document.documentElement.classList.contains('is-mobile'),
         ),
-      ).toBe(device === 'phone UA');
+      ).toBe(true);
 
       const gear = page.locator('.settings-menu-btn');
       await expect(gear).toBeVisible();
