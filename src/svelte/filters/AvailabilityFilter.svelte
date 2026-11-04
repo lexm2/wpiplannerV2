@@ -51,7 +51,11 @@
   const calendarEventCount = $derived(
     autoScheduleOrchestrator?.getLocalEventCount() ?? 0,
   );
-  const showCalendarToggle = $derived(calendarEventCount > 0);
+  // A course-list toggle left on stays visible with no events, so it can be
+  // turned off: otherwise it hides sections again the moment an event exists.
+  const showCalendarToggle = $derived(
+    calendarEventCount > 0 || (!isAuto && hideCalendarClashes),
+  );
   const calendarCountText = $derived(
     calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`,
   );

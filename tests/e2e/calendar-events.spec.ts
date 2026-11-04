@@ -202,6 +202,11 @@ test('Delete event in Edit names what it removes and closes both modals', async 
   await expect(editor(page)).toHaveCount(0);
   await expect(eventRows(page)).toHaveCount(3);
   expect(await savedEvent(page, 'ev-standup')).toBeUndefined();
+  // The row that opened Edit is gone; focus stays in the manager, not on the
+  // page behind it.
+  expect(
+    await manager(page).evaluate(el => el.contains(document.activeElement)),
+  ).toBe(true);
 });
 
 test('bulk delete is one undo step', async ({ page }) => {
@@ -219,6 +224,12 @@ test('bulk delete is one undo step', async ({ page }) => {
   await expect(confirm(page)).toContainText('Delete 4 events?');
   await confirm(page).getByRole('button', { name: 'Delete' }).click();
   await expect(manager(page).locator('[data-empty]')).toBeVisible();
+  // Focus moves once the confirm has finished closing.
+  await expect
+    .poll(() =>
+      manager(page).evaluate(el => el.contains(document.activeElement)),
+    )
+    .toBe(true);
   await page.keyboard.press('Escape');
   await expect(manager(page)).toHaveCount(0);
   await expect(page.locator('.external-event-block')).toHaveCount(0);

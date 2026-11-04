@@ -479,6 +479,31 @@ describe('edge cases', () => {
     expect(result.candidates.map(c => c.title)).toEqual(['Shift']);
   });
 
+  it('keeps different events that reuse one UID', () => {
+    const weekly = (title: string, day: string, date: string) =>
+      vevent(
+        [
+          `DTSTART;TZID=America/New_York:${date}T090000`,
+          `DTEND;TZID=America/New_York:${date}T100000`,
+          `RRULE:FREQ=WEEKLY;BYDAY=${day};COUNT=7`,
+          `SUMMARY:${title}`,
+        ],
+        'same@example.com',
+      );
+    const text = ics(
+      NY_VTIMEZONE,
+      weekly('Choir', 'MO', '20260824'),
+      weekly('Gym', 'TU', '20260825'),
+      weekly('Book club', 'WE', '20260826'),
+    );
+    const result = importIcsText(text, TERMS);
+    expect(result.candidates.map(c => c.title)).toEqual([
+      'Book club',
+      'Choir',
+      'Gym',
+    ]);
+  });
+
   it('reads every moved instance whose master is missing from the file', () => {
     const moved = (date: string) =>
       vevent(

@@ -158,9 +158,15 @@ test('the course list follows calendar events added and deleted while the toggle
   ]);
   await expect.poll(matching).toBeLessThan(before);
 
-  // Deleting both brings every course back.
+  // Deleting both brings every course back, and the toggle stays in view so
+  // it can be turned off: hidden, it would filter again on the next event.
   await setEvents(page, []);
   await expect.poll(matching).toBe(before);
+  await expect(
+    page.getByLabel(
+      'Hide sections that conflict with calendar events (0 events)',
+    ),
+  ).toBeChecked();
 });
 
 test('"avoid conflicts" follows the selection made after it was switched on', async ({

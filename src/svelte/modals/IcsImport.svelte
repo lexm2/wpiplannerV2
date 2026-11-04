@@ -190,9 +190,9 @@
     },
     {
       reason: 'plannerExport',
-      summary: () => "of your courses, from this planner's export",
+      summary: () => "courses from this planner's export",
       heading: () =>
-        "Your courses from this planner's own export (already on your schedule)",
+        "Courses from this planner's export (add courses from Classes, not as events)",
     },
   ];
 
@@ -442,6 +442,8 @@
           >
             {#if addable.length === 0}
               Nothing new to add
+            {:else if selected.length === 0}
+              Select events to add
             {:else}
               {@html getInlineSVG('CHECK', 'btn-icon')}
               Add {selected.length}

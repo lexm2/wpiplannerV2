@@ -178,8 +178,7 @@ function failureMessage(
     case 'no-candidates': {
       const byEvents = outcome.blockedByEvents ?? [];
       if (byEvents.length === outcome.courses.length) {
-        const one = byEvents.length === 1;
-        return `Could not generate a schedule: every usable section of ${listCourses(byEvents)} meets during your calendar events.\n\nChange or remove ${one ? 'the event' : 'those events'} under Calendar Events, or turn off "Keep classes clear of my calendar events" in Auto-Schedule settings.`;
+        return `Could not generate a schedule: every usable section of ${listCourses(byEvents)} meets during your calendar events.\n\nEdit your events under Calendar Events, or turn off "Keep classes clear of my calendar events" in Auto-Schedule settings.`;
       }
       const one = outcome.courses.length === 1;
       return `Could not generate a schedule: no section of ${listCourses(outcome.courses)} can be used.\n\nCommon causes:\n• Active schedule filters exclude all of ${one ? 'its' : 'their'} sections\n• ${one ? 'Its' : 'Their'} sections clash with locked courses or calendar events\n• ${one ? 'Its' : 'Their'} sections are missing time/day data`;

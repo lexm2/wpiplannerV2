@@ -739,7 +739,8 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   pointer-events: none;
   border: 3px dashed var(--color-primary);
   border-radius: var(--effect-border-radius);
-  background: color-mix(in srgb, var(--color-background) 85%, transparent);
+  /* Opaque: rows showing through crowd the label, worst in High Contrast. */
+  background: var(--color-background);
   color: var(--color-text);
   font-size: 1.15rem;
   font-weight: var(--font-weight-bold);

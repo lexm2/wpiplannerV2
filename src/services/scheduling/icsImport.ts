@@ -286,6 +286,15 @@ function parseCalendars(text: string): {
   return result;
 }
 
+/** Two VEVENTs with one UID describe the same event: same title and start. */
+function sameEvent(a: ICAL.Component, b: ICAL.Component): boolean {
+  const key = (c: ICAL.Component): string =>
+    `${String(c.getFirstPropertyValue('summary') ?? '').trim()}|${String(
+      c.getFirstPropertyValue('dtstart') ?? '',
+    )}`;
+  return key(a) === key(b);
+}
+
 interface EventGroup {
   master?: ICAL.Component;
   exceptions: ICAL.Component[];
@@ -350,6 +359,7 @@ export function parseIcsOccurrences(
   // Group VEVENTs by UID: the one without RECURRENCE-ID is the master.
   const groups = new Map<string, EventGroup>();
   let anonymous = 0;
+  let reused = 0;
   for (const calendar of calendars) {
     for (const vevent of calendar.getAllSubcomponents('vevent')) {
       const rawUid = vevent.getFirstPropertyValue('uid');
@@ -360,9 +370,13 @@ export function parseIcsOccurrences(
       let group = groups.get(uid);
       if (!group) groups.set(uid, (group = { exceptions: [] }));
       if (vevent.hasProperty('recurrence-id')) group.exceptions.push(vevent);
-      // A second copy of the same event (merged calendars, re-exports) adds
-      // nothing, and relating it as an exception would throw.
       else if (!group.master) group.master = vevent;
+      // A second copy of the same event (merged calendars, re-exports) adds
+      // nothing, and relating it as an exception would throw. A different
+      // event that reuses the UID (some exporters do) is its own event.
+      else if (!sameEvent(group.master, vevent)) {
+        groups.set(`${uid}#${reused++}`, { master: vevent, exceptions: [] });
+      }
     }
   }
 

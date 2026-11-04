@@ -230,7 +230,8 @@
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius);
-  max-height: 14rem;
+  /* Short enough that the event list stays in view on a laptop screen. */
+  max-height: 9rem;
   overflow-y: auto;
 }
 
