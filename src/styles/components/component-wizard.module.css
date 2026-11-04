@@ -496,3 +496,92 @@
     padding-right: 0.5rem;
   }
 }
+
+/* Short screens (a phone held sideways): the wizard shares ~340px with the
+   drawer bar and its own footer, which left less than one section card. The
+   "Filters: ..." banner goes, and the breadcrumbs, footer, step title and
+   cards tighten so about two cards show. */
+@media (max-height: 500px) {
+  .wizard-filter-status {
+    display: none;
+  }
+
+  .wizard-breadcrumbs {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .wizard-breadcrumb {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .wizard-content {
+    padding-top: 0.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .wizard-step-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .wizard-term-separator {
+    margin-top: 0.5rem;
+    padding-top: 0.25rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .wizard-sections-grid {
+    gap: 0.5rem;
+  }
+
+  .wizard-section-card {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .section-card-header {
+    margin-bottom: 0.25rem;
+  }
+
+  .wizard-footer {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .wizard-btn {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
+  /* The rating and its detail line share a row instead of stacking. */
+  .rmp-badge {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    margin-top: 0.2rem;
+    padding: 0.2rem 0.375rem;
+  }
+
+  .section-card-time {
+    margin-bottom: 0.2rem;
+  }
+
+  .section-card-footer {
+    margin-top: 0.2rem;
+  }
+}
+
+/* A landscape phone is wide enough to give the drawer more width while the
+   wizard is open (the .wizard-active content is inside it), so the cards sit
+   two across and two are in view at once. */
+@media (max-height: 500px) and (min-width: 700px) {
+  :global(.side-panel.side-panel-drawer):has(:global(.wizard-active)) {
+    width: min(600px, calc(100vw - 3rem));
+  }
+
+  .wizard-sections-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}

@@ -839,3 +839,34 @@ html.is-mobile .term-graph {
     white-space: nowrap;
   }
 }
+
+/* Short screens (a phone held sideways is 360-430px tall): the Courses drawer
+   spent its height on chrome, leaving ~200px for the course list. The paddings
+   tighten, and while the section wizard is open the Calendar / filter / clear
+   toolbar goes, since the wizard has its own Back / Cancel / Finish and
+   nothing in the toolbar applies to a course being edited. */
+@media (max-height: 500px) {
+  .schedule-sidebar-header {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .schedule-sidebar-header:has(~ .schedule-sidebar-content.wizard-active) {
+    display: none;
+  }
+
+  .schedule-sidebar-content {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .schedule-footer-row {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .auto-schedule-btn {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
