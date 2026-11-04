@@ -442,7 +442,13 @@ export function generateSchedules(
     SEARCH_CAP,
     performance.now() + SEARCH_BUDGET_MS,
   );
-  if (found.length === 0) {
+  // Time first: a search that ran out before finishing one schedule has not
+  // shown that everything clashes.
+  if (cutShort && found.length === 0) {
+    notices.push(
+      `No schedule yet: the search ran out of time (${SEARCH_BUDGET_MS / 1000} second) before finishing one, so this says nothing about whether one fits. Give fewer courses, or terms for the courses with many lab and discussion choices.`,
+    );
+  } else if (found.length === 0) {
     notices.push(
       `No schedule: every combination of the courses' sections clashes, with each other or with what is blocked. Likely causes: ${causes(input, ended)}. Try fewer courses, or more terms.`,
     );
