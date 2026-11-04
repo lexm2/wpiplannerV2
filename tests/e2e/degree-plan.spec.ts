@@ -111,3 +111,27 @@ test("a requirement's browse button filters the planner to it and says so", asyn
     )
     .toBe(false);
 });
+
+test('a requirement with no course list has nothing to browse', async ({
+  page,
+}) => {
+  await setup(page);
+  // MQP, IQP and the like: no sheet rule and no departments to filter by.
+  const slot = page
+    .locator('[data-bucket-id*="Major Qualifying Project"] .is-static')
+    .first();
+  await expect(slot).toBeVisible();
+  await expect(slot).toContainText('No course list');
+  await expect(slot).toContainText('Course needed');
+  expect(await slot.evaluate(el => el.tagName)).toBe('DIV');
+
+  await slot.click();
+  await expect(page.locator('#degree-page')).toBeVisible();
+  await expect(page.locator('#planner-page')).toBeHidden();
+  await expect(page.locator('.degree-filter-banner')).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      (window as any).services.filterService.hasFilter('degreeBucket'),
+    ),
+  ).toBe(false);
+});

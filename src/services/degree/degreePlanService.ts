@@ -32,21 +32,36 @@ class DegreePlanService {
   }
 
   /**
+   * Whether the bucket has a course list to browse. A requirement with neither
+   * a tracking-sheet rule nor departments (MQP, IQP, a custom bucket with no
+   * departments) has nothing to filter the catalog by.
+   */
+  canBrowse(bucket: DegreeBucket): boolean {
+    return this.bucketRule(bucket) !== null;
+  }
+
+  /**
    * From an empty bucket slot: filter the courses page to the courses that give
    * credit for the bucket (+ the active academic year), leaving out any already
-   * taken or scheduled, and navigate there so the user can pick one.
+   * taken or scheduled, and navigate there so the user can pick one. Does
+   * nothing for a bucket with no course list (see canBrowse).
    */
   browseForBucket(bucket: DegreeBucket): void {
+    const criteria = this.browseCriteria(bucket);
+    if (criteria) this.browse(criteria);
+  }
+
+  /** The degree filter for a bucket: its rule, minus what is already covered. */
+  private browseCriteria(
+    bucket: DegreeBucket,
+  ): DegreeBucketFilterCriteria | null {
     const rule = this.bucketRule(bucket);
-    this.browse(
-      rule
-        ? {
-            ...rule,
-            excludedCourses: [...rule.excludedCourses, ...this.coveredCodes()],
-            label: bucket.name,
-          }
-        : null,
-    );
+    if (!rule) return null;
+    return {
+      ...rule,
+      excludedCourses: [...rule.excludedCourses, ...this.coveredCodes()],
+      label: bucket.name,
+    };
   }
 
   /**
@@ -90,20 +105,16 @@ class DegreePlanService {
   }
 
   /**
-   * Apply (or, with null, clear) the degree filter for the active schedule's
-   * year and go to the planner.
+   * Apply the degree filter for the active schedule's year and go to the
+   * planner.
    */
-  private browse(criteria: DegreeBucketFilterCriteria | null): void {
+  private browse(criteria: DegreeBucketFilterCriteria): void {
     if (!this.filterService) return;
 
-    if (criteria) {
-      this.filterService.addFilter('degreeBucket', criteria);
-      // A BS requirement's departments include their graduate courses, which
-      // swamp the list; the visible level toggle lets the user flip it back.
-      this.filterService.addFilter('graduateLevel', { level: 'undergraduate' });
-    } else {
-      this.filterService.removeFilter('degreeBucket');
-    }
+    this.filterService.addFilter('degreeBucket', criteria);
+    // A BS requirement's departments include their graduate courses, which
+    // swamp the list; the visible level toggle lets the user flip it back.
+    this.filterService.addFilter('graduateLevel', { level: 'undergraduate' });
     // The degree filter says which departments; a leftover department filter
     // would narrow it further, or to nothing.
     this.filterService.removeFilter('department');

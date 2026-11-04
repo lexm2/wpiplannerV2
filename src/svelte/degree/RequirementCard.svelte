@@ -92,6 +92,9 @@
 
   const emptyTiles = $derived(Array.from({ length: progress.emptySlots }));
   const needsBrowse = $derived(!satisfied && progress.emptySlots > 0);
+  // Tracks the record and the loaded departments the rule is built from. A
+  // requirement with no course list keeps its slots, but they are not buttons.
+  const canBrowse = $derived(degreePlanService.canBrowse(bucket));
 
   /**
    * How many courses a collapsed card wants to show.
@@ -298,16 +301,23 @@
 
       {#if expanded}
         {#each emptyTiles as _, i (i)}
-          <button
-            type="button"
-            class="requirement-course requirement-course-empty"
-            onclick={() => degreePlanService.browseForBucket(bucket)}
-          >
-            <span class="requirement-course-empty-label">Course needed</span>
-            <span class="requirement-course-empty-hint"
-              >Browse courses &rarr;</span
+          {#if canBrowse}
+            <button
+              type="button"
+              class="requirement-course requirement-course-empty"
+              onclick={() => degreePlanService.browseForBucket(bucket)}
             >
-          </button>
+              <span class="requirement-course-empty-label">Course needed</span>
+              <span class="requirement-course-empty-hint"
+                >Browse courses &rarr;</span
+              >
+            </button>
+          {:else}
+            <div class="requirement-course requirement-course-empty is-static">
+              <span class="requirement-course-empty-label">Course needed</span>
+              <span class="requirement-course-empty-hint">No course list</span>
+            </div>
+          {/if}
         {/each}
       {/if}
     </div>
@@ -327,7 +337,7 @@
           onclick={() => toggleExpanded(bucket.id)}>{toggleLabel}</button
         >
       {/if}
-      {#if needsBrowse}
+      {#if needsBrowse && canBrowse}
         <button
           type="button"
           class="requirement-course-empty requirement-card-browse"
@@ -340,6 +350,13 @@
             >Browse courses &rarr;</span
           >
         </button>
+      {:else if needsBrowse}
+        <div class="requirement-course-empty requirement-card-browse is-static">
+          <span class="requirement-course-empty-label"
+            >Needs {progress.emptySlots} more</span
+          >
+          <span class="requirement-course-empty-hint">No course list</span>
+        </div>
       {/if}
     </div>
   {/if}

@@ -930,7 +930,7 @@ test('browses the catalog from an empty bucket slot', async ({ page }) => {
   await importFixture(page);
 
   // Clicking an empty slot filters the courses page and navigates there.
-  await page.locator('.requirement-course-empty').first().click();
+  await page.locator('button.requirement-course-empty').first().click();
   await expect(page.locator('#planner-page')).toBeVisible();
 });
 

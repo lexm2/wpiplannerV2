@@ -933,6 +933,28 @@
   margin-left: 0.4rem;
 }
 
+/* A slot whose requirement has no course list (MQP, IQP, ...): the same box as
+   a Browse slot, so the card's height does not change, but a plain element with
+   nothing to click. Declared after the hover rules above so it wins them. */
+.requirement-course-empty.is-static,
+.requirement-course-empty.is-static:hover {
+  cursor: default;
+  border-color: var(--color-border);
+  background: transparent;
+}
+
+.requirement-course-empty.is-static .requirement-course-empty-label {
+  color: var(--color-text-secondary);
+}
+
+/* Always on show, as in the collapsed strip: it is the slot's whole message. */
+.requirement-course-empty.is-static .requirement-course-empty-hint {
+  opacity: 1;
+  max-width: none;
+  margin-left: 0.4rem;
+  color: var(--color-text-secondary);
+}
+
 .course-badge {
   flex-shrink: 0;
   font-size: 0.75rem;
