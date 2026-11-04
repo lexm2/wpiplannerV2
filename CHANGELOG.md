@@ -7,6 +7,16 @@
 
 ### Changed
 - Auto-Schedule picks each course's sections by your preferences instead of only by the least time between classes
+- Filter Courses shows terms, course level and availability first. Academic year, departments, times, credit hours, minimum seats, calendar event conflicts and Rate My Professor are under More filters, which shows how many of them are on and stays open once you open it
+- Auto-Schedule settings show a preference's times and limits only once it is turned on, and its filters fold into one Filters section
+- What's New, Tutorials and Clear All Data are in the gear menu in the header. The Schedules window no longer has a Settings tab: New Schedule, Import and Export All are at the bottom of the list
+- Each schedule in the Schedules list shows Rename and Duplicate, with Copy Into, Export, Export ICS, Import and Delete in its ⋮ menu
+- The List/Grid view switch is in the gear menu
+- Clear all sections is at the end of the schedule's course list instead of in the sidebar's top bar
+- On the Degree page, Configure buckets, Re-import and Clear record are in the ⋯ menu on the summary card
+
+### Removed
+- The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
 
 ## [2026-10-10]
 
