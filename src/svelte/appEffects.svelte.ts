@@ -5,6 +5,7 @@ import type { ServiceContainer } from '../bootstrap/ServiceContainer';
 import { uiState } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
 import { degreeState } from './degree/degreeState.svelte';
+import { degreePlanService } from '../services/degree/degreePlanService';
 import { updateClientTimestamp } from './timestampState.svelte';
 import { wizardState } from './wizardState.svelte';
 import {
@@ -183,18 +184,23 @@ export function installAppEffects(services: ServiceContainer): void {
     });
   });
 
-  // Degree record cleared -> drop the degree filter. It narrows the course list
-  // to a requirement of that record, so it can't outlive it. The initial run is
-  // skipped (no record is loaded yet at mount).
-  let degreeRecordInit = false;
+  // Degree record or active schedule changed -> rebuild the degree filter. Its
+  // exclusion list (courses on the record or in the schedule) was computed when
+  // the user clicked Browse, so a different schedule or a re-imported record
+  // leaves it hiding the wrong courses; a cleared record removes it outright
+  // (refreshBrowse does both). Course selection changes are deliberately NOT
+  // tracked: a course the user just added from the filtered list should not
+  // vanish from under them. The initial run is skipped (nothing is filtered yet).
+  let degreeFilterInit = false;
   $effect(() => {
-    const record = degreeState.record; // track the record only
+    degreeState.record; // track the record
+    appState.activeScheduleId; // track the active schedule
     untrack(() => {
-      if (!degreeRecordInit) {
-        degreeRecordInit = true;
+      if (!degreeFilterInit) {
+        degreeFilterInit = true;
         return;
       }
-      if (record === null) services.filterService.removeFilter('degreeBucket');
+      degreePlanService.refreshBrowse();
     });
   });
 }

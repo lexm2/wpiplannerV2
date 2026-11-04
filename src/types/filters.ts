@@ -105,6 +105,8 @@ export interface DegreeBucketFilterCriteria {
   excludedCourses: string[];
   /** Optional bucket label for getDisplayValue (e.g. "Social Science"). */
   label?: string;
+  /** The degree bucket this was built for, so it can be rebuilt when the record or schedule changes. */
+  bucketId?: string;
 }
 
 export interface RMPRatingFilterCriteria {

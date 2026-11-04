@@ -135,3 +135,53 @@ test('a requirement with no course list has nothing to browse', async ({
     ),
   ).toBe(false);
 });
+
+test("switching schedules while browsing refreshes the filter's exclusions", async ({
+  page,
+}) => {
+  await setup(page);
+  // Schedule A (active, CS 1004) and a second schedule B holding CS 2102.
+  const idB = await page.evaluate(async () => {
+    const s = (window as any).services;
+    const sms = s.scheduleManagementService;
+    const a = sms.getActiveScheduleId();
+    const created = await sms.createNewSchedule('B');
+    const cs = s.courseDataService
+      .getAllDepartments()
+      .find((d: any) => d.abbreviation === 'CS').courses;
+    await s.courseSelectionService.selectCourse(
+      cs.find((c: any) => c.number === '2102'),
+    );
+    await sms.setActiveSchedule(a);
+    return created.schedule.id as string;
+  });
+
+  const card = page.locator('[data-bucket-id*="Core Requirement"]');
+  await card
+    .locator('.requirement-card-browse, .requirement-course-empty')
+    .locator('visible=true')
+    .first()
+    .click();
+  await expect(page.locator('#planner-page')).toBeVisible();
+
+  const excluded = () =>
+    page.evaluate(
+      () =>
+        (window as any).services.filterService.getCriteria('degreeBucket')
+          ?.excludedCourses as string[] | undefined,
+    );
+  await expect.poll(excluded).toContain('CS 1004');
+  expect(await excluded()).not.toContain('CS 2102');
+
+  await page.evaluate(
+    id =>
+      (window as any).services.scheduleManagementService.setActiveSchedule(id),
+    idB,
+  );
+  await expect.poll(excluded).toContain('CS 2102');
+  expect(await excluded()).not.toContain('CS 1004');
+  await expect(page.locator('.degree-filter-banner')).toContainText(
+    'Core Requirement',
+  );
+  await expect(page.locator('#planner-page')).toBeVisible();
+});

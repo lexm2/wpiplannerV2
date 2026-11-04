@@ -64,7 +64,8 @@ export class DegreeBucketFilter implements SectionBasedFilter {
       Array.isArray(c.allowedDepartments) &&
       c.allowedDepartments.every(d => typeof d === 'string') &&
       Array.isArray(c.excludedCourses) &&
-      c.excludedCourses.every(d => typeof d === 'string')
+      c.excludedCourses.every(d => typeof d === 'string') &&
+      (c.bucketId === undefined || typeof c.bucketId === 'string')
     );
   }
 

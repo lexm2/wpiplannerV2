@@ -51,6 +51,30 @@ class DegreePlanService {
     if (criteria) this.browse(criteria);
   }
 
+  /**
+   * Bring the active degree filter back in step with the record and the active
+   * schedule, which its exclusion list was computed from. Re-adds the criteria
+   * freshly computed for the same bucket, without navigating or touching any
+   * other filter; drops the filter when its bucket is gone (record cleared or
+   * replaced) or no longer has a course list. A filter that was not set from a
+   * bucket is left alone.
+   */
+  refreshBrowse(): void {
+    if (!this.filterService) return;
+    const current =
+      this.filterService.getCriteria<DegreeBucketFilterCriteria>(
+        'degreeBucket',
+      );
+    if (!current?.bucketId) return;
+
+    const bucket = degreeState.record
+      ? degreeState.buckets.find(b => b.id === current.bucketId)
+      : undefined;
+    const criteria = bucket ? this.browseCriteria(bucket) : null;
+    if (criteria) this.filterService.addFilter('degreeBucket', criteria);
+    else this.filterService.removeFilter('degreeBucket');
+  }
+
   /** The degree filter for a bucket: its rule, minus what is already covered. */
   private browseCriteria(
     bucket: DegreeBucket,
@@ -61,6 +85,7 @@ class DegreePlanService {
       ...rule,
       excludedCourses: [...rule.excludedCourses, ...this.coveredCodes()],
       label: bucket.name,
+      bucketId: bucket.id,
     };
   }
 
