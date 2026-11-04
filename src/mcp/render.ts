@@ -20,8 +20,8 @@ import { echo } from '../api/errors';
 import { one, plural } from '../api/text';
 import { escapeRegExp } from '../utils/searchUtils';
 import { QUARTERS, TERMS } from '../utils/typeGuards';
+import { isUncapped } from '../utils/seats';
 import {
-  isUncapped,
   LOW_SEATS,
   ownDates,
   SOLID_RATINGS,

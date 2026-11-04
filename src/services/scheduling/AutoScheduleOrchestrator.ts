@@ -8,6 +8,8 @@ import { appState } from '../../core/state/appState.svelte';
 import type { ScheduleResult } from './AutoScheduler';
 import { SmartScheduler } from './SmartScheduler';
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager';
+import { normalizeRankingPreferences } from './rankingPreferences';
+import { rateMyProfessorService } from '../external/RateMyProfessorService';
 import { logger } from '../../utils/logger';
 
 export interface CalendarEventProvider {
@@ -86,7 +88,11 @@ export class AutoScheduleOrchestrator {
   ): Promise<GenerateOutcome> {
     try {
       const scheduler = new SmartScheduler(this.filterService);
-      const built = scheduler.buildCandidateData(selectedCourses);
+      const built = scheduler.buildCandidateData(
+        selectedCourses,
+        normalizeRankingPreferences(appState.preferences.autoSchedule),
+        rateMyProfessorService,
+      );
 
       if (!built.ok) {
         this.resetSchedules();

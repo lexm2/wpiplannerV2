@@ -4,7 +4,6 @@ import {
   SmartScheduler,
   type SchedulerInput,
 } from '../services/scheduling/SmartScheduler';
-import { ScheduleScorer } from '../services/scheduling/ScheduleScorer';
 import type { ScheduleResult } from '../services/scheduling/AutoScheduler';
 import { logger } from '../utils/logger';
 import { errorMessage } from '../utils/errorMessage';
@@ -146,9 +145,7 @@ export class ScheduleWorkerManager {
     input: SchedulerInput,
     maxResults: number,
   ): ScheduleResult[][] {
-    const schedules = SmartScheduler.findSchedules(input, maxResults);
-    new ScheduleScorer().sortBest(schedules);
-    return schedules;
+    return SmartScheduler.findSchedules(input, maxResults);
   }
 
   terminate(): void {

@@ -31,7 +31,8 @@ import {
 } from './calendar';
 import { ApiError, listSome, withoutControls } from './errors';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
-import { courseCode, isUncapped, LOW_SEATS } from './serialize';
+import { courseCode, LOW_SEATS } from './serialize';
+import { isUncapped } from '../utils/seats';
 import { listFirst, one, plural } from './text';
 import { DaySchema } from './schemaHints';
 

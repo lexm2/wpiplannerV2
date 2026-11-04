@@ -4,6 +4,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ScheduleWorkerManager } from '../../src/workers/ScheduleWorkerManager';
+import { normalizeRankingPreferences } from '../../src/services/scheduling/rankingPreferences';
 import type { WorkerRequest } from '../../src/workers/protocol';
 
 class FakeWorker {
@@ -30,7 +31,11 @@ class FakeWorker {
   }
 }
 
-const input = { candidatesPerCourse: [], courses: [] };
+const input = {
+  candidatesPerCourse: [],
+  courses: [],
+  preferences: normalizeRankingPreferences(undefined),
+};
 
 function freshManager(): ScheduleWorkerManager {
   (ScheduleWorkerManager as unknown as { instance: unknown }).instance = null;

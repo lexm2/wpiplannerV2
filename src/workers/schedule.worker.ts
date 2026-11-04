@@ -3,7 +3,6 @@ import {
   SmartScheduler,
   type SchedulerInput,
 } from '../services/scheduling/SmartScheduler';
-import { ScheduleScorer } from '../services/scheduling/ScheduleScorer';
 
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const { id, type, payload } = event.data;
@@ -14,7 +13,6 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
 
   try {
     const schedules = SmartScheduler.findSchedules(input, maxResults);
-    new ScheduleScorer().sortBest(schedules);
 
     const response: WorkerResponse = {
       id,
