@@ -19,11 +19,10 @@ export interface ConfirmPayload {
 }
 
 interface LocalEventPayload {
-  /** Callback when the event is saved */
   onSave: (
     event: Omit<LocalCalendarEvent, 'id' | 'createdAt' | 'updatedAt'>,
   ) => void;
-  /** Optional: existing event to edit (if not provided, creates new) */
+  /** The event to edit; without one, the modal creates a new event. */
   existingEvent?: LocalCalendarEvent;
 }
 
@@ -57,7 +56,7 @@ class ModalState {
   // to its local active-tab then nulls this channel.
   schedulePickerTab = $state.raw<'schedules' | 'settings' | null>(null);
   // Filter modal payload (mode + auto-schedule continuation). Set by the
-  // trigger site before modalOpened('filter-modal' | 'auto-schedule-filter').
+  // trigger site before openModal('filter-modal' | 'auto-schedule-filter').
   filter = $state.raw<FilterModalPayload | null>(null);
 }
 

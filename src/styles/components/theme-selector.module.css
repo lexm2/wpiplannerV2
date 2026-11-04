@@ -2,7 +2,7 @@
   transform: rotate(180deg);
 }
 
-/* Real <button>s now, so reset the default inline-block chrome. */
+/* Real <button>s, so reset the default inline-block chrome. */
 .theme-option {
   display: block;
   width: 100%;

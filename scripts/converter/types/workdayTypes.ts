@@ -1,8 +1,3 @@
-/**
- * Type definitions for Workday JSON input format
- * Based on WPI's Workday course data feed structure
- */
-
 export interface WorkdayFeed {
   Report_Entry: WorkdaySection[];
 }

@@ -15,10 +15,7 @@ import { indexCrossListings } from './utils/crossListings.js';
 export class WorkdayConverter {
   constructor(private config: ConverterConfig) {}
 
-  /**
-   * Main conversion method
-   * Reads Workday JSON, transforms it, and writes planner JSON
-   */
+  /** Reads Workday JSON, transforms it, and writes planner JSON. */
   async convert(inputPath: string, outputPath: string): Promise<void> {
     console.log('Starting Workday to Planner conversion...');
     console.log(`Input: ${inputPath}`);

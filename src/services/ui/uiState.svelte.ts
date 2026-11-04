@@ -35,7 +35,7 @@ class UiState {
   currentPage = $state<PageId>('planner');
   currentView = $state<ViewMode>('list');
   // Reflects the *visible* theme. Written by ThemeManager (which has no listener
-  // system, so this rune is how the Svelte ThemeSelector stays in sync).
+  // system, so this rune is how ThemeSelector stays in sync).
   currentThemeId = $state<string>('wpi-dark');
   openModals = $state.raw<string[]>([]);
   appError = $state<AppError | null>(null);
@@ -62,7 +62,7 @@ export function closeModal(typeId: string): void {
   uiState.openModals = uiState.openModals.filter(id => id !== typeId);
 }
 
-// The declarative ModalLayer unmounts each component when its id leaves
+// ModalLayer unmounts each component when its id leaves
 // uiState.openModals (after its hide animation).
 export function closeAllModals(): void {
   if (uiState.openModals.length === 0) return;

@@ -1,7 +1,3 @@
-/**
- * Configuration for the Workday to Planner converter
- */
-
 export interface ConverterConfig {
   specialCourses: string[];
   specialSections: string[];

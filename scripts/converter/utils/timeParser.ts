@@ -1,7 +1,3 @@
-/**
- * Utilities for parsing Workday time and meeting pattern data
- */
-
 export interface ParsedMeetingPattern {
   location: string;
   days: string[];
@@ -34,7 +30,6 @@ export function parseSectionDetails(
   for (const meeting of meetings) {
     const parts = meeting.split('|').map(s => s.trim());
 
-    // Handle missing location case
     if (parts.length === 2) {
       // Format: "Days | Time"
       patterns.push({
@@ -197,9 +192,6 @@ export function timeToMinutes(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
-/**
- * Checks if two time ranges overlap
- */
 export function timeRangesOverlap(
   start1: string,
   end1: string,

@@ -2,7 +2,7 @@
  * Shared state for the classes-page course list: which course is selected, and
  * how much of the filtered list is rendered.
  *
- * Selection is the bridge between the Svelte CourseList / SelectedCoursesPanel
+ * Selection is the bridge between CourseList / SelectedCoursesPanel
  * and CourseDescription.svelte. CourseList and SelectedCoursesPanel set
  * `selectedCourse` (the full Course object) on item click. CourseDescription
  * reads it directly to render the description panel. `selectedCourseId` is a

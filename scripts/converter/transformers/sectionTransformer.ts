@@ -1,7 +1,3 @@
-/**
- * Transforms Workday section data into PlannerSection objects
- */
-
 import { WorkdaySection } from '../types/workdayTypes.js';
 import { PlannerSection, PlannerPeriod } from '../types/outputTypes.js';
 import { parseSectionDetails } from '../utils/timeParser.js';
@@ -15,10 +11,7 @@ export interface CategorizedSections {
   other: PlannerSection[];
 }
 
-/**
- * Transforms a Workday section into PlannerSection(s)
- * Returns array because graduate courses with F/S terms are duplicated for A+B or C+D
- */
+/** Empty for a canceled section; otherwise the one section. */
 export function transformSection(
   workdaySection: WorkdaySection,
   config: ConverterConfig,
@@ -39,7 +32,6 @@ export function transformSection(
     config,
   );
 
-  // Check if this is a special section (GPS, Interest List, etc.)
   const isGPS = isSpecialSection(courseSectionFull, subjectAndNumber, config);
   const isInterestList = courseSectionFull.includes('Interest List');
 
@@ -72,7 +64,6 @@ export function transformSection(
     professor = isInterestList ? 'N/A' : 'Not Assigned';
   }
 
-  // Normalize type (Laboratory -> Lab)
   const type =
     instructionalFormat === 'Laboratory' ? 'Lab' : instructionalFormat;
 
@@ -152,16 +143,11 @@ function coLocatedSections(coLocated: string | undefined): string[] {
     .filter(Boolean);
 }
 
-/**
- * Extracts section number from full course section string
- * Handles various formats: standard, GPS, Interest List, appendices
- */
 function extractSectionNumber(
   courseSectionFull: string,
   subjectAndNumber: string,
   config: ConverterConfig,
 ): string {
-  // Check for appendices (e.g., "A01-Quiz")
   const hasAppendix = config.sectionNumberAppendices.some(appendix =>
     courseSectionFull.includes(appendix),
   );
@@ -175,7 +161,6 @@ function extractSectionNumber(
     if (code) return code[0];
   }
 
-  // Check for Interest List
   if (courseSectionFull.includes('Interest List')) {
     const term = interestListTerm(courseSectionFull);
     const label =
@@ -183,7 +168,6 @@ function extractSectionNumber(
     return `Interest List-${label}`;
   }
 
-  // Check for special sections (GPS, Special Topics)
   if (isSpecialSection(courseSectionFull, subjectAndNumber, config)) {
     // Keep full section name: "GPS: Machine Learning"
     const dashIndex = courseSectionFull.indexOf('-');
@@ -247,9 +231,6 @@ function extractTermLetter(sectionNumber: string): string {
   return match ? match[1].toUpperCase() : 'A';
 }
 
-/**
- * Categorizes sections by type (Lecture, Discussion, Lab)
- */
 export function categorizeSections(
   sections: PlannerSection[],
 ): CategorizedSections {

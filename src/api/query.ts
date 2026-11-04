@@ -260,8 +260,8 @@ interface Relaxation {
  * The same search with each given filter left out in turn, so an empty
  * result can say which filter emptied it. The year stays: it is a choice
  * of what can be scheduled, not a narrowing. Filters that let everything
- * through are skipped; every other one is tried (at most 13 reruns, each a
- * few milliseconds, and only for an empty search).
+ * through are skipped; every other one is tried (one rerun per filter, each
+ * a few milliseconds, and only for an empty search).
  *
  * Ordered by blame, most to blame first. The text search says what the
  * student is looking for, and the other filters narrow it, so a filter

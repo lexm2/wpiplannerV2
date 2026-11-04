@@ -802,7 +802,7 @@ const INPUTS = {
           'Default true: an F section conflicts with A and B, S with C and D. False compares terms exactly.',
         ),
     }),
-    // Derived from the CRNs.
+    // toCriteria derives these from the CRNs.
     omit: ['avoidConflicts', 'blockedSlots', 'selectedCourses'],
     toCriteria: ({ crns, ...rest }, ctx) => {
       const { slots, otherYear } = blockedSlotsForCrns(

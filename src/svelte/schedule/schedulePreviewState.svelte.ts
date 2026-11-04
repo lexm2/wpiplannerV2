@@ -1,11 +1,11 @@
 import type { Course, SectionsByKind } from '../../types/types';
 
 /**
- * Shared wizard-preview state for the schedule grid (Svelte 5 runes).
+ * Shared wizard-preview state for the schedule grid.
  *
- * The still-vanilla {@link ComponentSelectionWizard} writes these as the user
- * navigates/hovers; the declarative `ScheduleGrids` reads them to overlay a
- * preview onto the grid.
+ * componentWizardService writes these as the user navigates/hovers in the
+ * component wizard; `ScheduleGrids` reads them to overlay a preview onto the
+ * grid.
  *
  * - `previewCourse` + `selections`: the wizard's CURRENT committed selection -
  *   overlaid onto the selected list so it renders as solid blocks.

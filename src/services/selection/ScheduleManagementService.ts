@@ -342,7 +342,6 @@ export class ScheduleManagementService {
         };
       }
 
-      // Prevent deletion of last schedule unless forced
       if (schedules.length <= 1 && !force) {
         return {
           success: false,

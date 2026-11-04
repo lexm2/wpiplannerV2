@@ -22,7 +22,7 @@ export class EndedTermsFilter implements SectionBasedFilter {
   readonly criteria = EndedTermsFilter.criteria;
   readonly name = 'Ended terms';
   readonly description = "Leave out sections of this year's ended terms";
-  // With the term filter.
+  // The term filter's priority: both drop sections by term.
   readonly priority = 25;
 
   apply(sections: FilterableSection[], criteria: unknown): FilterableSection[] {

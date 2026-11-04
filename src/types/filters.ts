@@ -162,14 +162,16 @@ export type DegreeBucketFilterCriteria = z.output<
 >;
 
 export const RMPRatingFilterCriteriaSchema = z.object({
-  minRating: z.number().min(0).max(5).optional(), // Minimum average rating (0-5 scale)
-  maxRating: z.number().min(0).max(5).optional(), // Maximum average rating (0-5 scale)
-  minDifficulty: z.number().min(0).max(5).optional(), // Minimum difficulty rating (0-5 scale)
-  maxDifficulty: z.number().min(0).max(5).optional(), // Maximum difficulty rating (0-5 scale)
-  minWouldTakeAgain: z.number().min(0).max(100).optional(), // Minimum "would take again" percentage (0-100)
-  maxWouldTakeAgain: z.number().min(0).max(100).optional(), // Maximum "would take again" percentage (0-100)
-  includeWithoutData: z.boolean().optional(), // Include professors without RMP data (default: true)
-  minNumRatings: z.number().min(0).optional(), // Fewest ratings a professor's numbers may rest on
+  minRating: z.number().min(0).max(5).optional(),
+  maxRating: z.number().min(0).max(5).optional(),
+  minDifficulty: z.number().min(0).max(5).optional(),
+  maxDifficulty: z.number().min(0).max(5).optional(),
+  minWouldTakeAgain: z.number().min(0).max(100).optional(),
+  maxWouldTakeAgain: z.number().min(0).max(100).optional(),
+  /** Keep professors with no RMP data. Default true. */
+  includeWithoutData: z.boolean().optional(),
+  /** Fewest ratings a professor's numbers may rest on. */
+  minNumRatings: z.number().min(0).optional(),
 });
 export type RMPRatingFilterCriteria = z.output<
   typeof RMPRatingFilterCriteriaSchema

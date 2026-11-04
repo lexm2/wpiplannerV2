@@ -11,8 +11,8 @@
   align-self: stretch;
 }
 
-/* The event-type and time rows are Fields now, so the rule above began matching
-   them. Both selectors are (0,2,0); this one is later, so it wins. */
+/* The event-type and time rows are Fields, so the rule above matches them
+   too. Both selectors are (0,2,0); this one is later, so it wins. */
 .local-event-form > .hug {
   align-self: flex-start;
   /* Hug the content, but never outgrow the dialog: at 320px the time row's two

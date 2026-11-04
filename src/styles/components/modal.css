@@ -361,7 +361,7 @@ html.is-mobile .modal-btn {
   gap: 1rem 0.75rem;
 }
 
-/* The colour cell is a Field now; both branches out-specify .field/.field-label
+/* The colour cell is a Field; both branches out-specify .field/.field-label
    so it keeps matching the four cells beside it. */
 .section-info-item,
 .field.section-info-item {
@@ -1025,7 +1025,7 @@ html.is-mobile .filter-select-none {
   box-shadow: var(--effect-shadow-large);
 }
 
-/* Real <button>s now, so reset default button chrome. */
+/* Real <button>s, so reset the default button chrome. */
 .professor-option {
   display: block;
   width: 100%;

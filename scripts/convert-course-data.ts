@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-/**
- * CLI script for converting Workday course data to WPI Planner format
- * This script is executed by GitHub Actions to generate course data
- */
+// Run by the update-course-data workflow (`bun run convert`).
 
 import { WorkdayConverter } from './converter/WorkdayConverter.js';
 import { converterConfig } from './converter.config.js';
