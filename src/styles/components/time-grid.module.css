@@ -24,6 +24,17 @@
   background: var(--color-surface);
 }
 
+/* A short screen (a phone in landscape) can't give 12+ hour rows a share of
+   ~120px: they came out 9-11px apart and the labels overlapped. Fixed rows
+   instead, and the modal body scrolls. */
+@media (max-height: 500px) {
+  .grid {
+    flex: none;
+    min-height: 0;
+    grid-template-rows: auto repeat(var(--grid-hours, 12), 16px);
+  }
+}
+
 .corner {
   border-bottom: 2px solid var(--color-border);
 }

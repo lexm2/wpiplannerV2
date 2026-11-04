@@ -785,6 +785,13 @@ html.is-mobile .time-grid-modal .modal-footer .filter-toggle-label {
   transition: var(--effect-transition);
 }
 
+/* A finger needs more than the 28px these are on a mouse: 32px tall. */
+html.is-mobile .filter-select-all,
+html.is-mobile .filter-select-none {
+  min-height: 32px;
+  padding-inline: 0.75rem;
+}
+
 .filter-select-all:hover,
 .filter-select-none:hover {
   background: var(--color-primary);
@@ -2048,5 +2055,37 @@ html.is-mobile .course-finder-modal .modal-dialog {
   .course-finder-bucket,
   .course-finder-row-foot .assign-menu-trigger {
     min-height: 40px;
+  }
+}
+
+/* A phone in landscape is under 500px tall, and the stacked footers above (a
+   full-width button per row, ~101px for the Filter modal) left a 199-229px body.
+   Keep each footer to one row there so the body gets the height back. */
+@media (max-height: 500px) {
+  html.is-mobile .modal-footer,
+  html.is-mobile .filter-modal .modal-footer {
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem 1rem;
+  }
+
+  html.is-mobile .modal-btn {
+    width: auto;
+  }
+
+  html.is-mobile .filter-modal .modal-footer {
+    gap: 0.5rem 0.75rem;
+  }
+
+  html.is-mobile .filter-actions {
+    width: auto;
+  }
+
+  html.is-mobile .filter-preview {
+    flex: 1 1 10rem;
+  }
+
+  html.is-mobile .filter-modal-body {
+    max-height: none;
   }
 }
