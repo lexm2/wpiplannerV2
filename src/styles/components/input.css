@@ -143,6 +143,20 @@
   color: var(--color-primary);
 }
 
+/* The professor-search toggle's icon is 19px, too small to hit on a touch
+   screen. An invisible extension makes the hit area ~32x33 without moving
+   the icon: it reaches left into the field's padding and stops at the clear
+   button's side (half the gap) so the two never overlap. */
+.field-affix #search-mode-btn {
+  position: relative;
+}
+
+.field-affix #search-mode-btn::after {
+  content: '';
+  position: absolute;
+  inset: -7px -1.8px -7px -12px;
+}
+
 .field-affix button svg {
   display: block;
   width: 1.2rem;

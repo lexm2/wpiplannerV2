@@ -419,7 +419,9 @@
 .term-conflict-warning {
   position: absolute;
   top: 0.4rem;
-  right: 0.4rem;
+  /* Beside the term letter in the corner cell. The top-right corner sat on
+     the "Fri" header whenever the card was short or narrow. */
+  left: 0.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -812,12 +814,12 @@ html.is-mobile .term-graph {
     grid-row: 1;
   }
 
-  /* The term warning sat in the card's top-right corner, on top of the "Fri"
-     header. It belongs to the whole term, so it moves beside the term letter
-     in the corner cell. */
-  .term-conflict-warning {
-    right: auto;
-    left: 0.25rem;
+  /* Tap targets: the Clear sections button was 34x26. The remove button's
+     twin rule is in right-panel.module.css. */
+  .course-clear-sections-btn {
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
   }
 }
 

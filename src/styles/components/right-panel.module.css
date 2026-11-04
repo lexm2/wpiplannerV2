@@ -236,6 +236,15 @@
   flex-shrink: 0;
 }
 
+/* Tap target: 34x26 on a phone. */
+@media (max-width: 560px) {
+  .course-remove-btn {
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
+  }
+}
+
 .course-remove-btn:hover {
   background: var(--color-danger-background);
   border-color: var(--color-danger);
