@@ -15,7 +15,7 @@ import {
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
-import { setOpen } from '../../svelte/ui/disclosureState.svelte';
+import { isOpen, setOpen } from '../../svelte/ui/disclosureState.svelte';
 import { logger } from '../../utils/logger';
 
 interface TutorialEntry {
@@ -108,8 +108,14 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     }
   }
 
+  // A step holds a "More…" section open, but whether it stays open afterwards
+  // is the user's choice, so each one goes back to how the tutorial found it.
+  const disclosuresBefore = new Map<string, boolean>();
+
   async function cleanupTutorial(setVisited: boolean) {
     stateMachine.clear();
+    for (const [id, wasOpen] of disclosuresBefore) setOpen(id, wasOpen);
+    disclosuresBefore.clear();
     if (setVisited) {
       localStorage.setItem(STORAGE_KEYS.VISITED, 'true');
     }
@@ -840,7 +846,10 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     } else {
       closeAllModals();
     }
-    for (const id of desired.openDisclosures ?? []) setOpen(id, true);
+    for (const id of desired.openDisclosures ?? []) {
+      if (!disclosuresBefore.has(id)) disclosuresBefore.set(id, isOpen(id));
+      setOpen(id, true);
+    }
   });
 
   tutorialService.onStepApply(index => {
