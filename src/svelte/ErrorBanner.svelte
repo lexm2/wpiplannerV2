@@ -124,13 +124,18 @@
   .error-banner {
     position: fixed;
     top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Centred between 1rem gutters. A bare left: 50% + translateX(-50%) left the
+       box no width to grow into and capped it near half the viewport (200px at
+       320px, 384px at 768px). */
+    left: 1rem;
+    right: 1rem;
+    margin-inline: auto;
+    width: fit-content;
     z-index: 2000;
     display: flex;
     align-items: center;
     gap: 1rem;
-    max-width: min(40rem, calc(100vw - 2rem));
+    max-width: 40rem;
     padding: 0.75rem 1rem;
     background: var(--color-surface-elevated);
     border: 1px solid var(--color-error);
@@ -169,5 +174,21 @@
     flex-direction: column;
     gap: 0.5rem;
     flex-shrink: 0;
+  }
+
+  /* Phone: the message gets the full width, with the actions in a wrapping row
+     under it rather than a column beside it. */
+  @media (max-width: 560px) {
+    .error-banner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .error-banner-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+      flex-shrink: 1;
+    }
   }
 </style>
