@@ -33,7 +33,7 @@ const minutes = (min: number, max: number, fallback: number, what: string) =>
  * schedule out; times are 24-hour "HH:MM", the same form the API uses for
  * busy blocks. Every field has a default, so a partial object parses.
  */
-const RankingPreferencesSchema = z.strictObject({
+export const RankingPreferencesSchema = z.strictObject({
   earlyClasses: z
     .strictObject({
       importance: importance('off', 'avoiding early classes'),

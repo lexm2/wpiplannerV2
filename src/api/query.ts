@@ -768,6 +768,27 @@ function describeTimes(times: TimesFilterCriteria): string {
     : `Times read as: only within ${text}${async}.`;
 }
 
+/**
+ * The criteria that leave out the sections of `ended` terms, and the notice
+ * saying so. Searching one year, the term filter does it; searching every
+ * year, EndedTermsFilter drops only the current year's.
+ */
+export function leaveOutEndedTerms(
+  year: number | 'all',
+  current: number,
+  ended: string[],
+): { id: string; criteria: unknown; notice: string } {
+  const notice = `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`;
+  if (year === 'all') {
+    const criteria: EndedTermsCriteria = { year: current, terms: ended };
+    return { id: 'endedTerms', criteria, notice };
+  }
+  const criteria: TermFilterCriteria = {
+    terms: TERM_ORDER.filter(t => !ended.includes(t)) as AcademicTerm[],
+  };
+  return { id: 'term', criteria, notice };
+}
+
 interface ReadQuery {
   criteria: Map<string, unknown>;
   year: number | 'all';
@@ -837,16 +858,9 @@ function readQuery(catalog: Catalog, query: CourseQuery): ReadQuery {
     }
   } else if (ended.length && !query.includeEndedTerms) {
     excludedEndedTerms = ended;
-    if (year === 'all') {
-      set<EndedTermsCriteria>('endedTerms', { year: current, terms: ended });
-    } else {
-      set<TermFilterCriteria>('term', {
-        terms: TERM_ORDER.filter(t => !ended.includes(t)) as AcademicTerm[],
-      });
-    }
-    notices.push(
-      `Sections in ${year === 'all' ? `${yearLabel(current)} ` : ''}terms that have ended (${ended.join(', ')}) are left out; pass includeEndedTerms: true to include them.`,
-    );
+    const left = leaveOutEndedTerms(year, current, ended);
+    set(left.id, left.criteria);
+    notices.push(left.notice);
   } else if (ended.length) {
     notices.push(
       ended.length === 1
@@ -932,7 +946,7 @@ function createFilterService(catalog: Catalog): FilterService {
   return service;
 }
 
-function filterServiceFor(
+export function filterServiceFor(
   catalog: Catalog,
   criteria: Map<string, unknown>,
 ): FilterService {

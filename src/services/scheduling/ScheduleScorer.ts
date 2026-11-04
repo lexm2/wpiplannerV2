@@ -39,6 +39,43 @@ const isFull = (s: { seats: number; seatsAvailable: number; status: string }) =>
   s.status === 'Waitlist';
 
 /**
+ * The timed meetings of the selections per (quarter, weekday) that has a
+ * class, each list unsorted. A semester section lands in both its quarters;
+ * async periods have no time and are left out.
+ */
+export function slotsByQuarterDay(
+  selections: ScoredSelection[],
+): Map<string, { quarter: string; day: string; slots: Slot[] }> {
+  const byQuarterDay = new Map<
+    string,
+    { quarter: string; day: string; slots: Slot[] }
+  >();
+  for (const { combination, term } of selections) {
+    for (const section of sectionsOf(combination)) {
+      for (const period of section.periods) {
+        if (period.isAsync) continue;
+        const slot = {
+          start: period.startTime.hours * 60 + period.startTime.minutes,
+          end: period.endTime.hours * 60 + period.endTime.minutes,
+        };
+        for (const quarter of getDisplayTerms(term)) {
+          for (const day of period.days) {
+            const key = `${quarter}-${day}`;
+            let entry = byQuarterDay.get(key);
+            if (!entry) {
+              entry = { quarter, day, slots: [] };
+              byQuarterDay.set(key, entry);
+            }
+            entry.slots.push(slot);
+          }
+        }
+      }
+    }
+  }
+  return byQuarterDay;
+}
+
+/**
  * The one scoring implementation: a schedule's cost is the weighted sum of
  * the penalties of the enabled criteria, so lower is better and never
  * negative. A semester section (F, S) counts in both of its quarters.
@@ -120,29 +157,7 @@ export class ScheduleScorer {
 
   /** Per-day criteria, summed over every (quarter, weekday) with a class. */
   private dayCost(selections: ScoredSelection[]): number {
-    const byQuarterDay = new Map<string, { day: string; slots: Slot[] }>();
-    for (const { combination, term } of selections) {
-      for (const section of sectionsOf(combination)) {
-        for (const period of section.periods) {
-          if (period.isAsync) continue;
-          const slot = {
-            start: period.startTime.hours * 60 + period.startTime.minutes,
-            end: period.endTime.hours * 60 + period.endTime.minutes,
-          };
-          for (const quarter of getDisplayTerms(term)) {
-            for (const day of period.days) {
-              const key = `${quarter}-${day}`;
-              let entry = byQuarterDay.get(key);
-              if (!entry) {
-                entry = { day, slots: [] };
-                byQuarterDay.set(key, entry);
-              }
-              entry.slots.push(slot);
-            }
-          }
-        }
-      }
-    }
+    const byQuarterDay = slotsByQuarterDay(selections);
 
     const { w } = this;
     let cost = 0;

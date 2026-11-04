@@ -24,6 +24,10 @@ import {
 import { caseless } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
 import { ApiError } from '../api/errors';
+import {
+  AutoScheduleInputSchema,
+  generateSchedules,
+} from '../api/autoSchedule';
 import { logger } from '../utils/logger';
 import { TERMS } from '../utils/typeGuards';
 import {
@@ -40,6 +44,7 @@ import {
   renderCourse,
   renderDepartments,
   renderPlan,
+  renderSchedules,
   renderSearch,
 } from './render';
 
@@ -80,7 +85,13 @@ CRNs.
 3. get_course for the description, prerequisites as stated, and this year's \
 sections, labs and discussions listed once per term. Take one lecture plus one \
 of each companion kind (lab, discussion) listed for it.
-4. check_conflicts with all the chosen CRNs, lectures, labs and discussions: it \
+4. generate_schedules when the student knows which courses they want and needs \
+sections that fit: it picks a lecture with its lab and discussion for each \
+course, around CRNs already chosen (keepCrns) and busy times, best first by \
+preferences like no early classes, short or long gaps, a lunch break, days \
+off, even terms, open seats or better-rated instructors. Preferences only \
+order the results; they never rule a schedule out.
+5. check_conflicts with all the chosen CRNs, lectures, labs and discussions: it \
 reports time overlaps, labs or discussions that do not go with the chosen \
 lecture, missing companions, and full, closed or ended sections.
 list_departments gives department abbreviations.
@@ -330,6 +341,31 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
       return {
         content: text(renderConflicts(check)),
         structuredContent: conflictData(check),
+      };
+    },
+  );
+
+  readTool(
+    'generate_schedules',
+    {
+      title: 'Generate schedules',
+      description:
+        'Builds whole schedules for the courses a student wants: for each course one lecture with the lab and discussion ' +
+        'that go with it, in some term, with no time conflicts, around CRNs the student already has (keepCrns) and busy ' +
+        "blocks. Returns the best few (default 3) with each section's CRN, times, instructors with ratings and seats, a per-quarter " +
+        'summary (days with class, earliest start, latest end, idle minutes) and the flat CRN list. Terms, keepCrns, busy and ' +
+        'openSeatsOnly EXCLUDE sections and schedules. preferences (early or late classes, gaps, lunch, fewer days, free days, ' +
+        'even terms, open seats, instructor rating, each off/low/medium/high) only ORDER the results and never exclude one: ' +
+        'a course offered only at 8:00 is still scheduled at 8:00. Defaults: balanced terms, then least idle time. ' +
+        'When nothing fits it answers with no schedules and the likely causes. Computes only; check the CRNs with ' +
+        'check_conflicts and register in Workday.',
+      inputSchema: AutoScheduleInputSchema,
+    },
+    async input => {
+      const set = generateSchedules(await getCatalog(), input);
+      return {
+        content: text(renderSchedules(set)),
+        structuredContent: { ...set },
       };
     },
   );
