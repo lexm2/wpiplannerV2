@@ -3,6 +3,8 @@
   import { getComputedTerm } from '../utils/typeGuards';
   import { AcademicTerm } from '../types/schedule';
   import SelectedCourseItem from './SelectedCourseItem.svelte';
+  import ClearAllSectionsButton from './ClearAllSectionsButton.svelte';
+  import { sectionsOf } from '../utils/courseUtils';
   import {
     compareSelectedCourses,
     TERM_ORDER,
@@ -57,6 +59,9 @@
     }));
   });
 
+  const hasSections = $derived(
+    appState.selectedCourses.some(sc => sectionsOf(sc.selected).length > 0),
+  );
   const isEmpty = $derived(appState.selectedCourses.length === 0);
 
   function handleRemove(course: Course): void {
@@ -89,4 +94,7 @@
       />
     {/each}
   {/each}
+  {#if hasSections}
+    <ClearAllSectionsButton {courseSelectionService} />
+  {/if}
 {/if}

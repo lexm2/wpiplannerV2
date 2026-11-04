@@ -38,7 +38,6 @@ if (modalRootEl) {
       filterService: services.filterService,
       courseSelectionService: services.courseSelectionService,
       autoScheduleOrchestrator: services.autoScheduleOrchestrator,
-      profileStateManager: services.profileStateManager,
       getDepartments: () => appState.loadedDepartments,
     },
   });

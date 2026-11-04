@@ -1,21 +1,13 @@
 <script lang="ts">
-  import { onMount, tick, untrack } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Modal from './Modal.svelte';
-  import { modalState, showConfirm } from './modalState.svelte';
+  import { showConfirm } from './modalState.svelte';
   import { appState } from '../../core/state/appState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
-  import { tutorialsAvailable } from '../phoneLayout.svelte';
   import { triggerFileDownload } from '../../utils/download';
   import { logger } from '../../utils/logger';
-  import { ThemeManager } from '../../themes/ThemeManager';
-  import {
-    openModal,
-    showAppError,
-    uiState,
-  } from '../../services/ui/uiState.svelte';
+  import { showAppError, uiState } from '../../services/ui/uiState.svelte';
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
-  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
-  import type { TutorialSetup } from '../../services/tutorial/setupTutorial';
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
   import TextField from '../ui/TextField.svelte';
@@ -23,13 +15,9 @@
 
   let {
     scheduleManagementService,
-    profileStateManager,
-    getTutorial,
     onRequestClose,
   }: {
     scheduleManagementService: ScheduleManagementService;
-    profileStateManager: ProfileStateManager;
-    getTutorial: () => TutorialSetup | undefined;
     onRequestClose: () => void;
   } = $props();
 
@@ -78,31 +66,7 @@
     );
   });
 
-  // Tab navigation (horizontal page slide)
-  let pagesContainer = $state<HTMLElement>();
-  let activeTab = $state<'schedules' | 'settings'>('schedules');
-
-  // Tutorial-driven tab navigation channel. Apply then clear so a later
-  // tutorial run can push the same value again.
-  $effect(() => {
-    const tab = modalState.schedulePickerTab;
-    if (!tab) return;
-    untrack(() => {
-      activeTab = tab;
-    });
-    modalState.schedulePickerTab = null;
-  });
-
-  // Drive the container scroll position from the active tab (CSS scroll-behavior
-  // animates it). offsetWidth is one page wide.
-  $effect(() => {
-    const tab = activeTab;
-    // Copy mode belongs to the schedule list; leaving it ends the mode.
-    if (tab !== 'schedules') untrack(() => (copySourceId = null));
-    const c = pagesContainer;
-    if (!c) return;
-    c.scrollLeft = tab === 'settings' ? c.offsetWidth : 0;
-  });
+  let listEl = $state<HTMLElement>();
 
   // Per-item ⋮ menu
   let openMenuId = $state<string | null>(null);
@@ -123,7 +87,7 @@
     // Position from the menu's real size once it renders: its height depends
     // on how many actions the row offers.
     await tick();
-    const menu = pagesContainer?.querySelector<HTMLElement>(
+    const menu = listEl?.querySelector<HTMLElement>(
       `[data-schedule-id="${CSS.escape(scheduleId)}"] [data-visible="true"]`,
     );
     if (!menu) return;
@@ -159,7 +123,7 @@
     // The field's autofocus only applies when nothing else has focus, and the
     // Rename button that was just clicked does.
     await tick();
-    pagesContainer
+    listEl
       ?.querySelector<HTMLInputElement>(
         `[data-schedule-id="${CSS.escape(schedule.id)}"] input`,
       )
@@ -209,7 +173,7 @@
     // The Copy Into button is replaced by the copy-mode row content, so move
     // focus to the first target instead of letting it fall to <body>.
     await tick();
-    pagesContainer?.querySelector<HTMLElement>('.copy-target-btn')?.focus();
+    listEl?.querySelector<HTMLElement>('.copy-target-btn')?.focus();
   }
 
   async function copyInto(targetId: string): Promise<void> {
@@ -407,8 +371,8 @@
     fileInput?.click();
   }
 
-  // Settings-page "Import" - creates a NEW schedule from the chosen file.
-  function importNewFromSettings(): void {
+  // Creates a NEW schedule from the chosen file.
+  function importNew(): void {
     pendingImport = 'new';
     fileInput?.click();
   }
@@ -460,17 +424,6 @@
     }
   }
 
-  function exportActiveICS(): void {
-    const activeId = scheduleManagementService.getActiveScheduleId();
-    // Not reached through handleAction, so this path has no catch above it.
-    if (activeId) {
-      exportScheduleICS(activeId).catch((error: unknown) => {
-        logger.error('Failed to export calendar:', error);
-        showAppError('Failed to export calendar. Please try again.');
-      });
-    }
-  }
-
   async function exportAllSchedules(): Promise<void> {
     const result = await scheduleManagementService.exportAllSchedules();
     if (result.success && result.data) {
@@ -484,60 +437,6 @@
       showAppError(`Export failed: ${result.error || 'Unknown error'}`);
     }
   }
-
-  async function confirmClearAllData(): Promise<void> {
-    try {
-      await scheduleManagementService.clearAllSchedules();
-      refreshTick++;
-    } catch (error) {
-      logger.error('Failed to clear all data:', error);
-      showAppError('Failed to clear all data. Please try again.');
-    }
-  }
-
-  function clearAllData(): void {
-    showConfirm({
-      title: 'Clear all data',
-      message:
-        'Are you sure you want to clear ALL schedules and data?\n' +
-        'This will delete all schedules, clear all selected courses and reset all preferences.\n' +
-        'This action CANNOT be undone.',
-      confirmLabel: 'Clear everything',
-      variant: 'danger',
-      onConfirm: () => {
-        void confirmClearAllData();
-      },
-    });
-  }
-
-  // Settings actions - call the real services directly (mirrors App.svelte's
-  // header handlers) instead of synthesizing clicks on app-shell buttons.
-  function toggleTheme(): void {
-    const tm = ThemeManager.getInstance();
-    tm.setTheme(
-      tm.getCurrentThemeId() === 'wpi-dark' ? 'wpi-light' : 'wpi-dark',
-    );
-  }
-  function undo(): void {
-    profileStateManager.undo().catch(error => {
-      logger.error('Undo failed:', error);
-      showAppError('Failed to undo. Please try again.');
-    });
-  }
-  function redo(): void {
-    profileStateManager.redo().catch(error => {
-      logger.error('Redo failed:', error);
-      showAppError('Failed to redo. Please try again.');
-    });
-  }
-
-  function openChangelog(): void {
-    openModal('changelog');
-  }
-  function openTutorials(close: () => void): void {
-    close();
-    if (getTutorial()) openModal('tutorials');
-  }
 </script>
 
 <svelte:window onkeydowncapture={onWindowKeydownCapture} />
@@ -549,364 +448,212 @@
   dialogClass="schedule-picker-modal-dialog no-transform"
   {onRequestClose}
 >
-  {#snippet children(close)}
-    <div class="modal-body schedule-picker-body">
-      <div class="modal-pages-container" bind:this={pagesContainer}>
-        <div
-          class="modal-page schedules-page"
-          inert={activeTab !== 'schedules'}
-        >
-          <div class="schedule-list">
-            {#if copySource}
-              <div class="schedule-copy-banner" role="status">
-                <span
-                  >Click a schedule to copy the courses from <strong
-                    >{copySource.name}</strong
-                  > into it.</span
+  <div class="modal-body schedule-picker-body">
+    <div class="schedule-list" bind:this={listEl}>
+      {#if copySource}
+        <div class="schedule-copy-banner" role="status">
+          <span
+            >Click a schedule to copy the courses from <strong
+              >{copySource.name}</strong
+            > into it.</span
+          >
+          <button
+            class="btn btn-secondary"
+            onclick={() => (copySourceId = null)}>Cancel</button
+          >
+        </div>
+      {/if}
+      {#if schedules.length === 0}
+        <div class="schedule-list-empty">No schedules found</div>
+      {:else}
+        {#each schedules as schedule (schedule.id)}
+          {@const isActive = schedule.id === activeScheduleId}
+          <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (row is a click-to-activate surface; actions stop propagation) -->
+          <div
+            class="schedule-item"
+            class:active={isActive}
+            class:copy-source={copySource?.id === schedule.id}
+            class:copy-target={copySource !== null &&
+              copySource.id !== schedule.id}
+            data-schedule-id={schedule.id}
+            onclick={() => onRowClick(schedule)}
+          >
+            <div class="schedule-item-info">
+              {#if editingId === schedule.id}
+                <TextField
+                  fieldClass="schedule-name-field"
+                  ariaLabel="Schedule name"
+                  autofocus
+                  bind:value={editValue}
+                  onfocus={e => (e.currentTarget as HTMLInputElement).select()}
+                  onclick={e => e.stopPropagation()}
+                  onblur={() => commitEdit(schedule)}
+                  onkeydown={onEditKeydown}
+                />
+              {:else}
+                <div
+                  class="schedule-item-name"
+                  ondblclick={e => {
+                    e.stopPropagation();
+                    if (!copySource) void startEdit(schedule);
+                  }}
+                >
+                  {schedule.name}
+                </div>
+              {/if}
+              <div class="schedule-item-details">
+                {courseCount(schedule)} course{courseCount(schedule) === 1
+                  ? ''
+                  : 's'}
+              </div>
+            </div>
+
+            {#if copySource?.id === schedule.id}
+              <div class="schedule-item-actions copy-hint">Copying from</div>
+            {:else if copySource}
+              <div class="schedule-item-actions">
+                <button
+                  class="btn-link copy-hint copy-target-btn"
+                  aria-label="Copy here: {schedule.name}"
+                  onclick={e => {
+                    e.stopPropagation();
+                    void copyInto(schedule.id);
+                  }}>Copy here</button
+                >
+              </div>
+            {:else}
+              <div class="schedule-item-actions">
+                <button
+                  class="btn-link inline-action-btn"
+                  onclick={e => {
+                    e.stopPropagation();
+                    void handleAction('rename', schedule);
+                  }}>Rename</button
                 >
                 <button
-                  class="btn btn-secondary"
-                  onclick={() => (copySourceId = null)}>Cancel</button
+                  class="btn-link inline-action-btn"
+                  onclick={e => {
+                    e.stopPropagation();
+                    void handleAction('duplicate', schedule);
+                  }}>Duplicate</button
+                >
+                <button
+                  class="btn-link {styles['menuBtn']}"
+                  title="More options"
+                  onclick={e => toggleMenu(e, schedule.id)}>⋮</button
                 >
               </div>
             {/if}
-            {#if schedules.length === 0}
-              <div class="schedule-list-empty">No schedules found</div>
-            {:else}
-              {#each schedules as schedule (schedule.id)}
-                {@const isActive = schedule.id === activeScheduleId}
-                <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (row is a click-to-activate surface; actions stop propagation) -->
-                <div
-                  class="schedule-item"
-                  class:active={isActive}
-                  class:copy-source={copySource?.id === schedule.id}
-                  class:copy-target={copySource !== null &&
-                    copySource.id !== schedule.id}
-                  data-schedule-id={schedule.id}
-                  onclick={() => onRowClick(schedule)}
+
+            <div
+              class={styles['scheduleItemMenu']}
+              data-visible={openMenuId === schedule.id}
+              use:clickOutside={{
+                enabled: openMenuId === schedule.id,
+                ignore: menuTrigger,
+                onOutside: closeMenus,
+              }}
+              style:left={`${menuPos.left}px`}
+              style:top={`${menuPos.top}px`}
+            >
+              <button
+                class="{styles['menuAction']} {styles['inlineAbove']}"
+                onclick={e => {
+                  e.stopPropagation();
+                  void handleAction('rename', schedule);
+                }}>Rename</button
+              >
+              <button
+                class="{styles['menuAction']} {styles['inlineAbove']}"
+                onclick={e => {
+                  e.stopPropagation();
+                  void handleAction('duplicate', schedule);
+                }}>Duplicate</button
+              >
+              {#if schedules.length > 1}
+                <button
+                  class={styles['menuAction']}
+                  onclick={e => {
+                    e.stopPropagation();
+                    void handleAction('copy-into', schedule);
+                  }}>Copy Into</button
                 >
-                  <div class="schedule-item-info">
-                    {#if editingId === schedule.id}
-                      <TextField
-                        fieldClass="schedule-name-field"
-                        ariaLabel="Schedule name"
-                        autofocus
-                        bind:value={editValue}
-                        onfocus={e =>
-                          (e.currentTarget as HTMLInputElement).select()}
-                        onclick={e => e.stopPropagation()}
-                        onblur={() => commitEdit(schedule)}
-                        onkeydown={onEditKeydown}
-                      />
-                    {:else}
-                      <div
-                        class="schedule-item-name"
-                        ondblclick={e => {
-                          e.stopPropagation();
-                          if (!copySource) void startEdit(schedule);
-                        }}
-                      >
-                        {schedule.name}
-                      </div>
-                    {/if}
-                    <div class="schedule-item-details">
-                      {courseCount(schedule)} course{courseCount(schedule) === 1
-                        ? ''
-                        : 's'}
-                    </div>
-                  </div>
-
-                  {#if copySource?.id === schedule.id}
-                    <div class="schedule-item-actions copy-hint">
-                      Copying from
-                    </div>
-                  {:else if copySource}
-                    <div class="schedule-item-actions">
-                      <button
-                        class="btn-link copy-hint copy-target-btn"
-                        aria-label="Copy here: {schedule.name}"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void copyInto(schedule.id);
-                        }}>Copy here</button
-                      >
-                    </div>
-                  {:else}
-                    <div class="schedule-item-actions">
-                      <button
-                        class="btn-link inline-action-btn"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('rename', schedule);
-                        }}>Rename</button
-                      >
-                      <button
-                        class="btn-link inline-action-btn"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('duplicate', schedule);
-                        }}>Duplicate</button
-                      >
-                      {#if schedules.length > 1}
-                        <button
-                          class="btn-link inline-action-btn"
-                          onclick={e => {
-                            e.stopPropagation();
-                            void handleAction('copy-into', schedule);
-                          }}>Copy Into</button
-                        >
-                      {/if}
-                      <button
-                        class="btn-link inline-action-btn"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('export', schedule);
-                        }}>Export</button
-                      >
-                      <button
-                        class="btn-link inline-action-btn"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('export-ics', schedule);
-                        }}>Export ICS</button
-                      >
-                      <button
-                        class="btn-link inline-action-btn"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('import', schedule);
-                        }}>Import</button
-                      >
-                      {#if schedules.length > 1}
-                        <button
-                          class="btn-link inline-action-btn danger"
-                          onclick={e => {
-                            e.stopPropagation();
-                            void handleAction('delete', schedule);
-                          }}>Delete</button
-                        >
-                      {/if}
-                      <button
-                        class="btn-link {styles['menuBtn']}"
-                        title="More options"
-                        onclick={e => toggleMenu(e, schedule.id)}>⋮</button
-                      >
-                    </div>
-                  {/if}
-
-                  <div
-                    class={styles['scheduleItemMenu']}
-                    data-visible={openMenuId === schedule.id}
-                    use:clickOutside={{
-                      enabled: openMenuId === schedule.id,
-                      ignore: menuTrigger,
-                      onOutside: closeMenus,
-                    }}
-                    style:left={`${menuPos.left}px`}
-                    style:top={`${menuPos.top}px`}
-                  >
-                    <button
-                      class={styles['menuAction']}
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('rename', schedule);
-                      }}>Rename</button
-                    >
-                    <button
-                      class={styles['menuAction']}
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('duplicate', schedule);
-                      }}>Duplicate</button
-                    >
-                    {#if schedules.length > 1}
-                      <button
-                        class={styles['menuAction']}
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('copy-into', schedule);
-                        }}>Copy Into</button
-                      >
-                    {/if}
-                    <button
-                      class={styles['menuAction']}
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('export', schedule);
-                      }}>Export</button
-                    >
-                    <button
-                      class={styles['menuAction']}
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('export-ics', schedule);
-                      }}>Export ICS</button
-                    >
-                    <button
-                      class={styles['menuAction']}
-                      onclick={e => {
-                        e.stopPropagation();
-                        void handleAction('import', schedule);
-                      }}>Import</button
-                    >
-                    {#if schedules.length > 1}
-                      <button
-                        class="{styles['menuAction']} {styles['danger']}"
-                        onclick={e => {
-                          e.stopPropagation();
-                          void handleAction('delete', schedule);
-                        }}>Delete</button
-                      >
-                    {/if}
-                  </div>
-                </div>
-              {/each}
-            {/if}
-            <button
-              class="btn btn-primary schedule-list-add-btn"
-              onclick={createNewSchedule}
-            >
-              {@html getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span
-                class="btn-text"
+              {/if}
+              <button
+                class={styles['menuAction']}
+                onclick={e => {
+                  e.stopPropagation();
+                  void handleAction('export', schedule);
+                }}>Export</button
               >
-                New Schedule</span
+              <button
+                class={styles['menuAction']}
+                onclick={e => {
+                  e.stopPropagation();
+                  void handleAction('export-ics', schedule);
+                }}>Export ICS</button
               >
-            </button>
+              <button
+                class={styles['menuAction']}
+                onclick={e => {
+                  e.stopPropagation();
+                  void handleAction('import', schedule);
+                }}>Import</button
+              >
+              {#if schedules.length > 1}
+                <button
+                  class="{styles['menuAction']} {styles['danger']}"
+                  onclick={e => {
+                    e.stopPropagation();
+                    void handleAction('delete', schedule);
+                  }}>Delete</button
+                >
+              {/if}
+            </div>
           </div>
-        </div>
-
-        <div class="modal-page settings-page" inert={activeTab !== 'settings'}>
-          <button
-            class="btn btn-primary"
-            id="new-schedule-btn-settings"
-            onclick={createNewSchedule}
-            >{@html getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              New Schedule</span
-            ></button
-          >
-          <button
-            class="btn btn-secondary"
-            id="import-schedule-btn-settings"
-            onclick={importNewFromSettings}
-            >{@html getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              Import</span
-            ></button
-          >
-          <button
-            class="btn btn-secondary"
-            id="export-ics-btn-settings"
-            onclick={exportActiveICS}
-            >{@html getInlineSVG('CALENDAR_SHARE', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              Export Current Schedule to Calendar</span
-            ></button
-          >
-          <button
-            class="btn btn-secondary"
-            id="export-schedule-btn-settings"
-            onclick={exportAllSchedules}
-            >{@html getInlineSVG('CALENDAR_UP', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              Export All</span
-            ></button
-          >
-          <button
-            class="btn btn-secondary"
-            id="toggle-theme-btn-settings"
-            onclick={toggleTheme}
-            >{@html getInlineSVG('BRIGHTNESS', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              Toggle Theme</span
-            ></button
-          >
-          <div class="settings-btn-row">
-            <button
-              class="btn btn-secondary"
-              id="undo-btn-settings"
-              onclick={undo}
-              >{@html getInlineSVG('ARROW_BACK_UP', 'modal-footer-icon')}<span
-                class="btn-text"
-              >
-                Undo</span
-              ></button
-            >
-            <button
-              class="btn btn-secondary"
-              id="redo-btn-settings"
-              onclick={redo}
-              >{@html getInlineSVG(
-                'ARROW_FORWARD_UP',
-                'modal-footer-icon',
-              )}<span class="btn-text"> Redo</span></button
-            >
-          </div>
-          <button
-            class="btn btn-secondary"
-            id="changelog-btn-settings"
-            onclick={openChangelog}
-            >{@html getInlineSVG('CLOCK', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              What's New</span
-            ></button
-          >
-          {#if getTutorial() && tutorialsAvailable()}
-            <button
-              class="btn btn-secondary"
-              id="tutorials-btn-settings"
-              onclick={() => openTutorials(close)}
-              >{@html getInlineSVG('CALENDAR_REPEAT', 'modal-footer-icon')}<span
-                class="btn-text"
-              >
-                Tutorials</span
-              ></button
-            >
-          {/if}
-          <button
-            class="btn btn-danger"
-            id="clear-all-data-btn-settings"
-            onclick={clearAllData}
-            >{@html getInlineSVG('TRASH', 'modal-footer-icon')}<span
-              class="btn-text"
-            >
-              Clear All Data</span
-            ></button
-          >
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer schedule-picker-footer">
-      <div class="nav-tabs-pill">
+        {/each}
+      {/if}
+      <div class="schedule-list-actions">
         <button
-          class="nav-tab"
-          class:active={activeTab === 'schedules'}
-          data-tab="schedules"
-          onclick={() => (activeTab = 'schedules')}>Schedules</button
+          class="btn btn-primary"
+          id="new-schedule-btn"
+          onclick={createNewSchedule}
+          >{@html getInlineSVG('CALENDAR_PLUS', 'modal-footer-icon')}<span
+            class="btn-text"
+          >
+            New Schedule</span
+          ></button
         >
         <button
-          class="nav-tab"
-          class:active={activeTab === 'settings'}
-          data-tab="settings"
-          onclick={() => (activeTab = 'settings')}>Settings</button
+          class="btn btn-secondary"
+          id="import-schedule-btn"
+          onclick={importNew}
+          >{@html getInlineSVG('CALENDAR_DOWN', 'modal-footer-icon')}<span
+            class="btn-text"
+          >
+            Import</span
+          ></button
+        >
+        <button
+          class="btn btn-secondary"
+          id="export-all-schedules-btn"
+          onclick={exportAllSchedules}
+          >{@html getInlineSVG('CALENDAR_UP', 'modal-footer-icon')}<span
+            class="btn-text"
+          >
+            Export All</span
+          ></button
         >
       </div>
     </div>
+  </div>
 
-    <!-- Hidden but real file input, following DegreeImport's pattern. -->
-    <input
-      bind:this={fileInput}
-      type="file"
-      accept=".json"
-      hidden
-      onchange={onFileChosen}
-    />
-  {/snippet}
+  <!-- Hidden but real file input, following DegreeImport's pattern. -->
+  <input
+    bind:this={fileInput}
+    type="file"
+    accept=".json"
+    hidden
+    onchange={onFileChosen}
+  />
 </Modal>

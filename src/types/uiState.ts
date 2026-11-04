@@ -14,5 +14,6 @@ export interface UIState {
   currentView: ViewMode;
   openModals: string[];
   wizard: WizardState;
-  schedulePickerTab?: 'schedules' | 'settings';
+  /** Disclosure ids (MoreSection) to hold open while the step is showing. */
+  openDisclosures?: string[];
 }

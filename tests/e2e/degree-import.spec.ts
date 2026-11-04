@@ -792,6 +792,7 @@ test('reorders config rows vertically, clamped to the list', async ({
   await page.goto('/');
   await page.click('#degree-tab');
   await importFixture(page);
+  await page.locator('#degree-summary-more-btn').click();
   await page.locator('#degree-configure-buckets-btn').click();
   await settleModal(page);
 
@@ -862,6 +863,7 @@ test('adds and deletes buckets from the config modal', async ({ page }) => {
   await page.click('#degree-tab');
   await importFixture(page);
 
+  await page.locator('#degree-summary-more-btn').click();
   await page.locator('#degree-configure-buckets-btn').click();
   await settleModal(page);
   const rows = page.locator('.bucket-config-row');
@@ -901,6 +903,7 @@ test('renames an imported bucket without touching the record', async ({
   await page.click('#degree-tab');
   await importFixture(page);
 
+  await page.locator('#degree-summary-more-btn').click();
   await page.locator('#degree-configure-buckets-btn').click();
   await settleModal(page);
   // Anchor on the bucket id: in edit mode the row swaps its name for inputs, so

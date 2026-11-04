@@ -15,6 +15,7 @@ import {
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
+import { isOpen, setOpen } from '../../svelte/ui/disclosureState.svelte';
 import { logger } from '../../utils/logger';
 
 interface TutorialEntry {
@@ -107,8 +108,14 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     }
   }
 
+  // A step holds a "More…" section open, but whether it stays open afterwards
+  // is the user's choice, so each one goes back to how the tutorial found it.
+  const disclosuresBefore = new Map<string, boolean>();
+
   async function cleanupTutorial(setVisited: boolean) {
     stateMachine.clear();
+    for (const [id, wasOpen] of disclosuresBefore) setOpen(id, wasOpen);
+    disclosuresBefore.clear();
     if (setVisited) {
       localStorage.setItem(STORAGE_KEYS.VISITED, 'true');
     }
@@ -666,6 +673,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-filter'],
+          openDisclosures: ['auto-schedule-filters'],
         },
       },
       {
@@ -678,6 +686,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-filter'],
+          openDisclosures: ['auto-schedule-filters'],
         },
         appState: {
           filters: [{ id: 'availability', criteria: { availableOnly: true } }],
@@ -712,47 +721,36 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: { currentPage: 'planner' },
       },
       {
-        selector: '.nav-tab[data-tab="settings"]',
-        title: 'Settings tab',
-        description: 'Click the Settings tab to see all options.',
-        waitFor: 'click',
+        selector: '.schedule-picker-modal-dialog .schedule-list',
+        title: 'Your schedules',
+        description:
+          'Every schedule you have is listed here. Click one to switch to it. Rename and Duplicate sit on each row, and the ⋮ menu holds Copy Into, Export, Export ICS, Import and Delete.',
+        waitFor: 'manual',
         uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
       {
         selector: '[data-tutorial-next]',
         title: 'Export ICS',
         description:
-          'The Export ICS button will export this schedule to a format that you can drag into your calendar to import.',
+          "In a schedule's ⋮ menu, Export ICS saves the schedule as a file you can drag into your calendar app.",
         waitFor: 'manual',
-        uiState: {
-          currentPage: 'planner',
-          openModals: ['schedule-picker'],
-          schedulePickerTab: 'settings',
-        },
+        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
       {
         selector: '[data-tutorial-next]',
-        title: 'Export/Import',
+        title: 'Export and Import',
         description:
-          'This will export the course to a JSON file which then can be imported on another device. Note that if you import into an existing schedule it will add all the courses from the exported schedule onto that schedule.',
+          "Export saves a schedule as a JSON file that you can import on another device. Importing from a schedule's ⋮ menu adds the file's courses to that schedule, while the Import button at the bottom of the list creates a new schedule from the file.",
         waitFor: 'manual',
-        uiState: {
-          currentPage: 'planner',
-          openModals: ['schedule-picker'],
-          schedulePickerTab: 'settings',
-        },
+        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
       {
-        selector: '#new-schedule-btn-settings',
+        selector: '#new-schedule-btn',
         title: 'All done',
         description:
           "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The modal will not automatically close.",
         waitFor: 'click',
-        uiState: {
-          currentPage: 'planner',
-          openModals: ['schedule-picker'],
-          schedulePickerTab: 'settings',
-        },
+        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
       {
         selector: '[data-tutorial-next]',
@@ -760,11 +758,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         description:
           'Make sure to give the new schedule a name and then hit Create.',
         waitFor: 'manual',
-        uiState: {
-          currentPage: 'planner',
-          openModals: ['schedule-picker'],
-          schedulePickerTab: 'settings',
-        },
+        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
     ],
   });
@@ -852,8 +846,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     } else {
       closeAllModals();
     }
-    if (desired.schedulePickerTab) {
-      modalState.schedulePickerTab = desired.schedulePickerTab;
+    for (const id of desired.openDisclosures ?? []) {
+      if (!disclosuresBefore.has(id)) disclosuresBefore.set(id, isOpen(id));
+      setOpen(id, true);
     }
   });
 

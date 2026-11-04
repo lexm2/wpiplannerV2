@@ -422,17 +422,14 @@ for (const { name, ...options } of WIZARD_CASES) {
 }
 
 /**
- * Where the Classes page's panels are drawers, List/Grid would crowd the
- * search field out, so they move to the settings menu and the field takes the
- * middle of the row.
+ * Where the Classes page's panels are drawers, the search field takes the
+ * middle of the row and List/Grid is switched from the settings menu.
  */
 test.describe('Classes toolbar at 755x755', () => {
   test.use({ viewport: { width: 755, height: 755 } });
 
   test('List/Grid move to the settings menu', async ({ page }) => {
     await boot(page);
-    await expect(page.locator('#view-toggle-btn')).toBeHidden();
-
     await page.locator('#settings-menu-btn').click();
     await expect(page.locator('#settings-view-btn')).toHaveText('Grid View');
     await page.locator('#settings-view-btn').click();
@@ -502,7 +499,8 @@ test.describe('Classes page at 1280x720', () => {
       500,
     );
     expect(panel).toBeGreaterThanOrEqual(360);
-    await expect(page.locator('#view-toggle-btn')).toBeVisible();
+    await page.locator('#settings-menu-btn').click();
+    await expect(page.locator('#settings-view-btn')).toBeVisible();
 
     // The course name is not cut down to a couple of letters.
     const name = page.locator('[data-course-item]').first().getByText(/\w{6}/);

@@ -105,9 +105,9 @@
       'Academic Progress',
   );
 
-  // Phone only: the card folds to its title and overall progress, with the
-  // stats a tap away and the record's actions behind a ⋯ menu - on a phone
-  // the full card was 356px, a whole screen's worth before any requirement.
+  // On a phone the card folds to its title and overall progress with the stats
+  // a tap away - the full card was 356px, a whole screen's worth before any
+  // requirement.
   let statsOpen = $state(false);
   let menuOpen = $state(false);
   let menuTrigger = $state<HTMLButtonElement | null>(null);
@@ -117,6 +117,14 @@
       menuOpen = false;
       action();
     };
+  }
+
+  function onKeydown(e: KeyboardEvent): void {
+    // Only while open, so Escape still reaches modals otherwise.
+    if (!menuOpen || e.key !== 'Escape') return;
+    e.preventDefault();
+    menuOpen = false;
+    menuTrigger?.focus();
   }
 
   function clearRecord(): void {
@@ -142,6 +150,8 @@
     }
   }
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 {#snippet bar(extra: string)}
   <div
@@ -200,6 +210,62 @@
   {/if}
 {/snippet}
 
+{#snippet recordMenu()}
+  <div class="degree-summary-more">
+    <button
+      type="button"
+      class="degree-summary-more-btn"
+      id="degree-summary-more-btn"
+      aria-label="Degree record actions"
+      aria-haspopup="true"
+      aria-expanded={menuOpen}
+      bind:this={menuTrigger}
+      onclick={() => (menuOpen = !menuOpen)}>&#8943;</button
+    >
+    {#if menuOpen}
+      <div
+        class="degree-summary-menu"
+        role="menu"
+        transition:scaleFade={{ duration: 150 }}
+        use:clickOutside={{
+          onOutside: () => (menuOpen = false),
+          ignore: menuTrigger,
+        }}
+      >
+        <button
+          type="button"
+          role="menuitem"
+          class="assign-menu-item"
+          id="degree-configure-buckets-btn"
+          onclick={runFromMenu(() => openModal('bucket-config'))}
+          >Configure buckets</button
+        >
+        <button
+          type="button"
+          role="menuitem"
+          class="assign-menu-item"
+          disabled={parsing}
+          onclick={runFromMenu(() => fileInput?.click())}>Re-import</button
+        >
+        <button
+          type="button"
+          role="menuitem"
+          class="assign-menu-item is-danger"
+          onclick={runFromMenu(clearRecord)}>Clear record</button
+        >
+      </div>
+    {/if}
+    <input
+      bind:this={fileInput}
+      type="file"
+      accept=".xlsx"
+      id="degree-reimport-file"
+      class="degree-file-input"
+      onchange={onInputChange}
+    />
+  </div>
+{/snippet}
+
 {#if phoneLayout.current}
   <section class="degree-summary degree-summary-compact">
     <div class="degree-summary-line">
@@ -215,59 +281,7 @@
           {@html getInlineSVG('CHEVRON_DOWN', 'degree-summary-chevron')}
         </span>
       </button>
-      <div class="degree-summary-more">
-        <button
-          type="button"
-          class="degree-summary-more-btn"
-          id="degree-summary-more-btn"
-          aria-label="Degree record actions"
-          aria-haspopup="true"
-          aria-expanded={menuOpen}
-          bind:this={menuTrigger}
-          onclick={() => (menuOpen = !menuOpen)}>&#8943;</button
-        >
-        {#if menuOpen}
-          <div
-            class="degree-summary-menu"
-            role="menu"
-            transition:scaleFade={{ duration: 150 }}
-            use:clickOutside={{
-              onOutside: () => (menuOpen = false),
-              ignore: menuTrigger,
-            }}
-          >
-            <button
-              type="button"
-              role="menuitem"
-              class="assign-menu-item"
-              id="degree-configure-buckets-btn"
-              onclick={runFromMenu(() => openModal('bucket-config'))}
-              >Configure buckets</button
-            >
-            <button
-              type="button"
-              role="menuitem"
-              class="assign-menu-item"
-              disabled={parsing}
-              onclick={runFromMenu(() => fileInput?.click())}>Re-import</button
-            >
-            <button
-              type="button"
-              role="menuitem"
-              class="assign-menu-item is-danger"
-              onclick={runFromMenu(clearRecord)}>Clear record</button
-            >
-          </div>
-        {/if}
-        <input
-          bind:this={fileInput}
-          type="file"
-          accept=".xlsx"
-          id="degree-reimport-file"
-          class="degree-file-input"
-          onchange={onInputChange}
-        />
-      </div>
+      {@render recordMenu()}
     </div>
 
     {#if segments}
@@ -301,31 +315,7 @@
           <p class="degree-summary-sub">Entered {record.startYear}</p>
         {/if}
       </div>
-      <div class="degree-summary-actions">
-        <button
-          type="button"
-          class="btn btn-primary"
-          id="degree-configure-buckets-btn"
-          onclick={() => openModal('bucket-config')}>Configure buckets</button
-        >
-        <button
-          type="button"
-          class="btn btn-secondary"
-          disabled={parsing}
-          onclick={() => fileInput?.click()}>Re-import</button
-        >
-        <button type="button" class="btn btn-secondary" onclick={clearRecord}
-          >Clear</button
-        >
-        <input
-          bind:this={fileInput}
-          type="file"
-          accept=".xlsx"
-          id="degree-reimport-file"
-          class="degree-file-input"
-          onchange={onInputChange}
-        />
-      </div>
+      {@render recordMenu()}
     </div>
 
     {#if parsing}

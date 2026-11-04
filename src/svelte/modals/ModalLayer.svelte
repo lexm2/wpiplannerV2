@@ -18,7 +18,6 @@
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
   import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
-  import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
   import type { Department } from '../../types/types';
 
   let {
@@ -27,7 +26,6 @@
     filterService,
     courseSelectionService,
     autoScheduleOrchestrator,
-    profileStateManager,
     getDepartments,
   }: {
     // Thunk, not a value: services.tutorial is assigned after this layer
@@ -39,7 +37,6 @@
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
-    profileStateManager: ProfileStateManager;
     getDepartments: () => Department[];
   } = $props();
 
@@ -73,8 +70,6 @@
   {:else if id === 'schedule-picker'}
     <SchedulePicker
       {scheduleManagementService}
-      {profileStateManager}
-      {getTutorial}
       onRequestClose={() => closeModal('schedule-picker')}
     />
   {:else if id === 'bucket-config'}

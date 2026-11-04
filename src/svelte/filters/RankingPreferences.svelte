@@ -9,6 +9,7 @@
     type Importance,
     type RankingPreferences,
   } from '../../services/scheduling/rankingPreferences';
+  import { slideFade } from '../transitions';
   import { TimeUtils } from '../../utils/timeUtils';
   import { DayOfWeek } from '../../types/types';
   import styles from '../../styles/components/ranking-preferences.module.css';
@@ -247,105 +248,104 @@
           {/each}
         </div>
 
-        {#if row.key === 'earlyClasses'}
-          <div
-            class="{styles.params} {importance === 'off' ? styles.muted : ''}"
-          >
-            Avoid classes before
-            {@render timeSelect(
-              'Early classes: time',
-              prefs.earlyClasses.before,
-              earlyTimes,
-              before =>
-                save({
-                  ...prefs,
-                  earlyClasses: { ...prefs.earlyClasses, before },
-                }),
-            )}
-          </div>
-        {:else if row.key === 'lateClasses'}
-          <div
-            class="{styles.params} {importance === 'off' ? styles.muted : ''}"
-          >
-            Avoid classes after
-            {@render timeSelect(
-              'Late classes: time',
-              prefs.lateClasses.after,
-              lateTimes,
-              after =>
-                save({
-                  ...prefs,
-                  lateClasses: { ...prefs.lateClasses, after },
-                }),
-            )}
-          </div>
-        {:else if row.key === 'gaps'}
-          <div
-            class="{styles.params} {importance === 'off' ? styles.muted : ''}"
-          >
-            Time between classes: at least
-            {@render numberSelect(
-              'Gaps: minimum time between classes',
-              prefs.gaps.min,
-              minGaps,
-              setMinGap,
-            )}
-            and at most
-            {@render numberSelect(
-              'Gaps: maximum time between classes',
-              prefs.gaps.max,
-              maxGaps,
-              max => save({ ...prefs, gaps: { ...prefs.gaps, max } }),
-            )}
-          </div>
-        {:else if row.key === 'lunch'}
-          <div
-            class="{styles.params} {importance === 'off' ? styles.muted : ''}"
-          >
-            Lunch break of
-            {@render numberSelect(
-              'Lunch: length',
-              prefs.lunch.minutes,
-              withCurrent(LUNCH_MINUTES, prefs.lunch.minutes, v => `${v} min`),
-              minutes => save({ ...prefs, lunch: { ...prefs.lunch, minutes } }),
-            )}
-            between
-            {@render timeSelect(
-              'Lunch: window start',
-              prefs.lunch.from,
-              lunchFromTimes,
-              setLunchFrom,
-            )}
-            and
-            {@render timeSelect(
-              'Lunch: window end',
-              prefs.lunch.to,
-              lunchToTimes,
-              to => save({ ...prefs, lunch: { ...prefs.lunch, to } }),
-            )}
-          </div>
-        {:else if row.key === 'freeDays'}
-          <div
-            class="{styles.params} {importance === 'off' ? styles.muted : ''}"
-          >
-            Keep these days free:
-            <span
-              class={styles.days}
-              role="group"
-              aria-label="Days to keep free"
-            >
-              {#each DAYS as day (day.value)}
-                <label class={styles.day}>
-                  <input
-                    type="checkbox"
-                    class={styles.radio}
-                    checked={prefs.freeDays.days.includes(day.value)}
-                    onchange={() => toggleDay(day.value)}
-                  />
-                  <span class={styles.segmentText}>{day.label}</span>
-                </label>
-              {/each}
-            </span>
+        {#if importance !== 'off'}
+          <div class={styles.reveal} transition:slideFade={{ duration: 150 }}>
+            {#if row.key === 'earlyClasses'}
+              <div class={styles.params}>
+                Avoid classes before
+                {@render timeSelect(
+                  'Early classes: time',
+                  prefs.earlyClasses.before,
+                  earlyTimes,
+                  before =>
+                    save({
+                      ...prefs,
+                      earlyClasses: { ...prefs.earlyClasses, before },
+                    }),
+                )}
+              </div>
+            {:else if row.key === 'lateClasses'}
+              <div class={styles.params}>
+                Avoid classes after
+                {@render timeSelect(
+                  'Late classes: time',
+                  prefs.lateClasses.after,
+                  lateTimes,
+                  after =>
+                    save({
+                      ...prefs,
+                      lateClasses: { ...prefs.lateClasses, after },
+                    }),
+                )}
+              </div>
+            {:else if row.key === 'gaps'}
+              <div class={styles.params}>
+                Time between classes: at least
+                {@render numberSelect(
+                  'Gaps: minimum time between classes',
+                  prefs.gaps.min,
+                  minGaps,
+                  setMinGap,
+                )}
+                and at most
+                {@render numberSelect(
+                  'Gaps: maximum time between classes',
+                  prefs.gaps.max,
+                  maxGaps,
+                  max => save({ ...prefs, gaps: { ...prefs.gaps, max } }),
+                )}
+              </div>
+            {:else if row.key === 'lunch'}
+              <div class={styles.params}>
+                Lunch break of
+                {@render numberSelect(
+                  'Lunch: length',
+                  prefs.lunch.minutes,
+                  withCurrent(
+                    LUNCH_MINUTES,
+                    prefs.lunch.minutes,
+                    v => `${v} min`,
+                  ),
+                  minutes =>
+                    save({ ...prefs, lunch: { ...prefs.lunch, minutes } }),
+                )}
+                between
+                {@render timeSelect(
+                  'Lunch: window start',
+                  prefs.lunch.from,
+                  lunchFromTimes,
+                  setLunchFrom,
+                )}
+                and
+                {@render timeSelect(
+                  'Lunch: window end',
+                  prefs.lunch.to,
+                  lunchToTimes,
+                  to => save({ ...prefs, lunch: { ...prefs.lunch, to } }),
+                )}
+              </div>
+            {:else if row.key === 'freeDays'}
+              <div class={styles.params}>
+                Keep these days free:
+                <span
+                  class={styles.days}
+                  role="group"
+                  aria-label="Days to keep free"
+                >
+                  {#each DAYS as day (day.value)}
+                    <label class={styles.day}>
+                      <input
+                        type="checkbox"
+                        class={styles.radio}
+                        checked={prefs.freeDays.days.includes(day.value)}
+                        onchange={() => toggleDay(day.value)}
+                      />
+                      <span class={styles.segmentText}>{day.label}</span>
+                    </label>
+                  {/each}
+                </span>
+              </div>
+            {/if}
           </div>
         {/if}
       </div>
