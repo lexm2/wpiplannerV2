@@ -32,9 +32,11 @@
   function formatTime(hours: number, minutes: number): string {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
-  function parseTime(value: string): { hours: number; minutes: number } {
-    const [hours, minutes] = value.split(':').map(Number);
-    return { hours: hours || 0, minutes: minutes || 0 };
+  // A time input holds "" while a field is blank or half typed; that must not
+  // read as midnight.
+  function parseTime(value: string): { hours: number; minutes: number } | null {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(value);
+    return m ? { hours: Number(m[1]), minutes: Number(m[2]) } : null;
   }
   function todayDate(): string {
     return formatLocalDate();
@@ -59,7 +61,9 @@
   let dayError = $state(false);
   let termError = $state(false);
   let dateError = $state(false);
+  let startError = $state(false);
   let endError = $state(false);
+  let endMessage = $state('');
 
   // Re-seed whenever a (new) payload arrives.
   let seededFor: object | null = null;
@@ -80,7 +84,13 @@
       : '10:00';
     selectedDays = new Set(ev?.days?.length ? ev.days : [DayOfWeek.MONDAY]);
     selectedTerms = new Set(ev?.terms?.length ? ev.terms : TERMS);
-    titleError = dayError = termError = dateError = endError = false;
+    titleError =
+      dayError =
+      termError =
+      dateError =
+      startError =
+      endError =
+        false;
   });
 
   function toggleDay(day: DayOfWeek): void {
@@ -115,14 +125,24 @@
 
     const s = parseTime(startTime);
     const e = parseTime(endTime);
+    startError = !s;
+    if (!s) return false;
+    if (!e) {
+      endError = true;
+      endMessage = 'Enter an end time.';
+      return false;
+    }
     endError = e.hours * 60 + e.minutes <= s.hours * 60 + s.minutes;
+    endMessage = 'End time must be after the start time.';
     if (endError) return false;
 
     return true;
   }
 
   function save(close: () => void): void {
-    if (!payload || !validate()) return;
+    const start = parseTime(startTime);
+    const end = parseTime(endTime);
+    if (!payload || !validate() || !start || !end) return;
 
     const eventData: Omit<
       LocalCalendarEvent,
@@ -131,8 +151,8 @@
       title: title.trim(),
       description: description.trim() || undefined,
       eventType,
-      startTime: parseTime(startTime),
-      endTime: parseTime(endTime),
+      startTime: start,
+      endTime: end,
       visible: true,
     };
 
@@ -303,7 +323,9 @@
               type="time"
               ariaLabel="Start time"
               fieldClass={styles['form-group-time']}
+              error={startError ? 'Enter a start time.' : undefined}
               bind:value={startTime}
+              oninput={() => (startError = false)}
             />
             <span class={styles['time-separator']}>to</span>
             <TextField
@@ -311,9 +333,7 @@
               type="time"
               ariaLabel="End time"
               fieldClass={styles['form-group-time']}
-              error={endError
-                ? 'End time must be after the start time.'
-                : undefined}
+              error={endError ? endMessage : undefined}
               bind:value={endTime}
               oninput={() => (endError = false)}
             />
