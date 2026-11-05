@@ -19,7 +19,8 @@ import { seatDataAge, termDates, today, yearStatus } from '../api/calendar';
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { caseless, FallYearSchema } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
-import { ApiError } from '../api/errors';
+import { ApiError, errorKind } from '../api/errors';
+import { ERROR_KIND_META } from '../api/requestLog';
 import {
   AutoScheduleInputSchema,
   generateSchedules,
@@ -118,7 +119,11 @@ const text = (value: string) => [{ type: 'text' as const, text: value }];
  */
 function failure(error: unknown, tool: string) {
   if (error instanceof ApiError) {
-    return { content: text(error.message), isError: true };
+    return {
+      content: text(error.message),
+      isError: true,
+      _meta: { [ERROR_KIND_META]: errorKind(error.status) },
+    };
   }
   logger.error(`[mcp] ${tool} failed:`, error);
   return {
@@ -126,6 +131,7 @@ function failure(error: unknown, tool: string) {
       `Internal error while running ${tool}; try a simpler query, or try again later.`,
     ),
     isError: true,
+    _meta: { [ERROR_KIND_META]: 'internal' },
   };
 }
 
