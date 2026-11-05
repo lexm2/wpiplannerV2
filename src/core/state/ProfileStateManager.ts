@@ -36,6 +36,17 @@ export interface ProfileState {
   hasUnsavedChanges: boolean;
 }
 
+/**
+ * State kept outside the schedules that still belongs in the one undo history
+ * (the Degree page's course placements). It is captured into every history
+ * entry and handed back on undo/redo, so a step of either kind undoes in the
+ * order it was made.
+ */
+export interface UndoSlice {
+  capture(): unknown;
+  restore(value: unknown): void;
+}
+
 /** Single source of truth for application state with synchronous persistence and event-driven updates. */
 export class ProfileStateManager {
   private static instance: ProfileStateManager | null = null;
@@ -43,6 +54,7 @@ export class ProfileStateManager {
   private isLoadingFlag = false;
   private allDepartments: Department[] = [];
   private undoRedoManager: UndoRedoManager;
+  private undoSlice: UndoSlice | null = null;
   private isRestoringState = false;
   private pendingSavePromises = new Set<Promise<void>>();
   // The schedule object each id last saved successfully. Schedules in state
@@ -545,6 +557,7 @@ export class ProfileStateManager {
     this.isRestoringState = true;
     try {
       this.restoreFromSnapshot(snapshot);
+      if (snapshot.extra !== undefined) this.undoSlice?.restore(snapshot.extra);
       this.save();
       return true;
     } finally {
@@ -560,11 +573,30 @@ export class ProfileStateManager {
     this.isRestoringState = true;
     try {
       this.restoreFromSnapshot(snapshot);
+      if (snapshot.extra !== undefined) this.undoSlice?.restore(snapshot.extra);
       this.save();
       return true;
     } finally {
       this.isRestoringState = false;
     }
+  }
+
+  registerUndoSlice(slice: UndoSlice): void {
+    this.undoSlice = slice;
+  }
+
+  /**
+   * Make the slice's current value a history step of its own, for changes that
+   * touch no schedule and so never reach save().
+   */
+  recordUndoStep(): void {
+    if (this.isRestoringState) return;
+    this.undoRedoManager.captureSnapshot(
+      this.state.activeScheduleId,
+      new Map(this.state.schedules.map(s => [s.id, s])),
+      this.state.preferences,
+      this.undoSlice?.capture(),
+    );
   }
 
   private restoreFromSnapshot(snapshot: {
@@ -630,6 +662,7 @@ export class ProfileStateManager {
       this.state.activeScheduleId,
       new Map(this.state.schedules.map(s => [s.id, s])),
       this.state.preferences,
+      this.undoSlice?.capture(),
     );
   }
 
@@ -667,6 +700,7 @@ export class ProfileStateManager {
           this.state.activeScheduleId,
           schedulesMap,
           this.state.preferences,
+          this.undoSlice?.capture(),
         );
       }
 

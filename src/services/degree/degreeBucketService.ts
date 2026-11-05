@@ -1,10 +1,14 @@
+import type { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import type { TransactionalStorageManager } from '../../core/storage/TransactionalStorageManager';
 import type {
   BucketOverride,
   CustomBucket,
   DegreeBucketConfig,
 } from '../../types/degree';
-import { DEGREE_BUCKET_CONFIG_VERSION } from '../../types/degree';
+import {
+  DEGREE_BUCKET_CONFIG_VERSION,
+  EMPTY_BUCKET_CONFIG,
+} from '../../types/degree';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
 import { logger } from '../../utils/logger';
 
@@ -23,8 +27,30 @@ type NewBucketInput = Omit<CustomBucket, 'id'>;
 class DegreeBucketService {
   private storage: TransactionalStorageManager | null = null;
 
-  init(storage: TransactionalStorageManager): void {
+  private profile: ProfileStateManager | null = null;
+
+  /**
+   * Placements join the schedules' undo history: Undo steps back through both
+   * in the order they were made, instead of reaching past a placement to the
+   * last schedule edit.
+   */
+  init(
+    storage: TransactionalStorageManager,
+    profile: ProfileStateManager,
+  ): void {
     this.storage = storage;
+    this.profile = profile;
+    profile.registerUndoSlice({
+      capture: () => degreeState.config.assignments,
+      restore: value =>
+        this.update(
+          c => ({
+            ...c,
+            assignments: value as DegreeBucketConfig['assignments'],
+          }),
+          false,
+        ),
+    });
   }
 
   /** Rehydrate the persisted config at startup; drops an incompatible schema. */
@@ -46,6 +72,7 @@ class DegreeBucketService {
       ...c,
       assignments: { ...c.assignments, [courseId]: bucketId },
     }));
+    degreeState.lastPlacement = { courseId, bucketId };
   }
 
   /** Send a course back to the unassigned rail. */
@@ -113,6 +140,23 @@ class DegreeBucketService {
     });
   }
 
+  /** Bring back every imported requirement the user deleted. */
+  restoreHidden(): void {
+    this.update(c => ({ ...c, hidden: [] }));
+  }
+
+  /**
+   * Forget everything that was arranged on top of an imported record: where
+   * courses were placed, which requirements were deleted, renamed or reordered.
+   * Custom buckets are the user's own and stay, minus their placements.
+   */
+  resetRecordEdits(): void {
+    this.update(c => ({
+      ...EMPTY_BUCKET_CONFIG,
+      custom: c.custom,
+    }));
+  }
+
   reorder(ids: string[]): void {
     this.update(c => ({ ...c, order: ids }));
   }
@@ -124,14 +168,24 @@ class DegreeBucketService {
     ).length;
   }
 
-  /** Config is $state.raw, so every write reassigns it immutably, then persists. */
-  private update(fn: (config: DegreeBucketConfig) => DegreeBucketConfig): void {
-    const next = fn(degreeState.config);
+  /**
+   * Config is $state.raw, so every write reassigns it immutably, then persists.
+   * A change to the placements also becomes an undo step (`recordUndo` is off
+   * only for the undo restoring them).
+   */
+  private update(
+    fn: (config: DegreeBucketConfig) => DegreeBucketConfig,
+    recordUndo = true,
+  ): void {
+    const prev = degreeState.config;
+    const next = fn(prev);
     degreeState.config = next;
     const result = this.storage?.saveDegreeBucketConfig(next);
     if (result && !result.success) {
       logger.warn('Failed to persist degree bucket config:', result.error);
     }
+    if (recordUndo && next.assignments !== prev.assignments)
+      this.profile?.recordUndoStep();
   }
 
   /**
