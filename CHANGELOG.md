@@ -33,6 +33,7 @@
 - The "incomplete" marker in the schedule sidebar now reads "Pick sections"
 - Previous/next schedule use chevrons, and Restart auto-schedule uses an adjustments icon
 - Requirements that depend on in-progress courses read "Satisfied (in progress)", and the Degree summary shows how many are complete
+- Undo and Redo are much faster with many schedules, and undo history uses far less memory
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
@@ -107,6 +108,7 @@
 - The Degree course finder matches "CS2223" as well as "CS 2223"
 - A placed course no longer vanishes under a status filter; a note explains it
 - Empty-schedule message, "1 course" plural and an import-warning typo on the Degree page
+- The planner no longer falls behind on saving when you edit quickly with many schedules. Saves that took up to a minute to catch up now finish almost at once
 
 ## [2026-10-10]
 
