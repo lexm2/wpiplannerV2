@@ -416,3 +416,23 @@ describe('prerequisite statements on the real catalog', () => {
     expect(description).not.toMatch(/recommended background/i);
   });
 });
+
+describe('search text gaps', () => {
+  it('says where a code-searched course runs when the term filter empties it', async () => {
+    const text = await toolText('search_courses', {
+      filters: { searchText: { query: 'CS 2102' }, term: { terms: ['C'] } },
+    });
+    expect(text).toMatch(/CS 2102 has no section under these filters/);
+  });
+
+  it('reads a zero-width space inside a code as nothing', async () => {
+    const plain = await toolText('search_courses', {
+      filters: { searchText: { query: 'CS 2102' } },
+    });
+    const zwsp = await toolText('search_courses', {
+      filters: { searchText: { query: 'CS​2102' } },
+    });
+    expect(zwsp.split('\n')[1]).toBe(plain.split('\n')[1]);
+    expect(zwsp).toMatch(/\n1\. CS 2102 /);
+  });
+});

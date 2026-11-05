@@ -36,7 +36,7 @@ import { suggestInstructors } from './instructors';
 import { knownTermNotes } from './knownTerms';
 import { echo } from './errors';
 import { notice, type Notice } from './notices';
-import { one } from './text';
+import { andList, one } from './text';
 import { ClosedSectionsFilter } from './closedSectionsFilter';
 import { EndedTermsFilter } from './endedTermsFilter';
 import { strictObject } from './schemaHints';
@@ -112,7 +112,7 @@ export const CourseQuerySchema = obj({
     .describe(
       'Default "relevance": by relevance with searchText, else by department and number. ' +
         '"rating": best-rated lecture instructor first, those with 5+ ratings above those with fewer (as "top"), unrated last. ' +
-        '"difficulty": easiest-rated instructor first, by the same rule. "openSeats": most open seats in the matching sections first. ' +
+        '"difficulty": easiest-rated instructor first, by the same rule. "openSeats": most open seats in one term of the matching sections first (terms are not added). ' +
         '"number": department, then course number. Ties keep the relevance order.',
     ),
   offset: z
@@ -577,7 +577,8 @@ const SORT_NOTICE: Record<Exclude<CourseQuery['sort'], 'relevance'>, string> = {
     'Sorted by the best-rated lecture instructor; averages on 5+ ratings rank above those on fewer, unrated last.',
   difficulty:
     'Sorted by the easiest-rated lecture instructor (shown as "easiest rated"); averages on 5+ ratings rank above those on fewer, unrated last.',
-  openSeats: 'Sorted by open seats in the matching sections, most first.',
+  openSeats:
+    "Sorted by open seats in the matching sections of the course's best term, most first (seats of different terms are not added).",
   number: 'Sorted by department, then course number.',
 };
 
@@ -593,8 +594,23 @@ function sortCourses(
   if (sort === 'relevance') return courses;
   if (sort === 'number') return [...courses].sort(byNumber);
   if (sort === 'openSeats') {
+    // One term's seats: a student takes the course in one term, so terms
+    // cannot be added (the totals line says the same).
     const open = new Map(
-      courses.map(c => [c, seatTotals(primarySections(c)).available]),
+      courses.map(c => {
+        const byTerm = new Map<string, Section[]>();
+        for (const s of primarySections(c)) {
+          byTerm.set(s.computedTerm, [
+            ...(byTerm.get(s.computedTerm) ?? []),
+            s,
+          ]);
+        }
+        const best = Math.max(
+          0,
+          ...[...byTerm.values()].map(s => seatTotals(s).available),
+        );
+        return [c, best] as const;
+      }),
     );
     return [...courses].sort((a, b) => open.get(b)! - open.get(a)!);
   }
@@ -817,6 +833,21 @@ function explainMatches(
   // The named course itself missing, even with mentions of it listed.
   const leftOut =
     named.length === 0 ? leftOutByDefaults(catalog, query, codeSearch) : [];
+  if (codeSearch !== null && named.length === 0 && leftOut.length === 0) {
+    // Only courses that mention the code are listed; say where the course
+    // itself runs, so "no CS 2102 in C" is not read as "no CS 2102".
+    const own = inYear.filter(
+      c => catalog.search.describeMatch(c, codeSearch) === 'code',
+    );
+    if (own.length) {
+      notices.push(
+        notice(
+          'codeElsewhere',
+          `${andList(own.map(courseCode))} ${own.length === 1 ? 'has' : 'have'} no section under these filters; ${own.map(c => `${courseCode(c)} runs in ${termsOf(primarySections(c)).join(', ') || 'no term'}`).join('; ')}. The courses listed only mention ${own.length === 1 ? 'it' : 'them'}.`,
+        ),
+      );
+    }
+  }
   if (matches.length === 0 && text) {
     notices.push(...instructorNotice(inYear, text.query));
   }
