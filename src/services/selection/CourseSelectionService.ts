@@ -404,7 +404,7 @@ export class CourseSelectionService {
         logger.warn(`Repaired ${repairedCount} selected courses`);
         // The repair edited the courses in place, so the schedules holding
         // them look unchanged to save().
-        this.profileStateManager.forgetSavedSchedules();
+        this.profileStateManager.markActiveScheduleChanged();
         this.profileStateManager.save();
       }
 

@@ -1,6 +1,11 @@
 import type { Department } from './types';
 import type { SchedulePreferences } from './schedule';
-import type { ExportData } from './export';
+import {
+  extrasOf,
+  parseExportedEvents,
+  type ExportData,
+  type ParsedExportData,
+} from './export';
 import { ScheduleState, findCourseById } from './ScheduleState';
 import type { SelectedCourse } from './schedule';
 import {
@@ -8,7 +13,7 @@ import {
   decodeCourseSelection,
 } from '../utils/courseUtils';
 
-const APPLICATION_STATE_VERSION: string = '4.3';
+const APPLICATION_STATE_VERSION: string = '4.4';
 
 /**
  * Application-level state: all schedules plus preferences.
@@ -20,6 +25,11 @@ export class ApplicationState {
   readonly activeScheduleId: string | null;
   readonly schedules: ScheduleState[];
   readonly preferences?: SchedulePreferences;
+  /**
+   * Per schedule (parallel to `schedules`): ids of courses the file named that
+   * the catalog does not have. Only set by fromMinimalFormat.
+   */
+  readonly skippedCourseIds: string[][] = [];
 
   constructor(
     activeScheduleId: string | null,
@@ -40,15 +50,18 @@ export class ApplicationState {
       v: this.version,
       a: this.getActiveScheduleIndex(),
       s: this.schedules.map(schedule => {
-        const tuple: [string, (string | null)[], number?] = [
+        const tuple: ExportData['s'][number] = [
           schedule.name,
           schedule.selectedCourses.flatMap(course =>
             encodeCourseSelection(course),
           ),
+          schedule.year ?? null,
         ];
-        if (schedule.year !== undefined) {
-          tuple.push(schedule.year);
-        }
+        const extras = extrasOf(schedule);
+        if (extras) tuple.push(extras);
+        // Dropped when empty so a plain schedule still reads in a 4.3 build,
+        // which rejects a null year.
+        if (tuple[2] === null && tuple.length === 3) tuple.length = 2;
         return tuple;
       }),
       p: this.preferences?.theme
@@ -62,11 +75,13 @@ export class ApplicationState {
   }
 
   static fromMinimalFormat(
-    data: ExportData,
+    data: ParsedExportData,
     courseCatalog: Department[],
   ): ApplicationState {
-    const schedules = data.s.map(([name, coursesArray, year]) => {
+    const skippedCourseIds: string[][] = [];
+    const schedules = data.s.map(([name, coursesArray, year, extras]) => {
       const selectedCourses: SelectedCourse[] = [];
+      const skipped: string[] = [];
 
       for (let i = 0; i < coursesArray.length; i += 4) {
         const courseId = coursesArray[i];
@@ -74,7 +89,8 @@ export class ApplicationState {
 
         const course = findCourseById(courseId, courseCatalog);
         if (!course) {
-          throw new Error(`Course ${courseId} not found in catalog`);
+          skipped.push(courseId);
+          continue;
         }
 
         const sections = decodeCourseSelection(
@@ -84,13 +100,17 @@ export class ApplicationState {
           course,
         );
 
+        const courseExtras = extras?.x?.[courseId];
         selectedCourses.push({
           course,
           selected: sections,
-          isRequired: false,
-          lockedSections: new Set(),
+          isRequired: courseExtras?.r ?? false,
+          lockedSections: new Set(courseExtras?.l),
+          ...(courseExtras?.c && { customColor: courseExtras.c }),
+          ...(courseExtras?.t && { allowedTerms: courseExtras.t }),
         });
       }
+      skippedCourseIds.push(skipped);
 
       return new ScheduleState(
         `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
@@ -98,8 +118,8 @@ export class ApplicationState {
         selectedCourses,
         [],
         Date.now(),
-        [],
-        year,
+        parseExportedEvents(extras?.e ?? []),
+        year ?? undefined,
       );
     });
 
@@ -113,13 +133,15 @@ export class ApplicationState {
         }
       : undefined;
 
-    return new ApplicationState(
+    const state = new ApplicationState(
       activeScheduleId,
       schedules,
       preferences,
       data.v,
       Date.now(),
     );
+    state.skippedCourseIds.push(...skippedCourseIds);
+    return state;
   }
 
   /** Index of the active schedule, or 0 if none. */

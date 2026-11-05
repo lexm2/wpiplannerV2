@@ -222,3 +222,123 @@ describe('IndexedDBStorageManager legacy rows', () => {
     expect(loaded.selectedCourses[0].lockedSections).toEqual(new Set(['x']));
   });
 });
+
+/** A row as a build of this app wrote it, with the given decoded payload. */
+function rowOf(
+  id: string,
+  payload: unknown,
+  extra: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id,
+    timestamp: Date.now(),
+    compressed: false,
+    schemaVersion: SCHEDULE_SCHEMA_VERSION,
+    serializedData: JSON.stringify(payload, setReplacer),
+    ...extra,
+  };
+}
+
+describe('IndexedDBStorageManager load boundary', () => {
+  const good = { name: 'ok', selectedCourses: [], generatedSchedules: [] };
+
+  it('survives each malformed row, keeps the rest and counts the skips', async () => {
+    await manager.saveSchedule(makeSchedule('keep'));
+    await putRaw(rowOf('noid', good));
+    await putRaw(rowOf('nullcourses', { ...good, selectedCourses: null }));
+    await putRaw(
+      rowOf('v99', { ...good, selectedCourses: [{}] }, { schemaVersion: 99 }),
+    );
+    await putRaw(
+      rowOf('partial', {
+        ...good,
+        selectedCourses: [
+          { selected: {} },
+          { course: { id: 'x' } },
+          { course: { id: 'fine' }, selected: {}, isRequired: false },
+        ],
+        localEvents: [null],
+      }),
+    );
+
+    const result = await manager.loadAllSchedules();
+    expect(result.success).toBe(true);
+    const byId = new Map(result.data!.map(s => [s.id, s]));
+    // A row without an id inside takes the store key.
+    expect([...byId.keys()].sort()).toEqual(['keep', 'noid', 'partial']);
+    expect(result.report).toEqual({
+      unreadable: 1,
+      newerVersion: 1,
+      dropped: 2,
+    });
+    // The course that lost its picks keeps a usable shape.
+    const partial = byId.get('partial')!;
+    expect(partial.selectedCourses.map(c => c.course.id)).toEqual([
+      'x',
+      'fine',
+    ]);
+    expect(partial.localEvents).toEqual([]);
+  });
+
+  it('leaves skipped rows in the store', async () => {
+    await putRaw(rowOf('v99', good, { schemaVersion: 99 }));
+    await manager.loadAllSchedules();
+    const second = await manager.loadAllSchedules();
+    expect(second.report.newerVersion).toBe(1);
+  });
+});
+
+describe('IndexedDBStorageManager concurrent tabs', () => {
+  async function secondTab(): Promise<IndexedDBStorageManager> {
+    const other = new IndexedDBStorageManager();
+    await other.initialize();
+    await other.loadAllSchedules();
+    return other;
+  }
+
+  it('refuses to overwrite a row another tab changed', async () => {
+    await manager.saveSchedule(makeSchedule('a'));
+    await manager.loadAllSchedules();
+    const other = await secondTab();
+
+    expect((await other.saveSchedule(makeSchedule('a', ['9']))).success).toBe(
+      true,
+    );
+    const stale = await manager.saveSchedule(makeSchedule('a', ['1']));
+    expect(stale).toMatchObject({ success: false, conflict: 'newer' });
+
+    // After re-reading, the write goes through.
+    await manager.loadSchedule('a');
+    expect((await manager.saveSchedule(makeSchedule('a', ['1']))).success).toBe(
+      true,
+    );
+  });
+
+  it('does not bring back a schedule another tab deleted', async () => {
+    await manager.saveSchedule(makeSchedule('a'));
+    await manager.loadAllSchedules();
+    const other = await secondTab();
+    await other.deleteSchedule('a');
+
+    const stale = await manager.saveSchedule(makeSchedule('a'));
+    expect(stale).toMatchObject({ success: false, conflict: 'deleted' });
+    expect(await loadIds(manager)).toEqual([]);
+  });
+
+  it('does not undo a clear made in another tab', async () => {
+    await manager.saveSchedule(makeSchedule('a'));
+    await manager.loadAllSchedules();
+    const other = await secondTab();
+    await other.clearAllSchedules();
+
+    const stale = await manager.saveSchedule(makeSchedule('a'));
+    expect(stale.conflict).toBe('deleted');
+    expect(await loadIds(manager)).toEqual([]);
+  });
+
+  it('writes a schedule this tab created without a baseline', async () => {
+    const other = await secondTab();
+    await other.saveSchedule(makeSchedule('mine'));
+    expect(await loadIds(manager)).toEqual(['mine']);
+  });
+});

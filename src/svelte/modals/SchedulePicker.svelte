@@ -386,37 +386,34 @@
 
     try {
       const text = await file.text();
-      if (target === 'new') {
-        const name = file.name.replace(/\.json$/i, '');
-        // Created inactive and only switched to once the import succeeds, so a
-        // bad file leaves neither an empty schedule nor a changed selection.
-        const created = await scheduleManagementService.createNewSchedule(
-          name,
-          { autoActivate: false },
-        );
-        const id = created.schedule?.id;
-        if (created.success && id) {
-          const imported = await scheduleManagementService.importScheduleInto(
-            id,
-            text,
-          );
-          if (imported.success) {
-            await switchToSchedule(id);
-          } else {
-            await scheduleManagementService.deleteSchedule(id);
-            showAppError(`Import failed: ${imported.error}`);
-          }
-          refreshTick++;
-        } else {
-          showAppError(`Import failed: ${created.error || 'Unknown error'}`);
-        }
-      } else {
-        const result = await scheduleManagementService.importScheduleInto(
-          target,
-          text,
-        );
-        if (result.success) refreshTick++;
-        else showAppError(`Import failed: ${result.error}`);
+      const result =
+        target === 'new'
+          ? await scheduleManagementService.importSchedulesFromFile(
+              text,
+              file.name.replace(/\.json$/i, ''),
+            )
+          : await scheduleManagementService.importScheduleInto(target, text);
+      if (!result.success) {
+        showAppError(`Import failed: ${result.error}`);
+        return;
+      }
+      // Only switched to once the import succeeded, so a bad file leaves the
+      // selection alone.
+      if (target === 'new' && result.schedule) {
+        await switchToSchedule(result.schedule.id);
+      }
+      refreshTick++;
+      const notes = [result.message, ...(result.warnings ?? [])].filter(
+        (note): note is string => !!note,
+      );
+      if (notes.length > 0) {
+        showConfirm({
+          title: 'Import finished',
+          message: notes.join('\n'),
+          confirmLabel: 'OK',
+          notice: true,
+          onConfirm: () => {},
+        });
       }
     } catch (error) {
       logger.error('Failed to import schedule:', error);
