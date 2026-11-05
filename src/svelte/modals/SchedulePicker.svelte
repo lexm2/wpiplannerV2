@@ -581,7 +581,11 @@
                   aria-haspopup="menu"
                   aria-expanded={openMenuId === schedule.id}
                   onkeydown={e => onMenuButtonKeydown(e, schedule.id)}
-                  onclick={e => toggleMenu(e, schedule.id)}>⋮</button
+                  onclick={e => toggleMenu(e, schedule.id)}
+                  >{@html getInlineSVG(
+                    'DOTS_VERTICAL',
+                    styles['menuIcon'],
+                  )}</button
                 >
               </div>
             {/if}
