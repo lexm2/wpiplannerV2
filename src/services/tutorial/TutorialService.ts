@@ -1,28 +1,37 @@
 import type {
   Tutorial,
   TutorialStep,
-  TutorialAppState,
+  TutorialState,
+  ResolvedStep,
 } from '../../types/tutorial';
+import { stateAt } from './tutorialState';
 import { getInlineSVG } from '../../utils/iconPaths';
 import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState.svelte';
 import { courseListState } from '../../svelte/courseListState.svelte';
 import { scrollParent } from '../../utils/scrollParent';
 import { headerCollapsed } from '../../svelte/phoneLayout.svelte';
 import { targetOnScreen } from '../../svelte/tutorial/floatingBox.position';
-
-import type { UIState } from '../../types/uiState';
 import { logger } from '../../utils/logger';
 
-type StepApplyCallback = (index: number) => void;
-type UIStateTransitionCallback = (uiState: Partial<UIState>) => void;
-type AppStateTransitionCallback = (appState: TutorialAppState) => Promise<void>;
-type PostTransitionCallback = (appState: TutorialAppState | undefined) => void;
+/**
+ * Make the app match `state` (and show the step's drawer). Idempotent, and
+ * checks `isStale` after anything it awaits so a step that has been overtaken
+ * stops writing.
+ */
+type EstablishCallback = (
+  state: TutorialState,
+  step: ResolvedStep,
+  isStale: () => boolean,
+) => Promise<void>;
+
+// A reading step points at Next, which the box always shows.
+const NEXT_SELECTOR = '[data-tutorial-next]';
 
 export class TutorialService {
   private tutorials: Map<string, Tutorial> = new Map();
   private activeTutorial: Tutorial | null = null;
   private currentStepIndex = 0;
-  private stepApplyCallback: StepApplyCallback | null = null;
+  private establishCallback: EstablishCallback | null = null;
   private completionCallback: (() => void) | null = null;
   private exitCallback: (() => void) | null = null;
   private currentSelector: string | null = null;
@@ -32,17 +41,11 @@ export class TutorialService {
   private positionFrame: number | null = null;
   private actionCleanup: (() => void) | null = null;
   private highlightObserver: MutationObserver | null = null;
-  private actionObserver: MutationObserver | null = null;
+  private aboutObserver: MutationObserver | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private layoutObserver: ResizeObserver | null = null;
   private svgContainer: HTMLElement | null = null;
   private originalPosition: string | null = null;
-  private uiStateTransitionCallback: UIStateTransitionCallback | null = null;
-  private appStateTransitionCallback: AppStateTransitionCallback | null = null;
-  private postTransitionCallback: PostTransitionCallback | null = null;
-  private suppressAutoAdvance = false;
-  private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
-  private actionTimeout: ReturnType<typeof setTimeout> | null = null;
   private revealTimer: ReturnType<typeof setTimeout> | null = null;
   private settleTimers: ReturnType<typeof setTimeout>[] = [];
   // Bumped by every apply and teardown, so an apply still waiting on the app
@@ -75,22 +78,6 @@ export class TutorialService {
     if (!tutorial || tutorial.steps.length === 0) return;
     this.activeTutorial = tutorial;
     this.currentStepIndex = 0;
-    if (tutorial.onStart) {
-      const result = tutorial.onStart();
-      if (result instanceof Promise) {
-        // onStart comes from the tutorial definition, so it is external code.
-        result.then(
-          () =>
-            requestAnimationFrame(() => {
-              void this.applyStep();
-            }),
-          (error: unknown) => {
-            logger.error('Tutorial onStart failed:', error);
-          },
-        );
-        return;
-      }
-    }
     void this.applyStep();
   }
 
@@ -130,17 +117,12 @@ export class TutorialService {
     }
   }
 
-  async goBack(
-    restoreFn: (targetIndex: number) => Promise<void>,
-  ): Promise<void> {
+  // Arrives the way every other path does: the previous step's state is
+  // established from scratch, with nothing remembered about how it was left.
+  async goBack(): Promise<void> {
     if (!this.activeTutorial || this.currentStepIndex <= 0) return;
     this.cleanup();
-    const tutorial = this.activeTutorial;
-    const targetIndex = this.currentStepIndex - 1;
-    await restoreFn(targetIndex);
-    if (this.activeTutorial !== tutorial) return;
-    this.currentStepIndex = targetIndex;
-    this.suppressAutoAdvance = true;
+    this.currentStepIndex--;
     await this.applyStep();
   }
 
@@ -156,12 +138,13 @@ export class TutorialService {
     if (
       !force &&
       step.selector === this.currentSelector &&
-      targetOnScreen(step.selector)
+      targetOnScreen(step.selector) &&
+      (!step.about || targetOnScreen(step.about))
     ) {
       return;
     }
     this.cleanup();
-    void this.applyStep(true);
+    void this.applyStep();
   }
 
   getCurrentStepIndex(): number {
@@ -169,17 +152,24 @@ export class TutorialService {
   }
 
   /** The running step as it applies at the current window width. */
-  getCurrentStep(): TutorialStep | null {
+  getCurrentStep(): ResolvedStep | null {
     const step = this.activeTutorial?.steps[this.currentStepIndex];
     return step ? this.resolveStep(step) : null;
+  }
+
+  /** What the app must look like at the running step. */
+  getRequiredState(): TutorialState | null {
+    return this.activeTutorial
+      ? stateAt(this.activeTutorial, this.currentStepIndex)
+      : null;
   }
 
   getActiveTutorial(): Tutorial | null {
     return this.activeTutorial;
   }
 
-  onStepApply(cb: StepApplyCallback): void {
-    this.stepApplyCallback = cb;
+  onEstablish(cb: EstablishCallback): void {
+    this.establishCallback = cb;
   }
 
   onComplete(cb: () => void): void {
@@ -190,59 +180,59 @@ export class TutorialService {
     this.exitCallback = cb;
   }
 
-  onUIStateTransition(cb: UIStateTransitionCallback): void {
-    this.uiStateTransitionCallback = cb;
-  }
-
-  onAppStateTransition(cb: AppStateTransitionCallback): void {
-    this.appStateTransitionCallback = cb;
-  }
-
-  onPostTransition(cb: PostTransitionCallback): void {
-    this.postTransitionCallback = cb;
-  }
-
   disarmCurrentListener(): void {
     this.actionCleanup?.();
     this.actionCleanup = null;
-    this.actionObserver?.disconnect();
-    this.actionObserver = null;
   }
 
-  private async applyStep(reapplying = false): Promise<void> {
+  private async applyStep(): Promise<void> {
     const tutorial = this.activeTutorial;
     if (!tutorial) return;
     const index = this.currentStepIndex;
     const run = ++this.applyRun;
-    // Only the step goBack applies skips its auto-advance; consume the flag here
-    // so a manual or click step can't leave it set for a later one.
-    const suppress = this.suppressAutoAdvance;
-    this.suppressAutoAdvance = false;
-    this.stepApplyCallback?.(index);
     const step = this.resolveStep(tutorial.steps[index]);
-    if (step.appState && this.appStateTransitionCallback) {
-      await this.appStateTransitionCallback(step.appState);
-      // Exited, skipped, or moved on while the app caught up - this step is
-      // stale, and drawing it would leak its overlay into whatever came next.
-      if (run !== this.applyRun) return;
+    try {
+      await this.establishCallback?.(
+        stateAt(tutorial, index),
+        step,
+        () => run !== this.applyRun,
+      );
+    } catch (error) {
+      logger.error('Tutorial step could not be set up:', error);
+      return;
     }
-    if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
-    // Generating is the step's one effect that isn't idempotent: another run
-    // could replace the schedule the student is looking at.
-    if (!reapplying || !step.appState?.runAutoSchedule) {
-      this.postTransitionCallback?.(step.appState);
-    }
+    // Exited, skipped, or moved on while the app caught up - this step is
+    // stale, and drawing it would leak its overlay into whatever came next.
+    if (run !== this.applyRun) return;
     this.highlightElement(step.selector, step.scrollArrow ?? false);
+    if (step.about) this.revealAbout(step.about);
     // A fresh object each time, so the box re-seats itself on a re-apply too.
     tutorialOverlayState.set({ ...step }, index, tutorial.steps.length);
-    if (step.waitFor !== 'manual') this.listenForAction(step, suppress);
+    if (step.waitFor === 'click') this.listenForAction(step);
   }
 
   // The step as it applies at the current window width.
-  private resolveStep(step: TutorialStep): TutorialStep {
-    return headerCollapsed.current && step.compact
-      ? { ...step, ...step.compact }
-      : step;
+  private resolveStep(step: TutorialStep): ResolvedStep {
+    if (step.waitFor === 'manual') {
+      return {
+        title: step.title,
+        description: step.description,
+        waitFor: 'manual',
+        selector: NEXT_SELECTOR,
+        about: step.about,
+        drawer: step.drawer,
+      };
+    }
+    return {
+      title: step.title,
+      description: step.description,
+      waitFor: 'click',
+      selector: step.selector,
+      waitForSelector: step.waitForSelector,
+      scrollArrow: step.scrollArrow,
+      drawer: step.drawer,
+      ...(headerCollapsed.current ? step.compact : undefined),
+    };
   }
 
   private highlightElement(selector: string, scrollArrow: boolean): void {
@@ -254,38 +244,55 @@ export class TutorialService {
 
     const el = document.querySelector(selector);
     if (el) {
-      this.revealAndSettle(el);
-      this.attachSvgOverlay(el, scrollArrow);
+      this.attachTo(el, selector, scrollArrow);
       return;
     }
 
     // Target isn't in the DOM yet - observe for it to mount while actively
-    // revealing it (rows past the rendered window, off-screen rows).
+    // revealing it (rows past the rendered window, off-screen rows). There is
+    // no deadline: a target that mounts late still gets its highlight.
     this.highlightObserver = new MutationObserver(() => {
       const found = document.querySelector(selector);
       if (!found) return;
       this.highlightObserver!.disconnect();
       this.highlightObserver = null;
       this.stopReveal();
-      if (this.highlightTimeout !== null) {
-        clearTimeout(this.highlightTimeout);
-        this.highlightTimeout = null;
-      }
-      this.revealAndSettle(found);
-      this.attachSvgOverlay(found, scrollArrow);
+      this.attachTo(found, selector, scrollArrow);
     });
     this.highlightObserver.observe(document.body, {
       childList: true,
       subtree: true,
     });
     this.startReveal(selector);
-    this.highlightTimeout = setTimeout(() => {
-      this.highlightObserver?.disconnect();
-      this.highlightObserver = null;
-      this.stopReveal();
-      this.highlightTimeout = null;
-      logger.warn(`[Tutorial] Element not found after 10s: ${selector}`);
-    }, 10_000);
+  }
+
+  private attachTo(el: Element, selector: string, scrollArrow: boolean): void {
+    // Next sits in the box, which is always on screen.
+    if (selector !== NEXT_SELECTOR) this.revealAndSettle(el);
+    this.attachSvgOverlay(el, scrollArrow);
+  }
+
+  // What a reading step describes may still be mounting (a window opening), so
+  // wait for it rather than give up.
+  private revealAbout(selector: string): void {
+    this.aboutObserver?.disconnect();
+    this.aboutObserver = null;
+    const el = document.querySelector(selector);
+    if (el) {
+      this.revealAndSettle(el);
+      return;
+    }
+    this.aboutObserver = new MutationObserver(() => {
+      const found = document.querySelector(selector);
+      if (!found) return;
+      this.aboutObserver!.disconnect();
+      this.aboutObserver = null;
+      this.revealAndSettle(found);
+    });
+    this.aboutObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
   }
 
   // A step's own transition can still be moving things when its target lands
@@ -371,21 +378,14 @@ export class TutorialService {
       this.positionFrame = null;
     }
 
+    // The highlight is always a child of its target, so it moves and resizes
+    // with it; every target is a control or a container, never a void element.
     const htmlEl = el as HTMLElement;
 
-    const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(
-      htmlEl.tagName,
-    );
-    // The overlay is a child of the target, so a target that clips its own
-    // overflow (a scrolling list) would hide one drawn outside its edge.
-    const clipsOwn = !voidEl && getComputedStyle(htmlEl).overflow !== 'visible';
-    const pad = clipsOwn ? -2 : 5;
-    const container: HTMLElement = voidEl ? htmlEl.parentElement! : htmlEl;
-
-    this.originalPosition = container.style.position;
-    if (getComputedStyle(container).position === 'static')
-      container.style.position = 'relative';
-    this.svgContainer = container;
+    this.originalPosition = htmlEl.style.position;
+    if (getComputedStyle(htmlEl).position === 'static')
+      htmlEl.style.position = 'relative';
+    this.svgContainer = htmlEl;
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.classList.add('tutorial-highlight-svg');
@@ -402,28 +402,22 @@ export class TutorialService {
     rectEl.setAttribute('stroke-dasharray', '8 6');
 
     svg.appendChild(rectEl);
-    container.appendChild(svg);
+    htmlEl.appendChild(svg);
     this.svgOverlay = svg;
 
     const updateSize = () => {
       if (htmlEl.offsetWidth === 0 || htmlEl.offsetHeight === 0) return;
+      const cs = getComputedStyle(htmlEl);
+      // The overlay is a child of the target, so a target that clips its own
+      // overflow (a scrolling list) would hide one drawn outside its edge.
+      // Read here because overflow can change at a breakpoint.
+      const pad = cs.overflow !== 'visible' ? -2 : 5;
       const w = htmlEl.offsetWidth + pad * 2;
       const h = htmlEl.offsetHeight + pad * 2;
-      const cs = getComputedStyle(htmlEl);
       const borderTop = parseFloat(cs.borderTopWidth) || 0;
       const borderLeft = parseFloat(cs.borderLeftWidth) || 0;
-      let top: number, left: number;
-      if (voidEl) {
-        const er = htmlEl.getBoundingClientRect();
-        const cr = container.getBoundingClientRect();
-        top = er.top - cr.top + container.scrollTop - pad - borderTop;
-        left = er.left - cr.left + container.scrollLeft - pad - borderLeft;
-      } else {
-        top = -(pad + borderTop);
-        left = -(pad + borderLeft);
-      }
-      svg.style.top = `${top}px`;
-      svg.style.left = `${left}px`;
+      svg.style.top = `${-(pad + borderTop)}px`;
+      svg.style.left = `${-(pad + borderLeft)}px`;
       svg.setAttribute('width', String(w));
       svg.setAttribute('height', String(h));
       rectEl.setAttribute('width', String(w - 2));
@@ -501,50 +495,22 @@ export class TutorialService {
     }
   }
 
-  private listenForAction(step: TutorialStep, suppress: boolean): void {
-    if (step.waitFor === 'appear') {
-      const selector = step.waitForSelector ?? step.selector;
-      if (document.querySelector(selector)) {
-        if (!suppress) this.nextStep();
-        return;
-      }
-      this.actionObserver = new MutationObserver(() => {
-        if (!document.querySelector(selector)) return;
-        this.actionObserver!.disconnect();
-        this.actionObserver = null;
-        if (this.actionTimeout !== null) {
-          clearTimeout(this.actionTimeout);
-          this.actionTimeout = null;
-        }
-        this.nextStep();
-      });
-      this.actionObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-      this.actionTimeout = setTimeout(() => {
-        this.actionObserver?.disconnect();
-        this.actionObserver = null;
-        this.actionTimeout = null;
-        logger.warn(
-          `[Tutorial] Waited element not found after 10s: ${selector}`,
-        );
-      }, 10_000);
-      return;
-    }
-
+  private listenForAction(step: ResolvedStep): void {
     const selector = step.waitForSelector ?? step.selector;
-    const eventType = step.waitFor === 'input' ? 'input' : 'click';
-    const stopProp = step.stopPropagation ?? false;
+    const run = this.applyRun;
     const handler = (e: Event) => {
-      if ((e.target as Element).closest?.(selector)) {
-        if (stopProp) e.stopPropagation();
-        this.nextStep();
-      }
+      if (!(e.target as Element).closest?.(selector)) return;
+      this.disarmCurrentListener();
+      // After the app's own handler (and a label's activation of its input) have
+      // run: the next step then sets the state it needs on top of theirs, instead
+      // of racing them.
+      setTimeout(() => {
+        if (run === this.applyRun) this.nextStep();
+      }, 0);
     };
-    document.body.addEventListener(eventType, handler, { capture: true });
+    document.body.addEventListener('click', handler, { capture: true });
     this.actionCleanup = () =>
-      document.body.removeEventListener(eventType, handler, { capture: true });
+      document.body.removeEventListener('click', handler, { capture: true });
   }
 
   private cleanup(): void {
@@ -557,16 +523,8 @@ export class TutorialService {
     this.stopReveal();
     this.highlightObserver?.disconnect();
     this.highlightObserver = null;
-    if (this.highlightTimeout !== null) {
-      clearTimeout(this.highlightTimeout);
-      this.highlightTimeout = null;
-    }
-    this.actionObserver?.disconnect();
-    this.actionObserver = null;
-    if (this.actionTimeout !== null) {
-      clearTimeout(this.actionTimeout);
-      this.actionTimeout = null;
-    }
+    this.aboutObserver?.disconnect();
+    this.aboutObserver = null;
     this.actionCleanup?.();
     this.actionCleanup = null;
   }

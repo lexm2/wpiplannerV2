@@ -1,7 +1,9 @@
 import { test, expect, type Page } from './fixtures';
+import { waitForTutorialState } from './tutorialExpect';
 
 /**
- * Guards every tutorial step's "Find Element" target.
+ * Guards every tutorial step's "Find Element" target, and that arriving at a
+ * step puts the app in the state the step requires.
  *
  * Each step declares a CSS `selector`; the tutorial highlights it and the
  * "Find Element" button (animateFindDot) flies to it. If a selector goes stale
@@ -12,9 +14,9 @@ import { test, expect, type Page } from './fixtures';
  * targets past the course list's rendered window).
  *
  * The walk is driven through the live TutorialService on `window.services`
- * rather than by synthetic clicks: each step carries its own ui/app-state, so
- * advancing with `nextStep()` reconstructs the DOM every step (the same
- * mechanism the tutorial's Back button relies on).
+ * rather than by synthetic clicks, so every step is reached the way the box's
+ * Next button reaches it: nothing but the tutorial's own state rule sets the
+ * app up. After each advance the app is compared with `getRequiredState()`.
  */
 
 interface StepResult {
@@ -24,63 +26,42 @@ interface StepResult {
   selector: string;
   found: boolean;
   highlighted: boolean;
+  mismatches: string[];
 }
 
-async function walkTutorials(page: Page): Promise<StepResult[]> {
-  return page.evaluate(async () => {
-    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-    const services = (window as any).services;
-    const tutorial = services?.tutorial;
-    if (!tutorial) throw new Error('window.services.tutorial not available');
-    const svc = tutorial.service;
-
-    const isVisible = (el: Element | null): boolean => {
-      if (!el) return false;
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    };
-
-    const results: StepResult[] = [];
-    // The wrapper start() runs sharedSetup (adds the TUT department + a tutorial
-    // schedule). onComplete chains welcome -> filtering -> autoSchedule -> schedules,
-    // so this single start walks all four tutorials.
-    await tutorial.start('welcome');
-
-    let guard = 0;
-    let lastKey = '';
-    while (guard++ < 120) {
-      const active = svc.getActiveTutorial();
-      if (!active) break;
-      const index = svc.getCurrentStepIndex();
-      const step = active.steps[index];
-      const key = `${active.id}#${index}`;
-      if (key === lastKey && guard > 110) break;
-
-      let found = false;
-      let highlighted = false;
-      for (let poll = 0; poll < 35; poll++) {
-        found = isVisible(document.querySelector(step.selector));
-        highlighted = !!document.querySelector('.tutorial-highlight-svg');
-        if (found && highlighted) break;
-        await sleep(160);
-      }
-      if (key !== lastKey) {
-        results.push({
-          tutorial: active.id,
-          index,
-          title: step.title,
-          selector: step.selector,
-          found,
-          highlighted,
-        });
-      }
-      lastKey = key;
-
-      svc.nextStep();
-      await sleep(350);
-    }
-    return results;
+async function currentStep(page: Page) {
+  return page.evaluate(() => {
+    const svc = (window as any).services.tutorial.service;
+    const active = svc.getActiveTutorial();
+    const step = svc.getCurrentStep();
+    return active && step
+      ? {
+          tutorial: active.id as string,
+          index: svc.getCurrentStepIndex() as number,
+          title: step.title as string,
+          selector: step.selector as string,
+        }
+      : null;
   });
+}
+
+async function targetReady(
+  page: Page,
+  selector: string,
+): Promise<{ found: boolean; highlighted: boolean }> {
+  return page.evaluate(async sel => {
+    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+    let found = false;
+    let highlighted = false;
+    for (let poll = 0; poll < 35; poll++) {
+      const r = document.querySelector(sel)?.getBoundingClientRect();
+      found = !!r && r.width > 0 && r.height > 0;
+      highlighted = !!document.querySelector('.tutorial-highlight-svg');
+      if (found && highlighted) break;
+      await sleep(160);
+    }
+    return { found, highlighted };
+  }, selector);
 }
 
 test('every tutorial step highlights a real, visible element', async ({
@@ -94,21 +75,53 @@ test('every tutorial step highlights a real, visible element', async ({
     timeout: 30_000,
   });
 
-  const results = await walkTutorials(page);
+  const expectedSteps = await page.evaluate(() => {
+    const svc = (window as any).services.tutorial.service;
+    return ([...svc.tutorials.values()] as Array<{ steps: unknown[] }>).reduce(
+      (n, t) => n + t.steps.length,
+      0,
+    );
+  });
 
-  // Sanity: all four tutorials were walked (welcome 9 + filtering 14 + autoSchedule 10 + schedules 6 = 39).
-  expect(results.length).toBeGreaterThanOrEqual(39);
+  // The wrapper start() runs sharedSetup (adds the TUT department + a tutorial
+  // schedule). onComplete chains welcome -> filtering -> autoSchedule -> schedules,
+  // so this single start walks all four tutorials.
+  await page.evaluate(() => (window as any).services.tutorial.start('welcome'));
 
-  const broken = results.filter(r => !r.found || !r.highlighted);
+  const results: StepResult[] = [];
+  let lastKey = '';
+  for (let guard = 0; guard < expectedSteps + 20; guard++) {
+    const step = await currentStep(page);
+    if (!step) break;
+    const key = `${step.tutorial}#${step.index}`;
+    if (key !== lastKey) {
+      const { found, highlighted } = await targetReady(page, step.selector);
+      const mismatches = await waitForTutorialState(page);
+      results.push({ ...step, found, highlighted, mismatches });
+    }
+    lastKey = key;
+
+    await page.evaluate(() =>
+      (window as any).services.tutorial.service.nextStep(),
+    );
+    await page.waitForTimeout(350);
+  }
+
+  expect(results.length).toBe(expectedSteps);
+
+  const broken = results.filter(
+    r => !r.found || !r.highlighted || r.mismatches.length > 0,
+  );
   const report = broken
     .map(
       r =>
-        `  ✗ ${r.tutorial}#${r.index} "${r.title}" -> ${r.selector}` +
-        ` (found=${r.found}, highlighted=${r.highlighted})`,
+        `  x ${r.tutorial}#${r.index} "${r.title}" -> ${r.selector}` +
+        ` (found=${r.found}, highlighted=${r.highlighted})` +
+        r.mismatches.map(m => `\n      ${m}`).join(''),
     )
     .join('\n');
   expect(
     broken,
-    `Tutorial steps whose target could not be found/highlighted:\n${report}`,
+    `Tutorial steps whose target could not be found/highlighted, or whose app state was wrong:\n${report}`,
   ).toEqual([]);
 });

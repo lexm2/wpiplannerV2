@@ -14,6 +14,7 @@ import type {
 import type { Course } from '../../types/types';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
+import { hasPickedSections } from '../../utils/courseUtils';
 
 /**
  * Standalone auto-schedule modal orchestration for the schedule page.
@@ -87,6 +88,10 @@ class AutoScheduleService {
    * here would break the structured clone.
    */
   setRankingPreferences(autoSchedule: RankingPreferences): void {
+    if (appState.tutorialRanking) {
+      appState.tutorialRanking = autoSchedule;
+      return;
+    }
     ProfileStateManager.getInstance().updatePreferences({ autoSchedule });
   }
 
@@ -108,30 +113,21 @@ class AutoScheduleService {
     openModal('auto-schedule-intro');
   }
 
-  updateAutoScheduleIntroTerms(preferences: Record<string, string[]>): void {
-    // Override channel the intro modal merges into its per-course term selection.
-    modalState.autoScheduleIntroTermPrefs = preferences;
-  }
-
   openAutoScheduleFilter(): void {
     if (!this.filterService || !this.courseSelectionService) return;
-    const selectedCourses = this.courseSelectionService.getSelectedCourses();
-    // Same FilterModal as openScheduleFilterModal, but for the current selection
-    // (direct button / tutorial reopen path).
-    this.openScheduleFilterModal(selectedCourses);
+    // Same FilterModal as openScheduleFilterModal, but skipping the intro, so
+    // the intro's lock rule is applied here.
+    this.openScheduleFilterModal(
+      lockPickedCourses(this.courseSelectionService.getSelectedCourses()),
+    );
   }
 
-  /** Generate for the current selection, keeping any named course to its terms. */
-  runAutoSchedule(allowedTerms: Record<string, string[]> = {}): void {
+  /** Generate for the current selection, as the intro would have set it up. */
+  runAutoSchedule(): void {
     if (!this.courseSelectionService) return;
-    const selectedCourses = this.courseSelectionService
-      .getSelectedCourses()
-      .map(sc =>
-        allowedTerms[sc.course.id]
-          ? { ...sc, allowedTerms: allowedTerms[sc.course.id] }
-          : sc,
-      );
-    void this.doGenerateSchedules(selectedCourses);
+    void this.doGenerateSchedules(
+      lockPickedCourses(this.courseSelectionService.getSelectedCourses()),
+    );
   }
 
   private async doGenerateSchedules(
@@ -171,6 +167,19 @@ class AutoScheduleService {
       appState.scheduleGenerating = false;
     }
   }
+}
+
+/**
+ * The intro's rule for what Auto-Schedule leaves alone: unless every course
+ * already has picks (then there would be nothing to schedule), a course with
+ * picks is locked by allowing it no terms. Every way into generation applies
+ * it, so none of them can reschedule a course the student chose sections for.
+ */
+function lockPickedCourses(courses: SelectedCourse[]): SelectedCourse[] {
+  if (courses.every(hasPickedSections)) return courses;
+  return courses.map(sc =>
+    hasPickedSections(sc) ? { ...sc, allowedTerms: [] } : sc,
+  );
 }
 
 /** "A", "A and B", "A, B and C". */

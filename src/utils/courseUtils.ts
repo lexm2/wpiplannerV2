@@ -57,6 +57,11 @@ export function getSelectedSections(course: SelectedCourse): Section[] {
   return sectionsOf(course.selected);
 }
 
+/** Whether any section has been picked for the course. */
+export function hasPickedSections(course: SelectedCourse): boolean {
+  return sectionsOf(course.selected).length > 0;
+}
+
 /**
  * Encodes a selection for export as [courseId, lectureCRN, discussionCRN, labCRN].
  *

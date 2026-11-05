@@ -1,50 +1,10 @@
-import { test, expect, type Page } from './fixtures';
+import { test, expect, appModuleUrl } from './fixtures';
 
 /**
  * Regression guards for defects fixed from a code surface audit.
  * Each of these bugs was invisible to tsc/svelte-check/unit tests, which is how
  * they survived; these assertions are the thing that keeps them fixed.
  */
-
-/**
- * Resolve a source module's URL from the page's OWN module graph.
- *
- * Tests that poke at app internals must import the exact module instance the
- * mounted app uses. A dev server that has served an HMR update stamps every
- * import specifier with a `?t=<timestamp>` cache-bust query, so importing the
- * bare path loads a SECOND copy of the module -- with its own `$state`
- * singletons -- that no mounted component ever reads. Since
- * playwright.config.ts reuses an already-running dev server, that is the
- * normal local case, not an edge case. Looking the URL up from resource timing
- * gets whichever form the app actually loaded.
- */
-async function appModuleUrl(page: Page, path: string): Promise<string> {
-  const url = await page.evaluate(p => {
-    return (
-      performance
-        .getEntriesByType('resource')
-        .map(e => e.name)
-        .find(n => n.includes(p)) ?? null
-    );
-  }, path);
-  // Deliberately no bare-path fallback: importing the bare path is exactly the
-  // bug this helper exists to prevent, and it fails SILENTLY (the detached copy
-  // accepts every mutation, so state-only assertions still pass). Fail loudly.
-  if (!url) {
-    throw new Error(
-      `${path} is not in the page's module graph, so its live instance cannot ` +
-        `be addressed. If the app grew past the resource-timing buffer, raise the ` +
-        `size in this file's beforeEach.`,
-    );
-  }
-  return url;
-}
-
-// The helper above reads resource timing, which stops recording once its buffer
-// fills. The app was at 242 of the 250-entry default, so raise it well clear.
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => performance.setResourceTimingBufferSize(2000));
-});
 
 test('right panel default width is 700px, not the old 320px', async ({
   page,

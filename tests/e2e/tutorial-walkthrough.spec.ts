@@ -1,15 +1,18 @@
 import { test, expect, type Page } from './fixtures';
+import { waitForTutorialState } from './tutorialExpect';
 
 /**
  * Walks all four tutorials the way a user does - by really clicking the element
- * each step points at - and asserts every step actually works.
+ * each step points at (Next, on a reading step) - and asserts every step
+ * actually works.
  *
  * This is the companion to tutorial-highlight.spec.ts. That test advances with
- * `svc.nextStep()`, which exercises the state-reconstruction path (what the Back
- * button relies on) but never proves a real click does anything. Here nothing is
- * advanced programmatically: the walk only moves forward because a genuine
- * pointer event on the step's own target fired TutorialService's `waitFor`
- * listener. A step that highlights a decoration, a duplicated id, or a target
+ * `svc.nextStep()`, which proves the tutorial's state rule alone sets the app up
+ * but never that a real click does anything. Here nothing is advanced
+ * programmatically: the walk only moves forward because a genuine pointer event
+ * on the step's own target fired TutorialService's `waitFor` listener, and
+ * after every click the app must still match the state the new step requires
+ * (the app's own handler and the tutorial's state rule must agree). A step that highlights a decoration, a duplicated id, or a target
  * buried under a modal fails here and passes there.
  *
  * It runs at each layout the tutorials support, since the page rearranges itself
@@ -56,13 +59,14 @@ interface StepProbe {
 }
 
 type StepReport = StepMeta &
-  StepProbe & { advanced: boolean; clickError: string | null };
+  StepProbe & {
+    advanced: boolean;
+    clickError: string | null;
+    mismatches: string[];
+  };
 
 const STEP_KEY = (m: StepMeta | null) =>
   m ? `${m.tutorial}#${m.index}` : 'done';
-
-// welcome 9 + filtering 14 + autoSchedule 10 + schedules 6.
-const EXPECTED_STEPS = 39;
 
 async function readStep(page: Page): Promise<StepMeta | null> {
   return page.evaluate(() => {
@@ -265,17 +269,25 @@ async function walk({ page }: { page: Page }): Promise<void> {
     { timeout: 30_000 },
   );
 
+  const expectedSteps = await page.evaluate(() => {
+    const svc = (window as any).services.tutorial.service;
+    return ([...svc.tutorials.values()] as Array<{ steps: unknown[] }>).reduce(
+      (n, t) => n + t.steps.length,
+      0,
+    );
+  });
+
   const results: StepReport[] = [];
-  for (let guard = 0; guard < 60; guard++) {
+  for (let guard = 0; guard < expectedSteps + 20; guard++) {
     const meta = await readStep(page);
     if (!meta) break;
 
+    const mismatches = await waitForTutorialState(page);
     const probe = await probeStep(page, meta.selector);
 
-    // Manual steps are completed with the floating box's Next button; every
-    // other step must be completed by clicking the highlighted target itself.
-    const clickSelector =
-      meta.waitFor === 'manual' ? '[data-tutorial-next]' : meta.selector;
+    // A reading step points at Next, so every step is completed by clicking
+    // the highlighted target itself.
+    const clickSelector = meta.selector;
     let clickError: string | null = null;
     try {
       await page.locator(clickSelector).first().click({ timeout: 5_000 });
@@ -302,7 +314,7 @@ async function walk({ page }: { page: Page }): Promise<void> {
     const advanced = clickError
       ? false
       : await waitForAdvance(page, STEP_KEY(meta));
-    results.push({ ...meta, ...probe, advanced, clickError });
+    results.push({ ...meta, ...probe, advanced, clickError, mismatches });
 
     // Keep walking so one broken step reports the rest instead of hiding them.
     if (!advanced) {
@@ -321,6 +333,7 @@ async function walk({ page }: { page: Page }): Promise<void> {
       r.blockedBy !== null ||
       !r.onArrival ||
       r.stuckButtons.length > 0 ||
+      r.mismatches.length > 0 ||
       !r.advanced,
   );
   const report = broken
@@ -342,6 +355,7 @@ async function walk({ page }: { page: Page }): Promise<void> {
         why.push('target out of reach when the step landed');
       if (r.stuckButtons.length > 0)
         why.push(`box buttons can't be clicked: ${r.stuckButtons.join(', ')}`);
+      for (const m of r.mismatches) why.push(`app state: ${m}`);
       if (!r.advanced)
         why.push(
           `clicking it did not advance the tutorial${r.clickError ? ` (${r.clickError})` : ''}`,
@@ -357,7 +371,7 @@ async function walk({ page }: { page: Page }): Promise<void> {
   expect(
     results.length,
     'all four tutorials should have been walked end to end',
-  ).toBe(EXPECTED_STEPS);
+  ).toBe(expectedSteps);
 
   // Finishing the last tutorial must hand the app back the way it found it:
   // cleanupTutorial drops the synthetic TUT department and the throwaway

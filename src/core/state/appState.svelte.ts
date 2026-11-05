@@ -5,6 +5,10 @@ import type {
 } from '../../types/schedule';
 import type { Department } from '../../types/types';
 import { catalogGridRange } from '../../utils/timeWindows';
+import {
+  normalizeRankingPreferences,
+  type RankingPreferences,
+} from '../../services/scheduling/rankingPreferences';
 
 /**
  * Reactive application state (Svelte 5 runes) - the single source of truth that
@@ -73,6 +77,18 @@ class AppState {
    * schedule grid's generating overlay.
    */
   scheduleGenerating = $state(false);
+
+  /**
+   * What a running tutorial ranks by. Held here rather than in `preferences`
+   * so the student's own are never touched and a reload simply forgets it.
+   */
+  tutorialRanking = $state.raw<RankingPreferences | null>(null);
+
+  /** What Auto-Schedule ranks by right now. */
+  rankingPreferences = $derived(
+    this.tutorialRanking ??
+      normalizeRankingPreferences(this.preferences.autoSchedule),
+  );
 
   /** The active schedule object (new identity whenever it or its id changes). */
   activeSchedule = $derived(

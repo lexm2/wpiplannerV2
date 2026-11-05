@@ -116,6 +116,8 @@ export function installAppEffects(services: ServiceContainer): void {
   $effect(() => {
     headerCollapsed.current; // track
     drawerMode.schedule.current; // track
+    drawerMode.departments.current; // track
+    drawerMode.details.current; // track
     untrack(() => {
       if (!layoutInit) {
         layoutInit = true;

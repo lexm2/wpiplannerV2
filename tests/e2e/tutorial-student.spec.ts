@@ -1,4 +1,5 @@
 import { test, expect, type Page } from './fixtures';
+import { expectAppMatchesTutorial } from './tutorialExpect';
 
 /**
  * What a tutorial does to a real student's planner, and what it does when the
@@ -74,18 +75,10 @@ async function startFromMenu(page: Page, id: string): Promise<void> {
   await expectStep(page, `${id}#0`);
 }
 
-/** Do what the step asks: click its target, or Next where it only explains. */
+/** Do what the step asks: click its target (Next, where it only explains). */
 async function doStep(page: Page): Promise<void> {
   const step = await currentStep(page);
-  const manual = await page.evaluate(
-    () =>
-      (window as any).services.tutorial.service.getCurrentStep().waitFor ===
-      'manual',
-  );
-  await page
-    .locator(manual ? NEXT : step!.selector)
-    .first()
-    .click();
+  await page.locator(step!.selector).first().click();
   await expect
     .poll(async () => stepKey(await currentStep(page)))
     .not.toBe(stepKey(step));
@@ -133,7 +126,7 @@ test('hands back the student’s filters, search and page', async ({ page }) => 
 
   await startFromMenu(page, 'welcome');
   // Their search would otherwise hide the very course the step points at.
-  await doStep(page);
+  await walkTo(page, 'welcome#2');
   await expect(page.locator((await currentStep(page))!.selector)).toBeVisible();
 
   await page.click(SKIP);
@@ -144,6 +137,78 @@ test('hands back the student’s filters, search and page', async ({ page }) => 
   );
   await expect(page.locator('#degree-tab')).toHaveClass(/active/);
   expect((await schedules(page)).active).toBe('My Real Plan');
+});
+
+test('a tutorial leaves the student’s saved preferences alone', async ({
+  page,
+}) => {
+  const saved = () =>
+    page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem('wpi-planner-preferences') ?? '{}')
+          .autoSchedule?.earlyClasses?.importance,
+    );
+  const live = () =>
+    page.evaluate(
+      () =>
+        (window as any).services.profileStateManager.getPreferences()
+          .autoSchedule?.earlyClasses?.importance,
+    );
+  const earlyHigh = page.locator(
+    '[data-ranking="earlyClasses"] input[value="high"]',
+  );
+
+  await returningStudent(page);
+  await page.evaluate(() =>
+    (window as any).services.profileStateManager.updatePreferences({
+      autoSchedule: { earlyClasses: { importance: 'low' } },
+    }),
+  );
+  await expect.poll(saved).toBe('low');
+
+  await startFromMenu(page, 'autoSchedule');
+  await walkTo(page, 'autoSchedule#4');
+  await doStep(page);
+  await expect(earlyHigh).toBeChecked();
+  // Long enough for a save to land, if one were coming.
+  await page.waitForTimeout(500);
+  expect(await saved()).toBe('low');
+  expect(await live()).toBe('low');
+
+  await page.click(SKIP);
+  await expect(page.locator(SKIP)).toHaveCount(0);
+  expect(await saved()).toBe('low');
+  expect(await live()).toBe('low');
+
+  await startFromMenu(page, 'autoSchedule');
+  await walkTo(page, 'autoSchedule#4');
+  await doStep(page);
+  await expect(earlyHigh).toBeChecked();
+  await page.reload();
+  await page.waitForFunction(
+    () =>
+      (window as any).services?.courseDataService?.getAllDepartments().length >
+      0,
+  );
+  await expect.poll(live).toBe('low');
+});
+
+test('what the student saves during a tutorial stays saved', async ({
+  page,
+}) => {
+  await firstVisit(page);
+  await page.evaluate(() =>
+    (window as any).services.themeManager.setTheme('wpi-light'),
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          JSON.parse(localStorage.getItem('wpi-planner-preferences') ?? '{}')
+            .theme,
+      ),
+    )
+    .toBe('wpi-light');
 });
 
 test('a schedule the student named Tutorial is theirs', async ({ page }) => {
@@ -171,7 +236,7 @@ test('a schedule the student named Tutorial is theirs', async ({ page }) => {
 test('undo stays out of the tutorial, during and after', async ({ page }) => {
   await returningStudent(page);
   await startFromMenu(page, 'welcome');
-  await walkTo(page, 'welcome#3');
+  await walkTo(page, 'welcome#6');
 
   await expect(page.locator('#undo-btn')).toBeDisabled();
   await page.keyboard.press('Control+z');
@@ -194,7 +259,7 @@ test('undo stays out of the tutorial, during and after', async ({ page }) => {
 test('creating a schedule at the end lands on it', async ({ page }) => {
   await firstVisit(page);
   await startFromMenu(page, 'schedules');
-  await walkTo(page, 'schedules#4');
+  await walkTo(page, 'schedules#3');
 
   await page.click('#new-schedule-btn');
   await page.getByPlaceholder('Schedule name').fill('Fall plan');
@@ -292,50 +357,173 @@ test('a reload mid-tutorial leaves no trace', async ({ page }) => {
 
 test('each click does what its step says', async ({ page }) => {
   await firstVisit(page);
-  await walkTo(page, 'filtering#3');
+  await walkTo(page, 'filtering#2');
+  await doStep(page);
   expect((await filters(page)).term).toEqual({ terms: ['B'] });
   await expect(page.locator('#avoid-conflicts-filter')).not.toBeChecked();
+  await expectStep(page, 'filtering#3');
   await doStep(page);
   await expect(page.locator('#avoid-conflicts-filter')).toBeChecked();
-  await doStep(page);
-  await expect(page.locator('#available-only-filter')).toBeChecked();
+  expect((await filters(page)).periodConflict.avoidConflicts).toBe(true);
+  await expectAppMatchesTutorial(page);
 
+  const earlyHigh = page.locator(
+    '[data-ranking="earlyClasses"] input[value="high"]',
+  );
   await walkTo(page, 'autoSchedule#4');
-  const badge = (id: string) =>
-    page.locator(
-      `.as-course-card[data-course-id="${id}"] [data-term-badge][data-term="C"]`,
-    );
-  await expect(badge('TUT-2001')).toHaveAttribute('aria-pressed', 'true');
+  await expect(earlyHigh).not.toBeChecked();
   await doStep(page);
-  await expect(badge('TUT-2001')).toHaveAttribute('aria-pressed', 'false');
-  await doStep(page);
-  await expect(badge('TUT-2006')).toHaveAttribute('aria-pressed', 'false');
+  await expect(earlyHigh).toBeChecked();
+  await expectAppMatchesTutorial(page);
 
-  await walkTo(page, 'autoSchedule#9');
-  const sections = () =>
-    page.evaluate(() =>
-      Object.fromEntries(
-        (window as any).services.courseSelectionService
-          .getSelectedCourses()
-          .map((sc: any) => [sc.course.id, sc.selected?.lecture?.number]),
-      ),
-    );
-  await expect.poll(async () => (await sections())['TUT-2001']).toBeTruthy();
-  const picked = await sections();
-  expect(picked['TUT-2008']).toContain('TA03');
-  // Both offer A and C; the step said A.
-  expect(picked['TUT-2001']).toMatch(/^TA/);
-  expect(picked['TUT-2006']).toMatch(/^TA/);
+  await doStep(page);
+  await expectStep(page, 'autoSchedule#6');
+  await expect(page.locator('.schedule-result-status')).toBeVisible();
   await expect(page.locator('.error-banner')).toHaveCount(0);
+  await expectAppMatchesTutorial(page);
+});
+
+test('a stray click is put right by the next step', async ({ page }) => {
+  await firstVisit(page);
+
+  // A course removed behind the tutorial's back comes back.
+  await walkTo(page, 'welcome#6');
+  await page.evaluate(async () => {
+    const s = (window as any).services;
+    const sc = s.courseSelectionService.getSelectedCourses()[0];
+    await s.courseSelectionService.unselectCourse(sc.course);
+  });
+  await page.locator(NEXT).click();
+  await expectStep(page, 'welcome#7');
+  await expectAppMatchesTutorial(page);
+
+  // A filter the step never asked for goes.
+  await page.evaluate(() =>
+    (window as any).services.tutorial.start('filtering'),
+  );
+  await expectStep(page, 'filtering#0');
+  await walkTo(page, 'filtering#2');
+  await page.evaluate(() =>
+    (window as any).services.filterService.addFilter('availability', {
+      availableOnly: true,
+    }),
+  );
+  await doStep(page);
+  await expectStep(page, 'filtering#3');
+  await expectAppMatchesTutorial(page);
+  expect(Object.keys(await filters(page))).not.toContain('availability');
+});
+
+const picksOfFirstCourse = (page: Page) =>
+  page.evaluate(() => {
+    const sc = (window as any).services.courseSelectionService
+      .getSelectedCourses()
+      .find((c: any) => c.course.id === 'TUT-2001');
+    return [sc.selected.lecture?.number, sc.selected.lab?.number];
+  });
+
+test.describe('generating keeps the picks the student made', () => {
+  test('by real clicks', async ({ page }) => {
+    await firstVisit(page);
+    await walkTo(page, 'autoSchedule#6');
+
+    await expect(page.locator('.schedule-result-status')).toBeVisible();
+    expect(await picksOfFirstCourse(page)).toEqual(['TCL01', 'TCX03']);
+    await expectAppMatchesTutorial(page);
+  });
+
+  test('by pressing Next all the way', async ({ page }) => {
+    await firstVisit(page);
+    await page.evaluate(() =>
+      (window as any).services.tutorial.start('autoSchedule'),
+    );
+    await expectStep(page, 'autoSchedule#0');
+    for (let i = 1; i <= 6; i++) {
+      await page.locator(NEXT).click();
+      await expectStep(page, `autoSchedule#${i}`);
+      await expectAppMatchesTutorial(page);
+    }
+
+    await expect(page.locator('.schedule-result-status')).toBeVisible();
+    expect(await picksOfFirstCourse(page)).toEqual(['TCL01', 'TCX03']);
+  });
+});
+
+test('a student with their own ranking sees the defaults, then gets theirs back', async ({
+  page,
+}) => {
+  const importance = (key: string) =>
+    page.evaluate(
+      k =>
+        (window as any).services.profileStateManager.getPreferences()
+          .autoSchedule?.[k]?.importance,
+      key,
+    );
+
+  await returningStudent(page);
+  await page.evaluate(() =>
+    (window as any).services.profileStateManager.updatePreferences({
+      autoSchedule: {
+        openSeats: { importance: 'off' },
+        lateClasses: { importance: 'high', after: '17:00' },
+      },
+    }),
+  );
+
+  await startFromMenu(page, 'autoSchedule');
+  await walkTo(page, 'autoSchedule#3');
+  await expect(
+    page.locator('[data-ranking="openSeats"] input[value="high"]'),
+  ).toBeChecked();
+  await expect(
+    page.locator('[data-ranking="lateClasses"] input[value="off"]'),
+  ).toBeChecked();
+
+  await page.click(SKIP);
+  await expect(page.locator(SKIP)).toHaveCount(0);
+  await expect.poll(() => importance('openSeats')).toBe('off');
+  expect(await importance('lateClasses')).toBe('high');
+});
+
+test('a course the student was reading is shown again afterwards', async ({
+  page,
+}) => {
+  await returningStudent(page);
+  const description = () => page.locator('#course-description').textContent();
+  await page.locator('[data-course-id] [data-open-btn]').nth(2).click();
+  await expect.poll(description).toBeTruthy();
+  const before = await description();
+
+  await startFromMenu(page, 'welcome');
+  await walkTo(page, 'welcome#3');
+  await expect.poll(description).not.toBe(before);
+
+  await page.click(SKIP);
+  await expect(page.locator(SKIP)).toHaveCount(0);
+  await expect.poll(description).toBe(before);
+});
+
+test('a step that only reads carries the outline on Next', async ({ page }) => {
+  await firstVisit(page);
+  const outlined = (selector: string) =>
+    page.locator(`${selector} .tutorial-highlight-svg`);
+
+  await expectStep(page, 'welcome#0');
+  await expect(outlined(NEXT)).toBeAttached();
+
+  await walkTo(page, 'welcome#3');
+  await expect(outlined(NEXT)).toBeAttached();
+  // What the text describes is not outlined, only kept clear of the box.
+  await expect(outlined('#course-description')).toHaveCount(0);
 });
 
 test('double-clicking a target counts as one click', async ({ page }) => {
   await firstVisit(page);
-  await walkTo(page, 'welcome#4');
+  await walkTo(page, 'welcome#7');
 
   await page.locator('[data-crn="100108"]').dblclick();
 
-  await expectStep(page, 'welcome#5');
+  await expectStep(page, 'welcome#8');
   // Still picked, so the wizard still offers the step's Next.
   await expect(page.locator('#wizard-next-btn')).toBeVisible();
 
@@ -344,7 +532,7 @@ test('double-clicking a target counts as one click', async ({ page }) => {
   await expect(page.locator(LOST)).toBeVisible({ timeout: 4_000 });
   await page.click(FIND);
   await page.locator('#wizard-next-btn').click();
-  await expectStep(page, 'welcome#6');
+  await expectStep(page, 'welcome#9');
 });
 
 test('Find Element brings back what the student closed or left', async ({
@@ -353,19 +541,19 @@ test('Find Element brings back what the student closed or left', async ({
   await firstVisit(page);
 
   // Closed the window the step works in.
-  await walkTo(page, 'welcome#4');
+  await walkTo(page, 'welcome#7');
   await expect(page.locator(LOST)).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(page.locator('[data-crn="100108"]')).toHaveCount(0);
   await expect(page.locator(LOST)).toBeVisible({ timeout: 4_000 });
   await page.click(FIND);
   await page.locator('[data-crn="100108"]').click();
-  await expectStep(page, 'welcome#5');
+  await expectStep(page, 'welcome#8');
 
   // Wandered off to another page.
   await page.evaluate(() => (window as any).services.tutorial.start('welcome'));
   await expectStep(page, 'welcome#0');
-  await walkTo(page, 'welcome#3');
+  await walkTo(page, 'welcome#6');
   const target = page.locator(
     '.schedule-course-item[data-course-id="TUT-2001"]',
   );
@@ -374,7 +562,7 @@ test('Find Element brings back what the student closed or left', async ({
   await page.click(FIND);
   await expect(target).toBeVisible();
   await target.click();
-  await expectStep(page, 'welcome#4');
+  await expectStep(page, 'welcome#7');
 });
 
 test('the keyboard can reach Next from a step inside a window', async ({
@@ -495,13 +683,13 @@ test('a step follows its target across a breakpoint', async ({ page }) => {
   // The schedule sidebar turns into a drawer.
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.evaluate(() => (window as any).services.tutorial.start('welcome'));
-  await walkTo(page, 'welcome#3');
+  await walkTo(page, 'welcome#6');
   await page.setViewportSize({ width: 900, height: 800 });
   const target = page.locator(
     '.schedule-course-item[data-course-id="TUT-2001"]',
   );
   await target.click();
-  await expectStep(page, 'welcome#4');
+  await expectStep(page, 'welcome#7');
 });
 
 test.describe('where the box sits', () => {
@@ -598,9 +786,8 @@ test.describe('where the box sits', () => {
       const svc = (window as any).services.tutorial.service;
       svc.nextStep();
       svc.nextStep();
-      svc.nextStep();
     });
-    await expectStep(page, 'schedules#4');
+    await expectStep(page, 'schedules#3');
     await expect
       .poll(() => coveredInWindow(page))
       .not.toContain('New Schedule');

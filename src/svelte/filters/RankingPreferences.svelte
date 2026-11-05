@@ -14,9 +14,7 @@
   import { DayOfWeek } from '../../types/types';
   import styles from '../../styles/components/ranking-preferences.module.css';
 
-  const prefs = $derived(
-    normalizeRankingPreferences(appState.preferences.autoSchedule),
-  );
+  const prefs = $derived(appState.rankingPreferences);
 
   const isDefault = $derived(
     JSON.stringify(prefs) === JSON.stringify(DEFAULT_RANKING_PREFERENCES),

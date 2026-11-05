@@ -13,7 +13,9 @@ import type { CourseColorService } from '../../src/services/scheduling/CourseCol
 import type { SelectedCourse } from '../../src/types/schedule';
 
 function setup(generateSchedules: () => Promise<unknown>): void {
-  const selection = [{ course: { id: 'CS2102' } }] as SelectedCourse[];
+  const selection = [
+    { course: { id: 'CS2102' }, selected: {} },
+  ] as unknown as SelectedCourse[];
   autoScheduleService.init(
     {
       getSelectedCourses: () => selection,
@@ -113,14 +115,19 @@ describe('autoScheduleService error reporting', () => {
 });
 
 describe('runAutoSchedule', () => {
-  it('keeps the named courses to their terms and leaves the rest alone', async () => {
+  function selected(id: string, picked: boolean): SelectedCourse {
+    return {
+      course: { id },
+      selected: picked ? { lecture: { number: 'L01' } } : {},
+    } as unknown as SelectedCourse;
+  }
+
+  async function generatedWith(
+    selection: SelectedCourse[],
+  ): Promise<SelectedCourse[]> {
     const generate = vi.fn((_courses: SelectedCourse[]) =>
       Promise.resolve({ status: 'generated' }),
     );
-    const selection = [
-      { course: { id: 'TUT-2001' } },
-      { course: { id: 'TUT-2002' } },
-    ] as SelectedCourse[];
     autoScheduleService.init(
       {
         getSelectedCourses: () => selection,
@@ -129,12 +136,27 @@ describe('runAutoSchedule', () => {
       {} as CourseColorService,
       { generateSchedules: generate } as unknown as AutoScheduleOrchestrator,
     );
-
-    autoScheduleService.runAutoSchedule({ 'TUT-2001': ['A'] });
+    autoScheduleService.runAutoSchedule();
     await vi.waitFor(() => expect(generate).toHaveBeenCalled());
+    return generate.mock.calls[0][0];
+  }
 
-    const [named, other] = generate.mock.calls[0][0];
-    expect(named.allowedTerms).toEqual(['A']);
-    expect(other.allowedTerms).toBeUndefined();
+  it('locks courses that have picks and leaves the rest to the scheduler', async () => {
+    const [picked, open] = await generatedWith([
+      selected('TUT-2001', true),
+      selected('TUT-2002', false),
+    ]);
+
+    expect(picked.allowedTerms).toEqual([]);
+    expect(open.allowedTerms).toBeUndefined();
+  });
+
+  it('locks nothing when every course has picks, since nothing would be left to schedule', async () => {
+    const courses = await generatedWith([
+      selected('TUT-2001', true),
+      selected('TUT-2002', true),
+    ]);
+
+    expect(courses.every(c => c.allowedTerms === undefined)).toBe(true);
   });
 });

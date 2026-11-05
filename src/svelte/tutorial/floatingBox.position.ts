@@ -255,35 +255,3 @@ export function placeBox(
   box.style.top = `${best.top}px`;
   box.style.bottom = 'auto';
 }
-
-/**
- * Decorate any `.tutorial-inline-highlight` spans inside the step description with
- * the marching-ants dashed-rect SVG (sized to each span). Kept as SVG - the
- * dashoffset animation is exactly what CSS approximates poorly.
- */
-export function decorateInlineHighlights(descEl: HTMLElement): void {
-  descEl
-    .querySelectorAll<HTMLElement>('.tutorial-inline-highlight')
-    .forEach(span => {
-      if (span.querySelector('svg')) return;
-      const w = span.offsetWidth + 4;
-      const h = span.offsetHeight + 4;
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('width', String(w));
-      svg.setAttribute('height', String(h));
-      const rect = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'rect',
-      );
-      rect.setAttribute('x', '1');
-      rect.setAttribute('y', '1');
-      rect.setAttribute('rx', '4');
-      rect.setAttribute('width', String(w - 2));
-      rect.setAttribute('height', String(h - 2));
-      rect.setAttribute('fill', 'none');
-      rect.setAttribute('stroke-width', '2');
-      rect.setAttribute('stroke-dasharray', '8 6');
-      svg.appendChild(rect);
-      span.insertBefore(svg, span.firstChild);
-    });
-}

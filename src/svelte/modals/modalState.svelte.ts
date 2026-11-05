@@ -60,11 +60,6 @@ class ModalState {
   localEvent = $state.raw<LocalEventPayload | null>(null);
   icsImport = $state.raw<IcsImportPayload | null>(null);
   autoScheduleIntro = $state.raw<AutoScheduleIntroPayload | null>(null);
-  // Tutorial-driven term-preference overrides. The component merges these
-  // into its per-course term selection whenever this changes.
-  autoScheduleIntroTermPrefs = $state.raw<Record<string, string[]> | null>(
-    null,
-  );
   // Filter modal payload (mode + auto-schedule continuation). Set by the
   // trigger site before openModal('filter-modal' | 'auto-schedule-filter').
   filter = $state.raw<FilterModalPayload | null>(null);

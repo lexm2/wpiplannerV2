@@ -10,8 +10,7 @@ import { uiState, openModal, closeModal } from '../services/ui/uiState.svelte';
  * modal stack like any dialog - Escape reaches the topmost entry only, a modal
  * opened from the drawer stacks above it, and the guards that stand down while
  * a modal is open (the section wizard's Escape, the term pager's keys) stand
- * down for a drawer too. `closeAllModals` and tutorial restores clear it with
- * the rest.
+ * down for a drawer too. `closeAllModals` clears it with the rest.
  */
 export type DrawerId = 'departments' | 'details' | 'schedule';
 
@@ -33,6 +32,11 @@ export const drawerMode = Object.fromEntries(
 
 const PREFIX = 'drawer-';
 const modalId = (id: DrawerId) => `${PREFIX}${id}`;
+
+/** Whether an `openModals` entry is a drawer rather than a dialog. */
+export function isDrawerEntry(modalTypeId: string): boolean {
+  return modalTypeId.startsWith(PREFIX);
+}
 
 /** The open drawer, if any - at most one is ever open. */
 export function openDrawerId(): DrawerId | null {

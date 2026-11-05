@@ -9,18 +9,11 @@
     coversTarget,
     layoutKey,
     placeBox,
-    decorateInlineHighlights,
     targetOnScreen,
   } from './floatingBox.position';
   import styles from '../../styles/components/floating-text-box.module.css';
 
-  let {
-    tutorialService,
-    onGoBack,
-  }: {
-    tutorialService: TutorialService;
-    onGoBack: () => Promise<void>;
-  } = $props();
+  let { tutorialService }: { tutorialService: TutorialService } = $props();
 
   // Step state is driven by the tutorialOverlayState rune store (written by
   // TutorialService).
@@ -33,6 +26,14 @@
   const TARGET_WATCH_MS = 500;
 
   let backDisabled = $state(false);
+
+  // Everything on the page the step is about: what to click, where the click
+  // is heard, and what the text describes.
+  function stepSelectors(s: NonNullable<typeof step>): string[] {
+    return [s.selector, s.waitForSelector, s.about].filter(
+      (sel): sel is string => !!sel,
+    );
+  }
 
   // Bound inside an {#if}, so it must be reactive.
   let boxEl = $state<HTMLElement | null>(null);
@@ -54,10 +55,9 @@
   // it's on what the step needs.
   let dragged = false;
 
-  // After each step's {@html} description renders, decorate any inline-highlight
-  // spans with the marching-ants dashed-rect SVG, and move the box out of the way.
-  // tick() (not rAF) is used so this runs after Svelte has flushed the {@html}
-  // update - the inline span only exists then.
+  // Move the box out of the way of what the step points at and describes.
+  // tick() (not rAF) is used so the first placement runs after Svelte has
+  // flushed the new description, which changes the box's size.
   //
   // Placing once isn't enough, since a step's window or page is often still
   // arriving when this runs. So the first moments of a step watch each frame and
@@ -74,8 +74,7 @@
       return;
     }
     const box = boxEl;
-    const selectors = [step.selector];
-    if (step.waitForSelector) selectors.push(step.waitForSelector);
+    const selectors = stepSelectors(step);
 
     let disposed = false;
     let placedFor = '';
@@ -90,7 +89,6 @@
     };
     void tick().then(() => {
       if (disposed) return;
-      decorateInlineHighlights(box);
       place();
     });
 
@@ -144,12 +142,13 @@
   let targetLost = $state(false);
   $effect(() => {
     if (!step) return;
-    const selector = step.selector;
+    const { selector, about } = step;
     const settleUntil = performance.now() + SETTLE_MS;
     targetLost = false;
     const poll = setInterval(() => {
       if (performance.now() > settleUntil) {
-        targetLost = !targetOnScreen(selector);
+        targetLost =
+          !targetOnScreen(selector) || (!!about && !targetOnScreen(about));
       }
     }, 500);
     return () => clearInterval(poll);
@@ -230,7 +229,7 @@
   async function onBack(): Promise<void> {
     backDisabled = true;
     try {
-      await onGoBack();
+      await tutorialService.goBack();
     } finally {
       backDisabled = false;
     }

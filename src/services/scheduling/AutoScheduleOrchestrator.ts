@@ -8,7 +8,6 @@ import { appState } from '../../core/state/appState.svelte';
 import type { ScheduleResult } from './AutoScheduler';
 import { SmartScheduler } from './SmartScheduler';
 import { ScheduleWorkerManager } from '../../workers/ScheduleWorkerManager';
-import { normalizeRankingPreferences } from './rankingPreferences';
 import { rateMyProfessorService } from '../external/RateMyProfessorService';
 import { logger } from '../../utils/logger';
 
@@ -107,9 +106,7 @@ export class AutoScheduleOrchestrator {
         appState.preferences.avoidCalendarEvents === false
           ? []
           : this.getAllCalendarBlockedTimes();
-      const preferences = normalizeRankingPreferences(
-        appState.preferences.autoSchedule,
-      );
+      const preferences = appState.rankingPreferences;
       const build = (slots: typeof calendarSlots) =>
         new SmartScheduler(this.filterService, slots).buildCandidateData(
           selectedCourses,
