@@ -114,8 +114,8 @@
 
   function handleKeydown(e: KeyboardEvent): void {
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
-    // Undo would change the schedule hidden behind the modal.
-    if (uiState.openModals.length > 0) return;
+    // Undo would change the schedule hidden behind the modal or the wizard.
+    if (uiState.openModals.length > 0 || wizardState.isOpen) return;
     // Leave text fields their own native undo.
     const target = e.target as Element | null;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
@@ -327,10 +327,8 @@
           courseSelectionService={services.courseSelectionService}
           getIncompleteInfo={(sc: SelectedCourse) =>
             componentWizardService.getIncompleteSelectionInfo(sc)}
-          onOpenWizard={(
-            course: Course,
-            existing: SelectedCourse | undefined,
-          ) => componentWizardService.openComponentWizard(course, existing)}
+          onOpenWizard={(course: Course) =>
+            componentWizardService.openComponentWizard(course)}
         />
         <WizardHost />
       </div>

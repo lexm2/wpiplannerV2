@@ -822,7 +822,6 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       if (selected) {
         componentWizardService.openComponentWizard(
           selected.course,
-          selected,
           step ?? undefined,
         );
       }

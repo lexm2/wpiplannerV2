@@ -295,6 +295,20 @@
   justify-content: center;
 }
 
+.schedule-course-list {
+  display: contents;
+}
+
+.incomplete-warning {
+  gap: 0.25rem;
+}
+
+.incomplete-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
 .incomplete-warning .warning-icon {
   color: var(--color-warning);
   vertical-align: middle;

@@ -3,18 +3,17 @@
 }
 
 .wizard-header {
-  padding: 1.5rem;
+  padding: 0.75rem 3rem 0.75rem 1.25rem;
   border-bottom: 1px solid var(--color-border);
   position: relative;
   background-color: var(--color-surface);
   flex-shrink: 0;
-  display: none;
 }
 
 .wizard-close-btn {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.5rem;
+  right: 0.75rem;
   background: none;
   border: none;
   font-size: 2rem;
@@ -37,16 +36,22 @@
 }
 
 .wizard-header h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
+  margin: 0;
+  font-size: 1.1rem;
   color: var(--color-primary);
   font-weight: 600;
 }
 
+.wizard-header h2:focus {
+  outline: none;
+}
+
 .wizard-course-name {
+  display: block;
   font-size: 0.9rem;
+  font-weight: 400;
   color: var(--color-text-secondary);
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
 }
 
 .wizard-breadcrumbs {

@@ -58,7 +58,6 @@ export class TutorialStateMachine {
       if (selected) {
         componentWizardService.openComponentWizard(
           selected.course,
-          selected,
           step ?? undefined,
         );
       }
