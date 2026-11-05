@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { DegreeBucketFilterCriteria } from '../../types/filters';
+  import { degreePlanService } from '../../services/degree/degreePlanService';
   import { setPage } from '../../services/ui/uiState.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
 
@@ -34,7 +35,7 @@
       id="degree-filter-clear"
       title="Stop filtering by this requirement"
       aria-label="Clear the degree requirement filter"
-      onclick={() => filterService.removeFilter('degreeBucket')}
+      onclick={() => degreePlanService.endBrowse()}
       >{@html getInlineSVG('X', 'x-icon')}</button
     >
   </div>

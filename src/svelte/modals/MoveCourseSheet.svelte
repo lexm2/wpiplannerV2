@@ -4,6 +4,7 @@
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
   import { remainingLabel, statusLabel } from '../degree/progressLabels';
+  import { refocusAfter } from '../degree/focusHelpers';
 
   /**
    * Placing a course on a phone. Touch can't drag a course (a finger on one
@@ -25,15 +26,39 @@
 
   const buckets = $derived(placeableBuckets(current));
 
+  /**
+   * The sheet was opened from the course's own row, which moves or goes away
+   * with the placement, so the modal has nothing to hand focus back to. Land on
+   * the course where it is now, else the first course still waiting.
+   */
+  function refocus(id: string): void {
+    void refocusAfter(
+      () =>
+        document.querySelector<HTMLElement>(
+          `[data-course-id="${CSS.escape(id)}"]:is(button, .requirement-course)`,
+        ),
+      () =>
+        document.querySelector<HTMLElement>(
+          '#degree-to-place .degree-to-place-row',
+        ),
+      () => document.querySelector<HTMLElement>('#degree-summary-more-btn'),
+    );
+  }
+
   function place(bucketId: string): void {
     onRequestClose();
-    if (courseId && bucketId !== current)
+    if (courseId && bucketId !== current) {
       degreeBucketService.assign(courseId, bucketId);
+      refocus(courseId);
+    }
   }
 
   function remove(): void {
     onRequestClose();
-    if (courseId) degreeBucketService.unassign(courseId);
+    if (courseId) {
+      degreeBucketService.unassign(courseId);
+      refocus(courseId);
+    }
   }
 
   function details(): void {
@@ -81,6 +106,9 @@
               Here now
             {:else if progress}
               {remainingLabel(progress) ?? statusLabel(progress)}
+            {/if}
+            {#if !here && entry && degreePlanService.mayNotCount(bucket, entry.code)}
+              &middot; may not count
             {/if}
           </span>
           {#if progress}

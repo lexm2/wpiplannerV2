@@ -21,7 +21,7 @@
   type="button"
   class="filter-btn drawer-toggle drawer-toggle-to-place"
   aria-label="Courses to place ({count})"
-  title={count ? `Courses to place (${count})` : 'Every course has a bucket'}
+  title={count ? `Courses to place (${count})` : 'No courses to place'}
   disabled={count === 0}
   onclick={show}
 >

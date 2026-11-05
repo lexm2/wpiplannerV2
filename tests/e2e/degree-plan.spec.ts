@@ -110,6 +110,38 @@ test("a requirement's browse button filters the planner to it and says so", asyn
       ),
     )
     .toBe(false);
+  // ...and gives the course level back: Browse had narrowed it to undergraduate
+  // over a level the student never chose.
+  expect(
+    await page.evaluate(() =>
+      (window as any).services.filterService.hasFilter('graduateLevel'),
+    ),
+  ).toBe(false);
+});
+
+test('a course code opened from a card is listed even while browsing', async ({
+  page,
+}) => {
+  await setup(page);
+  const card = page.locator('[data-bucket-id*="Core Requirement"]');
+  await card
+    .locator('.requirement-card-browse, .requirement-course-empty')
+    .locator('visible=true')
+    .first()
+    .click();
+  await expect(page.locator('.degree-filter-banner')).toBeVisible();
+  await page.click('#degree-tab');
+
+  // CS 1102 is on the record, so the degree filter alone would exclude it.
+  await page
+    .locator('[data-bucket-id*="Core Requirement"] .requirement-course-link')
+    .first()
+    .click();
+  await expect(page.locator('#planner-page')).toBeVisible();
+  await expect(page.locator('.degree-filter-banner')).toHaveCount(0);
+  await expect(
+    page.locator('#course-container [data-course-id]').first(),
+  ).toBeVisible();
 });
 
 test('a requirement with no course list has nothing to browse', async ({

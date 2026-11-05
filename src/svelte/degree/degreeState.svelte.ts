@@ -5,6 +5,7 @@ import {
   buildBuckets,
   computePlacements,
   computeUnassigned,
+  projectedScheduleTiles,
   UMBRELLA_CATEGORIES,
   type DegreeBucket,
   type DegreeTile,
@@ -61,15 +62,23 @@ class DegreeState {
    * Bucket id -> its live progress from the courses placed in it. Computed once
    * here so the status filter, the cards and the focus jump share one pass.
    */
-  progressById = $derived.by<Map<string, EffectiveProgress>>(
-    () =>
-      new Map(
-        this.buckets.map(b => [
-          b.id,
-          effectiveProgress(b, this.placements.get(b.id) ?? []),
-        ]),
-      ),
-  );
+  progressById = $derived.by<Map<string, EffectiveProgress>>(() => {
+    // A degree-wide aggregate counts every scheduled course, not just ones
+    // placed in it (a course sits in one bucket but counts toward the total).
+    const scheduled = projectedScheduleTiles(
+      this.record,
+      appState.selectedCourses,
+    );
+    return new Map(
+      this.buckets.map(b => {
+        const placed = this.placements.get(b.id) ?? [];
+        const tiles = UMBRELLA_CATEGORIES.has(b.category)
+          ? [...placed.filter(t => t.kind === 'planned'), ...scheduled]
+          : placed;
+        return [b.id, effectiveProgress(b, tiles)];
+      }),
+    );
+  });
 
   /** Bucket ids whose card is expanded to show every course. Not persisted. */
   expanded = new SvelteSet<string>();
@@ -84,12 +93,25 @@ class DegreeState {
   /** Whether the phone's "To place" list is open. Not persisted. */
   toPlaceOpen = $state(true);
 
+  /**
+   * The latest placement the user made. A fresh object each time, so the bucket
+   * list can react to a placement it would otherwise have no signal for.
+   */
+  lastPlacement = $state.raw<{ courseId: string; bucketId: string } | null>(
+    null,
+  );
+
   /** The course the phone's Move sheet is placing, while it is open. */
   moving = $state.raw<string | null>(null);
 
   /** Every course the page knows about, and which buckets hold it. */
   courseIndex = $derived.by<CourseIndexEntry[]>(() =>
-    buildCourseIndex(this.buckets, this.placements, this.unassigned),
+    buildCourseIndex(
+      this.buckets,
+      this.placements,
+      this.unassigned,
+      this.progressById,
+    ),
   );
 
   /** Schedule courses still waiting to be placed. */
@@ -98,6 +120,7 @@ class DegreeState {
       this.record,
       appState.selectedCourses,
       this.config.assignments,
+      this.buckets,
     ),
   );
 }

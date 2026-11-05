@@ -44,8 +44,16 @@ export interface EffectiveProgress {
   segments: ProgressSegments;
   creditsRemaining: number | null;
   coursesRemaining: number | null;
-  /** How many empty "Course needed" slots to render. */
+  /** How many empty "Course needed" slots to render (capped). */
   emptySlots: number;
+  /** How many more courses the requirement needs, uncapped, for the label. */
+  coursesNeeded: number;
+  /**
+   * Whether a satisfied requirement is met by completed courses alone. Workday
+   * counts in-progress courses toward a requirement, and so do we, but those
+   * are not finished: a satisfied requirement that leans on them says so.
+   */
+  confirmed: boolean;
 }
 
 const RANK: Record<RequirementStatus, number> = {
@@ -145,6 +153,8 @@ export function effectiveProgress(
           : 'not_satisfied';
     const status = anchor(computed, req.status);
     const creditsRemaining = round2(Math.max(0, required - covered));
+    const coursesNeeded =
+      status === 'satisfied' ? 0 : Math.max(1, Math.ceil(creditsRemaining / 3));
     const segments = makeSegments(
       earnedCredits,
       planned,
@@ -158,10 +168,11 @@ export function effectiveProgress(
       segments,
       creditsRemaining,
       coursesRemaining: null,
-      emptySlots:
-        status === 'satisfied'
-          ? 0
-          : Math.min(EMPTY_CAP, Math.max(1, Math.ceil(creditsRemaining / 3))),
+      emptySlots: Math.min(EMPTY_CAP, coursesNeeded),
+      coursesNeeded,
+      confirmed:
+        status === 'satisfied' &&
+        (req.status === 'satisfied' || earnedCredits >= required),
     };
   }
 
@@ -177,6 +188,7 @@ export function effectiveProgress(
           : 'not_satisfied';
     const status = anchor(computed, req.status);
     const coursesRemaining = Math.max(0, requiredCourses - have);
+    const needed = status === 'satisfied' ? 0 : coursesRemaining;
     const segments = makeSegments(
       completedCount,
       plannedCount,
@@ -193,8 +205,11 @@ export function effectiveProgress(
       segments,
       creditsRemaining: null,
       coursesRemaining,
-      emptySlots:
-        status === 'satisfied' ? 0 : Math.min(EMPTY_CAP, coursesRemaining),
+      emptySlots: Math.min(EMPTY_CAP, needed),
+      coursesNeeded: needed,
+      confirmed:
+        status === 'satisfied' &&
+        (req.status === 'satisfied' || completedCount >= requiredCourses),
     };
   }
 
@@ -202,6 +217,12 @@ export function effectiveProgress(
   const computed: RequirementStatus =
     plannedCount + scheduleCount > 0 ? 'in_progress' : req.status;
   const status = anchor(computed, req.status);
+  const needed =
+    status === 'satisfied'
+      ? 0
+      : req.appliedCourses.length || plannedCount + scheduleCount
+        ? 0
+        : 1;
   return {
     status,
     fraction: status === 'satisfied' ? 1 : null,
@@ -211,11 +232,8 @@ export function effectiveProgress(
         : EMPTY_SEGMENTS,
     creditsRemaining: null,
     coursesRemaining: null,
-    emptySlots:
-      status === 'satisfied'
-        ? 0
-        : req.appliedCourses.length || plannedCount + scheduleCount
-          ? 0
-          : 1,
+    emptySlots: needed,
+    coursesNeeded: needed,
+    confirmed: status === 'satisfied',
   };
 }

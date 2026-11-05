@@ -140,4 +140,30 @@ describe('effectiveProgress (no numeric target)', () => {
     );
     expect(effectiveProgress(base, []).fraction).toBeNull();
   });
+
+  it('reports the uncapped number of courses a big requirement still needs', () => {
+    const p = effectiveProgress(req({ creditsRequired: 135 }), []);
+    expect(p.coursesNeeded).toBe(45);
+    expect(p.emptySlots).toBe(12); // only the drawn ghost tiles are capped
+  });
+
+  it('is not confirmed while a satisfied requirement leans on in-progress courses', () => {
+    const p = effectiveProgress(req({ creditsRequired: 6 }), [
+      tile('CS 1101', 3, 'planned'),
+      tile('CS 2022', 3, 'planned'),
+    ]);
+    expect(p.status).toBe('satisfied');
+    expect(p.confirmed).toBe(false);
+  });
+
+  it('is confirmed once completed courses alone cover it', () => {
+    const p = effectiveProgress(
+      req({
+        creditsRequired: 6,
+        appliedCourses: [completed('CS 1101', 3), completed('CS 2022', 3)],
+      }),
+      [],
+    );
+    expect(p.confirmed).toBe(true);
+  });
 });
