@@ -89,14 +89,6 @@
   onclick={onToggleFocus}
 >
   <h2 class="visually-hidden">{term} term</h2>
-  {#if hasConflict}
-    <div
-      class="term-conflict-warning"
-      title="This term has overlapping courses"
-    >
-      {@html getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon')}
-    </div>
-  {/if}
   <div class="schedule-grid" style:--grid-hours={timeSlots.length}>
     <!-- The keyboard way into the term zoom the card's click gives a mouse. -->
     <button
@@ -107,8 +99,18 @@
       onclick={e => {
         e.stopPropagation(); // the card's own click would toggle it back
         onToggleFocus();
-      }}>{term}</button
+      }}
     >
+      {#if hasConflict}
+        <span
+          class="term-conflict-warning"
+          title="This term has overlapping courses"
+        >
+          {@html getInlineSVG('ALERT_CIRCLE', 'conflict-warning-icon')}
+        </span>
+      {/if}
+      {term}
+    </button>
     {#each WEEKDAYS as day (day)}
       <div class="day-header">{TimeUtils.getDayAbbr(day)}</div>
     {/each}
