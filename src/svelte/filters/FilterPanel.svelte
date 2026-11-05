@@ -1,5 +1,9 @@
 <script lang="ts">
   import { appState } from '../../core/state/appState.svelte';
+  import {
+    FILTER_WINDOW_TITLES,
+    type FilterMode,
+  } from '../modals/modalState.svelte';
   import CloseButton from '../ui/CloseButton.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
@@ -21,21 +25,27 @@
   import { countAdvancedFilters } from '../../services/filtering/advancedFilterCount';
   import { countAutoScheduleFilters } from '../../services/scheduling/autoScheduleFilterCount';
   import { NON_SECTION_FILTER_IDS } from '../../services/scheduling/AutoScheduler';
+  import {
+    clearSectionFilters,
+    sectionFilters,
+  } from '../../services/filtering/sectionFilters';
   import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 
   let {
     mode,
     onGenerate,
     coursesToSchedule,
+    sectionsShown,
     filterService,
     courseSelectionService,
     autoScheduleOrchestrator,
     getDepartments,
     requestClose,
   }: {
-    mode: 'filter' | 'auto-schedule';
+    mode: FilterMode;
     onGenerate?: () => void;
     coursesToSchedule?: SelectedCourse[];
+    sectionsShown?: () => { shown: number; total: number };
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
@@ -48,24 +58,38 @@
   const allCourses = $derived(getDepartments().flatMap(d => d.courses));
 
   const isAuto = $derived(mode === 'auto-schedule');
-  const title = $derived(isAuto ? 'Auto-Schedule Settings' : 'Filter Courses');
+  const isSections = $derived(mode === 'sections');
+  const title = $derived(FILTER_WINDOW_TITLES[mode]);
   const primaryLabel = $derived(isAuto ? 'Generate Schedule' : 'Done');
 
   const activeYear = $derived(appState.activeSchedule?.year);
-  const filterCount = $derived(
-    isAuto
-      ? countAutoScheduleFilters(
-          filterService.getActiveFilters(),
-          appState.preferences.avoidCalendarEvents,
-        )
-      : filterService.getFilterCount(activeYear),
-  );
+  const filterCount = $derived.by(() => {
+    if (isAuto) {
+      return countAutoScheduleFilters(
+        filterService.getActiveFilters(),
+        appState.preferences.avoidCalendarEvents,
+      );
+    }
+    return isSections
+      ? sectionFilters(filterService.getActiveFilters()).length
+      : filterService.getFilterCount(activeYear);
+  });
 
+  // In the picker the year isn't a filter at all, so there's no default to compare it to.
   const advancedCount = $derived(
-    countAdvancedFilters(filterService.getActiveFilters(), activeYear),
+    isSections
+      ? countAdvancedFilters(
+          sectionFilters(filterService.getActiveFilters()),
+          undefined,
+        )
+      : countAdvancedFilters(filterService.getActiveFilters(), activeYear),
   );
 
   const previewText = $derived.by(() => {
+    if (sectionsShown) {
+      const { shown, total } = sectionsShown();
+      return `${shown} of ${total} ${total === 1 ? 'section' : 'sections'} shown`;
+    }
     if (isAuto) {
       const selected =
         coursesToSchedule ?? courseSelectionService.getSelectedCourses();
@@ -106,7 +130,8 @@
   function onClearAll(): void {
     // Otherwise the remount's flush would write the old values over the reset.
     rmpFilter?.flush();
-    filterService.resetFilters(activeYear);
+    if (isSections) clearSectionFilters(filterService);
+    else filterService.resetFilters(activeYear);
     if (isAuto) autoScheduleService.setAvoidCalendarEvents(true);
     resetNonce++;
   }
@@ -114,21 +139,21 @@
 
 {#snippet essentialFilters()}
   <TermsFilter {filterService} {allCourses} />
-  <!-- Auto-Schedule works on the courses already chosen, so it skips the
-       filters that decide which courses are listed. -->
-  {#if !isAuto}
+  <!-- Auto-Schedule and the section picker work on courses already chosen, so
+       they skip the filters that decide which courses are listed. -->
+  {#if mode === 'filter'}
     <CourseLevelFilter {filterService} />
   {/if}
   <AvailabilityFilter {filterService} {courseSelectionService} />
 {/snippet}
 
 {#snippet advancedFilters()}
-  {#if !isAuto}
+  {#if mode === 'filter'}
     <AcademicYearFilter {filterService} {allCourses} />
     <DepartmentFilter {filterService} {allCourses} />
   {/if}
   <TimesFilter {filterService} />
-  {#if !isAuto}
+  {#if mode === 'filter'}
     <CreditHoursFilter {filterService} />
   {/if}
   <AvailabilityDetailsFilter

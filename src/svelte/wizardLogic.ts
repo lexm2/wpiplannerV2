@@ -11,8 +11,10 @@ import type {
 
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
-import type { AcademicYearFilterCriteria } from '../types/filters';
-import { isAcademicYearChanged } from '../services/filtering/advancedFilterCount';
+import {
+  COURSE_FILTER_IDS,
+  sectionFilters,
+} from '../services/filtering/sectionFilters';
 import { TERM_ORDER, semesterTermLabel } from '../utils/typeGuards';
 
 const TERM_NAMES: Record<string, string> = {
@@ -126,9 +128,11 @@ export function getOptionsWithFilterInfo(
   sections = sections.filter(s => !s.isInterestList);
   const totalBeforeFilter = sections.length;
 
-  if (filterService && !filterService.isEmpty() && sections.length > 0) {
+  if (filterService && sections.length > 0) {
     const passing = new Set(
-      filterService.apply([course]).map(fs => fs.section.crn),
+      filterService
+        .applyExcluding([course], COURSE_FILTER_IDS)
+        .map(fs => fs.section.crn),
     );
     return {
       filtered: sections.filter(s => passing.has(s.crn)),
@@ -246,25 +250,11 @@ export function getRmpRatingClass(
  */
 export function describeActiveFilters(
   filterService: FilterService | null,
-  scheduleYear: number | undefined,
 ): string[] {
   if (!filterService) return [];
 
   const descriptions: string[] = [];
-  const active = filterService.getActiveFilters();
-  if (isAcademicYearChanged(active, scheduleYear)) {
-    const year = (
-      active.find(f => f.id === 'academicYear')?.criteria as
-        AcademicYearFilterCriteria | undefined
-    )?.year;
-    descriptions.push(
-      typeof year === 'number'
-        ? `Academic Year ${year}-${year + 1}`
-        : 'All academic years',
-    );
-  }
-  for (const filter of active) {
-    if (filter.id === 'academicYear') continue;
+  for (const filter of sectionFilters(filterService.getActiveFilters())) {
     if (filter.id === 'rmpRating' && filter.criteria) {
       const c = filter.criteria as {
         minRating?: number;
@@ -294,7 +284,7 @@ export function describeActiveFilters(
         );
       }
       if (parts.length > 0) descriptions.push(`RMP: ${parts.join(' • ')}`);
-    } else if (filter.id !== 'searchText') {
+    } else {
       descriptions.push(filter.name);
     }
   }
