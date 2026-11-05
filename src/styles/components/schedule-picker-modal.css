@@ -25,28 +25,6 @@
   margin: 0;
 }
 
-.schedule-picker-modal-dialog .modal-close {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  line-height: 1;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  padding: 0;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-}
-
-.schedule-picker-modal-dialog .modal-close:hover {
-  background: var(--color-surface-hover);
-  color: var(--color-text);
-}
-
 .schedule-picker-modal-dialog .modal-body {
   padding: 0 !important;
   display: flex !important;
@@ -243,13 +221,6 @@
 /* Hide inline action buttons by default (shown only on wide screens) */
 .schedule-picker-modal-dialog .inline-action-btn {
   display: none;
-}
-
-/* Schedule Name Input - Inline Editing. The chrome comes from the shared
-   TextField; only the row's sizing and type scale belong here. */
-.schedule-picker-modal-dialog .modal-close:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
 }
 
 @media (min-width: 1200px) {
