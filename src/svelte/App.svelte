@@ -42,7 +42,6 @@
   import ThemeSelector from './ThemeSelector.svelte';
   import SettingsMenu from './SettingsMenu.svelte';
   import CalendarEventsButton from './CalendarEventsButton.svelte';
-  import ScheduleFilterButton from './ScheduleFilterButton.svelte';
   import ScheduleSidebar from './ScheduleSidebar.svelte';
   import WizardHost from './WizardHost.svelte';
   import AutoScheduleControls from './AutoScheduleControls.svelte';
@@ -333,18 +332,12 @@
       resizeLabel="Resize schedule sidebar"
     >
       <div class="schedule-sidebar-header">
-        <div class="schedule-filter-controls">
-          <div
-            id="calendar-events-header-slot"
-            class="calendar-events-header-slot"
-          >
-            <CalendarEventsButton
-              onClick={() => localEventService.openManager()}
-            />
-          </div>
-          <ScheduleFilterButton
-            filterService={services.filterService}
-            onFilter={openFilterModal}
+        <div
+          id="calendar-events-header-slot"
+          class="calendar-events-header-slot"
+        >
+          <CalendarEventsButton
+            onClick={() => localEventService.openManager()}
           />
         </div>
       </div>

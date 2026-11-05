@@ -38,13 +38,26 @@ type IcsImportPayload =
   | { status: 'ready'; fileName: string; year: number; result: IcsImportResult }
   | { status: 'error'; fileName?: string; message: string };
 
+export type FilterMode = 'filter' | 'auto-schedule' | 'sections';
+
+export const FILTER_WINDOW_TITLES: Record<FilterMode, string> = {
+  filter: 'Filter Courses',
+  'auto-schedule': 'Auto-Schedule Settings',
+  sections: 'Filter Sections',
+};
+
 interface FilterModalPayload {
-  /** 'filter' = planner/schedule filter; 'auto-schedule' = generate settings. */
-  mode: 'filter' | 'auto-schedule';
+  /**
+   * 'filter' = the course list; 'auto-schedule' = generate settings;
+   * 'sections' = the section picker's list.
+   */
+  mode: FilterMode;
   /** auto-schedule only: invoked (after close) when "Generate Schedule" clicked. */
   onGenerate?: () => void;
   /** auto-schedule only: the courses being scheduled (drives the preview). */
   coursesToSchedule?: SelectedCourse[];
+  /** sections only: how much of the picker's list is showing (drives the preview). */
+  sectionsShown?: () => { shown: number; total: number };
 }
 
 interface AutoScheduleIntroPayload {

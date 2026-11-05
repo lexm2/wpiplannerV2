@@ -2,6 +2,7 @@
   import FilterSection from './FilterSection.svelte';
   import TextField from '../ui/TextField.svelte';
   import FilterToggle from './FilterToggle.svelte';
+  import type { FilterMode } from '../modals/modalState.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
   import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
@@ -23,7 +24,7 @@
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
     autoScheduleOrchestrator: AutoScheduleOrchestrator;
-    mode: 'filter' | 'auto-schedule';
+    mode: FilterMode;
   } = $props();
 
   const avail = $derived(readAvailability(filterService));

@@ -9,8 +9,9 @@
   import { slideX, dur } from './transitions';
   import { appState } from '../core/state/appState.svelte';
   import { wizardState } from './wizardState.svelte';
-  import { showConfirm } from './modals/modalState.svelte';
-  import { uiState } from '../services/ui/uiState.svelte';
+  import { modalState, showConfirm } from './modals/modalState.svelte';
+  import { openModal, uiState } from '../services/ui/uiState.svelte';
+  import { clearSectionFilters } from '../services/filtering/sectionFilters';
   import {
     determineAvailableSteps,
     getOptionsWithFilterInfo,
@@ -85,8 +86,10 @@
     });
   });
 
-  const filterDescriptions = $derived(
-    describeActiveFilters(filterService, appState.activeSchedule?.year),
+  const filterDescriptions = $derived(describeActiveFilters(filterService));
+  // A single section has nothing to narrow, unless a filter is what's hiding it.
+  const canFilter = $derived(
+    optionInfo.totalBeforeFilter > 1 || filterDescriptions.length > 0,
   );
   // Judged against the schedule the picks would land on, not the filter: the
   // filter can show any year, but the grid only holds the schedule's own.
@@ -197,13 +200,18 @@
   }
 
   function clearFilters(): void {
-    if (!filterService) return;
-    const activeYear = filterService.getCriteria<{ year?: number }>(
-      'academicYear',
-    )?.year;
-    filterService.resetFilters(
-      typeof activeYear === 'number' ? activeYear : undefined,
-    );
+    if (filterService) clearSectionFilters(filterService);
+  }
+
+  function openSectionFilters(): void {
+    modalState.filter = {
+      mode: 'sections',
+      sectionsShown: () => ({
+        shown: optionInfo.filtered.length,
+        total: optionInfo.totalBeforeFilter,
+      }),
+    };
+    openModal('filter-modal');
   }
 
   function hoverPreview(section: Section): void {
@@ -242,6 +250,20 @@
   transition:fade|global={{ duration: dur(250) }}
 >
   <div class={styles['wizard-header']}>
+    {#if canFilter}
+      <button
+        id="wizard-filter-btn"
+        class={[
+          'filter-btn',
+          styles['wizard-filter-btn'],
+          { active: filterDescriptions.length > 0 },
+        ]}
+        onclick={openSectionFilters}
+      >
+        {@html getInlineSVG('FILTER_FILLED', 'filter-icon')}
+        Filter sections
+      </button>
+    {/if}
     <CloseButton class={styles['wizard-close']} onclick={cancel} />
     <h2 id={headingId} tabindex="-1" bind:this={headingEl}>
       {course.departmentAbbr}
