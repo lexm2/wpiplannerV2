@@ -31,10 +31,7 @@ export function alternatesInto(a: AlternatingYears, year: number): boolean {
 }
 
 /** The first academic year after `year` (fall year) the statement puts the course in. */
-export function nextAlternatingYear(
-  a: AlternatingYears,
-  year: number,
-): number {
+export function nextAlternatingYear(a: AlternatingYears, year: number): number {
   return alternatesInto(a, year + 1) ? year + 1 : year + 2;
 }
 
