@@ -110,6 +110,7 @@
 - A placed course no longer vanishes under a status filter; a note explains it
 - Empty-schedule message, "1 course" plural and an import-warning typo on the Degree page
 - The planner no longer falls behind on saving when you edit quickly with many schedules. Saves that took up to a minute to catch up now finish almost at once
+- Borders in the High Contrast theme are the normal size and no longer move the page when you hover over something
 
 ## [2026-10-10]
 
