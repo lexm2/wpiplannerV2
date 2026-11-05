@@ -1495,6 +1495,17 @@ describe('tool schemas', () => {
     const lower = await tool('get_course', { course: 'PH 1110', terms: ['b'] });
     expect(lower.isError).toBe(false);
   });
+
+  it('lists a required enum field as required', async () => {
+    const { tools } = await rpcOn(endpoints(BEFORE_A).mcp, 'tools/list', {});
+    const search = tools.find(
+      (t: { name: string }) => t.name === 'search_courses',
+    );
+    const window =
+      search.inputSchema.properties.filters.properties.times.properties.windows
+        .items;
+    expect(window.required).toContain('day');
+  });
 });
 
 describe('generate_schedules', () => {

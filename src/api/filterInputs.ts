@@ -784,8 +784,14 @@ const INPUTS = {
           'Default true: an F section conflicts with A and B, S with C and D. False compares terms exactly.',
         ),
     }),
-    // toCriteria derives these from the CRNs.
-    omit: ['avoidConflicts', 'blockedSlots', 'selectedCourses'],
+    // toCriteria derives the first three from the CRNs.
+    omit: [
+      'avoidConflicts',
+      'blockedSlots',
+      'selectedCourses',
+      // The app's calendar import; a search has no calendar to avoid.
+      'avoidCalendarEvents',
+    ],
     toCriteria: ({ crns, ...rest }, ctx) => {
       const { slots, otherYear } = blockedSlotsForCrns(
         ctx.catalog,
