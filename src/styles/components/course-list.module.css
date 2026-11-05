@@ -72,11 +72,11 @@
 .course-select-btn.selected {
   border-color: var(--color-primary);
   background: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
 }
 
 .course-select-btn.selected :global(.check-icon) {
-  stroke: var(--color-text-inverse);
+  stroke: var(--color-mark);
 }
 
 .course-select-btn:not(.selected) :global(.plus-icon) {
@@ -117,7 +117,7 @@
 .course-bookmark-btn.bookmarked {
   border-color: var(--color-warning);
   background: var(--color-warning);
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
 }
 
 .course-bookmark-btn:not(.bookmarked) :global(.bookmark-icon) {
@@ -130,7 +130,7 @@
 }
 
 .course-bookmark-btn.bookmarked :global(.bookmark-icon) {
-  fill: var(--color-text-inverse);
+  fill: var(--color-mark);
 }
 
 .course-item.selected {
