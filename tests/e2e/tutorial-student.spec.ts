@@ -517,6 +517,25 @@ test('a step that only reads carries the outline on Next', async ({ page }) => {
   await expect(outlined('#course-description')).toHaveCount(0);
 });
 
+test('a section card the step points at clears the footer over the list', async ({
+  page,
+}) => {
+  await firstVisit(page);
+  await walkTo(page, 'welcome#7');
+
+  const card = page.locator('[data-crn="100108"]');
+  const footer = page.locator('[class*="wizard-footer"]');
+  await expect
+    .poll(async () => {
+      const [c, f] = await Promise.all([
+        card.boundingBox(),
+        footer.boundingBox(),
+      ]);
+      return c && f && c.y + c.height <= f.y;
+    })
+    .toBe(true);
+});
+
 test('double-clicking a target counts as one click', async ({ page }) => {
   await firstVisit(page);
   await walkTo(page, 'welcome#7');

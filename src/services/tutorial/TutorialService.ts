@@ -333,9 +333,13 @@ export class TutorialService {
       this.layoutObserver.observe(el);
       return;
     }
-    const scroller = scrollParent(el).getBoundingClientRect();
+    const scrollerEl = scrollParent(el);
+    const scroller = scrollerEl.getBoundingClientRect();
+    // A footer floating over the list hides what is still inside the list's box.
+    const covered =
+      parseFloat(getComputedStyle(scrollerEl).scrollPaddingBottom) || 0;
     const top = Math.max(scroller.top, 0);
-    const bottom = Math.min(scroller.bottom, window.innerHeight);
+    const bottom = Math.min(scroller.bottom - covered, window.innerHeight);
     const cutOff = r.top < top || r.bottom > bottom;
     // A target taller than its container can't fit however it scrolls.
     if (cutOff && r.height <= bottom - top) {

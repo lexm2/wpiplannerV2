@@ -16,6 +16,7 @@
 - Every tutorial step sets up what it needs, whether you got there by clicking, pressing Next or Back, or using Find Element, so a step can't show with the planner in the wrong state. A stray click is put right on the next step
 - Pressing Next through the Auto Schedule tutorial no longer reschedules a course that already has its sections
 - The first tutorial step no longer has a sample box that kept its old size when you resized the window
+- A tutorial step pointing at a section card scrolls it clear of the picker's Cancel and Skip buttons, instead of outlining them with it
 - Filters from the Classes page like course level or credits no longer hide the sections of a course you've already chosen
 - The tutorial box moves out of the way by itself. It stays off whatever the step points at and off the buttons around it, wherever they are on screen, instead of only trying the four corners and sitting on the schedule list and New Schedule when none of them fit. If you drag the box it stays where you put it, unless it's on the thing the step needs
 - The tutorials can be finished on any window wider than a phone. At 1024px and narrower they got stuck where a step pointed at the course list, which was hidden in the Courses panel. The panel now opens for those steps
