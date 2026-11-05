@@ -1622,6 +1622,20 @@ html.is-mobile .changelog-modal-body {
   appearance: none;
 }
 
+/* The term chips are 28px elsewhere in the app; on a phone or touch screen
+   they are the main control of this window, so they get a full touch target.
+   The unavailable placeholders match so the row keeps its rhythm. */
+@media (max-width: 560px), (pointer: coarse) {
+  .as-card-terms [data-term-badge] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .as-card-terms {
+    gap: 0.25rem;
+  }
+}
+
 /* `.as-card-terms .term-badge.selected` lived here; `.term-badge` is hashed by
    course-list.module.css now, so that rule moved there. */
 

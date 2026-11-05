@@ -103,6 +103,7 @@
 
 .schedule-footer-row {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
 }
@@ -170,6 +171,14 @@
   display: block;
   stroke: currentColor;
   color: inherit;
+}
+
+.schedule-result-status {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  align-self: center;
+  white-space: nowrap;
 }
 
 /* Schedule navigation buttons (shown after auto-generation) */
