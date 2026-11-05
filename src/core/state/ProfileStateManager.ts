@@ -717,7 +717,7 @@ export class ProfileStateManager {
 
   // eslint-disable-next-line @typescript-eslint/require-await -- consumed as a promise by callers
   async undo(): Promise<boolean> {
-    const snapshot = this.undoRedoManager.undo();
+    const snapshot = this.undoRedoManager.undo(this.state.schedules);
     if (!snapshot) return false;
 
     this.isRestoringState = true;
@@ -733,7 +733,7 @@ export class ProfileStateManager {
 
   // eslint-disable-next-line @typescript-eslint/require-await -- consumed as a promise by callers
   async redo(): Promise<boolean> {
-    const snapshot = this.undoRedoManager.redo();
+    const snapshot = this.undoRedoManager.redo(this.state.schedules);
     if (!snapshot) return false;
 
     this.isRestoringState = true;
@@ -781,7 +781,9 @@ export class ProfileStateManager {
     const present = new Map(this.state.schedules.map(s => [s.id, s]));
     this.state.schedules = Array.from(snapshot.schedules.values()).map(snap => {
       const current = present.get(snap.id);
-      if (current && sameSchedule(current, snap)) return current;
+      if (current && (current === snap || sameSchedule(current, snap))) {
+        return current;
+      }
       const cloned = deepClone(snap);
       return {
         ...cloned,
@@ -854,9 +856,12 @@ export class ProfileStateManager {
    * calls this first.
    */
   markActiveScheduleChanged(): void {
-    if (this.state.activeScheduleId) {
-      this.savedSchedules.delete(this.state.activeScheduleId);
-    }
+    const active = this.state.schedules.find(
+      s => s.id === this.state.activeScheduleId,
+    );
+    if (!active) return;
+    this.savedSchedules.delete(active.id);
+    this.undoRedoManager.forget(active);
   }
 
   save(skipSnapshot = false): void {

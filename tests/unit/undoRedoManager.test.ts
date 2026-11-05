@@ -85,4 +85,33 @@ describe('UndoRedoManager', () => {
     m.redo();
     expect(m.undo()!.schedules.get('a')!.name).toBe('a');
   });
+
+  it('hands back the live object for a schedule the step left unchanged', () => {
+    const m = new UndoRedoManager();
+    const before = schedules('a', 'b');
+    m.captureSnapshot('a', before, prefs);
+    const after = new Map(before);
+    after.set('b', { ...before.get('b')!, name: 'renamed' });
+    m.captureSnapshot('a', after, prefs);
+
+    const back = m.undo([...after.values()])!;
+    expect(back.schedules.get('a')).toBe(after.get('a'));
+    expect(back.schedules.get('b')).not.toBe(after.get('b'));
+    expect(back.schedules.get('b')!.name).toBe('b');
+  });
+
+  it('re-serializes a schedule after forget()', () => {
+    const m = new UndoRedoManager();
+    const map = schedules('a');
+    m.captureSnapshot('a', map, prefs);
+    const a = map.get('a')!;
+    a.name = 'edited in place';
+    // Same object: its cached JSON still says the old name.
+    m.captureSnapshot('a', map, prefs);
+    expect(m.canUndo()).toBe(false);
+
+    m.forget(a);
+    m.captureSnapshot('a', map, prefs);
+    expect(m.canUndo()).toBe(true);
+  });
 });
