@@ -415,9 +415,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         },
         {
           selector: '#modal-primary-btn',
-          title: 'Apply filters',
+          title: 'Close the filters',
           description:
-            'Click Apply to close the filter panel and see your filtered results.',
+            'Filters take effect as you set them. Click Done to close the panel and see your filtered results.',
           waitFor: 'click',
           uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
           appState: {

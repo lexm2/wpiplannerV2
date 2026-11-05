@@ -3,7 +3,10 @@
  * counts only the hidden filters that differ from their defaults.
  */
 import { describe, it, expect } from 'vitest';
-import { countAdvancedFilters } from '../../src/services/filtering/advancedFilterCount';
+import {
+  countActiveFilters,
+  countAdvancedFilters,
+} from '../../src/services/filtering/advancedFilterCount';
 import type { ActiveFilter } from '../../src/types/filters';
 import type { WeeklyTimeSlot } from '../../src/types/schedule';
 
@@ -79,5 +82,29 @@ describe('countAdvancedFilters', () => {
       semesterSpansQuarters: true,
     });
     expect(countAdvancedFilters([manualSlot], undefined)).toBe(0);
+  });
+});
+
+describe('countActiveFilters', () => {
+  it('does not count the default academic year', () => {
+    expect(countActiveFilters([f('academicYear', { year: 2026 })], 2026)).toBe(
+      0,
+    );
+  });
+
+  it('counts the year once the student moves it', () => {
+    expect(countActiveFilters([f('academicYear', { year: 2027 })], 2026)).toBe(
+      1,
+    );
+    expect(countActiveFilters([], 2026)).toBe(1);
+  });
+
+  it('counts every other filter, search and department included', () => {
+    const filters = [
+      f('academicYear', { year: 2026 }),
+      f('searchText', { query: 'calc' }),
+      f('graduateLevel', { level: 'graduate' }),
+    ];
+    expect(countActiveFilters(filters, 2026)).toBe(2);
   });
 });

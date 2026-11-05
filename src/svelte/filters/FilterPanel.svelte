@@ -45,16 +45,10 @@
 
   const isAuto = $derived(mode === 'auto-schedule');
   const title = $derived(isAuto ? 'Auto-Schedule Settings' : 'Filter Courses');
-  const primaryLabel = $derived(isAuto ? 'Generate Schedule' : 'Apply');
+  const primaryLabel = $derived(isAuto ? 'Generate Schedule' : 'Done');
 
-  // Filter-count badge: only shown when filters differ from the
-  // schedule-year default.
   const activeYear = $derived(appState.activeSchedule?.year);
-  const filterCount = $derived(
-    filterService.hasNonDefaultFilters(activeYear)
-      ? filterService.getFilterCount()
-      : 0,
-  );
+  const filterCount = $derived(filterService.getFilterCount(activeYear));
 
   const advancedCount = $derived(
     countAdvancedFilters(filterService.getActiveFilters(), activeYear),

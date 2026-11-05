@@ -12,6 +12,7 @@ import type {
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
 import type { AcademicYearFilterCriteria } from '../types/filters';
+import { isAcademicYearChanged } from '../services/filtering/advancedFilterCount';
 import { TERM_ORDER, semesterTermLabel } from '../utils/typeGuards';
 
 const TERM_NAMES: Record<string, string> = {
@@ -213,15 +214,31 @@ export function getRmpRatingClass(
 
 /**
  * Human-readable descriptions of the active filters, for the filter-status banner.
- * RMP ranges are collapsed into one entry; search text is excluded (shown elsewhere).
+ * RMP ranges are collapsed into one entry; search text is excluded (shown
+ * elsewhere). The academic year is listed, with the year, only once the student
+ * has moved it off the schedule's own.
  */
 export function describeActiveFilters(
   filterService: FilterService | null,
+  scheduleYear: number | undefined,
 ): string[] {
-  if (!filterService || filterService.isEmpty()) return [];
+  if (!filterService) return [];
 
   const descriptions: string[] = [];
-  for (const filter of filterService.getActiveFilters()) {
+  const active = filterService.getActiveFilters();
+  if (isAcademicYearChanged(active, scheduleYear)) {
+    const year = (
+      active.find(f => f.id === 'academicYear')?.criteria as
+        AcademicYearFilterCriteria | undefined
+    )?.year;
+    descriptions.push(
+      typeof year === 'number'
+        ? `Academic Year ${year}-${year + 1}`
+        : 'All academic years',
+    );
+  }
+  for (const filter of active) {
+    if (filter.id === 'academicYear') continue;
     if (filter.id === 'rmpRating' && filter.criteria) {
       const c = filter.criteria as {
         minRating?: number;
