@@ -1,5 +1,6 @@
 import { Course } from '../types/types';
 import { getAllSections } from './courseUtils';
+import { withProjectAcronyms } from './degreeProjects';
 import { editDistance } from './editDistance';
 
 /**
@@ -19,7 +20,8 @@ import { editDistance } from './editDistance';
  * matches only a whole word (or its plural), so "AI" finds "AI in Writing"
  * but not "Aircraft"; it also matches the initials of consecutive words of
  * the name ("AI": "Artificial Intelligence", "CAD": "Computer Aided Design").
- * Accents are ignored on both sides: "Neel" finds "Néel", "Martín" "Martin".
+ * A degree project reads the same however it is written: "MQPs", "Major
+ * Qualifying Project". Accents are ignored on both sides: "Neel" finds "Néel", "Martín" "Martin".
  */
 
 export interface ParsedQuery {
@@ -164,7 +166,11 @@ function readCode(vocab: Vocabulary, compact: string): ParsedQuery['code'] {
 /** The query's distinct words, in order, split from the cap's leftovers. */
 function queryWords(text: string): Pick<ParsedQuery, 'words' | 'ignored'> {
   const distinct = [
-    ...new Set(tokenize(text).map(t => SHORT_FORMS.get(t) ?? numeral(t))),
+    ...new Set(
+      tokenize(withProjectAcronyms(text)).map(
+        t => SHORT_FORMS.get(t) ?? numeral(t),
+      ),
+    ),
   ];
   if (distinct.length <= MAX_QUERY_WORDS) return { words: distinct };
   return {

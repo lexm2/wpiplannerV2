@@ -36,6 +36,29 @@ function course(over: Partial<Course> = {}): Course {
   };
 }
 
+describe('degree projects in a query', () => {
+  it('reads one the same however it is written', () => {
+    for (const written of ['MQP', 'MQPs', 'major  qualifying projects']) {
+      expect(search.parse(written).words).toEqual(['mqp']);
+    }
+    expect(search.parse('Interactive Qualifying Project').words).toEqual([
+      'iqp',
+    ]);
+    expect(search.parse('iqp cape town').words).toEqual([
+      'iqp',
+      'cape',
+      'town',
+    ]);
+  });
+
+  it('leaves the words alone when they name no project', () => {
+    expect(search.parse('qualifying project').words).toEqual([
+      'qualifying',
+      'project',
+    ]);
+  });
+});
+
 describe('SearchIndex.score', () => {
   it('scores an exact course-code match above a name match', () => {
     const c = course();
