@@ -74,6 +74,7 @@ function only(over: Record<string, unknown>) {
   const off = {
     gaps: { importance: 'off' },
     termBalance: { importance: 'off' },
+    openSeats: { importance: 'off' },
   };
   return scorerWith({ ...off, ...over });
 }
@@ -295,6 +296,12 @@ describe('ScheduleScorer criteria', () => {
     expect(s.groupCost([pick('A', MON_9, full)])).toBe(120);
     expect(s.groupCost([pick('A', MON_9, { status: 'Closed' })])).toBe(120);
     expect(s.groupCost([pick('A', MON_9, { status: 'Waitlist' })])).toBe(120);
+  });
+
+  it('openSeats: on high by default', () => {
+    expect(
+      scorerWith().groupCost([pick('A', MON_9, { seatsAvailable: 0 })]),
+    ).toBe(1080);
   });
 
   it('openSeats: an uncapped section is not full', () => {

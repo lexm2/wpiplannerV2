@@ -110,9 +110,9 @@ export const RankingPreferencesSchema = z.strictObject({
     .describe('Aim for three courses in each term.'),
   openSeats: z
     .strictObject({
-      importance: importance('off', 'avoiding full sections'),
+      importance: importance('high', 'avoiding full sections'),
     })
-    .default({ importance: 'off' })
+    .default({ importance: 'high' })
     .describe('Avoid sections that are full, closed or waitlisted.'),
   instructorRating: z
     .strictObject({
