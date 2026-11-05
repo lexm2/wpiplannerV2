@@ -43,6 +43,46 @@ test('the Rename button puts the cursor in the name field', async ({
   );
 });
 
+test('renaming edits the name where it stands', async ({ page }) => {
+  await load(page);
+  await page.click('#schedule-picker-btn');
+  const row = firstRow(page);
+  const rename = row.getByRole('button', { name: 'Rename' });
+  // Hovering waits out the window's opening animation.
+  await rename.hover();
+  const letters = (el: Element) => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const { x, y } = range.getBoundingClientRect();
+    return { x, y };
+  };
+  const height = () => row.evaluate(el => el.getBoundingClientRect().height);
+  const rest = await row.locator('.schedule-item-name').evaluate(letters);
+  const restHeight = await height();
+
+  await rename.click();
+  const name = row.getByRole('textbox', { name: 'Schedule name' });
+  await expect(name).toBeFocused();
+  const editing = await name.evaluate(letters);
+  expect(editing.x).toBeCloseTo(rest.x, 0);
+  expect(editing.y).toBeCloseTo(rest.y, 0);
+  expect(await height()).toBeCloseTo(restHeight, 0);
+
+  // The whole name starts selected, so one key deletes it all.
+  await page.keyboard.press('Backspace');
+  await expect(name).toHaveText('');
+  expect(await height()).toBeCloseTo(restHeight, 0);
+
+  // Whatever a paste brings, a name stays on one line.
+  await page.evaluate(() =>
+    document.execCommand('insertText', false, 'Line one\nLine two'),
+  );
+  await page.keyboard.press('Enter');
+  await expect(row.locator('.schedule-item-name')).toHaveText(
+    'Line one Line two',
+  );
+});
+
 test('Escape cancels a rename and leaves the picker open', async ({ page }) => {
   await load(page);
   await page.click('#schedule-picker-btn');

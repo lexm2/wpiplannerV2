@@ -73,7 +73,7 @@ function canStart(e: TouchEvent): boolean {
   const x = e.touches[0].clientX;
   if (x < EDGE_PX || x > window.innerWidth - EDGE_PX) return false;
   const target = e.target as Element | null;
-  if (target?.closest('input, textarea, select, [contenteditable="true"]'))
+  if (target?.closest('input, textarea, select, [contenteditable]'))
     return false;
   return !inHorizontalScroller(target);
 }
