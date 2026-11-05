@@ -40,6 +40,13 @@
   gap: 2px;
 }
 
+/* Classic keeps --color-border dark for input outlines, so the inactive labels
+   cannot read on it. */
+:global(.theme-wpi-classic) .segments {
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+}
+
 .segment,
 .day {
   position: relative;

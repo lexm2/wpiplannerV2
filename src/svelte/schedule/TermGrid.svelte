@@ -194,7 +194,7 @@
   button.term-letter-label {
     margin: 0;
     border: 0;
-    border-right: 2px solid var(--color-border);
+    border-right: 2px solid var(--color-rule);
     line-height: inherit;
     cursor: pointer;
     /* The card clips overflow, so ring inside the cell. */

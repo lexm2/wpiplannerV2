@@ -484,7 +484,7 @@
 }
 
 .term-graph {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-rule);
   border-radius: var(--effect-border-radius-large);
   background: var(--color-surface);
   display: flex;
@@ -548,7 +548,7 @@
   grid-template-rows: auto repeat(var(--grid-hours, 12), minmax(0, 1fr));
   gap: 1px;
   container-type: inline-size;
-  background: var(--color-border);
+  background: var(--color-rule);
   font-size: 0.7rem;
   overflow: hidden;
   min-height: 150px;
@@ -580,7 +580,7 @@
   /* A wrapped "8:00 AM" is twice the row and runs into the next hour. */
   white-space: nowrap;
   line-height: 1;
-  border-right: 2px solid var(--color-border);
+  border-right: 2px solid var(--color-rule);
 }
 
 .day-header {
@@ -591,7 +591,7 @@
   font-size: clamp(0.6rem, 1.5cqi, 0.9rem);
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
-  border-bottom: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-rule);
   min-height: 2rem;
 }
 
