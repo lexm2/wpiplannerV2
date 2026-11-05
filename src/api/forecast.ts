@@ -5,7 +5,11 @@
  * in the year we do have. Nothing here invents a term or a time.
  */
 import type { Course } from '../types/types';
-import { alternatesInto } from '../utils/alternatingYears';
+import {
+  alternatesInto,
+  effectiveCategory,
+  nextAlternatingYear,
+} from '../utils/alternatingYears';
 import { yearLabel } from './calendar';
 import { andList } from './text';
 
@@ -16,7 +20,11 @@ export interface Forecast {
   year: number;
   /** The year whose schedule it reads. */
   basedOn: number;
-  /** WPI offering category: 1 every year, 2 every other year, 3 occasionally. */
+  /**
+   * WPI offering category as the course really behaves: 1 every year, 2 every
+   * other year, 3 occasionally. A catalog Cat. I whose description says
+   * alternating years counts as 2.
+   */
   category: 1 | 2 | 3 | null;
   outlook: Outlook;
   /** Terms the course has sections in during `basedOn`. */
@@ -68,9 +76,16 @@ function alternatingLead(
     };
   }
   const runs = alternatesInto(a, year);
+  const next = runs
+    ? ''
+    : ` Its next year is ${yearLabel(nextAlternatingYear(a, year))}.`;
+  const reclassed =
+    course.category === 1
+      ? ' The catalog lists it as Cat. I, but its description makes it effectively Cat. II.'
+      : '';
   return {
     outlook: runs ? 'likely' : 'unlikely',
-    lead: `Alternating years; ${runsInBase ? `runs in ${base}` : `not offered in ${base}`}, so likely ${runs ? '' : 'not '}offered in ${target} ${quote}.`,
+    lead: `Alternating years; ${runsInBase ? `runs in ${base}` : `not offered in ${base}`}, so likely ${runs ? '' : 'not '}offered in ${target} ${quote}.${next}${reclassed}`,
   };
 }
 
@@ -85,7 +100,7 @@ export function forecastCourse(
   basedOn: number,
   termsInBaseYear: string[],
 ): Forecast {
-  const category = course.category ?? null;
+  const category = effectiveCategory(course);
   const target = yearLabel(year);
   const base = yearLabel(basedOn);
   const runsInBase = termsInBaseYear.length > 0;
@@ -98,10 +113,7 @@ export function forecastCourse(
     year === basedOn + 1
       ? alternatingLead(course, year, basedOn, runsInBase)
       : null;
-  if (parity && category === 1) {
-    // Cat. I says every year; the description disagrees. Say both.
-    lead += ` The description, though, says it alternates years: "${course.alternatingYears!.statement}"`;
-  } else if (parity) {
+  if (parity) {
     outlook = parity.outlook;
     lead = parity.lead;
   } else if (category === 2 && year === basedOn + 1) {

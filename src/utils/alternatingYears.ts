@@ -29,3 +29,25 @@ export function readAlternatingYears(
 export function alternatesInto(a: AlternatingYears, year: number): boolean {
   return Math.abs(year - a.firstYear) % 2 === 0;
 }
+
+/** The first academic year after `year` (fall year) the statement puts the course in. */
+export function nextAlternatingYear(
+  a: AlternatingYears,
+  year: number,
+): number {
+  return alternatesInto(a, year + 1) ? year + 1 : year + 2;
+}
+
+/**
+ * The offering category a course really has. A catalog "Cat. I" (every year)
+ * whose description says it runs in alternating years behaves as Cat. II, so
+ * that is what to forecast and show; the catalog's own value stays on
+ * `course.category`.
+ */
+export function effectiveCategory(course: {
+  category?: 1 | 2 | 3 | null;
+  alternatingYears?: AlternatingYears | null;
+}): 1 | 2 | 3 | null {
+  const category = course.category ?? null;
+  return category === 1 && course.alternatingYears ? 2 : category;
+}

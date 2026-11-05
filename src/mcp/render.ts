@@ -293,7 +293,11 @@ function rowLine(
       ? `${yearLabel(c.year)} early entry: not published, cannot be scheduled yet`
       : rowSeats(c),
   ];
-  if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
+  if (c.effectiveCategory) {
+    parts.push(
+      `Cat. ${'I'.repeat(c.effectiveCategory)}${c.effectiveCategory !== c.category ? ' (alternating years)' : ''}`,
+    );
+  }
   if (c.topInstructor) {
     const t = c.topInstructor;
     parts.push(
@@ -609,6 +613,7 @@ export function courseDigest(
     departmentName: d.departmentName,
     isGraduate: d.isGraduate,
     category: d.category,
+    effectiveCategory: d.effectiveCategory,
     degreeAttributes: d.degreeAttributes,
     crossListedWith: d.crossListedWith,
     courseTypes: d.courseTypes,
@@ -745,7 +750,14 @@ export function renderCourse(
 
   const facts: string[] = [];
   facts.push(
-    `Offering: ${d.category ? CATEGORY_TEXT[d.category] : 'no category on record'}`,
+    `Offering: ${
+      d.effectiveCategory
+        ? CATEGORY_TEXT[d.effectiveCategory] +
+          (d.effectiveCategory !== d.category
+            ? ' - the catalog lists Cat. I, but the description says alternating years'
+            : '')
+        : 'no category on record'
+    }`,
   );
   facts.push(attributesFact(d.degreeAttributes));
   if (d.courseTypes.length) facts.push(`Type: ${d.courseTypes.join(', ')}`);
