@@ -24,7 +24,12 @@ import { TERM_ORDER, TERMS } from '../utils/typeGuards';
 import { TimeUtils } from '../utils/timeUtils';
 import { canonicalWindows } from '../utils/timeWindows';
 import type { Catalog } from './catalog';
-import { termDates, yearLabel, type TermLetter } from './calendar';
+import {
+  termDates,
+  termsInProgress,
+  yearLabel,
+  type TermLetter,
+} from './calendar';
 import { ClockSchema, EndClockSchema, clockMinutes, clockText } from './clock';
 import { blockedSlotsForCrns, MAX_CRNS } from './conflicts';
 import type { EndedTermsCriteria } from './endedTermsFilter';
@@ -369,6 +374,21 @@ const INPUTS = {
             `${named.map(t => `${t} term ended ${dates?.[t as TermLetter].end ?? ''}`.trim()).join('; ')}: its sections are listed but can no longer be taken.`,
           ),
         );
+      }
+      // A term already under way: its sections can still be added, late.
+      if (ctx.year === ctx.current || ctx.year === 'all') {
+        const running = termsInProgress(ctx.catalog, ctx.current).filter(t =>
+          (term.terms as string[]).includes(t),
+        );
+        const dates = termDates(ctx.catalog, ctx.current);
+        if (running.length && dates) {
+          ctx.notices.push(
+            notice(
+              'inProgress',
+              `${running.map(t => `${t} term is in progress (started ${dates[t].start})`).join('; ')}: adding its sections now is late and may need instructor or registrar approval.`,
+            ),
+          );
+        }
       }
       return term;
     },
@@ -784,8 +804,14 @@ const INPUTS = {
           'Default true: an F section conflicts with A and B, S with C and D. False compares terms exactly.',
         ),
     }),
-    // toCriteria derives these from the CRNs.
-    omit: ['avoidConflicts', 'blockedSlots', 'selectedCourses'],
+    // toCriteria derives the first three from the CRNs.
+    omit: [
+      'avoidConflicts',
+      'blockedSlots',
+      'selectedCourses',
+      // The app's calendar import; a search has no calendar to avoid.
+      'avoidCalendarEvents',
+    ],
     toCriteria: ({ crns, ...rest }, ctx) => {
       const { slots, otherYear } = blockedSlotsForCrns(
         ctx.catalog,

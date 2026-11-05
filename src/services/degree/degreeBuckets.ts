@@ -253,12 +253,18 @@ export function computeUnassigned(
   record: StudentRecord | null,
   selectedCourses: SelectedCourse[],
   assignments: Record<string, string>,
+  buckets: DegreeBucket[],
 ): DegreeTile[] {
   const transcriptCodes = record?.courses.map(c => c.code) ?? [];
+  const known = new Set(buckets.map(b => b.id));
 
   return selectedCourses
     .filter(sc => {
-      if (assignments[sc.course.id]) return false;
+      // A placement in a bucket that is gone (deleted, or restored by Undo
+      // after the bucket went) leaves the course unplaced, as computePlacements
+      // already treats it.
+      const placedIn = assignments[sc.course.id];
+      if (placedIn && known.has(placedIn)) return false;
       const code = codeOf(sc.course);
       return !transcriptCodes.some(tc => appliedCodeMatches(tc, code));
     })
@@ -284,10 +290,33 @@ export function projectPlan(
   record: StudentRecord | null,
   selectedCourses: SelectedCourse[],
 ): PlanProjection {
+  const counted = countedScheduleCourses(record, selectedCourses);
+  const credits = counted.reduce((sum, sc) => sum + sc.course.minCredits, 0);
+  return { credits: Math.round(credits * 100) / 100, courses: counted.length };
+}
+
+/**
+ * The schedule courses a degree-wide aggregate (Total Credits, Residency)
+ * counts: the same set projectPlan sums, so the cards and the summary can't
+ * disagree. Unlike a requirement, an aggregate takes a course whichever bucket
+ * it was placed in.
+ */
+export function projectedScheduleTiles(
+  record: StudentRecord | null,
+  selectedCourses: SelectedCourse[],
+): DegreeTile[] {
+  return countedScheduleCourses(record, selectedCourses).map(sc =>
+    scheduleTile(sc.course, ''),
+  );
+}
+
+function countedScheduleCourses(
+  record: StudentRecord | null,
+  selectedCourses: SelectedCourse[],
+): SelectedCourse[] {
   const transcriptCodes = record?.courses.map(c => c.code) ?? [];
   const seen = new Set<string>();
-  let credits = 0;
-  let courses = 0;
+  const counted: SelectedCourse[] = [];
   for (const sc of selectedCourses) {
     const codes = [
       codeOf(sc.course),
@@ -303,10 +332,9 @@ export function projectPlan(
     )
       continue;
     for (const code of codes) seen.add(code);
-    credits += sc.course.minCredits;
-    courses++;
+    counted.push(sc);
   }
-  return { credits: Math.round(credits * 100) / 100, courses };
+  return counted;
 }
 
 /**

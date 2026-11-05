@@ -4,6 +4,7 @@
 
 /* Real <button>s, so reset the default inline-block chrome. */
 .theme-option {
+  position: relative;
   display: block;
   width: 100%;
   text-align: left;
@@ -43,4 +44,23 @@
 .theme-option.active .theme-option-description {
   color: var(--color-text-inverse);
   opacity: 0.8;
+}
+
+/* The current theme is ticked as well as filled, so it doesn't depend on
+   seeing the fill's colour. */
+.theme-option-check {
+  display: none;
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+}
+
+.theme-option-check :global(svg) {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.theme-option.active .theme-option-check {
+  display: block;
 }

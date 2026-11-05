@@ -1057,14 +1057,20 @@ describe('schedule generation', () => {
     expect(open.body.schedules.map((s: { crns: number[] }) => s.crns)).toEqual([
       [402],
     ]);
-    const all = await generate({ courses: ['XX 1004'] });
+    // 401 is Closed, which no one can register for: out unless asked for.
+    const dflt = await generate({ courses: ['XX 1004'] });
+    expect(dflt.body.found.count).toBe(1);
+    expect(noticeText(dflt.body)).toContain('includeClosed: true');
+    const all = await generate({ courses: ['XX 1004'], includeClosed: true });
     expect(all.body.found.count).toBe(2);
     const closed = await generate({
       courses: ['XX 1007'],
       openSeatsOnly: true,
     });
     expect(closed.body.schedules).toEqual([]);
-    expect(noticeText(closed.body)).toContain('openSeatsOnly');
+    expect(noticeText(closed.body)).toContain('includeClosed: true');
+    const only = await generate({ courses: ['XX 1007'], includeClosed: true });
+    expect(only.body.found.count).toBe(1);
   });
 
   it('limits a course to the terms given, and leaves out ended terms', async () => {

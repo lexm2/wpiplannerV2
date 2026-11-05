@@ -159,8 +159,12 @@ function exportICS(s: Schedule): string {
   return result.data!;
 }
 
+/** Event lines only: the VTIMEZONE block has DTSTART and RRULE lines too. */
 function lines(ics: string, prefix: string): string[] {
-  return ics.split('\r\n').filter(l => l.startsWith(prefix));
+  return ics
+    .replace(/BEGIN:VTIMEZONE[\s\S]*?END:VTIMEZONE\r\n/, '')
+    .split('\r\n')
+    .filter(l => l.startsWith(prefix));
 }
 
 describe('localDate', () => {
@@ -334,5 +338,39 @@ describe('ICSGenerator.generateICS', () => {
     expect(lines(ics, 'DTSTART')).toEqual([
       'DTSTART;TZID=America/New_York:20270826T180000',
     ]);
+  });
+
+  it("ends a section at its own last day, not the term's", () => {
+    const sec = section(AcademicTerm.F, [period([W])]);
+    sec.startDate = '2026-08-20';
+    sec.endDate = '2026-11-20';
+    const ics = exportICS(schedule([course(sec, 2026)]));
+    // 23:59:59 EST on Nov 20 is 04:59:59 UTC on Nov 21.
+    expect(lines(ics, 'RRULE')[0]).toContain('UNTIL=20261121T045959Z');
+  });
+
+  it('keeps the term when a section carries dates outside it', () => {
+    const sec = section(AcademicTerm.A, [period([M])]);
+    sec.startDate = '2027-01-01';
+    sec.endDate = '2027-02-01';
+    const ics = exportICS(schedule([course(sec, 2026)]));
+    expect(lines(ics, 'RRULE')[0]).toContain('UNTIL=20261010T035959Z');
+  });
+
+  it('writes a VTIMEZONE and a valid header that ical.js parses', async () => {
+    const ics = exportICS(
+      schedule([course(section(AcademicTerm.A, [period([M, W])]), 2026)]),
+    );
+    expect(ics).toContain('PRODID:-//WPI Course Planner V2//EN');
+    expect(ics).not.toContain('TIMEZONE-ID');
+
+    const { default: ICAL } = await import('ical.js');
+    const root = new ICAL.Component(ICAL.parse(ics));
+    const zone = root.getFirstSubcomponent('vtimezone');
+    expect(zone?.getFirstPropertyValue('tzid')).toBe('America/New_York');
+    const event = new ICAL.Event(root.getFirstSubcomponent('vevent')!);
+    expect(event.startDate.zone.tzid).toBe('America/New_York');
+    expect(zone?.getAllSubcomponents('daylight')).toHaveLength(1);
+    expect(zone?.getAllSubcomponents('standard')).toHaveLength(1);
   });
 });

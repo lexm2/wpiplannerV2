@@ -69,11 +69,14 @@
 }
 
 .schedule-picker-modal-dialog .schedule-list-actions {
+  flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
   padding: 0.75rem 1.5rem 1rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 .schedule-picker-modal-dialog .schedule-list-actions .btn {
@@ -148,6 +151,29 @@
   -ms-user-select: none;
   display: inline-block;
   width: fit-content;
+  /* A button, so reset its chrome. */
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The click target is the whole row; the actions sit above it. */
+.schedule-picker-modal-dialog .schedule-item-name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.schedule-picker-modal-dialog .schedule-item-name:focus-visible {
+  outline: none;
+}
+
+.schedule-picker-modal-dialog .schedule-item-name:focus-visible::after {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
 }
 
 .schedule-picker-modal-dialog .schedule-item.active .schedule-item-name {
@@ -167,6 +193,7 @@
   gap: 0.75rem;
   flex-shrink: 0;
   margin-left: 1rem;
+  position: relative;
 }
 
 .schedule-picker-modal-dialog .inline-action-btn {
@@ -335,6 +362,10 @@ html.is-mobile .schedule-picker-modal-dialog .modal-title {
 .schedule-picker-modal-dialog .schedule-item.copy-source {
   cursor: default;
   opacity: 0.6;
+}
+
+.schedule-picker-modal-dialog .schedule-item.copy-source .schedule-item-name {
+  cursor: default;
 }
 
 .schedule-picker-modal-dialog .schedule-item.copy-source:hover {

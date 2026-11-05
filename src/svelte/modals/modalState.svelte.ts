@@ -10,6 +10,8 @@ export interface ConfirmPayload {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  /** Informs only: no cancel button, just the confirm button as "OK". */
+  notice?: boolean;
   /** 'danger' styles the confirm button red, for destructive actions. */
   variant?: 'default' | 'danger';
   /** Render a text field and pass its value to onConfirm (prompt replacement). */

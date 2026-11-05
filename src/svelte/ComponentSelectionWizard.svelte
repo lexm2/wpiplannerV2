@@ -3,8 +3,10 @@
   // term grouping, async/RMP/seat badges, toggle-select, Skip/Next/Finish footer,
   // filter status + hidden/year notices, live + hover grid preview, escape-to-cancel
   // - all derived from wizardState.{currentStep,selections} + the active filters.
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { slideX, dur } from './transitions';
+  import { appState } from '../core/state/appState.svelte';
   import { wizardState } from './wizardState.svelte';
   import { showConfirm } from './modals/modalState.svelte';
   import { uiState } from '../services/ui/uiState.svelte';
@@ -17,8 +19,11 @@
     getSeatsInfo,
     getRmpRatingClass,
     describeActiveFilters,
-    getYearMismatch,
+    getScheduleYearMismatch,
+    sectionMeetings,
+    sectionInstructors,
   } from './wizardLogic';
+  import { componentWizardService } from '../services/scheduling/componentWizardService';
   import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../utils/iconPaths';
   import type { ComponentKind, Section, SectionsByKind } from '../types/types';
@@ -79,8 +84,45 @@
     });
   });
 
-  const filterDescriptions = $derived(describeActiveFilters(filterService));
-  const yearMismatch = $derived(getYearMismatch(course, filterService));
+  const filterDescriptions = $derived(
+    describeActiveFilters(filterService, appState.activeSchedule?.year),
+  );
+  // Judged against the schedule the picks would land on, not the filter: the
+  // filter can show any year, but the grid only holds the schedule's own.
+  const scheduleYearMismatch = $derived(
+    getScheduleYearMismatch(course, appState.activeSchedule?.year),
+  );
+
+  // The course can leave the schedule while the wizard is open (its Remove
+  // button, a schedule switch); Finish could then only fail.
+  const courseStillSelected = $derived(
+    appState.selectedCourses.some(sc => sc.course.id === course.id),
+  );
+  $effect(() => {
+    if (!courseStillSelected) cancel();
+  });
+
+  const headingId = $props.id();
+  let rootEl: HTMLElement | undefined = $state();
+  let headingEl: HTMLElement | undefined = $state();
+  // Read at script init, before onMount moves focus into the wizard.
+  const opener = document.activeElement;
+
+  // On teardown (after the fade-out; effects are frozen once the outro starts)
+  // focus goes back to whatever opened the wizard, unless the user has already
+  // moved it elsewhere on purpose - which includes a newer wizard for another
+  // course.
+  onMount(() => {
+    headingEl?.focus({ preventScroll: true });
+    return () => {
+      const active = document.activeElement;
+      const focusIsLost =
+        !active || active === document.body || rootEl?.contains(active);
+      if (focusIsLost && opener instanceof HTMLElement && opener.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
+    };
+  });
 
   const currentIndex = $derived(availableSteps.indexOf(currentStep));
   const isFirstStep = $derived(currentIndex === 0);
@@ -105,6 +147,13 @@
     }
 
     cfg.onSelectionChange?.(wizardState.selections);
+  }
+
+  // The footer swaps Next for Skip/Finish in the same spot, so the second click
+  // of a double-click would land on the replacement and skip a step.
+  function singleClick(e: MouseEvent, action: () => void): void {
+    if (e.detail > 1) return;
+    action();
   }
 
   function next(): void {
@@ -156,12 +205,6 @@
     );
   }
 
-  function switchYear(): void {
-    if (filterService && course.academicYear) {
-      filterService.updateFilter('academicYear', { year: course.academicYear });
-    }
-  }
-
   function hoverPreview(section: Section): void {
     if (!cfg.onHoverPreview) return;
     cfg.onHoverPreview({ [currentStep]: section } satisfies SectionsByKind);
@@ -179,8 +222,10 @@
       e.key === 'Escape' &&
       !e.defaultPrevented &&
       uiState.openModals.length === 0
-    )
+    ) {
+      e.preventDefault();
       cancel();
+    }
   }
 </script>
 
@@ -190,6 +235,9 @@
      local outro would never play - the panel would just vanish. -->
 <div
   class={['sidebar-panel', styles['sidebar-panel--component-wizard']]}
+  role="region"
+  aria-labelledby={headingId}
+  bind:this={rootEl}
   transition:fade|global={{ duration: dur(250) }}
 >
   <div class={styles['wizard-header']}>
@@ -198,8 +246,11 @@
       onclick={cancel}
       aria-label="Close">&times;</button
     >
-    <h2>{course.departmentAbbr} {course.number}</h2>
-    <div class={styles['wizard-course-name']}>{course.name}</div>
+    <h2 id={headingId} tabindex="-1" bind:this={headingEl}>
+      {course.departmentAbbr}
+      {course.number}
+      <span class={styles['wizard-course-name']}>{course.name}</span>
+    </h2>
   </div>
 
   {#if filterDescriptions.length > 0}
@@ -265,7 +316,20 @@
         data-step={currentStep}
         in:slideX|global={{ from: dirSign, duration: 250 }}
       >
-        {#if optionInfo.filtered.length === 0}
+        {#if scheduleYearMismatch}
+          <div class={styles['wizard-filtered-notice']}>
+            <span class={styles['wizard-filtered-notice-text']}>
+              This course is from {scheduleYearMismatch.courseYear}-{scheduleYearMismatch.courseYear +
+                1}, but this schedule is for {scheduleYearMismatch.scheduleYear}-{scheduleYearMismatch.scheduleYear +
+                1}. Its sections can't be placed here.
+            </span>
+            <button
+              class={styles['wizard-filtered-notice-btn']}
+              onclick={() => componentWizardService.offerYearSwitch(course)}
+              >Switch schedule</button
+            >
+          </div>
+        {:else if optionInfo.filtered.length === 0}
           {@render filteredNotice()}
         {:else}
           <h3 class={styles['wizard-step-title']}>
@@ -277,10 +341,9 @@
             </div>
             <div class={styles['wizard-sections-grid']}>
               {#each group.sections as section, i (section.crn)}
-                {@const period = section.periods[0]}
-                {@const isAsync = isAsyncPeriod(period)}
+                {@const meetings = sectionMeetings(section)}
                 {@const professor =
-                  period?.instructors.join('; ') || 'Not Assigned'}
+                  sectionInstructors(section).join('; ') || 'Not Assigned'}
                 {@const rmp =
                   professor !== 'Not Assigned'
                     ? rateMyProfessorService.getRatingDisplay(professor)
@@ -310,6 +373,7 @@
                   tabindex="0"
                   onclick={() => selectSection(section)}
                   onkeydown={e =>
+                    e.target === e.currentTarget &&
                     (e.key === 'Enter' || e.key === ' ') &&
                     (e.preventDefault(), selectSection(section))}
                   onmouseenter={() => hoverPreview(section)}
@@ -321,26 +385,27 @@
                     >
                   </div>
 
-                  {#if isAsync}
-                    <div class={styles['section-card-async-badge']}>
-                      {@html getInlineSVG('CLOCK', 'async-icon')}
-                      Asynchronous
-                    </div>
+                  {#each meetings as period, m (m)}
+                    {#if isAsyncPeriod(period)}
+                      <div class={styles['section-card-async-badge']}>
+                        {@html getInlineSVG('CLOCK', 'async-icon')}
+                        Asynchronous
+                      </div>
+                    {:else}
+                      <div class={styles['section-card-time']}>
+                        <strong>{Array.from(period.days).join('')}</strong>
+                        {period.startTime.displayTime} - {period.endTime
+                          .displayTime}
+                      </div>
+                      <div class={styles['section-card-location']}>
+                        {period.location || 'TBA'}
+                      </div>
+                    {/if}
                   {:else}
                     <div class={styles['section-card-time']}>
-                      <strong
-                        >{period
-                          ? Array.from(period.days).join('')
-                          : 'TBA'}</strong
-                      >
-                      {period
-                        ? `${period.startTime.displayTime} - ${period.endTime.displayTime}`
-                        : 'TBA'}
+                      <strong>TBA</strong>
                     </div>
-                    <div class={styles['section-card-location']}>
-                      {period?.location || 'TBA'}
-                    </div>
-                  {/if}
+                  {/each}
 
                   <div class={styles['section-card-professor']}>
                     {#if rmpUrl}
@@ -349,8 +414,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                         class="professor-link"
-                        onclick={e => e.stopPropagation()}
-                        onkeydown={e => e.stopPropagation()}>{professor}</a
+                        onclick={e => e.stopPropagation()}>{professor}</a
                       >
                     {:else}
                       {professor}
@@ -410,7 +474,7 @@
   <div class={styles['wizard-footer']}>
     <button
       class={[styles['wizard-btn'], styles['wizard-btn-secondary']]}
-      onclick={prev}
+      onclick={e => singleClick(e, prev)}
       style:visibility={isFirstStep ? 'hidden' : 'visible'}
     >
       Back
@@ -419,45 +483,33 @@
       class={[styles['wizard-btn'], styles['wizard-btn-text']]}
       onclick={cancel}>Cancel</button
     >
-    {#if hasSelection || isLastStep}
+    {#if scheduleYearMismatch}
+      <!-- Nothing to pick or finish: the cards are replaced by the notice. -->
+    {:else if hasSelection || isLastStep}
       <button
         id="wizard-next-btn"
         class={[styles['wizard-btn'], styles['wizard-btn-primary']]}
-        onclick={() => (isLastStep ? tryComplete() : next())}
+        onclick={e => singleClick(e, isLastStep ? tryComplete : next)}
       >
         {isLastStep ? 'Finish' : 'Next'}
       </button>
     {:else}
       <button
         class={[styles['wizard-btn'], styles['wizard-btn-secondary']]}
-        onclick={next}>Skip</button
+        onclick={e => singleClick(e, next)}>Skip</button
       >
     {/if}
   </div>
 </div>
 
 {#snippet filteredNotice()}
-  {#if yearMismatch}
-    <div class={styles['wizard-filtered-notice']}>
-      <span class={styles['wizard-filtered-notice-text']}>
-        This course is from {yearMismatch.courseYear}-{yearMismatch.courseYear +
-          1} but you're viewing
-        {yearMismatch.filterYear}-{yearMismatch.filterYear + 1}
-      </span>
-      <button class={styles['wizard-filtered-notice-btn']} onclick={switchYear}>
-        Switch to {yearMismatch.courseYear}-{yearMismatch.courseYear + 1}
-      </button>
-    </div>
-  {:else}
-    <div class={styles['wizard-filtered-notice']}>
-      <span class={styles['wizard-filtered-notice-text']}>
-        {hiddenCount}
-        {hiddenCount === 1 ? 'section' : 'sections'} hidden by filters
-      </span>
-      <button
-        class={styles['wizard-filtered-notice-btn']}
-        onclick={clearFilters}>Clear Filters</button
-      >
-    </div>
-  {/if}
+  <div class={styles['wizard-filtered-notice']}>
+    <span class={styles['wizard-filtered-notice-text']}>
+      {hiddenCount}
+      {hiddenCount === 1 ? 'section' : 'sections'} hidden by filters
+    </span>
+    <button class={styles['wizard-filtered-notice-btn']} onclick={clearFilters}
+      >Clear Filters</button
+    >
+  </div>
 {/snippet}

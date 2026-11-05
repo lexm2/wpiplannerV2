@@ -139,6 +139,32 @@ describe('CourseLevelRangeFilter', () => {
 });
 
 describe('OfferingPatternFilter', () => {
+  it('files an alternating-years Cat. I course under Cat. II', () => {
+    const filter = new OfferingPatternFilter();
+    const pipeline = new SectionFilterPipeline();
+    pipeline.registerFilter(filter);
+    const alternating = course(
+      'BME 4023',
+      {
+        category: 1,
+        alternatingYears: {
+          firstYear: 2020,
+          statement: 'Offered in 2020-21, and in alternating years thereafter.',
+        },
+      },
+      [section(99)],
+    );
+    const kept = (categories: number[]) =>
+      pipeline
+        .applyFilters(
+          pipeline.flattenCoursesToSections([alternating]),
+          new Map([[filter.id, { categories }]]),
+        )
+        .map(fs => fs.section.crn);
+    expect(kept([1])).toEqual([]);
+    expect(kept([2])).toEqual([99]);
+  });
+
   it('keeps the categories asked for, and unknown ones only on request', () => {
     const filter = new OfferingPatternFilter();
     expect(run(filter, { categories: [1] })).toEqual([1]);

@@ -8,6 +8,9 @@ const QUARTERS = [
   AcademicTerm.C,
   AcademicTerm.D,
 ];
+// Shared, never mutated: the conflict filter asks per section and slot.
+const FALL = [AcademicTerm.A, AcademicTerm.B];
+const SPRING = [AcademicTerm.C, AcademicTerm.D];
 
 /**
  * The terms a slot occupies, for overlap tests and mask keys. With `spans`
@@ -17,8 +20,8 @@ const QUARTERS = [
 export function termsCovered(term: AcademicTerm, spans = true): AcademicTerm[] {
   if (spans) {
     if (term === AcademicTerm.ALL) return QUARTERS;
-    if (term === AcademicTerm.F) return [AcademicTerm.A, AcademicTerm.B];
-    if (term === AcademicTerm.S) return [AcademicTerm.C, AcademicTerm.D];
+    if (term === AcademicTerm.F) return FALL;
+    if (term === AcademicTerm.S) return SPRING;
     return [term];
   }
   if (term === AcademicTerm.ALL)
@@ -31,7 +34,7 @@ export function termsCovered(term: AcademicTerm, spans = true): AcademicTerm[] {
  * but some run half of it (BB 3813 BX01 to Nov 12, BX02 from Nov 16) or half
  * a semester, and those never meet. Unknown dates are taken to meet.
  */
-export function datesMeet(
+function datesMeet(
   aStart: string | undefined,
   aEnd: string | undefined,
   bStart: string | undefined,
@@ -39,6 +42,31 @@ export function datesMeet(
 ): boolean {
   if (!aStart || !aEnd || !bStart || !bEnd) return true;
   return aStart <= bEnd && bStart <= aEnd;
+}
+
+/** What a section or slot occupies besides its weekly hours: term and dates. */
+export interface TermScope {
+  term: AcademicTerm;
+  startDate?: string;
+  endDate?: string;
+}
+
+/**
+ * Whether two things can clash at all, before any weekly hours are compared:
+ * their terms share a quarter (F meets A and B, S meets C and D) and their
+ * date ranges share a day. The one rule behind the course-list conflict
+ * filter and the schedule grid's conflict matrix.
+ */
+export function scopesOverlap(
+  a: TermScope,
+  b: TermScope,
+  spans = true,
+): boolean {
+  const aTerms = termsCovered(a.term, spans);
+  return (
+    termsCovered(b.term, spans).some(t => aTerms.includes(t)) &&
+    datesMeet(a.startDate, a.endDate, b.startDate, b.endDate)
+  );
 }
 
 /**

@@ -1,4 +1,8 @@
-import { Schedule, SelectedCourse } from '../../types/schedule';
+import type {
+  LocalCalendarEvent,
+  Schedule,
+  SelectedCourse,
+} from '../../types/schedule';
 import { ProfileStateManager } from '../../core/state/ProfileStateManager';
 import { DataValidator } from '../../core/validation/DataValidator';
 import { CourseSelectionService } from './CourseSelectionService';
@@ -17,6 +21,13 @@ export interface ScheduleOperationResult {
   error?: string;
   warnings?: string[];
   message?: string;
+  /** Set by importSchedulesFromFile: how many schedules it created. */
+  importedCount?: number;
+}
+
+/** "CS-2102-2026" reads as "CS 2102" to a student. */
+function describeCourses(ids: string[]): string {
+  return ids.map(id => id.split('-').slice(0, 2).join(' ')).join(', ');
 }
 
 export interface ScheduleCreationOptions {
@@ -522,6 +533,81 @@ export class ScheduleManagementService {
     }
   }
 
+  /**
+   * Adds every schedule in an export file as a new schedule, named as the file
+   * names it (`fileName` only stands in for a schedule the file leaves
+   * unnamed). The file is read and checked before anything is created, so a
+   * bad file leaves nothing behind to undo, and the new schedules are one undo
+   * step. `schedule` is the one the file had active.
+   */
+  async importSchedulesFromFile(
+    jsonData: string,
+    fileName: string,
+  ): Promise<ScheduleOperationResult> {
+    try {
+      await this.ensureInitialized();
+
+      const file = this.profileStateManager.parseImport(jsonData);
+      if (!file.ok) return { success: false, error: file.error };
+
+      const kept = file.schedules.reduce(
+        (n, s) => n + s.selectedCourses.length + (s.localEvents?.length ?? 0),
+        0,
+      );
+      const unknown = file.skipped.flat();
+      if (file.schedules.length === 0) {
+        return { success: false, error: 'This file holds no schedules.' };
+      }
+      if (kept === 0 && unknown.length > 0) {
+        return {
+          success: false,
+          error: `None of the courses in this file are in the current catalog: ${describeCourses(unknown)}.`,
+        };
+      }
+      for (const schedule of file.schedules) {
+        const validation = this.dataValidator.validateSchedule(schedule);
+        if (!validation.valid) {
+          return {
+            success: false,
+            error: `Schedule validation failed: ${validation.errors.map(e => e.message).join(', ')}`,
+          };
+        }
+      }
+
+      // eslint-disable-next-line @typescript-eslint/require-await -- withBatch takes an async body
+      const created = await this.profileStateManager.withBatch(async () =>
+        file.schedules.map(schedule =>
+          this.profileStateManager.createScheduleFrom({
+            ...schedule,
+            name: this.generateUniqueScheduleName(
+              schedule.name.trim() || fileName,
+            ),
+          }),
+        ),
+      );
+
+      return {
+        success: true,
+        schedule: created[file.activeIndex] ?? created[0],
+        importedCount: created.length,
+        warnings: unknown.length
+          ? [
+              `Not in the current catalog, so left out: ${describeCourses(unknown)}.`,
+            ]
+          : undefined,
+      };
+    } catch (error) {
+      logger.error('Error importing schedules:', error);
+      return { success: false, error: errorMessage(error) };
+    }
+  }
+
+  /**
+   * Merges one schedule of an export file into `scheduleId`: its courses and
+   * calendar events, keeping whatever the target already has. A file holds
+   * several schedules after Export All; the one it had active is taken, and
+   * the result's `message` says so.
+   */
   async importScheduleInto(
     scheduleId: string,
     jsonData: string,
@@ -529,26 +615,34 @@ export class ScheduleManagementService {
     try {
       await this.ensureInitialized();
 
-      // safeParse, and a guarded JSON.parse, so a malformed file gets the same
-      // friendly message as an out-of-date one rather than a parser error.
-      let json: unknown;
-      try {
-        json = JSON.parse(jsonData);
-      } catch {
-        json = undefined;
-      }
-      const parsed = ExportDataSchema.safeParse(json);
-      if (!parsed.success || !parsed.data.v.startsWith('4')) {
-        return {
-          success: false,
-          error:
-            'Unsupported import format. Please export your schedules again using the latest version.',
-        };
-      }
+      const file = this.profileStateManager.parseImport(jsonData);
+      if (!file.ok) return { success: false, error: file.error };
 
-      const importedCourses =
-        this.profileStateManager.parseImportCourses(jsonData);
-      return await this.mergeCoursesInto(scheduleId, importedCourses);
+      const source = file.schedules[file.activeIndex] ?? file.schedules[0];
+      if (!source) {
+        return { success: false, error: 'This file holds no schedules.' };
+      }
+      const unknown = file.skipped[file.activeIndex] ?? [];
+
+      const merged = await this.mergeCoursesInto(
+        scheduleId,
+        source.selectedCourses,
+        source.localEvents ?? [],
+      );
+      if (!merged.success) return merged;
+
+      return {
+        ...merged,
+        message:
+          file.schedules.length > 1
+            ? `This file holds ${file.schedules.length} schedules. Only "${source.name}", the one it had active, was imported. Use Import at the bottom of the list to add them all.`
+            : undefined,
+        warnings: unknown.length
+          ? [
+              `Not in the current catalog, so left out: ${describeCourses(unknown)}.`,
+            ]
+          : undefined,
+      };
     } catch (error) {
       return { success: false, error: errorMessage(error) };
     }
@@ -594,6 +688,7 @@ export class ScheduleManagementService {
   private async mergeCoursesInto(
     scheduleId: string,
     courses: SelectedCourse[],
+    events: LocalCalendarEvent[] = [],
   ): Promise<ScheduleOperationResult> {
     const existing = this.getScheduleById(scheduleId);
     if (!existing) {
@@ -606,9 +701,19 @@ export class ScheduleManagementService {
       ...courses.filter(c => !existingIds.has(c.course.id)),
     ];
 
+    const existingEventIds = new Set(
+      (existing.localEvents ?? []).map(e => e.id),
+    );
+    const newEvents = events.filter(e => !existingEventIds.has(e.id));
+
     // updateSchedule also refreshes the live selection when the target is
     // the active schedule.
-    return this.updateSchedule(scheduleId, { selectedCourses: merged });
+    return this.updateSchedule(scheduleId, {
+      selectedCourses: merged,
+      ...(newEvents.length > 0 && {
+        localEvents: [...(existing.localEvents ?? []), ...newEvents],
+      }),
+    });
   }
 
   getCourseSelectionService(): CourseSelectionService {
@@ -668,6 +773,9 @@ export class ScheduleManagementService {
   }
 
   async clearAllSchedules(): Promise<void> {
-    await this.profileStateManager.clearAllData();
+    const result = await this.profileStateManager.clearAllData();
+    if (!result.success) {
+      throw new Error(result.error ?? 'Failed to clear data');
+    }
   }
 }

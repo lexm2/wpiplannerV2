@@ -290,12 +290,14 @@
         type="button"
         class="segmented-btn"
         class:active={gridMode === 'only'}
+        aria-pressed={gridMode === 'only'}
         onclick={() => setMode('only')}>Only these times</button
       >
       <button
         type="button"
         class="segmented-btn"
         class:active={gridMode === 'avoid'}
+        aria-pressed={gridMode === 'avoid'}
         onclick={() => setMode('avoid')}>Avoid these times</button
       >
     </div>

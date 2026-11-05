@@ -2,7 +2,14 @@
  * Hybrid storage layer with IndexedDB for schedules and localStorage for preferences, providing atomic transactions
  */
 import { Schedule, SchedulePreferences } from '../../types/schedule';
-import { IndexedDBStorageManager } from './IndexedDBStorageManager';
+import {
+  IndexedDBStorageManager,
+  type LoadReport,
+  type WriteConflict,
+} from './IndexedDBStorageManager';
+import { CrossTabChannel } from './CrossTabChannel';
+import { validateStoredPreferences } from './storageValidation';
+import { PANEL_WIDTHS } from '../../svelte/panelWidths';
 import { setReplacer, setReviver } from '../../utils/jsonSerializer';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
 import type { DegreeBucketConfig, StudentRecord } from '../../types/degree';
@@ -19,7 +26,19 @@ export interface TransactionResult {
   transactionId: string;
   error?: Error;
   rolledBack?: boolean;
+  /** Set when a schedule write was refused because another tab changed it. */
+  conflict?: WriteConflict;
 }
+
+/** A change another tab made to shared storage. */
+export type RemoteChange =
+  | { type: 'schedule'; id: string }
+  | { type: 'deleted'; id: string }
+  | { type: 'preferences' }
+  | { type: 'cleared' };
+
+/** Tutorial schedules are scratch copies; no other tab needs to hear of them. */
+const isTutorialId = (id: string): boolean => id.startsWith('tutorial_');
 
 export class TransactionalStorageManager {
   /** Shared registry; see utils/storageKeys.ts. */
@@ -28,9 +47,45 @@ export class TransactionalStorageManager {
   private transactionCounter = 0;
   private indexedDBStorage: IndexedDBStorageManager;
   private indexedDBInitialized = false;
+  private channel = new CrossTabChannel();
 
   constructor() {
     this.indexedDBStorage = new IndexedDBStorageManager();
+  }
+
+  /**
+   * Calls `listener` when another tab changes shared storage: a schedule
+   * written or deleted, preferences changed, or everything cleared. Never for
+   * this tab's own writes.
+   */
+  subscribe(listener: (change: RemoteChange) => void): () => void {
+    const stopChannel = this.channel.subscribe(message => {
+      if (message.type === 'cleared') listener({ type: 'cleared' });
+      else if (!isTutorialId(message.id)) listener(message);
+    });
+    // Preferences live in localStorage, which already tells other tabs.
+    const onStorage = (event: StorageEvent) => {
+      if (
+        event.key === TransactionalStorageManager.STORAGE_KEYS.PREFERENCES &&
+        event.newValue
+      ) {
+        listener({ type: 'preferences' });
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      stopChannel();
+      window.removeEventListener('storage', onStorage);
+    };
+  }
+
+  /**
+   * Tells other tabs everything was cleared. Separate from clearAllDataComplete
+   * so the caller can send it once the fresh state has been written: a tab that
+   * reloads on hearing it must find that state, not an empty store.
+   */
+  announceCleared(): void {
+    this.channel.post({ type: 'cleared' });
   }
 
   private async ensureInitialized(): Promise<void> {
@@ -56,10 +111,14 @@ export class TransactionalStorageManager {
   async saveSchedule(schedule: Schedule): Promise<TransactionResult> {
     await this.ensureInitialized();
     const result = await this.indexedDBStorage.saveSchedule(schedule);
+    if (result.success && !isTutorialId(schedule.id)) {
+      this.channel.post({ type: 'schedule', id: schedule.id });
+    }
     return {
       success: result.success,
       transactionId: `indexeddb-${Date.now()}`,
       error: result.error ? new Error(result.error) : undefined,
+      conflict: result.conflict,
     };
   }
 
@@ -67,11 +126,26 @@ export class TransactionalStorageManager {
     data: Schedule[] | null;
     valid: boolean;
     error?: string;
+    report: LoadReport;
   }> {
     await this.ensureInitialized();
     const result = await this.indexedDBStorage.loadAllSchedules();
     return {
       data: result.data ?? [],
+      valid: result.success,
+      error: result.error,
+      report: result.report,
+    };
+  }
+
+  /** One schedule re-read from storage; data is null if it is gone or unreadable. */
+  async loadSchedule(
+    scheduleId: string,
+  ): Promise<{ data: Schedule | null; valid: boolean; error?: string }> {
+    await this.ensureInitialized();
+    const result = await this.indexedDBStorage.loadSchedule(scheduleId);
+    return {
+      data: result.data ?? null,
       valid: result.success,
       error: result.error,
     };
@@ -80,6 +154,9 @@ export class TransactionalStorageManager {
   async deleteSchedule(scheduleId: string): Promise<TransactionResult> {
     await this.ensureInitialized();
     const result = await this.indexedDBStorage.deleteSchedule(scheduleId);
+    if (result.success && !isTutorialId(scheduleId)) {
+      this.channel.post({ type: 'deleted', id: scheduleId });
+    }
     return {
       success: result.success,
       transactionId: `indexeddb-${Date.now()}`,
@@ -102,14 +179,21 @@ export class TransactionalStorageManager {
     valid: boolean;
     error?: string;
   } {
-    const result = this.safeLoad<SchedulePreferences>(
+    const result = this.safeLoad<unknown>(
       TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
-      this.getDefaultPreferences(),
+      null,
       'preferences',
     );
+    // Absent is fine (defaults); present but not an object is as unusable as
+    // unparseable, and a field of the wrong type is dropped, not trusted.
+    const validated =
+      result.data === null ? null : validateStoredPreferences(result.data);
+    if (result.valid && result.data !== null && validated === null) {
+      logger.warn('Stored preferences are not an object; using defaults');
+    }
 
     return {
-      data: result.data ?? this.getDefaultPreferences(),
+      data: validated ?? this.getDefaultPreferences(),
       valid: result.valid,
       error: result.error,
     };
@@ -215,69 +299,28 @@ export class TransactionalStorageManager {
       Object.values(TransactionalStorageManager.STORAGE_KEYS).forEach(key => {
         localStorage.removeItem(key);
       });
+      // Panel widths keep their own keys (see panelWidths.ts).
+      for (const { storageKey } of Object.values(PANEL_WIDTHS)) {
+        localStorage.removeItem(storageKey);
+      }
     });
   }
 
   async clearAllDataComplete(): Promise<TransactionResult> {
     try {
-      await this.indexedDBStorage.clearAllSchedules();
-      const result = this.clearAllData();
-      return result;
+      const cleared = await this.indexedDBStorage.clearAllSchedules();
+      if (!cleared.success) {
+        return {
+          success: false,
+          transactionId: `clear-${Date.now()}`,
+          error: new Error(cleared.error),
+        };
+      }
+      return this.clearAllData();
     } catch (error) {
       return {
         success: false,
         transactionId: `clear-${Date.now()}`,
-        error: error as Error,
-      };
-    }
-  }
-
-  /**
-   * Expects full Schedule objects with Course/Section references. The caller
-   * (ProfileStateManager) is responsible for converting from ExportData (IDs only)
-   * to full objects before calling this method.
-   */
-  async importData(
-    schedules: Schedule[],
-    activeScheduleId: string | null,
-    preferences?: SchedulePreferences,
-  ): Promise<TransactionResult> {
-    try {
-      if (preferences) {
-        localStorage.setItem(
-          TransactionalStorageManager.STORAGE_KEYS.PREFERENCES,
-          JSON.stringify(preferences, this.replacer),
-        );
-      }
-
-      if (schedules.length > 0) {
-        await this.ensureInitialized();
-        for (const schedule of schedules) {
-          const saved = await this.saveSchedule(schedule);
-          if (!saved.success) {
-            throw new Error(
-              `Failed to import schedule "${schedule.name}": ${saved.error?.message}`,
-            );
-          }
-        }
-      }
-
-      if (activeScheduleId !== undefined) {
-        const saved = this.saveActiveScheduleId(activeScheduleId);
-        if (!saved.success) {
-          throw saved.error ?? new Error('Failed to save active schedule ID');
-        }
-      }
-
-      return {
-        success: true,
-        transactionId: `import-${Date.now()}`,
-      };
-    } catch (error) {
-      logger.error('[TransactionalStorageManager] importData() failed:', error);
-      return {
-        success: false,
-        transactionId: `import-${Date.now()}`,
         error: error as Error,
       };
     }

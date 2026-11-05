@@ -6,6 +6,7 @@
 import type { Course } from '../types/types';
 import { formatLocalDate } from '../utils/localDate';
 import { QUARTERS } from '../utils/typeGuards';
+import { isYearPublished } from '../utils/yearPublished';
 import { currentAcademicYear, type Catalog } from './catalog';
 
 type Quarter = 'A' | 'B' | 'C' | 'D';
@@ -17,13 +18,6 @@ export interface DateSpan {
   end: string;
 }
 
-/**
- * A future year counts as published once it lists at least this share of
- * the current year's courses. WPI's full schedule runs to well over a
- * thousand courses; a year with a handful holds only early entries.
- */
-const PUBLISHED_SHARE = 0.25;
-
 type YearStatus = 'past' | 'current' | 'published' | 'not yet published';
 
 export interface YearInfo {
@@ -33,9 +27,10 @@ export interface YearInfo {
 }
 
 /**
- * Whole days since the seat counts were read from WPI, on the catalog's
- * clock; null when the refresh time is unknown. A deployed server refreshes
- * every 15 minutes, so a large age means the data is a stale copy.
+ * Whole days since WPI's data last changed (last-updated.json), on the
+ * catalog's clock; null when that time is unknown. The refresh job only
+ * rewrites the file when the feed changes, so a large age means either a
+ * quiet feed or a stale copy; the file cannot tell which.
  */
 export function seatDataAge(catalog: Catalog): number | null {
   const then = catalog.lastUpdated ? Date.parse(catalog.lastUpdated) : NaN;
@@ -83,6 +78,16 @@ export function endedTerms(catalog: Catalog, year: number): TermLetter[] {
   if (!dates) return [];
   const now = today(catalog);
   return (Object.keys(dates) as TermLetter[]).filter(t => dates[t].end < now);
+}
+
+/** Terms of `year` under way today (B, and F with it, say). */
+export function termsInProgress(catalog: Catalog, year: number): TermLetter[] {
+  const dates = termDates(catalog, year);
+  if (!dates) return [];
+  const now = today(catalog);
+  return (Object.keys(dates) as TermLetter[]).filter(
+    t => dates[t].start <= now && now <= dates[t].end,
+  );
 }
 
 export interface TermNow {
@@ -134,7 +139,7 @@ export function yearInfo(catalog: Catalog): YearInfo[] {
   }
 
   const current = currentAcademicYear(catalog);
-  const threshold = (counts.get(current) ?? 0) * PUBLISHED_SHARE;
+  const currentCount = counts.get(current) ?? 0;
   return [...counts]
     .sort(([a], [b]) => a - b)
     .map(([year, courseCount]) => ({
@@ -145,7 +150,7 @@ export function yearInfo(catalog: Catalog): YearInfo[] {
           ? 'past'
           : year === current
             ? 'current'
-            : courseCount > 0 && courseCount >= threshold
+            : isYearPublished(courseCount, currentCount)
               ? 'published'
               : 'not yet published',
     }));

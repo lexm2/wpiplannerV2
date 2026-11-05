@@ -14,6 +14,7 @@
   import type { Course } from '../types/types';
   import type { CourseSelectionService } from '../services/selection/CourseSelectionService';
   import { logger } from '../utils/logger';
+  import { wizardState } from './wizardState.svelte';
 
   let {
     courseSelectionService,
@@ -25,10 +26,7 @@
       isIncomplete: boolean;
       message: string;
     };
-    onOpenWizard: (
-      course: Course,
-      existing: SelectedCourse | undefined,
-    ) => void;
+    onOpenWizard: (course: Course) => void;
   } = $props();
 
   // Unscheduled (and unknown terms) sort last.
@@ -76,25 +74,30 @@
   }
 </script>
 
-{#if isEmpty}
-  <div class="empty-state">No courses selected yet</div>
-{:else}
-  {#each groups as group (group.termKey)}
-    <div class="term-separator">
-      <span class="term-separator-label">{group.label}</span>
-      <span class="term-separator-line"></span>
-    </div>
-    {#each group.courses as sc (sc.course.id)}
-      <SelectedCourseItem
-        selectedCourse={sc}
-        incompleteInfo={getIncompleteInfo(sc)}
-        onOpenWizard={() => onOpenWizard(sc.course, sc)}
-        onRemove={() => handleRemove(sc.course)}
-        onClearSections={() => handleClearSections(sc.course)}
-      />
+<!-- `display: contents` keeps the cards laid out as direct children of the
+     scroll container. Inert while the section wizard covers the list, so Tab
+     can't reach invisible cards (and scroll the wizard out of view). -->
+<div class="schedule-course-list" inert={wizardState.isOpen}>
+  {#if isEmpty}
+    <div class="empty-state">No courses selected yet</div>
+  {:else}
+    {#each groups as group (group.termKey)}
+      <div class="term-separator">
+        <span class="term-separator-label">{group.label}</span>
+        <span class="term-separator-line"></span>
+      </div>
+      {#each group.courses as sc (sc.course.id)}
+        <SelectedCourseItem
+          selectedCourse={sc}
+          incompleteInfo={getIncompleteInfo(sc)}
+          onOpenWizard={() => onOpenWizard(sc.course)}
+          onRemove={() => handleRemove(sc.course)}
+          onClearSections={() => handleClearSections(sc.course)}
+        />
+      {/each}
     {/each}
-  {/each}
-  {#if hasSections}
-    <ClearAllSectionsButton {courseSelectionService} />
+    {#if hasSections}
+      <ClearAllSectionsButton {courseSelectionService} />
+    {/if}
   {/if}
-{/if}
+</div>

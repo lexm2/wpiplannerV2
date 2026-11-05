@@ -419,7 +419,7 @@ function rankingRow(page: Page, key: string) {
 /** Sets "Avoid classes before" to High at the given time through the UI. */
 async function setEarlyClasses(page: Page, time: string): Promise<void> {
   const row = rankingRow(page, 'earlyClasses');
-  await row.getByRole('radio', { name: 'High' }).check({ force: true });
+  await row.getByRole('radio', { name: 'High' }).check();
   await row.getByRole('combobox').selectOption(time);
 }
 
@@ -432,10 +432,10 @@ test('a ranking row shows its options only while it is not Off', async ({
   const row = rankingRow(page, 'earlyClasses');
   await expect(row.getByRole('combobox')).toHaveCount(0);
 
-  await row.getByRole('radio', { name: 'Low' }).check({ force: true });
+  await row.getByRole('radio', { name: 'Low' }).check();
   await expect(row.getByRole('combobox')).toHaveCount(1);
 
-  await row.getByRole('radio', { name: 'Off' }).check({ force: true });
+  await row.getByRole('radio', { name: 'Off' }).check();
   await expect(row.getByRole('combobox')).toHaveCount(0);
 });
 
@@ -667,4 +667,145 @@ test('a class over a calendar event shows a conflict on the grid', async ({
   await expect(
     page.locator(`.term-graph[data-term="${hit.term}"] .term-conflict-warning`),
   ).toBeVisible();
+});
+
+/** Holds each worker job back so a run can be interrupted. */
+async function delayWorker(page: Page, ms: number): Promise<void> {
+  await page.addInitScript(delay => {
+    const RealWorker = window.Worker;
+    window.Worker = class extends RealWorker {
+      postMessage(message: unknown): void {
+        setTimeout(() => super.postMessage(message), delay);
+      }
+    };
+  }, ms);
+}
+
+/** Section CRNs chosen in the active schedule, by course. */
+function pickedCrns(page: Page): Promise<number> {
+  return page.evaluate(() =>
+    (window as any).services.courseSelectionService.getSelectedCourses().reduce(
+      (n: number, sc: any) =>
+        n +
+        Object.values(sc.selected ?? {})
+          .flat()
+          .filter(Boolean).length,
+      0,
+    ),
+  );
+}
+
+test('a run finished after switching schedules is discarded', async ({
+  page,
+}) => {
+  await delayWorker(page, 1500);
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+  await page.click('#auto-schedule-btn');
+  await page.click(
+    '[data-modal-type="auto-schedule-intro"] [data-action="next"]',
+  );
+  await page.click('#modal-primary-btn');
+  await expect(page.locator('.schedule-generating-overlay')).toBeVisible();
+
+  const otherId = await page.evaluate(() => {
+    const psm = (window as any).services.profileStateManager;
+    const other = psm.createSchedule('Other');
+    psm.setActiveSchedule(other.id);
+    return other.id;
+  });
+  await expect(page.locator('.schedule-generating-overlay')).toHaveCount(0, {
+    timeout: 30_000,
+  });
+
+  await expect(page.locator('.error-banner')).toContainText('discarded');
+  expect(await pickedCrns(page)).toBe(0);
+  const active = await page.evaluate(
+    () => (window as any).services.profileStateManager.getActiveSchedule().id,
+  );
+  expect(active).toBe(otherId);
+  await expect(page.locator('#auto-schedule-btn')).toBeVisible();
+});
+
+test('one Undo after Generate returns to the schedule from before it', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+  await page.click('#auto-schedule-btn');
+  await generateFromIntro(page);
+  expect(await pickedCrns(page)).toBeGreaterThan(0);
+
+  const undone = await page.evaluate(async () => {
+    await (window as any).services.profileStateManager.undo();
+    return true;
+  });
+  expect(undone).toBe(true);
+  expect(await pickedCrns(page)).toBe(0);
+  await page.evaluate(() =>
+    (window as any).services.profileStateManager.redo(),
+  );
+  expect(await pickedCrns(page)).toBeGreaterThan(0);
+});
+
+test('results announce "N of M" and keep focus off the page body', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+  await page.click('#auto-schedule-btn');
+  await generateFromIntro(page);
+
+  const status = page.locator('.schedule-result-status');
+  await expect(status).toHaveAttribute('role', 'status');
+  await expect(status).toHaveText(/^Schedule 1 of \d+$/);
+  await expect(
+    page.getByRole('button', { name: 'Next schedule' }),
+  ).toBeFocused();
+  await page.getByRole('button', { name: 'Next schedule' }).click();
+  await expect(status).toHaveText(/^Schedule 2 of \d+$/);
+});
+
+test('the folded Filters badge counts only what Auto-Schedule honours', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, COURSES);
+  await page.evaluate(() => {
+    const f = (window as any).services.filterService;
+    f.addFilter('courseLevel', { min: 4, max: 4 });
+    f.addFilter('periodConflict', {
+      avoidConflicts: false,
+      blockedSlots: [],
+      selectedCourses: [],
+      semesterSpansQuarters: true,
+    });
+  });
+  await openSettings(page);
+  const toggle = page.locator('#auto-schedule-filters-toggle');
+  await expect(toggle).not.toContainText('active');
+  // The course-list-only filters are not offered here at all.
+  await expect(page.locator('#modal-primary-btn')).toBeVisible();
+  await expect(page.getByText('Course Level')).toHaveCount(0);
+  await expect(page.getByText('Credit Hours')).toHaveCount(0);
+  await expect(page.locator('.filter-preview')).not.toContainText('0 sections');
+});
+
+test('opting out of keeping clear of events shows in the folded badge and Clear All undoes it', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, ['CS2102']);
+  await setEvents(page, [weeklyEvent('1', 'Work', ['M'], 9, 11)]);
+  await openSettings(page);
+  const toggle = page.locator('#auto-schedule-filters-toggle');
+  await toggle.click();
+  await page.uncheck('#keep-clear-of-events');
+  await toggle.click();
+  await expect(toggle).toContainText('1 active');
+
+  await page.getByRole('button', { name: 'Clear All' }).click();
+  await expect(toggle).not.toContainText('active');
+  await toggle.click();
+  await expect(page.locator('#keep-clear-of-events')).toBeChecked();
 });

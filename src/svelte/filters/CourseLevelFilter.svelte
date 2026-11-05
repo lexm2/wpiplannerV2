@@ -37,20 +37,23 @@
 </script>
 
 <FilterSection title="Course Level">
-  <div class="filter-segmented-control">
+  <div class="filter-segmented-control" role="group" aria-label="Course level">
     <button
       class="segmented-btn"
       class:active={currentLevel === 'all'}
+      aria-pressed={currentLevel === 'all'}
       onclick={() => setLevel('all')}>All</button
     >
     <button
       class="segmented-btn"
       class:active={currentLevel === 'undergraduate'}
+      aria-pressed={currentLevel === 'undergraduate'}
       onclick={() => setLevel('undergraduate')}>Undergrad</button
     >
     <button
       class="segmented-btn"
       class:active={currentLevel === 'graduate'}
+      aria-pressed={currentLevel === 'graduate'}
       onclick={() => setLevel('graduate')}>Graduate</button
     >
   </div>
@@ -64,12 +67,14 @@
       <button
         class="segmented-btn"
         class:active={currentUndergradLevel === undefined}
+        aria-pressed={currentUndergradLevel === undefined}
         onclick={() => setUndergradLevel(undefined)}>All</button
       >
       {#each UNDERGRAD_LEVELS as lvl (lvl)}
         <button
           class="segmented-btn"
           class:active={currentUndergradLevel === lvl}
+          aria-pressed={currentUndergradLevel === lvl}
           onclick={() => setUndergradLevel(lvl)}>{lvl}</button
         >
       {/each}

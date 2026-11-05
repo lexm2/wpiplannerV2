@@ -28,6 +28,7 @@ import {
   endedTerms,
   seatDataAge,
   termDates,
+  termsInProgress,
   yearLabel,
   type TermLetter,
 } from './calendar';
@@ -46,6 +47,12 @@ import {
 } from './lookup';
 import { leaveOutEndedTerms } from './filterInputs';
 import { notice, type Notice } from './notices';
+import {
+  whyNoCombination,
+  whyNoSection,
+  type DiagnosisRequest,
+} from './scheduleDiagnosis';
+import { searchInThisThread, type ScheduleSearch } from './scheduleSearch';
 import { filterServiceFor } from './query';
 import { caseless, FallYearSchema } from './schemaHints';
 import {
@@ -61,8 +68,8 @@ const MAX_SCHEDULES = 10;
 /** How many schedules the search collects before the best are shown. */
 const SEARCH_CAP = 500;
 /**
- * Longest a search runs: the server has no worker to time out, and a few
- * courses with hundreds of lab and discussion choices take seconds.
+ * Longest a search runs: a few courses with hundreds of lab and discussion
+ * choices take seconds, and the search has no other stopping point.
  */
 const SEARCH_BUDGET_MS = 1000;
 
@@ -129,6 +136,12 @@ export const AutoScheduleInputSchema = z
       .describe(
         'Also consider terms that have already ended. Default false: they are left out.',
       ),
+    includeClosed: z
+      .boolean()
+      .default(false)
+      .describe(
+        'Also consider sections that are Closed for registration. Default false: they cannot be registered for at all, so they are left out (full and waitlisted sections are not Closed).',
+      ),
     preferences: RankingPreferencesSchema.optional().describe(
       'Soft preferences that order the schedules, best first. They never rule a schedule out. Every field is optional: give only the ones that matter (e.g. {earlyClasses: {importance: "high", before: "10:00"}}); the defaults balance terms and minimise idle time between classes.',
     ),
@@ -151,6 +164,8 @@ interface ScheduledSection extends SectionBrief {
 
 interface QuarterSummary {
   quarter: string;
+  /** Set when the quarter has already ended: the date it did. */
+  endedOn?: string;
   /** Weekdays with a class, in week order. */
   days: string[];
   /** The earliest start and latest end over those days, "HH:MM". */
@@ -196,6 +211,19 @@ interface Requested {
   terms?: string[];
 }
 
+/**
+ * Whether two course objects are one class: the same course, or listings
+ * that share sections (DS 502 / MA 543). The catalog holds a separate Course
+ * for each listing, so identity alone would schedule it twice.
+ */
+function sameClass(catalog: Catalog, a: Course, b: Course): boolean {
+  if (a === b || a.id === b.id) return true;
+  for (const { courses } of catalog.sectionsByCrn.values()) {
+    if (courses.includes(a) && courses.includes(b)) return true;
+  }
+  return false;
+}
+
 function requestedCourses(
   catalog: Catalog,
   input: AutoScheduleInput,
@@ -214,9 +242,12 @@ function requestedCourses(
         400,
       );
     }
-    if (requested.some(r => r.course === course)) {
+    const same = requested.find(r => sameClass(catalog, r.course, course));
+    if (same) {
       throw new ApiError(
-        `${courseCode(course)} is listed twice in courses.`,
+        same.course === course
+          ? `${courseCode(course)} is listed twice in courses.`
+          : `${courseCode(same.course)} and ${courseCode(course)} are cross-listed: one class with the same sections, taken under either code. List it once.`,
         400,
       );
     }
@@ -262,7 +293,10 @@ const termOf = (result: ScheduleResult): string =>
   (result.combination.lecture ?? result.combination.lab)!.computedTerm;
 
 /** A quarter's days with class, span and idle time, from the chosen sections. */
-function quarterSummaries(selections: ScoredSelection[]): QuarterSummary[] {
+function quarterSummaries(
+  selections: ScoredSelection[],
+  ended: Map<string, string>,
+): QuarterSummary[] {
   const byQuarter = new Map<string, QuarterSummary & { dayNames: string[] }>();
   for (const { quarter, day, slots } of slotsByQuarterDay(
     selections,
@@ -296,8 +330,19 @@ function quarterSummaries(selections: ScoredSelection[]): QuarterSummary[] {
   return QUARTERS.filter(q => byQuarter.has(q)).map(q => {
     const { dayNames, ...summary } = byQuarter.get(q)!;
     const days = TimeUtils.DAYS_ORDER.filter(d => dayNames.includes(d));
-    return { ...summary, days };
+    const endedOn = ended.get(q);
+    return { ...summary, days, ...(endedOn && { endedOn }) };
   });
+}
+
+/** The quarters of `year` already over, with their last day. */
+function endedQuarters(catalog: Catalog, year: number): Map<string, string> {
+  const dates = termDates(catalog, year);
+  const ended = new Map<string, string>();
+  for (const t of endedTerms(catalog, year)) {
+    if (dates && QUARTERS.includes(t as never)) ended.set(t, dates[t].end);
+  }
+  return ended;
 }
 
 function toGenerated(
@@ -308,8 +353,11 @@ function toGenerated(
   order: Course[],
 ): GeneratedSchedule {
   const dates = termDates(catalog, year);
+  // The search may have run in a worker, so its courses are copies: match
+  // them to the requested ones by id.
+  const place = (c: Course) => order.findIndex(o => o.id === c.id);
   const courses = [...schedule]
-    .sort((a, b) => order.indexOf(a.course) - order.indexOf(b.course))
+    .sort((a, b) => place(a.course) - place(b.course))
     .map(({ course, combination }) => ({
       code: courseCode(course),
       name: course.name,
@@ -342,29 +390,54 @@ function toGenerated(
     rank,
     crns: courses.flatMap(c => c.sections.map(s => s.crn)),
     courses,
-    quarters: quarterSummaries(selections),
+    quarters: quarterSummaries(selections, endedQuarters(catalog, year)),
   };
 }
 
-/** The likely reasons a request left a course (or every combination) nothing. */
-function causes(input: AutoScheduleInput, ended: string[]): string {
-  const list = [
-    input.busy?.length && 'the busy blocks',
-    input.keepCrns?.length && 'the sections in keepCrns',
-    input.openSeatsOnly && 'openSeatsOnly (full sections are left out)',
-    input.courses.some(c => typeof c !== 'string' && c.terms) &&
-      'a terms list that names terms the course is not offered in',
-    ended.length &&
-      `ended terms (${ended.join(', ')}) being left out; includeEndedTerms: true allows them`,
-    'a course with no timed sections',
-  ].filter(Boolean);
-  return list.join(', ');
+/** Terms under way today that the shown schedules take sections in. */
+function inProgressTerms(
+  catalog: Catalog,
+  year: number,
+  schedules: GeneratedSchedule[],
+): TermLetter[] {
+  const running = termsInProgress(catalog, year);
+  const used = new Set(
+    schedules.flatMap(s => s.courses.flatMap(c => c.sections.map(x => x.term))),
+  );
+  return running.filter(t => used.has(t));
 }
 
-export function generateSchedules(
+/** Closed sections of the requested courses the filters would otherwise keep. */
+function closedSectionCount(
+  catalog: Catalog,
+  requested: Requested[],
+  ended: string[],
+  input: AutoScheduleInput,
+): number {
+  let count = 0;
+  for (const { courses, section } of catalog.sectionsByCrn.values()) {
+    if (section.status !== 'Closed') continue;
+    if (!input.includeEndedTerms && ended.includes(section.computedTerm)) {
+      continue;
+    }
+    if (
+      requested.some(
+        r =>
+          courses.includes(r.course) &&
+          (!r.terms || r.terms.includes(section.computedTerm)),
+      )
+    ) {
+      count++;
+    }
+  }
+  return count;
+}
+
+export async function generateSchedules(
   catalog: Catalog,
   input: AutoScheduleInput,
-): ScheduleSet {
+  search: ScheduleSearch = searchInThisThread,
+): Promise<ScheduleSet> {
   const current = currentAcademicYear(catalog);
   const year = input.year ?? current;
   const unpublished = unpublishedYearError(catalog, year);
@@ -403,6 +476,9 @@ export function generateSchedules(
     criteria.set(left.id, left.criteria);
     notices.push(left.notice);
   }
+  // Closed is not ranked but registrability, like ended terms: no
+  // preference can make such a section a valid pick, so it is a hard rule.
+  if (!input.includeClosed) criteria.set('closedSections', {});
   if (input.openSeatsOnly)
     criteria.set('availability', { availableOnly: true });
 
@@ -413,6 +489,27 @@ export function generateSchedules(
     lockedSections: new Set(),
     allowedTerms: terms,
   }));
+  if (!input.includeClosed) {
+    const closed = closedSectionCount(catalog, requested, ended, input);
+    if (closed > 0) {
+      notices.push(
+        notice(
+          'closedLeftOut',
+          `${plural(closed, 'Closed section')} of these courses ${closed === 1 ? 'is' : 'are'} left out: Closed sections cannot be registered for. Pass includeClosed: true to include them.`,
+        ),
+      );
+    }
+  }
+  const diagnosis: DiagnosisRequest = {
+    endedLeftOut: ended.length && !input.includeEndedTerms ? ended : [],
+    closedLeftOut: !input.includeClosed,
+    openSeatsOnly: input.openSeatsOnly,
+    hasBusy: (input.busy?.length ?? 0) > 0,
+    hasKeepCrns: (input.keepCrns?.length ?? 0) > 0,
+    termsAsked: new Map(
+      requested.flatMap(r => (r.terms ? [[r.course, r.terms] as const] : [])),
+    ),
+  };
   // Parsed already; this fills the defaults and lifts a gaps.max below min.
   const preferences = normalizeRankingPreferences(input.preferences);
   const scheduler = new SmartScheduler(filterServiceFor(catalog, criteria));
@@ -434,7 +531,7 @@ export function generateSchedules(
     notices.push(
       notice(
         'noSchedule',
-        `No schedule: ${names.join(', ')} ${names.length === 1 ? 'has' : 'have'} no section that can be scheduled. Likely causes: ${causes(input, ended)}.`,
+        `No schedule: ${names.join(', ')} ${names.length === 1 ? 'has' : 'have'} no section that can be scheduled. ${candidates.unschedulable.map(c => whyNoSection(catalog, c, diagnosis)).join(' ')}`,
       ),
     );
     return {
@@ -448,11 +545,11 @@ export function generateSchedules(
     };
   }
 
-  const { schedules: found, cutShort } = SmartScheduler.findSchedulesBefore(
-    candidates.input,
-    SEARCH_CAP,
-    performance.now() + SEARCH_BUDGET_MS,
-  );
+  const { schedules: found, cutShort } = await search({
+    input: candidates.input,
+    cap: SEARCH_CAP,
+    budgetMs: SEARCH_BUDGET_MS,
+  });
   // Time first: a search that ran out before finishing one schedule has not
   // shown that everything clashes.
   if (cutShort && found.length === 0) {
@@ -466,7 +563,7 @@ export function generateSchedules(
     notices.push(
       notice(
         'noSchedule',
-        `No schedule: every combination of the courses' sections clashes, with each other or with what is blocked. Likely causes: ${causes(input, ended)}. Try fewer courses, or more terms.`,
+        `No schedule: ${whyNoCombination(catalog, candidates.input.candidatesPerCourse, candidates.input.courses, diagnosis)}`,
       ),
     );
   } else if (cutShort) {
@@ -485,6 +582,19 @@ export function generateSchedules(
     );
   }
   const order = requested.map(r => r.course);
+  const schedules = found
+    .slice(0, input.limit)
+    .map((schedule, i) => toGenerated(catalog, year, i + 1, schedule, order));
+  const late = inProgressTerms(catalog, year, schedules);
+  if (late.length) {
+    const dates = termDates(catalog, year)!;
+    notices.push(
+      notice(
+        'inProgress',
+        `${late.join(' and ')} ${late.length === 1 ? 'term is' : 'terms are'} in progress (started ${late.map(t => dates[t].start).join(', ')}): adding sections of ${late.length === 1 ? 'it' : 'them'} now is late and may need instructor or registrar approval.`,
+      ),
+    );
+  }
   return {
     ...base,
     found: {
@@ -492,9 +602,7 @@ export function generateSchedules(
       capped: found.length >= SEARCH_CAP,
       cutShort,
     },
-    schedules: found
-      .slice(0, input.limit)
-      .map((schedule, i) => toGenerated(catalog, year, i + 1, schedule, order)),
+    schedules,
     unschedulable: [],
   };
 }

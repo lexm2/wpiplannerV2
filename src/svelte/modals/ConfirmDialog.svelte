@@ -65,9 +65,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn btn-secondary" onclick={close}>
-          {payload.cancelLabel ?? 'Cancel'}
-        </button>
+        {#if !payload.notice}
+          <button class="modal-btn btn-secondary" onclick={close}>
+            {payload.cancelLabel ?? 'Cancel'}
+          </button>
+        {/if}
         <button
           id="confirm-primary-btn"
           class="modal-btn {payload.variant === 'danger'

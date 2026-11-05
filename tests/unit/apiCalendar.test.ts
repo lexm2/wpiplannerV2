@@ -231,7 +231,7 @@ describe('alternating years', () => {
     const f = forecastCourse(alternating(2020), 2027, 2026, ['D']);
     expect(f.outlook).toBe('unlikely');
     expect(f.summary).toBe(
-      'Alternating years; runs in 2026-27, so likely not offered in 2027-28 (the catalog description: "This course will be offered in 2020-21, and in alternating years thereafter."). Terms and times for 2027-28 are not published yet; in 2026-27 it runs in D.',
+      'Alternating years; runs in 2026-27, so likely not offered in 2027-28 (the catalog description: "This course will be offered in 2020-21, and in alternating years thereafter."). Its next year is 2028-29. Terms and times for 2027-28 are not published yet; in 2026-27 it runs in D.',
     );
   });
 
@@ -247,12 +247,14 @@ describe('alternating years', () => {
     );
   });
 
-  it('keeps Cat. I and notes the disagreement; hedges Cat. II without one', () => {
+  it('treats a Cat. I course that alternates as Cat. II and names the year it runs', () => {
     const cat1 = forecastCourse(alternating(2020, 1), 2027, 2026, ['A']);
-    expect(cat1.outlook).toBe('likely');
-    expect(cat1.summary).toContain(
-      'The description, though, says it alternates years',
-    );
+    expect(cat1).toMatchObject({ outlook: 'unlikely', category: 2 });
+    expect(cat1.summary).toContain('Its next year is 2028-29.');
+    expect(cat1.summary).toContain('effectively Cat. II');
+  });
+
+  it('hedges Cat. II without a statement', () => {
     const plain = forecastCourse(course(2026, 2), 2027, 2026, ['C']);
     expect(plain.outlook).toBe('possible');
     expect(plain.summary).toContain(

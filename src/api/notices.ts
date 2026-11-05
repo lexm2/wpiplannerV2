@@ -25,6 +25,8 @@ export type NoticeCode =
   // What is left out or cannot be taken.
   /** Sections of ended terms, left out by default. */
   | 'endedTermsLeftOut'
+  /** generate_schedules: Closed sections, left out by default. */
+  | 'closedLeftOut'
   /** Ended terms' sections, listed as asked, though they cannot be taken. */
   | 'endedTermsListed'
   /** Courses dropped because their labs or discussions failed a filter. */
@@ -44,6 +46,8 @@ export type NoticeCode =
   | 'offsetPastEnd'
   /** No course matched the words, but an instructor's name is close. */
   | 'instructorSuggested'
+  /** A code search's own course has no section under the filters, only mentions of it are listed. */
+  | 'codeElsewhere'
   /** The query asks to register, which the catalog cannot do. */
   | 'registration'
   /** generate_schedules: no schedule fits, and the likely causes. */
@@ -52,6 +56,8 @@ export type NoticeCode =
   | 'searchCutShort'
   /** generate_schedules: the search stopped at its cap of schedules. */
   | 'searchCapped'
+  /** A term the results list is already under way: adding its sections is late. */
+  | 'inProgress'
   /** One of an unpublished year's early entries: tentative. */
   | 'earlyEntry'
   /** A past year's offering. */

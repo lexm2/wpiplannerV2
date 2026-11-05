@@ -963,3 +963,142 @@ test('keeps all pages mounted when switching to Degree', async ({ page }) => {
   await expect(page.locator('#schedule-page')).toHaveCount(1);
   await expect(page.locator('#degree-page')).toBeVisible();
 });
+
+test('undo steps back through a placement before any schedule edit', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+
+  await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
+  await page
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
+    .click();
+  await expect(railCount(page)).toHaveText('0');
+
+  // The placement is the last thing done, so it is what Undo takes back - the
+  // course stays in the schedule.
+  await page.click('#undo-btn');
+  await expect(railCount(page)).toHaveText('1');
+  await expect(placedCodes(page)).toHaveCount(0);
+
+  await page.click('#redo-btn');
+  await expect(placedCodes(page)).toHaveText(['CS 1004']);
+});
+
+test('keeps keyboard focus in the rail after placing a course', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+  await page.evaluate(async () => {
+    const s = (window as any).services;
+    const cs = s.courseDataService
+      .getAllDepartments()
+      .find((d: any) => d.abbreviation === 'CS');
+    await s.courseSelectionService.selectCourse(
+      cs.courses.find((c: any) => c.number === '1005'),
+    );
+  });
+  await expect(railCount(page)).toHaveText('2');
+
+  await page.locator('.degree-rail-list .assign-menu-trigger').first().focus();
+  await page.keyboard.press('Enter');
+  // The menu takes focus, and the arrow keys walk its items.
+  await expect(page.locator('.assign-menu-item').first()).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('.assign-menu-item').nth(1)).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('Enter');
+
+  await expect(railCount(page)).toHaveText('1');
+  await expect(
+    page.locator('.degree-rail-list .assign-menu-trigger'),
+  ).toBeFocused();
+});
+
+test('cancels a course drag with Escape', async ({ page }) => {
+  await setupWithScheduleCourse(page);
+  const card = page.locator('[data-bucket-id*="Core Requirement"]');
+  await card.scrollIntoViewIfNeeded();
+  const grip = page
+    .locator('.degree-rail-list .requirement-course-title')
+    .first();
+  const box = (await grip.boundingBox())!;
+  const cardBox = (await card.boundingBox())!;
+  await page.mouse.move(box.x + 10, box.y + 5);
+  await page.mouse.down();
+  await page.mouse.move(box.x - 20, box.y + 40, { steps: 6 });
+  await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + 40, {
+    steps: 10,
+  });
+  await expect(card).toHaveClass(/drag-over/);
+
+  await page.keyboard.press('Escape');
+  await page.mouse.up();
+  await expect(page.locator('.requirement-course.is-dragging')).toHaveCount(0);
+  await expect(placedCodes(page)).toHaveCount(0);
+  await expect(railCount(page)).toHaveText('1');
+});
+
+test('a deleted Workday requirement can be restored, and Clear record starts clean', async ({
+  page,
+}) => {
+  await setupWithScheduleCourse(page);
+  const cards = page.locator('.requirement-card');
+  const before = await cards.count();
+
+  await page.locator('.degree-rail-list .assign-menu-trigger').first().click();
+  await page
+    .locator(
+      '.assign-menu-item:has(.assign-menu-bucket-name:text-is("Core Requirement"))',
+    )
+    .click();
+
+  await page.click('#degree-summary-more-btn');
+  await page.click('#degree-configure-buckets-btn');
+  await settleModal(page);
+  await page
+    .getByRole('button', { name: 'Delete Core Requirement', exact: true })
+    .click();
+  await page
+    .locator('[data-modal-type="confirm"]')
+    .getByRole('button', { name: 'Delete' })
+    .click();
+  await expect(cards).toHaveCount(before - 1);
+
+  await page.click('#bucket-config-restore-btn');
+  await expect(cards).toHaveCount(before);
+  await page.keyboard.press('Escape');
+
+  // Clear record forgets the placement, too: after re-importing, the course
+  // is waiting in the rail again.
+  await page.click('#degree-summary-more-btn');
+  await page.getByRole('menuitem', { name: 'Clear record' }).click();
+  await page
+    .locator('[data-modal-type="confirm"]')
+    .getByRole('button', { name: 'Clear' })
+    .click();
+  await page.setInputFiles('#degree-import-file', fixture);
+  await page.locator('.degree-summary-title').waitFor();
+  await dismissImportWarning(page);
+  await expect(railCount(page)).toHaveText('1');
+  await expect(placedCodes(page)).toHaveCount(0);
+});
+
+test('explains a file that is not an Excel workbook', async ({ page }) => {
+  await page.goto('/');
+  await page.click('#degree-tab');
+  await page.setInputFiles('#degree-import-file', {
+    name: 'notes.xlsx',
+    mimeType:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from('not a zip'),
+  });
+  await expect(page.locator('.degree-dropzone-error')).toContainText(
+    'not a readable Excel',
+  );
+  await expect(page.locator('.degree-dropzone-error')).toContainText(
+    'View My Academic Progress',
+  );
+});

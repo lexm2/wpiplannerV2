@@ -267,6 +267,7 @@
                         {courseId}
                         currentBucketId={entry.buckets[0]?.id}
                         label="Assign {entry.code} to a bucket"
+                        code={entry.code}
                       />
                     {/if}
                   </footer>

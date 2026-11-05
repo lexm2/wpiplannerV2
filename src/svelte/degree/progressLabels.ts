@@ -3,7 +3,9 @@ import type { EffectiveProgress } from '../../services/degree/requirementProgres
 /** A bucket's status as its card's pill names it. */
 export function statusLabel(progress: EffectiveProgress): string {
   return progress.status === 'satisfied'
-    ? 'Satisfied'
+    ? progress.confirmed
+      ? 'Satisfied'
+      : 'Satisfied (in progress)'
     : progress.status === 'in_progress'
       ? 'In progress'
       : 'Not satisfied';

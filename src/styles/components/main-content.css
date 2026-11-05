@@ -24,8 +24,7 @@
   flex: 1;
 }
 
-/* FilterButtons mounts here: clear-filters-btn and
-   .filter-buttons, held together so the row can place them as one. */
+/* FilterButtons mounts here; the host lets the row place it as one unit. */
 .content-controls-filter-host {
   display: flex;
   align-items: center;
@@ -73,8 +72,7 @@
 }
 
 .filter-icon,
-.bookmark-icon,
-.eraser-icon {
+.bookmark-icon {
   width: 18px;
   height: 18px;
   display: block;
@@ -160,8 +158,8 @@ html.is-mobile .filter-buttons {
 }
 
 /* Phone widths: the same 0.75rem gutter as the header, and a toolbar of just
-   search, Filter and Details. Clear All and "Show only bookmarked courses" are
-   both in the Filter modal, so their shortcut buttons go. */
+   search, Filter and Details. "Show only bookmarked courses" is in the Filter
+   modal, so its shortcut button goes. */
 @media (max-width: 560px) {
   .content-header {
     padding: 0.5rem 0.75rem;
@@ -171,7 +169,6 @@ html.is-mobile .filter-buttons {
     padding: 0.75rem;
   }
 
-  #clear-filters-btn,
   #bookmark-filter-btn {
     display: none;
   }

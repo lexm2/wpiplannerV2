@@ -15,8 +15,11 @@
 
   let {
     courseSelectionService,
+    onPickSections,
   }: {
     courseSelectionService: CourseSelectionService;
+    /** Takes the student to the Schedule page, where sections are chosen. */
+    onPickSections: () => void;
   } = $props();
 
   // Insertion order - the store appends, so new courses land at the bottom.
@@ -48,19 +51,13 @@
     courseListState.selectedCourse = course;
   }
 
-  function onItemKeydown(e: KeyboardEvent, course: Course): void {
-    // Enter/Space on the nested remove button belongs to that button.
-    if (e.target !== e.currentTarget) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleSelect(course);
-    }
-  }
-
   // stopPropagation so the row's own click handler (handleSelect) doesn't also
-  // fire when the remove button is clicked.
+  // fire when the remove button is clicked. The repeat clicks of a
+  // double-click are dropped: the row is gone after the first, and with no
+  // outro the next row has already moved under the pointer.
   function handleRemove(e: MouseEvent, course: Course): void {
     e.stopPropagation();
+    if (e.detail > 1) return;
     courseSelectionService
       .unselectCourse(course)
       .catch(err => logger.error('Failed to unselect course:', err));
@@ -87,6 +84,17 @@
   >
 </div>
 
+{#if count > 0}
+  <!-- Adding a course here only selects it; its sections are picked on the
+       Schedule page, which nothing else on this page says. -->
+  <button
+    type="button"
+    class={styles['pick-sections-link']}
+    id="pick-sections-link"
+    onclick={onPickSections}>Pick sections on the Schedule page</button
+  >
+{/if}
+
 {#if isExpanded}
   <div
     class={styles['selected-courses-content']}
@@ -100,20 +108,23 @@
     {/if}
     {#each courses as sc (sc.course.id)}
       {@const course = sc.course}
+      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (mouse convenience; the course code button is the keyboard route) -->
       <div
         class={styles['selected-course-item']}
         data-course-id={course.id}
-        role="button"
-        tabindex="0"
         transition:slideFade={{ duration: 260 }}
         animate:flip={{ duration: dur(260), easing: cubicOut }}
         onclick={() => handleSelect(course)}
-        onkeydown={e => onItemKeydown(e, course)}
       >
         <div class={styles['selected-course-info']}>
-          <div class={styles['selected-course-code']}>
-            {course.departmentAbbr}{course.number}
-          </div>
+          <button
+            type="button"
+            class={styles['selected-course-code']}
+            aria-label="{course.departmentAbbr}{course.number} {course.name}"
+            aria-current={courseListState.selectedCourseId === course.id
+              ? 'true'
+              : undefined}>{course.departmentAbbr}{course.number}</button
+          >
           <div class={styles['selected-course-name']}>{course.name}</div>
           <div class={styles['selected-course-credits']}>
             {formatCredits(course)}
@@ -123,6 +134,7 @@
           class={styles['course-remove-btn']}
           data-course-id={course.id}
           title="Remove from selection"
+          aria-label="Remove {course.departmentAbbr}{course.number} from selection"
           onclick={e => handleRemove(e, course)}
           >{@html getInlineSVG('TRASH', 'trash-icon')}</button
         >

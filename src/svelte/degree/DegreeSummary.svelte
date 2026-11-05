@@ -7,6 +7,7 @@
   import { phoneLayout } from '../phoneLayout.svelte';
   import { getInlineSVG } from '../../utils/iconPaths';
   import { clickOutside } from '../clickOutside';
+  import { menuKeys, refocusAfter } from './focusHelpers';
   import { scaleFade, slideFade } from '../transitions';
   import { appState } from '../../core/state/appState.svelte';
   import {
@@ -88,10 +89,18 @@
     const listed = degreeState.buckets.filter(
       b => !UMBRELLA_CATEGORIES.has(b.category),
     );
-    const met = listed.filter(
+    const satisfied = listed.filter(
       b => degreeState.progressById.get(b.id)?.status === 'satisfied',
-    ).length;
-    return { met, total: listed.length };
+    );
+    return {
+      met: satisfied.length,
+      // Workday counts in-progress courses toward a requirement, so some of the
+      // met ones are only met once those finish.
+      complete: satisfied.filter(
+        b => degreeState.progressById.get(b.id)?.confirmed,
+      ).length,
+      total: listed.length,
+    };
   });
 
   const planNote = $derived(
@@ -114,6 +123,9 @@
 
   function runFromMenu(action: () => void): () => void {
     return () => {
+      // Back on the trigger first: a modal the action opens restores focus to
+      // whatever held it, and the menu item is about to unmount.
+      menuTrigger?.focus();
       menuOpen = false;
       action();
     };
@@ -130,10 +142,19 @@
   function clearRecord(): void {
     showConfirm({
       title: 'Clear degree record',
-      message: 'Are you sure you want to do this?',
+      message:
+        'This removes the imported Workday record, and with it where you placed courses and any changes you made to its requirements, including requirements you deleted. Custom buckets and your schedule are kept. Import the file again to start over.',
       confirmLabel: 'Clear',
       variant: 'danger',
-      onConfirm: () => degreeImportService.clear(),
+      onConfirm: () => {
+        degreeImportService.clear();
+        // This menu goes with the record; the import page is what is left.
+        void refocusAfter(() =>
+          document.querySelector<HTMLElement>(
+            '#degree-page .degree-import-btn',
+          ),
+        );
+      },
     });
   }
 
@@ -199,7 +220,11 @@
     <div class="degree-stat">
       <span class="degree-stat-value"
         >{requirements.met}/{requirements.total}</span
-      ><span class="degree-stat-label">Satisfied</span>
+      ><span class="degree-stat-label"
+        >Satisfied{requirements.complete < requirements.met
+          ? ` (${requirements.complete} complete)`
+          : ''}</span
+      >
     </div>
   </div>
 {/snippet}
@@ -226,6 +251,7 @@
       <div
         class="degree-summary-menu"
         role="menu"
+        use:menuKeys
         transition:scaleFade={{ duration: 150 }}
         use:clickOutside={{
           onOutside: () => (menuOpen = false),

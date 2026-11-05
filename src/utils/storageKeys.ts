@@ -25,6 +25,8 @@ export const STORAGE_KEYS = {
   VISITED: 'wpi_visited',
   /** Expanded/collapsed state of the selected-courses panel. */
   SELECTED_COURSES_EXPANDED: 'selectedCoursesExpanded',
+  /** Cross-tab notices where BroadcastChannel is missing; see CrossTabChannel. */
+  TAB_SYNC: 'wpi-planner-tab-sync',
   /** Legacy: schedules live in IndexedDB, but clearAllData still purges this. */
   LEGACY_SCHEDULES: 'wpi-planner-schedules',
 } as const;

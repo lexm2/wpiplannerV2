@@ -2,9 +2,9 @@
  * Requests per client the server answers before refusing with 429: a
  * search is CPU work on the one thread every caller shares, and an AI
  * assistant stuck retrying would otherwise starve everyone else. A soft
- * limit for runaway loops, not a security boundary: the address comes from
- * X-Forwarded-For, which only the proxies in front of the server set
- * honestly.
+ * limit for runaway loops, not a security boundary: behind a proxy the
+ * address comes from X-Forwarded-For, which is believed only from the
+ * proxies the server is told of (TRUSTED_PROXIES; loopback always).
  */
 import { isIP } from 'node:net';
 
@@ -65,41 +65,65 @@ export class RateLimiter {
   }
 }
 
-/** Loopback and private ranges: our own proxies, never a student's address. */
-function isInternal(address: string): boolean {
-  const ip = address.replace(/^::ffff:/i, '');
-  if (isIP(ip) === 4) {
-    const [a, b] = ip.split('.').map(Number);
-    return (
-      a === 10 ||
-      a === 127 ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      (a === 169 && b === 254)
-    );
-  }
-  const lower = ip.toLowerCase();
-  return lower === '::1' || /^f[cd]/.test(lower) || /^fe[89ab]/.test(lower);
+const stripV4Mapping = (address: string) => address.replace(/^::ffff:/i, '');
+
+function ipv4Number(ip: string): number {
+  return ip.split('.').reduce((n, part) => n * 256 + Number(part), 0);
+}
+
+/** Proxies whose X-Forwarded-For can be believed: loopback, plus those configured. */
+export type TrustedProxies = (address: string) => boolean;
+
+/**
+ * `list` is comma-separated IPv4 CIDRs ("172.16.0.0/12") or addresses.
+ * Loopback is always trusted (Apache or nginx on the same host); nothing else
+ * is unless listed, as a private-range address is as likely a student's
+ * laptop on the campus network as a proxy, and a client that is not behind
+ * one can send any X-Forwarded-For it likes.
+ */
+export function trustedProxies(list = ''): TrustedProxies {
+  const ranges = list
+    .split(',')
+    .map(entry => entry.trim())
+    .filter(Boolean)
+    .map(entry => {
+      const [base, bits] = entry.split('/');
+      return {
+        base: stripV4Mapping(base),
+        bits: bits === undefined ? null : Number(bits),
+      };
+    });
+  return address => {
+    const ip = stripV4Mapping(address);
+    if (ip === '::1' || (isIP(ip) === 4 && ip.startsWith('127.'))) return true;
+    return ranges.some(({ base, bits }) => {
+      if (bits === null || isIP(ip) !== 4 || isIP(base) !== 4) {
+        return ip.toLowerCase() === base.toLowerCase();
+      }
+      const mask = bits === 0 ? 0 : (0xffffffff << (32 - bits)) >>> 0;
+      return (ipv4Number(ip) & mask) >>> 0 === (ipv4Number(base) & mask) >>> 0;
+    });
+  };
 }
 
 /**
- * The client a request counts against. Straight from a client, the socket
- * address. Through the proxies (nginx, Apache, any TLS proxy before them),
- * each appends the address it was reached from to X-Forwarded-For, so the
- * client is the last address there that is not one of ours; read only
- * when the socket itself is a proxy, as a client could send the header.
+ * The client a request counts against. A connection from anything but a
+ * trusted proxy is the client, whatever it sends in X-Forwarded-For. From
+ * a trusted proxy (Apache, nginx, a TLS proxy before them), each hop appended
+ * the address it was reached from, so the client is the last address there
+ * that is not itself a trusted proxy.
  */
 export function clientAddress(
   request: Request,
   socketAddress: string | null,
+  isTrusted: TrustedProxies = trustedProxies(),
 ): string {
   const peer = socketAddress ?? 'unknown';
-  if (!isInternal(peer)) return peer;
+  if (peer === 'unknown' || !isTrusted(peer)) return peer;
   const forwarded = (request.headers.get('x-forwarded-for') ?? '')
     .split(',')
     .map(a => a.trim())
-    .filter(a => isIP(a.replace(/^::ffff:/i, '')) !== 0);
-  // Every hop internal (a campus network): the first is the client.
-  const outermost = [...forwarded].reverse().find(a => !isInternal(a));
-  return outermost ?? forwarded[0] ?? peer;
+    .filter(a => isIP(stripV4Mapping(a)) !== 0);
+  const client = [...forwarded].reverse().find(a => !isTrusted(a));
+  return client ?? forwarded[0] ?? peer;
 }

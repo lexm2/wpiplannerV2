@@ -26,11 +26,18 @@ interface SchemaInternals {
 export function caseless<const T extends readonly [string, ...string[]]>(
   values: T,
 ) {
-  return z.preprocess(v => {
-    if (typeof v !== 'string') return v;
-    const want = v.trim().toLowerCase();
-    return values.find(x => x.toLowerCase() === want) ?? v;
-  }, z.enum(values));
+  // Built on z.string(), not z.preprocess: zod counts a preprocess step as
+  // "optional on input", which dropped the field from `required` in the
+  // exported JSON Schema (the MCP tool's inputSchema) although the enum
+  // behind it rejects undefined. The meta puts the enum back into the export.
+  return z
+    .string()
+    .meta({ enum: [...values] })
+    .transform(v => {
+      const want = v.trim().toLowerCase();
+      return values.find(x => x.toLowerCase() === want) ?? v;
+    })
+    .pipe(z.enum(values));
 }
 
 /** Weekday letters in any case: "t" is Tuesday. */

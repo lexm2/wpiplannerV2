@@ -39,12 +39,14 @@
       <button
         class="segmented-btn"
         class:active={currentYear === 'all'}
+        aria-pressed={currentYear === 'all'}
         onclick={() => setYear('all')}>All</button
       >
       {#each years as y (y)}
         <button
           class="segmented-btn"
           class:active={currentYear === y}
+          aria-pressed={currentYear === y}
           onclick={() => setYear(y)}>{y}-{y + 1}</button
         >
       {/each}

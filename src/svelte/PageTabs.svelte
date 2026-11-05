@@ -22,6 +22,7 @@
   id="planner-tab"
   class="nav-tab"
   class:active={page === 'planner'}
+  aria-current={page === 'planner' ? 'page' : undefined}
   aria-label="Classes view"
   onclick={() => onSwitch('planner')}>Classes</button
 >
@@ -29,6 +30,7 @@
   id="schedule-tab"
   class="nav-tab"
   class:active={page === 'schedule'}
+  aria-current={page === 'schedule' ? 'page' : undefined}
   aria-label="Schedule view"
   onclick={() => onSwitch('schedule')}>Schedule</button
 >
@@ -36,6 +38,7 @@
   id="degree-tab"
   class="nav-tab"
   class:active={page === 'degree'}
+  aria-current={page === 'degree' ? 'page' : undefined}
   aria-label="Degree view"
   onclick={() => onSwitch('degree')}>Degree</button
 >

@@ -68,6 +68,46 @@ function untilEndOfDay(day: Date, timezone: string): string {
   return new Date(utcMs).toISOString().replace(/[-:]|\.\d{3}/g, '');
 }
 
+/**
+ * RFC 5545 wants a VTIMEZONE for every TZID an event uses, and Outlook and
+ * some CalDAV servers drop or shift events without one. ical-generator only
+ * writes one from a generator, so the zones the planner exports in live here.
+ */
+const VTIMEZONES: Record<string, string> = {
+  'America/New_York': [
+    'BEGIN:VTIMEZONE',
+    'TZID:America/New_York',
+    'BEGIN:DAYLIGHT',
+    'TZOFFSETFROM:-0500',
+    'TZOFFSETTO:-0400',
+    'TZNAME:EDT',
+    'DTSTART:19700308T020000',
+    'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU',
+    'END:DAYLIGHT',
+    'BEGIN:STANDARD',
+    'TZOFFSETFROM:-0400',
+    'TZOFFSETTO:-0500',
+    'TZNAME:EST',
+    'DTSTART:19701101T020000',
+    'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU',
+    'END:STANDARD',
+    'END:VTIMEZONE',
+  ].join('\r\n'),
+};
+
+/** A section's own meeting dates, kept inside the term it belongs to. */
+function sectionDates(section: Section, term: DateRange): DateRange {
+  if (!section.startDate || !section.endDate) return term;
+  const start = parseLocalDate(section.startDate);
+  const end = parseLocalDate(section.endDate);
+  const clamped = {
+    start: start > term.start ? start : term.start,
+    end: end < term.end ? end : term.end,
+  };
+  // Dates that miss the term entirely are catalog noise; the term still holds.
+  return clamped.start <= clamped.end ? clamped : term;
+}
+
 export interface ICSExportOptions {
   includeDescription?: boolean;
   includeProfessor?: boolean;
@@ -231,8 +271,9 @@ export class ICSGenerator {
 
     const calendar = ical({
       name: schedule.name,
-      timezone: timezone,
-      prodId: '-//WPI Course Planner V2//EN',
+      timezone: { name: timezone, generator: zone => VTIMEZONES[zone] ?? null },
+      // ical-generator prefixes the leading "-".
+      prodId: '//WPI Course Planner V2//EN',
       method: ICalCalendarMethod.PUBLISH,
     });
 
@@ -249,10 +290,11 @@ export class ICSGenerator {
 
       for (const section of componentsToExport) {
         const courseYear = selectedCourse.course.academicYear ?? academicYear;
-        const termDates = this.getTermDates(section.computedTerm, courseYear);
-        if (!termDates) {
+        const term = this.getTermDates(section.computedTerm, courseYear);
+        if (!term) {
           continue;
         }
+        const termDates = sectionDates(section, term);
 
         for (const [periodIndex, period] of section.periods.entries()) {
           const firstMeetingDate = this.findFirstMeetingDate(
@@ -426,7 +468,9 @@ export class ICSGenerator {
 
     return {
       success: true,
-      data: calendar.toString(),
+      // TIMEZONE-ID is no iCalendar property; X-WR-TIMEZONE is the one
+      // clients read. Both are written whenever the calendar has a zone.
+      data: calendar.toString().replace(/^TIMEZONE-ID:.*\r\n/m, ''),
       skippedCourses,
       totalCourses,
     };

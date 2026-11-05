@@ -45,11 +45,37 @@
       navigating = false;
     }
   }
+  // After Generate the modal closes and the button that opened it is replaced
+  // by the result bar, which would leave focus on <body>. Only a run that
+  // started here moves focus: coming back to the page with old results must not.
+  let nextBtn = $state<HTMLButtonElement>();
+  let awaitingResults = false;
+  $effect(() => {
+    if (generating || !hasSchedules) {
+      awaitingResults = true;
+      return;
+    }
+    if (!awaitingResults) return;
+    awaitingResults = false;
+    const active = document.activeElement;
+    if (!active || active === document.body) nextBtn?.focus();
+  });
+
   const prev = (): Promise<void> => navigate(-1);
   const next = (): Promise<void> => navigate(1);
 </script>
 
 <div class="schedule-footer-row">
+  <!-- Always mounted so a screen reader is already watching when the first
+       result arrives; the wrapped text is also the visible "N of M". -->
+  <div
+    class="schedule-result-status"
+    role="status"
+    aria-live="polite"
+    hidden={!hasSchedules}
+  >
+    {#if hasSchedules}Schedule {currentIndex + 1} of {generatedCount}{/if}
+  </div>
   {#if !hasSchedules}
     <button
       id="auto-schedule-btn"
@@ -70,7 +96,7 @@
         aria-label="Previous schedule"
         disabled={generating}
         onclick={prev}
-        >{@html getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG('CHEVRON_LEFT', 'schedule-nav-icon')}</button
       >
       <button
         class="btn btn-secondary schedule-nav-btn"
@@ -78,21 +104,25 @@
         aria-label="Restart auto-schedule"
         disabled={generating}
         onclick={onOpenAutoSchedule}
-        >{@html getInlineSVG('REFRESH', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG(
+          'ADJUSTMENTS_HORIZONTAL',
+          'schedule-nav-icon',
+        )}</button
       >
       <button
         class="btn btn-secondary schedule-nav-btn"
         title="Next schedule"
         aria-label="Next schedule"
+        bind:this={nextBtn}
         disabled={generating}
         onclick={next}
-        >{@html getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG('CHEVRON_RIGHT', 'schedule-nav-icon')}</button
       >
     </div>
   {/if}
 </div>
 {#if hasSchedules}
-  <div class="schedule-progress-track">
+  <div class="schedule-progress-track" aria-hidden="true">
     <div class="schedule-progress-bar" style:width={`${progressPct}%`}></div>
   </div>
 {/if}

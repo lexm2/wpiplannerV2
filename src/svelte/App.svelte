@@ -33,6 +33,7 @@
   import CourseList from './CourseList.svelte';
   import DegreeFilterBanner from './degree/DegreeFilterBanner.svelte';
   import SelectedCoursesPanel from './SelectedCoursesPanel.svelte';
+  import { courseListState } from './courseListState.svelte';
   import CourseDescription from './CourseDescription.svelte';
   import PageTabs from './PageTabs.svelte';
   import UndoRedoButtons from './UndoRedoButtons.svelte';
@@ -87,6 +88,17 @@
     });
   }
 
+  // Each page has its own <main>, and only the current page's is displayed, so
+  // the link's target depends on the page. Focus there puts the next Tab on the
+  // page's first control (the search box, on Classes).
+  function skipToMain(e: MouseEvent): void {
+    e.preventDefault();
+    const page = uiState.currentPage;
+    document
+      .querySelector<HTMLElement>(`:is(#${page}-page main, main#${page}-page)`)
+      ?.focus();
+  }
+
   function openFilterModal(): void {
     modalState.filter = { mode: 'filter' };
     openModal('filter-modal');
@@ -105,17 +117,10 @@
     setPage(page);
   }
 
-  function toggleTheme(): void {
-    const currentThemeId = services.themeManager.getCurrentThemeId();
-    services.themeManager.setTheme(
-      currentThemeId === 'wpi-dark' ? 'wpi-light' : 'wpi-dark',
-    );
-  }
-
   function handleKeydown(e: KeyboardEvent): void {
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
-    // Undo would change the schedule hidden behind the modal.
-    if (uiState.openModals.length > 0) return;
+    // Undo would change the schedule hidden behind the modal or the wizard.
+    if (uiState.openModals.length > 0 || wizardState.isOpen) return;
     // Leave text fields their own native undo.
     const target = e.target as Element | null;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;
@@ -139,9 +144,19 @@
   // Swiping sideways between pages on a phone. Its callbacks read the page
   // when a swipe happens, so the effect itself tracks nothing and runs once.
   $effect(() => installPageSwipe(() => uiState.currentPage, switchToPageView));
+
+  // A newly picked course opens at its title, not wherever the last one was
+  // scrolled to.
+  let descriptionEl = $state<HTMLElement | null>(null);
+  $effect(() => {
+    courseListState.selectedCourseId;
+    descriptionEl?.scrollTo({ top: 0 });
+  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
+
+<a class="skip-link" href="#main" onclick={skipToMain}>Skip to main content</a>
 
 <ErrorBanner />
 
@@ -209,7 +224,6 @@
         scheduleManagementService={services.scheduleManagementService}
         getTutorial={() => services.tutorial}
         onSchedules={openSchedulePicker}
-        onToggleTheme={toggleTheme}
         onUndo={handleUndo}
         onRedo={handleRedo}
       />
@@ -235,17 +249,19 @@
     </div>
   </SidePanel>
 
-  <main class="main-content">
+  <main class="main-content" tabindex="-1">
     <div class="content-header">
       <div class="content-controls">
-        <div class="search-input-wrapper">
-          <SearchBar filterService={services.filterService} {debouncedSearch} />
-        </div>
+        <!-- Source order is Tab order, so it follows the screen: filters, search,
+             details, left to right at every width. -->
         <div id="filter-buttons-host" class="content-controls-filter-host">
           <FilterButtons
             filterService={services.filterService}
             onFilter={openFilterModal}
           />
+        </div>
+        <div class="search-input-wrapper">
+          <SearchBar filterService={services.filterService} {debouncedSearch} />
         </div>
         <DrawerToggle drawer="details" label="Details" side="right" />
       </div>
@@ -272,10 +288,15 @@
     <section class={styles['selected-courses-section']}>
       <SelectedCoursesPanel
         courseSelectionService={services.courseSelectionService}
+        onPickSections={() => switchToPageView('schedule')}
       />
     </section>
     <section class={styles['course-description-section']}>
-      <div class={styles['course-description-content']} id="course-description">
+      <div
+        class={styles['course-description-content']}
+        id="course-description"
+        bind:this={descriptionEl}
+      >
         <CourseDescription courseDataService={services.courseDataService} />
       </div>
     </section>
@@ -327,10 +348,8 @@
           courseSelectionService={services.courseSelectionService}
           getIncompleteInfo={(sc: SelectedCourse) =>
             componentWizardService.getIncompleteSelectionInfo(sc)}
-          onOpenWizard={(
-            course: Course,
-            existing: SelectedCourse | undefined,
-          ) => componentWizardService.openComponentWizard(course, existing)}
+          onOpenWizard={(course: Course) =>
+            componentWizardService.openComponentWizard(course)}
         />
         <WizardHost />
       </div>
@@ -344,6 +363,7 @@
 
     <main
       class="schedule-main"
+      tabindex="-1"
       use:icsDropTarget={{
         onActiveChange: active => (icsDropActive = active),
         onFile: file => void localEventService.importFile(file),
@@ -366,10 +386,11 @@
   </div>
 </div>
 
-<div
+<main
   class="app-body degree-page"
   id="degree-page"
+  tabindex="-1"
   style:display={currentPage === 'degree' ? 'flex' : 'none'}
 >
   <DegreePage degreeImportService={services.degreeImportService} />
-</div>
+</main>

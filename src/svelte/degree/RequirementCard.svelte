@@ -21,6 +21,7 @@
   import { degreePlanService } from '../../services/degree/degreePlanService';
   import { academicYearForPeriod } from '../../services/degree/catalogLookup';
   import AssignMenu from './AssignMenu.svelte';
+  import { neighbourControls, refocusAfter } from './focusHelpers';
   import { courseDrag, draggableCourse } from './courseDrag.svelte';
   import { slideFade } from '../transitions';
 
@@ -133,12 +134,30 @@
     expanded
       ? 'Show less'
       : satisfied && shown.length === 0
-        ? `${entries.length} course${entries.length === 1 ? '' : 's'} · complete`
+        ? `${entries.length} course${entries.length === 1 ? '' : 's'} · ${progress.confirmed ? 'complete' : 'in progress'}`
         : `+${hiddenCount} more`,
   );
   const canToggle = $derived(
     collapsible && (expanded ? entries.length > 0 : hiddenCount > 0),
   );
+
+  /**
+   * Send a course back to the rail. The tile and the × that was just pressed
+   * go with it, so focus moves to the tile beside it, else to the course's
+   * Assign button in the rail.
+   */
+  function removeTile(button: HTMLElement, courseId: string): void {
+    const row = button.closest('[data-course-id]');
+    degreeBucketService.unassign(courseId);
+    void refocusAfter(
+      ...neighbourControls(row, '.requirement-course-remove'),
+      () =>
+        document.querySelector<HTMLElement>(
+          `.degree-rail [data-course-id="${CSS.escape(courseId)}"] .assign-menu-trigger`,
+        ),
+      () => document.querySelector<HTMLElement>('#degree-summary-more-btn'),
+    );
+  }
 
   // Highlighted while a dragged course hovers this card.
   const dragOver = $derived(
@@ -155,12 +174,14 @@
   role="group"
   aria-label={bucket.name}
 >
-  <header class="requirement-card-head">
+  <!-- A div: a <header> inside this role=group would be exposed as a banner
+       landmark, one per card. -->
+  <div class="requirement-card-head">
     <h3 class="requirement-card-name" title={bucket.scope || undefined}>
       {bucket.name}
     </h3>
     <span class="req-status req-status-{progress.status}">{statusLabel}</span>
-  </header>
+  </div>
 
   <!-- Always rendered, even with no numeric target (the segments are then all
        zero and only the hatched track shows): in a grid every card needs the
@@ -275,6 +296,13 @@
               }}>{tile.code}</button
             >
             <span class="requirement-course-title">{tile.title}</span>
+            {#if tile.kind === 'schedule' && degreePlanService.mayNotCount(bucket, tile.code)}
+              <span
+                class="requirement-course-hint"
+                title="This course is not on the requirement's list of eligible courses. You can still keep it here."
+                >May not count</span
+              >
+            {/if}
             {#if tile.kind === 'schedule' && tile.courseId}
               {@const courseId = tile.courseId}
               <div class="requirement-course-actions">
@@ -282,13 +310,14 @@
                   {courseId}
                   currentBucketId={bucket.id}
                   label="Move {tile.code}"
+                  code={tile.code}
                 />
                 <button
                   type="button"
                   class="requirement-course-remove"
                   title="Remove from this bucket"
                   aria-label="Remove {tile.code} from {bucket.name}"
-                  onclick={() => degreeBucketService.unassign(courseId)}
+                  onclick={e => removeTile(e.currentTarget, courseId)}
                   >&times;</button
                 >
               </div>
@@ -344,7 +373,7 @@
           onclick={() => degreePlanService.browseForBucket(bucket)}
         >
           <span class="requirement-course-empty-label"
-            >Needs {progress.emptySlots} more</span
+            >Needs {progress.coursesNeeded} more</span
           >
           <span class="requirement-course-empty-hint"
             >Browse courses &rarr;</span
@@ -353,7 +382,7 @@
       {:else if needsBrowse}
         <div class="requirement-course-empty requirement-card-browse is-static">
           <span class="requirement-course-empty-label"
-            >Needs {progress.emptySlots} more</span
+            >Needs {progress.coursesNeeded} more</span
           >
           <span class="requirement-course-empty-hint">No course list</span>
         </div>

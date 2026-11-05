@@ -3,6 +3,7 @@ import { uiState } from '../../services/ui/uiState.svelte';
 import { DeviceDetection } from '../../utils/deviceDetection';
 import { QUARTER_TERMS } from '../../utils/typeGuards';
 import { reduceMotion } from '../transitions';
+import { wizardState } from '../wizardState.svelte';
 
 /**
  * Schedule-page term focus: zooming one term card up to fill the pane, and
@@ -33,6 +34,9 @@ const isFocusLocked = (): boolean =>
 
 class TermFocus {
   term = $state.raw<string | null>(isFocusLocked() ? TERMS[0] : null);
+  // Set by the first move the reader makes, so the schedule's own opening
+  // choice (see placeTerm) never overrides it.
+  moved = false;
 }
 
 export const termFocus = new TermFocus();
@@ -142,6 +146,7 @@ function settle(anims: Animation[], done: () => void): void {
 
 export function toggleFocus(term: string): void {
   if (busy || !gridEl) return;
+  termFocus.moved = true;
   if (termFocus.term === null) {
     capture(term);
     busy = true;
@@ -163,9 +168,53 @@ function unfocus(): void {
 function stepTerm(dir: 1 | -1): void {
   if (busy || termFocus.term === null || !gridEl) return;
   const i = TERMS.indexOf(termFocus.term);
+  termFocus.moved = true;
   pendingDir = dir;
   busy = true;
   termFocus.term = TERMS[(i + dir + TERMS.length) % TERMS.length];
+}
+
+/** Page straight to `term` from the pager. */
+export function goToTerm(term: string): void {
+  if (busy || termFocus.term === null || termFocus.term === term || !gridEl)
+    return;
+  termFocus.moved = true;
+  pendingDir = TERMS.indexOf(term) > TERMS.indexOf(termFocus.term) ? 1 : -1;
+  busy = true;
+  termFocus.term = term;
+}
+
+// The next term change is the schedule choosing where to open, not a page.
+let placing = false;
+
+/**
+ * Open a focused grid on `term` without paging there. Does nothing once the
+ * reader has moved, or while the grid is zoomed out.
+ */
+export function placeTerm(term: string): void {
+  if (termFocus.moved || termFocus.term === null || termFocus.term === term)
+    return;
+  placing = true;
+  termFocus.term = term;
+}
+
+/**
+ * The term a schedule should open on: the one in progress (or next to start)
+ * when it holds classes, else the first term that does, else the one in
+ * progress. A term counts as over after its last day.
+ */
+export function openingTerm(
+  hasClasses: (term: string) => boolean,
+  termEnds: (term: string) => Date | null,
+  now: Date = new Date(),
+): string {
+  const current =
+    TERMS.find(t => {
+      const end = termEnds(t);
+      return end !== null && end >= now;
+    }) ?? TERMS[TERMS.length - 1];
+  if (hasClasses(current)) return current;
+  return TERMS.find(hasClasses) ?? current;
 }
 
 /**
@@ -334,6 +383,8 @@ export function termMotion(node: HTMLElement, term: string | null) {
     )
       return;
     if (e.key === 'Escape') {
+      // The section wizard sits over the grid, so it closes first.
+      if (wizardState.isOpen) return;
       e.preventDefault();
       unfocus();
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
@@ -357,6 +408,10 @@ export function termMotion(node: HTMLElement, term: string | null) {
       if (next === current) return;
       const prev = current;
       current = next;
+      if (placing) {
+        placing = false;
+        return;
+      }
       const from = pendingBox;
       const dir = pendingDir;
       pendingBox = null;

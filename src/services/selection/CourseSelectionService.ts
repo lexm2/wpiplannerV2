@@ -6,6 +6,7 @@ import { DataValidator } from '../../core/validation/DataValidator';
 import { getAllSections } from '../../utils/courseUtils';
 import { logger } from '../../utils/logger';
 import { errorMessage } from '../../utils/errorMessage';
+import type { YearScheduleSwitcher } from './YearScheduleSwitcher';
 
 export interface CourseSelectionOptions {
   isRequired?: boolean;
@@ -29,6 +30,8 @@ export class CourseSelectionService {
   private dataValidator: DataValidator;
   private isInitialized = false;
   private initializationPromise: Promise<boolean> | null = null;
+  // Built after this service (it needs the schedule service, which needs this).
+  private yearSwitcher: YearScheduleSwitcher | null = null;
 
   constructor(
     profileStateManager?: ProfileStateManager,
@@ -37,6 +40,10 @@ export class CourseSelectionService {
     this.profileStateManager =
       profileStateManager || ProfileStateManager.getInstance();
     this.dataValidator = dataValidator || new DataValidator();
+  }
+
+  setYearSwitcher(switcher: YearScheduleSwitcher): void {
+    this.yearSwitcher = switcher;
   }
 
   async initialize(): Promise<boolean> {
@@ -147,9 +154,14 @@ export class CourseSelectionService {
 
     if (isSelected) {
       return this.unselectCourse(course);
-    } else {
-      return this.selectCourse(course, options);
     }
+    // The "+" lands here. A course from another academic year goes to a
+    // schedule of that year, once the student agrees.
+    if (this.yearSwitcher?.isOtherYear(course)) {
+      this.yearSwitcher.offerSwitch(course);
+      return { success: false, error: 'Waiting for schedule switch' };
+    }
+    return this.selectCourse(course, options);
   }
 
   async setSelectedSection(
@@ -404,7 +416,7 @@ export class CourseSelectionService {
         logger.warn(`Repaired ${repairedCount} selected courses`);
         // The repair edited the courses in place, so the schedules holding
         // them look unchanged to save().
-        this.profileStateManager.forgetSavedSchedules();
+        this.profileStateManager.markActiveScheduleChanged();
         this.profileStateManager.save();
       }
 

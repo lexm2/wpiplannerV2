@@ -240,7 +240,7 @@ function side(crn: number, entry: CrnEntry): ConflictSide {
   };
 }
 
-const termsMeet = (a: AcademicTerm, b: AcademicTerm) =>
+export const termsMeet = (a: AcademicTerm, b: AcademicTerm) =>
   termsCovered(a).some(t => termsCovered(b).includes(t));
 
 const minutesOf = (t: { hours: number; minutes: number }) =>

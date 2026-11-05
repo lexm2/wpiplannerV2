@@ -119,7 +119,7 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
     test('the schedule opens on one term', async ({ page }) => {
       await boot(page);
       await page.click('#schedule-tab');
-      await expect(page.locator('[data-focused-term="A"]')).toBeVisible();
+      await expect(page.locator('[data-focused-term]')).toBeVisible();
     });
 
     test('course names wrap instead of being cut off', async ({ page }) => {
@@ -509,10 +509,27 @@ test.describe('Classes page at 1280x720', () => {
 
   test('a stored drag width still wins', async ({ page }) => {
     await page.addInitScript(() =>
+      localStorage.setItem('wpi-planner-width-right-panel', '560'),
+    );
+    await boot(page);
+    expect((await widths(page)).panel).toBe(560);
+  });
+
+  test('a stored width that would squeeze the list is repaired', async ({
+    page,
+  }) => {
+    await page.addInitScript(() =>
       localStorage.setItem('wpi-planner-width-right-panel', '640'),
     );
     await boot(page);
-    expect((await widths(page)).panel).toBe(640);
+    const { panel, list } = await widths(page);
+    expect(list).toBeGreaterThanOrEqual(400);
+    expect(panel).toBeLessThan(640);
+    expect(
+      await page.evaluate(() =>
+        localStorage.getItem('wpi-planner-width-right-panel'),
+      ),
+    ).toBe(String(panel));
   });
 
   test('double-click reset returns to the adaptive default', async ({

@@ -6,21 +6,20 @@ import {
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 import { FilterableSection } from '../../../types/filterableUnit';
 import {
-  datesMeet,
+  scopesOverlap,
   sectionToWeeklySlots,
   termsCovered,
+  type TermScope,
 } from '../../../utils/timeSlotUtils';
 import { weeklySlotToMask } from '../../scheduling/BitMaskEngine';
 import { getSelectedSections } from '../../../utils/courseUtils';
 
-/** A blocked slot parsed once per apply: owning CRN, terms, minute range. */
+/** A blocked slot parsed once per apply: owning CRN, term scope, minute range. */
 interface PreparedSlot {
   crn: string;
-  terms: AcademicTerm[];
+  scope: TermScope;
   start: number;
   end: number;
-  startDate?: string;
-  endDate?: string;
 }
 
 /** Where the filter reads the active schedule's calendar-event slots from. */
@@ -89,11 +88,13 @@ export class ConflictFilter implements SectionBasedFilter {
     for (const slot of blockedSlots) {
       const prepared: PreparedSlot = {
         crn: slot.id.split('-')[0],
-        terms: termsCovered(slot.term, spans),
+        scope: {
+          term: slot.term,
+          startDate: slot.startDate,
+          endDate: slot.endDate,
+        },
         start: slot.startTime.hours * 60 + slot.startTime.minutes,
         end: slot.endTime.hours * 60 + slot.endTime.minutes,
-        startDate: slot.startDate,
-        endDate: slot.endDate,
       };
       const forDay = blockedByDay.get(slot.day);
       if (forDay) forDay.push(prepared);
@@ -109,10 +110,11 @@ export class ConflictFilter implements SectionBasedFilter {
         return true;
       }
 
-      const sectionTerms = termsCovered(
-        fs.section.computedTerm || AcademicTerm.ALL,
-        spans,
-      );
+      const sectionScope: TermScope = {
+        term: fs.section.computedTerm || AcademicTerm.ALL,
+        startDate: fs.section.startDate,
+        endDate: fs.section.endDate,
+      };
 
       for (const period of fs.section.periods) {
         const start = period.startTime.hours * 60 + period.startTime.minutes;
@@ -126,13 +128,7 @@ export class ConflictFilter implements SectionBasedFilter {
             if (
               start < blocked.end &&
               blocked.start < end &&
-              blocked.terms.some(t => sectionTerms.includes(t)) &&
-              datesMeet(
-                fs.section.startDate,
-                fs.section.endDate,
-                blocked.startDate,
-                blocked.endDate,
-              )
+              scopesOverlap(sectionScope, blocked.scope, spans)
             ) {
               return false;
             }

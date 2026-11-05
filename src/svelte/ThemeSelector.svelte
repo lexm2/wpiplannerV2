@@ -1,11 +1,13 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
+  import { tick } from 'svelte';
   import styles from '../styles/components/theme-selector.module.css';
   import { dur } from './transitions';
   import { clickOutside } from './clickOutside';
   import { ThemeManager } from '../themes/ThemeManager';
   import { uiState } from '../services/ui/uiState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
+  import { menuKeys, focusMenuItem, openingKey } from './menuKeys';
 
   // The saved-theme load happens during bootstrap; this component only renders +
   // drives selection off the ThemeManager singleton and the currentThemeId rune.
@@ -14,9 +16,10 @@
 
   let open = $state(false);
   let trigger = $state<HTMLButtonElement | null>(null);
+  let optionsEl = $state<HTMLElement | null>(null);
   // `uiState.currentThemeId` is a rune bumped by ThemeManager.setTheme - so the
   // active option + current-name text recompute on any theme change, including
-  // the settings-menu "Toggle Theme" which calls themeManager.setTheme directly.
+  // the gear menu's theme choices, which call themeManager.setTheme directly.
   const currentId = $derived(uiState.currentThemeId);
   const currentName = $derived(
     themes.find(t => t.id === currentId)?.name ?? '',
@@ -25,6 +28,30 @@
   function selectTheme(id: string): void {
     tm.setTheme(id);
     open = false;
+    // The option is about to go; keep the keyboard user's place.
+    trigger?.focus();
+  }
+
+  // Opens with focus on the current theme when the trigger was operated by
+  // keyboard (a click from Enter or Space has detail 0); a mouse click leaves
+  // focus where it is.
+  async function openOptions(
+    focus: 'first' | 'last' | 'current' | null,
+  ): Promise<void> {
+    open = true;
+    if (!focus) return;
+    await tick();
+    if (focus === 'current') {
+      optionsEl?.querySelector<HTMLElement>('[aria-checked="true"]')?.focus();
+    } else focusMenuItem(optionsEl, focus);
+  }
+
+  function onTriggerKeydown(e: KeyboardEvent): void {
+    const which = openingKey(e);
+    if (!which) return;
+    e.preventDefault();
+    if (open) focusMenuItem(optionsEl, which);
+    else void openOptions(which);
   }
 
   function onKeydown(e: KeyboardEvent): void {
@@ -51,9 +78,15 @@
   class={['theme-dropdown', { [styles['open']]: open }]}
   id="theme-dropdown"
   bind:this={trigger}
-  aria-haspopup="true"
+  aria-label="Theme: {currentName}"
+  aria-haspopup="menu"
   aria-expanded={open}
-  onclick={() => (open = !open)}
+  aria-controls={open ? 'theme-options' : undefined}
+  onkeydown={onTriggerKeydown}
+  onclick={e => {
+    if (open) open = false;
+    else void openOptions(e.detail === 0 ? 'current' : null);
+  }}
 >
   <span id="current-theme-name">{currentName}</span>
   <span class="dropdown-arrow" id="theme-dropdown-arrow"
@@ -64,8 +97,12 @@
   <div
     class="theme-options"
     id="theme-options"
+    role="menu"
+    aria-label="Theme"
+    bind:this={optionsEl}
     transition:fly={{ y: -8, duration: dur(200) }}
     use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
+    use:menuKeys={{ trigger, onClose: () => (open = false) }}
   >
     {#each themes as t (t.id)}
       <button
@@ -75,9 +112,14 @@
           { [styles['active']]: t.id === currentId },
         ]}
         data-theme-id={t.id}
+        role="menuitemradio"
+        aria-checked={t.id === currentId}
         onclick={() => selectTheme(t.id)}
       >
         <span class={styles['theme-option-name']}>{t.name}</span>
+        <span class={styles['theme-option-check']} aria-hidden="true"
+          >{@html getInlineSVG('CHECK')}</span
+        >
         <span class={styles['theme-option-description']}>{t.description}</span>
       </button>
     {/each}

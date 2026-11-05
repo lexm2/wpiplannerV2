@@ -4,6 +4,7 @@ import { CourseSelectionService } from '../services/selection/CourseSelectionSer
 import { BitMaskEngine } from '../core/scheduling/BitMaskEngine';
 import { FilterService } from '../services/filtering/FilterService';
 import { ScheduleManagementService } from '../services/selection/ScheduleManagementService';
+import { YearScheduleSwitcher } from '../services/selection/YearScheduleSwitcher';
 import { ThemeManager } from '../themes/ThemeManager';
 import { OperationManager } from '../utils/RequestCancellation';
 import { CourseColorService } from '../services/scheduling/CourseColorService';
@@ -19,6 +20,7 @@ export interface ServiceContainer {
   conflictDetector: BitMaskEngine;
   filterService: FilterService;
   scheduleManagementService: ScheduleManagementService;
+  yearScheduleSwitcher: YearScheduleSwitcher;
   themeManager: ThemeManager;
   operationManager: OperationManager;
   colorService: CourseColorService;

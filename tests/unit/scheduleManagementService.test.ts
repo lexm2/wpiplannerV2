@@ -20,6 +20,7 @@ function makeService(): {
     saveActiveScheduleId: vi.fn(() => ok),
     savePreferences: vi.fn(() => ok),
     clearAllDataComplete: vi.fn(() => Promise.resolve(ok)),
+    subscribe: vi.fn(() => () => undefined),
   } as unknown as TransactionalStorageManager;
   // The constructor is private (getInstance() is the app's way in).
   const Ctor = ProfileStateManager as unknown as new (

@@ -54,6 +54,7 @@
       degreeState.record,
       appState.selectedCourses,
       assignments,
+      degreeState.buckets,
     );
     const index = next.findIndex(t => t.courseId === id);
     return index < 0 ? null : index;
@@ -93,8 +94,13 @@
 
   {#if slots.length === 0}
     <p class="empty-state">
-      Every course in your schedule has a bucket. Add courses to your schedule
-      and they will show up here to place.
+      {#if appState.selectedCourses.length === 0}
+        Your schedule has no courses yet. Add courses on the Classes page and
+        they will show up here to place.
+      {:else}
+        No courses are waiting to be placed. Courses you add to your schedule
+        will show up here.
+      {/if}
     </p>
   {:else}
     <p class="degree-rail-hint">
@@ -147,7 +153,11 @@
               <!-- The keyboard and touch path for placing the course; the
                    drag ignores presses that start on these controls. -->
               <div class="requirement-course-actions">
-                <AssignMenu {courseId} label="Assign {tile.code} to a bucket" />
+                <AssignMenu
+                  {courseId}
+                  label="Assign {tile.code} to a bucket"
+                  code={tile.code}
+                />
               </div>
             {/if}
           </div>

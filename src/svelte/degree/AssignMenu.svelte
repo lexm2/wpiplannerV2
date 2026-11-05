@@ -9,6 +9,13 @@
   import { remainingLabel, statusLabel } from './progressLabels';
   import { scaleFade } from '../transitions';
   import { clickOutside } from '../clickOutside';
+  import { degreePlanService } from '../../services/degree/degreePlanService';
+  import {
+    menuKeys,
+    neighbourControls,
+    placedTile,
+    refocusAfter,
+  } from './focusHelpers';
 
   /** The click/keyboard path for placing a course, alongside dragging. On a
    * phone or a touch screen it opens the Move sheet instead (MoveCourseSheet),
@@ -17,10 +24,13 @@
     courseId,
     currentBucketId = null,
     label = 'Assign to bucket',
+    code = null,
   }: {
     courseId: string;
     currentBucketId?: string | null;
     label?: string;
+    /** The course's code, to flag buckets it may not count toward. */
+    code?: string | null;
   } = $props();
 
   let open = $state(false);
@@ -57,9 +67,20 @@
 
   function choose(bucketId: string): void {
     open = false;
-    if (bucketId !== currentBucketId) {
-      degreeBucketService.assign(courseId, bucketId);
+    if (bucketId === currentBucketId) {
+      trigger?.focus();
+      return;
     }
+    // Placing a course usually unmounts this very menu (it leaves the rail, or
+    // moves to another card), so work out where focus goes next before it does:
+    // the course beside it, else the course where it landed.
+    const row = trigger?.closest('[data-course-id]') ?? null;
+    degreeBucketService.assign(courseId, bucketId);
+    void refocusAfter(
+      () => trigger,
+      ...neighbourControls(row, '.assign-menu-trigger'),
+      () => placedTile(courseId, '.assign-menu-trigger'),
+    );
   }
 
   function closeAndRefocus(): void {
@@ -102,6 +123,7 @@
       class:opens-down={down}
       role="menu"
       tabindex="-1"
+      use:menuKeys
       transition:scaleFade={{ duration: 150 }}
       use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
       onkeydown={e => {
@@ -128,6 +150,9 @@
               Here now
             {:else if progress}
               {remainingLabel(progress) ?? statusLabel(progress)}
+            {/if}
+            {#if !here && code && degreePlanService.mayNotCount(bucket, code)}
+              &middot; may not count
             {/if}
           </span>
           {#if progress}

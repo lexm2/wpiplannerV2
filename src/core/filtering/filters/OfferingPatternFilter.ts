@@ -3,6 +3,7 @@ import {
   type OfferingPatternFilterCriteria,
 } from '../../../types/filters';
 import type { FilterableSection } from '../../../types/filterableUnit';
+import { effectiveCategory } from '../../../utils/alternatingYears';
 import { SectionBasedFilter } from '../SectionFilterPipeline';
 
 const LABELS = {
@@ -31,7 +32,7 @@ export class OfferingPatternFilter implements SectionBasedFilter {
   ): FilterableSection[] {
     const wanted = new Set<number>(criteria.categories);
     return sections.filter(fs => {
-      const category = fs.course.category ?? null;
+      const category = effectiveCategory(fs.course);
       return category === null
         ? (criteria.includeUnknown ?? false)
         : wanted.has(category);
