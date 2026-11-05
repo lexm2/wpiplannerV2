@@ -78,7 +78,10 @@
         aria-label="Restart auto-schedule"
         disabled={generating}
         onclick={onOpenAutoSchedule}
-        >{@html getInlineSVG('ADJUSTMENTS_HORIZONTAL', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG(
+          'ADJUSTMENTS_HORIZONTAL',
+          'schedule-nav-icon',
+        )}</button
       >
       <button
         class="btn btn-secondary schedule-nav-btn"
