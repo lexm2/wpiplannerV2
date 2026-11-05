@@ -1,5 +1,30 @@
 # Changelog
 
+## [2026-11-05]
+
+### Changed
+- The tutorial box takes up less of the screen and has no empty space under its text
+- Undo and Redo are off during a tutorial. Use the tutorial's Back button instead
+- The last tutorial no longer shows a Next Tutorial button, since nothing comes after it
+
+### Fixed
+- The tutorials can be finished on any window wider than a phone. At 1024px and narrower they got stuck where a step pointed at the course list, which was hidden in the Courses panel. The panel now opens for those steps
+- Starting a tutorial no longer deletes your own schedules named "Tutorial"
+- Your filters, search and page come back when a tutorial ends
+- Undo after a tutorial no longer brings back the tutorial's schedule
+- Creating or picking a schedule during the Managing Schedules tutorial leaves you on that schedule, instead of sending you back to the one you started on
+- Reloading mid-tutorial returns you to your own schedule and leaves nothing behind in your saved data
+- Clicking a term in the Auto Schedule tutorial turns it off right away, and the schedule it generates stays in the terms you chose
+- Double-clicking something in a tutorial no longer undoes the first click, such as unpicking the section you just picked
+- A step's target that was hidden in a scrolling list or window now scrolls into view
+- Find Element brings back a step's window or page if you closed it or moved away, and the tutorial box offers it when you can't reach what the step needs
+- The tutorial's Next, Back and Skip can be reached with the keyboard while a window is open
+- Skip tutorial is no longer cut off in narrow windows, and the term step works at those widths
+- The Your Schedules step shows its highlight, which its own list was hiding
+- The tutorial follows along when you resize the window past a point where the layout changes
+- If the tutorial can't load, the planner just starts without it instead of reporting a failure and offering to clear your data
+- The tutorial courses stay visible after the catalog moves to a new academic year
+
 ## [2026-11-04]
 
 ### Added
