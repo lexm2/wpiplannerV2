@@ -419,7 +419,7 @@ function rankingRow(page: Page, key: string) {
 /** Sets "Avoid classes before" to High at the given time through the UI. */
 async function setEarlyClasses(page: Page, time: string): Promise<void> {
   const row = rankingRow(page, 'earlyClasses');
-  await row.getByRole('radio', { name: 'High' }).check({ force: true });
+  await row.getByRole('radio', { name: 'High' }).check();
   await row.getByRole('combobox').selectOption(time);
 }
 
@@ -432,10 +432,10 @@ test('a ranking row shows its options only while it is not Off', async ({
   const row = rankingRow(page, 'earlyClasses');
   await expect(row.getByRole('combobox')).toHaveCount(0);
 
-  await row.getByRole('radio', { name: 'Low' }).check({ force: true });
+  await row.getByRole('radio', { name: 'Low' }).check();
   await expect(row.getByRole('combobox')).toHaveCount(1);
 
-  await row.getByRole('radio', { name: 'Off' }).check({ force: true });
+  await row.getByRole('radio', { name: 'Off' }).check();
   await expect(row.getByRole('combobox')).toHaveCount(0);
 });
 
