@@ -31,7 +31,7 @@ interface CourseTypeInfo {
  * narrow the course list, but the user has already picked these courses, so
  * e.g. a search or year left over from the Degree page must not block them.
  */
-const NON_SECTION_FILTER_IDS = [
+export const NON_SECTION_FILTER_IDS = [
   'periodConflict',
   'searchText',
   'department',
