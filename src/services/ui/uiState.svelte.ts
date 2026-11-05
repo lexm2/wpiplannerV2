@@ -16,8 +16,10 @@ import { wizardState } from '../../svelte/wizardState.svelte';
 /** Error surfaced by App.svelte's ErrorBanner. */
 export interface AppError {
   message: string;
-  /** When set, the banner offers "Clear Data & Reload", which awaits this then reloads. */
+  /** When set, the banner offers "Clear Data & Reload", after a confirmation. */
   onClearData?: () => Promise<void>;
+  /** When set, the banner offers "Retry"; a resolved retry dismisses the banner. */
+  onRetry?: () => Promise<void>;
   /**
    * When set, the banner offers "Export Data" so a backup can be downloaded
    * before the clear destroys it. Shaped as
@@ -71,10 +73,9 @@ export function closeAllModals(): void {
 
 export function showAppError(
   message: string,
-  onClearData?: () => Promise<void>,
-  onExportData?: AppError['onExportData'],
+  actions: Omit<AppError, 'message'> = {},
 ): void {
-  uiState.appError = { message, onClearData, onExportData };
+  uiState.appError = { message, ...actions };
 }
 
 /** Snapshot for the tutorial (fresh objects/arrays - safe to store as-is). */
