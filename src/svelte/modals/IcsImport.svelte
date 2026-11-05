@@ -204,16 +204,20 @@
     return parts.length ? `Not added: ${parts.join(', ')}` : '';
   }
 
+  // Distinct titles, not events: one title can stand for many source events.
+  const MAX_LISTED_TITLES = 50;
+
   function skippedGroups(result: IcsImportResult, year: number) {
     const label = yearLabel(year);
     return SKIP_REASONS.filter(r => result.skipped[r.reason] > 0).map(r => {
-      const titles = result.skippedTitles[r.reason] ?? [];
+      const all = result.skippedTitles[r.reason] ?? [];
+      const titles = all.slice(0, MAX_LISTED_TITLES);
       return {
         reason: r.reason,
         heading: r.heading(label),
         count: result.skipped[r.reason],
         titles,
-        more: Math.max(0, result.skipped[r.reason] - titles.length),
+        more: all.length - titles.length,
       };
     });
   }
@@ -325,7 +329,11 @@
                         {#each g.titles as title (title)}
                           <li>{title}</li>
                         {/each}
-                        {#if g.more > 0}<li>and {g.more} more</li>{/if}
+                        {#if g.more > 0}<li>
+                            and {g.more} more {g.more === 1
+                              ? 'title'
+                              : 'titles'}
+                          </li>{/if}
                       </ul>
                     {/if}
                   </div>

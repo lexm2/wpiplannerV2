@@ -446,14 +446,26 @@ export function parseIcsOccurrences(
       // The latest occurrence passed over before the window, for `span`.
       let lastSkipped: ICAL.Time | null = null;
 
+      // ical.js expands RDATE-only series from the RDATE list alone, but
+      // RFC 5545 makes DTSTART the first instance.
+      const rdateOnly =
+        !master.hasProperty('rrule') && master.hasProperty('rdate');
+      let pendingStart: ICAL.Time | null = rdateOnly ? dtstart : null;
+
       for (let i = 0; i < MAX_ITERATIONS; i++) {
-        const next = iterator.next();
+        const synthetic = pendingStart !== null;
+        const next: ICAL.Time | null = pendingStart ?? iterator.next();
+        pendingStart = null;
         if (!next) {
           reachedEnd = true;
           break;
         }
+        // An RDATE that repeats DTSTART was already handled above.
+        if (rdateOnly && !synthetic && next.compare(dtstart) === 0) continue;
         const nextMs = next.toUnixTime() * 1000;
         if (nextMs > stopMs) {
+          // RDATEs aren't guaranteed to come after DTSTART.
+          if (synthetic) continue;
           reachedEnd = true;
           break;
         }

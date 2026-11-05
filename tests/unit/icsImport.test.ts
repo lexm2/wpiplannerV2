@@ -607,6 +607,27 @@ describe('edge cases', () => {
   });
 });
 
+describe('RDATE-only series', () => {
+  it('counts DTSTART as the first meeting', () => {
+    const text = ics(
+      vevent(
+        [
+          'SUMMARY:Three Rdate Tuesdays',
+          'DTSTART:20261020T160000Z',
+          'DTEND:20261020T170000Z',
+          'RDATE:20261027T160000Z,20261103T160000Z',
+        ],
+        'rdate',
+      ),
+    );
+    const dates = parseIcsOccurrences(text, {
+      start: new Date(2026, 9, 19),
+      end: new Date(2026, 11, 11),
+    }).occurrences.map(o => o.date);
+    expect(dates).toEqual(['2026-10-20', '2026-10-27', '2026-11-03']);
+  });
+});
+
 describe('invalid input', () => {
   it.each([
     ['garbage text', 'hello, this is not a calendar'],
