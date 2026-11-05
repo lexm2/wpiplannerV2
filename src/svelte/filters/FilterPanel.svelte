@@ -1,5 +1,6 @@
 <script lang="ts">
   import { appState } from '../../core/state/appState.svelte';
+  import CloseButton from '../ui/CloseButton.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
   import type { AutoScheduleOrchestrator } from '../../services/scheduling/AutoScheduleOrchestrator';
@@ -147,9 +148,7 @@
     <span class="filter-count">{filterCount > 0 ? `(${filterCount})` : ''}</span
     >
   </h3>
-  <button class="modal-close" aria-label="Close" onclick={requestClose}
-    >×</button
-  >
+  <CloseButton onclick={requestClose} />
 </div>
 
 <div class="modal-body filter-modal-body">

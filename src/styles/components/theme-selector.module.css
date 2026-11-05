@@ -31,12 +31,16 @@
   color: var(--color-text-inverse);
 }
 
+/* Spans, as a button can't hold divs, but each takes its own line: the tick sits
+   at the end of the name's, clear of the description. */
 .theme-option-name {
+  display: block;
   font-weight: var(--font-weight-medium);
   margin-bottom: 0.25rem;
 }
 
 .theme-option-description {
+  display: block;
   font-size: 0.8rem;
   color: var(--color-text-secondary);
 }
@@ -53,6 +57,7 @@
   position: absolute;
   top: 0.75rem;
   right: 1rem;
+  color: var(--color-mark);
 }
 
 .theme-option-check :global(svg) {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
+  import CloseButton from '../ui/CloseButton.svelte';
   import { degreeState, placeableBuckets } from '../degree/degreeState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import { degreePlanService } from '../../services/degree/degreePlanService';
@@ -80,9 +81,7 @@
         <span class="requirement-course-code">{entry?.code}</span>
         <span class="move-sheet-title">{entry?.title}</span>
       </div>
-      <button class="modal-close" aria-label="Close" onclick={close}
-        >&times;</button
-      >
+      <CloseButton onclick={close} />
     </div>
   {/snippet}
 

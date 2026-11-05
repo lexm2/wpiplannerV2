@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import CloseButton from './ui/CloseButton.svelte';
   import ResizeHandle from './ResizeHandle.svelte';
   import type { PanelWidthConfig } from './panelWidths';
   import { trapFocus } from './modals/trapFocus';
@@ -168,12 +169,7 @@
   {#if asDrawer && drawer}
     <div class="side-panel-drawer-bar">
       <h2 class="side-panel-drawer-title">{drawer.title}</h2>
-      <button
-        type="button"
-        class="side-panel-drawer-close"
-        aria-label="Close {drawer.title}"
-        onclick={close}>&times;</button
-      >
+      <CloseButton label="Close {drawer.title}" onclick={close} />
     </div>
   {/if}
   {@render children()}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import CloseButton from '../ui/CloseButton.svelte';
   import { trapFocus } from './trapFocus';
   import { uiState } from '../../services/ui/uiState.svelte';
   import { fade } from 'svelte/transition';
@@ -120,9 +121,7 @@
         <div class="modal-header">
           <h2 class="modal-title">{title}</h2>
           {#if !hideClose}
-            <button class="modal-close" aria-label="Close" onclick={close}
-              >&times;</button
-            >
+            <CloseButton onclick={close} />
           {/if}
         </div>
       {/if}

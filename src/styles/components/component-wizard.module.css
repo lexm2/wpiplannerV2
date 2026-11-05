@@ -10,29 +10,17 @@
   flex-shrink: 0;
 }
 
-.wizard-close-btn {
+.wizard-close {
   position: absolute;
   top: 0.5rem;
   right: 0.75rem;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  line-height: 1;
-  padding: 0.25rem;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
 }
 
-.wizard-close-btn:hover {
-  background-color: var(--color-surface-hover);
-  color: var(--color-text);
+/* Room for the larger close button a phone gets. */
+@media (max-width: 560px) {
+  .wizard-header {
+    padding-right: 3.75rem;
+  }
 }
 
 .wizard-header h2 {

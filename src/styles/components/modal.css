@@ -56,27 +56,6 @@
   color: var(--color-text);
 }
 
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--effect-border-radius);
-  transition: var(--effect-transition);
-}
-
-.modal-close:hover {
-  background: var(--color-secondary);
-  color: var(--color-text);
-}
-
 .modal-body {
   padding: 1rem 1.5rem;
   flex: 1;
@@ -237,17 +216,6 @@ html.is-mobile .modal-btn {
   color: var(--color-text);
   letter-spacing: -0.01em;
   line-height: 1.3;
-}
-
-.section-info-modal .modal-close {
-  color: var(--color-text-secondary);
-  transition: all 0.15s ease;
-}
-
-.section-info-modal .modal-close:hover {
-  background: var(--color-secondary);
-  color: var(--color-text);
-  transform: scale(1.05);
 }
 
 .section-info-modal .modal-footer {
@@ -663,8 +631,7 @@ html.is-mobile .section-enrollment-waitlist {
   }
 
   .section-period,
-  .section-color-input,
-  .modal-close {
+  .section-color-input {
     transition: none;
   }
 }
@@ -948,7 +915,7 @@ html.is-mobile .filter-select-none {
 .department-checkbox:checked {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
 }
 
 .department-checkbox:checked::before {
@@ -959,7 +926,7 @@ html.is-mobile .filter-select-none {
   transform: translate(-50%, -50%);
   font-size: 14px;
   font-weight: bold;
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
   line-height: 1;
 }
 
@@ -976,7 +943,7 @@ html.is-mobile .filter-select-none {
   transform: translate(-50%, -50%);
   font-size: 16px;
   font-weight: bold;
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
   line-height: 1;
 }
 
@@ -2135,11 +2102,9 @@ html.is-mobile .course-finder-modal .modal-dialog {
     padding: 0.75rem 0.5rem 0.75rem 1rem;
   }
 
-  .course-finder-header .modal-close {
+  .course-finder-header .close-button {
     grid-column: 2;
     grid-row: 1;
-    width: 44px;
-    height: 44px;
   }
 
   .course-finder-search {

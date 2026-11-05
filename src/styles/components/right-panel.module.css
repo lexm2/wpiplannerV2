@@ -195,12 +195,6 @@
   box-shadow: var(--effect-shadow-hover);
 }
 
-/* Dark's primary hover is too dark for its dark label to read on; the glow and
-   the chevron still answer the pointer. */
-:global(.theme-wpi-dark) .selected-courses-content .pick-sections:hover {
-  background: var(--color-primary);
-}
-
 .pick-sections-icon {
   flex-shrink: 0;
   width: 1.125rem;

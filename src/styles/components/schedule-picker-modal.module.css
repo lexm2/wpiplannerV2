@@ -24,16 +24,27 @@
   pointer-events: none;
 }
 
+/* A square around an icon: the dots used to be a text character, which each
+   font draws at its own height, off-centre in the hover highlight. */
 .menuBtn {
-  font-size: 1.5rem;
-  padding: 0.25rem 0.5rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   background: none;
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
   border-radius: var(--effect-border-radius);
   transition: all 0.15s ease;
+}
+
+.menuIcon {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .menuBtn:hover {
