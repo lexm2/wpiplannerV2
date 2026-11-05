@@ -67,6 +67,7 @@ function section(
 const MON_9_10 = () => section(1, [period([DayOfWeek.MONDAY], 9, 0, 10, 0)]);
 const MON_930_1030 = () =>
   section(2, [period([DayOfWeek.MONDAY], 9, 30, 10, 30)]);
+const mon9 = () => period([DayOfWeek.MONDAY], 9, 0, 10, 0);
 const TUE_9_10 = () => section(3, [period([DayOfWeek.TUESDAY], 9, 0, 10, 0)]);
 const MON_10_11 = () => section(4, [period([DayOfWeek.MONDAY], 10, 0, 11, 0)]);
 
@@ -201,38 +202,44 @@ describe('BitMaskEngine', () => {
     expect(engine.sectionsConflict(MON_9_10(), MON_10_11())).toBe(false);
   });
 
-  it('segregates by exact term string, so identical times in different terms do not conflict', () => {
+  it('does not conflict identical times in disjoint terms', () => {
     const engine = new BitMaskEngine();
-    const a = section(
-      10,
-      [period([DayOfWeek.MONDAY], 9, 0, 10, 0)],
-      AcademicTerm.A,
-    );
-    const b = section(
-      11,
-      [period([DayOfWeek.MONDAY], 9, 0, 10, 0)],
-      AcademicTerm.B,
-    );
+    const a = section(10, [mon9()], AcademicTerm.A);
+    const b = section(11, [mon9()], AcademicTerm.B);
+    const c = section(12, [mon9()], AcademicTerm.C);
     expect(engine.sectionsConflict(a, b)).toBe(false);
+    expect(engine.sectionsConflict(a, c)).toBe(false);
   });
 
-  it('compares terms by string equality, so an A section and an F section spanning A do not conflict', () => {
-    // Documents a real limitation: F spans A+B and S spans C+D, but
-    // sectionsConflict early-returns on `computedTerm` inequality, so the
-    // overlap is invisible here. Term expansion is the caller's job
-    // (see ConflictFilter.precomputeBlockedMasks).
+  it('conflicts a semester section with the quarters it spans', () => {
     const engine = new BitMaskEngine();
-    const a = section(
-      12,
-      [period([DayOfWeek.MONDAY], 9, 0, 10, 0)],
-      AcademicTerm.A,
-    );
-    const f = section(
-      13,
-      [period([DayOfWeek.MONDAY], 9, 0, 10, 0)],
-      AcademicTerm.F,
-    );
-    expect(engine.sectionsConflict(a, f)).toBe(false);
+    const f = section(13, [mon9()], AcademicTerm.F);
+    const s = section(14, [mon9()], AcademicTerm.S);
+    for (const [term, hitsF, hitsS] of [
+      [AcademicTerm.A, true, false],
+      [AcademicTerm.B, true, false],
+      [AcademicTerm.C, false, true],
+      [AcademicTerm.D, false, true],
+    ] as const) {
+      const q = section(20, [mon9()], term);
+      expect(engine.sectionsConflict(q, f)).toBe(hitsF);
+      expect(engine.sectionsConflict(q, s)).toBe(hitsS);
+    }
+    expect(engine.sectionsConflict(f, s)).toBe(false);
+  });
+
+  it('lets sections with disjoint date ranges share a time', () => {
+    const engine = new BitMaskEngine();
+    const early = section(15, [mon9()], AcademicTerm.A);
+    const late = section(16, [mon9()], AcademicTerm.A);
+    early.startDate = '2026-08-26';
+    early.endDate = '2026-09-30';
+    late.startDate = '2026-10-01';
+    late.endDate = '2026-10-16';
+    expect(engine.sectionsConflict(early, late)).toBe(false);
+    late.startDate = '2026-09-30';
+    // Cached masks are keyed by section, dates are read on every check.
+    expect(engine.sectionsConflict(early, late)).toBe(true);
   });
 });
 
