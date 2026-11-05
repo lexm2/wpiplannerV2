@@ -8,6 +8,7 @@
 - The last tutorial no longer shows a Next Tutorial button, since nothing comes after it
 
 ### Fixed
+- The tutorial box moves out of the way by itself. It stays off whatever the step points at and off the buttons around it, wherever they are on screen, instead of only trying the four corners and sitting on the schedule list and New Schedule when none of them fit. If you drag the box it stays where you put it, unless it's on the thing the step needs
 - The tutorials can be finished on any window wider than a phone. At 1024px and narrower they got stuck where a step pointed at the course list, which was hidden in the Courses panel. The panel now opens for those steps
 - Starting a tutorial no longer deletes your own schedules named "Tutorial"
 - Your filters, search and page come back when a tutorial ends

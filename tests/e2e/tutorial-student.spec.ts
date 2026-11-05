@@ -503,3 +503,120 @@ test('a step follows its target across a breakpoint', async ({ page }) => {
   await target.click();
   await expectStep(page, 'welcome#4');
 });
+
+test.describe('where the box sits', () => {
+  /** Reach the step that shows the schedule list, with the student's own plans. */
+  async function showScheduleList(page: Page, plans: number): Promise<void> {
+    await page.addInitScript(() => localStorage.setItem('wpi_visited', 'true'));
+    await page.goto('/');
+    await page.waitForFunction(
+      () =>
+        (window as any).services?.courseDataService?.getAllDepartments()
+          .length > 0,
+    );
+    await page.evaluate(async n => {
+      const s = (window as any).services;
+      for (let i = 1; i <= n; i++) {
+        await s.scheduleManagementService.createNewSchedule(`Plan ${i}`);
+      }
+      await s.tutorial.start('schedules');
+      s.tutorial.service.nextStep();
+    }, plans);
+    await expect(page.locator('.schedule-item').first()).toBeVisible();
+    await expectStep(page, 'schedules#1');
+  }
+
+  /** Names of the things in the schedule window that the box is on top of. */
+  function coveredInWindow(page: Page): Promise<string[]> {
+    return page.evaluate(() => {
+      const box = document
+        .querySelector('[data-tutorial-box]')!
+        .getBoundingClientRect();
+      const dialog = document.querySelector('.schedule-picker-modal-dialog')!;
+      return [...dialog.querySelectorAll('button, .schedule-item')]
+        .filter(el => {
+          const r = el.getBoundingClientRect();
+          return !(
+            box.right <= r.left ||
+            box.left >= r.right ||
+            box.bottom <= r.top ||
+            box.top >= r.bottom
+          );
+        })
+        .map(el => el.textContent.trim());
+    });
+  }
+
+  for (const [width, height] of [
+    [1920, 1080],
+    [1280, 800],
+    [1024, 768],
+    [600, 800],
+  ] as const) {
+    test.describe(`${width}x${height}`, () => {
+      test.use({ viewport: { width, height } });
+
+      test('stays off the schedule rows and the window buttons', async ({
+        page,
+      }) => {
+        await showScheduleList(page, 0);
+        await expect.poll(() => coveredInWindow(page)).toEqual([]);
+      });
+    });
+  }
+
+  test('with a full list it still covers no button', async ({ page }) => {
+    await showScheduleList(page, 12);
+    await expect
+      .poll(async () =>
+        (await coveredInWindow(page)).filter(name => !/^Plan|^My/.test(name)),
+      )
+      .toEqual([]);
+  });
+
+  test('leaves a spot the student dragged it to, unless the target needs it', async ({
+    page,
+  }) => {
+    await showScheduleList(page, 0);
+    const box = page.locator('[data-tutorial-box]');
+    await expect.poll(() => coveredInWindow(page)).toEqual([]);
+    await page.waitForTimeout(400); // done scaling in
+
+    // Drag it over New Schedule, which this step doesn't point at.
+    const header = await box.locator('[class*="title"]').first().boundingBox();
+    const button = await page.locator('#new-schedule-btn').boundingBox();
+    await page.mouse.move(header!.x + 4, header!.y + 4);
+    await page.mouse.down();
+    await page.mouse.move(button!.x + 4, button!.y - 20, { steps: 5 });
+    await page.mouse.up();
+    const dropped = await box.boundingBox();
+    await page.waitForTimeout(1500); // past the step's settling
+    expect(await box.boundingBox()).toEqual(dropped);
+
+    // The step that does point at New Schedule moves it off.
+    await page.evaluate(() => {
+      const svc = (window as any).services.tutorial.service;
+      svc.nextStep();
+      svc.nextStep();
+      svc.nextStep();
+    });
+    await expectStep(page, 'schedules#4');
+    await expect
+      .poll(() => coveredInWindow(page))
+      .not.toContain('New Schedule');
+  });
+
+  test('scrolling a list under it does not send it anywhere', async ({
+    page,
+  }) => {
+    await showScheduleList(page, 12);
+    const box = page.locator('[data-tutorial-box]');
+    await page.waitForTimeout(1500);
+    const before = await box.boundingBox();
+    await page
+      .locator('.schedule-picker-modal-dialog .schedule-list')
+      .evaluate(list => (list.scrollTop = 200));
+    await page.waitForTimeout(800);
+    expect(await box.boundingBox()).toEqual(before);
+  });
+});

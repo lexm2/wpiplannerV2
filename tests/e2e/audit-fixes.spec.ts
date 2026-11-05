@@ -271,9 +271,11 @@ test('tutorial box still drags (pointer events, mouse input)', async ({
     };
   });
 
+  // Towards the middle, since the box can start in any corner.
+  const dx = before.left > 100 ? -120 : 120;
   await page.mouse.move(before.hx, before.hy);
   await page.mouse.down();
-  await page.mouse.move(before.hx + 120, before.hy - 80, { steps: 10 });
+  await page.mouse.move(before.hx + dx, before.hy - 80, { steps: 10 });
   await page.mouse.up();
   await page.waitForTimeout(200);
 
@@ -290,7 +292,7 @@ test('tutorial box still drags (pointer events, mouse input)', async ({
     'after:',
     JSON.stringify(after),
   );
-  expect(after.left).toBeGreaterThan(before.left + 80);
+  expect(Math.abs(after.left - before.left)).toBeGreaterThan(80);
   expect(after.top).toBeLessThan(before.top - 50);
 });
 

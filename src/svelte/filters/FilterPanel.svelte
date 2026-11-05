@@ -178,7 +178,7 @@
 </div>
 
 <div class="modal-footer">
-  <div class="filter-preview">
+  <div class="filter-preview" role="status">
     <span>{previewText}</span>
   </div>
   <div class="filter-actions">
