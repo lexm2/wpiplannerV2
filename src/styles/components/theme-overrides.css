@@ -118,17 +118,6 @@
   --effect-transition: all 0.1s ease;
 }
 
-/* `.course-item` and `.section-badge` were in this list; both are hashed by
-   course-list.module.css now, so their copy of it lives there. */
-.theme-high-contrast .btn,
-.theme-high-contrast .field-shell,
-.theme-high-contrast .requirement-card,
-.theme-high-contrast .requirement-course,
-.theme-high-contrast .degree-filter-chip,
-.theme-high-contrast .bucket-config-row {
-  border-width: 2px;
-}
-
 /* In this theme --color-primary and --color-border are both #000000, so the
    focus border-colour change is a no-op and the ring resolves to a barely
    visible rgba(0,0,0,0.2). An explicit outline is the only unambiguous focus
@@ -139,20 +128,13 @@
   box-shadow: none;
 }
 
-.theme-high-contrast .btn:hover,
-.theme-high-contrast .requirement-card:hover,
-.theme-high-contrast .requirement-course-draggable:hover,
-.theme-high-contrast .degree-filter-chip:hover {
-  border-width: 3px;
-}
-
 /* The segmented control's track is --color-border and its active pill is
    --color-primary, both black here, so the inactive label was dim grey on black
    and the active pill vanished into the track. A white track with black labels
    leaves the active pill as the one solid black block. */
 .theme-high-contrast .filter-segmented-control {
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
 }
 
 .theme-high-contrast .segmented-btn:not(.active) {
