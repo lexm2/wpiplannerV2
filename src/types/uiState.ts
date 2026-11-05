@@ -1,4 +1,5 @@
 import type { ComponentKind } from './types';
+import type { DrawerId } from '../svelte/drawerState.svelte';
 
 export type PageId = 'planner' | 'schedule' | 'degree';
 export type ViewMode = 'list' | 'grid';
@@ -16,4 +17,6 @@ export interface UIState {
   wizard: WizardState;
   /** Disclosure ids (MoreSection) to hold open while the step is showing. */
   openDisclosures?: string[];
+  /** Side panels to slide in while the step is showing, where they are drawers. */
+  openDrawers?: DrawerId[];
 }

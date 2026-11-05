@@ -111,3 +111,30 @@ describe('autoScheduleService error reporting', () => {
     expect(await run()).toMatch(/No courses are included/);
   });
 });
+
+describe('runAutoSchedule', () => {
+  it('keeps the named courses to their terms and leaves the rest alone', async () => {
+    const generate = vi.fn((_courses: SelectedCourse[]) =>
+      Promise.resolve({ status: 'generated' }),
+    );
+    const selection = [
+      { course: { id: 'TUT-2001' } },
+      { course: { id: 'TUT-2002' } },
+    ] as SelectedCourse[];
+    autoScheduleService.init(
+      {
+        getSelectedCourses: () => selection,
+      } as unknown as CourseSelectionService,
+      {} as FilterService,
+      {} as CourseColorService,
+      { generateSchedules: generate } as unknown as AutoScheduleOrchestrator,
+    );
+
+    autoScheduleService.runAutoSchedule({ 'TUT-2001': ['A'] });
+    await vi.waitFor(() => expect(generate).toHaveBeenCalled());
+
+    const [named, other] = generate.mock.calls[0][0];
+    expect(named.allowedTerms).toEqual(['A']);
+    expect(other.allowedTerms).toBeUndefined();
+  });
+});

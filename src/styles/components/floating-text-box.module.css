@@ -2,10 +2,11 @@
   position: fixed;
   bottom: 20px;
   left: 20px;
-  width: 40vw;
+  width: clamp(330px, 40vw, 640px);
+  max-width: calc(100vw - 16px);
   height: auto;
-  min-height: 30vh;
-  min-width: 200px;
+  max-height: calc(100vh - 16px);
+  min-width: min(330px, calc(100vw - 16px));
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius-large);
@@ -29,7 +30,9 @@
   touch-action: none;
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 4px 0;
 }
 
 .nextTutorialBtn {
@@ -75,6 +78,7 @@
   cursor: pointer;
   padding: 2px 8px;
   border-radius: var(--effect-border-radius);
+  white-space: nowrap;
 }
 
 .findBtn:hover {
@@ -111,6 +115,13 @@
   letter-spacing: clamp(-0.02em, -0.05cqi, 0em);
   line-height: 1.35;
   font-optical-sizing: auto;
+}
+
+.lostHint {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
 }
 
 .footer {

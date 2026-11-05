@@ -6,7 +6,7 @@ import { uiState, closeModal } from '../services/ui/uiState.svelte';
 import { appState } from '../core/state/appState.svelte';
 import { degreeState } from './degree/degreeState.svelte';
 import { degreePlanService } from '../services/degree/degreePlanService';
-import { tutorialsAvailable } from './phoneLayout.svelte';
+import { headerCollapsed, tutorialsAvailable } from './phoneLayout.svelte';
 import { tutorialOverlayState } from './tutorial/tutorialOverlayState.svelte';
 import { updateClientTimestamp } from './timestampState.svelte';
 import { wizardState } from './wizardState.svelte';
@@ -106,6 +106,22 @@ export function installAppEffects(services: ServiceContainer): void {
       if (available) return;
       if (tutorialOverlayState.step) services.tutorial?.service.exit();
       closeModal('tutorials');
+    });
+  });
+
+  // Window crosses a breakpoint that moves what a tutorial step points at (the
+  // gear menu taking over the header's buttons, a side panel becoming a drawer)
+  // -> re-apply the running step for the new layout.
+  let layoutInit = false;
+  $effect(() => {
+    headerCollapsed.current; // track
+    drawerMode.schedule.current; // track
+    untrack(() => {
+      if (!layoutInit) {
+        layoutInit = true;
+        return;
+      }
+      services.tutorial?.service.relocate(true);
     });
   });
 

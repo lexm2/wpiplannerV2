@@ -19,9 +19,8 @@
   );
 
   function toggleTerm(term: AcademicTerm, checked: boolean): void {
-    const next = checked
-      ? [...activeTerms, term]
-      : activeTerms.filter(t => t !== term);
+    const others = activeTerms.filter(t => t !== term);
+    const next = checked ? [...others, term] : others;
     if (next.length > 0) filterService.addFilter('term', { terms: next });
     else filterService.removeFilter('term');
   }
@@ -30,7 +29,7 @@
 <FilterSection title="Terms">
   <div class="filter-term-row">
     {#each terms as term (term)}
-      <label class="filter-term-label">
+      <label class="filter-term-label" data-term-option={term}>
         <input
           type="checkbox"
           class="filter-toggle"

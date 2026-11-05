@@ -247,9 +247,7 @@ export class AppBootstrap {
         services.profileStateManager.getPreferences()?.theme ?? 'wpi-dark';
       services.themeManager.setTheme(savedTheme, { persist: false });
 
-      if (!localStorage.getItem(STORAGE_KEYS.VISITED)) {
-        await services.tutorial?.start('welcome');
-      }
+      await AppBootstrap.startFirstVisitTutorial(services);
     } catch (error) {
       logger.error('Failed to initialize application:', error);
       if (error instanceof CatalogLoadError) {
@@ -279,8 +277,19 @@ export class AppBootstrap {
     await AppBootstrap.loadCatalog(services);
     await loadServerTimestamp();
     await AppBootstrap.loadDegree(services);
-    if (!localStorage.getItem(STORAGE_KEYS.VISITED)) {
+    await AppBootstrap.startFirstVisitTutorial(services);
+  }
+
+  // A tutorial that can't start costs the student nothing and the next visit
+  // tries again, so it must not surface as the app failing to start.
+  private static async startFirstVisitTutorial(
+    services: ServiceContainer,
+  ): Promise<void> {
+    if (localStorage.getItem(STORAGE_KEYS.VISITED)) return;
+    try {
       await services.tutorial?.start('welcome');
+    } catch (error) {
+      logger.warn('Could not start the welcome tutorial:', error);
     }
   }
 }

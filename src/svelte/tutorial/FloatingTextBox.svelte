@@ -6,8 +6,11 @@
   import { scaleFade } from '../transitions';
   import {
     clampToViewport,
-    repositionIfObstructed,
+    coversTarget,
+    layoutKey,
+    placeBox,
     decorateInlineHighlights,
+    targetOnScreen,
   } from './floatingBox.position';
   import styles from '../../styles/components/floating-text-box.module.css';
 
@@ -26,6 +29,8 @@
   const total = $derived(tutorialOverlayState.total);
 
   const SETTLE_MS = 1200;
+  const FIND_WAIT_MS = 1500;
+  const TARGET_WATCH_MS = 500;
 
   let backDisabled = $state(false);
 
@@ -40,65 +45,114 @@
       : 'Next',
   );
   const showBack = $derived(index > 0);
+  // The last tutorial names its final step's button, and has nothing after it.
+  const hasNextTutorial = $derived(
+    step !== null && !tutorialService.getActiveTutorial()?.lastStepLabel,
+  );
+
+  // Set once the student drags the box: from then on their spot stands, unless
+  // it's on what the step needs.
+  let dragged = false;
 
   // After each step's {@html} description renders, decorate any inline-highlight
-  // spans with the marching-ants dashed-rect SVG, and reposition the box off the
-  // highlighted target. tick() (not rAF) is used so this runs after Svelte has
-  // flushed the {@html} update - the inline span only exists then.
+  // spans with the marching-ants dashed-rect SVG, and move the box out of the way.
+  // tick() (not rAF) is used so this runs after Svelte has flushed the {@html}
+  // update - the inline span only exists then.
   //
-  // Positioning once isn't enough: the target keeps moving after this runs.
-  // TutorialService scrolls an off-screen target into view, and a scroll inside
-  // the course list or schedule sidebar can slide the target straight under the
-  // box - which then covers the very thing the step asks the user to click. So
-  // re-check on any scroll (captured, since scroll doesn't bubble) and on resize.
-  // A target can also settle into place with no scroll or resize - a wizard or
-  // page that is still laying out when the step applies - so the first moments
-  // of every step re-check each frame too. The rAF here only throttles
-  // measurement; it drives no animation.
+  // Placing once isn't enough, since a step's window or page is often still
+  // arriving when this runs. So the first moments of a step watch each frame and
+  // place again whenever the target has moved and come to rest, then once more at
+  // the end for anything that changed without moving the target. The rAF here only
+  // throttles measurement; it drives no animation.
+  //
+  // After that only the target matters. Scrolling a list slides rows under the box
+  // and that shouldn't send it anywhere, but TutorialService scrolling the target
+  // itself under the box should, as should a menu the step's click opened.
   $effect(() => {
-    if (!step || !boxEl) return;
+    if (!step || !boxEl) {
+      dragged = false;
+      return;
+    }
     const box = boxEl;
-    const selector = step.selector;
+    const selectors = [step.selector];
+    if (step.waitForSelector) selectors.push(step.waitForSelector);
+
     let disposed = false;
-    let stopWatching = () => {};
+    let placedFor = '';
+    // A list full of schedules leaves no clear spot. Once the box has done its
+    // best, re-placing it on every scroll would only make it hop around.
+    let nowhereClear = false;
+    const place = () => {
+      placedFor = layoutKey(box, selectors);
+      placeBox(box, selectors, { onlyOffTarget: dragged });
+      clampToViewport(box);
+      nowhereClear = coversTarget(box, selectors);
+    };
     void tick().then(() => {
       if (disposed) return;
       decorateInlineHighlights(box);
-      stopWatching = repositionIfObstructed(box, selector);
-      clampToViewport(box);
+      place();
     });
 
+    const settleUntil = performance.now() + SETTLE_MS;
+    let lastKey = '';
+    let settleFrame = 0;
+    const settle = () => {
+      if (performance.now() >= settleUntil) {
+        place();
+        return;
+      }
+      const key = layoutKey(box, selectors);
+      if (key === lastKey && key !== placedFor) place();
+      lastKey = key;
+      settleFrame = requestAnimationFrame(settle);
+    };
+    settleFrame = requestAnimationFrame(settle);
+
     let frame = 0;
-    const recheck = () => {
+    const onNextFrame = (work: () => void) => {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        repositionIfObstructed(box, selector, false);
-        clampToViewport(box);
+        work();
       });
     };
-    const settleUntil = performance.now() + SETTLE_MS;
-    let settleFrame = 0;
-    const settle = () => {
-      repositionIfObstructed(box, selector, false);
-      clampToViewport(box);
-      if (performance.now() < settleUntil)
-        settleFrame = requestAnimationFrame(settle);
+    const keepOffTarget = () => {
+      if (!nowhereClear && coversTarget(box, selectors)) place();
     };
-    settleFrame = requestAnimationFrame(settle);
-    document.addEventListener('scroll', recheck, {
+    const onScroll = () => onNextFrame(keepOffTarget);
+    const onResize = () => onNextFrame(place);
+    const watch = setInterval(keepOffTarget, TARGET_WATCH_MS);
+
+    document.addEventListener('scroll', onScroll, {
       capture: true,
       passive: true,
     });
-    window.addEventListener('resize', recheck);
+    window.addEventListener('resize', onResize);
     return () => {
       disposed = true;
-      stopWatching();
       if (frame) cancelAnimationFrame(frame);
       cancelAnimationFrame(settleFrame);
-      document.removeEventListener('scroll', recheck, { capture: true });
-      window.removeEventListener('resize', recheck);
+      clearInterval(watch);
+      document.removeEventListener('scroll', onScroll, { capture: true });
+      window.removeEventListener('resize', onResize);
     };
+  });
+
+  // Once a step has settled, notice when its target is out of reach (the student
+  // closed its window, say) and offer the way back.
+  let targetLost = $state(false);
+  $effect(() => {
+    if (!step) return;
+    const selector = step.selector;
+    const settleUntil = performance.now() + SETTLE_MS;
+    targetLost = false;
+    const poll = setInterval(() => {
+      if (performance.now() > settleUntil) {
+        targetLost = !targetOnScreen(selector);
+      }
+    }, 500);
+    return () => clearInterval(poll);
   });
 
   let dragging = false;
@@ -141,6 +195,7 @@
     );
     boxEl.style.left = `${x}px`;
     boxEl.style.top = `${y}px`;
+    dragged = true;
   }
 
   function onDragEnd(e: PointerEvent): void {
@@ -153,8 +208,18 @@
     }
   }
 
+  // Relocating can take a moment to mount the target, so the dot waits for it.
   function onFindElement(): void {
-    if (step) animateFindDot(step.selector);
+    tutorialService.relocate();
+    const selector = step?.selector;
+    if (!selector) return;
+    const giveUpAt = performance.now() + FIND_WAIT_MS;
+    const fly = () => {
+      if (tutorialOverlayState.step?.selector !== selector) return;
+      if (targetOnScreen(selector)) animateFindDot(selector);
+      else if (performance.now() < giveUpAt) setTimeout(fly, 100);
+    };
+    fly();
   }
 
   function onNext(): void {
@@ -179,6 +244,9 @@
   <div
     bind:this={boxEl}
     class={styles['container']}
+    role="dialog"
+    aria-label="Tutorial"
+    data-tutorial-box
     transition:scaleFade={{ duration: 200 }}
   >
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -198,14 +266,16 @@
       >
         Find Element
       </button>
-      <button
-        class={styles['nextTutorialBtn']}
-        data-tutorial-next-tutorial
-        onpointerdown={stopPointerdown}
-        onclick={() => tutorialService.skipToNextTutorial()}
-      >
-        Next Tutorial
-      </button>
+      {#if hasNextTutorial}
+        <button
+          class={styles['nextTutorialBtn']}
+          data-tutorial-next-tutorial
+          onpointerdown={stopPointerdown}
+          onclick={() => tutorialService.skipToNextTutorial()}
+        >
+          Next Tutorial
+        </button>
+      {/if}
       <button
         class={styles['skipBtn']}
         data-tutorial-skip
@@ -215,12 +285,17 @@
         Skip tutorial
       </button>
     </div>
-    <div class={styles['body']}>
+    <div class={styles['body']} aria-live="polite">
       <div class={styles['stepTitle']}>{step?.title ?? ''}</div>
       <!-- eslint-disable-next-line svelte/no-at-html-tags - tutorial copy is author-controlled -->
       <div class={styles['stepDescription']}>
         {@html step?.description ?? ''}
       </div>
+      {#if targetLost}
+        <div class={styles['lostHint']} data-tutorial-lost>
+          Can't see it? Find Element brings it back, or use Back.
+        </div>
+      {/if}
     </div>
     <div class={styles['footer']}>
       <span class={styles['stepCounter']}>Step {index + 1} of {total}</span>

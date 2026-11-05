@@ -21,7 +21,8 @@ export interface TutorialAppState {
   filters?: TutorialFilterState[];
   autoScheduleTermPrefs?: Record<string, string[]>;
   refreshFilterUI?: boolean;
-  runAutoSchedule?: boolean;
+  /** Generate a schedule, keeping these courses to these terms. */
+  runAutoSchedule?: { allowedTerms: Record<string, string[]> };
 }
 
 export interface TutorialStep {
