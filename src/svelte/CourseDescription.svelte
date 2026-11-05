@@ -7,6 +7,7 @@
   import { courseListState } from './courseListState.svelte';
   import { formatCredits } from './selectedCourseUtils';
   import { isAsyncPeriod } from './wizardLogic';
+  import { effectiveCategory } from '../utils/alternatingYears';
   import type { CourseDataService } from '../services/data/courseDataService';
   import type { Course, Section } from '../types/types';
 
@@ -25,6 +26,7 @@
   const course = $derived(courseListState.selectedCourse);
 
   const credits = $derived(course ? formatCredits(course) : '');
+  const category = $derived(course ? effectiveCategory(course) : null);
   const yearLabel = $derived(
     course?.academicYear
       ? `${course.academicYear}-${course.academicYear + 1}`
@@ -196,11 +198,11 @@
     {/if}
     <div class={styles['course-meta']}>
       {#if yearLabel}<div class={styles['course-year']}>{yearLabel}</div>{/if}
-      {#if course.category != null}
+      {#if category != null}
         <div class={styles['course-category']}>
-          Cat {course.category}
+          Cat {category}
           <div class={styles['course-category-tooltip']}>
-            {CATEGORY_DESCRIPTIONS[course.category]}
+            {CATEGORY_DESCRIPTIONS[category]}
           </div>
         </div>
       {/if}
