@@ -12,7 +12,9 @@ function managerWith(counts: Record<number, number>): ProfileStateManager {
   const Ctor = ProfileStateManager as unknown as new (
     s: TransactionalStorageManager,
   ) => ProfileStateManager;
-  const psm = new Ctor({} as TransactionalStorageManager);
+  const psm = new Ctor({
+    subscribe: () => () => undefined,
+  } as unknown as TransactionalStorageManager);
   const courses = Object.entries(counts).flatMap(([year, n]) =>
     Array.from({ length: n }, () => ({ academicYear: Number(year) })),
   );
