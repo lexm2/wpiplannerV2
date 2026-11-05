@@ -47,7 +47,11 @@
   border-radius: var(--effect-border-radius);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: var(--effect-transition);
+  /* Not "all": that would also delay the visibility it inherits from an opening
+     drawer, leaving it unfocusable just as the drawer moves focus to it. */
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .close-button:hover {
