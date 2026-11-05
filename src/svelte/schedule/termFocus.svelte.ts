@@ -3,6 +3,7 @@ import { uiState } from '../../services/ui/uiState.svelte';
 import { DeviceDetection } from '../../utils/deviceDetection';
 import { QUARTER_TERMS } from '../../utils/typeGuards';
 import { reduceMotion } from '../transitions';
+import { wizardState } from '../wizardState.svelte';
 
 /**
  * Schedule-page term focus: zooming one term card up to fill the pane, and
@@ -382,6 +383,8 @@ export function termMotion(node: HTMLElement, term: string | null) {
     )
       return;
     if (e.key === 'Escape') {
+      // The section wizard sits over the grid, so it closes first.
+      if (wizardState.isOpen) return;
       e.preventDefault();
       unfocus();
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {

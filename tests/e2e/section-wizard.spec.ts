@@ -66,6 +66,28 @@ test('wizard names its course, shows every meeting, and manages focus', async ({
   await expect(card).toBeFocused();
 });
 
+test('Escape closes the wizard before zooming a focused term back out', async ({
+  page,
+}) => {
+  await addCourse(page, 'ML4011');
+  await page.getByRole('button', { name: 'Schedule view' }).click();
+  await page.getByRole('button', { name: 'Zoom to A term' }).click();
+  const grid = page.locator('[data-focused-term="A"]');
+  await expect(grid).toHaveCount(1);
+
+  await page.locator('.schedule-course-header', { hasText: 'ML4011' }).click();
+  await expect(page.locator('[data-crn]').first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-crn]')).toHaveCount(0);
+  await expect(grid).toHaveCount(1);
+
+  // The zoom ignores keys until its own animation has finished.
+  await expect(async () => {
+    await page.keyboard.press('Escape');
+    await expect(grid).toHaveCount(0, { timeout: 500 });
+  }).toPass();
+});
+
 test('removing the course closes the wizard', async ({ page }) => {
   const id = await addCourse(page, 'PH1120');
   await page.getByRole('button', { name: 'Schedule view' }).click();

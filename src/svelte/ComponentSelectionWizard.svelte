@@ -222,8 +222,10 @@
       e.key === 'Escape' &&
       !e.defaultPrevented &&
       uiState.openModals.length === 0
-    )
+    ) {
+      e.preventDefault();
       cancel();
+    }
   }
 </script>
 
