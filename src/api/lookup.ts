@@ -531,6 +531,23 @@ export function listDepartments(
     .sort((a, b) => a.abbr.localeCompare(b.abbr));
 }
 
+/**
+ * The departments of a year with the year's own status: a not yet published
+ * year lists its early entries (real courses), labelled as such rather than
+ * refused.
+ */
+export function departmentsOf(catalog: Catalog, year?: number | 'all') {
+  const departments = listDepartments(catalog, year);
+  if (year === 'all') return { year, departments };
+  const info = yearStatus(catalog, year ?? currentAcademicYear(catalog));
+  return {
+    year: info.year,
+    status: info.status,
+    published: info.status !== 'not yet published',
+    departments,
+  };
+}
+
 /** A department or course name as compared: lowercase words, "&" read as "and". */
 function normalName(name: string): string {
   return name

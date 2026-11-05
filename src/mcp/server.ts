@@ -30,7 +30,7 @@ import { logger } from '../utils/logger';
 import { TERMS } from '../utils/typeGuards';
 import {
   catalogMeta,
-  listDepartments,
+  departmentsOf,
   lookupCourse,
   MAX_COURSE_INPUT,
 } from '../api/lookup';
@@ -106,8 +106,8 @@ degree audit or advisor rather than ruling a course out.
 the student to the Registrar or their academic advisor.
 - No exam, assessment or final exam information.
 
-Seat counts are as of the last refresh (get_catalog_info's dataAsOf) and can \
-lag. Quote CRNs and section numbers exactly.`;
+Seat counts are as of when the data last changed (get_catalog_info's dataAsOf; \
+it stays put while WPI's data does) and can lag. Quote CRNs and section numbers exactly.`;
 
 const text = (value: string) => [{ type: 'text' as const, text: value }];
 
@@ -295,14 +295,14 @@ function buildServer(
     },
     async ({ year }) => {
       const catalog = await getCatalog();
-      const departments = listDepartments(catalog, year);
+      const result = departmentsOf(catalog, year);
       const status =
         year === 'all'
           ? null
           : yearStatus(catalog, year ?? currentAcademicYear(catalog));
       return {
-        content: text(renderDepartments(departments, status)),
-        structuredContent: { departments },
+        content: text(renderDepartments(result.departments, status)),
+        structuredContent: { ...result },
       };
     },
   );

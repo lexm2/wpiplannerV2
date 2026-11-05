@@ -64,20 +64,23 @@ interface SeatData {
 const STALE_DAYS = 7;
 
 /**
- * The once-per-response line on how old the seat counts are: "Seat data is
- * 48 days old (2026-09-01)", with what that means for low or any counts.
+ * The once-per-response line on the seat counts: "Seat data last changed 48
+ * days ago (2026-09-01)", with what that means for low or any counts. The
+ * date is when WPI's data last changed, not when it was last read: the
+ * refresh job keeps it while the feed is unchanged, so a quiet week looks
+ * old without being stale.
  */
 function seatDataLine(data: SeatData, low: boolean): string {
   const date = asOf(data.dataAsOf);
   const days = data.dataAgeDays;
   const age =
     days === null
-      ? `Seat data is from ${date}`
+      ? `Seat data last changed ${date}`
       : days === 0
-        ? `Seat data is under a day old (${date})`
-        : `Seat data is ${plural(days, 'day')} old (${date})`;
+        ? `Seat data last changed under a day ago (${date})`
+        : `Seat data last changed ${plural(days, 'day')} ago (${date})`;
   if (days !== null && days > STALE_DAYS) {
-    return `${age}: check live seats in Workday before registering.`;
+    return `${age}; the date stays while WPI's data is unchanged, but check live seats in Workday before registering.`;
   }
   return low
     ? `${age}; low counts (${LOW_SEATS} or fewer) may already be gone.`
@@ -1066,7 +1069,7 @@ export function renderCatalogInfo(
   const lines = [
     termNowText(meta.currentTerm, meta.today),
     `Current academic year: ${meta.currentAcademicYear} (${yearLabel(meta.currentAcademicYear)}), the only one with schedules (sections, times, CRNs).`,
-    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${plural(meta.dataAgeDays, 'day')} old)`}; seat counts are from then.`,
+    `Data last changed ${meta.dataAsOf ?? 'at an unknown time'}${meta.dataAgeDays === null ? '' : ` (${plural(meta.dataAgeDays, 'day')} ago)`}; seat counts are as of then. The date stays while WPI's data is unchanged.`,
     `Years: ${meta.years
       .map(
         y =>

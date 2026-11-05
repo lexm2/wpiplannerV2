@@ -15,7 +15,7 @@ import { FallYearSchema } from './schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { AutoScheduleInputSchema, generateSchedules } from './autoSchedule';
 import type { ScheduleSearch } from './scheduleSearch';
-import { catalogMeta, listDepartments, lookupCourse } from './lookup';
+import { catalogMeta, departmentsOf, lookupCourse } from './lookup';
 import { ApiError, echo } from './errors';
 import { logger } from '../utils/logger';
 import { TERMS } from '../utils/typeGuards';
@@ -248,7 +248,7 @@ const ROUTES: Route[] = [
       const year = url.searchParams.has('year')
         ? parseOrThrow(YearOrAllParamSchema, url.searchParams.get('year'))
         : undefined;
-      return json({ departments: listDepartments(await getCatalog(), year) });
+      return json(departmentsOf(await getCatalog(), year));
     },
   },
   {

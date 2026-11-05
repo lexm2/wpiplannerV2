@@ -42,7 +42,9 @@ describe('MCP server', () => {
     });
     expect(result.data.total).toBe(1);
     expect(result.text).not.toContain('{');
-    expect(result.text).toContain('Seat data is under a day old (2026-09-02).');
+    expect(result.text).toContain(
+      'Seat data last changed under a day ago (2026-09-02).',
+    );
     expect(result.text).toContain('1. PH 1110 General Physics | 3 cr | B');
     expect(result.text).toContain(
       'BL01 CRN 20 B | MTRF 09:00-09:50 | Ada Lovelace RMP 4.5, diff 2.1, 91% again (12) | 10/30 open',
@@ -128,7 +130,7 @@ describe('MCP server', () => {
     expect(low.text).toContain('TF 16:00-17:50 | Grace Hopper | no seat cap');
     expect(low.text).toContain('2 open in 1 section + 1 with no seat cap');
     expect(low.text).toContain(
-      'Seat data is under a day old (2026-09-02); low counts (3 or fewer) may already be gone.',
+      'Seat data last changed under a day ago (2026-09-02); low counts (3 or fewer) may already be gone.',
     );
   });
 
@@ -485,12 +487,12 @@ describe('MCP server', () => {
     const late = new Date(2026, 9, 19);
     const check = await tool('check_conflicts', { crns: [40] }, late);
     expect(check.text).toContain(
-      'Seat data is 47 days old (2026-09-02): check live seats in Workday before registering.',
+      "Seat data last changed 47 days ago (2026-09-02); the date stays while WPI's data is unchanged, but check live seats in Workday before registering.",
     );
     expect(check.data.dataAgeDays).toBe(47);
     const info = await tool('get_catalog_info', {}, late);
     expect(info.text).toContain(
-      'Data as of 2026-09-02T00:00:00Z (47 days old)',
+      'Data last changed 2026-09-02T00:00:00Z (47 days ago)',
     );
   });
 
@@ -1534,7 +1536,7 @@ describe('generate_schedules', () => {
     expect(text).toContain('  XX 1003 lab: AL01 CRN 302 A | T 15:00-16:50');
     expect(text).toContain('Run check_conflicts on the chosen CRNs');
     expect(text).toContain('register in WPI Workday');
-    expect(text).toContain('Seat data is under a day old');
+    expect(text).toContain('Seat data last changed under a day ago');
     // The structured content is the API's answer.
     expect(result.data.schedules[0].crns).toEqual([102, 301, 302]);
     expect(result.data.preferences.earlyClasses.before).toBe('10:00');
@@ -1552,7 +1554,9 @@ describe('generate_schedules', () => {
     });
     expect(none.isError).toBe(false);
     expect(none.text).toContain('No schedule found for 2026-27.');
-    expect(none.text).toContain('Note: No schedule: XX 1005 and XX 1008 clash in every combination');
+    expect(none.text).toContain(
+      'Note: No schedule: XX 1005 and XX 1008 clash in every combination',
+    );
     expect(none.text).not.toContain('Run check_conflicts');
     const bad = await toolOn(mcp, 'generate_schedules', {
       courses: ['XX 9999'],
