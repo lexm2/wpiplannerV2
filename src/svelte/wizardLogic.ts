@@ -11,7 +11,6 @@ import type {
 
 import type { CourseDataService } from '../services/data/courseDataService';
 import type { FilterService } from '../services/filtering/FilterService';
-import type { AcademicYearFilterCriteria } from '../types/filters';
 import { TERM_ORDER, semesterTermLabel } from '../utils/typeGuards';
 
 const TERM_NAMES: Record<string, string> = {
@@ -198,6 +197,32 @@ export function isAsyncPeriod(period: Period | undefined): boolean {
   );
 }
 
+/**
+ * A section's distinct meetings. A section can meet in several blocks (a lecture
+ * plus a 6 AM T/W/R slot, a split MTRF 12:00 and 1:00 pair); the card has to
+ * show all of them, and exact duplicates collapse to one row.
+ */
+export function sectionMeetings(section: Section): Period[] {
+  const seen = new Set<string>();
+  return section.periods.filter(p => {
+    const key = [
+      Array.from(p.days).join(''),
+      p.startTime.displayTime,
+      p.endTime.displayTime,
+      p.location,
+      p.isAsync ? 'async' : '',
+    ].join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/** Instructors across every meeting, without repeats. */
+export function sectionInstructors(section: Section): string[] {
+  return [...new Set(section.periods.flatMap(p => p.instructors))];
+}
+
 export function getSeatsInfo(section: Section): string {
   return section.seatsAvailable > 0
     ? `${section.seatsAvailable}/${section.seats} seats remaining`
@@ -259,21 +284,15 @@ export function describeActiveFilters(
 }
 
 /**
- * If an academic-year filter is active and doesn't match this course, returns the
- * info needed to render the "switch year" notice. Otherwise null.
+ * A course published for another academic year than the active schedule's can't
+ * be placed on that schedule's grid, whatever the filters currently show.
  */
-export function getYearMismatch(
+export function getScheduleYearMismatch(
   course: Course,
-  filterService: FilterService | null,
-): { courseYear: number; filterYear: number } | null {
-  if (!filterService || !course.academicYear) return null;
-  const yearFilter = filterService
-    .getActiveFilters()
-    .find(f => f.id === 'academicYear');
-  if (!yearFilter) return null;
-  const filterYear = (yearFilter.criteria as AcademicYearFilterCriteria).year;
-  if (typeof filterYear === 'number' && filterYear !== course.academicYear) {
-    return { courseYear: course.academicYear, filterYear };
-  }
-  return null;
+  scheduleYear: number | undefined,
+): { courseYear: number; scheduleYear: number } | null {
+  if (!course.academicYear || typeof scheduleYear !== 'number') return null;
+  return course.academicYear !== scheduleYear
+    ? { courseYear: course.academicYear, scheduleYear }
+    : null;
 }
