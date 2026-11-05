@@ -28,10 +28,13 @@ function parseCellRef(ref: string): { col: number; row: number } | null {
   return { col: columnToIndex(match[1]), row: parseInt(match[2], 10) };
 }
 
+const EXPORT_HINT =
+  'In Workday, open "View My Academic Progress", click the Export to Excel icon, and upload the .xlsx file it downloads.';
+
 function parseXml(text: string): Document {
   const doc = new DOMParser().parseFromString(text, 'application/xml');
   if (doc.querySelector('parsererror')) {
-    throw new Error('Malformed XML in spreadsheet');
+    throw new Error(`The spreadsheet could not be read. ${EXPORT_HINT}`);
   }
   return doc;
 }
@@ -41,7 +44,18 @@ function parseXml(text: string): Document {
  * Missing/empty cells become "". Rows are 0-indexed in the result.
  */
 export function readSheet(buf: ArrayBuffer): string[][] {
-  const files = unzipSync(new Uint8Array(buf));
+  if (buf.byteLength === 0)
+    throw new Error(`The file is empty. ${EXPORT_HINT}`);
+
+  let files: ReturnType<typeof unzipSync>;
+  try {
+    files = unzipSync(new Uint8Array(buf));
+  } catch {
+    // fflate's own messages ("invalid zip data") mean nothing to a student.
+    throw new Error(
+      `That file is not a readable Excel (.xlsx) file. ${EXPORT_HINT}`,
+    );
+  }
 
   const sheetEntry =
     files['xl/worksheets/sheet1.xml'] ??
@@ -50,7 +64,7 @@ export function readSheet(buf: ArrayBuffer): string[][] {
       Object.keys(files).find(k => /^xl\/worksheets\/.*\.xml$/.test(k)) ?? ''
     ];
   if (!sheetEntry) {
-    throw new Error('No worksheet found in the .xlsx file');
+    throw new Error(`The spreadsheet has no worksheet. ${EXPORT_HINT}`);
   }
 
   // Shared strings table (optional in theory, always present here).
