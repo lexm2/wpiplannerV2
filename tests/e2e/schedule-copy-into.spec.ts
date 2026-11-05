@@ -74,7 +74,7 @@ const row = (page: Page, id: string) =>
 /** Copy Into lives in a row's ⋮ menu. */
 async function chooseCopyInto(rowLoc: Locator): Promise<void> {
   await rowLoc.getByTitle('More options').click();
-  await rowLoc.getByRole('button', { name: 'Copy Into' }).click();
+  await rowLoc.getByRole('menuitem', { name: 'Copy Into' }).click();
 }
 
 test('copies one schedule into another without duplicating shared courses', async ({
@@ -246,7 +246,9 @@ test('copy mode works from the keyboard', async ({ page }) => {
 
   await row(page, secondId).getByTitle('More options').focus();
   await page.keyboard.press('Enter');
-  await row(page, secondId).getByRole('button', { name: 'Copy Into' }).focus();
+  await row(page, secondId)
+    .getByRole('menuitem', { name: 'Copy Into' })
+    .focus();
   await page.keyboard.press('Enter');
 
   // Focus lands on a target, not on <body>.

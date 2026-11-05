@@ -37,6 +37,7 @@ export const railStacked = new MediaQuery('(max-width: 991px)');
 
 /**
  * The header folds Schedules, theme and undo/redo into the gear menu here.
- * The same 1250px as header.css.
+ * The same query as header.css, in em so a larger default text size collapses
+ * it earlier (1250px at 16px).
  */
-export const headerCollapsed = new MediaQuery('(max-width: 1250px)');
+export const headerCollapsed = new MediaQuery('(max-width: 78.125em)');

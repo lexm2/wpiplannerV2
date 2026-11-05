@@ -87,6 +87,17 @@
     });
   }
 
+  // Each page has its own <main>, and only the current page's is displayed, so
+  // the link's target depends on the page. Focus there puts the next Tab on the
+  // page's first control (the search box, on Classes).
+  function skipToMain(e: MouseEvent): void {
+    e.preventDefault();
+    const page = uiState.currentPage;
+    document
+      .querySelector<HTMLElement>(`:is(#${page}-page main, main#${page}-page)`)
+      ?.focus();
+  }
+
   function openFilterModal(): void {
     modalState.filter = { mode: 'filter' };
     openModal('filter-modal');
@@ -103,13 +114,6 @@
       componentWizardService.closeComponentWizard();
     }
     setPage(page);
-  }
-
-  function toggleTheme(): void {
-    const currentThemeId = services.themeManager.getCurrentThemeId();
-    services.themeManager.setTheme(
-      currentThemeId === 'wpi-dark' ? 'wpi-light' : 'wpi-dark',
-    );
   }
 
   function handleKeydown(e: KeyboardEvent): void {
@@ -142,6 +146,8 @@
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
+
+<a class="skip-link" href="#main" onclick={skipToMain}>Skip to main content</a>
 
 <ErrorBanner />
 
@@ -209,7 +215,6 @@
         scheduleManagementService={services.scheduleManagementService}
         getTutorial={() => services.tutorial}
         onSchedules={openSchedulePicker}
-        onToggleTheme={toggleTheme}
         onUndo={handleUndo}
         onRedo={handleRedo}
       />
@@ -235,7 +240,7 @@
     </div>
   </SidePanel>
 
-  <main class="main-content">
+  <main class="main-content" tabindex="-1">
     <div class="content-header">
       <div class="content-controls">
         <div class="search-input-wrapper">
@@ -344,6 +349,7 @@
 
     <main
       class="schedule-main"
+      tabindex="-1"
       use:icsDropTarget={{
         onActiveChange: active => (icsDropActive = active),
         onFile: file => void localEventService.importFile(file),
@@ -366,10 +372,11 @@
   </div>
 </div>
 
-<div
+<main
   class="app-body degree-page"
   id="degree-page"
+  tabindex="-1"
   style:display={currentPage === 'degree' ? 'flex' : 'none'}
 >
   <DegreePage degreeImportService={services.degreeImportService} />
-</div>
+</main>

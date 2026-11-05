@@ -88,6 +88,7 @@
   inert={hidden}
   onclick={onToggleFocus}
 >
+  <h2 class="visually-hidden">{term} term</h2>
   {#if hasConflict}
     <div
       class="term-conflict-warning"
