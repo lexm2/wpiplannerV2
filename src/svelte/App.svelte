@@ -32,6 +32,7 @@
   import FilterButtons from './FilterButtons.svelte';
   import CourseList from './CourseList.svelte';
   import DegreeFilterBanner from './degree/DegreeFilterBanner.svelte';
+  import DegreeProjectNote from './DegreeProjectNote.svelte';
   import SelectedCoursesPanel from './SelectedCoursesPanel.svelte';
   import { courseListState } from './courseListState.svelte';
   import CourseDescription from './CourseDescription.svelte';
@@ -268,6 +269,7 @@
     </div>
     <div class="course-container" id="course-container">
       <DegreeFilterBanner filterService={services.filterService} />
+      <DegreeProjectNote filterService={services.filterService} />
       <CourseList
         filterService={services.filterService}
         courseSelectionService={services.courseSelectionService}

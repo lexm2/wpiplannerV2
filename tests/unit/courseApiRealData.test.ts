@@ -209,6 +209,7 @@ describe('known terms on the real catalog', () => {
       'Catalog courses named for it: ID 2050',
     );
     expect(iqp.courses[0].code).toBe('ID 2050');
+    expect(iqp.notices[0].message).toMatch(/ID 2050 SOC SCI RES-IQP\.$/);
     const hua = search('HUA', 5);
     expect(hua.notices[0].message).toContain(
       'HU 3900 Inquiry Seminar In Humanities And Arts',
@@ -216,6 +217,28 @@ describe('known terms on the real catalog', () => {
     expect(hua.notices[0].message).toContain(
       'HU 3910 Practicum In Humanities And Arts',
     );
+  });
+});
+
+describe('degree projects on the real catalog', () => {
+  it('finds a project the same however it is written', () => {
+    const iqp = search('IQP', 25).courses.map(c => c.code);
+    expect(iqp[0]).toBe('ID 2050');
+    for (const written of ['IQPs', 'Interactive Qualifying Project']) {
+      expect(search(written, 25).courses.map(c => c.code)).toEqual(iqp);
+    }
+    const mqp = search('MQP', 25).courses.map(c => c.code);
+    for (const written of ['MQPs', 'major qualifying projects']) {
+      expect(search(written, 25).courses.map(c => c.code)).toEqual(mqp);
+    }
+  });
+
+  it('says so when no catalog course is named for one', () => {
+    const { notices, courses } = search('Major Qualifying Project', 25);
+    expect(notices[0].code).toBe('knownTerm');
+    expect(notices[0].message).toContain('No catalog course is named for it');
+    expect(courses.map(c => c.code)).toContain('MIS 4720');
+    expect(courses.map(c => c.code)).not.toContain('DS 598');
   });
 });
 
