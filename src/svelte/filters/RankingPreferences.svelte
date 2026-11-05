@@ -66,38 +66,40 @@
     save({ ...prefs, [key]: { ...prefs[key], importance } });
   }
 
-  // "HH:MM" every half hour, 7:00 AM to 10:00 PM.
+  // "HH:MM" every hour, 7:00 AM to 10:00 PM. Classes start on the hour, so a
+  // half hour picks out no class the next hour doesn't.
   const TIMES: { value: string; label: string }[] = Array.from(
-    { length: 31 },
+    { length: 16 },
     (_, i) => {
-      const minutes = 7 * 60 + i * 30;
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
+      const hours = 7 + i;
       return {
-        value: `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`,
-        label: TimeUtils.formatTime({ hours, minutes: mins, displayTime: '' }),
+        value: `${String(hours).padStart(2, '0')}:00`,
+        label: TimeUtils.formatTime({ hours, minutes: 0, displayTime: '' }),
       };
     },
   );
 
-  const MIN_GAPS = [
-    { value: 0, label: 'No minimum' },
-    ...[10, 15, 20, 30, 45, 60].map(m => ({ value: m, label: `${m} min` })),
-  ];
+  // Classes run 50 minutes from the hour: the next one is 10 minutes away, and
+  // each hour left free adds 60. No other gap exists to ask for.
+  const BACK_TO_BACK = { value: 0, label: 'Back to back' };
+  const freeHours = (hours: number) => ({
+    value: 10 + hours * 60,
+    label: hours === 1 ? '1 free hour' : `${hours} free hours`,
+  });
+  const MIN_GAPS = [BACK_TO_BACK, freeHours(1), freeHours(2)];
   const MAX_GAPS = [
-    { value: 0, label: 'As little as possible (0)' },
-    { value: 15, label: '15 min' },
-    { value: 30, label: '30 min' },
-    { value: 45, label: '45 min' },
-    { value: 60, label: '1 hr' },
-    { value: 90, label: '1.5 hr' },
-    { value: 120, label: '2 hr' },
-    { value: 180, label: '3 hr' },
+    BACK_TO_BACK,
+    freeHours(1),
+    freeHours(2),
+    freeHours(3),
+    freeHours(4),
   ];
-  const LUNCH_MINUTES = [15, 30, 45, 60, 90, 120].map(m => ({
-    value: m,
-    label: `${m} min`,
-  }));
+  // A free hour between classes is 70 minutes, so these two are every lunch a
+  // schedule can have: anything shorter asks for the same free hour.
+  const LUNCH_MINUTES = [
+    { value: 60, label: '1 hour' },
+    { value: 120, label: '2 hours' },
+  ];
 
   const DAYS: { value: Day; label: string }[] = [
     DayOfWeek.MONDAY,
@@ -174,9 +176,9 @@
   }
 
   function setLunchFrom(from: string): void {
-    // Keep the window non-empty: push `to` half an hour past a later start.
+    // Keep the window non-empty: push `to` an hour past a later start.
     const to =
-      prefs.lunch.to > from ? prefs.lunch.to : asClock(asMinutes(from) + 30);
+      prefs.lunch.to > from ? prefs.lunch.to : asClock(asMinutes(from) + 60);
     setLunchWindow(from, to);
   }
 

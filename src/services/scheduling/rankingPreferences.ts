@@ -56,15 +56,15 @@ export const RankingPreferencesSchema = z.strictObject({
       importance: importance('medium', 'the time between classes'),
       min: minutes(
         0,
-        120,
+        300,
         0,
-        'Minutes wanted between consecutive classes; back-to-back is shorter.',
+        'Minutes wanted between consecutive classes. Classes start on the hour and run 50 minutes, so back-to-back is 10 and one free hour is 70.',
       ),
       max: minutes(
         0,
         300,
         0,
-        'Minutes of idle time between classes that is acceptable; any more counts against a schedule.',
+        'Minutes of idle time between classes that is acceptable; any more counts against a schedule. 10 allows back-to-back, 70 one free hour.',
       ),
     })
     .default({ importance: 'medium', min: 0, max: 0 })
@@ -77,14 +77,14 @@ export const RankingPreferencesSchema = z.strictObject({
       minutes: minutes(
         15,
         120,
-        45,
-        'Free minutes wanted somewhere inside the window.',
+        60,
+        'Free minutes wanted somewhere inside the window. A free hour between classes is 70.',
       ),
     })
     .refine(l => l.to > l.from, {
       message: 'The lunch window must end after it starts.',
     })
-    .default({ importance: 'off', from: '11:00', to: '14:00', minutes: 45 })
+    .default({ importance: 'off', from: '11:00', to: '14:00', minutes: 60 })
     .describe('Keep a free stretch for lunch on days with classes.'),
   fewerDays: z
     .strictObject({

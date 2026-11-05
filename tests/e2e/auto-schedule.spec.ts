@@ -1,4 +1,4 @@
-import { test, expect, type Page } from './fixtures';
+import { test, expect, type Page, type Locator } from './fixtures';
 
 /**
  * Auto-schedule flows that need the real app: the filter panel's toggles, the
@@ -437,6 +437,41 @@ test('a ranking row shows its options only while it is not Off', async ({
 
   await row.getByRole('radio', { name: 'Off' }).check();
   await expect(row.getByRole('combobox')).toHaveCount(0);
+});
+
+test('the time settings offer what the hourly class grid can give', async ({
+  page,
+}) => {
+  await loadApp(page);
+  await selectCourses(page, ['CS2102']);
+  await openSettings(page);
+
+  const options = (row: Locator, index: number) =>
+    row.getByRole('combobox').nth(index).locator('option').allTextContents();
+  const gaps = rankingRow(page, 'gaps');
+  expect(await options(gaps, 0)).toEqual([
+    'Back to back',
+    '1 free hour',
+    '2 free hours',
+  ]);
+  expect(await options(gaps, 1)).toEqual([
+    'Back to back',
+    '1 free hour',
+    '2 free hours',
+    '3 free hours',
+    '4 free hours',
+  ]);
+
+  const lunch = rankingRow(page, 'lunch');
+  await lunch.getByRole('radio', { name: 'Low' }).check();
+  expect(await options(lunch, 0)).toEqual(['1 hour', '2 hours']);
+  const times = await lunch
+    .getByRole('combobox')
+    .nth(1)
+    .locator('option')
+    .evaluateAll(all => all.map(o => (o as HTMLOptionElement).value));
+  expect(times.length).toBeGreaterThan(0);
+  expect(times.every(t => t.endsWith(':00'))).toBe(true);
 });
 
 test('the filters in the settings stay folded until opened, then stay open', async ({

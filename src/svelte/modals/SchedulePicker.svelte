@@ -10,7 +10,6 @@
   import type { ScheduleManagementService } from '../../services/selection/ScheduleManagementService';
   import type { Schedule } from '../../types/schedule';
   import styles from '../../styles/components/schedule-picker-modal.module.css';
-  import TextField from '../ui/TextField.svelte';
   import { clickOutside } from '../clickOutside';
   import { menuKeys, focusMenuItem, openingKey } from '../menuKeys';
 
@@ -145,27 +144,28 @@
     if (!(e.target as Element).closest('.modal-dialog')) e.stopPropagation();
   }
 
-  // Inline rename
+  // Inline rename: the name itself turns editable, so its letters stay where
+  // they are and wrap as they did, which a field swapped in can't do.
   let editingId = $state<string | null>(null);
   let editValue = $state('');
 
   async function startEdit(schedule: Schedule): Promise<void> {
     editingId = schedule.id;
     editValue = schedule.name;
-    // The field's autofocus only applies when nothing else has focus, and the
-    // Rename button that was just clicked does.
     await tick();
-    listEl
-      ?.querySelector<HTMLInputElement>(
-        `[data-schedule-id="${CSS.escape(schedule.id)}"] input`,
-      )
-      ?.focus();
+    const name = listEl?.querySelector<HTMLElement>(
+      `[data-schedule-id="${CSS.escape(schedule.id)}"] [role="textbox"]`,
+    );
+    if (!name) return;
+    name.focus();
+    getSelection()?.selectAllChildren(name);
   }
   async function commitEdit(schedule: Schedule): Promise<void> {
     // Escape clears editingId first; removing the field then blurs it, and
     // that blur must not save.
     if (editingId !== schedule.id) return;
-    const newName = editValue.trim();
+    // A paste can bring line breaks along.
+    const newName = editValue.replace(/\s+/g, ' ').trim();
     if (newName && newName !== schedule.name) {
       try {
         const result = await scheduleManagementService.renameSchedule(
@@ -184,7 +184,7 @@
   function onEditKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter') {
       e.preventDefault();
-      (e.currentTarget as HTMLInputElement).blur();
+      (e.currentTarget as HTMLElement).blur();
     } else if (e.key === 'Escape') {
       // preventDefault tells Modal the key was used, so the picker stays open.
       e.preventDefault();
@@ -511,15 +511,18 @@
           >
             <div class="schedule-item-info">
               {#if editingId === schedule.id}
-                <TextField
-                  fieldClass="schedule-name-field"
-                  ariaLabel="Schedule name"
-                  autofocus
-                  bind:value={editValue}
-                  onfocus={e => (e.currentTarget as HTMLInputElement).select()}
+                <span
+                  class="schedule-name-edit"
+                  role="textbox"
+                  tabindex="0"
+                  aria-label="Schedule name"
+                  contenteditable="plaintext-only"
+                  spellcheck="false"
+                  enterkeyhint="done"
+                  bind:innerText={editValue}
                   onblur={() => commitEdit(schedule)}
                   onkeydown={onEditKeydown}
-                />
+                ></span>
               {:else}
                 <!-- The name is the row's switch; its ::after stretches over the
                      row so a click anywhere on it works too. -->

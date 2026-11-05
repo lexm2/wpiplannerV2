@@ -16,7 +16,7 @@ describe('normalizeRankingPreferences', () => {
       before: '09:00',
     });
     expect(defaults.freeDays.days).toEqual(['F']);
-    expect(defaults.lunch.minutes).toBe(45);
+    expect(defaults.lunch.minutes).toBe(60);
     expect(normalizeRankingPreferences(null)).toEqual(defaults);
     expect(normalizeRankingPreferences('junk')).toEqual(defaults);
   });
