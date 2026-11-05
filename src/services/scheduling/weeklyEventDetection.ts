@@ -105,7 +105,7 @@ export interface IcsImportResult {
    * year's terms (includes the parser's `outsideWindow`).
    */
   skipped: Record<SkipReason, number>;
-  /** Distinct titles behind each count, natural-sorted, at most 50 per reason. */
+  /** Distinct titles behind each count, natural-sorted. */
   skippedTitles: Partial<Record<SkipReason, string[]>>;
 }
 
@@ -122,9 +122,6 @@ const WEEK_ORDER: DayOfWeek[] = [
   DayOfWeek.SUNDAY,
 ];
 const TERM_ORDER: TermWindow['term'][] = ['A', 'B', 'C', 'D'];
-
-/** Most titles listed per skip reason. */
-const MAX_TITLES = 50;
 
 /**
  * The form titles are grouped and matched by: NFKC, every dash variant as "-",
@@ -145,14 +142,14 @@ function naturalCompare(a: string, b: string): number {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 }
 
-/** Distinct (by normalized form) titles, natural-sorted, capped at 50. */
+/** Distinct (by normalized form) titles, natural-sorted. */
 export function distinctTitles(titles: Iterable<string>): string[] {
   const byNorm = new Map<string, string>();
   for (const t of titles) {
     const norm = normalizeTitle(t);
     if (!byNorm.has(norm)) byNorm.set(norm, t.trim());
   }
-  return [...byNorm.values()].sort(naturalCompare).slice(0, MAX_TITLES);
+  return [...byNorm.values()].sort(naturalCompare);
 }
 
 /** Threshold as an integer ratio, so `met / possible >= 0.3` has no float error. */

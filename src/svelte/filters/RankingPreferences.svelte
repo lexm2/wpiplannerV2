@@ -150,11 +150,34 @@
     ),
   );
 
+  // A break longer than its window can never be satisfied.
+  const lunchWindow = $derived(
+    asMinutes(prefs.lunch.to) - asMinutes(prefs.lunch.from),
+  );
+  const lunchLengths = $derived(
+    withCurrent(LUNCH_MINUTES, prefs.lunch.minutes, v => `${v} min`).filter(
+      o => o.value <= lunchWindow || o.value === prefs.lunch.minutes,
+    ),
+  );
+
+  function setLunchWindow(from: string, to: string): void {
+    const window = asMinutes(to) - asMinutes(from);
+    save({
+      ...prefs,
+      lunch: {
+        ...prefs.lunch,
+        from,
+        to,
+        minutes: Math.min(prefs.lunch.minutes, window),
+      },
+    });
+  }
+
   function setLunchFrom(from: string): void {
     // Keep the window non-empty: push `to` half an hour past a later start.
     const to =
       prefs.lunch.to > from ? prefs.lunch.to : asClock(asMinutes(from) + 30);
-    save({ ...prefs, lunch: { ...prefs.lunch, from, to } });
+    setLunchWindow(from, to);
   }
 
   function setMinGap(min: number): void {
@@ -301,11 +324,7 @@
                 {@render numberSelect(
                   'Lunch: length',
                   prefs.lunch.minutes,
-                  withCurrent(
-                    LUNCH_MINUTES,
-                    prefs.lunch.minutes,
-                    v => `${v} min`,
-                  ),
+                  lunchLengths,
                   minutes =>
                     save({ ...prefs, lunch: { ...prefs.lunch, minutes } }),
                 )}
@@ -321,9 +340,15 @@
                   'Lunch: window end',
                   prefs.lunch.to,
                   lunchToTimes,
-                  to => save({ ...prefs, lunch: { ...prefs.lunch, to } }),
+                  to => setLunchWindow(prefs.lunch.from, to),
                 )}
               </div>
+              {#if prefs.lunch.minutes > lunchWindow}
+                <p class="filter-hint {styles.hint}">
+                  The window is shorter than the break, so no schedule can have
+                  it. Widen the window or shorten the break.
+                </p>
+              {/if}
             {:else if row.key === 'freeDays'}
               <div class={styles.params}>
                 Keep these days free:
@@ -345,6 +370,12 @@
                   {/each}
                 </span>
               </div>
+              {#if prefs.freeDays.days.length === 0}
+                <p class="filter-hint {styles.hint}">
+                  No days are ticked, so this has no effect. Tick the days to
+                  keep free.
+                </p>
+              {/if}
             {/if}
           </div>
         {/if}

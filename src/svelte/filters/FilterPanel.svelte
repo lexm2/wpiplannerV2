@@ -18,6 +18,9 @@
   import RmpRatingFilter from './RmpRatingFilter.svelte';
   import MoreSection from '../ui/MoreSection.svelte';
   import { countAdvancedFilters } from '../../services/filtering/advancedFilterCount';
+  import { countAutoScheduleFilters } from '../../services/scheduling/autoScheduleFilterCount';
+  import { NON_SECTION_FILTER_IDS } from '../../services/scheduling/AutoScheduler';
+  import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
 
   let {
     mode,
@@ -51,9 +54,14 @@
   // schedule-year default.
   const activeYear = $derived(appState.activeSchedule?.year);
   const filterCount = $derived(
-    filterService.hasNonDefaultFilters(activeYear)
-      ? filterService.getFilterCount()
-      : 0,
+    isAuto
+      ? countAutoScheduleFilters(
+          filterService.getActiveFilters(),
+          appState.preferences.avoidCalendarEvents,
+        )
+      : filterService.hasNonDefaultFilters(activeYear)
+        ? filterService.getFilterCount()
+        : 0,
   );
 
   const advancedCount = $derived(
@@ -66,7 +74,12 @@
         coursesToSchedule ?? courseSelectionService.getSelectedCourses();
       if (selected.length === 0) return 'No courses selected';
       const courses = selected.map(sc => sc.course);
-      const sections = filterService.apply(courses);
+      // Same filters Generate applies, so the preview can't read "0 sections"
+      // for a run that succeeds.
+      const sections = filterService.applyExcluding(
+        courses,
+        NON_SECTION_FILTER_IDS,
+      );
       const uniqueCourses = new Set(sections.map(fs => fs.course.id)).size;
       return `${sections.length} sections across ${uniqueCourses} courses available`;
     }
@@ -97,21 +110,30 @@
     // Otherwise the remount's flush would write the old values over the reset.
     rmpFilter?.flush();
     filterService.resetFilters(activeYear);
+    if (isAuto) autoScheduleService.setAvoidCalendarEvents(true);
     resetNonce++;
   }
 </script>
 
 {#snippet essentialFilters()}
   <TermsFilter {filterService} {allCourses} />
-  <CourseLevelFilter {filterService} />
+  <!-- Auto-Schedule works on the courses already chosen, so it skips the
+       filters that decide which courses are listed. -->
+  {#if !isAuto}
+    <CourseLevelFilter {filterService} />
+  {/if}
   <AvailabilityFilter {filterService} {courseSelectionService} />
 {/snippet}
 
 {#snippet advancedFilters()}
-  <AcademicYearFilter {filterService} {allCourses} />
-  <DepartmentFilter {filterService} {allCourses} />
+  {#if !isAuto}
+    <AcademicYearFilter {filterService} {allCourses} />
+    <DepartmentFilter {filterService} {allCourses} />
+  {/if}
   <TimesFilter {filterService} />
-  <CreditHoursFilter {filterService} />
+  {#if !isAuto}
+    <CreditHoursFilter {filterService} />
+  {/if}
   <AvailabilityDetailsFilter
     {filterService}
     {courseSelectionService}

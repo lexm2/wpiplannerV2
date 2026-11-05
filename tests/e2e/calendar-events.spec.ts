@@ -186,6 +186,27 @@ test('editing an event keeps its id and moves its block', async ({ page }) => {
   expect(after!.height).toBeGreaterThan(before!.height);
 });
 
+test('a blank start or end time is rejected, not saved as midnight', async ({
+  page,
+}) => {
+  await openSchedule(page);
+  await seedEvents(page);
+  await openManager(page);
+  await eventRows(page).nth(1).getByRole('button', { name: /^Edit/ }).click();
+
+  await editor(page).locator('#event-start').fill('');
+  await editor(page).getByRole('button', { name: 'Save Changes' }).click();
+  await expect(editor(page)).toContainText('Enter a start time');
+  await editor(page).locator('#event-start').fill('09:00');
+  await editor(page).locator('#event-end').fill('');
+  await editor(page).getByRole('button', { name: 'Save Changes' }).click();
+  await expect(editor(page)).toContainText('Enter an end time');
+
+  const saved = await savedEvent(page, 'ev-work');
+  expect(saved.startTime).toEqual(t(9));
+  expect(saved.endTime).toEqual(t(11));
+});
+
 test('Delete event in Edit names what it removes and closes both modals', async ({
   page,
 }) => {

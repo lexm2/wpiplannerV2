@@ -5,7 +5,7 @@
   import { getInlineSVG } from '../utils/iconPaths';
   import { semesterTermLabel } from '../utils/typeGuards';
   import { courseListState } from './courseListState.svelte';
-  import { buildCourseView } from './courseView';
+  import { buildCourseView, INTEREST_LIST_ONLY_TITLE } from './courseView';
   import { expandedTerm, toggleTerm, termFlip } from './termExpansion.svelte';
   import { infiniteScroll } from './infiniteScroll';
   import type { Course } from '../types/types';
@@ -319,7 +319,11 @@
                   data-term-badge
                   aria-label={termSectionsLabel(expanded)}
                   aria-expanded="true"
-                  title={sec?.allFull ? 'All sections full' : undefined}
+                  title={sec?.allFull
+                    ? 'All sections full'
+                    : sec?.onlyInterestList
+                      ? INTEREST_LIST_ONLY_TITLE
+                      : undefined}
                   onclick={e => {
                     e.stopPropagation();
                     toggleTerm(e, course.id, expanded, true);
@@ -378,7 +382,9 @@
                       aria-expanded="false"
                       title={t.allFull
                         ? 'All sections full'
-                        : semesterTermLabel(t.term)}
+                        : t.onlyInterestList
+                          ? INTEREST_LIST_ONLY_TITLE
+                          : semesterTermLabel(t.term)}
                       onclick={e => {
                         e.stopPropagation();
                         toggleTerm(e, course.id, t.term, true);

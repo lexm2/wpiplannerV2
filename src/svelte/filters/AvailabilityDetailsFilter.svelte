@@ -75,7 +75,7 @@
     {/if}
   {/if}
 
-  {#if state.avoidConflicts || state.hasCalendarEvents}
+  {#if !isAuto && (state.avoidConflicts || state.hasCalendarEvents)}
     <FilterToggle
       id="semester-spans-filter"
       label="Semester courses (F, S) conflict with their quarters (A and B, C and D)"

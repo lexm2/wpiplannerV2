@@ -27,12 +27,18 @@ export type GenerateOutcome =
       /** The ones that would have a usable section without the calendar events. */
       blockedByEvents?: Course[];
     }
-  | { status: 'no-schedules' };
+  | { status: 'no-schedules' }
+  /** The student switched schedules or changed courses while it ran. */
+  | { status: 'stale' };
 
 export class AutoScheduleOrchestrator {
   private generatedSchedules: ScheduleResult[][] = [];
   private currentScheduleIndex: number = 0;
   private isApplyingAutoSchedule: boolean = false;
+  // Bumped whenever the selection changes. A run compares it after the worker
+  // returns: results computed for another schedule or course set must not be
+  // written into whatever is on screen now.
+  private selectionEpoch = 0;
   private courseSelectionService: CourseSelectionService;
   private filterService: FilterService;
   private calendarEventProvider: CalendarEventProvider | null = null;
@@ -60,6 +66,7 @@ export class AutoScheduleOrchestrator {
   // guard suppresses the self-trigger while a generated schedule is being applied.
   invalidateOnSelectionChange(): void {
     if (this.isApplyingAutoSchedule) return;
+    this.selectionEpoch++;
     this.generatedSchedules = [];
     this.currentScheduleIndex = 0;
     this.notifyStateChange();
@@ -91,6 +98,8 @@ export class AutoScheduleOrchestrator {
   async generateSchedules(
     selectedCourses: SelectedCourse[],
   ): Promise<GenerateOutcome> {
+    const originScheduleId = appState.activeScheduleId;
+    const originEpoch = this.selectionEpoch;
     try {
       // Events are read now, not when a filter was set: unless the user
       // opted out, classes stay clear of whatever is on the calendar today.
@@ -136,6 +145,14 @@ export class AutoScheduleOrchestrator {
         500,
       );
 
+      if (
+        appState.activeScheduleId !== originScheduleId ||
+        this.selectionEpoch !== originEpoch
+      ) {
+        this.resetSchedules();
+        return { status: 'stale' };
+      }
+
       if (allSchedules.length === 0) {
         this.resetSchedules();
         return { status: 'no-schedules' };
@@ -144,7 +161,12 @@ export class AutoScheduleOrchestrator {
       this.generatedSchedules = allSchedules;
       this.currentScheduleIndex = 0;
 
-      await this.applyScheduleAtIndex(0);
+      // The first apply is the one that must be undoable: Undo then returns to
+      // exactly what the student had before pressing Generate.
+      if (!(await this.applyScheduleAtIndex(0, false))) {
+        this.resetSchedules();
+        return { status: 'stale' };
+      }
       this.notifyStateChange();
       return { status: 'generated' };
     } catch (error) {
@@ -154,11 +176,14 @@ export class AutoScheduleOrchestrator {
     }
   }
 
-  private async applyScheduleAtIndex(index: number): Promise<void> {
+  private async applyScheduleAtIndex(
+    index: number,
+    skipSnapshot = true,
+  ): Promise<boolean> {
     const schedule = this.generatedSchedules[index];
     if (!schedule) {
       logger.warn(`[Auto-Schedule] No schedule found at index ${index}`);
-      return;
+      return false;
     }
 
     this.isApplyingAutoSchedule = true;
@@ -168,12 +193,14 @@ export class AutoScheduleOrchestrator {
         selected: result.combination,
       }));
 
-      if (selections.length > 0) {
+      if (selections.length === 0) return true;
+      const result =
         await this.courseSelectionService.batchSetSelectedComponents(
           selections,
-          true,
+          skipSnapshot,
         );
-      }
+      if (!result.success) logger.warn(`[Auto-Schedule] ${result.error}`);
+      return result.success;
     } finally {
       this.isApplyingAutoSchedule = false;
     }

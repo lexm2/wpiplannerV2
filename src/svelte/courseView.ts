@@ -25,17 +25,38 @@ interface TermInfo {
   term: string;
   available: boolean;
   allFull: boolean;
+  /** Nothing but interest-list placeholders: no real section to be full. */
+  onlyInterestList: boolean;
 }
+
+/**
+ * "Full" judges real sections. An interest list always shows zero seats, so
+ * counting it would label a term full when filters merely hid its sections.
+ */
+const termStatus = (secs: Section[]) => {
+  const real = secs.filter(s => !s.isInterestList);
+  return {
+    allFull: real.length > 0 && real.every(s => s.seatsAvailable <= 0),
+    onlyInterestList: real.length === 0,
+  };
+};
 
 export interface CourseView {
   course: Course;
   hasWarning: boolean;
   terms: TermInfo[];
-  sectionsByTerm: Map<
-    string,
-    { badges: SectionBadge[]; overflow: number; allFull: boolean }
-  >;
+  sectionsByTerm: Map<string, TermSections>;
 }
+
+interface TermSections {
+  badges: SectionBadge[];
+  overflow: number;
+  allFull: boolean;
+  onlyInterestList: boolean;
+}
+
+export const INTEREST_LIST_ONLY_TITLE =
+  'Only an interest list is shown - other sections are not scheduled or are hidden by your filters';
 
 // Identity-keyed memo: a CourseView depends only on the Course object, which is
 // a `$state.raw` value replaced wholesale on data refresh - so a cache hit means
@@ -68,14 +89,13 @@ export function buildCourseView(course: Course): CourseView {
     return {
       term,
       available: !!secs,
-      allFull: !!secs && secs.every(s => s.seatsAvailable <= 0),
+      ...(secs
+        ? termStatus(secs)
+        : { allFull: false, onlyInterestList: false }),
     };
   });
 
-  const sectionsByTerm = new Map<
-    string,
-    { badges: SectionBadge[]; overflow: number; allFull: boolean }
-  >();
+  const sectionsByTerm = new Map<string, TermSections>();
   for (const term of TERM_ORDER) {
     const sections = sectionsByTermRaw.get(term);
     if (!sections) continue;
@@ -127,7 +147,7 @@ export function buildCourseView(course: Course): CourseView {
     sectionsByTerm.set(term, {
       badges,
       overflow: total > MAX_BADGES ? total - MAX_BADGES : 0,
-      allFull: sections.every(s => s.seatsAvailable <= 0),
+      ...termStatus(sections),
     });
   }
 

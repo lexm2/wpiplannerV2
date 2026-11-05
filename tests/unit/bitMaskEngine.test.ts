@@ -173,6 +173,15 @@ describe('weeklySlotToMask', () => {
     expect(masksConflict(slotMask, sectionToMask(MON_9_10()))).toBe(true);
     expect(masksConflict(slotMask, sectionToMask(TUE_9_10()))).toBe(false);
   });
+
+  it('blocks a class that starts before an off-grid end', () => {
+    const slotMask = weeklySlotToMask({
+      day: DayOfWeek.MONDAY,
+      startTime: { hours: 9, minutes: 0 },
+      endTime: { hours: 10, minutes: 3 },
+    } as never);
+    expect(masksConflict(slotMask, sectionToMask(MON_10_11()))).toBe(true);
+  });
 });
 
 describe('BitMaskEngine', () => {
