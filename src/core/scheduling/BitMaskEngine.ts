@@ -9,7 +9,8 @@
  */
 
 import type { Section } from '../../types/types';
-import type { WeeklyTimeSlot } from '../../types/schedule';
+import { AcademicTerm, type WeeklyTimeSlot } from '../../types/schedule';
+import { scopesOverlap, type TermScope } from '../../utils/timeSlotUtils';
 
 const SLOT_MINUTES = 5;
 const SLOTS_PER_DAY = (24 * 60) / SLOT_MINUTES; // 288
@@ -24,6 +25,14 @@ const DAY_INDEX: Record<string, number> = {
   S: 5, // weekends not used in main calculation
   U: 6,
 };
+
+function sectionScope(section: Section): TermScope {
+  return {
+    term: section.computedTerm || AcademicTerm.ALL,
+    startDate: section.startDate,
+    endDate: section.endDate,
+  };
+}
 
 export interface SectionMask {
   section: Section;
@@ -124,7 +133,9 @@ export class BitMaskEngine {
   }
 
   sectionsConflict(section1: Section, section2: Section): boolean {
-    if (section1.computedTerm !== section2.computedTerm) return false;
+    if (!scopesOverlap(sectionScope(section1), sectionScope(section2))) {
+      return false;
+    }
     const mask1 = this.getMask(section1);
     const mask2 = this.getMask(section2);
     return masksConflict(mask1.mask, mask2.mask);

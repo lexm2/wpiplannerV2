@@ -49,8 +49,9 @@ export interface GridBlock {
   color?: string;
   courseId?: string;
   sectionNumber?: string;
-  eventId?: string;
+  /** Section blocks: course, section, day and time, for the tooltip and name. */
   title?: string;
+  eventId?: string;
   /** Event blocks: the time range as shown to the user, e.g. "9:00-11:00 AM". */
   timeRange?: string;
   /** Event blocks: the event's description (imported events keep the location here). */
@@ -213,31 +214,43 @@ export function buildHoverCourse(
 }
 
 /**
- * Per-day collapsed time ranges for a section (earliest start -> latest end of
- * all periods that day). Skips days with no periods and zero-duration (async)
- * ranges.
+ * One range per meeting per weekday. A section that meets twice on one day
+ * (a 10 AM discussion and a 6 AM lab) keeps two blocks, so the gap between
+ * them stays free and a conflict only marks time both sections occupy. Skips
+ * zero-duration (async) periods.
  */
-function sectionDayRanges(
-  section: Section,
-): { dayIndex: number; startMin: number; endMin: number }[] {
-  const ranges: { dayIndex: number; startMin: number; endMin: number }[] = [];
-  WEEKDAYS.forEach((day, dayIndex) => {
-    const periods = section.periods.filter(p => p.days.has(day));
-    if (periods.length === 0) return;
-
-    let startMin = Infinity;
-    let endMin = -1;
-    for (const p of periods) {
-      startMin = Math.min(
-        startMin,
-        p.startTime.hours * 60 + p.startTime.minutes,
-      );
-      endMin = Math.max(endMin, p.endTime.hours * 60 + p.endTime.minutes);
-    }
+function sectionMeetings(section: Section): {
+  dayIndex: number;
+  periodIndex: number;
+  startMin: number;
+  endMin: number;
+  timeRange: string;
+}[] {
+  const meetings: ReturnType<typeof sectionMeetings> = [];
+  section.periods.forEach((p, periodIndex) => {
+    const startMin = p.startTime.hours * 60 + p.startTime.minutes;
+    const endMin = p.endTime.hours * 60 + p.endTime.minutes;
     if (startMin >= endMin) return; // async / no real time slot
-    ranges.push({ dayIndex, startMin, endMin });
+    const timeRange = TimeUtils.formatTimeRange(
+      { ...p.startTime, displayTime: '' },
+      { ...p.endTime, displayTime: '' },
+    );
+    WEEKDAYS.forEach((day, dayIndex) => {
+      if (p.days.has(day))
+        meetings.push({ dayIndex, periodIndex, startMin, endMin, timeRange });
+    });
   });
-  return ranges;
+  return meetings;
+}
+
+/** The accessible name and tooltip of a section block. */
+function sectionTitle(
+  label: string,
+  section: Section,
+  dayIndex: number,
+  timeRange: string,
+): string {
+  return `${label} ${section.number}, ${TimeUtils.getDayName(WEEKDAYS[dayIndex])} ${timeRange}`;
 }
 
 /** Recurring, visible events that render in `term`. */
@@ -289,11 +302,12 @@ export function buildTermBlocks(
     const color = colorOf(sc.course.id);
     const label = `${sc.course.departmentAbbr}${sc.course.number}`;
     for (const section of getSelectedSections(sc)) {
-      for (const r of sectionDayRanges(section)) {
+      for (const r of sectionMeetings(section)) {
         const block: GridBlock = {
-          key: `sec-${sc.course.id}-${section.crn}-${r.dayIndex}`,
+          key: `sec-${sc.course.id}-${section.crn}-${r.dayIndex}-${r.periodIndex}`,
           kind: 'section',
           label,
+          title: sectionTitle(label, section, r.dayIndex, r.timeRange),
           color,
           courseId: sc.course.id,
           sectionNumber: section.number,
@@ -369,10 +383,10 @@ export function buildTermBlocks(
         const a = daySolids[i];
         const b = daySolids[j];
         if (!conflictMap.get(a.crn)?.has(b.crn)) continue;
-        hasConflict = true;
         const start = Math.max(a.startMin, b.startMin);
         const end = Math.min(a.endMin, b.endMin);
-        if (start >= end) continue; // conflict on another day, not this one's time
+        if (start >= end) continue; // the clash is at another time or day
+        hasConflict = true;
         const key = `${start}-${end}`;
         let region = regions.get(key);
         if (!region) {
@@ -445,9 +459,9 @@ export function buildTermBlocks(
     const color = colorOf(termHoverCourse.course.id);
     const label = `${termHoverCourse.course.departmentAbbr}${termHoverCourse.course.number}`;
     for (const section of getSelectedSections(termHoverCourse)) {
-      for (const r of sectionDayRanges(section)) {
+      for (const r of sectionMeetings(section)) {
         blocks.push({
-          key: `prev-${termHoverCourse.course.id}-${section.crn}-${r.dayIndex}`,
+          key: `prev-${termHoverCourse.course.id}-${section.crn}-${r.dayIndex}-${r.periodIndex}`,
           kind: 'preview',
           label,
           color,
