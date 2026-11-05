@@ -4,6 +4,7 @@
   // filter status + hidden/year notices, live + hover grid preview, escape-to-cancel
   // - all derived from wizardState.{currentStep,selections} + the active filters.
   import { onMount } from 'svelte';
+  import CloseButton from './ui/CloseButton.svelte';
   import { fade } from 'svelte/transition';
   import { slideX, dur } from './transitions';
   import { appState } from '../core/state/appState.svelte';
@@ -241,11 +242,7 @@
   transition:fade|global={{ duration: dur(250) }}
 >
   <div class={styles['wizard-header']}>
-    <button
-      class={styles['wizard-close-btn']}
-      onclick={cancel}
-      aria-label="Close">&times;</button
-    >
+    <CloseButton class={styles['wizard-close']} onclick={cancel} />
     <h2 id={headingId} tabindex="-1" bind:this={headingEl}>
       {course.departmentAbbr}
       {course.number}

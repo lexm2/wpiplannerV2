@@ -1,5 +1,6 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
+  import CloseButton from '../ui/CloseButton.svelte';
   import { degreeState } from '../degree/degreeState.svelte';
   import { degreeViewState } from '../degree/degreeViewState.svelte';
   import { degreePlanService } from '../../services/degree/degreePlanService';
@@ -125,9 +126,7 @@
           >{@html getInlineSVG('SORT_DESCENDING')}</span
         >
       </button>
-      <button class="modal-close" aria-label="Close" onclick={close}
-        >&times;</button
-      >
+      <CloseButton onclick={close} />
     </div>
   {/snippet}
 

@@ -39,6 +39,7 @@
 - Renaming a schedule edits its name right where it is, instead of swapping in a text box
 - Auto-Schedule's time settings follow how classes actually run. Time between classes is in free hours, lunch in hours, and every time is on the hour
 - WPI Dark's buttons have white labels, so they stay easy to read on hover. Check marks stay dark
+- Every window and drawer has the same close button
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
