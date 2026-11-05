@@ -3,6 +3,29 @@
  * `box` element and read live layout; none touch component state.
  */
 
+/**
+ * Whether the student can actually get at a step's target: not hidden on another
+ * page, parked off-canvas in a closed drawer, scrolled out of its container or
+ * under another window. Under the tutorial box doesn't count, since the box moves
+ * itself off the target.
+ */
+export function targetOnScreen(selector: string): boolean {
+  const el = document.querySelector(selector);
+  if (!el) return false;
+  const r = el.getBoundingClientRect();
+  if (r.width === 0 || r.height === 0) return false;
+  const at = document.elementFromPoint(
+    r.left + r.width / 2,
+    r.top + r.height / 2,
+  );
+  if (!at) return false;
+  return (
+    el.contains(at) ||
+    !!at.closest('label')?.contains(el) ||
+    !!at.closest('[data-tutorial-box]')
+  );
+}
+
 /** Nudge the box back inside the viewport (8px inset) if it overflows any edge. */
 export function clampToViewport(box: HTMLElement): void {
   const rect = box.getBoundingClientRect();

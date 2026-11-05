@@ -110,8 +110,12 @@ export class TransactionalStorageManager {
 
   async saveSchedule(schedule: Schedule): Promise<TransactionResult> {
     await this.ensureInitialized();
+    // Scratch: a reload mid-tutorial should find no trace of it.
+    if (isTutorialId(schedule.id)) {
+      return { success: true, transactionId: `tutorial-${Date.now()}` };
+    }
     const result = await this.indexedDBStorage.saveSchedule(schedule);
-    if (result.success && !isTutorialId(schedule.id)) {
+    if (result.success) {
       this.channel.post({ type: 'schedule', id: schedule.id });
     }
     return {
@@ -200,6 +204,10 @@ export class TransactionalStorageManager {
   }
 
   saveActiveScheduleId(scheduleId: string | null): TransactionResult {
+    // Left in place, the saved id still names what a reload should come back to.
+    if (scheduleId && isTutorialId(scheduleId)) {
+      return { success: true, transactionId: `tutorial-${Date.now()}` };
+    }
     return this.executeSyncTransaction(() => {
       if (scheduleId) {
         localStorage.setItem(

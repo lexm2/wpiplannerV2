@@ -1012,6 +1012,13 @@ export class ProfileStateManager {
 
       const drift: CatalogDrift[] = [];
       if (schedulesResult.valid && schedulesResult.data) {
+        // Tutorial schedules aren't saved any more, but older builds left one
+        // behind on every reload mid-tutorial.
+        for (const s of schedulesResult.data) {
+          if (s.id.startsWith('tutorial_')) {
+            void this.storageManager.deleteSchedule(s.id);
+          }
+        }
         this.state.schedules = schedulesResult.data
           .filter(s => !s.id.startsWith('tutorial_'))
           .map(s => ({
@@ -1030,9 +1037,8 @@ export class ProfileStateManager {
         this.reportUnreadable(schedulesResult.report);
       }
 
-      // The saved id can name a schedule that was not loaded back: tutorial
-      // schedules are filtered out above, so reloading mid-tutorial leaves
-      // one behind. Fall back to the first real schedule.
+      // The saved id can name a schedule that was not loaded back, like a
+      // tutorial schedule from an older build. Fall back to the first real one.
       const activeIdResult = this.storageManager.loadActiveScheduleId();
       const savedId = activeIdResult.valid ? activeIdResult.data : null;
       this.savedActiveId = activeIdResult.valid ? savedId : undefined;

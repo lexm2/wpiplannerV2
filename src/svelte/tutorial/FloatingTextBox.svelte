@@ -8,6 +8,7 @@
     clampToViewport,
     repositionIfObstructed,
     decorateInlineHighlights,
+    targetOnScreen,
   } from './floatingBox.position';
   import styles from '../../styles/components/floating-text-box.module.css';
 
@@ -26,6 +27,7 @@
   const total = $derived(tutorialOverlayState.total);
 
   const SETTLE_MS = 1200;
+  const FIND_WAIT_MS = 1500;
 
   let backDisabled = $state(false);
 
@@ -40,6 +42,10 @@
       : 'Next',
   );
   const showBack = $derived(index > 0);
+  // The last tutorial names its final step's button, and has nothing after it.
+  const hasNextTutorial = $derived(
+    step !== null && !tutorialService.getActiveTutorial()?.lastStepLabel,
+  );
 
   // After each step's {@html} description renders, decorate any inline-highlight
   // spans with the marching-ants dashed-rect SVG, and reposition the box off the
@@ -101,6 +107,22 @@
     };
   });
 
+  // Once a step has settled, notice when its target is out of reach (the student
+  // closed its window, say) and offer the way back.
+  let targetLost = $state(false);
+  $effect(() => {
+    if (!step) return;
+    const selector = step.selector;
+    const settleUntil = performance.now() + SETTLE_MS;
+    targetLost = false;
+    const poll = setInterval(() => {
+      if (performance.now() > settleUntil) {
+        targetLost = !targetOnScreen(selector);
+      }
+    }, 500);
+    return () => clearInterval(poll);
+  });
+
   let dragging = false;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
@@ -153,8 +175,18 @@
     }
   }
 
+  // Relocating can take a moment to mount the target, so the dot waits for it.
   function onFindElement(): void {
-    if (step) animateFindDot(step.selector);
+    tutorialService.relocate();
+    const selector = step?.selector;
+    if (!selector) return;
+    const giveUpAt = performance.now() + FIND_WAIT_MS;
+    const fly = () => {
+      if (tutorialOverlayState.step?.selector !== selector) return;
+      if (targetOnScreen(selector)) animateFindDot(selector);
+      else if (performance.now() < giveUpAt) setTimeout(fly, 100);
+    };
+    fly();
   }
 
   function onNext(): void {
@@ -179,6 +211,9 @@
   <div
     bind:this={boxEl}
     class={styles['container']}
+    role="dialog"
+    aria-label="Tutorial"
+    data-tutorial-box
     transition:scaleFade={{ duration: 200 }}
   >
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -198,14 +233,16 @@
       >
         Find Element
       </button>
-      <button
-        class={styles['nextTutorialBtn']}
-        data-tutorial-next-tutorial
-        onpointerdown={stopPointerdown}
-        onclick={() => tutorialService.skipToNextTutorial()}
-      >
-        Next Tutorial
-      </button>
+      {#if hasNextTutorial}
+        <button
+          class={styles['nextTutorialBtn']}
+          data-tutorial-next-tutorial
+          onpointerdown={stopPointerdown}
+          onclick={() => tutorialService.skipToNextTutorial()}
+        >
+          Next Tutorial
+        </button>
+      {/if}
       <button
         class={styles['skipBtn']}
         data-tutorial-skip
@@ -215,12 +252,17 @@
         Skip tutorial
       </button>
     </div>
-    <div class={styles['body']}>
+    <div class={styles['body']} aria-live="polite">
       <div class={styles['stepTitle']}>{step?.title ?? ''}</div>
       <!-- eslint-disable-next-line svelte/no-at-html-tags - tutorial copy is author-controlled -->
       <div class={styles['stepDescription']}>
         {@html step?.description ?? ''}
       </div>
+      {#if targetLost}
+        <div class={styles['lostHint']} data-tutorial-lost>
+          Can't see it? Find Element brings it back, or use Back.
+        </div>
+      {/if}
     </div>
     <div class={styles['footer']}>
       <span class={styles['stepCounter']}>Step {index + 1} of {total}</span>

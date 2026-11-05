@@ -38,6 +38,14 @@ function focusableWithin(node: HTMLElement): HTMLElement[] {
   );
 }
 
+// The tutorial box floats above every dialog, and on a step that explains a
+// window rather than asking for a click in it, its Next is the only way on. So
+// it joins the Tab cycle of whichever dialog is on top.
+function tabStops(node: HTMLElement): HTMLElement[] {
+  const box = document.querySelector<HTMLElement>('[data-tutorial-box]');
+  return [...focusableWithin(node), ...(box ? focusableWithin(box) : [])];
+}
+
 export function trapFocus(node: HTMLElement) {
   const previouslyFocused = document.activeElement as HTMLElement | null;
   const owner = previouslyFocused
@@ -67,32 +75,36 @@ export function trapFocus(node: HTMLElement) {
   }
 
   function onKeydown(e: KeyboardEvent): void {
-    if (e.key !== 'Tab') return;
-    const focusables = focusableWithin(node);
-    if (focusables.length === 0) {
+    if (e.key !== 'Tab' || e.defaultPrevented) return;
+    if ([...restoreTargets.keys()].pop() !== node) return;
+    const stops = tabStops(node);
+    if (stops.length === 0) {
       e.preventDefault();
       return;
     }
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
     const active = document.activeElement as HTMLElement | null;
+    const at = active ? stops.indexOf(active) : -1;
+    // Focus sits somewhere the list doesn't name, like the dialog itself: inside
+    // the dialog Tab can carry on from there, outside it comes back in.
+    if (at === -1 && node.contains(active)) return;
 
-    if (e.shiftKey) {
-      if (active === first || !node.contains(active)) {
-        e.preventDefault();
-        last.focus();
-      }
-    } else if (active === last || !node.contains(active)) {
+    const following = stops[at + (e.shiftKey ? -1 : 1)];
+    const wraps = at === -1 || following === undefined;
+    const next = wraps ? stops.at(e.shiftKey ? -1 : 0)! : following;
+    // Within the dialog the browser's own order stands; only wrapping round or
+    // crossing to the tutorial box needs steering.
+    if (wraps || node.contains(active) !== node.contains(next)) {
       e.preventDefault();
-      first.focus();
+      next.focus();
     }
   }
 
-  node.addEventListener('keydown', onKeydown);
+  // On document, not the dialog, to also hear Tab from the tutorial box.
+  document.addEventListener('keydown', onKeydown);
 
   return {
     destroy(): void {
-      node.removeEventListener('keydown', onKeydown);
+      document.removeEventListener('keydown', onKeydown);
       restoreTargets.delete(node);
       lockCount = Math.max(0, lockCount - 1);
       if (lockCount === 0) {

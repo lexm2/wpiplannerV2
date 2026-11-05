@@ -10,6 +10,7 @@
   } from '../services/ui/uiState.svelte';
   import { showConfirm } from './modals/modalState.svelte';
   import { tutorialsAvailable } from './phoneLayout.svelte';
+  import { tutorialOverlayState } from './tutorial/tutorialOverlayState.svelte';
   import { logger } from '../utils/logger';
   import type { ScheduleManagementService } from '../services/selection/ScheduleManagementService';
   import type { TutorialSetup } from '../services/tutorial/setupTutorial';
@@ -100,8 +101,8 @@
   // appState.canUndo/canRedo are runes published by UndoRedoManager - the same
   // source the header UndoRedoButtons use - so the items' disabled state stays
   // in sync.
-  const canUndo = $derived(appState.canUndo);
-  const canRedo = $derived(appState.canRedo);
+  const canUndo = $derived(appState.canUndo && !tutorialOverlayState.step);
+  const canRedo = $derived(appState.canRedo && !tutorialOverlayState.step);
 
   // The Classes page's only List/Grid switch, offering whichever view is not
   // showing.

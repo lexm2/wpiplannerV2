@@ -1,4 +1,4 @@
-import { mount } from 'svelte';
+import { mount, tick } from 'svelte';
 import { TutorialService } from './TutorialService';
 import { TutorialStateMachine } from './TutorialStateMachine';
 import FloatingTextBox from '../../svelte/tutorial/FloatingTextBox.svelte';
@@ -16,7 +16,11 @@ import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
 import { isOpen, setOpen } from '../../svelte/ui/disclosureState.svelte';
+import { openDrawer } from '../../svelte/drawerState.svelte';
+import { deepClone } from '../../utils/jsonSerializer';
 import { logger } from '../../utils/logger';
+import type { ActiveFilter } from '../../types/filters';
+import type { PageId } from '../../types/uiState';
 
 interface TutorialEntry {
   id: string;
@@ -39,6 +43,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   let previousScheduleId: string | null = null;
   let tutorialScheduleId: string | null = null;
   let cleaningUp = false;
+  let starting = false;
+  // What a run takes over from the student, handed back when it ends.
+  let handBack: { filters: ActiveFilter[]; page: PageId } | null = null;
 
   function getTutorialCourse(id: string) {
     return services.courseDataService
@@ -85,9 +92,14 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     cleaningUp = true;
     try {
       await cleanupTutorial(false);
+      // Before anything else changes, so a failed fetch costs the student nothing.
+      await services.courseDataService.addTutorialDepartment(
+        services.profileStateManager.getDefaultAcademicYear(),
+      );
+      // By id: a schedule the student named "Tutorial" is theirs.
       const stale = services.scheduleManagementService
         .getAllSchedules()
-        .filter(s => s.name === 'Tutorial' || s.name.startsWith('Tutorial ('));
+        .filter(s => s.id.startsWith('tutorial_'));
       for (const s of stale) {
         await services.scheduleManagementService.deleteSchedule(s.id, {
           force: true,
@@ -95,7 +107,11 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       }
       previousScheduleId =
         services.scheduleManagementService.getActiveScheduleId();
-      await services.courseDataService.addTutorialDepartment();
+      handBack = {
+        filters: deepClone(services.filterService.getActiveFilters()),
+        page: uiState.currentPage,
+      };
+      services.filterService.clearFilters();
       services.filterService.addFilter('department', { departments: ['TUT'] });
       const tutorialId = `tutorial_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       const result = await services.scheduleManagementService.createNewSchedule(
@@ -120,7 +136,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       localStorage.setItem(STORAGE_KEYS.VISITED, 'true');
     }
     componentWizardService.closeComponentWizard();
-    services.filterService.clearFilters();
+    const returning = previousScheduleId !== null;
     if (previousScheduleId) {
       await services.scheduleManagementService.setActiveSchedule(
         previousScheduleId,
@@ -128,6 +144,14 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       previousScheduleId = null;
     }
     if (tutorialScheduleId) {
+      // Deleting refuses the last schedule, and the student can delete their
+      // own from the tutorial's Schedules window.
+      const schedules = services.scheduleManagementService.getAllSchedules();
+      if (schedules.length === 1 && schedules[0].id === tutorialScheduleId) {
+        await services.scheduleManagementService.createNewSchedule(
+          'My Schedule',
+        );
+      }
       await services.scheduleManagementService.deleteSchedule(
         tutorialScheduleId,
         { force: true },
@@ -135,19 +159,38 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       tutorialScheduleId = null;
     }
     services.courseDataService.filterDepartments(d => d.abbreviation !== 'TUT');
+    if (handBack) {
+      await handBackToStudent(handBack, returning);
+      handBack = null;
+    }
   }
 
-  // Tear down the tutorial for good and leave the user on a real schedule:
-  // cleanupTutorial deletes the tutorial's own schedule, so a first-time user
-  // who had none of their own would otherwise be left with no active schedule.
+  async function handBackToStudent(
+    taken: { filters: ActiveFilter[]; page: PageId },
+    returning: boolean,
+  ): Promise<void> {
+    setPage(taken.page);
+    // Activating a schedule and changing page each rewrite filters from an
+    // effect, so those land first.
+    await tick();
+    // The year goes with the schedule, so it only comes back with theirs.
+    const restores = (f: ActiveFilter) => returning || f.id !== 'academicYear';
+    for (const f of [...services.filterService.getActiveFilters()]) {
+      if (restores(f)) services.filterService.removeFilter(f.id);
+    }
+    for (const f of taken.filters) {
+      if (restores(f)) services.filterService.addFilter(f.id, f.criteria);
+    }
+    // Every step so far was on a schedule that no longer exists, and undoing
+    // into one would bring it back.
+    services.profileStateManager.seedUndoBaseline();
+  }
+
   // The cleaningUp guard keeps the schedule swap from re-entering teardown via
   // onActiveScheduleChange.
   function endTutorials(): void {
     cleaningUp = true;
     cleanupTutorial(true)
-      .then(() =>
-        services.scheduleManagementService.initializeDefaultScheduleIfNeeded(),
-      )
       .catch((error: unknown) => {
         logger.error('Tutorial cleanup failed:', error);
       })
@@ -165,6 +208,12 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     if (appState.activeScheduleId !== tutorialScheduleId) {
       tutorialService.cancel();
       cleaningUp = true;
+      // They picked this schedule, so it's where they stay. Deleting the
+      // tutorial's own is no pick: active only fell to the first one left.
+      const stillThere = services.scheduleManagementService
+        .getAllSchedules()
+        .some(s => s.id === tutorialScheduleId);
+      if (stillThere) previousScheduleId = null;
       // cleanupTutorial has no internal try/catch and .finally rethrows, so a
       // teardown failure would escape as an unhandled rejection.
       cleanupTutorial(true)
@@ -217,7 +266,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         description:
           'Click the course you just added to open the section picker.',
         waitFor: 'click',
-        uiState: { currentPage: 'schedule' },
+        uiState: { currentPage: 'schedule', openDrawers: ['schedule'] },
         appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
       },
       {
@@ -272,7 +321,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '#wizard-next-btn',
         title: 'Finish',
         description:
-          'Click Finish to confirm your selections, if you hit cancel the selections will be lost.',
+          'Click Finish to confirm your selections. If you hit Cancel, the selections will be lost.',
         waitFor: 'click',
         uiState: {
           currentPage: 'schedule',
@@ -304,6 +353,15 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   });
 
   function registerFilteringTutorial() {
+    const avoidConflicts = {
+      id: 'periodConflict',
+      // What the toggle itself sets, so the panel reads the same either way.
+      criteria: {
+        avoidConflicts: true,
+        blockedSlots: [],
+        semesterSpansQuarters: true,
+      },
+    };
     tutorialService.register({
       id: 'filtering',
       onStart: async () => {
@@ -373,7 +431,12 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           uiState: { currentPage: 'planner' },
         },
         {
-          selector: 'input.filter-toggle[value="B"][data-filter="term"]',
+          // The label, since narrow windows shrink the input itself to nothing.
+          // But the input's click is what counts: it comes after the label's and
+          // has already flipped the box, where acting on the label's would have
+          // the box flip after this step's filter and undo it.
+          selector: 'label[data-term-option="B"]',
+          waitForSelector: 'input.filter-toggle[value="B"][data-filter="term"]',
           title: 'Filter by term',
           description:
             'Check the B term box to filter for courses/sections that have sections in B term.',
@@ -405,10 +468,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           appState: {
             filters: [
               { id: 'term', criteria: { terms: ['B'] } },
-              {
-                id: 'periodConflict',
-                criteria: { avoidConflicts: true, blockedSlots: [] },
-              },
+              avoidConflicts,
             ],
             refreshFilterUI: true,
           },
@@ -423,10 +483,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           appState: {
             filters: [
               { id: 'term', criteria: { terms: ['B'] } },
-              {
-                id: 'periodConflict',
-                criteria: { avoidConflicts: true, blockedSlots: [] },
-              },
+              avoidConflicts,
               { id: 'availability', criteria: { availableOnly: true } },
             ],
             refreshFilterUI: true,
@@ -443,10 +500,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           appState: {
             filters: [
               { id: 'term', criteria: { terms: ['B'] } },
-              {
-                id: 'periodConflict',
-                criteria: { avoidConflicts: true, blockedSlots: [] },
-              },
+              avoidConflicts,
               { id: 'availability', criteria: { availableOnly: true } },
             ],
             refreshFilterUI: true,
@@ -465,7 +519,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           title: 'Open section selection',
           description: 'Click Blinking LEDs 101 to open the section picker.',
           waitFor: 'click',
-          uiState: { currentPage: 'schedule' },
+          uiState: { currentPage: 'schedule', openDrawers: ['schedule'] },
           appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
         },
         {
@@ -581,7 +635,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           'We are going to lock the TUT2008 course so the auto scheduler does not change it. We can do this just by manually selecting the course.',
         waitFor: 'click',
         scrollArrow: true,
-        uiState: { currentPage: 'schedule' },
+        uiState: { currentPage: 'schedule', openDrawers: ['schedule'] },
       },
       {
         selector: '[data-crn="100041"]',
@@ -623,6 +677,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         uiState: {
           currentPage: 'schedule',
           wizard: { isOpen: false, courseId: null, step: null },
+          openDrawers: ['schedule'],
         },
       },
       {
@@ -632,6 +687,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         description:
           'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
         waitFor: 'click',
+        // The badge toggles, and the next step's appState turns this same term
+        // off: letting both act would turn it straight back on.
+        stopPropagation: true,
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-intro'],
@@ -643,6 +701,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         title: 'Change generation parameters',
         description: 'Same change for TUT2006.',
         waitFor: 'click',
+        stopPropagation: true,
         uiState: {
           currentPage: 'schedule',
           openModals: ['auto-schedule-intro'],
@@ -667,7 +726,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '#available-only-filter',
         title: 'Filter for only available courses',
         description:
-          'We only want to generate schedules with courses that are not full so lets filter out the full courses.',
+          "We only want to generate schedules with courses that are not full, so let's filter out the full courses.",
         waitFor: 'click',
         scrollArrow: true,
         uiState: {
@@ -700,7 +759,11 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
           'The next tutorial goes over how to create a new schedule and some of the settings available.',
         waitFor: 'manual',
         uiState: { currentPage: 'schedule' },
-        appState: { runAutoSchedule: true },
+        appState: {
+          runAutoSchedule: {
+            allowedTerms: { 'TUT-2001': ['A'], 'TUT-2006': ['A'] },
+          },
+        },
       },
     ],
   });
@@ -732,7 +795,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '.schedule-picker-modal-dialog .schedule-list',
         title: 'Your schedules',
         description:
-          'Every schedule you have is listed here. Click one to switch to it. Rename and Duplicate sit on each row, and the ⋮ menu holds Copy Into, Export, Export ICS, Import and Delete.',
+          'Every schedule you have is listed here. Click one to switch to it, though doing that now ends this tutorial. Rename and Duplicate sit on each row, and the ⋮ menu holds Copy Into, Export, Export ICS, Import and Delete.',
         waitFor: 'manual',
         uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
@@ -756,7 +819,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '#new-schedule-btn',
         title: 'All done',
         description:
-          "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The modal will not automatically close.",
+          "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The Schedules window stays open until you close it.",
         waitFor: 'click',
         uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
@@ -764,7 +827,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
         selector: '[data-tutorial-next]',
         title: 'Almost there!',
         description:
-          'Make sure to give the new schedule a name and then hit Create.',
+          'If you clicked New Schedule, give it a name and hit Create: the tutorial ends and you land on your new schedule. Otherwise, hit Finish to end here.',
         waitFor: 'manual',
         uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
       },
@@ -806,7 +869,9 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     // reactive, so applying filters to filterService (in
     // onAppStateTransition) updates the open filter modal directly.
     if (appState?.runAutoSchedule) {
-      autoScheduleService.runAutoSchedule();
+      autoScheduleService.runAutoSchedule(
+        appState.runAutoSchedule.allowedTerms,
+      );
     }
   });
 
@@ -857,6 +922,20 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       if (!disclosuresBefore.has(id)) disclosuresBefore.set(id, isOpen(id));
       setOpen(id, true);
     }
+    // After the effects this transition sets off: changing page and the wizard
+    // closing each put a drawer away.
+    if (desired.openDrawers) {
+      const tutorial = tutorialService.getActiveTutorial();
+      const index = tutorialService.getCurrentStepIndex();
+      void tick().then(() => {
+        if (
+          tutorialService.getActiveTutorial() === tutorial &&
+          tutorialService.getCurrentStepIndex() === index
+        ) {
+          desired.openDrawers?.forEach(openDrawer);
+        }
+      });
+    }
   });
 
   tutorialService.onStepApply(index => {
@@ -895,6 +974,8 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
 
   mount(FloatingTextBox, {
     target: document.body,
+    // First in the document, so the box is the first Tab stop while it shows.
+    anchor: document.body.firstChild ?? undefined,
     props: {
       tutorialService,
       onGoBack: async () => {
@@ -913,17 +994,24 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   ];
 
   async function start(id: string) {
-    if (!tutorialsAvailable()) return;
-    await sharedSetup();
-    // The window may have narrowed while the setup ran.
-    if (!tutorialsAvailable()) {
-      endTutorials();
-      return;
+    // The first-visit tutorial can still be loading when the student picks one
+    // from the list, and two setups at once would strand one's schedule.
+    if (starting || !tutorialsAvailable()) return;
+    starting = true;
+    try {
+      await sharedSetup();
+      // The window may have narrowed while the setup ran.
+      if (!tutorialsAvailable()) {
+        endTutorials();
+        return;
+      }
+      filteringStarted = id !== 'welcome';
+      autoScheduleStarted = id === 'autoSchedule' || id === 'schedules';
+      schedulesStarted = id === 'schedules';
+      tutorialService.start(id);
+    } finally {
+      starting = false;
     }
-    filteringStarted = id !== 'welcome';
-    autoScheduleStarted = id === 'autoSchedule' || id === 'schedules';
-    schedulesStarted = id === 'schedules';
-    tutorialService.start(id);
   }
 
   return { service: tutorialService, tutorials, start, onActiveScheduleChange };

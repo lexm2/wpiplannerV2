@@ -141,7 +141,11 @@ export class CourseDataService {
     this.notifyDataRefreshed();
   }
 
-  async addTutorialDepartment(): Promise<void> {
+  /**
+   * `year` stamps the courses into the year the student is planning, or the
+   * year filter would hide them all once the catalog moves past the file's.
+   */
+  async addTutorialDepartment(year?: number): Promise<void> {
     if (!this.scheduleDB) return;
     const response = await fetch('./tutorial-courses.json', {
       cache: 'no-cache',
@@ -155,6 +159,7 @@ export class CourseDataService {
     const tutorial = { abbreviation: 'TUT', name: 'Tutorial' };
     const parsedCourses = json.courses.map(raw => ({
       ...parseCourse(raw, tutorial),
+      ...(year !== undefined && { academicYear: year }),
       transient: true,
     }));
     const tutDept: Department = { ...tutorial, courses: parsedCourses };

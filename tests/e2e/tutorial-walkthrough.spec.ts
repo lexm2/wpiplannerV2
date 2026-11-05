@@ -12,7 +12,14 @@ import { test, expect, type Page } from './fixtures';
  * listener. A step that highlights a decoration, a duplicated id, or a target
  * buried under a modal fails here and passes there.
  *
+ * It runs at each layout the tutorials support, since the page rearranges itself
+ * across them: the header folds into the gear menu, the schedule sidebar becomes
+ * a drawer, and the term toggles shrink to letters.
+ *
  * Per step it checks:
+ *   - the target is on screen and unobstructed when the step lands, with nothing
+ *     scrolled or opened on the student's behalf
+ *   - every button in the tutorial box can really be clicked
  *   - the selector matches exactly one element (a second match means the
  *     highlight's `querySelector` can silently pick the wrong one)
  *   - that element is laid out and visible
@@ -34,6 +41,7 @@ interface StepMeta {
   title: string;
   selector: string;
   waitFor: string;
+  waitForSelector?: string;
 }
 
 interface StepProbe {
@@ -43,6 +51,8 @@ interface StepProbe {
   highlightOwned: boolean;
   highlightOverlaps: boolean;
   blockedBy: string | null;
+  onArrival: boolean;
+  stuckButtons: string[];
 }
 
 type StepReport = StepMeta &
@@ -60,7 +70,7 @@ async function readStep(page: Page): Promise<StepMeta | null> {
     const active = svc?.getActiveTutorial();
     if (!active) return null;
     const index = svc.getCurrentStepIndex();
-    const step = active.steps[index];
+    const step = svc.getCurrentStep();
     if (!step) return null;
     return {
       tutorial: active.id,
@@ -69,6 +79,7 @@ async function readStep(page: Page): Promise<StepMeta | null> {
       title: step.title,
       selector: step.selector,
       waitFor: step.waitFor,
+      waitForSelector: step.waitForSelector,
     };
   });
 }
@@ -114,8 +125,39 @@ async function probeStep(page: Page, selector: string): Promise<StepProbe> {
         highlightOwned: false,
         highlightOverlaps: false,
         blockedBy: null,
+        onArrival: false,
+        stuckButtons: [],
       };
     }
+
+    // Before anything below scrolls it: can the student get at it as it stands?
+    // Polled because a drawer slides in and the box moves off after the fact.
+    const reachable = () => {
+      const r = el.getBoundingClientRect();
+      const at = document.elementFromPoint(
+        r.left + r.width / 2,
+        r.top + r.height / 2,
+      );
+      return !!at && (el.contains(at) || !!at.closest('label')?.contains(el));
+    };
+    let onArrival = reachable();
+    for (let poll = 0; poll < 20 && !onArrival; poll++) {
+      await sleep(150);
+      onArrival = reachable();
+    }
+    const stuckButtons = [
+      ...document.querySelectorAll<HTMLElement>('[data-tutorial-box] button'),
+    ]
+      .filter(b => b.offsetWidth > 0)
+      .filter(b => {
+        const r = b.getBoundingClientRect();
+        const at = document.elementFromPoint(
+          r.left + r.width / 2,
+          r.top + r.height / 2,
+        );
+        return !at || !b.contains(at);
+      })
+      .map(b => b.textContent?.trim() ?? '');
 
     const rect = el.getBoundingClientRect();
     const style = getComputedStyle(el);
@@ -158,6 +200,8 @@ async function probeStep(page: Page, selector: string): Promise<StepProbe> {
       highlightOwned,
       highlightOverlaps,
       blockedBy: registers ? null : describe(atPoint),
+      onArrival,
+      stuckButtons,
     };
   }, selector);
 }
@@ -183,9 +227,24 @@ async function waitForAdvance(
   return false;
 }
 
-test('every tutorial step can be completed by clicking its own target', async ({
-  page,
-}) => {
+const LAYOUTS = [
+  { name: 'wide header', viewport: { width: 1280, height: 800 } },
+  { name: 'schedule drawer', viewport: { width: 1024, height: 768 } },
+  { name: 'narrowest', viewport: { width: 600, height: 800 } },
+];
+
+for (const { name, viewport } of LAYOUTS) {
+  test.describe(name, () => {
+    test.use({ viewport });
+
+    test(
+      'every tutorial step can be completed by clicking its own target',
+      walk,
+    );
+  });
+}
+
+async function walk({ page }: { page: Page }): Promise<void> {
   // Nothing should raise a native dialog, but accept any so the walk can't hang.
   page.on('dialog', d => d.accept('Tutorial E2E').catch(() => {}));
 
@@ -224,6 +283,22 @@ test('every tutorial step can be completed by clicking its own target', async ({
       clickError = (e as Error).message.split('\n')[0];
     }
 
+    // A target reached through something else (Schedules in the gear menu)
+    // advances on that second click.
+    if (
+      !clickError &&
+      meta.waitForSelector &&
+      !(await waitForAdvance(page, STEP_KEY(meta), 500))
+    ) {
+      await page
+        .locator(meta.waitForSelector)
+        .first()
+        .click({ timeout: 5_000 })
+        .catch((e: Error) => {
+          clickError = e.message.split('\n')[0];
+        });
+    }
+
     const advanced = clickError
       ? false
       : await waitForAdvance(page, STEP_KEY(meta));
@@ -244,6 +319,8 @@ test('every tutorial step can be completed by clicking its own target', async ({
       !r.highlightOwned ||
       !r.highlightOverlaps ||
       r.blockedBy !== null ||
+      !r.onArrival ||
+      r.stuckButtons.length > 0 ||
       !r.advanced,
   );
   const report = broken
@@ -261,6 +338,10 @@ test('every tutorial step can be completed by clicking its own target', async ({
       if (r.highlighted && r.highlightOwned && !r.highlightOverlaps)
         why.push('highlight SVG does not overlap the target');
       if (r.blockedBy) why.push(`click point hits ${r.blockedBy}`);
+      if (r.matches >= 1 && !r.onArrival)
+        why.push('target out of reach when the step landed');
+      if (r.stuckButtons.length > 0)
+        why.push(`box buttons can't be clicked: ${r.stuckButtons.join(', ')}`);
       if (!r.advanced)
         why.push(
           `clicking it did not advance the tutorial${r.clickError ? ` (${r.clickError})` : ''}`,
@@ -304,4 +385,4 @@ test('every tutorial step can be completed by clicking its own target', async ({
     tutDepartments: 0,
     tutorialSchedules: 0,
   });
-});
+}

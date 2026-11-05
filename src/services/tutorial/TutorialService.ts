@@ -8,6 +8,7 @@ import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState
 import { courseListState } from '../../svelte/courseListState.svelte';
 import { scrollParent } from '../../utils/scrollParent';
 import { headerCollapsed } from '../../svelte/phoneLayout.svelte';
+import { targetOnScreen } from '../../svelte/tutorial/floatingBox.position';
 
 import type { UIState } from '../../types/uiState';
 import { logger } from '../../utils/logger';
@@ -43,6 +44,27 @@ export class TutorialService {
   private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
   private actionTimeout: ReturnType<typeof setTimeout> | null = null;
   private revealTimer: ReturnType<typeof setTimeout> | null = null;
+  private settleTimers: ReturnType<typeof setTimeout>[] = [];
+  // Bumped by every apply and teardown, so an apply still waiting on the app
+  // can tell it has been overtaken.
+  private applyRun = 0;
+
+  constructor() {
+    // The second half of a double-click lands after the step has moved on, where
+    // it would undo the first (unpick the section just picked) or hit whatever
+    // just opened under the pointer. Registered first, so it also keeps the next
+    // step from counting it.
+    document.body.addEventListener(
+      'click',
+      e => {
+        if (this.activeTutorial && e.detail > 1) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      },
+      { capture: true },
+    );
+  }
 
   register(tutorial: Tutorial): void {
     this.tutorials.set(tutorial.id, tutorial);
@@ -122,8 +144,34 @@ export class TutorialService {
     await this.applyStep();
   }
 
+  /**
+   * Put the current step back on screen, for a student who closed its window,
+   * wandered to another page or scrolled away. `force` re-applies it even if
+   * its target looks fine, for a breakpoint change that moves things around
+   * (a drawer still sliding out reads as on screen).
+   */
+  relocate(force = false): void {
+    const step = this.getCurrentStep();
+    if (!step) return;
+    if (
+      !force &&
+      step.selector === this.currentSelector &&
+      targetOnScreen(step.selector)
+    ) {
+      return;
+    }
+    this.cleanup();
+    void this.applyStep(true);
+  }
+
   getCurrentStepIndex(): number {
     return this.currentStepIndex;
+  }
+
+  /** The running step as it applies at the current window width. */
+  getCurrentStep(): TutorialStep | null {
+    const step = this.activeTutorial?.steps[this.currentStepIndex];
+    return step ? this.resolveStep(step) : null;
   }
 
   getActiveTutorial(): Tutorial | null {
@@ -161,10 +209,11 @@ export class TutorialService {
     this.actionObserver = null;
   }
 
-  private async applyStep(): Promise<void> {
+  private async applyStep(reapplying = false): Promise<void> {
     const tutorial = this.activeTutorial;
     if (!tutorial) return;
     const index = this.currentStepIndex;
+    const run = ++this.applyRun;
     // Only the step goBack applies skips its auto-advance; consume the flag here
     // so a manual or click step can't leave it set for a later one.
     const suppress = this.suppressAutoAdvance;
@@ -175,13 +224,17 @@ export class TutorialService {
       await this.appStateTransitionCallback(step.appState);
       // Exited, skipped, or moved on while the app caught up - this step is
       // stale, and drawing it would leak its overlay into whatever came next.
-      if (this.activeTutorial !== tutorial || this.currentStepIndex !== index)
-        return;
+      if (run !== this.applyRun) return;
     }
     if (step.uiState) this.uiStateTransitionCallback?.(step.uiState);
-    this.postTransitionCallback?.(step.appState);
+    // Generating is the step's one effect that isn't idempotent: another run
+    // could replace the schedule the student is looking at.
+    if (!reapplying || !step.appState?.runAutoSchedule) {
+      this.postTransitionCallback?.(step.appState);
+    }
     this.highlightElement(step.selector, step.scrollArrow ?? false);
-    tutorialOverlayState.set(step, index, tutorial.steps.length);
+    // A fresh object each time, so the box re-seats itself on a re-apply too.
+    tutorialOverlayState.set({ ...step }, index, tutorial.steps.length);
     if (step.waitFor !== 'manual') this.listenForAction(step, suppress);
   }
 
@@ -201,7 +254,7 @@ export class TutorialService {
 
     const el = document.querySelector(selector);
     if (el) {
-      this.revealInView(el);
+      this.revealAndSettle(el);
       this.attachSvgOverlay(el, scrollArrow);
       return;
     }
@@ -218,7 +271,7 @@ export class TutorialService {
         clearTimeout(this.highlightTimeout);
         this.highlightTimeout = null;
       }
-      this.revealInView(found);
+      this.revealAndSettle(found);
       this.attachSvgOverlay(found, scrollArrow);
     });
     this.highlightObserver.observe(document.body, {
@@ -235,9 +288,27 @@ export class TutorialService {
     }, 10_000);
   }
 
-  // Scroll a found target into view if it's outside the viewport, so the
-  // highlight (and the user) land on it. The SVG overlay is a child of the
-  // target's container, so it follows this scroll automatically. A target on a
+  // A step's own transition can still be moving things when its target lands
+  // (a wizard mounting, a drawer sliding in, cards reflowing), so look again
+  // once it has settled.
+  private revealAndSettle(el: Element): void {
+    this.revealInView(el);
+    this.clearSettleTimers();
+    this.settleTimers = [300, 800].map(ms =>
+      setTimeout(() => {
+        if (el.isConnected) this.revealInView(el);
+      }, ms),
+    );
+  }
+
+  private clearSettleTimers(): void {
+    this.settleTimers.forEach(clearTimeout);
+    this.settleTimers = [];
+  }
+
+  // Scroll a found target into view if the window or its own scroll container
+  // cuts it off, so the highlight (and the user) land on it. The SVG overlay is
+  // a child of the target's container, so it follows this scroll. A target on a
   // page the step's own transition just switched to is in the DOM but still
   // display:none, where scrolling does nothing - so wait until it has a box.
   private revealInView(el: Element): void {
@@ -255,14 +326,14 @@ export class TutorialService {
       this.layoutObserver.observe(el);
       return;
     }
-    const outOfView =
-      r.bottom <= 0 ||
-      r.top >= window.innerHeight ||
-      r.right <= 0 ||
-      r.left >= window.innerWidth ||
-      r.top < 0 ||
-      r.bottom > window.innerHeight;
-    if (outOfView) el.scrollIntoView({ block: 'center', inline: 'center' });
+    const scroller = scrollParent(el).getBoundingClientRect();
+    const top = Math.max(scroller.top, 0);
+    const bottom = Math.min(scroller.bottom, window.innerHeight);
+    const cutOff = r.top < top || r.bottom > bottom;
+    // A target taller than its container can't fit however it scrolls.
+    if (cutOff && r.height <= bottom - top) {
+      el.scrollIntoView({ block: 'center', inline: 'nearest' });
+    }
   }
 
   // While a step's target is missing, page the course list forward until it
@@ -301,11 +372,14 @@ export class TutorialService {
     }
 
     const htmlEl = el as HTMLElement;
-    const pad = 5;
 
     const voidEl = ['INPUT', 'IMG', 'TEXTAREA', 'HR', 'BR'].includes(
       htmlEl.tagName,
     );
+    // The overlay is a child of the target, so a target that clips its own
+    // overflow (a scrolling list) would hide one drawn outside its edge.
+    const clipsOwn = !voidEl && getComputedStyle(htmlEl).overflow !== 'visible';
+    const pad = clipsOwn ? -2 : 5;
     const container: HTMLElement = voidEl ? htmlEl.parentElement! : htmlEl;
 
     this.originalPosition = container.style.position;
@@ -332,9 +406,9 @@ export class TutorialService {
     this.svgOverlay = svg;
 
     const updateSize = () => {
+      if (htmlEl.offsetWidth === 0 || htmlEl.offsetHeight === 0) return;
       const w = htmlEl.offsetWidth + pad * 2;
       const h = htmlEl.offsetHeight + pad * 2;
-      if (w <= pad * 2 || h <= pad * 2) return;
       const cs = getComputedStyle(htmlEl);
       const borderTop = parseFloat(cs.borderTopWidth) || 0;
       const borderLeft = parseFloat(cs.borderLeftWidth) || 0;
@@ -474,6 +548,8 @@ export class TutorialService {
   }
 
   private cleanup(): void {
+    this.applyRun++;
+    this.clearSettleTimers();
     this.currentSelector = null;
     this.layoutObserver?.disconnect();
     this.layoutObserver = null;

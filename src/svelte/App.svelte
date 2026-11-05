@@ -2,6 +2,7 @@
   import styles from '../styles/components/right-panel.module.css';
   import { untrack } from 'svelte';
   import { wizardState } from './wizardState.svelte';
+  import { tutorialOverlayState } from './tutorial/tutorialOverlayState.svelte';
   import { wizardScrollLock } from './wizardScrollLock';
   import type { PageId } from '../types/uiState';
   import type { Course } from '../types/types';
@@ -119,8 +120,15 @@
 
   function handleKeydown(e: KeyboardEvent): void {
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
-    // Undo would change the schedule hidden behind the modal or the wizard.
-    if (uiState.openModals.length > 0 || wizardState.isOpen) return;
+    // Undo would change the schedule hidden behind the modal or the wizard, or
+    // the one a tutorial step is built on.
+    if (
+      uiState.openModals.length > 0 ||
+      wizardState.isOpen ||
+      tutorialOverlayState.step
+    ) {
+      return;
+    }
     // Leave text fields their own native undo.
     const target = e.target as Element | null;
     if (target?.closest?.('input, textarea, select, [contenteditable]')) return;

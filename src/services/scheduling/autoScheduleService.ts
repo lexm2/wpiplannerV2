@@ -121,9 +121,16 @@ class AutoScheduleService {
     this.openScheduleFilterModal(selectedCourses);
   }
 
-  runAutoSchedule(): void {
+  /** Generate for the current selection, keeping any named course to its terms. */
+  runAutoSchedule(allowedTerms: Record<string, string[]> = {}): void {
     if (!this.courseSelectionService) return;
-    const selectedCourses = this.courseSelectionService.getSelectedCourses();
+    const selectedCourses = this.courseSelectionService
+      .getSelectedCourses()
+      .map(sc =>
+        allowedTerms[sc.course.id]
+          ? { ...sc, allowedTerms: allowedTerms[sc.course.id] }
+          : sc,
+      );
     void this.doGenerateSchedules(selectedCourses);
   }
 
