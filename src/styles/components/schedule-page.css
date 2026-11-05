@@ -420,6 +420,46 @@
   z-index: 5;
 }
 
+/* Above the focused card (5), below the generating overlay (10). */
+.term-pager {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  box-shadow: var(--effect-shadow-hover);
+}
+
+.term-pager-button {
+  min-width: 2rem;
+  min-height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* A dot under the letter says that term holds classes. */
+.term-pager-button.has-classes {
+  color: var(--color-text);
+  box-shadow: inset 0 -3px 0 -1px var(--color-primary);
+}
+
+.term-pager-button[aria-current='true'] {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: none;
+}
+
 .term-graph {
   border: 1px solid var(--color-border);
   border-radius: var(--effect-border-radius-large);
@@ -480,7 +520,8 @@
 .schedule-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 60px repeat(5, 1fr);
+  /* The label column follows the root font size with the labels in it. */
+  grid-template-columns: 3.75rem repeat(5, 1fr);
   grid-template-rows: auto repeat(var(--grid-hours, 12), minmax(0, 1fr));
   gap: 1px;
   container-type: inline-size;
@@ -513,6 +554,9 @@
   padding: 0 0.25rem;
   min-height: 0;
   overflow: hidden;
+  /* A wrapped "8:00 AM" is twice the row and runs into the next hour. */
+  white-space: nowrap;
+  line-height: 1;
   border-right: 2px solid var(--color-border);
 }
 
@@ -605,19 +649,32 @@
   line-height: 1.1;
 }
 
-@container (max-width: 33px) {
+/* The thresholds are in em, which a container query resolves against the
+   block's own font size, so they follow the root font size like the type does.
+
+   Half-width blocks (two classes sharing a column) keep the code on a line or
+   two at a smaller size instead of clipping at full size. */
+@container (max-width: 4.7em) {
+  .block-label {
+    /* Capped by the block's width so a larger root font cannot outgrow it. */
+    font-size: min(0.62rem, 24cqi);
+    line-height: 1;
+  }
+}
+
+@container (max-width: 2.6em) {
   .block-label {
     font-size: 0.6rem;
   }
 }
 
-@container (max-width: 23px) {
+@container (max-width: 1.8em) {
   .block-label {
     font-size: 0.5rem;
   }
 }
 
-@container (max-width: 17px) {
+@container (max-width: 1.3em) {
   .block-label {
     display: none;
   }
@@ -712,7 +769,7 @@
   white-space: nowrap;
 }
 
-@container (max-width: 17px) {
+@container (max-width: 1.3em) {
   .external-event-block .event-label {
     display: none;
   }

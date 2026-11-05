@@ -15,9 +15,14 @@
     scheduleRange,
     type TermBlocks,
   } from './scheduleGeometry';
+  import { untrack } from 'svelte';
+  import { TermBoundsService } from '../../utils/termBounds';
   import TermGrid from './TermGrid.svelte';
   import {
     TERMS,
+    goToTerm,
+    openingTerm,
+    placeTerm,
     termFocus,
     termMotion,
     toggleFocus,
@@ -95,6 +100,41 @@
   });
 
   const range = $derived(scheduleRange(Object.values(blocksByTerm)));
+
+  const hasClasses = (term: string): boolean =>
+    blocksByTerm[term].blocks.some(b => b.kind === 'section');
+
+  // A focused grid (a phone's only layout) opens on the term the schedule is
+  // about, not always on A, which is over by the time most people use it. Runs
+  // again when the schedule changes, and while it is still empty (the saved
+  // schedule loads after the first render), until the reader pages themselves.
+  let placedFor: string | null | undefined;
+  let placedEmpty = false;
+  $effect(() => {
+    const id = appState.activeScheduleId;
+    const anyClasses = TERMS.some(hasClasses);
+    // The term bounds load after the schedule; course data lands after both.
+    const dataLoaded = appState.loadedDepartments.length > 0;
+    untrack(() => {
+      if (!dataLoaded) return;
+      if (id === placedFor && !(placedEmpty && anyClasses)) return;
+      placedFor = id;
+      placedEmpty = !anyClasses;
+      const bounds = TermBoundsService.getInstance();
+      const year =
+        appState.activeSchedule?.year ?? bounds.getCurrentAcademicYear();
+      placeTerm(
+        openingTerm(
+          hasClasses,
+          term =>
+            bounds.getTermDates(
+              term as 'A' | 'B' | 'C' | 'D',
+              year ?? undefined,
+            )?.end ?? null,
+        ),
+      );
+    });
+  });
 </script>
 
 <!-- Focus state, its zoom/page animation and the wheel/touch/key input that
@@ -119,6 +159,22 @@
       {onOpenEvent}
     />
   {/each}
+  <!-- With one term filling the pane, the other three are otherwise reachable
+       only by a vertical swipe, the wheel or arrow keys. -->
+  {#if termFocus.term !== null}
+    <nav class="term-pager" aria-label="Terms">
+      {#each TERMS as term (term)}
+        <button
+          type="button"
+          class="term-pager-button"
+          class:has-classes={hasClasses(term)}
+          aria-current={termFocus.term === term ? 'true' : undefined}
+          aria-label={`${term} term${hasClasses(term) ? '' : ', no classes'}`}
+          onclick={() => goToTerm(term)}>{term}</button
+        >
+      {/each}
+    </nav>
+  {/if}
   {#if appState.scheduleGenerating}
     <div class="schedule-generating-overlay visible">
       <span class="auto-schedule-spinner"></span>

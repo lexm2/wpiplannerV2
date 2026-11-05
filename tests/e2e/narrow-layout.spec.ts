@@ -119,7 +119,7 @@ for (const device of ['phone UA', 'desktop UA'] as const) {
     test('the schedule opens on one term', async ({ page }) => {
       await boot(page);
       await page.click('#schedule-tab');
-      await expect(page.locator('[data-focused-term="A"]')).toBeVisible();
+      await expect(page.locator('[data-focused-term]')).toBeVisible();
     });
 
     test('course names wrap instead of being cut off', async ({ page }) => {

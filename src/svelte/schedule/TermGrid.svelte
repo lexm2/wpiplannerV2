@@ -132,8 +132,8 @@
             style:left={b.left}
             style:width={b.width}
             style:background-color={b.color}
-            title={b.label}
-            aria-label={b.label}
+            title={b.title}
+            aria-label={b.title}
             onmouseenter={() =>
               (scheduleSidebarState.hoveredCourseId = b.courseId ?? null)}
             onmouseleave={() => (scheduleSidebarState.hoveredCourseId = null)}
