@@ -13,15 +13,18 @@ const ok = { success: true, transactionId: 't' };
 
 function fakeStorage() {
   const writes: string[] = [];
+  const savedNames: string[] = [];
   let failNext = false;
   const storage = {
     saveSchedule: vi.fn((s: Schedule) => {
       writes.push(s.id);
+      savedNames.push(s.name);
       if (failNext) {
         failNext = false;
         return Promise.resolve({ ...ok, success: false, error: new Error() });
       }
-      return Promise.resolve(ok);
+      // Resolves a tick later, as a real write does, so saves overlap it.
+      return new Promise(resolve => setTimeout(() => resolve(ok), 0));
     }),
     deleteSchedule: vi.fn(() => Promise.resolve(ok)),
     saveActiveScheduleId: vi.fn(() => ok),
@@ -32,6 +35,7 @@ function fakeStorage() {
   return {
     storage: storage as unknown as TransactionalStorageManager,
     writes,
+    savedNames,
     failNextWrite: () => (failNext = true),
   };
 }
@@ -68,6 +72,22 @@ describe('ProfileStateManager save', () => {
     psm.renameSchedule(a.id, 'A2');
     await settled(psm);
     expect(writes).toEqual([a.id]);
+  });
+
+  it('writes a burst of edits to one schedule at most twice, ending on the latest', async () => {
+    const { storage, writes, savedNames } = fakeStorage();
+    const psm = makePsm(storage);
+    const a = psm.createSchedule('A');
+    await settled(psm);
+    writes.length = 0;
+    savedNames.length = 0;
+
+    for (let i = 1; i <= 25; i++) psm.renameSchedule(a.id, `A${i}`);
+    expect(psm.hasPendingSaves()).toBe(true);
+    await settled(psm);
+
+    expect(writes.length).toBeLessThanOrEqual(2);
+    expect(savedNames.at(-1)).toBe('A25');
   });
 
   it('retries a schedule whose write failed', async () => {
