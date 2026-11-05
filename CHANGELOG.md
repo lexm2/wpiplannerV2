@@ -8,6 +8,7 @@
 - Calendar Events lists your events. Edit them, delete several at once, or add and import more. One-time events show here too
 - Click an event on the schedule to edit or delete it
 - Courses in a calendar you export are marked, so importing that calendar later skips them instead of adding them as events
+- A subtle "may not count" hint on the Degree page when a requirement's rules don't list a course. Placement is never blocked
 
 ### Changed
 - Auto-Schedule picks each course's sections by your preferences instead of only by the least time between classes
@@ -22,9 +23,20 @@
 - Classes that overlap a calendar event show as a conflict on the schedule
 - Adding, importing or deleting calendar events can be undone
 - Thursday shows as R in Add Event, like the rest of the planner
+- The planner's academic year switches to next year once next year is published
+- Adding a course from another academic year offers to switch to, or create, a schedule of that year instead of mixing years
+- A course offered in alternating years shows as Cat. II instead of Cat. I, in its details and in the offering filter
+- The Filter Courses window applies filters as you set them and closes with Done
+- The details panel shows "Also listed as ..." and instructor ratings
+- Adding the second listing of a cross-listed class asks before counting it twice
+- Selected Courses links to the Schedule page for picking sections
+- The "incomplete" marker in the schedule sidebar now reads "Pick sections"
+- Previous/next schedule use chevrons, and Restart auto-schedule uses an adjustments icon
+- Requirements that depend on in-progress courses read "Satisfied (in progress)", and the Degree summary shows how many are complete
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
+- The clear-filters eraser button. Clear filters from the Filter Courses window
 
 ### Fixed
 - The Managing Schedules tutorial no longer gets stuck on windows narrower than 1250px, where the Schedules button is in the gear menu. It points at the gear and moves on when you choose Schedules
@@ -33,6 +45,68 @@
 - Hiding sections that conflict with calendar events now follows events you add or delete after turning it on
 - The calendar events count leaves out one-time events, which don't block any time
 - Undo and redo shortcuts no longer change the schedule behind an open window
+- Two planner tabs no longer overwrite each other. Changes show up in the other tab, a schedule deleted in one tab stays deleted, and a tab that would overwrite a newer copy keeps the newer one and tells you
+- Clear All Data resets the whole screen (degree record, theme, panel widths) and can no longer be undone by another open tab
+- Export, Export All and Duplicate keep calendar events, required courses, locked sections and custom colours. Imported schedules keep the name saved in the file
+- Import from the schedule list adds every schedule in an Export All file. Importing into one schedule takes the file's active schedule and tells you when there are more
+- A course missing from the catalog no longer rejects a whole import: the rest is imported and the missing ones are named. Wrong or damaged files get their own message
+- Undo after a failed import no longer brings back an empty schedule, and schedules removed or restored by undo and redo stay that way after a reload
+- One unreadable saved schedule or setting no longer hides the others; you are told how many could not be read
+- You are told when saved sections are no longer offered or saved courses are from an older catalog, and adding the current version of such a course replaces the old one
+- A failed course catalog download says so and offers Retry instead of suggesting you delete your data. Clear Data and Reload asks first, and the error banner no longer covers the page tabs
+- Fall and Spring sections now show as conflicting with the A/B and C/D classes they overlap in the schedule grid
+- A section that meets twice in a day is drawn as separate blocks, and conflicts cover only the time actually shared
+- Narrow grid blocks show a readable compact label, and each block's tooltip names the course, section and time
+- Schedule time labels no longer overlap at larger text sizes
+- ICS export ends a section on its own last day when it has one, and includes a proper time zone definition and a valid product ID
+- On a phone, the Schedule page opens on the current term instead of always A, and a term pager shows the other terms
+- Section wizard cards show every meeting of a section, not just the first
+- "Change Sections" opens the wizard on your current picks and keeps them unless you change them
+- The section wizard names its course at every width, takes focus when it opens, keeps the hidden course list out of the Tab order, and returns focus when it closes
+- Undo and redo no longer change the schedule behind an open section wizard, and the wizard closes if its course is removed
+- Double-clicking Next in the section wizard no longer skips a step
+- Escape closes the section wizard even when a professor link has focus or a term is zoomed in
+- Auto-Schedule no longer applies a finished run to a different schedule. If you switch schedules or change courses while it runs, the result is discarded and you are told
+- Undo after Auto-Schedule returns to exactly what you had before pressing Generate, and Redo brings the generated schedule back
+- A blank or half-typed start or end time on a calendar event is rejected instead of saving as 12:00 AM
+- Turning off "Keep classes clear of my calendar events" shows in the Filters "N active" badge in Auto-Schedule, and Clear All turns it back on
+- Auto-Schedule's Filters section no longer shows filters it ignores (Course Level, Departments, Academic Year, Credit Hours), and its preview no longer reads "0 sections" when Generate would work
+- The calendar import's "Not added" list no longer says "and N more" when there are no more titles, and a series made only of listed dates keeps its first meeting
+- A term whose only sections are hidden by your calendar-event filter is no longer marked "All sections full"
+- Auto-Schedule results show "Schedule N of M", are announced to screen readers, and focus lands on Next schedule after Generate
+- Auto-Schedule term chips are larger on touch screens
+- Events that end between 5-minute marks (for example 10:03) now keep a class from starting inside them, matching the grid
+- Auto-Schedule warns when a lunch break is longer than its window, or when "Free days" has no days ticked
+- The default academic year no longer counts as an active filter in the Filter button, its window and the Auto-Schedule filters badge. It counts only when you change it
+- A search made only of punctuation or emoji is treated as no search instead of reordering the list
+- Empty results say which search and filters are narrowing the list, with a one-click way to clear them
+- Collapsed department categories no longer leave their departments in the Tab order, and show how many are selected
+- Professor suggestions list individual instructors only
+- Double-clicking a trash icon in Selected Courses removes one course
+- Panels can no longer be dragged until the course list is unusably narrow, and old oversized widths are repaired
+- Term badges and term pickers in course rows follow the list's width instead of the window's
+- Picking another course scrolls the details panel back to the top
+- The department search in Filter Courses matches full names
+- Minimum Available Seats rejects negatives and exponent notation, and Credit Hours now reaches 0, 0.75 and 1.5-credit courses
+- The last-updated time reads "Nov 4, 2026 at 6:11 PM"
+- Toggling professor search keeps your typed text
+- Department counts in the bookmarks view follow the bookmarked list
+- Schedule switching, the header and gear menus, and the theme menu work from the keyboard. Arrow keys, Home and End move between items, Escape returns to the button, and focus is no longer lost after closing What's New or a confirmation
+- Clicking outside a schedule's menu in the Schedules window closes only the menu
+- New Schedule, Import and Export All stay visible however many schedules there are
+- At narrow widths all four themes are available from the settings menu, and High Contrast is no longer dropped by the theme toggle
+- The header reflows at larger text sizes instead of clipping the title or covering the Degree tab
+- Added a "Skip to main content" link and page landmarks, and many controls now tell screen readers their name and state
+- Uploading a corrupt, empty or non-Excel file on the Degree page says what is wrong and which file to export from Workday
+- The Total Credits and Residency cards count scheduled courses, matching the summary
+- "Needs N more" on a requirement is no longer capped at 12
+- Focus stays in place after assigning, moving or removing a course on the Degree page; menus respond to arrow keys; Escape cancels a course drag
+- Undo on the Degree page steps back through course placements before schedule edits
+- Clicking a course code while a Browse filter is on opens that course, and ending Browse restores your course-level filter
+- Clear record explains what it removes. Deleted Workday requirements can be restored from the Buckets window
+- The Degree course finder matches "CS2223" as well as "CS 2223"
+- A placed course no longer vanishes under a status filter; a note explains it
+- Empty-schedule message, "1 course" plural and an import-warning typo on the Degree page
 
 ## [2026-10-10]
 
