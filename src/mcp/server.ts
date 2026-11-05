@@ -24,6 +24,7 @@ import {
   AutoScheduleInputSchema,
   generateSchedules,
 } from '../api/autoSchedule';
+import type { ScheduleSearch } from '../api/scheduleSearch';
 import { logger } from '../utils/logger';
 import { TERMS } from '../utils/typeGuards';
 import {
@@ -135,7 +136,10 @@ const YearInputSchema = FallYearSchema.describe(
 /** Every tool only reads the catalog it is given. */
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false };
 
-function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
+function buildServer(
+  getCatalog: () => Promise<Catalog>,
+  search?: ScheduleSearch,
+): McpServer {
   const server = new McpServer(
     { name: 'wpi-courses', version: '2.0.0' },
     {
@@ -358,7 +362,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
       inputSchema: AutoScheduleInputSchema,
     },
     async input => {
-      const set = generateSchedules(await getCatalog(), input);
+      const set = await generateSchedules(await getCatalog(), input, search);
       return {
         content: text(renderSchedules(set)),
         structuredContent: { ...set },
@@ -372,6 +376,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
 /** The MCP endpoint: stateless, one fresh server per request. */
 export function createMcpEndpoint(
   getCatalog: () => Promise<Catalog>,
+  search?: ScheduleSearch,
 ): McpHttpHandler {
-  return createMcpHandler(() => buildServer(getCatalog));
+  return createMcpHandler(() => buildServer(getCatalog, search));
 }

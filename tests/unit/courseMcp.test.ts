@@ -1541,7 +1541,7 @@ describe('generate_schedules', () => {
     });
     expect(none.isError).toBe(false);
     expect(none.text).toContain('No schedule found for 2026-27.');
-    expect(none.text).toContain('Note: No schedule: every combination');
+    expect(none.text).toContain('Note: No schedule: XX 1005 and XX 1008 clash in every combination');
     expect(none.text).not.toContain('Run check_conflicts');
     const bad = await toolOn(mcp, 'generate_schedules', {
       courses: ['XX 9999'],

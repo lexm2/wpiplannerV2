@@ -14,6 +14,7 @@ import {
 import { FallYearSchema } from './schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from './conflicts';
 import { AutoScheduleInputSchema, generateSchedules } from './autoSchedule';
+import type { ScheduleSearch } from './scheduleSearch';
 import { catalogMeta, listDepartments, lookupCourse } from './lookup';
 import { ApiError, echo } from './errors';
 import { logger } from '../utils/logger';
@@ -212,6 +213,7 @@ interface RouteContext {
   /** The path's regex match, for a route keyed by one. */
   match: RegExpExecArray | null;
   getCatalog: () => Promise<Catalog>;
+  search?: ScheduleSearch;
 }
 
 interface Route {
@@ -302,12 +304,12 @@ const ROUTES: Route[] = [
   {
     path: '/schedules',
     method: 'POST',
-    handle: async ({ request, getCatalog }) => {
+    handle: async ({ request, getCatalog, search }) => {
       const input = parseOrThrow(
         AutoScheduleInputSchema,
         await readBody(request),
       );
-      return json(generateSchedules(await getCatalog(), input));
+      return json(await generateSchedules(await getCatalog(), input, search));
     },
   },
 ];
@@ -317,6 +319,7 @@ async function route(
   path: string,
   url: URL,
   getCatalog: () => Promise<Catalog>,
+  search: ScheduleSearch | undefined,
 ): Promise<Response> {
   for (const { path: key, method, handle } of ROUTES) {
     const match = typeof key === 'string' ? null : key.exec(path);
@@ -330,7 +333,7 @@ async function route(
         { Allow: `${method}, OPTIONS` },
       );
     }
-    return handle({ request, url, match, getCatalog });
+    return handle({ request, url, match, getCatalog, search });
   }
   throw new ApiError('Not found', 404);
 }
@@ -349,6 +352,8 @@ export const API_VERSION = 'v1';
 export function createApiHandler(options: {
   basePath: string;
   getCatalog: () => Promise<Catalog>;
+  /** Where generate_schedules searches; default: in this thread. */
+  search?: ScheduleSearch;
 }): (request: Request) => Promise<Response | null> {
   const root = `${options.basePath}/api`;
   const prefix = `${root}/${API_VERSION}`;
@@ -372,7 +377,13 @@ export function createApiHandler(options: {
 
     const path = url.pathname.slice(prefix.length).replace(/\/$/, '');
     try {
-      return await route(request, path, url, options.getCatalog);
+      return await route(
+        request,
+        path,
+        url,
+        options.getCatalog,
+        options.search,
+      );
     } catch (error) {
       if (error instanceof ApiError) {
         return json(

@@ -25,6 +25,8 @@ export type NoticeCode =
   // What is left out or cannot be taken.
   /** Sections of ended terms, left out by default. */
   | 'endedTermsLeftOut'
+  /** generate_schedules: Closed sections, left out by default. */
+  | 'closedLeftOut'
   /** Ended terms' sections, listed as asked, though they cannot be taken. */
   | 'endedTermsListed'
   /** Courses dropped because their labs or discussions failed a filter. */
@@ -52,6 +54,8 @@ export type NoticeCode =
   | 'searchCutShort'
   /** generate_schedules: the search stopped at its cap of schedules. */
   | 'searchCapped'
+  /** generate_schedules: a shown schedule has sections of a term already under way. */
+  | 'inProgress'
   /** One of an unpublished year's early entries: tentative. */
   | 'earlyEntry'
   /** A past year's offering. */

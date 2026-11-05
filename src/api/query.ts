@@ -37,6 +37,7 @@ import { knownTermNotes } from './knownTerms';
 import { echo } from './errors';
 import { notice, type Notice } from './notices';
 import { one } from './text';
+import { ClosedSectionsFilter } from './closedSectionsFilter';
 import { EndedTermsFilter } from './endedTermsFilter';
 import { strictObject } from './schemaHints';
 import {
@@ -434,6 +435,7 @@ function createFilterService(catalog: Catalog): FilterService {
     service.registerFilter(filter);
   }
   service.registerFilter(new EndedTermsFilter());
+  service.registerFilter(new ClosedSectionsFilter());
   return service;
 }
 

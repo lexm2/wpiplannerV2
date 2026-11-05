@@ -85,6 +85,16 @@ export function endedTerms(catalog: Catalog, year: number): TermLetter[] {
   return (Object.keys(dates) as TermLetter[]).filter(t => dates[t].end < now);
 }
 
+/** Terms of `year` under way today (B, and F with it, say). */
+export function termsInProgress(catalog: Catalog, year: number): TermLetter[] {
+  const dates = termDates(catalog, year);
+  if (!dates) return [];
+  const now = today(catalog);
+  return (Object.keys(dates) as TermLetter[]).filter(
+    t => dates[t].start <= now && now <= dates[t].end,
+  );
+}
+
 export interface TermNow {
   /** The quarter in session today, or null between terms. */
   term: Quarter | null;

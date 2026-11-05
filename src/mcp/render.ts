@@ -1001,7 +1001,7 @@ function scheduleLines(schedule: GeneratedSchedule): string[] {
   const lines = [`#${schedule.rank}: CRNs ${schedule.crns.join(', ')}`];
   for (const q of schedule.quarters) {
     lines.push(
-      `  ${q.quarter}: ${q.days.join('')}, ${q.earliestStart}-${q.latestEnd}, ${plural(q.idleMinutes, 'idle minute')}`,
+      `  ${q.quarter}${q.endedOn ? ` (ended ${q.endedOn})` : ''}: ${q.days.join('')}, ${q.earliestStart}-${q.latestEnd}, ${plural(q.idleMinutes, 'idle minute')}`,
     );
   }
   for (const course of schedule.courses) {
@@ -1032,6 +1032,13 @@ export function renderSchedules(set: ScheduleSet): string {
   }
   if (set.notices.length)
     lines.push('', ...set.notices.map(n => `Note: ${n.message}`));
+  if (
+    set.schedules.some(s =>
+      s.courses.some(c => c.sections.some(x => x.uncapped)),
+    )
+  ) {
+    lines.push('', MEMBERSHIP_NOTE);
+  }
   if (set.schedules.length) {
     lines.push(
       '',

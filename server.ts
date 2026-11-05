@@ -18,6 +18,7 @@ import {
   mcpCallError,
   mcpToolName,
 } from './src/api/requestLog';
+import { createSearchPool } from './src/api/scheduleSearchPool';
 import { createMcpEndpoint } from './src/mcp/server';
 
 const basePath = (process.env.BASE_PATH ?? '/wpiplannerV2').replace(/\/$/, '');
@@ -38,8 +39,13 @@ const catalog = new CatalogSource({
 });
 const getCatalog = () => catalog.get();
 
-const api = createApiHandler({ basePath, getCatalog });
-const mcp = createMcpEndpoint(getCatalog);
+// Searches run in workers so a long one never stalls the other requests.
+const search = createSearchPool({
+  workers: Number(process.env.SEARCH_WORKERS ?? 2),
+  maxQueue: Number(process.env.SEARCH_QUEUE ?? 8),
+});
+const api = createApiHandler({ basePath, getCatalog, search });
+const mcp = createMcpEndpoint(getCatalog, search);
 const mcpPath = `${basePath}/mcp`;
 const healthPath = `${basePath}/api/${API_VERSION}/health`;
 
