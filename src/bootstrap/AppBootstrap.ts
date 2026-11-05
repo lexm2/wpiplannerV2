@@ -3,6 +3,7 @@ import { CourseSelectionService } from '../services/selection/CourseSelectionSer
 import { BitMaskEngine } from '../core/scheduling/BitMaskEngine';
 import { FilterService } from '../services/filtering/FilterService';
 import { ScheduleManagementService } from '../services/selection/ScheduleManagementService';
+import { YearScheduleSwitcher } from '../services/selection/YearScheduleSwitcher';
 import { ProfileStateManager } from '../core/state/ProfileStateManager';
 import { ThemeManager } from '../themes/ThemeManager';
 import { OperationManager } from '../utils/RequestCancellation';
@@ -62,6 +63,12 @@ export class AppBootstrap {
       profileStateManager,
       courseSelectionService,
     );
+    const yearScheduleSwitcher = new YearScheduleSwitcher(
+      profileStateManager,
+      scheduleManagementService,
+      courseSelectionService,
+    );
+    courseSelectionService.setYearSwitcher(yearScheduleSwitcher);
 
     const operationManager = new OperationManager();
 
@@ -86,6 +93,7 @@ export class AppBootstrap {
       conflictDetector,
       filterService,
       scheduleManagementService,
+      yearScheduleSwitcher,
       themeManager,
       operationManager,
       colorService,
@@ -104,12 +112,14 @@ export class AppBootstrap {
       profileStateManager,
       colorService,
       autoScheduleOrchestrator,
+      yearScheduleSwitcher,
     } = services;
 
     componentWizardService.init(
       courseSelectionService,
       courseDataService,
       filterService,
+      yearScheduleSwitcher,
     );
     localEventService.init(profileStateManager);
     sectionInfoService.init(courseSelectionService, colorService);

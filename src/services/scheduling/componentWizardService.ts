@@ -5,6 +5,7 @@ import { determineAvailableSteps } from '../../svelte/wizardLogic';
 import { schedulePreviewState } from '../../svelte/schedule/schedulePreviewState.svelte';
 import type { CourseSelectionService } from '../selection/CourseSelectionService';
 import type { CourseDataService } from '../data/courseDataService';
+import type { YearScheduleSwitcher } from '../selection/YearScheduleSwitcher';
 import type { FilterService } from '../filtering/FilterService';
 import { logger } from '../../utils/logger';
 import { showAppError } from '../ui/uiState.svelte';
@@ -23,22 +24,21 @@ class ComponentWizardService {
   private courseSelectionService: CourseSelectionService | null = null;
   private courseDataService: CourseDataService | null = null;
   private filterService: FilterService | null = null;
+  private yearScheduleSwitcher: YearScheduleSwitcher | null = null;
 
   init(
     courseSelectionService: CourseSelectionService,
     courseDataService: CourseDataService,
     filterService: FilterService,
+    yearScheduleSwitcher: YearScheduleSwitcher,
   ): void {
+    this.yearScheduleSwitcher = yearScheduleSwitcher;
     this.courseSelectionService = courseSelectionService;
     this.courseDataService = courseDataService;
     this.filterService = filterService;
   }
 
-  openComponentWizard(
-    course: Course,
-    existingSelections?: SelectedCourse,
-    initialStep?: ComponentKind,
-  ): void {
+  openComponentWizard(course: Course, initialStep?: ComponentKind): void {
     if (!this.courseDataService || !this.courseSelectionService) {
       logger.error('CourseDataService not available');
       return;
@@ -55,6 +55,20 @@ class ComponentWizardService {
       logger.error('Could not find fresh course data for:', course.id);
       return;
     }
+
+    // The wizard edits a course that is already on the schedule, and starts
+    // from whatever it holds, whichever surface opened it.
+    const existingSelections = this.courseSelectionService
+      .getSelectedCourses()
+      .find(sc => sc.course.id === freshCourse.id);
+    if (!existingSelections) {
+      logger.error('Course is not selected:', course.id);
+      return;
+    }
+
+    // A wizard already open for another course leaves its previewed picks
+    // drawn on the grid; they are abandoned, not committed.
+    schedulePreviewState.clear();
 
     wizardState.open(
       {
@@ -73,6 +87,19 @@ class ComponentWizardService {
           this.onWizardHoverPreview(freshCourse, selections),
       },
       initialStep,
+    );
+    // Seed the grid overlay with the wizard's own picks, so a hover preview
+    // never swaps the course's real blocks for an empty selection.
+    this.onWizardSelectionChange(freshCourse, wizardState.selections);
+  }
+
+  /**
+   * The wizard was opened for a course of another academic year than the active
+   * schedule. Offers the move; afterwards the wizard reopens on the new schedule.
+   */
+  offerYearSwitch(course: Course): void {
+    this.yearScheduleSwitcher?.offerSwitch(course, () =>
+      this.openComponentWizard(course),
     );
   }
 
