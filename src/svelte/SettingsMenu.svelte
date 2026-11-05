@@ -1,5 +1,6 @@
 <script lang="ts">
   import { scale } from 'svelte/transition';
+  import { tick } from 'svelte';
   import { appState } from '../core/state/appState.svelte';
   import {
     uiState,
@@ -15,6 +16,8 @@
   import { getInlineSVG } from '../utils/iconPaths';
   import { dur } from './transitions';
   import { clickOutside } from './clickOutside';
+  import { menuKeys, focusMenuItem, openingKey } from './menuKeys';
+  import { ThemeManager } from '../themes/ThemeManager';
 
   // The dropdown is position:fixed (anchored to the viewport), so rendering it
   // inside the header rather than in the body places it identically. Actions are
@@ -24,19 +27,24 @@
     scheduleManagementService,
     getTutorial,
     onSchedules,
-    onToggleTheme,
     onUndo,
     onRedo,
   }: {
     scheduleManagementService: ScheduleManagementService;
     getTutorial: () => TutorialSetup | undefined;
     onSchedules: () => void;
-    onToggleTheme: () => void;
     onUndo: () => void;
     onRedo: () => void;
   } = $props();
 
+  // The header's theme dropdown is hidden below 1250px, so the menu offers the
+  // same choice there.
+  const themeManager = ThemeManager.getInstance();
+  const themes = themeManager.getAvailableThemes();
+  const currentThemeId = $derived(uiState.currentThemeId);
+
   let open = $state(false);
+  let menuEl = $state<HTMLElement | null>(null);
   let trigger = $state<HTMLButtonElement | null>(null);
 
   // The menu hangs from the gear: its corner meets the button's, a few px
@@ -65,9 +73,28 @@
     };
   }
 
-  function toggle(): void {
-    if (!open) place();
-    open = !open;
+  // Opens with focus on an item when the trigger was operated by keyboard
+  // (a click from Enter or Space has no pointer, so detail is 0); a mouse
+  // click leaves focus where it is.
+  async function openMenu(focus: 'first' | 'last' | null): Promise<void> {
+    place();
+    open = true;
+    if (!focus) return;
+    await tick();
+    focusMenuItem(menuEl, focus);
+  }
+
+  function toggle(e: MouseEvent): void {
+    if (open) open = false;
+    else void openMenu(e.detail === 0 ? 'first' : null);
+  }
+
+  function onTriggerKeydown(e: KeyboardEvent): void {
+    const which = openingKey(e);
+    if (!which) return;
+    e.preventDefault();
+    if (open) focusMenuItem(menuEl, which);
+    else void openMenu(which);
   }
 
   // appState.canUndo/canRedo are runes published by UndoRedoManager - the same
@@ -110,9 +137,11 @@
   }
 
   // Each item closes the menu as it runs; clicks anywhere else close it via
-  // clickOutside.
+  // clickOutside. Focus goes back to the gear first: the item is about to be
+  // removed, and a dialog the action opens restores focus to whatever held it.
   function choose(action: () => void): () => void {
     return () => {
+      trigger?.focus();
       open = false;
       action();
     };
@@ -134,10 +163,12 @@
   class="btn btn-icon settings-menu-btn"
   title="Settings"
   aria-label="Settings menu"
-  aria-haspopup="true"
+  aria-haspopup="menu"
   aria-expanded={open}
+  aria-controls={open ? 'settings-dropdown-menu' : undefined}
   class:open
   bind:this={trigger}
+  onkeydown={onTriggerKeydown}
   onclick={toggle}>{@html getInlineSVG('SETTINGS', 'settings-icon')}</button
 >
 
@@ -146,33 +177,53 @@
     class="settings-dropdown-menu"
     class:up={anchor.up}
     id="settings-dropdown-menu"
+    role="menu"
+    aria-label="Settings"
+    bind:this={menuEl}
     style:top={anchor.up ? 'auto' : `${anchor.top}px`}
     style:bottom={anchor.up ? `${anchor.bottom}px` : 'auto'}
     style:right="{anchor.right}px"
     style:max-height="{anchor.maxHeight}px"
     transition:scale={{ start: 0.92, duration: dur(150) }}
     use:clickOutside={{ onOutside: () => (open = false), ignore: trigger }}
+    use:menuKeys={{ trigger, onClose: () => (open = false) }}
   >
     <button
       class="settings-menu-item narrow-only"
+      role="menuitem"
       id="settings-schedules-btn"
       onclick={choose(onSchedules)}
     >
       {@html getInlineSVG('CALENDAR_UP', 'menu-item-icon')}<span>Schedules</span
       >
     </button>
-    <button
-      class="settings-menu-item narrow-only"
-      id="settings-theme-btn"
-      onclick={choose(onToggleTheme)}
+    <div
+      class="settings-menu-group narrow-only"
+      role="group"
+      aria-labelledby="settings-theme-label"
     >
-      {@html getInlineSVG('BRIGHTNESS', 'menu-item-icon')}<span
-        >Toggle Theme</span
-      >
-    </button>
+      <div class="settings-menu-label" id="settings-theme-label">Theme</div>
+      {#each themes as t (t.id)}
+        <button
+          class="settings-menu-item"
+          id="settings-theme-{t.id}"
+          role="menuitemradio"
+          aria-checked={t.id === currentThemeId}
+          onclick={choose(() => themeManager.setTheme(t.id))}
+        >
+          <span
+            class="menu-item-check"
+            class:checked={t.id === currentThemeId}
+            aria-hidden="true"
+            >{@html getInlineSVG('CHECK', 'menu-item-icon')}</span
+          ><span>{t.name}</span>
+        </button>
+      {/each}
+    </div>
     {#if onClasses}
       <button
         class="settings-menu-item"
+        role="menuitem"
         id="settings-view-btn"
         onclick={choose(() => setView(otherView))}
       >
@@ -184,6 +235,7 @@
     {/if}
     <button
       class="settings-menu-item narrow-only"
+      role="menuitem"
       id="settings-undo-btn"
       disabled={!canUndo}
       onclick={choose(onUndo)}
@@ -192,6 +244,7 @@
     </button>
     <button
       class="settings-menu-item narrow-only"
+      role="menuitem"
       id="settings-redo-btn"
       disabled={!canRedo}
       onclick={choose(onRedo)}
@@ -201,6 +254,7 @@
     </button>
     <button
       class="settings-menu-item"
+      role="menuitem"
       id="changelog-btn"
       onclick={choose(() => openModal('changelog'))}
     >
@@ -209,6 +263,7 @@
     {#if getTutorial() && tutorialsAvailable()}
       <button
         class="settings-menu-item"
+        role="menuitem"
         id="tutorials-btn"
         onclick={choose(openTutorials)}
       >
@@ -219,6 +274,7 @@
     {/if}
     <button
       class="settings-menu-item danger"
+      role="menuitem"
       id="clear-all-data-btn"
       onclick={choose(clearAllData)}
     >

@@ -98,7 +98,7 @@ test.describe('schedule picker More options menu', () => {
     await row.getByTitle('More options').click();
     await row
       .locator('[data-visible="true"]')
-      .getByRole('button', { name: 'Rename' })
+      .getByRole('menuitem', { name: 'Rename' })
       .click();
     await expect(openMenu(page)).toHaveCount(0);
     await expect(row.getByLabel('Schedule name')).toBeFocused();
@@ -143,7 +143,10 @@ test.describe('settings dropdown', () => {
     const name = page.locator('#current-theme-name');
     const before = await name.textContent();
     await page.click('#settings-menu-btn');
-    await page.click('#settings-theme-btn');
+    await settingsMenu(page)
+      .locator('[role="menuitemradio"][aria-checked="false"]')
+      .first()
+      .click();
     await expect(name).not.toHaveText(before ?? '');
     await expect(settingsMenu(page)).toHaveCount(0);
   });

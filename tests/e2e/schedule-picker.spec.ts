@@ -118,7 +118,7 @@ test.describe('More options button', () => {
       menu.getByRole('button', { name: 'Export ICS' }),
     ).toBeVisible();
     await expect(menu.getByRole('button', { name: 'Import' })).toBeVisible();
-    await expect(menu.getByRole('button', { name: 'Rename' })).toBeHidden();
+    await expect(menu.getByRole('menuitem', { name: 'Rename' })).toBeHidden();
   });
 
   test('at narrow widths it holds every action', async ({ page }) => {
@@ -130,9 +130,48 @@ test.describe('More options button', () => {
     await expect(row.getByRole('button', { name: 'Rename' })).toBeHidden();
     await row.getByTitle('More options').click();
     await expect(
-      row.locator('[data-visible="true"]').getByRole('button', {
+      row.locator('[data-visible="true"]').getByRole('menuitem', {
         name: 'Rename',
       }),
     ).toBeVisible();
   });
+});
+
+test('a schedule can be switched to from the keyboard', async ({ page }) => {
+  await load(page);
+  await page.evaluate(() =>
+    (window as any).services.scheduleManagementService.createNewSchedule(
+      'Second plan',
+    ),
+  );
+  await page.click('#schedule-picker-btn');
+  const rows = page.locator(`${PICKER} .schedule-item`);
+  await expect(rows.nth(1).locator('.schedule-item-name')).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
+
+  await rows.nth(0).locator('.schedule-item-name').focus();
+  await page.keyboard.press('Enter');
+  await expect(rows.nth(0).locator('.schedule-item-name')).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
+});
+
+test('a click on the backdrop closes an open menu but not the window', async ({
+  page,
+}) => {
+  await load(page);
+  await page.click('#schedule-picker-btn');
+  const menu = page.locator(`${PICKER} [data-visible="true"]`);
+  await firstRow(page).getByTitle('More options').click();
+  await expect(menu).toBeVisible();
+
+  await page.mouse.click(4, 450);
+  await expect(menu).toHaveCount(0);
+  await expect(page.locator(PICKER)).toBeVisible();
+
+  await page.mouse.click(4, 450);
+  await expect(page.locator(PICKER)).toHaveCount(0);
 });
