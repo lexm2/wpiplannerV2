@@ -15,6 +15,7 @@ import { FilterableSection } from '../../types/filterableUnit';
 import { getAllSections } from '../../utils/courseUtils';
 import type { FilterOption } from '../../types/common';
 import { logger } from '../../utils/logger';
+import { countActiveFilters } from './advancedFilterCount';
 
 export class FilterService {
   private filterState: FilterState;
@@ -97,22 +98,9 @@ export class FilterService {
     }
   }
 
-  /** Check if filters are in "default" state (only the schedule's year filter, or empty) */
-  hasNonDefaultFilters(scheduleYear?: number): boolean {
-    const filters = this.getActiveFilters();
-    if (filters.length === 0) {
-      // "All" years (no year filter) differs from a schedule that has a year.
-      return scheduleYear !== undefined;
-    }
-    if (
-      filters.length === 1 &&
-      filters[0].id === 'academicYear' &&
-      scheduleYear !== undefined
-    ) {
-      const criteria = filters[0].criteria as { year: number | 'all' };
-      return criteria.year !== scheduleYear;
-    }
-    return true;
+  /** Whether the student has set any filter beyond the default academic year. */
+  hasNonDefaultFilters(scheduleYear: number | undefined): boolean {
+    return this.getFilterCount(scheduleYear) > 0;
   }
 
   hasFilter(filterId: string): boolean {
@@ -132,8 +120,9 @@ export class FilterService {
     return this.filterState.getFilter(filterId)?.criteria as T | undefined;
   }
 
-  getFilterCount(): number {
-    return this.filterState.getFilterCount();
+  /** Filters the student set; the default academic year is not counted. */
+  getFilterCount(scheduleYear: number | undefined): number {
+    return countActiveFilters(this.getActiveFilters(), scheduleYear);
   }
 
   isEmpty(): boolean {
@@ -187,16 +176,7 @@ export class FilterService {
       );
     }
 
-    if (
-      bookmarkCriteria &&
-      bookmarkCriteria.showBookmarkedOnly &&
-      this.getBookmarkedCourseIds
-    ) {
-      const bookmarkedIds = new Set(this.getBookmarkedCourseIds());
-      filteredCourses = filteredCourses.filter(course =>
-        bookmarkedIds.has(course.id),
-      );
-    }
+    filteredCourses = this.keepBookmarked(filteredCourses, bookmarkCriteria);
 
     // A search criterion was only accepted through the registered
     // SearchTextFilter, which ranks by the index it matched with.
@@ -211,20 +191,38 @@ export class FilterService {
     return filteredCourses;
   }
 
+  /** Like filterCourses(), but skipping the given filters (and not ranking). */
   filterCoursesExcluding(courses: Course[], excludeIds: string[]): Course[] {
     const criteriaMap = this.getCriteriaMap();
+    const bookmarkCriteria = criteriaMap.get('bookmark') as
+      BookmarkFilterCriteria | undefined;
     criteriaMap.delete('bookmark');
     for (const id of excludeIds) {
       criteriaMap.delete(id);
     }
 
-    if (criteriaMap.size === 0) {
+    let filtered = courses;
+    if (criteriaMap.size > 0) {
+      const sections = this.sectionPipeline.flattenCoursesToSections(courses);
+      filtered = this.sectionPipeline.reconstructCourses(
+        this.sectionPipeline.applyFilters(sections, criteriaMap),
+      );
+    }
+    return excludeIds.includes('bookmark')
+      ? filtered
+      : this.keepBookmarked(filtered, bookmarkCriteria);
+  }
+
+  // The bookmark filter is course-level, so it runs after the section pipeline.
+  private keepBookmarked(
+    courses: Course[],
+    criteria: BookmarkFilterCriteria | undefined,
+  ): Course[] {
+    if (!criteria?.showBookmarkedOnly || !this.getBookmarkedCourseIds) {
       return courses;
     }
-
-    const sections = this.sectionPipeline.flattenCoursesToSections(courses);
-    const filtered = this.sectionPipeline.applyFilters(sections, criteriaMap);
-    return this.sectionPipeline.reconstructCourses(filtered);
+    const bookmarkedIds = new Set(this.getBookmarkedCourseIds());
+    return courses.filter(course => bookmarkedIds.has(course.id));
   }
 
   /** Like apply(), but skipping the given section filters. */

@@ -24,6 +24,7 @@ import { ExportDataSchema } from '../../types/export';
 import { UndoRedoManager } from './UndoRedoManager';
 import { appState } from './appState.svelte';
 import { TermBoundsService } from '../../utils/termBounds';
+import { isYearPublished } from '../../utils/yearPublished';
 import { showAppError } from '../../services/ui/uiState.svelte';
 
 export interface ProfileState {
@@ -346,20 +347,29 @@ export class ProfileStateManager {
   }
 
   /**
-   * The academic year to select by default: the current academic year (date-driven,
-   * from term bounds) when course data exists for it, otherwise the newest year with data.
+   * The academic year to select by default: the current academic year
+   * (date-driven, from term bounds) when course data exists for it, otherwise
+   * the newest year with data. Once the next year is published it takes over,
+   * rather than waiting for the current year's last term to end.
    */
-  getDefaultAcademicYear(): number | undefined {
-    const available = new Set(
-      this.allDepartments
-        .flatMap(d => d.courses)
-        .map(c => c.academicYear)
-        .filter(Boolean) as number[],
-    );
-    if (!available.size) return undefined;
-    const current = TermBoundsService.getInstance().getCurrentAcademicYear();
-    if (current !== null && available.has(current)) return current;
-    return Math.max(...available);
+  getDefaultAcademicYear(now: Date = new Date()): number | undefined {
+    const counts = new Map<number, number>();
+    for (const course of this.allDepartments.flatMap(d => d.courses)) {
+      if (course.academicYear)
+        counts.set(
+          course.academicYear,
+          (counts.get(course.academicYear) ?? 0) + 1,
+        );
+    }
+    if (!counts.size) return undefined;
+    const current = TermBoundsService.getInstance().getCurrentAcademicYear(now);
+    if (current === null || !counts.has(current)) {
+      return Math.max(...counts.keys());
+    }
+    const next = current + 1;
+    return isYearPublished(counts.get(next) ?? 0, counts.get(current) ?? 0)
+      ? next
+      : current;
   }
 
   createSchedule(

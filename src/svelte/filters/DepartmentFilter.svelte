@@ -4,6 +4,8 @@
     CATEGORY_ORDER,
   } from '../../utils/departmentUtils';
   import FilterSection from './FilterSection.svelte';
+  import { appState } from '../../core/state/appState.svelte';
+  import { foldText } from '../../utils/searchUtils';
   import TextField from '../ui/TextField.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { Course } from '../../types/types';
@@ -53,21 +55,30 @@
     }));
   });
 
+  // Abbreviation -> full name, so the list can be searched and read by the names
+  // the sidebar shows.
+  const departmentNames = $derived(
+    new Map(appState.loadedDepartments.map(d => [d.abbreviation, d.name])),
+  );
+
   const visibleItems = $derived.by<Item[]>(() => {
-    const q = search.toLowerCase();
+    const q = foldText(search.trim());
     if (!q) return items;
     return items.filter(it =>
       isCategoryMode
-        ? it.value.toLowerCase().includes(q)
+        ? foldText(it.value).includes(q)
         : departmentMatchesSearch(it.value, q),
     );
   });
 
-  // Caller (visibleItems) only invokes this with a non-empty, already-lowercased
+  // Caller (visibleItems) only invokes this with a non-empty, already-folded
   // query, so no empty-query guard is needed here.
   function departmentMatchesSearch(dept: string, lq: string): boolean {
-    if (dept.toLowerCase().includes(lq)) return true;
-    return getDepartmentCategory(dept).toLowerCase().includes(lq);
+    return [
+      dept,
+      departmentNames.get(dept) ?? '',
+      getDepartmentCategory(dept),
+    ].some(text => foldText(text).includes(lq));
   }
 
   function writeDepartments(departments: string[]): void {
@@ -138,7 +149,10 @@
   </div>
   <div class="filter-checkbox-grid">
     {#each visibleItems as item (item.value)}
-      <label class="department-checkbox-label">
+      <label
+        class="department-checkbox-label"
+        title={isCategoryMode ? undefined : departmentNames.get(item.value)}
+      >
         <input
           type="checkbox"
           class="department-checkbox"

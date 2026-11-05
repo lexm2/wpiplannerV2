@@ -17,7 +17,7 @@
   // own - no dependency trick needed.
   const year = $derived(appState.activeSchedule?.year);
   const hasNonDefault = $derived(filterService.hasNonDefaultFilters(year));
-  const filterCount = $derived(filterService.getFilterCount());
+  const filterCount = $derived(filterService.getFilterCount(year));
 </script>
 
 <button

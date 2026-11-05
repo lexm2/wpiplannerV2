@@ -100,3 +100,25 @@ function findSectionByCRN(course: Course, crn: string): Section | null {
   const allSections = getAllSections(course);
   return allSections.find(s => s.crn.toString() === crn) || null;
 }
+
+const codeKey = (code: string) => code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+/**
+ * A course in `others` that is this course under its other listing: they name
+ * each other and run the same sections (same CRNs), so taking both would count
+ * one class twice.
+ */
+export function crossListedTwin(
+  course: Course,
+  others: readonly Course[],
+): Course | undefined {
+  if (course.crossListedWith.length === 0) return undefined;
+  const listings = new Set(course.crossListedWith.map(codeKey));
+  const crns = new Set(getAllSections(course).map(s => s.crn));
+  return others.find(
+    other =>
+      other.id !== course.id &&
+      listings.has(codeKey(`${other.departmentAbbr}${other.number}`)) &&
+      getAllSections(other).some(s => crns.has(s.crn)),
+  );
+}

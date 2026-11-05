@@ -33,6 +33,7 @@
   import CourseList from './CourseList.svelte';
   import DegreeFilterBanner from './degree/DegreeFilterBanner.svelte';
   import SelectedCoursesPanel from './SelectedCoursesPanel.svelte';
+  import { courseListState } from './courseListState.svelte';
   import CourseDescription from './CourseDescription.svelte';
   import PageTabs from './PageTabs.svelte';
   import UndoRedoButtons from './UndoRedoButtons.svelte';
@@ -143,6 +144,14 @@
   // Swiping sideways between pages on a phone. Its callbacks read the page
   // when a swipe happens, so the effect itself tracks nothing and runs once.
   $effect(() => installPageSwipe(() => uiState.currentPage, switchToPageView));
+
+  // A newly picked course opens at its title, not wherever the last one was
+  // scrolled to.
+  let descriptionEl = $state<HTMLElement | null>(null);
+  $effect(() => {
+    courseListState.selectedCourseId;
+    descriptionEl?.scrollTo({ top: 0 });
+  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -243,14 +252,16 @@
   <main class="main-content" tabindex="-1">
     <div class="content-header">
       <div class="content-controls">
-        <div class="search-input-wrapper">
-          <SearchBar filterService={services.filterService} {debouncedSearch} />
-        </div>
+        <!-- Source order is Tab order, so it follows the screen: filters, search,
+             details, left to right at every width. -->
         <div id="filter-buttons-host" class="content-controls-filter-host">
           <FilterButtons
             filterService={services.filterService}
             onFilter={openFilterModal}
           />
+        </div>
+        <div class="search-input-wrapper">
+          <SearchBar filterService={services.filterService} {debouncedSearch} />
         </div>
         <DrawerToggle drawer="details" label="Details" side="right" />
       </div>
@@ -277,10 +288,15 @@
     <section class={styles['selected-courses-section']}>
       <SelectedCoursesPanel
         courseSelectionService={services.courseSelectionService}
+        onPickSections={() => switchToPageView('schedule')}
       />
     </section>
     <section class={styles['course-description-section']}>
-      <div class={styles['course-description-content']} id="course-description">
+      <div
+        class={styles['course-description-content']}
+        id="course-description"
+        bind:this={descriptionEl}
+      >
         <CourseDescription courseDataService={services.courseDataService} />
       </div>
     </section>

@@ -3,6 +3,7 @@
   import { rateMyProfessorService } from '../services/external/RateMyProfessorService';
   import { getInlineSVG } from '../utils/iconPaths';
   import { seatsLabel } from '../utils/courseUtils';
+  import { instructorsOf } from '../core/filtering/filters/RMPRatingFilter';
   import { courseListState } from './courseListState.svelte';
   import { formatCredits } from './selectedCourseUtils';
   import { isAsyncPeriod } from './wizardLogic';
@@ -160,14 +161,23 @@
   function sectionLocation(section: Section): string {
     return section.periods[0]?.location || 'TBA';
   }
-  function sectionProfessor(section: Section): string {
-    return section.periods[0]?.instructors.join('; ') || 'Not Assigned';
-  }
-  function professorRmpUrl(section: Section): string | null {
-    const professor = sectionProfessor(section);
-    return professor !== 'Not Assigned'
-      ? rateMyProfessorService.getProfessorRMPUrl(professor)
-      : null;
+  // Each instructor on their own, with the Rate My Professor link and ratings
+  // where it has them.
+  function sectionProfessors(section: Section) {
+    return instructorsOf(section).map(name => {
+      const ratings = rateMyProfessorService.getRatingDisplay(name);
+      return {
+        name,
+        url: rateMyProfessorService.getProfessorRMPUrl(name),
+        ratings: ratings
+          ? `${ratings.rating} rating, ${ratings.difficulty} difficulty` +
+            (ratings.wouldTakeAgain
+              ? `, ${ratings.wouldTakeAgain} would retake`
+              : '')
+          : null,
+        count: ratings?.numRatings,
+      };
+    });
   }
 </script>
 
@@ -179,6 +189,11 @@
     <div class={styles['course-code']}>
       {course.departmentAbbr}{course.number} ({credits})
     </div>
+    {#if course.crossListedWith.length > 0}
+      <div class={styles['course-cross-listed']}>
+        Also listed as {course.crossListedWith.join(', ')}
+      </div>
+    {/if}
     <div class={styles['course-meta']}>
       {#if yearLabel}<div class={styles['course-year']}>{yearLabel}</div>{/if}
       {#if course.category != null}
@@ -195,7 +210,7 @@
 
   {#if showTabs}
     <div class={styles['course-components-section']}>
-      <div class={styles['component-tabs']}>
+      <div class={styles['component-tabs']} role="tablist">
         {#each tabs as tab (tab.id)}
           <button
             class={[
@@ -203,6 +218,8 @@
               { [styles['active']]: activeTab === tab.id },
             ]}
             data-tab={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
             onclick={() => (activeTab = tab.id)}>{tab.label}</button
           >
         {/each}
@@ -212,13 +229,14 @@
           <div
             class={[styles['tab-panel'], styles['active']]}
             data-panel={activeTab}
+            role="tabpanel"
           >
             <h3>{activeGroup.heading}</h3>
             <div class={styles['sections-list']}>
               {#each activeGroup.sections as section (section.crn)}
                 {@const interest = section.isInterestList}
                 {@const async = isAsyncPeriod(section.periods[0])}
-                {@const rmpUrl = professorRmpUrl(section)}
+                {@const professors = sectionProfessors(section)}
                 <div class={styles['section-list-item']}>
                   <div class={styles['section-header']}>
                     <span class={styles['section-number']}
@@ -249,17 +267,29 @@
                     {/if}
                     {#if !interest}
                       <div class={styles['section-professor']}>
-                        {#if rmpUrl}
-                          <a
-                            href={rmpUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="professor-link"
-                            >{sectionProfessor(section)}</a
-                          >
+                        {#each professors as prof (prof.name)}
+                          <div>
+                            {#if prof.url}
+                              <a
+                                href={prof.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="professor-link">{prof.name}</a
+                              >
+                            {:else}
+                              {prof.name}
+                            {/if}
+                            {#if prof.ratings}
+                              <span
+                                class={styles['professor-rating']}
+                                title="From {prof.count} Rate My Professor ratings"
+                                >{prof.ratings}</span
+                              >
+                            {/if}
+                          </div>
                         {:else}
-                          {sectionProfessor(section)}
-                        {/if}
+                          Not Assigned
+                        {/each}
                       </div>
                     {/if}
                     <div class={styles['section-seats']}>

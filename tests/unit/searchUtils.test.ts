@@ -5,6 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   getAvailableProfessors,
+  hasSearchableText,
   foldText,
   MAX_QUERY_WORDS,
   namesHaveWord,
@@ -779,5 +780,15 @@ describe('a catalog that replaces another', () => {
     expect(fresh.parse('ZZ2').code).toEqual({ dept: 'zz', number: '2' });
     // The old catalog's index, still in use until the swap, is untouched.
     expect(old.parse('QQ2').code).toEqual({ dept: 'qq', number: '2' });
+  });
+});
+
+describe('hasSearchableText', () => {
+  it('needs a letter or digit', () => {
+    for (const q of ['(', '*', '---', '?', '\\', '   '])
+      expect(hasSearchableText(q)).toBe(false);
+    expect(hasSearchableText('c++')).toBe(true);
+    expect(hasSearchableText('1101')).toBe(true);
+    expect(hasSearchableText('Frédéric')).toBe(true);
   });
 });

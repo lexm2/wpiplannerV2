@@ -5,6 +5,7 @@
   // - all derived from wizardState.{currentStep,selections} + the active filters.
   import { fade } from 'svelte/transition';
   import { slideX, dur } from './transitions';
+  import { appState } from '../core/state/appState.svelte';
   import { wizardState } from './wizardState.svelte';
   import { showConfirm } from './modals/modalState.svelte';
   import { uiState } from '../services/ui/uiState.svelte';
@@ -79,7 +80,9 @@
     });
   });
 
-  const filterDescriptions = $derived(describeActiveFilters(filterService));
+  const filterDescriptions = $derived(
+    describeActiveFilters(filterService, appState.activeSchedule?.year),
+  );
   const yearMismatch = $derived(getYearMismatch(course, filterService));
 
   const currentIndex = $derived(availableSteps.indexOf(currentStep));

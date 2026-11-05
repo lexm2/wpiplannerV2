@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { scaleFade } from './transitions';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
   import type { FilterService } from '../services/filtering/FilterService';
@@ -12,12 +11,13 @@
     onFilter: () => void;
   } = $props();
 
-  // hasNonDefaultFilters / getFilterCount / hasFilter read the SvelteMap-backed
-  // FilterState (and appState.activeSchedule is a rune), so these $derived
-  // recompute on their own - no dependency trick needed.
-  const year = $derived(appState.activeSchedule?.year);
-  const hasNonDefault = $derived(filterService.hasNonDefaultFilters(year));
-  const filterCount = $derived(filterService.getFilterCount());
+  // getFilterCount / hasFilter read the SvelteMap-backed FilterState (and
+  // appState.activeSchedule is a rune), so these $derived recompute on their
+  // own - no dependency trick needed.
+  const filterCount = $derived(
+    filterService.getFilterCount(appState.activeSchedule?.year),
+  );
+  const hasNonDefault = $derived(filterCount > 0);
   const bookmarkOn = $derived(filterService.hasFilter('bookmark'));
 
   function toggleBookmark(): void {
@@ -27,24 +27,8 @@
       filterService.addFilter('bookmark', { showBookmarkedOnly: true });
     }
   }
-
-  // The filter change flows through the SvelteMap, so the filter `watch`
-  // refreshes the course list - no manual refresh here.
-  function clearFilters(): void {
-    filterService.resetFilters(year);
-  }
 </script>
 
-{#if hasNonDefault}
-  <button
-    id="clear-filters-btn"
-    class="filter-btn"
-    title="Clear all filters"
-    aria-label="Clear all filters"
-    transition:scaleFade={{ duration: 150 }}
-    onclick={clearFilters}>{@html getInlineSVG('ERASER', 'eraser-icon')}</button
-  >
-{/if}
 <div class="filter-buttons">
   <button
     id="filter-btn"
@@ -62,7 +46,8 @@
     class="filter-btn"
     class:active={bookmarkOn}
     title={bookmarkOn ? 'Show all courses' : 'Show bookmarked only'}
-    aria-label="Toggle bookmark filter"
+    aria-label="Show bookmarked courses only"
+    aria-pressed={bookmarkOn}
     onclick={toggleBookmark}
     >{@html getInlineSVG(
       bookmarkOn ? 'BOOKMARK_FILLED' : 'BOOKMARK',

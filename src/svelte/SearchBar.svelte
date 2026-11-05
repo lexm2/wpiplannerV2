@@ -4,7 +4,11 @@
   import { untrack } from 'svelte';
   import { appState } from '../core/state/appState.svelte';
   import { getInlineSVG } from '../utils/iconPaths';
-  import { foldText, getAvailableProfessors } from '../utils/searchUtils';
+  import {
+    foldText,
+    getAvailableProfessors,
+    hasSearchableText,
+  } from '../utils/searchUtils';
   import type { FilterService } from '../services/filtering/FilterService';
   import type { DebouncedOperation } from '../utils/RequestCancellation';
   import type { SearchTextFilterCriteria } from '../types/filters';
@@ -49,8 +53,7 @@
     // filter value, clobbering what the user typed.
     const committed = filterQuery;
     untrack(() => {
-      // Trimmed: a whitespace-only query commits as "no filter".
-      if (committed.trim() !== query.trim()) {
+      if (committed.trim() !== committedQuery(query)) {
         query = committed;
         // If the filter was cleared externally (e.g. page-switch reset), drop the
         // professor mode + dropdown too.
@@ -61,6 +64,19 @@
       }
     });
   });
+
+  // What a typed query commits as: whitespace-only text and text with nothing
+  // to search for (punctuation, emoji) commit as "no filter", so they must not
+  // read as a change against the cleared filter either.
+  function committedQuery(text: string): string {
+    return hasSearchableText(text) ? text.trim() : '';
+  }
+
+  // The field is non-empty yet searches nothing; said so rather than left to
+  // look like a search that matched everything.
+  const nothingSearchable = $derived(
+    query.trim().length > 0 && !hasSearchableText(query),
+  );
 
   // Every professor in the catalog, gathered once per catalog load rather than
   // per keystroke. `appState.loadedDepartments` is a rune, so this recomputes
@@ -80,7 +96,7 @@
   // ORIGINAL query (with spaces). The filter modal reads the same filter
   // reactively, so no manual modal sync is needed.
   function applySearch(): void {
-    if (query.trim().length > 0) {
+    if (committedQuery(query)) {
       filterService.addFilter('searchText', {
         query,
         professorOnly: professorMode,
@@ -157,11 +173,12 @@
     }
   }
 
+  // The typed text carries over: it is searched as a professor (or as a course
+  // again), not thrown away.
   function toggleMode(): void {
     professorMode = !professorMode;
-    query = '';
-    dropdownOpen = false;
-    filterService.removeFilter('searchText');
+    dropdownOpen = professorMode && professorMatches.length > 0;
+    applySearch();
   }
 
   function clear(): void {
@@ -187,6 +204,7 @@
   fieldClass="search-field"
   ariaLabel="Search courses"
   placeholder={professorMode ? 'Search professors...' : 'Search courses...'}
+  hint={nothingSearchable ? 'Type a letter or number to search' : undefined}
   bind:value={query}
   oninput={onInput}
   onkeydown={onInputKeydown}
@@ -218,8 +236,9 @@
   <button
     id="search-mode-btn"
     class:active={professorMode}
-    title="Search professors"
-    aria-label="Toggle professor search"
+    title={professorMode ? 'Search courses instead' : 'Search professors'}
+    aria-label="Search by professor"
+    aria-pressed={professorMode}
     onclick={toggleMode}
     >{@html professorMode
       ? getInlineSVG('SCHOOL_FULL', 'school-full-icon')
