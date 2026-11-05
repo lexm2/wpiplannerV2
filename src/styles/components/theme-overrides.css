@@ -23,6 +23,17 @@
   --color-rule: var(--color-secondary);
 }
 
+/* A control's on-state mark: a check mark, or a bookmark on its orange. It
+   follows the labels unless a theme sets it apart, as WPI Dark does: white
+   labels read well on its red, but a lone white check mark looks wrong there. */
+:root {
+  --color-mark: var(--color-text-inverse);
+}
+
+.theme-wpi-dark {
+  --color-mark: var(--color-background);
+}
+
 /* The identity of Classic is the crimson masthead over WPI grey. The
    controls inside it keep their light surfaces, so only the bar, the title
    and the focus ring (crimson on crimson would vanish) are restated. The page

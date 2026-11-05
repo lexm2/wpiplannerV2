@@ -53,6 +53,7 @@
   position: absolute;
   top: 0.75rem;
   right: 1rem;
+  color: var(--color-mark);
 }
 
 .theme-option-check :global(svg) {

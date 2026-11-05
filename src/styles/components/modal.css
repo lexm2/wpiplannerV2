@@ -948,7 +948,7 @@ html.is-mobile .filter-select-none {
 .department-checkbox:checked {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
 }
 
 .department-checkbox:checked::before {
@@ -959,7 +959,7 @@ html.is-mobile .filter-select-none {
   transform: translate(-50%, -50%);
   font-size: 14px;
   font-weight: bold;
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
   line-height: 1;
 }
 
@@ -976,7 +976,7 @@ html.is-mobile .filter-select-none {
   transform: translate(-50%, -50%);
   font-size: 16px;
   font-weight: bold;
-  color: var(--color-text-inverse);
+  color: var(--color-mark);
   line-height: 1;
 }
 
