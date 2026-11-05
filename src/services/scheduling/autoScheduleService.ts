@@ -140,7 +140,12 @@ class AutoScheduleService {
         await this.orchestrator.generateSchedules(selectedCourses);
 
       if (outcome.status !== 'generated') {
-        logger.warn(`[Auto-Schedule] No schedule generated: ${outcome.status}`);
+        // A discarded run is the student's doing, not a problem worth a warning.
+        if (outcome.status !== 'stale') {
+          logger.warn(
+            `[Auto-Schedule] No schedule generated: ${outcome.status}`,
+          );
+        }
         showAppError(failureMessage(outcome));
       }
       // On success the grid and footer re-render on their own: the orchestrator
@@ -183,6 +188,8 @@ function failureMessage(
       const one = outcome.courses.length === 1;
       return `Could not generate a schedule: no section of ${listCourses(outcome.courses)} can be used.\n\nCommon causes:\n• Active schedule filters exclude all of ${one ? 'its' : 'their'} sections\n• ${one ? 'Its' : 'Their'} sections clash with locked courses or calendar events\n• ${one ? 'Its' : 'Their'} sections are missing time/day data`;
     }
+    case 'stale':
+      return 'Auto-Schedule was discarded because you switched schedules or changed your courses while it was running.\n\nNothing was changed. Run Auto-Schedule again when you are ready.';
     case 'no-schedules':
       return 'Could not generate a schedule: every combination of the included courses has a time conflict.\n\nTry locking fewer courses, allowing more terms, or removing a course.';
   }
