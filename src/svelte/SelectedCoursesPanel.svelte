@@ -100,11 +100,17 @@
            list so it never scrolls out of reach of a long one. -->
       <button
         type="button"
-        class={styles['pick-sections-link']}
-        id="pick-sections-link"
+        class="btn btn-primary {styles['pick-sections']}"
+        id="pick-sections-btn"
         transition:slideFade={{ duration: 220 }}
-        onclick={onPickSections}>Pick sections on the Schedule page</button
+        onclick={onPickSections}
       >
+        {@html getInlineSVG('CALENDAR', styles['pick-sections-icon'])}
+        <span class={styles['pick-sections-label']}
+          >Pick sections on the Schedule page</span
+        >
+        {@html getInlineSVG('CHEVRON_RIGHT', styles['pick-sections-chevron'])}
+      </button>
     {/if}
     {#each courses as sc (sc.course.id)}
       {@const course = sc.course}
