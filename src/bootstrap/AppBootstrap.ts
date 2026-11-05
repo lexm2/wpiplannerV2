@@ -29,6 +29,9 @@ import type { ServiceContainer } from './ServiceContainer';
 import { logger } from '../utils/logger';
 import { STORAGE_KEYS } from '../utils/storageKeys';
 
+/** The course catalog could not be fetched or understood: not a storage problem. */
+class CatalogLoadError extends Error {}
+
 export class AppBootstrap {
   static createServices(): ServiceContainer {
     const profileStateManager = ProfileStateManager.getInstance();
@@ -151,7 +154,6 @@ export class AppBootstrap {
       profileStateManager,
       courseSelectionService,
       scheduleManagementService,
-      courseDataService,
     } = services;
 
     // The small static fetches depend on nothing, so they run while storage
@@ -176,9 +178,25 @@ export class AppBootstrap {
     // The fetch itself has been running since createServices; this only
     // waits for it and publishes the result (or throws its failure).
     await Promise.all([rmpLoad, termBoundsLoad]);
-    await courseDataService.loadCourseData();
+    await AppBootstrap.loadCatalog(services);
     await timestampLoad;
+    await AppBootstrap.loadDegree(services);
+  }
 
+  /** Only the fetch is blamed on the network; see CatalogLoadError. */
+  private static async loadCatalog(services: ServiceContainer): Promise<void> {
+    try {
+      await services.courseDataService.loadCourseData();
+    } catch (error) {
+      throw new CatalogLoadError('Failed to load the course catalog', {
+        cause: error,
+      });
+    }
+  }
+
+  // Both rehydrate from saved data and need the catalog, so a catalog failure
+  // skips them until a retry.
+  private static async loadDegree(services: ServiceContainer): Promise<void> {
     // Rehydrate a previously-imported degree record (no-op if none/invalid).
     await services.degreeImportService.load();
     // ...and the manual bucket layout / course placements layered over it.
@@ -234,14 +252,35 @@ export class AppBootstrap {
       }
     } catch (error) {
       logger.error('Failed to initialize application:', error);
+      if (error instanceof CatalogLoadError) {
+        showAppError(
+          "Couldn't load the course catalog. Check your connection and try again. Your saved schedules are untouched.",
+          { onRetry: () => AppBootstrap.retryCatalog(services) },
+        );
+        return;
+      }
       // Storage is loaded first in initializeAsyncServices, so by the time a
       // later step throws the in-memory state is populated and the export the
       // banner offers is a real backup rather than an empty shell.
       showAppError(
         'Failed to initialize application. Some features may not work properly.',
-        () => services.scheduleManagementService.clearAllSchedules(),
-        () => services.scheduleManagementService.exportAllSchedules(),
+        {
+          onClearData: () =>
+            services.scheduleManagementService.clearAllSchedules(),
+          onExportData: () =>
+            services.scheduleManagementService.exportAllSchedules(),
+        },
       );
+    }
+  }
+
+  // The rest of startup that the failed catalog fetch skipped.
+  private static async retryCatalog(services: ServiceContainer): Promise<void> {
+    await AppBootstrap.loadCatalog(services);
+    await loadServerTimestamp();
+    await AppBootstrap.loadDegree(services);
+    if (!localStorage.getItem(STORAGE_KEYS.VISITED)) {
+      await services.tutorial?.start('welcome');
     }
   }
 }

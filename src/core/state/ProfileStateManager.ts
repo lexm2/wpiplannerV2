@@ -13,12 +13,19 @@ import type {
 import { COMPONENT_KINDS } from '../../types/types';
 import { ApplicationState } from '../../types/ApplicationState';
 import { ScheduleState } from '../../types/ScheduleState';
-import type { TransactionResult } from '../storage/TransactionalStorageManager';
+import type {
+  RemoteChange,
+  TransactionResult,
+} from '../storage/TransactionalStorageManager';
 import { TransactionalStorageManager } from '../storage/TransactionalStorageManager';
+import type {
+  LoadReport,
+  WriteConflict,
+} from '../storage/IndexedDBStorageManager';
 import { getAllSections } from '../../utils/courseUtils';
 import { TERM_ORDER } from '../../utils/typeGuards';
 import { logger } from '../../utils/logger';
-import { deepClone } from '../../utils/jsonSerializer';
+import { deepClone, setReplacer } from '../../utils/jsonSerializer';
 import { errorMessage } from '../../utils/errorMessage';
 import { ExportDataSchema } from '../../types/export';
 import { UndoRedoManager } from './UndoRedoManager';
@@ -26,6 +33,7 @@ import { appState } from './appState.svelte';
 import { TermBoundsService } from '../../utils/termBounds';
 import { isYearPublished } from '../../utils/yearPublished';
 import { showAppError } from '../../services/ui/uiState.svelte';
+import { showConfirm } from '../../svelte/modals/modalState.svelte';
 
 export interface ProfileState {
   activeScheduleId: string | null;
@@ -48,6 +56,47 @@ export interface UndoSlice {
   restore(value: unknown): void;
 }
 
+/** An export file read against the catalog; see parseImport. */
+export type ImportParse =
+  | {
+      ok: true;
+      schedules: Schedule[];
+      skipped: string[][];
+      activeIndex: number;
+    }
+  | { ok: false; error: string };
+
+/** A saved piece of a schedule that no longer matches the catalog. */
+interface CatalogDrift {
+  kind: 'section' | 'course';
+  scheduleName: string;
+  label: string;
+}
+
+/** Where resolveCourseReferences records what it could not match. */
+interface DriftSink {
+  scheduleName: string;
+  into: CatalogDrift[];
+}
+
+const unchanged: TransactionResult = { success: true, transactionId: 'clean' };
+
+const courseLabel = (course: Course): string =>
+  `${course.departmentAbbr}${course.number}`;
+
+/** Two copies of the same course (code), from different catalog years. */
+function isOtherYearCopy(a: Course, b: Course): boolean {
+  return (
+    a.id !== b.id &&
+    a.departmentAbbr === b.departmentAbbr &&
+    a.number === b.number
+  );
+}
+
+function sameSchedule(a: Schedule, b: Schedule): boolean {
+  return JSON.stringify(a, setReplacer) === JSON.stringify(b, setReplacer);
+}
+
 /** Single source of truth for application state with synchronous persistence and event-driven updates. */
 export class ProfileStateManager {
   private static instance: ProfileStateManager | null = null;
@@ -58,15 +107,27 @@ export class ProfileStateManager {
   private undoSlice: UndoSlice | null = null;
   private isRestoringState = false;
   private pendingSavePromises = new Set<Promise<void>>();
-  // The schedule object each id last saved successfully. Schedules in state
-  // are replaced, never mutated, so an unchanged object needs no re-save.
+  // The schedule object each id last saved (or loaded) successfully. Schedules
+  // in state are replaced, never mutated, so an unchanged object needs no
+  // re-save; a save writes exactly the schedules that differ from this map.
   private savedSchedules = new Map<string, Schedule>();
+  // Objects handed to storage whose write has not finished, so a second save
+  // before it does not queue the same write again.
+  private writesInFlight = new Map<string, Schedule>();
+  private savedPreferences: SchedulePreferences | null = null;
+  private savedActiveId: string | null | undefined;
+  // Set while all data is being cleared, here or in another tab: whatever is
+  // pending is moot and must not be written, and the leave-page prompt would
+  // only nag.
+  private discardingState = false;
   public isBatchUpdate = false;
+  private driftReported = false;
 
   private constructor(storageManager?: TransactionalStorageManager) {
     this.storageManager = storageManager || new TransactionalStorageManager();
     this.undoRedoManager = new UndoRedoManager();
     this.setupBeforeUnloadHandler();
+    this.storageManager.subscribe(change => void this.onRemoteChange(change));
   }
 
   /**
@@ -90,11 +151,16 @@ export class ProfileStateManager {
     if (typeof window === 'undefined') return;
 
     window.addEventListener('beforeunload', (e: BeforeUnloadEvent) => {
-      if (this.pendingSavePromises.size > 0) {
+      if (this.shouldWarnBeforeUnload()) {
         // Calling preventDefault() triggers the browser's "leave site?" prompt.
         e.preventDefault();
       }
     });
+  }
+
+  /** Whether leaving the page now would lose a change still being written. */
+  shouldWarnBeforeUnload(): boolean {
+    return this.pendingSavePromises.size > 0 && !this.discardingState;
   }
 
   /**
@@ -110,13 +176,62 @@ export class ProfileStateManager {
     );
     if (departments.length === 0) return;
 
-    this.state.schedules = this.state.schedules.map(s => ({
-      ...s,
-      selectedCourses: this.resolveCourseReferences(s.selectedCourses),
-    }));
+    const drift: CatalogDrift[] = [];
+    this.state.schedules = this.state.schedules.map(s => {
+      const resolved = {
+        ...s,
+        selectedCourses: this.resolveCourseReferences(s.selectedCourses, {
+          scheduleName: s.name,
+          into: drift,
+        }),
+      };
+      // Pointing at the live catalog is not an edit: a schedule that was clean
+      // stays clean under its new object.
+      if (this.savedSchedules.get(s.id) === s) {
+        this.savedSchedules.set(s.id, resolved);
+      }
+      return resolved;
+    });
     this.state.selectedCourses = this.resolveCourseReferences(
       this.state.selectedCourses,
     );
+    this.reportCatalogDrift(drift);
+  }
+
+  /**
+   * Tells the student, once per page load, which saved sections vanished from
+   * the catalog and which saved courses are from an older catalog year. Both
+   * stay quiet otherwise: a section that is silently dropped looks like a
+   * lost schedule.
+   */
+  private reportCatalogDrift(drift: CatalogDrift[]): void {
+    if (this.driftReported || drift.length === 0) return;
+    this.driftReported = true;
+
+    const lines: string[] = [];
+    const missing = drift.filter(d => d.kind === 'section');
+    const stale = drift.filter(d => d.kind === 'course');
+    if (missing.length > 0) {
+      lines.push('These saved sections are no longer offered:');
+      lines.push(...missing.map(d => `${d.scheduleName}: ${d.label}`));
+    }
+    if (stale.length > 0) {
+      lines.push(
+        'These saved courses are not in the current catalog, so their times and seats may be out of date. Add the current version from the course list to replace each:',
+      );
+      lines.push(...stale.map(d => `${d.scheduleName}: ${d.label}`));
+    }
+    const shown = lines.slice(0, 14);
+    if (lines.length > shown.length) {
+      shown.push(`...and ${lines.length - shown.length} more`);
+    }
+    showConfirm({
+      title: 'Your saved schedules have changed',
+      message: shown.join('\n'),
+      confirmLabel: 'OK',
+      notice: true,
+      onConfirm: () => {},
+    });
   }
 
   getState(): Readonly<ProfileState> {
@@ -224,10 +339,31 @@ export class ProfileStateManager {
           isRequired,
           lockedSections: new Set(),
         };
-        this.state.selectedCourses = [
-          ...this.state.selectedCourses,
-          selectedCourse,
-        ];
+        // A saved copy of this course from another catalog year is the same
+        // course to the student: replace it rather than hold both. Its picks
+        // are CRNs of the old year and mean nothing here.
+        const staleIndex = this.state.selectedCourses.findIndex(sc =>
+          isOtherYearCopy(sc.course, course),
+        );
+        if (staleIndex >= 0) {
+          const stale = this.state.selectedCourses[staleIndex];
+          this.state.selectedCourses = this.state.selectedCourses.map(
+            (sc, i) =>
+              i === staleIndex
+                ? {
+                    ...selectedCourse,
+                    isRequired: isRequired || stale.isRequired,
+                    customColor: stale.customColor,
+                    allowedTerms: stale.allowedTerms,
+                  }
+                : sc,
+          );
+        } else {
+          this.state.selectedCourses = [
+            ...this.state.selectedCourses,
+            selectedCourse,
+          ];
+        }
       }
 
       this.updateActiveScheduleWithCurrentCourses();
@@ -392,6 +528,19 @@ export class ProfileStateManager {
     });
   }
 
+  /** Adds a schedule built elsewhere (an import) under a fresh id. */
+  createScheduleFrom(content: Omit<Schedule, 'id'>): Schedule {
+    return this.withStateUpdateSync(() => {
+      const schedule: Schedule = {
+        ...content,
+        id: this.generateScheduleId(),
+        generatedSchedules: [],
+      };
+      this.state.schedules = [...this.state.schedules, schedule];
+      return schedule;
+    });
+  }
+
   setActiveSchedule(scheduleId: string, source: string = 'user'): boolean {
     return this.withStateUpdateSync(() => {
       const schedule = this.state.schedules.find(s => s.id === scheduleId);
@@ -507,6 +656,11 @@ export class ProfileStateManager {
         name: newName,
         selectedCourses: [...originalSchedule.selectedCourses],
         generatedSchedules: [...originalSchedule.generatedSchedules],
+        // Events are part of the plan: Auto-Schedule keeps classes clear of
+        // them, so a copy without them would book over the student's commitments.
+        ...(originalSchedule.localEvents && {
+          localEvents: [...originalSchedule.localEvents],
+        }),
         year: originalSchedule.year,
       };
 
@@ -616,14 +770,22 @@ export class ProfileStateManager {
   }): void {
     this.state.activeScheduleId = snapshot.activeScheduleId;
 
-    // The clone detaches every Course from the catalog, so point all
-    // schedules back at it (as loadFromStorage and setCourseData do), not
-    // just the active one: switching to another schedule reads these.
-    const schedulesArray = Array.from(snapshot.schedules.values());
-    this.state.schedules = deepClone(schedulesArray).map(s => ({
-      ...s,
-      selectedCourses: this.resolveCourseReferences(s.selectedCourses),
-    }));
+    // A schedule the snapshot shares with the present keeps its object (and
+    // so its clean state): only schedules the step really changed are
+    // rewritten. The rest are cloned, which detaches every Course from the
+    // catalog, so they are pointed back at it (as loadFromStorage and
+    // setCourseData do) - for all of them, not just the active one, because
+    // switching to another schedule reads these.
+    const present = new Map(this.state.schedules.map(s => [s.id, s]));
+    this.state.schedules = Array.from(snapshot.schedules.values()).map(snap => {
+      const current = present.get(snap.id);
+      if (current && sameSchedule(current, snap)) return current;
+      const cloned = deepClone(snap);
+      return {
+        ...cloned,
+        selectedCourses: this.resolveCourseReferences(cloned.selectedCourses),
+      };
+    });
     this.state.preferences = deepClone(snapshot.preferences);
 
     if (this.state.activeScheduleId) {
@@ -685,12 +847,14 @@ export class ProfileStateManager {
   }
 
   /**
-   * Make the next save write every schedule. save() skips a schedule whose
-   * object is unchanged, so a caller that edited one in place calls this
-   * first.
+   * Make the next save write the active schedule. save() skips a schedule
+   * whose object is unchanged, so a caller that edited its courses in place
+   * calls this first.
    */
-  forgetSavedSchedules(): void {
-    this.savedSchedules.clear();
+  markActiveScheduleChanged(): void {
+    if (this.state.activeScheduleId) {
+      this.savedSchedules.delete(this.state.activeScheduleId);
+    }
   }
 
   save(skipSnapshot = false): void {
@@ -703,6 +867,7 @@ export class ProfileStateManager {
   }
 
   private async executeSave(skipSnapshot = false): Promise<void> {
+    if (this.discardingState) return;
     try {
       if (!this.isRestoringState && !skipSnapshot) {
         const schedulesMap = new Map(this.state.schedules.map(s => [s.id, s]));
@@ -714,43 +879,87 @@ export class ProfileStateManager {
         );
       }
 
-      const activeIdResult = this.storageManager.saveActiveScheduleId(
-        this.state.activeScheduleId,
+      // Each write is skipped unless its data changed, so a tab that edits
+      // one schedule never rewrites (and so never overwrites) the others.
+      const activeId = this.state.activeScheduleId;
+      const activeIdResult =
+        activeId === this.savedActiveId
+          ? unchanged
+          : this.storageManager.saveActiveScheduleId(activeId);
+
+      const liveSchedules = this.state.schedules;
+      const toSave = liveSchedules.filter(
+        schedule =>
+          this.savedSchedules.get(schedule.id) !== schedule &&
+          this.writesInFlight.get(schedule.id) !== schedule,
+      );
+      // Saved before, absent now: removed by a delete, or by undoing/redoing
+      // past the schedule's creation. Storage must lose it too, or a reload
+      // brings it back.
+      const liveIds = new Set(liveSchedules.map(s => s.id));
+      const toDelete = [...this.savedSchedules.entries()].filter(
+        ([id]) => !liveIds.has(id),
       );
 
-      const toSave = this.state.schedules.filter(
-        schedule => this.savedSchedules.get(schedule.id) !== schedule,
-      );
-      const savePromises = toSave.map(schedule => {
+      const writes = toSave.map(schedule => {
+        this.writesInFlight.set(schedule.id, schedule);
         const scheduleToSave = {
           ...schedule,
           selectedCourses: schedule.selectedCourses.filter(
             sc => !sc.course.transient,
           ),
         };
-        return this.storageManager.saveSchedule(scheduleToSave);
+        return this.storageManager.saveSchedule(scheduleToSave).finally(() => {
+          if (this.writesInFlight.get(schedule.id) === schedule) {
+            this.writesInFlight.delete(schedule.id);
+          }
+        });
       });
-      const results = await Promise.all(savePromises);
-      results.forEach((result, i) => {
-        if (result.success) this.savedSchedules.set(toSave[i].id, toSave[i]);
-      });
-      // Drop deleted schedules, so one restored later is written again.
-      const liveIds = new Set(this.state.schedules.map(s => s.id));
-      for (const id of this.savedSchedules.keys()) {
-        if (!liveIds.has(id)) this.savedSchedules.delete(id);
-      }
-
-      const preferencesResult = this.storageManager.savePreferences(
-        this.state.preferences,
+      const deletes = toDelete.map(([id]) =>
+        this.storageManager.deleteSchedule(id),
       );
+      const [results, deleteResults] = await Promise.all([
+        Promise.all(writes),
+        Promise.all(deletes),
+      ]);
+      const conflicts: { schedule: Schedule; conflict: WriteConflict }[] = [];
+      results.forEach((result, i) => {
+        if (result.success) {
+          this.savedSchedules.set(toSave[i].id, toSave[i]);
+        } else if (result.conflict) {
+          conflicts.push({ schedule: toSave[i], conflict: result.conflict });
+        }
+      });
+      deleteResults.forEach((result, i) => {
+        const [id, savedCopy] = toDelete[i];
+        if (result.success && this.savedSchedules.get(id) === savedCopy) {
+          this.savedSchedules.delete(id);
+        }
+      });
+      if (activeIdResult.success) this.savedActiveId = activeId;
+
+      const preferences = this.state.preferences;
+      const preferencesResult =
+        preferences === this.savedPreferences
+          ? unchanged
+          : this.storageManager.savePreferences(preferences);
+      if (preferencesResult.success) this.savedPreferences = preferences;
+
+      for (const { schedule, conflict } of conflicts) {
+        await this.resolveWriteConflict(schedule, conflict);
+      }
 
       // A rejected write comes back as a result, not a throw: falling through
       // here would mark the state clean while the schedule is silently gone on
       // the next reload. Stay dirty and say so instead. The localStorage
-      // writes (active id, preferences) fail the same way on a full quota.
-      const failed = [...results, activeIdResult, preferencesResult].filter(
-        r => !r.success,
-      );
+      // writes (active id, preferences) fail the same way on a full quota. A
+      // conflict is not a failure: it was answered above.
+      const failed = [
+        ...results.filter(r => !r.conflict),
+        ...deleteResults,
+        activeIdResult,
+        preferencesResult,
+      ].filter(r => !r.success);
       if (failed.length > 0) {
         logger.error(
           `Save failed for ${failed.length} write(s):`,
@@ -782,21 +991,34 @@ export class ProfileStateManager {
       this.state.isLoading = true;
       this.isLoadingFlag = true;
       this.savedSchedules.clear();
+      this.writesInFlight.clear();
 
       const preferencesResult = this.storageManager.loadPreferences();
       if (preferencesResult.valid && preferencesResult.data) {
         this.state.preferences = preferencesResult.data;
+        this.savedPreferences = this.state.preferences;
       }
 
       const schedulesResult = await this.storageManager.loadAllSchedules();
 
+      const drift: CatalogDrift[] = [];
       if (schedulesResult.valid && schedulesResult.data) {
         this.state.schedules = schedulesResult.data
           .filter(s => !s.id.startsWith('tutorial_'))
           .map(s => ({
             ...s,
-            selectedCourses: this.resolveCourseReferences(s.selectedCourses),
+            selectedCourses: this.resolveCourseReferences(s.selectedCourses, {
+              scheduleName: s.name,
+              into: drift,
+            }),
           }));
+        // As loaded, every schedule is what storage holds: only an edit makes
+        // one dirty, so this tab's first save writes just what it changed.
+        for (const schedule of this.state.schedules) {
+          this.savedSchedules.set(schedule.id, schedule);
+        }
+        this.reportCatalogDrift(drift);
+        this.reportUnreadable(schedulesResult.report);
       }
 
       // The saved id can name a schedule that was not loaded back: tutorial
@@ -804,6 +1026,7 @@ export class ProfileStateManager {
       // one behind. Fall back to the first real schedule.
       const activeIdResult = this.storageManager.loadActiveScheduleId();
       const savedId = activeIdResult.valid ? activeIdResult.data : null;
+      this.savedActiveId = activeIdResult.valid ? savedId : undefined;
       this.state.activeScheduleId = this.state.schedules.some(
         s => s.id === savedId,
       )
@@ -893,49 +1116,46 @@ export class ProfileStateManager {
     );
   }
 
-  parseImportCourses(data: string): SelectedCourse[] {
-    const parsed = ExportDataSchema.parse(JSON.parse(data));
-    const applicationState = ApplicationState.fromMinimalFormat(
-      parsed,
-      this.allDepartments,
-    );
-    return applicationState.schedules[0]?.toSchedule().selectedCourses ?? [];
-  }
-
-  async importData(data: string): Promise<TransactionResult> {
+  /**
+   * Reads an export file against the live catalog. Courses the catalog lacks
+   * are left out and named in `skipped` (parallel to `schedules`), so one
+   * stale course never costs the rest of the file.
+   */
+  parseImport(text: string): ImportParse {
+    let json: unknown;
     try {
-      const parsed = ExportDataSchema.parse(JSON.parse(data));
-      const applicationState = ApplicationState.fromMinimalFormat(
-        parsed,
-        this.allDepartments,
-      );
-      const schedules = applicationState.schedules.map(s => s.toSchedule());
-
-      const result = await this.storageManager.importData(
-        schedules,
-        applicationState.activeScheduleId,
-        applicationState.preferences,
-      );
-
-      if (result.success) {
-        this.savedSchedules.clear();
-        this.state.schedules = [];
-        this.state.selectedCourses = [];
-        this.state.activeScheduleId = null;
-        await this.loadFromStorage();
-      } else {
-        logger.error('[ProfileStateManager] Import failed:', result.error);
-      }
-
-      return result;
-    } catch (error) {
-      logger.error('[ProfileStateManager] importData() failed:', error);
+      json = JSON.parse(text);
+    } catch {
       return {
-        success: false,
-        transactionId: `import-${Date.now()}`,
-        error: error as Error,
+        ok: false,
+        error: 'This file is not valid JSON, so it cannot be a planner export.',
       };
     }
+    const parsed = ExportDataSchema.safeParse(json);
+    if (!parsed.success) {
+      return {
+        ok: false,
+        error:
+          'This file is not a planner export, or it is damaged. Pick a file saved with Export or Export All.',
+      };
+    }
+    if (!parsed.data.v.startsWith('4')) {
+      return {
+        ok: false,
+        error:
+          'Unsupported import format. Please export your schedules again using the latest version.',
+      };
+    }
+    const state = ApplicationState.fromMinimalFormat(
+      parsed.data,
+      this.allDepartments,
+    );
+    return {
+      ok: true,
+      schedules: state.schedules.map(s => s.toSchedule()),
+      skipped: state.skippedCourseIds,
+      activeIndex: state.getActiveScheduleIndex(),
+    };
   }
 
   isHealthy(): { healthy: boolean; issues: string[] } {
@@ -957,6 +1177,7 @@ export class ProfileStateManager {
 
   private resolveCourseReferences(
     selectedCourses: SelectedCourse[],
+    sink?: DriftSink,
   ): SelectedCourse[] {
     // Before the catalog loads there is nothing to resolve against;
     // setCourseData resolves everything once it arrives.
@@ -979,6 +1200,13 @@ export class ProfileStateManager {
         logger.warn(
           `Course ${courseId} not found in catalog, keeping original reference`,
         );
+        if (sink && !selectedCourse.course.transient) {
+          sink.into.push({
+            kind: 'course',
+            scheduleName: sink.scheduleName,
+            label: courseLabel(selectedCourse.course),
+          });
+        }
         return selectedCourse;
       }
 
@@ -1001,6 +1229,11 @@ export class ProfileStateManager {
           logger.warn(
             `Section CRN ${section.crn} not found for course ${courseId}, section may no longer exist`,
           );
+          sink?.into.push({
+            kind: 'section',
+            scheduleName: sink.scheduleName,
+            label: `${courseLabel(liveCourse)} ${section.number ?? section.crn}`,
+          });
           return null;
         }
 
@@ -1045,17 +1278,6 @@ export class ProfileStateManager {
 
       return resolved;
     });
-  }
-
-  /** Reset reactive state back to defaults (immutable reassignment). */
-  private resetState(): void {
-    appState.activeScheduleId = null;
-    appState.schedules = [];
-    appState.selectedCourses = [];
-    appState.preferences = { theme: 'wpi-dark', bookmarkedCourseIds: [] };
-    appState.isLoading = false;
-    appState.lastSaved = 0;
-    appState.hasUnsavedChanges = false;
   }
 
   /**
@@ -1152,30 +1374,178 @@ export class ProfileStateManager {
     return `schedule_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
+  /**
+   * Wipes every key and schedule this app stores, writes the fresh starting
+   * schedule, then reloads the page: the theme, degree record, panel widths and
+   * disclosure state all live outside this class, and reloading is what makes
+   * the screen match storage. Other tabs are told to reload only once the fresh
+   * schedule is written, so each finds it instead of making its own, and none
+   * can write a stale copy back over the cleared store.
+   */
   async clearAllData(): Promise<{ success: boolean; error?: string }> {
+    // Whatever is still being written is moot, and must not land after the
+    // clear and bring the data back.
+    this.discardingState = true;
     try {
+      await Promise.allSettled([...this.pendingSavePromises]);
       const result = await this.storageManager.clearAllDataComplete();
-      // Cleared even on failure: storage may be partly wiped.
-      this.savedSchedules.clear();
       if (!result.success) {
+        this.discardingState = false;
         return {
           success: false,
           error: result.error?.message || 'Failed to clear storage',
         };
       }
 
-      this.resetState();
+      this.savedSchedules.clear();
+      this.writesInFlight.clear();
+      this.savedPreferences = null;
+      this.savedActiveId = undefined;
       this.undoRedoManager.clear();
+      this.state.schedules = [];
+      this.state.selectedCourses = [];
+      this.state.activeScheduleId = null;
+      this.state.preferences = { theme: 'wpi-dark', bookmarkedCourseIds: [] };
 
-      const defaultSchedule = this.createSchedule('My Schedule', 'system');
-      this.setActiveSchedule(defaultSchedule.id, 'system');
+      this.discardingState = false;
+      const fresh = this.createSchedule('My Schedule', 'system');
+      this.setActiveSchedule(fresh.id, 'system');
+      await Promise.allSettled([...this.pendingSavePromises]);
 
+      this.discardingState = true;
+      this.storageManager.announceCleared();
+      window.location.reload();
       return { success: true };
     } catch (error) {
+      this.discardingState = false;
       return {
         success: false,
         error: `Failed to clear data: ${errorMessage(error)}`,
       };
     }
+  }
+
+  /** One notice for rows the load had to leave out. */
+  private reportUnreadable(report: LoadReport): void {
+    const lines: string[] = [];
+    if (report.unreadable > 0) {
+      lines.push(
+        `${report.unreadable} saved schedule${report.unreadable === 1 ? '' : 's'} could not be read and ${report.unreadable === 1 ? 'was' : 'were'} skipped.`,
+      );
+    }
+    if (report.newerVersion > 0) {
+      lines.push(
+        `${report.newerVersion} saved schedule${report.newerVersion === 1 ? ' was' : 's were'} written by a newer version of the planner and ${report.newerVersion === 1 ? 'was' : 'were'} skipped.`,
+      );
+    }
+    if (report.dropped > 0) {
+      lines.push(
+        `${report.dropped} course${report.dropped === 1 ? '' : 's'} or event${report.dropped === 1 ? '' : 's'} inside your schedules could not be read and ${report.dropped === 1 ? 'was' : 'were'} left out.`,
+      );
+    }
+    if (lines.length === 0) return;
+    lines.push('Nothing was deleted from storage.');
+    showConfirm({
+      title: 'Some saved data could not be loaded',
+      message: lines.join('\n'),
+      confirmLabel: 'OK',
+      notice: true,
+      onConfirm: () => {},
+    });
+  }
+
+  /** Re-reads one schedule another tab changed and shows that copy. */
+  private async adoptStoredSchedule(id: string): Promise<void> {
+    const loaded = await this.storageManager.loadSchedule(id);
+    if (!loaded.valid) return;
+    if (!loaded.data) {
+      this.dropScheduleLocally(id);
+      return;
+    }
+    const resolved: Schedule = {
+      ...loaded.data,
+      selectedCourses: this.resolveCourseReferences(
+        loaded.data.selectedCourses,
+      ),
+    };
+    const known = this.state.schedules.some(s => s.id === id);
+    this.state.schedules = known
+      ? this.state.schedules.map(s => (s.id === id ? resolved : s))
+      : [...this.state.schedules, resolved];
+    this.savedSchedules.set(id, resolved);
+    this.writesInFlight.delete(id);
+
+    if (id === this.state.activeScheduleId) {
+      this.state.selectedCourses = resolved.selectedCourses;
+      this.signalActivation('remote');
+    }
+  }
+
+  /** Removes a schedule that is gone from storage, without writing anything. */
+  private dropScheduleLocally(id: string): void {
+    this.savedSchedules.delete(id);
+    this.writesInFlight.delete(id);
+    if (!this.state.schedules.some(s => s.id === id)) return;
+
+    this.state.schedules = this.state.schedules.filter(s => s.id !== id);
+    if (id !== this.state.activeScheduleId) return;
+
+    const next = this.state.schedules[0];
+    if (next) {
+      this.state.activeScheduleId = next.id;
+      this.state.selectedCourses = next.selectedCourses;
+      this.signalActivation('remote');
+    } else {
+      // The other tab deleted the last one (or cleared everything).
+      const fresh = this.createSchedule('My Schedule', 'system');
+      this.setActiveSchedule(fresh.id, 'system');
+    }
+  }
+
+  private async onRemoteChange(change: RemoteChange): Promise<void> {
+    try {
+      if (change.type === 'cleared') {
+        this.discardingState = true;
+        window.location.reload();
+      } else if (change.type === 'preferences') {
+        const loaded = this.storageManager.loadPreferences();
+        if (loaded.valid) {
+          this.state.preferences = loaded.data;
+          this.savedPreferences = loaded.data;
+        }
+      } else if (change.type === 'deleted') {
+        this.dropScheduleLocally(change.id);
+      } else {
+        await this.adoptStoredSchedule(change.id);
+      }
+    } catch (error) {
+      logger.error('Could not apply a change from another tab:', error);
+    }
+  }
+
+  /**
+   * A write was refused because another tab changed or deleted the schedule
+   * meanwhile. The other tab's version stays; the student is told that this
+   * tab's latest edit to it did not make it.
+   */
+  private async resolveWriteConflict(
+    schedule: Schedule,
+    conflict: WriteConflict,
+  ): Promise<void> {
+    if (conflict === 'deleted') {
+      this.dropScheduleLocally(schedule.id);
+    } else {
+      await this.adoptStoredSchedule(schedule.id);
+    }
+    showConfirm({
+      title: 'Schedule changed in another tab',
+      message:
+        conflict === 'deleted'
+          ? `"${schedule.name}" was deleted in another tab, so your latest change to it was not saved.`
+          : `"${schedule.name}" was changed in another tab, so your latest change to it was not saved. The newer version is shown.`,
+      confirmLabel: 'OK',
+      notice: true,
+      onConfirm: () => {},
+    });
   }
 }

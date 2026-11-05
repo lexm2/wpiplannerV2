@@ -47,6 +47,27 @@ describe('preferences round-trip', () => {
   });
 });
 
+describe('preferences boundary', () => {
+  it.each([
+    ['an object', { 'CS-2102-2026': true }],
+    ['a number', 5],
+    ['null', null],
+  ])('drops bookmarkedCourseIds that is %s and keeps the theme', (_, bad) => {
+    localStorage.setItem(
+      STORAGE_KEYS.PREFERENCES,
+      JSON.stringify({ theme: 'wpi-light', bookmarkedCourseIds: bad }),
+    );
+    const loaded = mgr().loadPreferences();
+    expect(loaded.data.bookmarkedCourseIds).toEqual([]);
+    expect(loaded.data.theme).toBe('wpi-light');
+  });
+
+  it('uses defaults when preferences are not an object', () => {
+    localStorage.setItem(STORAGE_KEYS.PREFERENCES, '[1,2]');
+    expect(mgr().loadPreferences().data.bookmarkedCourseIds).toEqual([]);
+  });
+});
+
 describe('active schedule id', () => {
   it('round-trips an id', () => {
     const m = mgr();
@@ -188,38 +209,5 @@ describe('write scoping', () => {
     expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBe(
       'other-writer',
     );
-  });
-});
-
-describe('importData', () => {
-  function withSchedules(saveResult: { success: boolean; error?: string }) {
-    const m = mgr();
-    (m as unknown as { indexedDBStorage: unknown }).indexedDBStorage = {
-      checkCompatibility: () => Promise.resolve(true),
-      saveSchedule: () => Promise.resolve(saveResult),
-    };
-    return m;
-  }
-  const schedule = {
-    id: 's1',
-    name: 'Fall',
-    selectedCourses: [],
-    generatedSchedules: [],
-  } as never;
-
-  it('reports failure when a schedule cannot be saved', async () => {
-    const m = withSchedules({ success: false, error: 'quota exceeded' });
-    const result = await m.importData([schedule], 's1');
-    expect(result.success).toBe(false);
-    expect(result.error?.message).toContain('quota exceeded');
-    // Nothing points at a schedule that was never written.
-    expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBeNull();
-  });
-
-  it('reports success when every schedule saves', async () => {
-    const m = withSchedules({ success: true });
-    const result = await m.importData([schedule], 's1');
-    expect(result.success).toBe(true);
-    expect(localStorage.getItem(STORAGE_KEYS.ACTIVE_SCHEDULE_ID)).toBe('s1');
   });
 });

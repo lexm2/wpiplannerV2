@@ -27,6 +27,7 @@ function fakeStorage() {
     saveActiveScheduleId: vi.fn(() => ok),
     savePreferences: vi.fn(() => ok),
     clearAllDataComplete: vi.fn(() => Promise.resolve(ok)),
+    subscribe: vi.fn(() => () => undefined),
   };
   return {
     storage: storage as unknown as TransactionalStorageManager,
@@ -102,17 +103,18 @@ describe('ProfileStateManager save', () => {
     expect(writes).toEqual([b.id]);
   });
 
-  it('writes everything after forgetSavedSchedules()', async () => {
+  it('writes the active schedule after markActiveScheduleChanged()', async () => {
     const { storage, writes } = fakeStorage();
     const psm = makePsm(storage);
     const a = psm.createSchedule('A');
-    const b = psm.createSchedule('B');
+    psm.createSchedule('B');
+    psm.setActiveSchedule(a.id);
     await settled(psm);
     writes.length = 0;
 
-    psm.forgetSavedSchedules();
+    psm.markActiveScheduleChanged();
     psm.save();
     await settled(psm);
-    expect(writes.sort()).toEqual([a.id, b.id].sort());
+    expect(writes).toEqual([a.id]);
   });
 });

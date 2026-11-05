@@ -1,5 +1,6 @@
 <script lang="ts">
   import { uiState } from '../services/ui/uiState.svelte';
+  import { showConfirm } from './modals/modalState.svelte';
   import { triggerFileDownload } from '../utils/download';
   import { STORAGE_KEYS } from '../utils/storageKeys';
 
@@ -8,6 +9,7 @@
   const error = $derived(uiState.appError);
 
   let clearing = $state(false);
+  let retrying = $state(false);
   let exporting = $state(false);
   // Tagged with the error it was raised under, so a new error doesn't inherit
   // the previous one's export failure.
@@ -67,13 +69,51 @@
     }
   }
 
-  async function clearDataAndReload(): Promise<void> {
+  // Wiping is irreversible, so it asks first, in the app's own dialog.
+  function clearDataAndReload(): void {
     if (clearing) return;
+    showConfirm({
+      title: 'Clear all data',
+      message:
+        'This deletes ALL saved schedules, your degree record and your preferences, then reloads the planner.\n' +
+        'Use Export Data first if you want a copy.\n' +
+        'This action CANNOT be undone.',
+      confirmLabel: 'Clear everything',
+      variant: 'danger',
+      onConfirm: () => void runClear(),
+    });
+  }
+
+  // The clear reloads the page itself once storage is empty.
+  async function runClear(): Promise<void> {
+    const forError = error;
     clearing = true;
     try {
       await uiState.appError?.onClearData?.();
+    } catch (err) {
+      clearing = false;
+      exportFailure = {
+        for: forError,
+        message: `Clearing failed: ${err instanceof Error ? err.message : String(err)}`,
+      };
+    }
+  }
+
+  async function retry(): Promise<void> {
+    if (retrying) return;
+    const forError = error;
+    retrying = true;
+    exportFailure = null;
+    try {
+      await uiState.appError?.onRetry?.();
+      if (uiState.appError === forError) uiState.appError = null;
+    } catch {
+      exportFailure = {
+        for: forError,
+        message: 'Still unable to load the course catalog.',
+      };
     } finally {
-      location.reload();
+      retrying = false;
     }
   }
 </script>
@@ -84,8 +124,8 @@
       <p class="error-banner-message">{error.message}</p>
       {#if error.onClearData}
         <p>
-          Your saved data may be outdated or deprecated. Clearing it will reset
-          the app to a fresh state.
+          If the problem comes from your saved data, clearing it resets the app
+          to a fresh state.
         </p>
       {/if}
       {#if exportError}
@@ -93,9 +133,19 @@
       {/if}
     </div>
     <div class="error-banner-actions">
+      {#if error.onRetry}
+        <button
+          class="btn btn-primary"
+          id="error-retry-btn"
+          disabled={retrying}
+          onclick={retry}
+        >
+          {retrying ? 'Retrying…' : 'Retry'}
+        </button>
+      {/if}
       {#if error.onExportData}
         <button
-          class="btn"
+          class="btn btn-secondary"
           id="error-export-data-btn"
           disabled={exporting}
           onclick={exportData}
@@ -105,7 +155,7 @@
       {/if}
       {#if error.onClearData}
         <button
-          class="btn"
+          class="btn btn-secondary"
           id="error-clear-data-btn"
           disabled={clearing}
           onclick={clearDataAndReload}
@@ -113,8 +163,9 @@
           {clearing ? 'Clearing…' : 'Clear Data & Reload'}
         </button>
       {/if}
-      <button class="btn" onclick={() => (uiState.appError = null)}
-        >Dismiss</button
+      <button
+        class="btn btn-secondary"
+        onclick={() => (uiState.appError = null)}>Dismiss</button
       >
     </div>
   </div>
@@ -123,7 +174,9 @@
 <style>
   .error-banner {
     position: fixed;
-    top: 1rem;
+    /* Under the header, which carries the page tabs: a banner over them would
+       leave Classes / Schedule / Degree unclickable until it was dismissed. */
+    top: calc(var(--spacing-header-height) + 0.5rem);
     /* Centred between 1rem gutters. A bare left: 50% + translateX(-50%) left the
        box no width to grow into and capped it near half the viewport (200px at
        320px, 384px at 768px). */
@@ -143,8 +196,10 @@
     box-shadow: var(--effect-shadow, 0 4px 16px rgba(0, 0, 0, 0.3));
   }
 
+  /* The red border says "error"; the text stays in the body colour, since the
+     error red does not reach 4.5:1 on the elevated surface. */
   .error-banner-text {
-    color: var(--color-error);
+    color: var(--color-text);
     font-size: 0.9rem;
   }
 
@@ -166,7 +221,7 @@
      supporting copy. Reported inline because showAppError would replace the
      whole banner. */
   .error-banner-text p + p.error-banner-export-error {
-    color: var(--color-error);
+    color: var(--color-text);
   }
 
   .error-banner-actions {
