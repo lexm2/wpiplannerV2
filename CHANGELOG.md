@@ -34,6 +34,7 @@
 - Previous/next schedule use chevrons, and Restart auto-schedule uses an adjustments icon
 - Requirements that depend on in-progress courses read "Satisfied (in progress)", and the Degree summary shows how many are complete
 - Undo and Redo are much faster with many schedules, and undo history uses far less memory
+- Redesigned the WPI Classic theme around the official crimson and WPI grey: a crimson header over light grey-tinted panels, with readable text and clearer input borders and focus rings
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
