@@ -182,7 +182,12 @@ const namesDepartment = (text: CourseText, words: string[]) =>
   words.length > 0 && text.departmentNames.includes(departmentPhrase(words));
 
 function parseQuery(vocab: Vocabulary, query: string): ParsedQuery {
-  const text = foldText(query).trim().replace(/\s+/g, ' ');
+  // Zero-width characters (pasted from web pages) are invisible but split
+  // "CS<ZWSP>2102" into two words; a no-break space is already whitespace.
+  const text = foldText(query)
+    .replace(/\p{Cf}/gu, '')
+    .trim()
+    .replace(/\s+/g, ' ');
   const code = readCode(vocab, text.replace(/[\s_.-]/g, ''));
   if (code) return { text, words: [], code };
   const lead = LEADING_CODE_RE.exec(text);

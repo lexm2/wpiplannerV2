@@ -14,6 +14,7 @@ import type { Forecast } from './forecast';
 import type { DateSpan } from './calendar';
 import { clockText } from './clock';
 import { isUncapped } from '../utils/seats';
+import { effectiveCategory } from '../utils/alternatingYears';
 
 const MAX_SUMMARY_PROFESSORS = 4;
 
@@ -83,6 +84,8 @@ export interface CourseSummary {
   professors: string[];
   /** WPI offering category: 1 every year, 2 every other year, 3 occasionally. */
   category: 1 | 2 | 3 | null;
+  /** `category`, but 2 for a Cat. I course whose description says it alternates years. */
+  effectiveCategory: 1 | 2 | 3 | null;
   /** Degree requirements its sections count toward, e.g. "Social Sciences". */
   degreeAttributes: string[];
   /** Other codes the same sections are listed under; one class. */
@@ -361,6 +364,7 @@ export function toCourseSummary(
     isGraduate: course.isGraduate ?? false,
     professors: professorsOf(primary).slice(0, MAX_SUMMARY_PROFESSORS),
     category: course.category ?? null,
+    effectiveCategory: effectiveCategory(course),
     degreeAttributes: course.degreeAttributes,
     crossListedWith: course.crossListedWith,
     topInstructor: bestInstructor(primary, ratingLookup(rmp), topBy),

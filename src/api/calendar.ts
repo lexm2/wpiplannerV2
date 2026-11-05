@@ -33,9 +33,10 @@ export interface YearInfo {
 }
 
 /**
- * Whole days since the seat counts were read from WPI, on the catalog's
- * clock; null when the refresh time is unknown. A deployed server refreshes
- * every 15 minutes, so a large age means the data is a stale copy.
+ * Whole days since WPI's data last changed (last-updated.json), on the
+ * catalog's clock; null when that time is unknown. The refresh job only
+ * rewrites the file when the feed changes, so a large age means either a
+ * quiet feed or a stale copy; the file cannot tell which.
  */
 export function seatDataAge(catalog: Catalog): number | null {
   const then = catalog.lastUpdated ? Date.parse(catalog.lastUpdated) : NaN;
@@ -83,6 +84,16 @@ export function endedTerms(catalog: Catalog, year: number): TermLetter[] {
   if (!dates) return [];
   const now = today(catalog);
   return (Object.keys(dates) as TermLetter[]).filter(t => dates[t].end < now);
+}
+
+/** Terms of `year` under way today (B, and F with it, say). */
+export function termsInProgress(catalog: Catalog, year: number): TermLetter[] {
+  const dates = termDates(catalog, year);
+  if (!dates) return [];
+  const now = today(catalog);
+  return (Object.keys(dates) as TermLetter[]).filter(
+    t => dates[t].start <= now && now <= dates[t].end,
+  );
 }
 
 export interface TermNow {

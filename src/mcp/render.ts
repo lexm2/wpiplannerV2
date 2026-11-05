@@ -64,20 +64,23 @@ interface SeatData {
 const STALE_DAYS = 7;
 
 /**
- * The once-per-response line on how old the seat counts are: "Seat data is
- * 48 days old (2026-09-01)", with what that means for low or any counts.
+ * The once-per-response line on the seat counts: "Seat data last changed 48
+ * days ago (2026-09-01)", with what that means for low or any counts. The
+ * date is when WPI's data last changed, not when it was last read: the
+ * refresh job keeps it while the feed is unchanged, so a quiet week looks
+ * old without being stale.
  */
 function seatDataLine(data: SeatData, low: boolean): string {
   const date = asOf(data.dataAsOf);
   const days = data.dataAgeDays;
   const age =
     days === null
-      ? `Seat data is from ${date}`
+      ? `Seat data last changed ${date}`
       : days === 0
-        ? `Seat data is under a day old (${date})`
-        : `Seat data is ${plural(days, 'day')} old (${date})`;
+        ? `Seat data last changed under a day ago (${date})`
+        : `Seat data last changed ${plural(days, 'day')} ago (${date})`;
   if (days !== null && days > STALE_DAYS) {
-    return `${age}: check live seats in Workday before registering.`;
+    return `${age}; the date stays while WPI's data is unchanged, but check live seats in Workday before registering.`;
   }
   return low
     ? `${age}; low counts (${LOW_SEATS} or fewer) may already be gone.`
@@ -290,7 +293,11 @@ function rowLine(
       ? `${yearLabel(c.year)} early entry: not published, cannot be scheduled yet`
       : rowSeats(c),
   ];
-  if (c.category) parts.push(`Cat. ${'I'.repeat(c.category)}`);
+  if (c.effectiveCategory) {
+    parts.push(
+      `Cat. ${'I'.repeat(c.effectiveCategory)}${c.effectiveCategory !== c.category ? ' (alternating years)' : ''}`,
+    );
+  }
   if (c.topInstructor) {
     const t = c.topInstructor;
     parts.push(
@@ -606,6 +613,7 @@ export function courseDigest(
     departmentName: d.departmentName,
     isGraduate: d.isGraduate,
     category: d.category,
+    effectiveCategory: d.effectiveCategory,
     degreeAttributes: d.degreeAttributes,
     crossListedWith: d.crossListedWith,
     courseTypes: d.courseTypes,
@@ -742,7 +750,14 @@ export function renderCourse(
 
   const facts: string[] = [];
   facts.push(
-    `Offering: ${d.category ? CATEGORY_TEXT[d.category] : 'no category on record'}`,
+    `Offering: ${
+      d.effectiveCategory
+        ? CATEGORY_TEXT[d.effectiveCategory] +
+          (d.effectiveCategory !== d.category
+            ? ' - the catalog lists Cat. I, but the description says alternating years'
+            : '')
+        : 'no category on record'
+    }`,
   );
   facts.push(attributesFact(d.degreeAttributes));
   if (d.courseTypes.length) facts.push(`Type: ${d.courseTypes.join(', ')}`);
@@ -1001,7 +1016,7 @@ function scheduleLines(schedule: GeneratedSchedule): string[] {
   const lines = [`#${schedule.rank}: CRNs ${schedule.crns.join(', ')}`];
   for (const q of schedule.quarters) {
     lines.push(
-      `  ${q.quarter}: ${q.days.join('')}, ${q.earliestStart}-${q.latestEnd}, ${plural(q.idleMinutes, 'idle minute')}`,
+      `  ${q.quarter}${q.endedOn ? ` (ended ${q.endedOn})` : ''}: ${q.days.join('')}, ${q.earliestStart}-${q.latestEnd}, ${plural(q.idleMinutes, 'idle minute')}`,
     );
   }
   for (const course of schedule.courses) {
@@ -1032,6 +1047,13 @@ export function renderSchedules(set: ScheduleSet): string {
   }
   if (set.notices.length)
     lines.push('', ...set.notices.map(n => `Note: ${n.message}`));
+  if (
+    set.schedules.some(s =>
+      s.courses.some(c => c.sections.some(x => x.uncapped)),
+    )
+  ) {
+    lines.push('', MEMBERSHIP_NOTE);
+  }
   if (set.schedules.length) {
     lines.push(
       '',
@@ -1059,7 +1081,7 @@ export function renderCatalogInfo(
   const lines = [
     termNowText(meta.currentTerm, meta.today),
     `Current academic year: ${meta.currentAcademicYear} (${yearLabel(meta.currentAcademicYear)}), the only one with schedules (sections, times, CRNs).`,
-    `Data as of ${meta.dataAsOf ?? 'unknown'}${meta.dataAgeDays === null ? '' : ` (${plural(meta.dataAgeDays, 'day')} old)`}; seat counts are from then.`,
+    `Data last changed ${meta.dataAsOf ?? 'at an unknown time'}${meta.dataAgeDays === null ? '' : ` (${plural(meta.dataAgeDays, 'day')} ago)`}; seat counts are as of then. The date stays while WPI's data is unchanged.`,
     `Years: ${meta.years
       .map(
         y =>

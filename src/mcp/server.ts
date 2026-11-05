@@ -19,16 +19,18 @@ import { seatDataAge, termDates, today, yearStatus } from '../api/calendar';
 import { CourseQuerySchema, runCourseQuery } from '../api/query';
 import { caseless, FallYearSchema } from '../api/schemaHints';
 import { ConflictCheckInputSchema, findConflicts } from '../api/conflicts';
-import { ApiError } from '../api/errors';
+import { ApiError, errorKind } from '../api/errors';
+import { ERROR_KIND_META } from '../api/requestLog';
 import {
   AutoScheduleInputSchema,
   generateSchedules,
 } from '../api/autoSchedule';
+import type { ScheduleSearch } from '../api/scheduleSearch';
 import { logger } from '../utils/logger';
 import { TERMS } from '../utils/typeGuards';
 import {
   catalogMeta,
-  listDepartments,
+  departmentsOf,
   lookupCourse,
   MAX_COURSE_INPUT,
 } from '../api/lookup';
@@ -104,8 +106,8 @@ degree audit or advisor rather than ruling a course out.
 the student to the Registrar or their academic advisor.
 - No exam, assessment or final exam information.
 
-Seat counts are as of the last refresh (get_catalog_info's dataAsOf) and can \
-lag. Quote CRNs and section numbers exactly.`;
+Seat counts are as of when the data last changed (get_catalog_info's dataAsOf; \
+it stays put while WPI's data does) and can lag. Quote CRNs and section numbers exactly.`;
 
 const text = (value: string) => [{ type: 'text' as const, text: value }];
 
@@ -117,7 +119,11 @@ const text = (value: string) => [{ type: 'text' as const, text: value }];
  */
 function failure(error: unknown, tool: string) {
   if (error instanceof ApiError) {
-    return { content: text(error.message), isError: true };
+    return {
+      content: text(error.message),
+      isError: true,
+      _meta: { [ERROR_KIND_META]: errorKind(error.status) },
+    };
   }
   logger.error(`[mcp] ${tool} failed:`, error);
   return {
@@ -125,6 +131,7 @@ function failure(error: unknown, tool: string) {
       `Internal error while running ${tool}; try a simpler query, or try again later.`,
     ),
     isError: true,
+    _meta: { [ERROR_KIND_META]: 'internal' },
   };
 }
 
@@ -135,7 +142,10 @@ const YearInputSchema = FallYearSchema.describe(
 /** Every tool only reads the catalog it is given. */
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false };
 
-function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
+function buildServer(
+  getCatalog: () => Promise<Catalog>,
+  search?: ScheduleSearch,
+): McpServer {
   const server = new McpServer(
     { name: 'wpi-courses', version: '2.0.0' },
     {
@@ -285,14 +295,14 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
     },
     async ({ year }) => {
       const catalog = await getCatalog();
-      const departments = listDepartments(catalog, year);
+      const result = departmentsOf(catalog, year);
       const status =
         year === 'all'
           ? null
           : yearStatus(catalog, year ?? currentAcademicYear(catalog));
       return {
-        content: text(renderDepartments(departments, status)),
-        structuredContent: { departments },
+        content: text(renderDepartments(result.departments, status)),
+        structuredContent: { ...result },
       };
     },
   );
@@ -358,7 +368,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
       inputSchema: AutoScheduleInputSchema,
     },
     async input => {
-      const set = generateSchedules(await getCatalog(), input);
+      const set = await generateSchedules(await getCatalog(), input, search);
       return {
         content: text(renderSchedules(set)),
         structuredContent: { ...set },
@@ -372,6 +382,7 @@ function buildServer(getCatalog: () => Promise<Catalog>): McpServer {
 /** The MCP endpoint: stateless, one fresh server per request. */
 export function createMcpEndpoint(
   getCatalog: () => Promise<Catalog>,
+  search?: ScheduleSearch,
 ): McpHttpHandler {
-  return createMcpHandler(() => buildServer(getCatalog));
+  return createMcpHandler(() => buildServer(getCatalog, search));
 }

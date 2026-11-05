@@ -17,6 +17,29 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * What kind of failure a status is, for the request log: the log says what
+ * went wrong without repeating any of the caller's text.
+ */
+export function errorKind(status: number): string {
+  switch (status) {
+    case 404:
+      return 'notFound';
+    case 405:
+      return 'wrongMethod';
+    case 413:
+      return 'tooLarge';
+    case 422:
+      return 'unprocessable';
+    case 429:
+      return 'rateLimited';
+    case 503:
+      return 'busy';
+    default:
+      return status >= 500 ? 'internal' : 'badRequest';
+  }
+}
+
 /** Characters of a caller's own text a message echoes before "...". */
 const ECHO_CHARS = 60;
 
