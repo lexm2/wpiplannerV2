@@ -506,19 +506,11 @@
 }
 
 .term-conflict-warning {
-  position: absolute;
-  top: 0.4rem;
-  /* Beside the term letter in the corner cell. The top-right corner sat on
-     the "Fri" header whenever the card was short or narrow. */
-  left: 0.25rem;
+  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
   animation: pulse-warning 2s infinite;
-  z-index: 30;
-  pointer-events: none;
 }
 
 .conflict-warning-icon {
@@ -596,6 +588,7 @@
 }
 
 .term-letter-label {
+  gap: 0.25rem;
   font-size: 1rem;
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
