@@ -115,9 +115,9 @@ test.describe('More options button', () => {
     await row.getByTitle('More options').click();
     const menu = row.locator('[data-visible="true"]');
     await expect(
-      menu.getByRole('button', { name: 'Export ICS' }),
+      menu.getByRole('menuitem', { name: 'Export ICS' }),
     ).toBeVisible();
-    await expect(menu.getByRole('button', { name: 'Import' })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Import' })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Rename' })).toBeHidden();
   });
 
