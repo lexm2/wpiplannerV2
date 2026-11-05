@@ -35,6 +35,21 @@
   }
 }
 
+/* Touch: an hour row is the hour label's whole tap target, so rows get 44px
+   and the modal body scrolls (the label column stays scrollable by touch; only
+   the painting area captures it). */
+@media (pointer: coarse) {
+  .grid {
+    flex: none;
+    min-height: 0;
+    grid-template-rows: auto repeat(var(--grid-hours, 12), 44px);
+  }
+
+  .headerBtn {
+    min-height: 44px;
+  }
+}
+
 .corner {
   border-bottom: 2px solid var(--color-border);
 }

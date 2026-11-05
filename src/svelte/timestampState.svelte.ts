@@ -11,21 +11,23 @@ class TimestampState {
 
 export const timestampState = new TimestampState();
 
-const TIMESTAMP_FORMAT: Intl.DateTimeFormatOptions = {
+const DATE_FORMAT: Intl.DateTimeFormatOptions = {
   month: 'short',
   day: 'numeric',
   year: 'numeric',
+};
+const TIME_FORMAT: Intl.DateTimeFormatOptions = {
   hour: 'numeric',
   minute: '2-digit',
-  second: '2-digit',
   hour12: true,
 };
 
 // public/last-updated.json, rewritten whenever the course data changes.
 const LastUpdatedSchema = z.object({ timestamp: z.string() });
 
-function formatTimestamp(date: Date): string {
-  return date.toLocaleDateString('en-US', TIMESTAMP_FORMAT).replace(',', ' at');
+/** "Nov 4, 2026 at 6:11 PM". */
+export function formatTimestamp(date: Date): string {
+  return `${date.toLocaleDateString('en-US', DATE_FORMAT)} at ${date.toLocaleTimeString('en-US', TIME_FORMAT)}`;
 }
 
 export function updateClientTimestamp(): void {

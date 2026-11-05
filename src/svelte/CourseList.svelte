@@ -15,6 +15,9 @@
   import type { ProfileStateManager } from '../core/state/ProfileStateManager';
   import { logger } from '../utils/logger';
   import { openDrawer } from './drawerState.svelte';
+  import { showConfirm } from './modals/modalState.svelte';
+  import { crossListedTwin } from '../utils/courseUtils';
+  import EmptyResults from './EmptyResults.svelte';
 
   let {
     filterService,
@@ -117,22 +120,35 @@
     openDrawer('details');
   }
 
-  // The card/row is itself a button for keyboard users. The target guard keeps
-  // Enter/Space on the nested select/bookmark/term buttons and professor links
-  // doing their own thing instead of also opening the course.
-  function onCourseKeydown(e: KeyboardEvent, course: Course): void {
-    if (e.target !== e.currentTarget) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      selectCourse(course);
-    }
+  function termSectionsLabel(term: string, course: Course): string {
+    return `${semesterTermLabel(term) ?? `${term} term`} sections of ${courseLabel(course)}`;
   }
 
-  function termSectionsLabel(term: string): string {
-    return `${semesterTermLabel(term) ?? `${term} term`} sections`;
-  }
+  const courseLabel = (course: Course) =>
+    `${course.departmentAbbr}${course.number}`;
 
   function toggleSelect(course: Course): void {
+    if (!appState.selectedById.has(course.id)) {
+      const twin = crossListedTwin(
+        course,
+        appState.selectedCourses.map(sc => sc.course),
+      );
+      if (twin) {
+        const code = courseLabel(course);
+        const twinCode = courseLabel(twin);
+        showConfirm({
+          title: 'Same class already selected',
+          message: `${code} is the same class as ${twinCode}, which you have already selected.\nAdding both would count its credits twice.`,
+          confirmLabel: 'Add anyway',
+          onConfirm: () => select(course),
+        });
+        return;
+      }
+    }
+    select(course);
+  }
+
+  function select(course: Course): void {
     // The service drives appState.selectedById, so the button state below
     // (isSelected) updates reactively - no optimistic DOM patching needed.
     courseSelectionService.toggleCourseSelection(course).catch(error => {
@@ -150,16 +166,75 @@
   }
 </script>
 
+<!-- The course's own button: Enter or Space opens its details. Mouse users can
+     press anywhere on the row; the row's click handler does the same. -->
+{#snippet codeButton(course: Course)}
+  <button
+    type="button"
+    class={listStyles['course-code']}
+    data-open-btn
+    aria-label="{courseLabel(course)} {course.name}"
+    aria-current={courseListState.selectedCourseId === course.id
+      ? 'true'
+      : undefined}>{courseLabel(course)}</button
+  >
+{/snippet}
+
+{#snippet rowButtons(
+  course: Course,
+  isSelected: boolean,
+  isBookmarked: boolean,
+)}
+  <button
+    type="button"
+    class={[
+      listStyles['course-select-btn'],
+      { [listStyles['selected']]: isSelected },
+    ]}
+    data-select-btn
+    title={isSelected ? 'Remove from selection' : 'Add to selection'}
+    aria-label="{isSelected ? 'Remove' : 'Add'} {courseLabel(
+      course,
+    )} {isSelected ? 'from' : 'to'} selection"
+    onclick={e => {
+      e.stopPropagation();
+      toggleSelect(course);
+    }}
+    >{@html isSelected
+      ? getInlineSVG('CHECK', 'check-icon')
+      : getInlineSVG('PLUS', 'plus-icon')}</button
+  >
+  <button
+    type="button"
+    class={[
+      listStyles['course-bookmark-btn'],
+      { [listStyles['bookmarked']]: isBookmarked },
+    ]}
+    title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
+    aria-label="{isBookmarked
+      ? 'Remove bookmark from'
+      : 'Bookmark'} {courseLabel(course)}"
+    onclick={e => {
+      e.stopPropagation();
+      toggleBookmark(course.id, isBookmarked);
+    }}
+    >{@html isBookmarked
+      ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon')
+      : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button
+  >
+{/snippet}
+
 {#if appState.loadedDepartments.length === 0}
   <div class="empty-state">Loading courses...</div>
 {:else if displayed.length === 0}
-  <div class="empty-state">No courses found.</div>
+  <EmptyResults {filterService} />
 {:else if view === 'grid'}
   <div class={listStyles['course-grid']}>
     {#each courseViews as cv (cv.course.id)}
       {@const course = cv.course}
       {@const isSelected = appState.selectedById.has(course.id)}
       {@const isBookmarked = appState.bookmarkedIds.has(course.id)}
+      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (the click is a mouse convenience; the course code button is the keyboard route) -->
       <div
         class={[
           listStyles['course-card'],
@@ -173,20 +248,14 @@
         data-active={courseListState.selectedCourseId === course.id
           ? ''
           : undefined}
-        role="button"
-        tabindex="0"
-        aria-label="{course.departmentAbbr}{course.number} {course.name}"
         onclick={() => selectCourse(course)}
-        onkeydown={e => onCourseKeydown(e, course)}
       >
         <div class={listStyles['course-card-header']}>
           <!-- Code above name, buttons stacked at the right: the same layout
                the list rows take at phone widths. -->
           <div class={listStyles['course-card-info']}>
             <div class={listStyles['course-code-row']}>
-              <div class={listStyles['course-code']}>
-                {course.departmentAbbr}{course.number}
-              </div>
+              {@render codeButton(course)}
               {#if cv.hasWarning}<span class={listStyles['capacity-badge']}
                   >At capacity</span
                 >{/if}
@@ -194,35 +263,7 @@
             <div class={listStyles['course-title-main']}>{course.name}</div>
           </div>
           <div class={listStyles['course-card-buttons']}>
-            <button
-              class={[
-                listStyles['course-select-btn'],
-                { [listStyles['selected']]: isSelected },
-              ]}
-              data-select-btn
-              title={isSelected ? 'Remove from selection' : 'Add to selection'}
-              onclick={e => {
-                e.stopPropagation();
-                toggleSelect(course);
-              }}
-              >{@html isSelected
-                ? getInlineSVG('CHECK', 'check-icon')
-                : getInlineSVG('PLUS', 'plus-icon')}</button
-            >
-            <button
-              class={[
-                listStyles['course-bookmark-btn'],
-                { [listStyles['bookmarked']]: isBookmarked },
-              ]}
-              title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-              onclick={e => {
-                e.stopPropagation();
-                toggleBookmark(course.id, isBookmarked);
-              }}
-              >{@html isBookmarked
-                ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon')
-                : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button
-            >
+            {@render rowButtons(course, isSelected, isBookmarked)}
           </div>
         </div>
       </div>
@@ -235,6 +276,7 @@
       {@const isSelected = appState.selectedById.has(course.id)}
       {@const isBookmarked = appState.bookmarkedIds.has(course.id)}
       {@const expanded = expandedTerm.get(course.id)}
+      <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (the click is a mouse convenience; the course code button is the keyboard route) -->
       <div
         class={[
           listStyles['course-item'],
@@ -249,47 +291,13 @@
         data-active={courseListState.selectedCourseId === course.id
           ? ''
           : undefined}
-        role="button"
-        tabindex="0"
-        aria-label="{course.departmentAbbr}{course.number} {course.name}"
         onclick={() => selectCourse(course)}
-        onkeydown={e => onCourseKeydown(e, course)}
         use:termFlip={expanded}
       >
         <div class={listStyles['course-header']}>
           <div class={listStyles['course-header-controls']}>
-            <button
-              class={[
-                listStyles['course-select-btn'],
-                { [listStyles['selected']]: isSelected },
-              ]}
-              data-select-btn
-              title={isSelected ? 'Remove from selection' : 'Add to selection'}
-              onclick={e => {
-                e.stopPropagation();
-                toggleSelect(course);
-              }}
-              >{@html isSelected
-                ? getInlineSVG('CHECK', 'check-icon')
-                : getInlineSVG('PLUS', 'plus-icon')}</button
-            >
-            <button
-              class={[
-                listStyles['course-bookmark-btn'],
-                { [listStyles['bookmarked']]: isBookmarked },
-              ]}
-              title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-              onclick={e => {
-                e.stopPropagation();
-                toggleBookmark(course.id, isBookmarked);
-              }}
-              >{@html isBookmarked
-                ? getInlineSVG('BOOKMARK_FILLED', 'bookmark-icon')
-                : getInlineSVG('BOOKMARK', 'bookmark-icon')}</button
-            >
-            <div class={listStyles['course-code']}>
-              {course.departmentAbbr}{course.number}
-            </div>
+            {@render rowButtons(course, isSelected, isBookmarked)}
+            {@render codeButton(course)}
             <div class={listStyles['course-name']}>
               <span class={listStyles['course-name-text']}>{course.name}</span>
             </div>
@@ -317,7 +325,7 @@
                   ]}
                   data-term={expanded}
                   data-term-badge
-                  aria-label={termSectionsLabel(expanded)}
+                  aria-label={termSectionsLabel(expanded, course)}
                   aria-expanded="true"
                   title={sec?.allFull ? 'All sections full' : undefined}
                   onclick={e => {
@@ -374,7 +382,7 @@
                       ]}
                       data-term={t.term}
                       data-term-badge
-                      aria-label={termSectionsLabel(t.term)}
+                      aria-label={termSectionsLabel(t.term, course)}
                       aria-expanded="false"
                       title={t.allFull
                         ? 'All sections full'

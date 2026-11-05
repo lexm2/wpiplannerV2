@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { clampWidth, type PanelWidthConfig } from './panelWidths';
+  import {
+    clampWidth,
+    maxWidthNow,
+    type PanelWidthConfig,
+  } from './panelWidths';
 
   interface Props {
     config: PanelWidthConfig;
@@ -14,6 +18,26 @@
   let dragging = $state(false);
   let startX = 0;
   let startWidth = 0;
+  // Fixed for a drag: the two columns trade width, so the limit doesn't move.
+  let dragMax = 0;
+
+  let handleEl = $state<HTMLElement | null>(null);
+  // Mirrored into aria-value* so a screen reader can say where the handle is.
+  let valueNow = $state(0);
+  let valueMax = $state(0);
+
+  function syncValue(): void {
+    if (!handleEl) return;
+    const width = Math.round(currentWidth(handleEl));
+    // A hidden page's panel measures 0; the next focus or hover measures it.
+    if (width === 0) return;
+    valueNow = width;
+    valueMax = maxWidthNow(config, width);
+  }
+
+  $effect(() => {
+    syncValue();
+  });
 
   function currentWidth(handle: HTMLElement): number {
     const panel = handle.parentElement;
@@ -24,10 +48,9 @@
     return Number.parseFloat(raw) || config.defaultWidth;
   }
 
-  function setWidth(width: number): number {
-    const w = clampWidth(config, width);
+  function setWidth(width: number, max: number): void {
+    const w = clampWidth(config, width, max);
     document.documentElement.style.setProperty(config.cssVar, `${w}px`);
-    return w;
   }
 
   function onPointerDown(e: PointerEvent): void {
@@ -36,6 +59,7 @@
     dragging = true;
     startX = e.clientX;
     startWidth = currentWidth(handle);
+    dragMax = maxWidthNow(config, startWidth);
     try {
       handle.setPointerCapture(e.pointerId);
     } catch {
@@ -49,7 +73,11 @@
   function onPointerMove(e: PointerEvent): void {
     if (!dragging) return;
     const delta = e.clientX - startX;
-    setWidth(edge === 'right' ? startWidth + delta : startWidth - delta);
+    setWidth(
+      edge === 'right' ? startWidth + delta : startWidth - delta,
+      dragMax,
+    );
+    syncValue();
   }
 
   function clearBodyStyles(): void {
@@ -72,6 +100,7 @@
     clearBodyStyles();
     const w = currentWidth(handle);
     localStorage.setItem(config.storageKey, String(Math.round(w)));
+    syncValue();
   }
 
   // Unmounted mid-drag (e.g. the panel closed): nothing else would clear them.
@@ -85,16 +114,18 @@
   function reset(): void {
     document.documentElement.style.removeProperty(config.cssVar);
     localStorage.removeItem(config.storageKey);
+    syncValue();
   }
 
   function onKeyDown(e: KeyboardEvent): void {
     const step = e.shiftKey ? 32 : 8;
     const handle = e.currentTarget as HTMLElement;
     const base = currentWidth(handle);
+    const max = maxWidthNow(config, base);
     if (e.key === 'ArrowLeft') {
-      setWidth(edge === 'right' ? base - step : base + step);
+      setWidth(edge === 'right' ? base - step : base + step, max);
     } else if (e.key === 'ArrowRight') {
-      setWidth(edge === 'right' ? base + step : base - step);
+      setWidth(edge === 'right' ? base + step : base - step, max);
     } else if (e.key === 'Home') {
       reset();
     } else {
@@ -104,6 +135,7 @@
       config.storageKey,
       String(Math.round(currentWidth(handle))),
     );
+    syncValue();
     e.preventDefault();
   }
 </script>
@@ -116,7 +148,11 @@
   role="separator"
   aria-orientation="vertical"
   aria-label={label}
+  aria-valuenow={valueNow}
+  aria-valuemin={config.min}
+  aria-valuemax={valueMax}
   tabindex="0"
+  bind:this={handleEl}
   onpointerdown={onPointerDown}
   onpointermove={onPointerMove}
   onpointerup={onPointerUp}
@@ -124,6 +160,8 @@
   onlostpointercapture={onPointerUp}
   ondblclick={reset}
   onkeydown={onKeyDown}
+  onfocus={syncValue}
+  onpointerenter={syncValue}
 ></div>
 
 <style>

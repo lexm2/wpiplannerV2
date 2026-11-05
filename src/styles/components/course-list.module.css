@@ -152,6 +152,11 @@
   border-radius: calc(var(--effect-border-radius) / 2);
   width: fit-content;
   flex-shrink: 0;
+  /* A button, so Enter and Space open the course; undo the UA button chrome. */
+  border: 0;
+  cursor: pointer;
+  line-height: inherit;
+  text-align: left;
 }
 
 .course-name {
@@ -476,7 +481,11 @@
    classes are hashed by this module now, so a rule in a global stylesheet can
    no longer reach them. The outer halves stay global - .theme-high-contrast is
    set on <body> by the theme manager, .as-card-terms is modal.css's. */
-@media (max-width: 1440px) {
+/* Keyed to the list column rather than the window, so widening the panel
+   brings the term badges back. The nearest container is .main-content (the
+   name is left off: a module would hash it). Under ~600px
+   the badges leave course names too little room. */
+@container (max-width: 600px) {
   .course-sections {
     display: none;
   }

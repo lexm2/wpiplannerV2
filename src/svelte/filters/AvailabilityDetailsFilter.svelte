@@ -26,7 +26,7 @@
     mode: 'filter' | 'auto-schedule';
   } = $props();
 
-  const state = $derived(readAvailability(filterService));
+  const avail = $derived(readAvailability(filterService));
   const isAuto = $derived(mode === 'auto-schedule');
   // Auto-Schedule's own setting; unset means on.
   const keepClearOfEvents = $derived(
@@ -39,17 +39,24 @@
   // A course-list toggle left on stays visible with no events, so it can be
   // turned off: otherwise it hides sections again the moment an event exists.
   const showCalendarToggle = $derived(
-    calendarEventCount > 0 || (!isAuto && state.hasCalendarEvents),
+    calendarEventCount > 0 || (!isAuto && avail.hasCalendarEvents),
   );
   const calendarCountText = $derived(
     calendarEventCount === 1 ? '1 event' : `${calendarEventCount} events`,
   );
 
+  // Whole numbers from 0 up. A number input reports "" for text it can't read
+  // ("1e3" is read as 1000, "-" as nothing), so anything else is no minimum.
+  let seatsError = $state('');
   function onMinSeats(value: string): void {
+    const seats = Number(value);
+    const typed = value.trim() !== '';
+    const valid = typed && Number.isInteger(seats) && seats >= 0;
+    seatsError = typed && !valid ? 'Enter a whole number, 0 or more' : '';
     writeAvailability(
       filterService,
-      state.availableOnly,
-      value ? parseInt(value) : undefined,
+      avail.availableOnly,
+      valid && seats > 0 ? seats : undefined,
     );
   }
 </script>
@@ -68,18 +75,18 @@
       <FilterToggle
         id="hide-calendar-conflicts-filter"
         label={`Hide sections that conflict with calendar events (${calendarCountText})`}
-        checked={state.hasCalendarEvents}
+        checked={avail.hasCalendarEvents}
         onchange={checked =>
           setCalendarConflicts(filterService, courseSelectionService, checked)}
       />
     {/if}
   {/if}
 
-  {#if state.avoidConflicts || state.hasCalendarEvents}
+  {#if avail.avoidConflicts || avail.hasCalendarEvents}
     <FilterToggle
       id="semester-spans-filter"
       label="Semester courses (F, S) conflict with their quarters (A and B, C and D)"
-      checked={state.semesterSpans}
+      checked={avail.semesterSpans}
       onchange={checked => setSemesterSpans(filterService, checked)}
     />
   {/if}
@@ -94,7 +101,8 @@
       min={0}
       max={999}
       placeholder="Any"
-      value={String(state.minAvailable ?? '')}
+      error={seatsError || undefined}
+      value={String(avail.minAvailable ?? '')}
       oninput={e => onMinSeats((e.currentTarget as HTMLInputElement).value)}
     />
   </div>

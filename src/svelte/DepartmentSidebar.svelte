@@ -1,9 +1,14 @@
 <script lang="ts">
   import { SvelteSet } from 'svelte/reactivity';
   import { appState } from '../core/state/appState.svelte';
+  import { getInlineSVG } from '../utils/iconPaths';
   import { groupDepartmentsByCategory } from '../utils/departmentUtils';
   import type { FilterService } from '../services/filtering/FilterService';
-  import type { DepartmentFilterCriteria } from '../types/filters';
+  import type {
+    AcademicYearFilterCriteria,
+    DepartmentFilterCriteria,
+  } from '../types/filters';
+  import type { Department } from '../types/types';
 
   let { filterService }: { filterService: FilterService } = $props();
 
@@ -15,13 +20,37 @@
   // is a rune, and `filterService.getActiveFilters()` reads a SvelteMap. So the
   // list, active highlighting, and counts all recompute on their own.
   const departments = $derived(appState.loadedDepartments);
-  const categories = $derived(groupDepartmentsByCategory(departments));
 
   const activeDepts = $derived(
     filterService.getCriteria<DepartmentFilterCriteria>('department')
       ?.departments ?? [],
   );
   const activeSet = $derived(new Set(activeDepts));
+
+  // The selected academic year decides which departments exist: one with no
+  // courses in it would only lead to an empty list. The active department
+  // stays listed so the student can always see and undo their choice. Filters
+  // other than the year only zero a department's count, which says why.
+  const year = $derived(
+    filterService.getCriteria<AcademicYearFilterCriteria>('academicYear')?.year,
+  );
+  function offeredInYear(dept: Department): boolean {
+    return (
+      year === undefined ||
+      year === 'all' ||
+      dept.courses.some(c => c.academicYear === year)
+    );
+  }
+  const categories = $derived(
+    Object.fromEntries(
+      Object.entries(groupDepartmentsByCategory(departments)).map(
+        ([name, depts]) => [
+          name,
+          depts.filter(d => activeSet.has(d.abbreviation) || offeredInYear(d)),
+        ],
+      ),
+    ),
+  );
 
   // Per-department counts reflect what the OTHER active filters allow (the
   // department filter itself is excluded).
@@ -93,6 +122,7 @@
         type="button"
         class="department-item all-departments"
         class:active={activeSet.size === 0}
+        aria-pressed={activeSet.size === 0}
         data-dept-id="all"
         onclick={e => selectDepartment('all', e)}
       >
@@ -103,22 +133,48 @@
 
   {#each Object.entries(categories) as [categoryName, depts] (categoryName)}
     {#if depts.length > 0}
+      {@const expanded = isExpanded(categoryName)}
+      {@const listId = `department-list-${categoryName.replace(/\W+/g, '-')}`}
+      {@const activeHere = depts.filter(d => activeSet.has(d.abbreviation))}
       <div class="department-category">
         <button
           type="button"
           class="category-header"
           data-category={categoryName}
-          aria-expanded={isExpanded(categoryName)}
+          aria-expanded={expanded}
+          aria-controls={listId}
           onclick={() => toggleCategory(categoryName)}
         >
-          {categoryName}
+          <span class="category-header-chevron" aria-hidden="true"
+            >{@html getInlineSVG(
+              expanded ? 'CHEVRON_DOWN' : 'CHEVRON_RIGHT',
+            )}</span
+          >
+          <span class="category-header-name">{categoryName}</span>
+          <!-- A collapsed category hides its departments, so it says when one
+               of them is what the list is showing. -->
+          {#if !expanded && activeHere.length > 0}
+            <span
+              class="category-header-active"
+              title={activeHere.map(d => d.name).join(', ')}
+              >{activeHere.length} selected</span
+            >
+          {/if}
         </button>
-        <div class="department-list" class:expanded={isExpanded(categoryName)}>
+        <!-- inert keeps a collapsed list out of the Tab order and the
+             accessibility tree; the max-height transition only hides it. -->
+        <div
+          class="department-list"
+          class:expanded
+          id={listId}
+          inert={!expanded}
+        >
           {#each depts as dept (dept.abbreviation)}
             <button
               type="button"
               class="department-item"
               class:active={activeSet.has(dept.abbreviation)}
+              aria-pressed={activeSet.has(dept.abbreviation)}
               data-dept-id={dept.abbreviation}
               onclick={e => selectDepartment(dept.abbreviation, e)}
             >

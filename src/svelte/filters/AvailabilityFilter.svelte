@@ -23,7 +23,7 @@
 <FilterSection title="Availability">
   <FilterToggle
     id="avoid-conflicts-filter"
-    label="Hide periods that conflict with selected sections"
+    label="Hide class times that conflict with selected sections"
     checked={state.avoidConflicts}
     onchange={checked =>
       setAvoidConflicts(filterService, courseSelectionService, checked)}

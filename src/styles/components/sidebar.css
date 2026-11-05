@@ -27,6 +27,9 @@
 }
 
 .category-header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   font-weight: var(--font-weight-medium);
   color: var(--color-primary);
   margin-bottom: 0.5rem;
@@ -43,6 +46,28 @@
 
 .category-header:hover {
   background: var(--color-surface-hover);
+}
+
+.category-header-chevron {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.category-header-chevron svg {
+  width: 14px;
+  height: 14px;
+}
+
+.category-header-active {
+  margin-left: auto;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .department-list {

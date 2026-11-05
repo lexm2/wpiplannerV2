@@ -132,6 +132,9 @@ const stripMarks = (text: string) =>
  */
 export const foldText = (text: string) => stripMarks(text.toLowerCase());
 
+/** Whether a query has any letter or digit to search for; "(" or an emoji has none. */
+export const hasSearchableText = (query: string) => /[\p{L}\p{N}]/u.test(query);
+
 const TOKEN_SPLIT = /[^a-z0-9+#]+/;
 const tokenize = (text: string) => text.split(TOKEN_SPLIT).filter(Boolean);
 

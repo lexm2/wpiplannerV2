@@ -1098,7 +1098,8 @@ html.is-mobile .filter-select-none {
   transition: var(--effect-transition);
 }
 
-.filter-quick-btn:hover {
+.filter-quick-btn:hover,
+.filter-quick-btn[aria-pressed='true'] {
   background: var(--color-primary);
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
