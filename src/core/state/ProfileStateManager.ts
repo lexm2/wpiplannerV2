@@ -111,9 +111,11 @@ export class ProfileStateManager {
   // in state are replaced, never mutated, so an unchanged object needs no
   // re-save; a save writes exactly the schedules that differ from this map.
   private savedSchedules = new Map<string, Schedule>();
-  // Objects handed to storage whose write has not finished, so a second save
-  // before it does not queue the same write again.
-  private writesInFlight = new Map<string, Schedule>();
+  // At most one flush runs at a time. A save() that lands while it does only
+  // marks the state dirty again, so a burst of edits costs one write per
+  // dirty schedule plus one trailing write, not one write per edit.
+  private flushing = false;
+  private flushRequested = false;
   private savedPreferences: SchedulePreferences | null = null;
   private savedActiveId: string | null | undefined;
   // Set while all data is being cleared, here or in another tab: whatever is
@@ -858,27 +860,38 @@ export class ProfileStateManager {
   }
 
   save(skipSnapshot = false): void {
-    const savePromise = this.executeSave(skipSnapshot);
-    this.pendingSavePromises.add(savePromise);
+    if (this.discardingState) return;
+    if (!this.isRestoringState && !skipSnapshot) {
+      const schedulesMap = new Map(this.state.schedules.map(s => [s.id, s]));
+      this.undoRedoManager.captureSnapshot(
+        this.state.activeScheduleId,
+        schedulesMap,
+        this.state.preferences,
+        this.undoSlice?.capture(),
+      );
+    }
 
-    savePromise
-      .catch(error => logger.error('Save failed:', error))
-      .finally(() => this.pendingSavePromises.delete(savePromise));
+    this.flushRequested = true;
+    if (this.flushing) return;
+    this.flushing = true;
+    const flush = this.runFlushes();
+    this.pendingSavePromises.add(flush);
+    void flush.finally(() => this.pendingSavePromises.delete(flush));
   }
 
-  private async executeSave(skipSnapshot = false): Promise<void> {
-    if (this.discardingState) return;
+  private async runFlushes(): Promise<void> {
     try {
-      if (!this.isRestoringState && !skipSnapshot) {
-        const schedulesMap = new Map(this.state.schedules.map(s => [s.id, s]));
-        this.undoRedoManager.captureSnapshot(
-          this.state.activeScheduleId,
-          schedulesMap,
-          this.state.preferences,
-          this.undoSlice?.capture(),
-        );
+      while (this.flushRequested && !this.discardingState) {
+        this.flushRequested = false;
+        await this.flushOnce();
       }
+    } finally {
+      this.flushing = false;
+    }
+  }
 
+  private async flushOnce(): Promise<void> {
+    try {
       // Each write is skipped unless its data changed, so a tab that edits
       // one schedule never rewrites (and so never overwrites) the others.
       const activeId = this.state.activeScheduleId;
@@ -889,9 +902,7 @@ export class ProfileStateManager {
 
       const liveSchedules = this.state.schedules;
       const toSave = liveSchedules.filter(
-        schedule =>
-          this.savedSchedules.get(schedule.id) !== schedule &&
-          this.writesInFlight.get(schedule.id) !== schedule,
+        schedule => this.savedSchedules.get(schedule.id) !== schedule,
       );
       // Saved before, absent now: removed by a delete, or by undoing/redoing
       // past the schedule's creation. Storage must lose it too, or a reload
@@ -901,20 +912,14 @@ export class ProfileStateManager {
         ([id]) => !liveIds.has(id),
       );
 
-      const writes = toSave.map(schedule => {
-        this.writesInFlight.set(schedule.id, schedule);
-        const scheduleToSave = {
+      const writes = toSave.map(schedule =>
+        this.storageManager.saveSchedule({
           ...schedule,
           selectedCourses: schedule.selectedCourses.filter(
             sc => !sc.course.transient,
           ),
-        };
-        return this.storageManager.saveSchedule(scheduleToSave).finally(() => {
-          if (this.writesInFlight.get(schedule.id) === schedule) {
-            this.writesInFlight.delete(schedule.id);
-          }
-        });
-      });
+        }),
+      );
       const deletes = toDelete.map(([id]) =>
         this.storageManager.deleteSchedule(id),
       );
@@ -991,7 +996,6 @@ export class ProfileStateManager {
       this.state.isLoading = true;
       this.isLoadingFlag = true;
       this.savedSchedules.clear();
-      this.writesInFlight.clear();
 
       const preferencesResult = this.storageManager.loadPreferences();
       if (preferencesResult.valid && preferencesResult.data) {
@@ -1398,7 +1402,6 @@ export class ProfileStateManager {
       }
 
       this.savedSchedules.clear();
-      this.writesInFlight.clear();
       this.savedPreferences = null;
       this.savedActiveId = undefined;
       this.undoRedoManager.clear();
@@ -1473,7 +1476,6 @@ export class ProfileStateManager {
       ? this.state.schedules.map(s => (s.id === id ? resolved : s))
       : [...this.state.schedules, resolved];
     this.savedSchedules.set(id, resolved);
-    this.writesInFlight.delete(id);
 
     if (id === this.state.activeScheduleId) {
       this.state.selectedCourses = resolved.selectedCourses;
@@ -1484,7 +1486,6 @@ export class ProfileStateManager {
   /** Removes a schedule that is gone from storage, without writing anything. */
   private dropScheduleLocally(id: string): void {
     this.savedSchedules.delete(id);
-    this.writesInFlight.delete(id);
     if (!this.state.schedules.some(s => s.id === id)) return;
 
     this.state.schedules = this.state.schedules.filter(s => s.id !== id);
