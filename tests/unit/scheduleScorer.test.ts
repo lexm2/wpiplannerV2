@@ -219,6 +219,44 @@ describe('ScheduleScorer criteria', () => {
     expect(s.groupCost([])).toBe(0);
   });
 
+  // The settings offer free hours because classes keep to the hour: these
+  // are what make the numbers behind those choices mean what they say.
+  describe('on the hourly class grid', () => {
+    const at = (hour: number) => ({
+      days: 'M',
+      start: `${hour}:00`,
+      end: `${hour}:50`,
+    });
+    const backToBack = [pick('A', at(11)), pick('A', at(12))];
+    const freeHour = [pick('A', at(11)), pick('A', at(13))];
+    const twoFreeHours = [pick('A', at(11)), pick('A', at(14))];
+
+    it('"at least 1 free hour" is met by a free hour, not back to back', () => {
+      const s = only({ gaps: { importance: 'medium', min: 70 } });
+      expect(s.groupCost(freeHour)).toBe(0);
+      expect(s.groupCost(backToBack)).toBeGreaterThan(0);
+    });
+
+    it('"at most 1 free hour" allows one and charges a second', () => {
+      const s = only({ gaps: { importance: 'medium', max: 70 } });
+      expect(s.groupCost(backToBack)).toBe(0);
+      expect(s.groupCost(freeHour)).toBe(0);
+      expect(s.groupCost(twoFreeHours)).toBeGreaterThan(0);
+    });
+
+    it('a 1 hour lunch is met by a free hour, a 2 hour one by two', () => {
+      const lunch = (minutes: number) =>
+        only({
+          lunch: { importance: 'medium', from: '11:00', to: '15:00', minutes },
+        });
+      const day = (...hours: number[]) => hours.map(h => pick('A', at(h)));
+      expect(lunch(60).groupCost(day(11, 13, 14))).toBe(0);
+      expect(lunch(60).groupCost(day(11, 12, 13, 14))).toBeGreaterThan(0);
+      expect(lunch(120).groupCost(day(11, 14))).toBe(0);
+      expect(lunch(120).groupCost(day(11, 13, 14))).toBeGreaterThan(0);
+    });
+  });
+
   it('fewerDays: 90 per quarter-day with a class', () => {
     const s = only({ fewerDays: { importance: 'low' } });
     const tue = { ...MON_9, days: 'T' };
