@@ -139,12 +139,16 @@
   gap: 0.25rem;
 }
 
-.schedule-picker-modal-dialog .schedule-item-name {
+.schedule-picker-modal-dialog .schedule-item-name,
+.schedule-picker-modal-dialog .schedule-name-edit {
   font-size: 1rem;
   font-weight: 500;
   color: var(--color-text);
   line-height: 1.4;
   word-break: break-word;
+}
+
+.schedule-picker-modal-dialog .schedule-item-name {
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -176,9 +180,32 @@
   outline-offset: -2px;
 }
 
-.schedule-picker-modal-dialog .schedule-item.active .schedule-item-name {
+.schedule-picker-modal-dialog .schedule-item.active .schedule-item-name,
+.schedule-picker-modal-dialog .schedule-item.active .schedule-name-edit {
   color: var(--color-text);
   font-weight: 600;
+}
+
+/* The name being edited: no box, only an underline that follows its letters.
+   The minimums hold the row's height, and a place for the caret, once every
+   letter is deleted. */
+.schedule-picker-modal-dialog .schedule-name-edit {
+  display: inline-block;
+  width: fit-content;
+  min-width: 1ch;
+  min-height: 1.4em;
+  outline: none;
+  caret-color: var(--color-primary);
+  text-decoration: underline 2px var(--color-primary);
+  text-underline-offset: 3px;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+}
+
+.schedule-picker-modal-dialog .schedule-name-edit::selection {
+  background: color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .schedule-picker-modal-dialog .schedule-item-details {
@@ -220,18 +247,6 @@
 
 /* Schedule Name Input - Inline Editing. The chrome comes from the shared
    TextField; only the row's sizing and type scale belong here. */
-.schedule-picker-modal-dialog .schedule-name-field {
-  min-width: 12.5rem;
-  width: 100%;
-}
-
-/* Matches .schedule-item-name, the static text this field replaces on
-   double-click, so the row doesn't change size when editing starts. */
-.schedule-picker-modal-dialog .schedule-name-field .field-control {
-  font-size: 1rem;
-  font-weight: 500;
-}
-
 .schedule-picker-modal-dialog .modal-close:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
