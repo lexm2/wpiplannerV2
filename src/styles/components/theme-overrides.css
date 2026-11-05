@@ -12,6 +12,108 @@
   color-scheme: light;
 }
 
+/* Lines that only decorate, like schedule grid lines and the Degree hatch. They
+   cover much of the screen, so a theme that keeps --color-border dark for input
+   outlines can lighten them on their own. */
+:root {
+  --color-rule: var(--color-border);
+}
+
+.theme-wpi-classic {
+  --color-rule: var(--color-secondary);
+}
+
+/* The identity of Classic is the crimson masthead over WPI grey. The
+   controls inside it keep their light surfaces, so only the bar, the title
+   and the focus ring (crimson on crimson would vanish) are restated. The page
+   tabs sit in a light pill, so they keep the crimson ring. */
+.theme-wpi-classic .app-header {
+  background: var(--color-primary);
+  border-bottom: 3px solid var(--color-secondary);
+}
+
+.theme-wpi-classic .header-content h1 {
+  color: var(--color-text-inverse);
+}
+
+.theme-wpi-classic .app-header :focus-visible:not(.nav-tab) {
+  outline-color: var(--color-text-inverse);
+}
+
+/* The segmented control's track is --color-border, which Classic keeps dark
+   enough for input outlines; the inactive labels cannot read on it. */
+.theme-wpi-classic .filter-segmented-control {
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+}
+
+/* The shared hover paints these in --color-primary, which is the bar itself
+   here, so the button would lose its shape. */
+.theme-wpi-classic .undo-redo-controls .btn:hover:not(:disabled),
+.theme-wpi-classic #schedule-picker-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+}
+
+.theme-wpi-classic .undo-redo-controls .btn:hover:not(:disabled) svg {
+  stroke: var(--color-primary);
+}
+
+.theme-wpi-classic #schedule-picker-btn:hover,
+.theme-wpi-classic #schedule-picker-btn:hover svg {
+  color: var(--color-text);
+  stroke: currentColor;
+}
+
+/* At phone width the header is a bottom tab bar with no pill or button
+   surfaces, so its tabs and icons sit directly on the crimson. Inactive tabs
+   stay at 4.5:1; the marker is what singles out the active one. */
+@media (max-width: 560px) {
+  .theme-wpi-classic .app-header {
+    border-bottom: none;
+    border-top: 3px solid var(--color-secondary);
+  }
+
+  .theme-wpi-classic .nav-tab {
+    color: color-mix(
+      in srgb,
+      var(--color-text-inverse) 80%,
+      var(--color-primary)
+    );
+  }
+
+  .theme-wpi-classic .nav-tab.active,
+  .theme-wpi-classic .nav-tab:hover:not(.active) {
+    background: transparent;
+    color: var(--color-text-inverse);
+  }
+
+  .theme-wpi-classic .nav-tab:focus-visible {
+    outline-color: var(--color-text-inverse);
+  }
+
+  .theme-wpi-classic .nav-tab-marker {
+    background: var(--color-text-inverse);
+  }
+
+  .theme-wpi-classic .header-drawer-toggle .drawer-toggle {
+    color: var(--color-text-inverse);
+  }
+
+  .theme-wpi-classic .header-drawer-toggle .drawer-toggle-count {
+    background: var(--color-text-inverse);
+    color: var(--color-primary);
+  }
+
+  .theme-wpi-classic .app-header .settings-menu-btn svg {
+    stroke: var(--color-text-inverse) !important;
+  }
+
+  .theme-wpi-classic .app-header .settings-menu-btn.open {
+    background: color-mix(in srgb, var(--color-text-inverse) 20%, transparent);
+  }
+}
+
 .theme-high-contrast {
   --effect-transition: all 0.1s ease;
 }

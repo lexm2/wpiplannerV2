@@ -285,13 +285,13 @@
      guarantees to differ from the card under it: in WPI Dark that token and
      --color-surface are the same #2c2c2e, so the unfilled part of every bar
      was invisible, and --color-background-alt is a satisfied card's background
-     in every theme. The hatch is drawn in --color-border, so it reads as
+     in every theme. The hatch is drawn in --color-rule, so it reads as
      unfilled track whatever the card is painted in - and gives every bar the
      same anatomy whether or not the bucket has a numeric target to fill. */
   background-color: var(--color-background-alt);
   background-image: repeating-linear-gradient(
     45deg,
-    var(--color-border) 0 4px,
+    var(--color-rule) 0 4px,
     transparent 4px 8px
   );
   border-radius: var(--effect-border-radius);
