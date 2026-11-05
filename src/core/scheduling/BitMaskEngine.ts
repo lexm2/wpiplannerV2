@@ -35,6 +35,11 @@ function timeToSlot(hours: number, minutes: number): number {
   return Math.floor((hours * 60 + minutes) / SLOT_MINUTES);
 }
 
+/** The slot after the one containing this minute, unless it starts a slot. */
+function timeToEndSlot(hours: number, minutes: number): number {
+  return Math.ceil((hours * 60 + minutes) / SLOT_MINUTES);
+}
+
 export function sectionToMask(section: Section): bigint {
   let mask = 0n;
 
@@ -76,8 +81,10 @@ export function weeklySlotToMask(slot: WeeklyTimeSlot): bigint {
   const dayIndex = DAY_INDEX[slot.day];
   if (dayIndex === undefined || dayIndex >= DAYS_PER_WEEK) return mask;
 
+  // Busy time is user-typed, so it can end off the 5-minute grid. Rounding
+  // its end down would let a class start inside an event that ends at 10:03.
   const startSlot = timeToSlot(slot.startTime.hours, slot.startTime.minutes);
-  const endSlot = timeToSlot(slot.endTime.hours, slot.endTime.minutes);
+  const endSlot = timeToEndSlot(slot.endTime.hours, slot.endTime.minutes);
 
   if (startSlot >= endSlot || startSlot < 0 || endSlot > SLOTS_PER_DAY)
     return mask;
