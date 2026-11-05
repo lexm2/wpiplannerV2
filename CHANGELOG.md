@@ -37,6 +37,7 @@
 - Redesigned the WPI Classic theme around the official crimson and WPI grey: a crimson header over light grey-tinted panels, with readable text and clearer input borders and focus rings
 - Searching MQP or IQP explains what they are, as they aren't in the course catalog, and lists any course named for them. The full names and plurals find the same courses
 - Renaming a schedule edits its name right where it is, instead of swapping in a text box
+- Auto-Schedule's time settings follow how classes actually run. Time between classes is in free hours, lunch in hours, and every time is on the hour
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
