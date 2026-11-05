@@ -70,7 +70,7 @@
         aria-label="Previous schedule"
         disabled={generating}
         onclick={prev}
-        >{@html getInlineSVG('ARROW_BAR_LEFT', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG('CHEVRON_LEFT', 'schedule-nav-icon')}</button
       >
       <button
         class="btn btn-secondary schedule-nav-btn"
@@ -78,7 +78,7 @@
         aria-label="Restart auto-schedule"
         disabled={generating}
         onclick={onOpenAutoSchedule}
-        >{@html getInlineSVG('REFRESH', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG('ADJUSTMENTS_HORIZONTAL', 'schedule-nav-icon')}</button
       >
       <button
         class="btn btn-secondary schedule-nav-btn"
@@ -86,7 +86,7 @@
         aria-label="Next schedule"
         disabled={generating}
         onclick={next}
-        >{@html getInlineSVG('ARROW_BAR_RIGHT', 'schedule-nav-icon')}</button
+        >{@html getInlineSVG('CHEVRON_RIGHT', 'schedule-nav-icon')}</button
       >
     </div>
   {/if}
