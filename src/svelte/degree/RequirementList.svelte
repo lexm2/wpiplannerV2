@@ -17,6 +17,7 @@
   import { UMBRELLA_CATEGORIES } from '../../services/degree/degreeBuckets';
   import { dur, slideFade } from '../transitions';
   import { phoneLayout } from '../phoneLayout.svelte';
+  import { statusLabel } from './progressLabels';
 
   /**
    * Cards glide when the grid reflows - a filter change, or a card expanding.
@@ -42,6 +43,7 @@
   const allActive = $derived(selected.length === 0);
 
   function toggleStatus(s: RequirementStatus): void {
+    pinned = null;
     let next = selected.includes(s)
       ? selected.filter(x => x !== s)
       : [...selected, s];
@@ -70,11 +72,50 @@
     })),
   );
 
+  /**
+   * A bucket the user just placed a course in, kept on screen although the
+   * status filter now hides it. Placing changes its live status, and a card
+   * that vanishes the moment a course lands in it leaves the course nowhere on
+   * the page. Dropped when the filter changes or the note is dismissed.
+   */
+  let pinned = $state<{ bucketId: string; code: string } | null>(null);
+
   const filtered = $derived(
     allActive
       ? withStatus.map(x => x.b)
-      : withStatus.filter(x => selected.includes(x.status)).map(x => x.b),
+      : withStatus
+          .filter(
+            x => selected.includes(x.status) || x.b.id === pinned?.bucketId,
+          )
+          .map(x => x.b),
   );
+
+  const pinnedNote = $derived.by(() => {
+    if (!pinned) return null;
+    const bucket = degreeState.buckets.find(b => b.id === pinned?.bucketId);
+    const progress = bucket && degreeState.progressById.get(bucket.id);
+    if (!bucket || !progress) return null;
+    return `${pinned.code} placed in ${bucket.name}, now ${statusLabel(progress)}. The status filter would hide it, so it stays until you change the filter.`;
+  });
+
+  $effect(() => {
+    const placed = degreeState.lastPlacement;
+    if (!placed) return;
+    untrack(() => {
+      const bucket = degreeState.buckets.find(b => b.id === placed.bucketId);
+      const status = degreeState.progressById.get(placed.bucketId)?.status;
+      const course = degreeState.courseIndex.find(
+        e => e.courseId === placed.courseId,
+      );
+      const shown = visible.some(b => b.id === placed.bucketId);
+      pinned =
+        bucket && status && course && shown && !allActive
+          ? !selected.includes(status)
+            ? { bucketId: bucket.id, code: course.code }
+            : null
+          : null;
+    });
+  });
 
   // Phone only: the chips, the degree-wide switch and the layout toggle fold
   // into a panel behind one Filter button beside the search bar.
@@ -139,8 +180,10 @@
       class="degree-filter-chip"
       class:active={allActive}
       aria-pressed={allActive}
-      onclick={() => (selected = [])}
-      >All <span class="degree-filter-count">{counts.all}</span></button
+      onclick={() => {
+        pinned = null;
+        selected = [];
+      }}>All <span class="degree-filter-count">{counts.all}</span></button
     >
     {#each STATUSES as s (s.key)}
       <button
@@ -247,6 +290,17 @@
         ><span class="degree-legend-swatch seg-schedule"></span> Schedule</span
       >
     </div>
+  {/if}
+
+  {#if pinnedNote}
+    <p class="degree-placed-note" role="status">
+      {pinnedNote}
+      <button
+        type="button"
+        class="degree-placed-note-dismiss"
+        onclick={() => (pinned = null)}>Dismiss</button
+      >
+    </p>
   {/if}
 
   {#if filtered.length === 0}

@@ -7,7 +7,10 @@ import {
   inferBucketDepartments,
   type DegreeBucket,
 } from './degreeBuckets';
-import type { DegreeBucketFilterCriteria } from '../../types/filters';
+import type {
+  DegreeBucketFilterCriteria,
+  GraduateLevelFilterCriteria,
+} from '../../types/filters';
 import { getDegreeBucketCriteria } from './degreeBucketRules';
 import { candidateCodes, findCatalogCourse } from './catalogLookup';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
@@ -22,6 +25,12 @@ import { courseListState } from '../../svelte/courseListState.svelte';
 class DegreePlanService {
   private profileStateManager: ProfileStateManager | null = null;
   private filterService: FilterService | null = null;
+  /**
+   * The course level the student had before Browse narrowed it to
+   * undergraduate, so ending the Browse can put it back. null when there was
+   * no level filter (All); undefined when no Browse has captured one.
+   */
+  private levelBeforeBrowse: GraduateLevelFilterCriteria | null | undefined;
 
   init(
     profileStateManager: ProfileStateManager,
@@ -72,7 +81,29 @@ class DegreePlanService {
       : undefined;
     const criteria = bucket ? this.browseCriteria(bucket) : null;
     if (criteria) this.filterService.addFilter('degreeBucket', criteria);
-    else this.filterService.removeFilter('degreeBucket');
+    else this.endBrowse();
+  }
+
+  /**
+   * Stop filtering by a requirement and give back what Browse took over: the
+   * course level goes back to what it was, unless the student has changed it
+   * since (their choice wins).
+   */
+  endBrowse(): void {
+    const filters = this.filterService;
+    if (!filters) return;
+    filters.removeFilter('degreeBucket');
+
+    const before = this.levelBeforeBrowse;
+    this.levelBeforeBrowse = undefined;
+    if (before === undefined) return;
+    const now =
+      filters.getCriteria<GraduateLevelFilterCriteria>('graduateLevel');
+    const stillBrowseLevel =
+      now?.level === 'undergraduate' && now.undergradLevel === undefined;
+    if (!stillBrowseLevel) return;
+    if (before) filters.addFilter('graduateLevel', before);
+    else filters.removeFilter('graduateLevel');
   }
 
   /** The degree filter for a bucket: its rule, minus what is already covered. */
@@ -96,19 +127,8 @@ class DegreePlanService {
    * departments. null when there is neither.
    */
   private bucketRule(bucket: DegreeBucket): DegreeBucketFilterCriteria | null {
-    const record = degreeState.record;
-    const classYear = record?.startYear != null ? record.startYear + 4 : null;
     const depts = inferBucketDepartments(bucket, appState.loadedDepartments);
-    const sheet =
-      record && bucket.source === 'import'
-        ? getDegreeBucketCriteria(
-            record.major,
-            classYear,
-            bucket.category,
-            bucketRuleLabel(bucket),
-            depts,
-          )
-        : null;
+    const sheet = this.sheetRule(bucket, depts);
     if (sheet) {
       return {
         allowedDepartments: sheet.allowedDepartments,
@@ -119,6 +139,57 @@ class DegreePlanService {
     return depts.length
       ? { allowedDepartments: depts, excludedCourses: [] }
       : null;
+  }
+
+  private sheetRule(
+    bucket: DegreeBucket,
+    depts: string[],
+  ): DegreeBucketFilterCriteria | null {
+    const record = degreeState.record;
+    if (!record || bucket.source !== 'import') return null;
+    const classYear = record.startYear != null ? record.startYear + 4 : null;
+    return getDegreeBucketCriteria(
+      record.major,
+      classYear,
+      bucket.category,
+      bucketRuleLabel(bucket),
+      depts,
+    );
+  }
+
+  /**
+   * Whether the bucket's rules say a course does not count toward it. Placement
+   * is free by design, so this only feeds a hint. It speaks only where the rule
+   * is firm - a tracking sheet's, a custom bucket's own departments, Physical
+   * Education - never from departments guessed off the courses Workday applied,
+   * which would flag every course outside that sample.
+   */
+  mayNotCount(bucket: DegreeBucket, code: string): boolean {
+    const rule = this.firmRule(bucket);
+    if (!rule) return false;
+    const codes = candidateCodes(code);
+    if (!codes.length) return false;
+    const allowed = new Set(rule.allowedDepartments.map(d => d.toUpperCase()));
+    const excluded = new Set(
+      rule.excludedCourses.flatMap(c =>
+        candidateCodes(c).map(x => `${x.dept} ${x.number}`),
+      ),
+    );
+    return codes.every(
+      ({ dept, number }) =>
+        (allowed.size > 0 && !allowed.has(dept.toUpperCase())) ||
+        excluded.has(`${dept} ${number}`),
+    );
+  }
+
+  private firmRule(bucket: DegreeBucket): DegreeBucketFilterCriteria | null {
+    const sheet = this.sheetRule(bucket, []);
+    if (sheet) return sheet;
+    if (bucket.source === 'custom' && bucket.departments?.length)
+      return { allowedDepartments: bucket.departments, excludedCourses: [] };
+    if (bucket.category === 'physical_education')
+      return { allowedDepartments: ['WPE'], excludedCourses: [] };
+    return null;
   }
 
   /** Codes already taken, in progress, or in the active schedule. */
@@ -136,6 +207,14 @@ class DegreePlanService {
   private browse(criteria: DegreeBucketFilterCriteria): void {
     if (!this.filterService) return;
 
+    // Capture the level only when a Browse is starting: switching buckets while
+    // already browsing must not remember Browse's own undergraduate filter.
+    if (!this.filterService.hasFilter('degreeBucket')) {
+      this.levelBeforeBrowse =
+        this.filterService.getCriteria<GraduateLevelFilterCriteria>(
+          'graduateLevel',
+        ) ?? null;
+    }
     this.filterService.addFilter('degreeBucket', criteria);
     // A BS requirement's departments include their graduate courses, which
     // swamp the list; the visible level toggle lets the user flip it back.
@@ -182,6 +261,10 @@ class DegreePlanService {
     }
 
     if (this.filterService) {
+      // The requirement and department filters list other courses by design;
+      // left on, they hide the one just asked for.
+      this.endBrowse();
+      this.filterService.removeFilter('department');
       this.filterService.addFilter('searchText', {
         query: `${course.departmentAbbr}${course.number}`,
       });

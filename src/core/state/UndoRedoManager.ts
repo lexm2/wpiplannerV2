@@ -7,6 +7,8 @@ export interface StateSnapshot {
   activeScheduleId: string | null;
   schedules: Map<string, Schedule>;
   preferences: SchedulePreferences;
+  /** Whatever the registered slice captured alongside the schedules. */
+  extra?: unknown;
 }
 
 export class UndoRedoManager {
@@ -21,9 +23,10 @@ export class UndoRedoManager {
     activeScheduleId: string | null,
     schedules: Map<string, Schedule>,
     preferences: SchedulePreferences,
+    extra?: unknown,
   ): void {
     const serialized = JSON.stringify(
-      [activeScheduleId, Array.from(schedules.entries()), preferences],
+      [activeScheduleId, Array.from(schedules.entries()), preferences, extra],
       setReplacer,
     );
     // One action can reach save() more than once (a no-op edit, or several
@@ -56,10 +59,11 @@ export class UndoRedoManager {
     activeScheduleId: string | null,
     schedules: Map<string, Schedule>,
     preferences: SchedulePreferences,
+    extra?: unknown,
   ): void {
     this.history = [];
     this.currentIndex = -1;
-    this.captureSnapshot(activeScheduleId, schedules, preferences);
+    this.captureSnapshot(activeScheduleId, schedules, preferences, extra);
   }
 
   undo(): StateSnapshot | null {
@@ -99,15 +103,21 @@ export class UndoRedoManager {
   /** Parse a history entry back into a fresh snapshot. */
   private snapshotAt(index: number): StateSnapshot {
     const { timestamp, serialized } = this.history[index];
-    const [activeScheduleId, entries, preferences] = JSON.parse(
+    const [activeScheduleId, entries, preferences, extra] = JSON.parse(
       serialized,
       setReviver,
-    ) as [string | null, Array<[string, Schedule]>, SchedulePreferences];
+    ) as [
+      string | null,
+      Array<[string, Schedule]>,
+      SchedulePreferences,
+      unknown,
+    ];
     return {
       timestamp,
       activeScheduleId,
       schedules: new Map(entries),
       preferences,
+      extra,
     };
   }
 

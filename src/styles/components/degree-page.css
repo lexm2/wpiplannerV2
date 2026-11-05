@@ -856,6 +856,35 @@
   overflow: hidden;
 }
 
+/* Says why a card the status filter would hide is still showing. */
+.degree-placed-note {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--effect-border-radius);
+  background: var(--color-background-alt);
+  font-size: 0.85rem;
+}
+
+.degree-placed-note-dismiss {
+  margin-left: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* A placement the requirement's own rules don't list: allowed, but flagged. */
+.requirement-course-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
 /* empty placeholder tile - a clickable slot still needing a course */
 .requirement-course-empty {
   align-items: center;

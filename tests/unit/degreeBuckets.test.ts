@@ -331,18 +331,41 @@ describe('computePlacements', () => {
 
 describe('computeUnassigned', () => {
   const rec = record([req('CS Core', 'major_specific')]);
+  const buckets = buildBuckets(rec, config());
 
   it('lists every schedule course when nothing is assigned', () => {
-    const out = computeUnassigned(rec, selected(course('CS', '4341')), {});
+    const out = computeUnassigned(
+      rec,
+      selected(course('CS', '4341')),
+      {},
+      buckets,
+    );
     expect(out.map(t => t.code)).toEqual(['CS 4341']);
     expect(out[0].courseId).toBe('CS-4341-2026');
   });
 
   it('drops a course once it is assigned', () => {
-    const out = computeUnassigned(rec, selected(course('CS', '4341')), {
-      'CS-4341-2026': 'req:CS Core',
-    });
+    const out = computeUnassigned(
+      rec,
+      selected(course('CS', '4341')),
+      {
+        'CS-4341-2026': 'req:CS Core',
+      },
+      buckets,
+    );
     expect(out).toEqual([]);
+  });
+
+  it('lists a course placed in a bucket that no longer exists', () => {
+    const out = computeUnassigned(
+      rec,
+      selected(course('CS', '4341')),
+      {
+        'CS-4341-2026': 'req:Deleted',
+      },
+      buckets,
+    );
+    expect(out.map(t => t.code)).toEqual(['CS 4341']);
   });
 
   it('excludes a course Workday already has on the transcript', () => {
@@ -351,7 +374,12 @@ describe('computeUnassigned', () => {
       [applied('CS 4341')],
     );
     expect(
-      computeUnassigned(withTranscript, selected(course('CS', '4341')), {}),
+      computeUnassigned(
+        withTranscript,
+        selected(course('CS', '4341')),
+        {},
+        buckets,
+      ),
     ).toEqual([]);
   });
 
@@ -364,13 +392,14 @@ describe('computeUnassigned', () => {
       withTranscript,
       selected(course('MA', '2201'), course('CS', '4341')),
       {},
+      buckets,
     );
     expect(out.map(t => t.code)).toEqual(['CS 4341']);
   });
 
   it('still lists schedule courses when nothing has been imported', () => {
     expect(
-      computeUnassigned(null, selected(course('CS', '4341')), {}),
+      computeUnassigned(null, selected(course('CS', '4341')), {}, []),
     ).toHaveLength(1);
   });
 });

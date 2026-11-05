@@ -1,6 +1,7 @@
 import type { TransactionalStorageManager } from '../../core/storage/TransactionalStorageManager';
 import type { StudentRecord } from '../../types/degree';
 import { degreeState } from '../../svelte/degree/degreeState.svelte';
+import { degreeBucketService } from './degreeBucketService';
 import { logger } from '../../utils/logger';
 
 /**
@@ -65,6 +66,7 @@ export class DegreeImportService {
   }
 
   clear(): void {
+    degreeBucketService.resetRecordEdits();
     degreeState.record = null;
     degreeState.status = 'empty';
     degreeState.errorMessage = null;

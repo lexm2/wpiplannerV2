@@ -5,6 +5,7 @@
   import { degreeState } from '../degree/degreeState.svelte';
   import { degreeBucketService } from '../../services/degree/degreeBucketService';
   import type { DegreeBucket } from '../../services/degree/degreeBuckets';
+  import { importedBucketId } from '../../types/degree';
   import { onDestroy, tick } from 'svelte';
   import { flip } from 'svelte/animate';
   import { dur } from '../transitions';
@@ -17,6 +18,16 @@
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
   const buckets = $derived(degreeState.buckets);
+  // Imported requirements the user deleted, which only this window can bring back.
+  const hiddenCount = $derived(
+    degreeState.record
+      ? degreeState.record.requirements.filter(
+          r =>
+            r.category !== 'unused' &&
+            degreeState.config.hidden.includes(importedBucketId(r.rawName)),
+        ).length
+      : 0,
+  );
 
   let editingId = $state<string | null>(null);
   let draftName = $state('');
@@ -77,7 +88,7 @@
       : '';
     showConfirm({
       title: 'Delete bucket',
-      message: `Delete "${bucket.name}"?${consequence}`,
+      message: `Delete "${bucket.name}"?${consequence}${bucket.source === 'import' ? ' You can restore deleted Workday requirements from this window.' : ''}`,
       confirmLabel: 'Delete',
       variant: 'danger',
       // onConfirm fires later, so it needs its own catch.
@@ -243,7 +254,7 @@
     if (bucket.creditsRequired !== null)
       return `${bucket.creditsRequired} credits`;
     if (bucket.coursesRemaining !== null)
-      return `${bucket.coursesRemaining} courses`;
+      return `${bucket.coursesRemaining} course${bucket.coursesRemaining === 1 ? '' : 's'}`;
     return 'No target';
   }
 </script>
@@ -360,6 +371,18 @@
           <p class="empty-state">No buckets yet.</p>
         {/each}
       </div>
+
+      {#if hiddenCount > 0}
+        <button
+          type="button"
+          class="modal-btn btn-secondary bucket-config-add-btn"
+          id="bucket-config-restore-btn"
+          onclick={() => degreeBucketService.restoreHidden()}
+          >Restore {hiddenCount} deleted Workday requirement{hiddenCount === 1
+            ? ''
+            : 's'}</button
+        >
+      {/if}
 
       {#if adding}
         <div class="bucket-config-add">

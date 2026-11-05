@@ -77,7 +77,7 @@ export class AppBootstrap {
     // independent of the schedule/IndexedDB collection).
     const degreeStorage = new TransactionalStorageManager();
     const degreeImportService = new DegreeImportService(degreeStorage);
-    degreeBucketService.init(degreeStorage);
+    degreeBucketService.init(degreeStorage, profileStateManager);
 
     return {
       profileStateManager,
@@ -173,6 +173,9 @@ export class AppBootstrap {
     await services.degreeImportService.load();
     // ...and the manual bucket layout / course placements layered over it.
     degreeBucketService.load();
+    // The undo baseline is taken before the placements load; take it again so
+    // Undo never steps back to a state with none.
+    services.profileStateManager.seedUndoBaseline();
   }
 
   static setupWindowUnloadHandler(): void {

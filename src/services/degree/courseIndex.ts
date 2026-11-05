@@ -15,7 +15,10 @@ import type { AppliedCourse, RequirementStatus } from '../../types/degree';
 import type { DegreeBucket, DegreeTile } from './degreeBuckets';
 import { UMBRELLA_CATEGORIES } from './degreeBuckets';
 import { academicYearForPeriod } from './catalogLookup';
-import { effectiveProgress } from './requirementProgress';
+import {
+  effectiveProgress,
+  type EffectiveProgress,
+} from './requirementProgress';
 
 /** Where the page learned about a course. */
 export type CourseSource = 'completed' | 'transfer' | 'planned' | 'schedule';
@@ -109,6 +112,7 @@ export function buildCourseIndex(
   buckets: DegreeBucket[],
   placements: Map<string, DegreeTile[]>,
   unassigned: DegreeTile[],
+  progressById?: Map<string, EffectiveProgress>,
 ): CourseIndexEntry[] {
   const byKey = new Map<string, CourseIndexEntry>();
 
@@ -128,7 +132,8 @@ export function buildCourseIndex(
 
   for (const bucket of buckets) {
     const tiles = placements.get(bucket.id) ?? [];
-    const progress = effectiveProgress(bucket, tiles);
+    const progress =
+      progressById?.get(bucket.id) ?? effectiveProgress(bucket, tiles);
     const ref: CourseBucketRef = {
       id: bucket.id,
       name: bucket.name,
@@ -201,12 +206,19 @@ export function buildCourseIndex(
   return [...byKey.values()].sort((a, b) => compareCodes(a.code, b.code));
 }
 
-/** Case-insensitive match on code, title, or the name of a bucket it is in. */
+/**
+ * Case-insensitive match on code, title, or the name of a bucket it is in.
+ * Codes also match with the spaces taken out of both sides: the Classes page
+ * writes "CS2223", Workday "CS 2223".
+ */
 export function matchesQuery(entry: CourseIndexEntry, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return true;
+  const squash = (text: string): string =>
+    text.toLowerCase().replace(/\s+/g, '');
   return (
     entry.code.toLowerCase().includes(q) ||
+    squash(entry.code).includes(squash(q)) ||
     entry.title.toLowerCase().includes(q) ||
     entry.buckets.some(b => b.name.toLowerCase().includes(q))
   );

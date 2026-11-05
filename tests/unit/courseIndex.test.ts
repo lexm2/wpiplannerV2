@@ -301,6 +301,12 @@ describe('matchesQuery', () => {
     expect(matchesQuery(entry, 'core req')).toBe(true);
   });
 
+  it('matches a code typed without its space', () => {
+    expect(matchesQuery(entry, 'CS1101')).toBe(true);
+    expect(matchesQuery(entry, 'cs  1101')).toBe(true);
+    expect(matchesQuery(entry, 'CS1102')).toBe(false);
+  });
+
   it('matches everything on an empty or whitespace query', () => {
     expect(matchesQuery(entry, '')).toBe(true);
     expect(matchesQuery(entry, '   ')).toBe(true);

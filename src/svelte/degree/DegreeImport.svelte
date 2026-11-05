@@ -86,7 +86,7 @@
     {:else}
       <button
         type="button"
-        class="btn degree-import-btn"
+        class="btn btn-primary degree-import-btn"
         onclick={e => {
           e.stopPropagation();
           fileInput?.click();

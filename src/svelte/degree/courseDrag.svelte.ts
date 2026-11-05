@@ -92,6 +92,13 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     window.addEventListener('pointercancel', onPointerCancel);
   }
 
+  /** Escape abandons a drag in flight; the release that follows drops nothing. */
+  function onKeydown(e: KeyboardEvent): void {
+    if (e.key !== 'Escape' || !dragging) return;
+    e.preventDefault();
+    onPointerCancel();
+  }
+
   function begin(e: PointerEvent): void {
     // Capture on the root, not the tile - the tile goes pointer-events:none so
     // it can be dragged over its own drop targets. Keeps the release reaching
@@ -133,6 +140,7 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     moveTo(e.clientX, e.clientY);
 
     dragging = true;
+    window.addEventListener('keydown', onKeydown);
     courseDrag.courseId = current.courseId;
     courseDrag.height = rect.height;
     courseDrag.settling = false;
@@ -223,6 +231,7 @@ export function draggableCourse(node: HTMLElement, params: CourseDragParams) {
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
     window.removeEventListener('pointercancel', onPointerCancel);
+    window.removeEventListener('keydown', onKeydown);
     armed = false;
   }
 
