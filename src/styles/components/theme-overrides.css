@@ -12,6 +12,30 @@
   color-scheme: light;
 }
 
+/* The identity of Classic is the crimson masthead over WPI grey. The
+   controls inside it keep their light surfaces, so only the bar, the title
+   and the focus ring (crimson on crimson would vanish) are restated. The page
+   tabs sit in a light pill, so they keep the crimson ring. */
+.theme-wpi-classic .app-header {
+  background: var(--color-primary);
+  border-bottom: 3px solid var(--color-secondary);
+}
+
+.theme-wpi-classic .header-content h1 {
+  color: var(--color-text-inverse);
+}
+
+.theme-wpi-classic .app-header :focus-visible:not(.nav-tab) {
+  outline-color: var(--color-text-inverse);
+}
+
+/* The segmented control's track is --color-border, which Classic keeps dark
+   enough for input outlines; the inactive labels cannot read on it. */
+.theme-wpi-classic .filter-segmented-control {
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+}
+
 .theme-high-contrast {
   --effect-transition: all 0.1s ease;
 }
