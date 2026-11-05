@@ -35,6 +35,7 @@
 - Requirements that depend on in-progress courses read "Satisfied (in progress)", and the Degree summary shows how many are complete
 - Undo and Redo are much faster with many schedules, and undo history uses far less memory
 - Redesigned the WPI Classic theme around the official crimson and WPI grey: a crimson header over light grey-tinted panels, with readable text and clearer input borders and focus rings
+- Searching MQP or IQP explains what they are, as they aren't in the course catalog, and lists any course named for them. The full names and plurals find the same courses
 
 ### Removed
 - The Bookmarks section of Filter Courses. The bookmark button next to the filter button does the same thing
@@ -110,6 +111,8 @@
 - A placed course no longer vanishes under a status filter; a note explains it
 - Empty-schedule message, "1 course" plural and an import-warning typo on the Degree page
 - The planner no longer falls behind on saving when you edit quickly with many schedules. Saves that took up to a minute to catch up now finish almost at once
+- Borders in the High Contrast theme are the normal size and no longer move the page when you hover over something
+- The Low, Medium and High labels in Auto-Schedule settings are readable in the High Contrast theme
 
 ## [2026-10-10]
 

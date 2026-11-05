@@ -84,17 +84,6 @@
   >
 </div>
 
-{#if count > 0}
-  <!-- Adding a course here only selects it; its sections are picked on the
-       Schedule page, which nothing else on this page says. -->
-  <button
-    type="button"
-    class={styles['pick-sections-link']}
-    id="pick-sections-link"
-    onclick={onPickSections}>Pick sections on the Schedule page</button
-  >
-{/if}
-
 {#if isExpanded}
   <div
     class={styles['selected-courses-content']}
@@ -105,6 +94,23 @@
       <div class="empty-state" transition:slideFade={{ duration: 220 }}>
         No courses selected yet
       </div>
+    {:else}
+      <!-- Adding a course here only selects it; its sections are picked on the
+           Schedule page, which nothing else on this page says. First in the
+           list so it never scrolls out of reach of a long one. -->
+      <button
+        type="button"
+        class="btn btn-primary {styles['pick-sections']}"
+        id="pick-sections-btn"
+        transition:slideFade={{ duration: 220 }}
+        onclick={onPickSections}
+      >
+        {@html getInlineSVG('CALENDAR', styles['pick-sections-icon'])}
+        <span class={styles['pick-sections-label']}
+          >Pick sections on the Schedule page</span
+        >
+        {@html getInlineSVG('CHEVRON_RIGHT', styles['pick-sections-chevron'])}
+      </button>
     {/if}
     {#each courses as sc (sc.course.id)}
       {@const course = sc.course}

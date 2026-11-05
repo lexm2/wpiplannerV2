@@ -479,8 +479,8 @@
 
 /* Moved here from responsive.css, theme-overrides.css and modal.css: these
    classes are hashed by this module now, so a rule in a global stylesheet can
-   no longer reach them. The outer halves stay global - .theme-high-contrast is
-   set on <body> by the theme manager, .as-card-terms is modal.css's. */
+   no longer reach them. The outer half stays global: .as-card-terms is
+   modal.css's. */
 /* Keyed to the list column rather than the window, so widening the panel
    brings the term badges back. The nearest container is .main-content (the
    name is left off: a module would hash it). Under ~600px
@@ -581,18 +581,29 @@
   }
 }
 
-:global(.theme-high-contrast) .course-item,
-:global(.theme-high-contrast) .section-badge {
-  border-width: 2px;
-}
-
-:global(.theme-high-contrast) .course-item:hover,
-:global(.theme-high-contrast) .section-badge:hover {
-  border-width: 3px;
-}
-
 :global(.as-card-terms) .term-badge.selected {
   background: var(--color-primary);
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
+}
+
+.degree-project-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0 0 1rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--effect-border-radius);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.degree-project-note-icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-primary);
 }

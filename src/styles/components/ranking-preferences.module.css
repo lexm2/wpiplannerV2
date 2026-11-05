@@ -40,9 +40,10 @@
   gap: 2px;
 }
 
-/* Classic keeps --color-border dark for input outlines, so the inactive labels
-   cannot read on it. */
-:global(.theme-wpi-classic) .segments {
+/* These themes keep --color-border dark for input outlines, so the inactive
+   labels cannot read on it. */
+:global(.theme-wpi-classic) .segments,
+:global(.theme-high-contrast) .segments {
   background: var(--color-background-alt);
   border: 1px solid var(--color-border);
 }
@@ -83,6 +84,11 @@
 .radio[value='off']:checked + .segmentText {
   background: var(--color-surface);
   color: var(--color-text);
+}
+
+/* White on a near-white track, so the outline is what marks Off as chosen. */
+:global(.theme-high-contrast) .radio[value='off']:checked + .segmentText {
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .radio:not(:checked):hover + .segmentText {
