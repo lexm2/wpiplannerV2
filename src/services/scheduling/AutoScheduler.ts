@@ -7,6 +7,7 @@ import {
   masksConflict,
 } from '../../core/scheduling/BitMaskEngine';
 import type { FilterService } from '../filtering/FilterService';
+import { COURSE_FILTER_IDS } from '../filtering/sectionFilters';
 import { acceptsCriteria } from '../../core/filtering/SectionFilterPipeline';
 import { ConflictFilter } from '../../core/filtering/filters/ConflictFilter';
 import type { ConflictCriteria } from '../../types/filters';
@@ -27,22 +28,9 @@ interface CourseTypeInfo {
 /**
  * Filters the auto-scheduler ignores. Conflicts are checked against the
  * blocked masks instead (see getBlockedMasksByTerm), so the conflict filter's
- * stale snapshot is skipped. The rest judge the course, not the section: they
- * narrow the course list, but the user has already picked these courses, so
- * e.g. a search or year left over from the Degree page must not block them.
+ * stale snapshot is skipped.
  */
-export const NON_SECTION_FILTER_IDS = [
-  'periodConflict',
-  'searchText',
-  'department',
-  'academicYear',
-  'degreeBucket',
-  'graduateLevel',
-  'creditRange',
-  'degreeAttribute',
-  'courseLevel',
-  'offeringPattern',
-];
+export const NON_SECTION_FILTER_IDS = ['periodConflict', ...COURSE_FILTER_IDS];
 
 export interface MaskedCandidate {
   combination: SectionsByKind;

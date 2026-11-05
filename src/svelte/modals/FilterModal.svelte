@@ -1,6 +1,6 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
-  import { modalState } from './modalState.svelte';
+  import { FILTER_WINDOW_TITLES, modalState } from './modalState.svelte';
   import FilterPanel from '../filters/FilterPanel.svelte';
   import type { FilterService } from '../../services/filtering/FilterService';
   import type { CourseSelectionService } from '../../services/selection/CourseSelectionService';
@@ -15,7 +15,7 @@
     getDepartments,
     onRequestClose,
   }: {
-    // 'filter-modal' (planner/schedule) or 'auto-schedule-filter'.
+    // 'filter-modal' (course list, section picker) or 'auto-schedule-filter'.
     typeId: string;
     filterService: FilterService;
     courseSelectionService: CourseSelectionService;
@@ -31,9 +31,7 @@
 
 <Modal
   {typeId}
-  title={payload.mode === 'auto-schedule'
-    ? 'Auto-Schedule Settings'
-    : 'Filter Courses'}
+  title={FILTER_WINDOW_TITLES[payload.mode]}
   extraClass="filter-modal"
   dialogClass="filter-modal-dialog"
   {onRequestClose}
@@ -43,6 +41,7 @@
       mode={payload.mode}
       onGenerate={payload.onGenerate}
       coursesToSchedule={payload.coursesToSchedule}
+      sectionsShown={payload.sectionsShown}
       {filterService}
       {courseSelectionService}
       {autoScheduleOrchestrator}

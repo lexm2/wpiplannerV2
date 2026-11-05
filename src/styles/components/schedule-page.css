@@ -29,12 +29,6 @@
   flex-shrink: 0;
 }
 
-.schedule-filter-controls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
 .schedule-sidebar-content {
   flex: 1;
   padding: 1rem 1.5rem;
@@ -785,9 +779,6 @@
 }
 
 .calendar-events-header-slot {
-  flex: 1;
-  min-width: 0;
-  align-self: stretch;
   display: flex;
 }
 
@@ -926,30 +917,10 @@ html.is-mobile .term-graph {
   }
 }
 
-@media (max-width: 360px) {
-  /* The slot is ~127px at 320px, too narrow for the label beside its icon
-     ("Calendar E..."), so below 360px it shows the icon alone. The label is
-     clipped rather than removed to stay the button's accessible name. */
-  .calendar-events-btn {
-    position: relative;
-    justify-content: center;
-  }
-
-  .calendar-events-btn-name {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-}
-
 /* Short screens (a phone held sideways is 360-430px tall): the Courses drawer
    spent its height on chrome, leaving ~200px for the course list. The paddings
-   tighten, and while the section wizard is open the Calendar / filter / clear
-   toolbar goes, since the wizard has its own Back / Cancel / Finish and
-   nothing in the toolbar applies to a course being edited. */
+   tighten, and while the section wizard is open the Calendar Events button goes,
+   since it has nothing to do with a course being edited. */
 @media (max-height: 500px) {
   .schedule-sidebar-header {
     padding-top: 0.5rem;

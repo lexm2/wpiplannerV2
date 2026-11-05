@@ -236,15 +236,6 @@ for (const { name, ...options } of SCHEDULE_CASES) {
       await expectShown(sidebar);
 
       await sidebar
-        .getByRole('button', { name: 'Filter selected courses' })
-        .click();
-      const filter = page.locator('[data-modal-type="filter-modal"]');
-      await expect(filter).toBeVisible();
-      await page.keyboard.press('Escape');
-      await expect(filter).toHaveCount(0);
-      await expectShown(sidebar);
-
-      await sidebar
         .getByRole('button', { name: 'Auto-generate schedule' })
         .click();
       const intro = page.locator('[data-modal-type="auto-schedule-intro"]');
@@ -257,6 +248,30 @@ for (const { name, ...options } of SCHEDULE_CASES) {
       await page.keyboard.press('Escape');
       await expect(sidebar).toBeHidden();
       await expect(opener).toBeFocused();
+    });
+
+    test('the section picker opens its filters over the drawer', async ({
+      page,
+    }) => {
+      await openCourses(page);
+      const sidebar = scheduleSidebar(page);
+      await page.evaluate(async () => {
+        const s = (window as any).services;
+        const course = s.courseDataService
+          .getAllDepartments()
+          .flatMap((d: any) => d.courses)
+          .find((c: any) => c.lectures?.length >= 4);
+        await s.courseSelectionService.selectCourse(course);
+      });
+      await sidebar.locator('.schedule-course-header').last().click();
+
+      await sidebar.locator('#wizard-filter-btn').click();
+      const filter = page.locator('[data-modal-type="filter-modal"]');
+      await expect(filter).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(filter).toHaveCount(0);
+      await expectShown(sidebar);
+      await expect(sidebar.locator('#wizard-filter-btn')).toBeVisible();
     });
 
     test('the close button closes the schedule drawer', async ({ page }) => {

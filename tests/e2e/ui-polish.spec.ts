@@ -62,13 +62,32 @@ async function openWizard(page: Page): Promise<void> {
   await page.waitForTimeout(SETTLE_MS);
 }
 
+/** Select a course whose lecture step lists sections in more than one term. */
+async function openPickerOnLongCourse(page: Page): Promise<void> {
+  await load(page);
+  await page.evaluate(async () => {
+    const services = (window as any).services;
+    const course = services.courseDataService
+      .getAllDepartments()
+      .flatMap((d: any) => d.courses)
+      .find((c: any) => {
+        const terms = new Set(
+          (c.lectures ?? []).map((l: any) => l.section.computedTerm),
+        );
+        return c.lectures?.length >= 4 && terms.size >= 2;
+      });
+    await services.courseSelectionService.selectCourse(course);
+  });
+  await page.click('#schedule-tab');
+  await openWizard(page);
+}
+
 test('escape over the wizard closes only the filter modal', async ({
   page,
 }) => {
-  await setupSchedule(page);
-  await openWizard(page);
+  await openPickerOnLongCourse(page);
 
-  await page.click('#schedule-filter-btn');
+  await page.click('#wizard-filter-btn');
   const modal = page.locator('[data-modal-type="filter-modal"]');
   await expect(modal).toBeVisible();
   await page.waitForTimeout(SETTLE_MS);
@@ -188,4 +207,110 @@ test('escape closes the theme dropdown', async ({ page }) => {
     'false',
   );
   await expect(page.locator('#theme-dropdown')).toBeFocused();
+});
+
+test.describe('filtering in the section picker', () => {
+  const FILTER_BTN = '#wizard-filter-btn';
+  const filterWindow = (page: Page) =>
+    page.locator('[data-modal-type="filter-modal"]');
+  const cards = (page: Page) => page.locator('[data-crn]');
+
+  test('is only on offer inside the picker', async ({ page }) => {
+    await openPickerOnLongCourse(page);
+    await expect(page.locator(FILTER_BTN)).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(wizard(page)).toHaveCount(0);
+    await expect(page.locator(FILTER_BTN)).toHaveCount(0);
+    await expect(page.locator('.schedule-sidebar .filter-btn')).toHaveCount(0);
+  });
+
+  test('narrows the list live and says by how much', async ({ page }) => {
+    await openPickerOnLongCourse(page);
+    const total = await cards(page).count();
+
+    await page.click(FILTER_BTN);
+    const panel = filterWindow(page);
+    await expect(panel.locator('.modal-title')).toContainText(
+      'Filter Sections',
+    );
+    await expect(panel.locator('.filter-preview')).toHaveText(
+      `${total} of ${total} sections shown`,
+    );
+
+    const term = await page.evaluate(() => {
+      const { course } = (
+        window as any
+      ).services.courseSelectionService.getSelectedCourses()[0];
+      return course.lectures[0].section.computedTerm as string;
+    });
+    await panel.locator(`label[data-term-option="${term}"]`).click();
+
+    await expect.poll(() => cards(page).count()).toBeLessThan(total);
+    const shown = await cards(page).count();
+    await expect(panel.locator('.filter-preview')).toHaveText(
+      `${shown} of ${total} sections shown`,
+    );
+
+    await page.click('#modal-primary-btn');
+    await expect(panel).toHaveCount(0);
+    await expect(wizard(page)).toHaveCount(1);
+    await expect(page.locator(FILTER_BTN)).toHaveClass(/active/);
+  });
+
+  test('offers only filters that can change the list', async ({ page }) => {
+    await openPickerOnLongCourse(page);
+    await page.click(FILTER_BTN);
+    const panel = filterWindow(page);
+    await expect(panel).toBeVisible();
+    await expect(panel).toContainText('Terms');
+    await expect(panel).not.toContainText('Course Level');
+    await expect(panel).not.toContainText('Credit');
+    await expect(panel).not.toContainText('Department');
+  });
+
+  test('leaves the course list’s filters alone', async ({ page }) => {
+    await openPickerOnLongCourse(page);
+    const total = await cards(page).count();
+
+    // Set on the Classes page, and nothing to do with this course's sections.
+    await page.evaluate(() => {
+      const f = (window as any).services.filterService;
+      f.addFilter('graduateLevel', { level: 'graduate' });
+      f.addFilter('term', { terms: ['A'] });
+    });
+    const active = () =>
+      page.evaluate(() =>
+        (window as any).services.filterService
+          .getActiveFilters()
+          .map((x: any) => x.id as string),
+      );
+    expect(await active()).toContain('graduateLevel');
+
+    await page.click(FILTER_BTN);
+    await filterWindow(page).getByRole('button', { name: 'Clear All' }).click();
+    await page.click('#modal-primary-btn');
+
+    await expect.poll(() => cards(page).count()).toBe(total);
+    const after = await active();
+    expect(after).toContain('graduateLevel');
+    expect(after).not.toContain('term');
+  });
+
+  test('a course filter never hides a chosen course’s sections', async ({
+    page,
+  }) => {
+    await openPickerOnLongCourse(page);
+    const total = await cards(page).count();
+
+    await page.evaluate(() =>
+      (window as any).services.filterService.addFilter('graduateLevel', {
+        level: 'graduate',
+      }),
+    );
+    await page.waitForTimeout(SETTLE_MS);
+
+    await expect(cards(page)).toHaveCount(total);
+    await expect(page.locator(FILTER_BTN)).not.toHaveClass(/active/);
+  });
 });
