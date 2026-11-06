@@ -808,25 +808,6 @@ export class ProfileStateManager {
     }
   }
 
-  restoreTutorialState(data: {
-    activeScheduleId: string | null;
-    schedules: Schedule[];
-    preferences: SchedulePreferences;
-  }): void {
-    this.isRestoringState = true;
-    try {
-      const schedulesMap = new Map(data.schedules.map(s => [s.id, s]));
-      this.restoreFromSnapshot({
-        activeScheduleId: data.activeScheduleId,
-        schedules: schedulesMap,
-        preferences: data.preferences,
-      });
-      this.save(true);
-    } finally {
-      this.isRestoringState = false;
-    }
-  }
-
   /**
    * Records the as-loaded state as history[0] so the user's first change is
    * undoable. `canUndo()` needs `currentIndex > 0`, so without this the first

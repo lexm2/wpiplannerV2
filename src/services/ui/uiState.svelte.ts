@@ -1,16 +1,14 @@
-import type { PageId, ViewMode, UIState } from '../../types/uiState';
-import { wizardState } from '../../svelte/wizardState.svelte';
+import type { PageId, ViewMode } from '../../types/uiState';
 
 /**
  * Reactive UI state (Svelte 5 runes) - page/view/modal tracking - plus the
  * module-level mutator functions every caller uses directly.
  *
  * `openModals` uses `$state.raw` because mutators replace it wholesale with
- * immutable updates (and it gets copied into tutorial snapshots).
+ * immutable updates.
  *
  * Wizard state is NOT mirrored here - `wizardState` (src/svelte/wizardState) is
- * the single source of truth; the tutorial snapshot derives its wizard view from
- * it in {@link getUiSnapshot}.
+ * the single source of truth.
  */
 
 /** Error surfaced by App.svelte's ErrorBanner. */
@@ -76,29 +74,4 @@ export function showAppError(
   actions: Omit<AppError, 'message'> = {},
 ): void {
   uiState.appError = { message, ...actions };
-}
-
-/** Snapshot for the tutorial (fresh objects/arrays - safe to store as-is). */
-export function getUiSnapshot(): UIState {
-  return {
-    currentPage: uiState.currentPage,
-    currentView: uiState.currentView,
-    openModals: [...uiState.openModals],
-    // Derived from the live wizard store (single source of truth) so the
-    // tutorial snapshot reflects whether the wizard is open at capture time.
-    wizard: {
-      isOpen: wizardState.isOpen,
-      courseId: wizardState.config?.course.id ?? null,
-      step: wizardState.isOpen ? wizardState.currentStep : null,
-    },
-  };
-}
-
-/** Bulk restore for the tutorial. */
-export function restoreUiSnapshot(snapshot: UIState): void {
-  uiState.currentPage = snapshot.currentPage;
-  uiState.currentView = snapshot.currentView;
-  // Only restore page/view here; modals and the wizard are reopened
-  // explicitly by the caller (the wizard via componentWizardService).
-  uiState.openModals = [];
 }

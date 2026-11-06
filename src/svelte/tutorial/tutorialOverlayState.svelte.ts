@@ -1,4 +1,4 @@
-import type { TutorialStep } from '../../types/tutorial';
+import type { ResolvedStep } from '../../types/tutorial';
 
 /**
  * Reactive home for the tutorial overlay's current step.
@@ -8,11 +8,11 @@ import type { TutorialStep } from '../../types/tutorial';
  * them to render the floating box. `step === null` means no tutorial is active.
  */
 class TutorialOverlayState {
-  step = $state.raw<TutorialStep | null>(null);
+  step = $state.raw<ResolvedStep | null>(null);
   index = $state(0);
   total = $state(0);
 
-  set(step: TutorialStep | null, index: number, total: number): void {
+  set(step: ResolvedStep | null, index: number, total: number): void {
     this.step = step;
     this.index = index;
     this.total = total;

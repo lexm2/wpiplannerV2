@@ -3,12 +3,20 @@
 ## [2026-11-05]
 
 ### Changed
+- The tutorials now teach the basics: finding a course, reading its details, adding it, picking its sections and reading your schedule. Filtering Courses and Managing Schedules are shorter, and advanced filters are left out
+- The Auto Schedule tutorial sets one simple preference and generates, instead of locking a section, narrowing terms and setting a filter
+- Auto-Schedule avoids full sections by default: Prefer sections with open seats now starts on High, here and in the course API. A setting you already changed stays as you left it
+- When a tutorial step is only for reading, Next is what gets the highlight
 - The filter button on the Schedule page moved into the section picker, beside the course name, since that's the only place it ever changed anything. It's now called Filter sections, shows how many sections are left, and only offers filters that can change that list. Clear All there leaves your Classes page filters alone
 - The tutorial box takes up less of the screen and has no empty space under its text
 - Undo and Redo are off during a tutorial. Use the tutorial's Back button instead
 - The last tutorial no longer shows a Next Tutorial button, since nothing comes after it
 
 ### Fixed
+- Every tutorial step sets up what it needs, whether you got there by clicking, pressing Next or Back, or using Find Element, so a step can't show with the planner in the wrong state. A stray click is put right on the next step
+- Pressing Next through the Auto Schedule tutorial no longer reschedules a course that already has its sections
+- The first tutorial step no longer has a sample box that kept its old size when you resized the window
+- A tutorial step pointing at a section card scrolls it clear of the picker's Cancel and Skip buttons, instead of outlining them with it
 - Filters from the Classes page like course level or credits no longer hide the sections of a course you've already chosen
 - The tutorial box moves out of the way by itself. It stays off whatever the step points at and off the buttons around it, wherever they are on screen, instead of only trying the four corners and sitting on the schedule list and New Schedule when none of them fit. If you drag the box it stays where you put it, unless it's on the thing the step needs
 - The tutorials can be finished on any window wider than a phone. At 1024px and narrower they got stuck where a step pointed at the course list, which was hidden in the Courses panel. The panel now opens for those steps

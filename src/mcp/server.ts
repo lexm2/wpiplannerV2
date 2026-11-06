@@ -362,7 +362,7 @@ function buildServer(
         'summary (days with class, earliest start, latest end, idle minutes) and the flat CRN list. Terms, keepCrns, busy and ' +
         'openSeatsOnly EXCLUDE sections and schedules. preferences (early or late classes, gaps, lunch, fewer days, free days, ' +
         'even terms, open seats, instructor rating, each off/low/medium/high) only ORDER the results and never exclude one: ' +
-        'a course offered only at 8:00 is still scheduled at 8:00. Defaults: balanced terms, then least idle time. ' +
+        'a course offered only at 8:00 is still scheduled at 8:00. Defaults: balanced terms and no full sections, then least idle time. ' +
         'When nothing fits it answers with no schedules and the likely causes. Computes only; check the CRNs with ' +
         'check_conflicts and register in Workday.',
       inputSchema: AutoScheduleInputSchema,

@@ -134,6 +134,8 @@
   overflow-x: hidden;
   padding: 1.5rem;
   padding-bottom: 80px;
+  /* The footer floats over the end of the list. */
+  scroll-padding-bottom: 80px;
   background-color: var(--color-background);
 }
 
@@ -523,6 +525,7 @@
   .wizard-content {
     padding-top: 0.5rem;
     padding-bottom: 3.5rem;
+    scroll-padding-bottom: 3.5rem;
   }
 
   .wizard-step-title {

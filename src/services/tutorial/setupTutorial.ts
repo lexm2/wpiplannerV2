@@ -1,10 +1,10 @@
 import { mount, tick } from 'svelte';
 import { TutorialService } from './TutorialService';
-import { TutorialStateMachine } from './TutorialStateMachine';
 import FloatingTextBox from '../../svelte/tutorial/FloatingTextBox.svelte';
 import { appState } from '../../core/state/appState.svelte';
 import { componentWizardService } from '../../services/scheduling/componentWizardService';
 import { autoScheduleService } from '../../services/scheduling/autoScheduleService';
+import { normalizeRankingPreferences } from '../../services/scheduling/rankingPreferences';
 import { modalState } from '../../svelte/modals/modalState.svelte';
 import {
   uiState,
@@ -15,16 +15,36 @@ import {
 import type { ServiceContainer } from '../../bootstrap/ServiceContainer';
 import { tutorialsAvailable } from '../../svelte/phoneLayout.svelte';
 import { STORAGE_KEYS } from '../../utils/storageKeys';
-import { isOpen, setOpen } from '../../svelte/ui/disclosureState.svelte';
-import { openDrawer } from '../../svelte/drawerState.svelte';
+import {
+  closeDrawer,
+  isDrawerEntry,
+  isDrawerOpen,
+  openDrawer,
+} from '../../svelte/drawerState.svelte';
+import { wizardState } from '../../svelte/wizardState.svelte';
 import { deepClone } from '../../utils/jsonSerializer';
 import { logger } from '../../utils/logger';
 import type { ActiveFilter } from '../../types/filters';
 import type { PageId } from '../../types/uiState';
+import type { Course, SectionsByKind } from '../../types/types';
+import type {
+  TutorialModal,
+  TutorialPicks,
+  TutorialState,
+} from '../../types/tutorial';
+import { TUTORIALS } from './tutorials';
+import { courseListState } from '../../svelte/courseListState.svelte';
 
 interface TutorialEntry {
   id: string;
   label: string;
+}
+
+/** What a run takes over from the student, handed back when it ends. */
+interface HandBack {
+  filters: ActiveFilter[];
+  page: PageId;
+  viewing: Course | null;
 }
 
 export interface TutorialSetup {
@@ -36,7 +56,6 @@ export interface TutorialSetup {
 
 export function setupTutorial(services: ServiceContainer): TutorialSetup {
   const tutorialService = new TutorialService();
-  const stateMachine = new TutorialStateMachine(services);
   let filteringStarted = false;
   let autoScheduleStarted = false;
   let schedulesStarted = false;
@@ -44,45 +63,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   let tutorialScheduleId: string | null = null;
   let cleaningUp = false;
   let starting = false;
-  // What a run takes over from the student, handed back when it ends.
-  let handBack: { filters: ActiveFilter[]; page: PageId } | null = null;
-
-  function getTutorialCourse(id: string) {
-    return services.courseDataService
-      .getAllDepartments()
-      .flatMap(d => d.courses)
-      .find(c => c.id === id);
-  }
-
-  async function selectTutorialCourse(cs: {
-    courseId: string;
-    lecture?: string;
-    discussion?: string;
-    lab?: string;
-  }): Promise<void> {
-    const course = getTutorialCourse(cs.courseId);
-    if (!course) return;
-    await services.courseSelectionService.selectCourse(course);
-    if (cs.lecture || cs.discussion || cs.lab) {
-      const group =
-        course.lectures?.find(g => g.section.number === cs.lecture) ?? null;
-      const disc =
-        cs.discussion && group
-          ? (group.compatibleDiscussions.find(
-              d => d.number === cs.discussion,
-            ) ?? null)
-          : null;
-      const lab =
-        cs.lab && group
-          ? (group.compatibleLabs.find(l => l.number === cs.lab) ?? null)
-          : null;
-      await services.courseSelectionService.setSelectedComponents(course, {
-        ...(group?.section && { lecture: group.section }),
-        ...(disc && { discussion: disc }),
-        ...(lab && { lab }),
-      });
-    }
-  }
+  let handBack: HandBack | null = null;
 
   // Restarting mid-tutorial: stop the running one first, and hold cleaningUp
   // so swapping back to the previous schedule doesn't trigger a second,
@@ -110,9 +91,8 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
       handBack = {
         filters: deepClone(services.filterService.getActiveFilters()),
         page: uiState.currentPage,
+        viewing: courseListState.selectedCourse,
       };
-      services.filterService.clearFilters();
-      services.filterService.addFilter('department', { departments: ['TUT'] });
       const tutorialId = `tutorial_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       const result = await services.scheduleManagementService.createNewSchedule(
         'Tutorial',
@@ -124,18 +104,12 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     }
   }
 
-  // A step holds a "More…" section open, but whether it stays open afterwards
-  // is the user's choice, so each one goes back to how the tutorial found it.
-  const disclosuresBefore = new Map<string, boolean>();
-
   async function cleanupTutorial(setVisited: boolean) {
-    stateMachine.clear();
-    for (const [id, wasOpen] of disclosuresBefore) setOpen(id, wasOpen);
-    disclosuresBefore.clear();
     if (setVisited) {
       localStorage.setItem(STORAGE_KEYS.VISITED, 'true');
     }
     componentWizardService.closeComponentWizard();
+    appState.tutorialRanking = null;
     const returning = previousScheduleId !== null;
     if (previousScheduleId) {
       await services.scheduleManagementService.setActiveSchedule(
@@ -166,10 +140,11 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   }
 
   async function handBackToStudent(
-    taken: { filters: ActiveFilter[]; page: PageId },
+    taken: HandBack,
     returning: boolean,
   ): Promise<void> {
     setPage(taken.page);
+    courseListState.selectedCourse = taken.viewing;
     // Activating a schedule and changing page each rewrite filters from an
     // effect, so those land first.
     await tick();
@@ -226,728 +201,228 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     }
   }
 
-  tutorialService.register({
-    id: 'welcome',
-    onStart: () => {
-      componentWizardService.closeComponentWizard();
-      setPage('planner');
-    },
-    steps: [
-      {
-        selector: '[data-tutorial-find]',
-        title: 'WPI Planner Tutorials',
-        description:
-          'Welcome to the WPI planner! Each step will highlight an element like <span class="tutorial-inline-highlight">this</span>. Try clicking the Find Element button to see where the highlighted element is.',
-        waitFor: 'click',
-        uiState: { currentPage: 'planner' },
-      },
-      {
-        selector: '[data-course-id="TUT-2001"] [data-select-btn]',
-        title: 'Select a course',
-        description:
-          'Click the + button on the Tutorial course to add it to your planner.',
-        waitFor: 'click',
-        scrollArrow: true,
-        stopPropagation: true,
-        uiState: { currentPage: 'planner' },
-      },
-      {
-        selector: '#schedule-tab',
-        title: 'Go to the Schedule tab',
-        description:
-          'Head to the Schedule tab, this is where you will select your sections and see your schedule.',
-        waitFor: 'click',
-        uiState: { currentPage: 'planner' },
-        appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
-      },
-      {
-        selector: '.schedule-course-item[data-course-id="TUT-2001"]',
-        title: 'Open section selection',
-        description:
-          'Click the course you just added to open the section picker.',
-        waitFor: 'click',
-        uiState: { currentPage: 'schedule', openDrawers: ['schedule'] },
-        appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
-      },
-      {
-        selector: '[data-crn="100108"]',
-        title: 'Pick a lecture',
-        description: 'Select the second lecture section.',
-        waitFor: 'click',
-        // The wizard toggles a section off when it is clicked while already
-        // selected, and the next step's appState selects this very section.
-        // Whichever lands first, letting both run cancels the pick - so the
-        // tutorial's declarative state is the only thing that selects here.
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' },
-        },
-        appState: { selectedCourses: [{ courseId: 'TUT-2001' }] },
-      },
-      {
-        selector: '#wizard-next-btn',
-        title: 'Continue to labs',
-        description: 'Click Next to move on to selecting a lab.',
-        waitFor: 'click',
-        // The next step moves the wizard to its lab step, which flips this
-        // button from Next to Finish. If the app's own handler runs after
-        // that, the click completes and closes the wizard instead.
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lecture' },
-        },
-        appState: {
-          selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01' }],
-        },
-      },
-      {
-        selector: '[data-crn="100111"]',
-        title: 'Pick a lab',
-        description:
-          'Select the bottom lab section. Notice how you can hover the different sections to see how they fit into your schedule.',
-        waitFor: 'click',
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' },
-        },
-        appState: {
-          selectedCourses: [{ courseId: 'TUT-2001', lecture: 'TCL01' }],
-        },
-      },
-      {
-        selector: '#wizard-next-btn',
-        title: 'Finish',
-        description:
-          'Click Finish to confirm your selections. If you hit Cancel, the selections will be lost.',
-        waitFor: 'click',
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: true, courseId: 'TUT-2001', step: 'lab' },
-        },
-        appState: {
-          selectedCourses: [
-            { courseId: 'TUT-2001', lecture: 'TCL01', lab: 'TCX03' },
-          ],
-        },
-      },
-      {
-        selector: '[data-tutorial-next]',
-        title: 'Next Tutorial: Filtering',
-        description:
-          'You now know the basic functionality of the planner. The next tutorial will go over how to quickly find courses that work for you. If you want to move past a tutorial for any reason just hit next tutorial and it will move onto the next one, or hit skip tutorial to leave the tutorials entirely. If you want to restart a tutorial, open the gear menu at the top right and choose Tutorials.',
-        waitFor: 'manual',
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: false, courseId: null, step: null },
-        },
-        appState: {
-          selectedCourses: [
-            { courseId: 'TUT-2001', lecture: 'TCL01', lab: 'TCX03' },
-          ],
-        },
-      },
-    ],
+  function getTutorialCourse(id: string) {
+    return services.courseDataService
+      .getAllDepartments()
+      .flatMap(d => d.courses)
+      .find(c => c.id === id);
+  }
+
+  const pickNumbers = (selected: SectionsByKind): TutorialPicks => ({
+    lecture: selected.lecture?.number,
+    discussion: selected.discussion?.number,
+    lab: selected.lab?.number,
   });
 
-  function registerFilteringTutorial() {
-    const avoidConflicts = {
-      id: 'periodConflict',
-      // What the toggle itself sets, so the panel reads the same either way.
-      criteria: {
-        avoidConflicts: true,
-        blockedSlots: [],
-        semesterSpansQuarters: true,
-      },
+  // The sections a set of picks names, as the course's own objects.
+  function sectionsFor(course: Course, picks: TutorialPicks): SectionsByKind {
+    const group =
+      course.lectures?.find(g => g.section.number === picks.lecture) ?? null;
+    const discussion =
+      picks.discussion && group
+        ? (group.compatibleDiscussions.find(
+            d => d.number === picks.discussion,
+          ) ?? null)
+        : null;
+    const lab =
+      picks.lab && group
+        ? (group.compatibleLabs.find(l => l.number === picks.lab) ?? null)
+        : null;
+    return {
+      ...(group?.section && { lecture: group.section }),
+      ...(discussion && { discussion }),
+      ...(lab && { lab }),
     };
-    tutorialService.register({
-      id: 'filtering',
-      onStart: async () => {
-        componentWizardService.closeComponentWizard();
-        setPage('schedule');
-        const selections: Array<
-          [string, string, string | null, string | null]
-        > = [
-          ['TUT-2001', 'TAL01', null, 'TAX01'],
-          ['TUT-2002', 'TDL01', null, 'TDX02'],
-          ['TUT-2003', 'TC01', null, null],
-          ['TUT-2004', 'TDL02', 'TDD02', null],
-          ['TUT-2006', 'TAL01', null, 'TAX01'],
-          ['TUT-2007', 'TCL01', null, 'TCX01'],
-          [
-            'TUT-2008',
-            'TA01 - INQ SEM: Integrating the Humanities in STEM Education',
-            null,
-            null,
-          ],
-          ['TUT-2009', 'TBL01', null, 'TBX01'],
-          ['TUT-2010', 'TD01', null, null],
-          ['TUT-2011', 'TC01', null, null],
-          ['TUT-2012', 'TBL01', null, 'TBX02'],
-        ];
-        await services.profileStateManager.withBatch(async () => {
-          for (const [id, lecNum, discNum, labNum] of selections) {
-            const course = getTutorialCourse(id);
-            if (!course?.lectures) continue;
-            const group = course.lectures.find(
-              g => g.section.number === lecNum,
-            );
-            if (!group) continue;
-            await services.courseSelectionService.selectCourse(course);
-            const disc = discNum
-              ? (group.compatibleDiscussions.find(d => d.number === discNum) ??
-                null)
-              : null;
-            const lab = labNum
-              ? (group.compatibleLabs.find(l => l.number === labNum) ?? null)
-              : null;
-            await services.courseSelectionService.setSelectedComponents(
-              course,
-              {
-                lecture: group.section,
-                ...(disc && { discussion: disc }),
-                ...(lab && { lab }),
-              },
-            );
-          }
-        });
-      },
-      steps: [
-        {
-          selector: '#planner-tab',
-          title: 'Go to the Classes tab',
-          description:
-            "We only have 2 classes in B term so we need a new course. Let's head to the Classes tab to find one that fits.",
-          waitFor: 'click',
-          uiState: { currentPage: 'schedule' },
-        },
-        {
-          selector: '#filter-btn',
-          title: 'Open filters',
-          description: 'Click the filter button to open course filters.',
-          waitFor: 'click',
-          uiState: { currentPage: 'planner' },
-        },
-        {
-          // The label, since narrow windows shrink the input itself to nothing.
-          // But the input's click is what counts: it comes after the label's and
-          // has already flipped the box, where acting on the label's would have
-          // the box flip after this step's filter and undo it.
-          selector: 'label[data-term-option="B"]',
-          waitForSelector: 'input.filter-toggle[value="B"][data-filter="term"]',
-          title: 'Filter by term',
-          description:
-            'Check the B term box to filter for courses/sections that have sections in B term.',
-          waitFor: 'click',
-          scrollArrow: true,
-          uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
-        },
-        {
-          selector: '#avoid-conflicts-filter',
-          title: 'Avoid schedule conflicts',
-          description:
-            'Toggle this to hide courses/sections that cannot fit into your current schedule.',
-          waitFor: 'click',
-          scrollArrow: true,
-          uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
-          appState: {
-            filters: [{ id: 'term', criteria: { terms: ['B'] } }],
-            refreshFilterUI: true,
-          },
-        },
-        {
-          selector: '#available-only-filter',
-          title: 'Show available courses only',
-          description:
-            'Toggle this to hide courses/sections with no open seats.',
-          waitFor: 'click',
-          scrollArrow: true,
-          uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
-          appState: {
-            filters: [
-              { id: 'term', criteria: { terms: ['B'] } },
-              avoidConflicts,
-            ],
-            refreshFilterUI: true,
-          },
-        },
-        {
-          selector: '#modal-primary-btn',
-          title: 'Close the filters',
-          description:
-            'Filters take effect as you set them. Click Done to close the panel and see your filtered results.',
-          waitFor: 'click',
-          uiState: { currentPage: 'planner', openModals: ['filter-modal'] },
-          appState: {
-            filters: [
-              { id: 'term', criteria: { terms: ['B'] } },
-              avoidConflicts,
-              { id: 'availability', criteria: { availableOnly: true } },
-            ],
-            refreshFilterUI: true,
-          },
-        },
-        {
-          selector: '[data-course-id="TUT-2005"] [data-select-btn]',
-          title: 'Add Blinking LEDs 101',
-          description: 'Click the + button on Blinking LEDs 101 to add it.',
-          waitFor: 'click',
-          scrollArrow: true,
-          stopPropagation: true,
-          uiState: { currentPage: 'planner' },
-          appState: {
-            filters: [
-              { id: 'term', criteria: { terms: ['B'] } },
-              avoidConflicts,
-              { id: 'availability', criteria: { availableOnly: true } },
-            ],
-            refreshFilterUI: true,
-          },
-        },
-        {
-          selector: '#schedule-tab',
-          title: 'Go to the Schedule tab',
-          description: 'Head to the Schedule tab to pick your sections.',
-          waitFor: 'click',
-          uiState: { currentPage: 'planner' },
-          appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
-        },
-        {
-          selector: '.schedule-course-item[data-course-id="TUT-2005"]',
-          title: 'Open section selection',
-          description: 'Click Blinking LEDs 101 to open the section picker.',
-          waitFor: 'click',
-          uiState: { currentPage: 'schedule', openDrawers: ['schedule'] },
-          appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
-        },
-        {
-          selector: '[data-crn="100122"]',
-          title: 'Pick a lecture',
-          description: 'Select the B term lecture section.',
-          waitFor: 'click',
-          stopPropagation: true,
-          uiState: {
-            currentPage: 'schedule',
-            wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lecture' },
-          },
-          appState: { selectedCourses: [{ courseId: 'TUT-2005' }] },
-        },
-        {
-          selector: '#wizard-next-btn',
-          title: 'Continue to labs',
-          description: 'Click Next to move on to selecting a lab.',
-          waitFor: 'click',
-          stopPropagation: true,
-          uiState: {
-            currentPage: 'schedule',
-            wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lecture' },
-          },
-          appState: {
-            selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }],
-          },
-        },
-        {
-          selector: '[data-crn="100124"]',
-          title: 'Pick a lab',
-          description:
-            'Select the first lab section. Notice how you can hover sections to preview them on the schedule.',
-          waitFor: 'click',
-          stopPropagation: true,
-          uiState: {
-            currentPage: 'schedule',
-            wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lab' },
-          },
-          appState: {
-            selectedCourses: [{ courseId: 'TUT-2005', lecture: 'TBL01' }],
-          },
-        },
-        {
-          selector: '#wizard-next-btn',
-          title: 'Finish',
-          description: 'Click Finish to confirm your selections.',
-          waitFor: 'click',
-          uiState: {
-            currentPage: 'schedule',
-            wizard: { isOpen: true, courseId: 'TUT-2005', step: 'lab' },
-          },
-          appState: {
-            selectedCourses: [
-              { courseId: 'TUT-2005', lecture: 'TBL01', lab: 'TBX02' },
-            ],
-          },
-        },
-        {
-          selector: '[data-tutorial-next]',
-          title: 'Next Tutorial: Auto Scheduling',
-          description:
-            'The next tutorial will go over how to use the auto scheduler to automatically select your course sections.',
-          waitFor: 'manual',
-          uiState: {
-            currentPage: 'schedule',
-            wizard: { isOpen: false, courseId: null, step: null },
-          },
-          appState: {
-            selectedCourses: [
-              { courseId: 'TUT-2005', lecture: 'TBL01', lab: 'TBX02' },
-            ],
-          },
-        },
-      ],
+  }
+
+  async function establishCourses(
+    state: TutorialState,
+    isStale: () => boolean,
+  ): Promise<void> {
+    const selection = services.courseSelectionService;
+    const selected = selection.getSelectedCourses();
+    const writes: Array<() => Promise<unknown>> = [];
+
+    for (const sc of selected) {
+      if (!(sc.course.id in state.courses)) {
+        writes.push(() => selection.unselectCourse(sc.course));
+      }
+    }
+    for (const [id, picks] of Object.entries(state.courses)) {
+      const course = getTutorialCourse(id);
+      if (!course) continue;
+      const current = selected.find(sc => sc.course.id === id);
+      // Selecting again would change the course's identity and throw away the
+      // schedules generated for it.
+      if (!current) writes.push(() => selection.selectCourse(course));
+      // Once a schedule is generated, its sections are the state: correcting
+      // them back to the start's would undo the generation.
+      if (state.generated) continue;
+      const has = current ? pickNumbers(current.selected) : {};
+      const differs =
+        has.lecture !== picks.lecture ||
+        has.discussion !== picks.discussion ||
+        has.lab !== picks.lab;
+      if (differs) {
+        writes.push(() =>
+          selection.setSelectedComponents(course, sectionsFor(course, picks)),
+        );
+      }
+    }
+    if (writes.length === 0) return;
+
+    await services.profileStateManager.withBatch(async () => {
+      for (const write of writes) {
+        if (isStale()) return;
+        await write();
+      }
     });
   }
 
-  tutorialService.register({
-    id: 'autoSchedule',
-    onStart: async () => {
-      componentWizardService.closeComponentWizard();
-      await services.profileStateManager.withBatch(async () => {
-        for (const id of [
-          'TUT-2001',
-          'TUT-2002',
-          'TUT-2003',
-          'TUT-2004',
-          'TUT-2005',
-          'TUT-2006',
-          'TUT-2007',
-          'TUT-2008',
-          'TUT-2009',
-          'TUT-2010',
-          'TUT-2011',
-          'TUT-2012',
-        ]) {
-          const c = getTutorialCourse(id);
-          if (c) {
-            await services.courseSelectionService.selectCourse(c);
-            await services.courseSelectionService.setSelectedComponents(c, {});
-          }
-        }
-      });
-      services.filterService.clearFilters();
-      setPage('schedule');
-    },
-    steps: [
-      {
-        selector: '.schedule-course-item[data-course-id="TUT-2008"]',
-        title: 'Lock a section before generating schedules',
-        description:
-          'We are going to lock the TUT2008 course so the auto scheduler does not change it. We can do this just by manually selecting the course.',
-        waitFor: 'click',
-        scrollArrow: true,
-        uiState: { currentPage: 'schedule', openDrawers: ['schedule'] },
-      },
-      {
-        selector: '[data-crn="100041"]',
-        title: 'Pick a lecture',
-        description: 'We are going to use this lecture.',
-        waitFor: 'click',
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: true, courseId: 'TUT-2008', step: 'lecture' },
-        },
-        appState: { selectedCourses: [{ courseId: 'TUT-2008' }] },
-      },
-      {
-        selector: '#wizard-next-btn',
-        title: 'Finish',
-        description: 'Click Finish to confirm your selections.',
-        waitFor: 'click',
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: true, courseId: 'TUT-2008', step: 'lecture' },
-        },
-        appState: {
-          selectedCourses: [
-            {
-              courseId: 'TUT-2008',
-              lecture: 'TA03 - INQ SEM: Early American History',
-            },
-          ],
-        },
-      },
-      {
-        selector: '#auto-schedule-btn',
-        title: 'Auto Schedule',
-        description:
-          'Click Auto Schedule to let the planner automatically find a combination of sections that fit together. It uses your active filters to avoid conflicts and respect your preferences.',
-        waitFor: 'click',
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          wizard: { isOpen: false, courseId: null, step: null },
-          openDrawers: ['schedule'],
-        },
-      },
-      {
-        selector:
-          '.as-course-card[data-course-id="TUT-2001"] [data-term-badge][data-term="C"]',
-        title: 'Change generation parameters',
-        description:
-          'We are going to make it so TUT2001 and TUT2006 generate only in A term. So we need to unselect the other terms.',
-        waitFor: 'click',
-        // The badge toggles, and the next step's appState turns this same term
-        // off: letting both act would turn it straight back on.
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          openModals: ['auto-schedule-intro'],
-        },
-      },
-      {
-        selector:
-          '.as-course-card[data-course-id="TUT-2006"] [data-term-badge][data-term="C"]',
-        title: 'Change generation parameters',
-        description: 'Same change for TUT2006.',
-        waitFor: 'click',
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          openModals: ['auto-schedule-intro'],
-        },
-        appState: { autoScheduleTermPrefs: { 'TUT-2001': ['A'] } },
-      },
-      {
-        selector: '.modal-btn[data-action="next"]',
-        title: 'Move onto filters',
-        description:
-          "After you're done selecting what courses you want to auto schedule for, move onto selecting filters.",
-        waitFor: 'click',
-        uiState: {
-          currentPage: 'schedule',
-          openModals: ['auto-schedule-intro'],
-        },
-        appState: {
-          autoScheduleTermPrefs: { 'TUT-2001': ['A'], 'TUT-2006': ['A'] },
-        },
-      },
-      {
-        selector: '#available-only-filter',
-        title: 'Filter for only available courses',
-        description:
-          "We only want to generate schedules with courses that are not full, so let's filter out the full courses.",
-        waitFor: 'click',
-        scrollArrow: true,
-        uiState: {
-          currentPage: 'schedule',
-          openModals: ['auto-schedule-filter'],
-          openDisclosures: ['auto-schedule-filters'],
-        },
-      },
-      {
-        selector: '#modal-primary-btn',
-        title: 'Generate schedules',
-        description:
-          'Click Generate to run the scheduler. It will find all valid section combinations based on your filters and show you the results.',
-        waitFor: 'click',
-        stopPropagation: true,
-        uiState: {
-          currentPage: 'schedule',
-          openModals: ['auto-schedule-filter'],
-          openDisclosures: ['auto-schedule-filters'],
-        },
-        appState: {
-          filters: [{ id: 'availability', criteria: { availableOnly: true } }],
-          refreshFilterUI: true,
-        },
-      },
-      {
-        selector: '[data-tutorial-next]',
-        title: 'Next Tutorial: schedule manager',
-        description:
-          'The next tutorial goes over how to create a new schedule and some of the settings available.',
-        waitFor: 'manual',
-        uiState: { currentPage: 'schedule' },
-        appState: {
-          runAutoSchedule: {
-            allowedTerms: { 'TUT-2001': ['A'], 'TUT-2006': ['A'] },
-          },
-        },
-      },
-    ],
-  });
+  const canonical = (value: unknown): string =>
+    JSON.stringify(value, (_key, v: unknown) =>
+      v && typeof v === 'object' && !Array.isArray(v)
+        ? Object.fromEntries(
+            Object.entries(v).sort(([a], [b]) => a.localeCompare(b)),
+          )
+        : v,
+    );
 
-  tutorialService.register({
-    id: 'schedules',
-    lastStepLabel: 'Finish',
-    onStart: () => {
-      componentWizardService.closeComponentWizard();
-      setPage('planner');
-    },
-    steps: [
-      {
-        selector: '#schedule-picker-btn',
-        title: 'Open the schedule manager',
-        description: 'Click the Schedules button to open the schedule manager.',
-        waitFor: 'click',
-        uiState: { currentPage: 'planner' },
-        // The header hides the button here, so the gear menu holds it: the
-        // gear is what gets pointed at, and choosing Schedules is the click.
-        compact: {
-          selector: '#settings-menu-btn',
-          waitForSelector: '#settings-schedules-btn',
-          description:
-            'Open the gear menu at the top right, then choose Schedules to open the schedule manager.',
-        },
-      },
-      {
-        selector: '.schedule-picker-modal-dialog .schedule-list',
-        title: 'Your schedules',
-        description:
-          'Every schedule you have is listed here. Click one to switch to it, though doing that now ends this tutorial. Rename and Duplicate sit on each row, and the ⋮ menu holds Copy Into, Export, Export ICS, Import and Delete.',
-        waitFor: 'manual',
-        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
-      },
-      {
-        selector: '[data-tutorial-next]',
-        title: 'Export ICS',
-        description:
-          "In a schedule's ⋮ menu, Export ICS saves the schedule as a file you can drag into your calendar app.",
-        waitFor: 'manual',
-        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
-      },
-      {
-        selector: '[data-tutorial-next]',
-        title: 'Export and Import',
-        description:
-          "Export saves a schedule as a JSON file that you can import on another device. Importing from a schedule's ⋮ menu adds the file's courses to that schedule, while the Import button at the bottom of the list creates a new schedule from the file.",
-        waitFor: 'manual',
-        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
-      },
-      {
-        selector: '#new-schedule-btn',
-        title: 'All done',
-        description:
-          "Click New Schedule, type a name, and you're all set. The tutorial will end, and you'll be taken to your new schedule automatically. The Schedules window stays open until you close it.",
-        waitFor: 'click',
-        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
-      },
-      {
-        selector: '[data-tutorial-next]',
-        title: 'Almost there!',
-        description:
-          'If you clicked New Schedule, give it a name and hit Create: the tutorial ends and you land on your new schedule. Otherwise, hit Finish to end here.',
-        waitFor: 'manual',
-        uiState: { currentPage: 'planner', openModals: ['schedule-picker'] },
-      },
-    ],
-  });
-
-  tutorialService.onAppStateTransition(async appState => {
-    if (appState.selectedCourses) {
-      for (const cs of appState.selectedCourses) {
-        await selectTutorialCourse(cs);
+  function establishFilters(state: TutorialState): void {
+    const filters = services.filterService;
+    const wanted = new Map(Object.entries(state.filters));
+    // The app drops the department filter on the schedule page, so it is only
+    // part of the state where the app keeps it.
+    if (state.page === 'planner') {
+      wanted.set('department', { departments: ['TUT'] });
+    }
+    const active = filters.getActiveFilters();
+    for (const f of active) {
+      // The schedule owns its academic year.
+      if (f.id !== 'academicYear' && !wanted.has(f.id)) {
+        filters.removeFilter(f.id);
       }
     }
-    if (appState.filters) {
-      for (const f of appState.filters) {
-        let criteria = f.criteria;
-        if (f.id === 'periodConflict') {
-          const conflictCriteria = criteria as {
-            avoidConflicts: boolean;
-            blockedSlots: unknown[];
-          };
-          criteria = {
-            ...conflictCriteria,
-            selectedCourses:
-              services.courseSelectionService.getSelectedCourses(),
-          };
-        }
-        services.filterService.addFilter(f.id, criteria);
+    for (const [id, criteria] of wanted) {
+      const current = active.find(f => f.id === id);
+      if (id === 'periodConflict') {
+        // It also holds the sections it blocks against, which follow the
+        // selection and so are not part of what a step says.
+        const { selectedCourses: _held, ...held } =
+          (current?.criteria as Record<string, unknown> | undefined) ?? {};
+        if (current && canonical(held) === canonical(criteria)) continue;
+        filters.addFilter(id, {
+          ...(criteria as object),
+          selectedCourses: services.courseSelectionService.getSelectedCourses(),
+        });
+      } else if (
+        !current ||
+        canonical(current.criteria) !== canonical(criteria)
+      ) {
+        filters.addFilter(id, criteria);
       }
     }
-  });
+  }
 
-  tutorialService.onPostTransition(appState => {
-    if (appState?.autoScheduleTermPrefs) {
-      autoScheduleService.updateAutoScheduleIntroTerms(
-        appState.autoScheduleTermPrefs,
-      );
+  function establishRanking(state: TutorialState): void {
+    const wanted = normalizeRankingPreferences(
+      Object.fromEntries(
+        Object.entries(state.ranking).map(([key, importance]) => [
+          key,
+          { importance },
+        ]),
+      ),
+    );
+    if (JSON.stringify(appState.tutorialRanking) !== JSON.stringify(wanted)) {
+      appState.tutorialRanking = wanted;
     }
-    // appState.refreshFilterUI needs no handler: the filter sections are
-    // reactive, so applying filters to filterService (in
-    // onAppStateTransition) updates the open filter modal directly.
-    if (appState?.runAutoSchedule) {
-      autoScheduleService.runAutoSchedule(
-        appState.runAutoSchedule.allowedTerms,
-      );
-    }
-  });
+  }
 
-  tutorialService.onUIStateTransition(desired => {
-    if (desired.currentPage) {
-      setPage(desired.currentPage);
+  function openTutorialModal(modal: TutorialModal): void {
+    switch (modal) {
+      case 'filter-modal':
+        modalState.filter = { mode: 'filter' };
+        openModal('filter-modal');
+        break;
+      case 'schedule-picker':
+        openModal('schedule-picker');
+        break;
+      case 'auto-schedule-intro':
+        autoScheduleService.openAutoScheduleIntro();
+        break;
+      case 'auto-schedule-filter':
+        autoScheduleService.openAutoScheduleFilter();
+        break;
     }
-    if (desired.wizard?.isOpen && desired.wizard.courseId) {
-      const { courseId, step } = desired.wizard;
-      const selected = services.courseSelectionService
-        .getSelectedCourses()
-        .find(sc => sc.course.id === courseId);
-      if (selected) {
-        componentWizardService.openComponentWizard(
-          selected.course,
-          step ?? undefined,
-        );
+  }
+
+  function establishModal(state: TutorialState): void {
+    // Drawers are a step's view, set last, so only dialogs count here.
+    const open = uiState.openModals.filter(m => !isDrawerEntry(m));
+    const matches =
+      state.modal === null
+        ? open.length === 0
+        : open.length === 1 && open[0] === state.modal;
+    // A window the student's own click just opened already holds their choices.
+    if (matches) return;
+    closeAllModals();
+    if (state.modal) openTutorialModal(state.modal);
+  }
+
+  // Makes the app match `state`, whatever it was before and however the step
+  // was reached. Each part writes only where the app differs, so running it
+  // again (a layout change, a Find Element) disturbs nothing. The order
+  // follows what the app does on its own: a page change drops the department
+  // filter and any open drawer, and the wizard seeds itself from the picks.
+  tutorialService.onEstablish(async (state, step, isStale) => {
+    if (uiState.currentPage !== state.page) {
+      setPage(state.page);
+      await tick();
+      if (isStale()) return;
+    }
+
+    await establishCourses(state, isStale);
+    if (isStale()) return;
+
+    establishFilters(state);
+    establishRanking(state);
+
+    if (courseListState.selectedCourseId !== state.viewing) {
+      courseListState.selectedCourse =
+        (state.viewing && getTutorialCourse(state.viewing)) || null;
+    }
+
+    establishModal(state);
+
+    if (state.wizard) {
+      const course = getTutorialCourse(state.wizard.courseId);
+      if (course) {
+        componentWizardService.openComponentWizard(course, state.wizard.step);
       }
-    } else if (desired.wizard && !desired.wizard.isOpen) {
+    } else if (wizardState.isOpen) {
       componentWizardService.closeComponentWizard();
     }
-    const currentTypes = uiState.openModals;
-    if (desired.openModals !== undefined) {
-      const desiredTypes = desired.openModals;
-      const same =
-        currentTypes.length === desiredTypes.length &&
-        desiredTypes.every(t => currentTypes.includes(t));
-      if (!same) {
-        closeAllModals();
-        for (const modalId of desiredTypes) {
-          if (modalId === 'filter-modal') {
-            modalState.filter = { mode: 'filter' };
-            openModal('filter-modal');
-          }
-          if (modalId === 'schedule-picker') openModal('schedule-picker');
-          if (modalId === 'auto-schedule')
-            autoScheduleService.openAutoSchedule();
-          if (modalId === 'auto-schedule-intro')
-            autoScheduleService.openAutoScheduleIntro();
-          if (modalId === 'auto-schedule-filter')
-            autoScheduleService.openAutoScheduleFilter();
-        }
-      }
+
+    // After the effects the above set off, which each put a drawer away.
+    await tick();
+    if (isStale()) return;
+    if (step.drawer) {
+      if (!isDrawerOpen(step.drawer)) openDrawer(step.drawer);
     } else {
-      closeAllModals();
+      closeDrawer();
     }
-    for (const id of desired.openDisclosures ?? []) {
-      if (!disclosuresBefore.has(id)) disclosuresBefore.set(id, isOpen(id));
-      setOpen(id, true);
-    }
-    // After the effects this transition sets off: changing page and the wizard
-    // closing each put a drawer away.
-    if (desired.openDrawers) {
-      const tutorial = tutorialService.getActiveTutorial();
-      const index = tutorialService.getCurrentStepIndex();
-      void tick().then(() => {
-        if (
-          tutorialService.getActiveTutorial() === tutorial &&
-          tutorialService.getCurrentStepIndex() === index
-        ) {
-          desired.openDrawers?.forEach(openDrawer);
-        }
-      });
+
+    if (
+      state.generated &&
+      appState.autoScheduleCount === 0 &&
+      !appState.scheduleGenerating
+    ) {
+      autoScheduleService.runAutoSchedule();
     }
   });
 
-  tutorialService.onStepApply(index => {
-    if (!stateMachine.hasSnapshot(index)) {
-      stateMachine.captureSnapshot(index);
-    }
-  });
-
-  registerFilteringTutorial();
-
+  for (const tutorial of TUTORIALS) tutorialService.register(tutorial);
   tutorialService.onComplete(() => {
-    stateMachine.clear();
     if (!filteringStarted) {
       filteringStarted = true;
       tutorialService.start('filtering');
@@ -965,7 +440,6 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
   // Skip tutorial: leave the tutorial system entirely, without chaining into
   // whichever tutorial would have come next.
   tutorialService.onExit(() => {
-    stateMachine.clear();
     // A step's own window (Auto-Schedule settings, Schedules) would otherwise
     // stay open over the app the tutorial just stopped setting up.
     closeAllModals();
@@ -976,14 +450,7 @@ export function setupTutorial(services: ServiceContainer): TutorialSetup {
     target: document.body,
     // First in the document, so the box is the first Tab stop while it shows.
     anchor: document.body.firstChild ?? undefined,
-    props: {
-      tutorialService,
-      onGoBack: async () => {
-        await tutorialService.goBack(targetIndex =>
-          stateMachine.restoreSnapshot(targetIndex),
-        );
-      },
-    },
+    props: { tutorialService },
   });
 
   const tutorials: TutorialEntry[] = [

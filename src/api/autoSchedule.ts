@@ -128,7 +128,7 @@ export const AutoScheduleInputSchema = z
       .boolean()
       .default(false)
       .describe(
-        'Leave out sections with no open seat. Default false: full sections may appear (ranked lower only if preferences.openSeats is on).',
+        'Leave out sections with no open seat. Default false: full sections may appear, ranked lower unless preferences.openSeats is off.',
       ),
     includeEndedTerms: z
       .boolean()

@@ -4,16 +4,12 @@
   import Modal from './Modal.svelte';
   import { modalState } from './modalState.svelte';
   import type { SelectedCourse } from '../../types/schedule';
-  import { sectionsOf } from '../../utils/courseUtils';
+  import { hasPickedSections } from '../../utils/courseUtils';
   import { QUARTER_TERMS, SEMESTER_TERMS } from '../../utils/typeGuards';
 
   let { onRequestClose }: { onRequestClose: () => void } = $props();
 
   const payload = $derived(modalState.autoScheduleIntro);
-
-  function hasPickedSections(sc: SelectedCourse): boolean {
-    return sectionsOf(sc.selected).length > 0;
-  }
 
   function computeAvailableTerms(sc: SelectedCourse): Set<string> {
     const terms = new Set<string>();
@@ -72,18 +68,6 @@
       );
     }
     termsByCourse = next;
-  });
-
-  // Tutorial-driven term-preference overrides. Merge whenever the override
-  // channel changes, then clear it so the same prefs can be pushed again on a
-  // later tutorial run.
-  $effect(() => {
-    const prefs = modalState.autoScheduleIntroTermPrefs;
-    if (!prefs) return;
-    for (const [courseId, terms] of Object.entries(prefs)) {
-      termsByCourse.set(courseId, new SvelteSet(terms));
-    }
-    modalState.autoScheduleIntroTermPrefs = null;
   });
 
   function isSelected(sc: SelectedCourse, term: string): boolean {

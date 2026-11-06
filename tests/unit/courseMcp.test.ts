@@ -1523,7 +1523,7 @@ describe('generate_schedules', () => {
     expect(result.isError).toBe(false);
     const { text } = result;
     expect(text).toContain(
-      'Ranked best first by: no classes before 10:00 (high); least idle time between classes (medium); 60 free min for lunch 11:00-14:00 (low); three courses per term (high).',
+      'Ranked best first by: no classes before 10:00 (high); least idle time between classes (medium); 60 free min for lunch 11:00-14:00 (low); three courses per term (high); open seats (high).',
     );
     expect(text).toContain('Preferences only order schedules');
     // One schedule per assignment of courses to terms; both are in A.
