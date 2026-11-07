@@ -513,8 +513,40 @@ test('a step that only reads carries the outline on Next', async ({ page }) => {
 
   await walkTo(page, 'welcome#3');
   await expect(outlined(NEXT)).toBeAttached();
-  // What the text describes is not outlined, only kept clear of the box.
+  // What the text describes gets its own look, not the one that means "click".
   await expect(outlined('#course-description')).toHaveCount(0);
+  const about = page.locator('#course-description');
+  await expect(about).toHaveAttribute('data-tutorial-about');
+  await expect(about).toHaveCSS('outline-style', 'solid');
+
+  await page.click(NEXT);
+  await expectStep(page, 'welcome#4');
+  await expect(page.locator('[data-tutorial-about]')).toHaveCount(0);
+});
+
+test('the solid outline follows what it marks and leaves with the tutorial', async ({
+  page,
+}) => {
+  await firstVisit(page);
+  await walkTo(page, 'welcome#3');
+  const marked = page.locator('[data-tutorial-about]');
+  await expect(marked).toHaveCount(1);
+
+  // Lost and brought back: a fresh element, and the mark is on it.
+  await page.evaluate(() => {
+    const el = document.querySelector('#course-description')!;
+    const parent = el.parentElement!;
+    const twin = el.cloneNode(true) as Element;
+    twin.removeAttribute('data-tutorial-about');
+    el.remove();
+    parent.appendChild(twin);
+  });
+  await expect(page.locator('#course-description')).toHaveAttribute(
+    'data-tutorial-about',
+  );
+
+  await page.click(SKIP);
+  await expect(marked).toHaveCount(0);
 });
 
 test('a section card the step points at clears the footer over the list', async ({
@@ -695,6 +727,9 @@ test('a step follows its target across a breakpoint', async ({ page }) => {
   const gear = page.locator('#settings-menu-btn');
   await expect(gear.locator('.tutorial-highlight-svg')).toBeAttached();
   await gear.click();
+  await expect(
+    page.locator('#settings-schedules-btn .tutorial-highlight-svg'),
+  ).toBeAttached();
   await page.click('#settings-schedules-btn');
   await expectStep(page, 'schedules#1');
   await page.click(SKIP);

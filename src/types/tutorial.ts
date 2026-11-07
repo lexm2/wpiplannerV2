@@ -53,26 +53,30 @@ interface BaseStep {
 interface ActionStep extends BaseStep {
   waitFor: 'click';
   /**
-   * What to point at. Must resolve at every window width the tutorials run at
-   * (see `compact` for what moves).
+   * What the student clicks, which is also what gets the outline. Must resolve
+   * at every window width the tutorials run at (see `compact` for what moves).
    */
   selector: string;
-  /** Where the click is listened for, when it differs from what is pointed at. */
-  waitForSelector?: string;
+  /**
+   * What opens the way to `selector` while it isn't on the page, like a menu's
+   * button. Gets the outline until then; clicking it doesn't move on.
+   */
+  via?: string;
   scrollArrow?: boolean;
   /**
    * Replaces fields of this step while the header is collapsed into the gear
    * menu (<=1250px), for a target that is only reachable another way there.
    */
-  compact?: Partial<
-    Pick<ActionStep, 'selector' | 'waitForSelector' | 'description'>
-  >;
+  compact?: Partial<Pick<ActionStep, 'selector' | 'via' | 'description'>>;
 }
 
 /** Reading only: Next is what is highlighted. */
 interface ReadingStep extends BaseStep {
   waitFor: 'manual';
-  /** What the text describes. Scrolled into view and kept clear of the box. */
+  /**
+   * What the text describes. Gets its own solid outline, is scrolled into view
+   * and is kept clear of the box.
+   */
   about?: string;
 }
 
@@ -84,7 +88,7 @@ export interface ResolvedStep {
   description: string;
   waitFor: 'click' | 'manual';
   selector: string;
-  waitForSelector?: string;
+  via?: string;
   about?: string;
   scrollArrow?: boolean;
   drawer?: DrawerId;

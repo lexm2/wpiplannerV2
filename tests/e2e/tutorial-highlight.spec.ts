@@ -26,6 +26,7 @@ interface StepResult {
   selector: string;
   found: boolean;
   highlighted: boolean;
+  aboutMarked: boolean;
   mismatches: string[];
 }
 
@@ -40,6 +41,7 @@ async function currentStep(page: Page) {
           index: svc.getCurrentStepIndex() as number,
           title: step.title as string,
           selector: step.selector as string,
+          about: step.about as string | undefined,
         }
       : null;
   });
@@ -62,6 +64,30 @@ async function targetReady(
     }
     return { found, highlighted };
   }, selector);
+}
+
+/** Only what the step describes has the solid outline, and only if it has one. */
+async function aboutMarked(page: Page, about?: string): Promise<boolean> {
+  return page.evaluate(async sel => {
+    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+    const correct = () => {
+      const marked = [...document.querySelectorAll('[data-tutorial-about]')];
+      if (!sel) return marked.length === 0;
+      const el = document.querySelector(sel);
+      const r = el?.getBoundingClientRect();
+      return (
+        marked.length === 1 &&
+        marked[0] === el &&
+        !!r &&
+        r.width > 0 &&
+        r.height > 0 &&
+        getComputedStyle(el).outlineStyle === 'solid' &&
+        !el.querySelector(':scope > .tutorial-highlight-svg')
+      );
+    };
+    for (let poll = 0; poll < 35 && !correct(); poll++) await sleep(160);
+    return correct();
+  }, about ?? null);
 }
 
 test('every tutorial step highlights a real, visible element', async ({
@@ -96,8 +122,15 @@ test('every tutorial step highlights a real, visible element', async ({
     const key = `${step.tutorial}#${step.index}`;
     if (key !== lastKey) {
       const { found, highlighted } = await targetReady(page, step.selector);
+      const marked = await aboutMarked(page, step.about);
       const mismatches = await waitForTutorialState(page);
-      results.push({ ...step, found, highlighted, mismatches });
+      results.push({
+        ...step,
+        found,
+        highlighted,
+        aboutMarked: marked,
+        mismatches,
+      });
     }
     lastKey = key;
 
@@ -110,13 +143,14 @@ test('every tutorial step highlights a real, visible element', async ({
   expect(results.length).toBe(expectedSteps);
 
   const broken = results.filter(
-    r => !r.found || !r.highlighted || r.mismatches.length > 0,
+    r =>
+      !r.found || !r.highlighted || !r.aboutMarked || r.mismatches.length > 0,
   );
   const report = broken
     .map(
       r =>
         `  x ${r.tutorial}#${r.index} "${r.title}" -> ${r.selector}` +
-        ` (found=${r.found}, highlighted=${r.highlighted})` +
+        ` (found=${r.found}, highlighted=${r.highlighted}, aboutMarked=${r.aboutMarked})` +
         r.mismatches.map(m => `\n      ${m}`).join(''),
     )
     .join('\n');

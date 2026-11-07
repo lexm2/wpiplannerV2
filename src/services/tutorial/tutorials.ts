@@ -34,13 +34,14 @@ const welcome: Tutorial = {
       waitFor: 'manual',
       title: 'Welcome to the WPI Planner',
       description:
-        "This tour shows you how to plan your classes. A dashed outline marks what to do next. Right now it's on Next, because this step is just for reading. If you lose track of it, Find Element points it out.",
+        "This tour shows you how to plan your classes. A dashed outline marks what to click next. Right now it's on Next, because this step is just for reading. If you lose track of it, Find Element points it out.",
     },
     {
       waitFor: 'manual',
+      about: '#course-container',
       title: 'Find your classes',
       description:
-        "This is the Classes page, where every course is listed. Right now it only shows practice courses made for this tour. Pick a department or search by name or number to narrow the list. Where there's room, the letters on a row show the terms it runs in.",
+        "A solid outline marks what a step is talking about, like this list of every course. Right now it only shows practice courses made for this tour. Pick a department or search by name or number to narrow the list. Where there's room, the letters on a row show the terms it runs in.",
     },
     {
       waitFor: 'click',
@@ -125,6 +126,7 @@ const welcome: Tutorial = {
     },
     {
       waitFor: 'manual',
+      about: '#settings-menu-btn',
       title: 'Next Tutorial: Filtering',
       description:
         "That's the basics. Next up: finding a course that fits what you already have. To leave the tour, hit Skip tutorial. To run any part again, open the gear menu at the top right and choose Tutorials.",
@@ -187,9 +189,10 @@ const filtering: Tutorial = {
     },
     {
       waitFor: 'manual',
+      about: '#filter-btn',
       title: 'Next Tutorial: Auto Scheduling',
       description:
-        "It's on your schedule, and you'd pick its sections on the Schedule tab the same way as before. Filters stay on until you clear them. Next up: letting the planner choose sections for you.",
+        "It's on your schedule, and you'd pick its sections on the Schedule tab the same way as before. Filters stay on until you open this and clear them. Next up: letting the planner choose sections for you.",
     },
   ],
 };
@@ -233,6 +236,7 @@ const autoSchedule: Tutorial = {
     },
     {
       waitFor: 'manual',
+      about: '[data-ranking-list]',
       title: 'Schedule preferences',
       description:
         'These decide which schedules come first. They never rule one out. By default the planner avoids full sections and spreads your courses evenly across terms.',
@@ -274,11 +278,10 @@ const schedules: Tutorial = {
       selector: '#schedule-picker-btn',
       title: 'Open your schedules',
       description: 'Click Schedules to see them all.',
-      // The header hides the button here, so the gear menu holds it: the
-      // gear is what gets pointed at, and choosing Schedules is the click.
+      // The header hides the button here, so the gear menu holds it.
       compact: {
-        selector: '#settings-menu-btn',
-        waitForSelector: '#settings-schedules-btn',
+        selector: '#settings-schedules-btn',
+        via: '#settings-menu-btn',
         description:
           'Open the gear menu at the top right, then choose Schedules.',
       },
@@ -293,6 +296,7 @@ const schedules: Tutorial = {
     },
     {
       waitFor: 'manual',
+      about: '.schedule-picker-modal-dialog [aria-haspopup="menu"]',
       title: 'Take it with you',
       description:
         "In a schedule's ⋮ menu, Export ICS saves a file you can add to your calendar app. Export and Import move a schedule to another device.",
