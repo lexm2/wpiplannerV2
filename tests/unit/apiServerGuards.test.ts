@@ -111,6 +111,17 @@ describe('request log', () => {
     expect(await mcpToolName(new Request('http://x/mcp'))).toBeNull();
   });
 
+  it("never logs a tool name that is only the caller's own text", async () => {
+    for (const name of [
+      'x\n2026-11-07T00:00:00.000Z GET /forged 200 1ms',
+      'L'.repeat(60_000),
+    ]) {
+      expect(
+        await mcpToolName(rpc({ method: 'tools/call', params: { name } })),
+      ).toBe('invalid');
+    }
+  });
+
   it("reads a tool call's error kind from its event, never its text", async () => {
     expect(
       await mcpCallError(

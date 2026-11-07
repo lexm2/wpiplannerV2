@@ -24,6 +24,26 @@ import {
 } from './courseApiFixture';
 
 describe('MCP server', () => {
+  it('refuses a batch, which would run many calls for one rate limit token', async () => {
+    const message = { jsonrpc: '2.0', method: 'tools/list', params: {} };
+    const post = (body: unknown) =>
+      endpoints(BEFORE_A).mcp.fetch(
+        new Request('http://x/mcp', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            accept: 'application/json, text/event-stream',
+          },
+          body: JSON.stringify(body),
+        }),
+      );
+
+    const batch = await post([{ ...message, id: 1 }]);
+    expect(batch.status).toBe(400);
+    expect((await batch.json()).error.code).toBe(-32600);
+    expect((await post({ ...message, id: 2 })).status).toBe(200);
+  });
+
   it('lists the tools', async () => {
     const { tools } = await rpcOn(endpoints(BEFORE_A).mcp, 'tools/list', {});
     expect(tools.map((t: { name: string }) => t.name)).toEqual([
