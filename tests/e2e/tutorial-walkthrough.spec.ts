@@ -44,7 +44,7 @@ interface StepMeta {
   title: string;
   selector: string;
   waitFor: string;
-  waitForSelector?: string;
+  via?: string;
 }
 
 interface StepProbe {
@@ -83,7 +83,7 @@ async function readStep(page: Page): Promise<StepMeta | null> {
       title: step.title,
       selector: step.selector,
       waitFor: step.waitFor,
-      waitForSelector: step.waitForSelector,
+      via: step.via,
     };
   });
 }
@@ -116,7 +116,12 @@ async function probeStep(page: Page, selector: string): Promise<StepProbe> {
     for (let poll = 0; poll < 40; poll++) {
       el = document.querySelector(sel);
       svg = document.querySelector('.tutorial-highlight-svg');
-      if (el && el.getBoundingClientRect().width > 0 && svg) break;
+      if (
+        el &&
+        el.getBoundingClientRect().width > 0 &&
+        svg?.parentElement === el
+      )
+        break;
       await sleep(150);
     }
 
@@ -171,12 +176,11 @@ async function probeStep(page: Page, selector: string): Promise<StepProbe> {
       style.visibility !== 'hidden' &&
       style.display !== 'none';
 
-    // attachSvgOverlay appends the SVG to the target itself, or to the
-    // target's parent when the target is a void element that can't hold
-    // children. Anything else means the highlight is drawn on the wrong box.
-    const svgParent = svg?.parentElement ?? null;
+    // The outline must be on the very thing the walk is about to click, and be
+    // the only one, or the student is being told to click something else.
     const highlightOwned =
-      !!svgParent && (svgParent === el || svgParent === el.parentElement);
+      svg?.parentElement === el &&
+      document.querySelectorAll('.tutorial-highlight-svg').length === 1;
     const highlightOverlaps =
       !!svg && overlaps(svg.getBoundingClientRect(), rect);
 
@@ -283,32 +287,33 @@ async function walk({ page }: { page: Page }): Promise<void> {
     if (!meta) break;
 
     const mismatches = await waitForTutorialState(page);
-    const probe = await probeStep(page, meta.selector);
-
-    // A reading step points at Next, so every step is completed by clicking
-    // the highlighted target itself.
-    const clickSelector = meta.selector;
     let clickError: string | null = null;
-    try {
-      await page.locator(clickSelector).first().click({ timeout: 5_000 });
-    } catch (e) {
-      clickError = (e as Error).message.split('\n')[0];
-    }
 
-    // A target reached through something else (Schedules in the gear menu)
-    // advances on that second click.
-    if (
-      !clickError &&
-      meta.waitForSelector &&
-      !(await waitForAdvance(page, STEP_KEY(meta), 500))
-    ) {
+    // A target behind something else (Schedules in the gear menu): the outline
+    // sits on what opens the way, then moves to what moves the step on.
+    if (meta.via) {
+      const opener = await probeStep(page, meta.via);
+      if (!opener.highlightOwned) {
+        mismatches.push(`outline should be on ${meta.via} until it is clicked`);
+      }
       await page
-        .locator(meta.waitForSelector)
-        .first()
+        .locator(meta.via)
         .click({ timeout: 5_000 })
         .catch((e: Error) => {
           clickError = e.message.split('\n')[0];
         });
+    }
+
+    const probe = await probeStep(page, meta.selector);
+
+    // A reading step points at Next, so every step is completed by clicking
+    // the highlighted target itself.
+    if (!clickError) {
+      try {
+        await page.locator(meta.selector).first().click({ timeout: 5_000 });
+      } catch (e) {
+        clickError = (e as Error).message.split('\n')[0];
+      }
     }
 
     const advanced = clickError

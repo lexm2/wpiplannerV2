@@ -26,6 +26,16 @@
   animation: tutorial-march 0.6s linear infinite;
 }
 
+/* What a step is talking about, against the dashed outline on what to click.
+   Solid and still rather than just another color, since high contrast makes
+   both black. A real outline needs no measuring and stays on the edge of a list
+   that scrolls; drawn inward, a parent can't clip it. A focused control clears
+   its own outline, hence !important. */
+[data-tutorial-about] {
+  outline: 2px solid var(--color-text) !important;
+  outline-offset: -2px !important;
+}
+
 .tutorial-scroll-arrow {
   position: fixed;
   background: var(--color-primary);

@@ -244,7 +244,7 @@
     filters below do that.
   </p>
 
-  <div class={styles.rows}>
+  <div class={styles.rows} data-ranking-list>
     {#each ROWS as row (row.key)}
       {@const importance = prefs[row.key].importance}
       <div class={styles.row} data-ranking={row.key}>

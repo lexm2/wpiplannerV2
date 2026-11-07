@@ -89,10 +89,36 @@ test.describe('collapsed header', () => {
 
     await expect(page.locator('#schedule-picker-btn')).toBeHidden();
     const gear = page.locator('#settings-menu-btn');
-    await expect(gear.locator('.tutorial-highlight-svg')).toBeAttached();
+    const outline = '.tutorial-highlight-svg';
+    await expect(gear.locator(outline)).toBeAttached();
+
+    // The outline is always on what to click next, so it follows the menu.
+    const schedules = page.locator('#settings-schedules-btn');
+    await gear.click();
+    await expect(schedules.locator(outline)).toBeAttached();
+    await expect(gear.locator(outline)).toHaveCount(0);
+    // The menu scrolls, so anything drawn past its edge would be cut off.
+    await expect
+      .poll(() =>
+        schedules.locator(`${outline} rect`).evaluate(rect => {
+          const r = rect.getBoundingClientRect();
+          const m = rect
+            .closest('.settings-dropdown-menu')!
+            .getBoundingClientRect();
+          return (
+            r.left >= m.left &&
+            r.top >= m.top &&
+            r.right <= m.right &&
+            r.bottom <= m.bottom
+          );
+        }),
+      )
+      .toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(gear.locator(outline)).toBeAttached();
 
     await gear.click();
-    await page.click('#settings-schedules-btn');
+    await schedules.click();
     await expect(page.locator('.schedule-picker-modal-dialog')).toBeVisible();
     expect(
       await page.evaluate(() =>

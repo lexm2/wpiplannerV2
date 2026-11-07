@@ -10,7 +10,10 @@ import { tutorialOverlayState } from '../../svelte/tutorial/tutorialOverlayState
 import { courseListState } from '../../svelte/courseListState.svelte';
 import { scrollParent } from '../../utils/scrollParent';
 import { headerCollapsed } from '../../svelte/phoneLayout.svelte';
-import { targetOnScreen } from '../../svelte/tutorial/floatingBox.position';
+import {
+  clickTarget,
+  targetOnScreen,
+} from '../../svelte/tutorial/floatingBox.position';
 import { logger } from '../../utils/logger';
 
 /**
@@ -26,6 +29,8 @@ type EstablishCallback = (
 
 // A reading step points at Next, which the box always shows.
 const NEXT_SELECTOR = '[data-tutorial-next]';
+// Set on what a reading step describes; tutorial-highlight.css draws it.
+const ABOUT_ATTR = 'data-tutorial-about';
 
 export class TutorialService {
   private tutorials: Map<string, Tutorial> = new Map();
@@ -35,6 +40,8 @@ export class TutorialService {
   private completionCallback: (() => void) | null = null;
   private exitCallback: (() => void) | null = null;
   private currentSelector: string | null = null;
+  private currentVia: string | undefined;
+  private aboutEl: Element | null = null;
   private svgOverlay: SVGSVGElement | null = null;
   private arrowOverlay: HTMLElement | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
@@ -138,7 +145,7 @@ export class TutorialService {
     if (
       !force &&
       step.selector === this.currentSelector &&
-      targetOnScreen(step.selector) &&
+      targetOnScreen(clickTarget(step)) &&
       (!step.about || targetOnScreen(step.about))
     ) {
       return;
@@ -190,6 +197,7 @@ export class TutorialService {
     if (!tutorial) return;
     const index = this.currentStepIndex;
     const run = ++this.applyRun;
+    this.clearAbout();
     const step = this.resolveStep(tutorial.steps[index]);
     try {
       await this.establishCallback?.(
@@ -204,8 +212,8 @@ export class TutorialService {
     // Exited, skipped, or moved on while the app caught up - this step is
     // stale, and drawing it would leak its overlay into whatever came next.
     if (run !== this.applyRun) return;
-    this.highlightElement(step.selector, step.scrollArrow ?? false);
-    if (step.about) this.revealAbout(step.about);
+    this.highlightElement(step.selector, step.via, step.scrollArrow ?? false);
+    if (step.about) this.markAbout(step.about);
     // A fresh object each time, so the box re-seats itself on a re-apply too.
     tutorialOverlayState.set({ ...step }, index, tutorial.steps.length);
     if (step.waitFor === 'click') this.listenForAction(step);
@@ -228,21 +236,26 @@ export class TutorialService {
       description: step.description,
       waitFor: 'click',
       selector: step.selector,
-      waitForSelector: step.waitForSelector,
+      via: step.via,
       scrollArrow: step.scrollArrow,
       drawer: step.drawer,
       ...(headerCollapsed.current ? step.compact : undefined),
     };
   }
 
-  private highlightElement(selector: string, scrollArrow: boolean): void {
+  private highlightElement(
+    selector: string,
+    via: string | undefined,
+    scrollArrow: boolean,
+  ): void {
     this.currentSelector = selector;
+    this.currentVia = via;
     this.removeHighlight();
     this.highlightObserver?.disconnect();
     this.highlightObserver = null;
     this.stopReveal();
 
-    const el = document.querySelector(selector);
+    const el = document.querySelector(clickTarget({ selector, via }));
     if (el) {
       this.attachTo(el, selector, scrollArrow);
       return;
@@ -252,7 +265,7 @@ export class TutorialService {
     // revealing it (rows past the rendered window, off-screen rows). There is
     // no deadline: a target that mounts late still gets its highlight.
     this.highlightObserver = new MutationObserver(() => {
-      const found = document.querySelector(selector);
+      const found = document.querySelector(clickTarget({ selector, via }));
       if (!found) return;
       this.highlightObserver!.disconnect();
       this.highlightObserver = null;
@@ -272,27 +285,31 @@ export class TutorialService {
     this.attachSvgOverlay(el, scrollArrow);
   }
 
-  // What a reading step describes may still be mounting (a window opening), so
-  // wait for it rather than give up.
-  private revealAbout(selector: string): void {
-    this.aboutObserver?.disconnect();
-    this.aboutObserver = null;
-    const el = document.querySelector(selector);
-    if (el) {
+  // What a reading step describes may still be mounting (a window opening) and
+  // can be remounted while the step shows, so the mark follows whatever matches.
+  private markAbout(selector: string): void {
+    const mark = () => {
+      const el = document.querySelector(selector);
+      if (el === this.aboutEl) return;
+      this.aboutEl?.removeAttribute(ABOUT_ATTR);
+      this.aboutEl = el;
+      if (!el) return;
+      el.setAttribute(ABOUT_ATTR, '');
       this.revealAndSettle(el);
-      return;
-    }
-    this.aboutObserver = new MutationObserver(() => {
-      const found = document.querySelector(selector);
-      if (!found) return;
-      this.aboutObserver!.disconnect();
-      this.aboutObserver = null;
-      this.revealAndSettle(found);
-    });
+    };
+    mark();
+    this.aboutObserver = new MutationObserver(mark);
     this.aboutObserver.observe(document.body, {
       childList: true,
       subtree: true,
     });
+  }
+
+  private clearAbout(): void {
+    this.aboutObserver?.disconnect();
+    this.aboutObserver = null;
+    this.aboutEl?.removeAttribute(ABOUT_ATTR);
+    this.aboutEl = null;
   }
 
   // A step's own transition can still be moving things when its target lands
@@ -413,9 +430,17 @@ export class TutorialService {
       if (htmlEl.offsetWidth === 0 || htmlEl.offsetHeight === 0) return;
       const cs = getComputedStyle(htmlEl);
       // The overlay is a child of the target, so a target that clips its own
-      // overflow (a scrolling list) would hide one drawn outside its edge.
+      // overflow (a scrolling list) would hide one drawn outside its edge, and
+      // so would a scroller it fills from side to side (a menu item). Compared
+      // by size because a target's position is still moving at this point, as
+      // it scrolls into view or its drawer slides in.
       // Read here because overflow can change at a breakpoint.
-      const pad = cs.overflow !== 'visible' ? -2 : 5;
+      const outside = 5;
+      const pad =
+        cs.overflow !== 'visible' ||
+        htmlEl.offsetWidth + outside * 2 > scrollParent(htmlEl).clientWidth
+          ? -2
+          : outside;
       const w = htmlEl.offsetWidth + pad * 2;
       const h = htmlEl.offsetHeight + pad * 2;
       const borderTop = parseFloat(cs.borderTopWidth) || 0;
@@ -465,13 +490,22 @@ export class TutorialService {
     );
     this.intersectionObserver.observe(el);
 
+    // Also moves it when a menu opens over what opened it, or closes again.
     this.highlightObserver = new MutationObserver(() => {
-      if (el.isConnected && this.svgOverlay?.isConnected) return;
+      const selector = this.currentSelector;
+      if (
+        selector &&
+        el.isConnected &&
+        el.matches(clickTarget({ selector, via: this.currentVia })) &&
+        this.svgOverlay?.isConnected
+      ) {
+        return;
+      }
       this.highlightObserver!.disconnect();
       this.highlightObserver = null;
       this.removeHighlight();
-      if (this.currentSelector)
-        this.highlightElement(this.currentSelector, scrollArrow);
+      if (selector)
+        this.highlightElement(selector, this.currentVia, scrollArrow);
     });
     this.highlightObserver.observe(document.body, {
       childList: true,
@@ -500,7 +534,7 @@ export class TutorialService {
   }
 
   private listenForAction(step: ResolvedStep): void {
-    const selector = step.waitForSelector ?? step.selector;
+    const { selector } = step;
     const run = this.applyRun;
     const handler = (e: Event) => {
       if (!(e.target as Element).closest?.(selector)) return;
@@ -527,8 +561,7 @@ export class TutorialService {
     this.stopReveal();
     this.highlightObserver?.disconnect();
     this.highlightObserver = null;
-    this.aboutObserver?.disconnect();
-    this.aboutObserver = null;
+    this.clearAbout();
     this.actionCleanup?.();
     this.actionCleanup = null;
   }

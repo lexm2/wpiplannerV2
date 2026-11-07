@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-11-07]
+
+### Changed
+- The tutorials have two outlines now. The dashed one is always what you click to go on, and a solid one marks what a step is talking about. Find Element points at the solid one when a step has it
+
+### Fixed
+- Where Schedules sits in the gear menu, the tutorial's outline moves from the gear onto Schedules once the menu is open, instead of staying on the gear while you had to click something else
+
 ## [2026-11-05]
 
 ### Changed

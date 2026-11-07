@@ -6,6 +6,7 @@
   import { scaleFade } from '../transitions';
   import {
     clampToViewport,
+    clickTarget,
     coversTarget,
     layoutKey,
     placeBox,
@@ -27,12 +28,10 @@
 
   let backDisabled = $state(false);
 
-  // Everything on the page the step is about: what to click, where the click
-  // is heard, and what the text describes.
+  // Everything on the page the step is about: what to click, what opens the way
+  // to it, and what the text describes.
   function stepSelectors(s: NonNullable<typeof step>): string[] {
-    return [s.selector, s.waitForSelector, s.about].filter(
-      (sel): sel is string => !!sel,
-    );
+    return [s.selector, s.via, s.about].filter((sel): sel is string => !!sel);
   }
 
   // Bound inside an {#if}, so it must be reactive.
@@ -142,13 +141,14 @@
   let targetLost = $state(false);
   $effect(() => {
     if (!step) return;
-    const { selector, about } = step;
+    const { selector, via, about } = step;
     const settleUntil = performance.now() + SETTLE_MS;
     targetLost = false;
     const poll = setInterval(() => {
       if (performance.now() > settleUntil) {
         targetLost =
-          !targetOnScreen(selector) || (!!about && !targetOnScreen(about));
+          !targetOnScreen(clickTarget({ selector, via })) ||
+          (!!about && !targetOnScreen(about));
       }
     }, 500);
     return () => clearInterval(poll);
@@ -210,12 +210,14 @@
   // Relocating can take a moment to mount the target, so the dot waits for it.
   function onFindElement(): void {
     tutorialService.relocate();
-    const selector = step?.selector;
-    if (!selector) return;
+    if (!step) return;
+    const { title, selector, via, about } = step;
     const giveUpAt = performance.now() + FIND_WAIT_MS;
     const fly = () => {
-      if (tutorialOverlayState.step?.selector !== selector) return;
-      if (targetOnScreen(selector)) animateFindDot(selector);
+      if (tutorialOverlayState.step?.title !== title) return;
+      // Next is in the box already, so what's worth finding is what the text means.
+      const target = about ?? clickTarget({ selector, via });
+      if (targetOnScreen(target)) animateFindDot(target);
       else if (performance.now() < giveUpAt) setTimeout(fly, 100);
     };
     fly();

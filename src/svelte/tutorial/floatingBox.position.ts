@@ -24,6 +24,13 @@ function boxArea(box: HTMLElement): Area {
  * under another window. Under the tutorial box doesn't count, since the box moves
  * itself off the target.
  */
+/** What to click right now: the step's target, or what opens the way to it. */
+export function clickTarget(step: { selector: string; via?: string }): string {
+  return step.via && !document.querySelector(step.selector)
+    ? step.via
+    : step.selector;
+}
+
 export function targetOnScreen(selector: string): boolean {
   const el = document.querySelector(selector);
   if (!el) return false;
