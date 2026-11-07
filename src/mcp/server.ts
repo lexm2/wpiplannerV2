@@ -379,10 +379,34 @@ function buildServer(
   return server;
 }
 
-/** The MCP endpoint: stateless, one fresh server per request. */
+/**
+ * The MCP endpoint: stateless, one fresh server per request. A JSON-RPC batch
+ * is refused: it would run up to 100 tool calls for the one request the rate
+ * limit counts, all on the thread every caller shares.
+ */
 export function createMcpEndpoint(
   getCatalog: () => Promise<Catalog>,
   search?: ScheduleSearch,
 ): McpHttpHandler {
-  return createMcpHandler(() => buildServer(getCatalog, search));
+  const handler = createMcpHandler(() => buildServer(getCatalog, search));
+  return {
+    ...handler,
+    fetch: async (request, options) => {
+      const body = await request.clone().text();
+      if (body.trimStart().startsWith('[')) {
+        return Response.json(
+          {
+            jsonrpc: '2.0',
+            error: {
+              code: -32600,
+              message: 'Batches are not supported; send one message a request.',
+            },
+            id: null,
+          },
+          { status: 400 },
+        );
+      }
+      return handler.fetch(request, options);
+    },
+  };
 }

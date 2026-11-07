@@ -23,14 +23,20 @@ interface RpcMessage {
 /** The SDK's own check of a tool's arguments words its failure this way. */
 const SCHEMA_ERROR_RE = /^(?:MCP error -?\d+: )?Input validation error/;
 
+/**
+ * What a real tool's name looks like. Any other name is only the caller's own
+ * text, and a newline in it would write a line of their choosing to the log.
+ */
+const TOOL_NAME_RE = /^[\w.-]{1,64}$/;
+
 /** The tool a tools/call request names; null for anything else. */
 export async function mcpToolName(request: Request): Promise<string | null> {
   if (request.method !== 'POST') return null;
   try {
     const body = (await request.clone().json()) as RpcMessage;
-    return body.method === 'tools/call' && typeof body.params?.name === 'string'
-      ? body.params.name
-      : null;
+    const name = body.params?.name;
+    if (body.method !== 'tools/call' || typeof name !== 'string') return null;
+    return TOOL_NAME_RE.test(name) ? name : 'invalid';
   } catch {
     return null;
   }

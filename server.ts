@@ -148,6 +148,9 @@ async function withinBodyCap(request: Request): Promise<Request | Response> {
 await getCatalog();
 
 const server = Bun.serve({
+  // Otherwise on unless NODE_ENV says production, and its error page shows the
+  // caller the stack, the server's paths and the source around the failure.
+  development: false,
   port: Number(process.env.PORT ?? 3001),
   hostname: process.env.HOST ?? '127.0.0.1',
   async fetch(incoming, server) {
